@@ -1,0 +1,19 @@
+appId: app.push.mobile
+name: AI 채팅 → 빠른 시작(공고 링크) → 변경 확인 → 완료
+---
+- runFlow: _login.yaml
+- tapOn: "AI 채팅"
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- tapOn: "공고 링크로 맞추기"
+- tapOn: "공고 링크"
+- inputText: "https://careers.moapay.kr/jobs/1182"
+- tapOn: "맞추기 시작"
+- extendedWaitUntil:
+    visible: "네, 반영해 주세요"
+    timeout: 60000
+- tapOn: "네, 반영해 주세요"
+- extendedWaitUntil:
+    visible: "내 서류에 저장"
+    timeout: 60000

@@ -1,0 +1,4 @@
+# Maestro E2E for fo-mobile, run against the mock API (EXPO_PUBLIC_API_MOCK=1).
+# Android inputText is ASCII-only, so typed values are English/URLs.
+flows:
+  - flows/*

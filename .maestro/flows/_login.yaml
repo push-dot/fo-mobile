@@ -1,0 +1,11 @@
+appId: app.push.mobile
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "개발 토큰으로 들어가기"
+    timeout: 60000
+- tapOn: "개발 토큰으로 들어가기"
+- extendedWaitUntil:
+    visible: "새로 올라온 공고"
+    timeout: 20000

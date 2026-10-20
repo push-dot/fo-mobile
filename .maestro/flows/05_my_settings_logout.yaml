@@ -1,0 +1,19 @@
+appId: app.push.mobile
+name: 마이 → 설정 → 로그아웃
+---
+- runFlow: _login.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "설정"
+- scrollUntilVisible:
+    element: "로그아웃"
+    direction: DOWN
+- tapOn: "로그아웃"
+- tapOn:
+    text: "로그아웃"
+    index: 1
+- extendedWaitUntil:
+    visible: "Google로 계속하기"
+    timeout: 10000

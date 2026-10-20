@@ -1,0 +1,24 @@
+appId: app.push.mobile
+name: 홈 → 채용공고 필터 → 상세 → 지원
+---
+- runFlow: _login.yaml
+- assertVisible: "마감 임박 공고"
+- tapOn:
+    text: "채용공고"
+    index: 0
+- extendedWaitUntil:
+    visible: "공고 .*개"
+    timeout: 10000
+- tapOn: "직군"
+- tapOn: "개발"
+- tapOn: "공고 .*개 보기"
+- assertVisible: "개발"
+- tapOn: "모아페이"
+- extendedWaitUntil:
+    visible: "지원하기"
+    timeout: 20000
+- tapOn: "지원하기"
+- tapOn: "이 서류로 지원하기"
+- extendedWaitUntil:
+    visible: "지원 완료"
+    timeout: 10000

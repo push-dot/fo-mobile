@@ -1,0 +1,17 @@
+appId: app.push.mobile
+name: 허브 → 프로필 → 제안하기
+---
+- runFlow: _login.yaml
+- tapOn: "허브"
+- extendedWaitUntil:
+    visible: "추천 프로필"
+    timeout: 10000
+- tapOn: "이하은"
+- extendedWaitUntil:
+    visible: "제안하기"
+    timeout: 20000
+- tapOn: "제안하기"
+- tapOn: "어떤 이야기를 나누고 싶은지 적어 주세요"
+- inputText: "Coffee chat?"
+- tapOn: "제안 보내기"
+- assertNotVisible: "제안 보내기"
