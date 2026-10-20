@@ -19,9 +19,9 @@ const hrefOf = ({ target }: AppNotification): Href => {
     case 'posting':
       return `/postings/${target.id}`
     case 'offer':
-      return `/(tabs)/(my)/offers/${target.id}`
+      return `/offers/${target.id}`
     case 'post':
-      return `/(tabs)/(social)/posts/${target.id}`
+      return `/posts/${target.id}`
     case 'conversation':
       return `/chat/${target.id}`
   }

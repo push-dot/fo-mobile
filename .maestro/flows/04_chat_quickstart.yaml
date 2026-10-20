@@ -9,7 +9,10 @@ name: AI 채팅 → 빠른 시작(공고 링크) → 변경 확인 → 완료
 - tapOn: "공고 링크로 맞추기"
 - tapOn: "공고 링크"
 - inputText: "https://careers.moapay.kr/jobs/1182"
-- tapOn: "맞추기 시작"
+- runFlow:
+    file: _tap_sheet_button.yaml
+    env:
+      TEXT: "맞추기 시작"
 - extendedWaitUntil:
     visible: "네, 반영해 주세요"
     timeout: 60000

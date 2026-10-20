@@ -1,0 +1,12 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Maestro's first tap on a sheet's primary button is sometimes dropped on Android
+# (adb taps on the same point land), so tap again if the button is still there.
+---
+- tapOn: ${TEXT}
+- runFlow:
+    when:
+      visible: ${TEXT}
+    commands:
+      - tapOn: ${TEXT}

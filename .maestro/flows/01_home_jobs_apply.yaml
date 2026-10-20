@@ -11,7 +11,12 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
     timeout: 10000
 - tapOn: "직군"
 - tapOn: "개발"
-- tapOn: "공고 .*개 보기"
+# The count on the button refetches after each pick; let it settle before applying.
+- waitForAnimationToEnd
+- runFlow:
+    file: _tap_sheet_button.yaml
+    env:
+      TEXT: "공고 .*개 보기"
 - assertVisible: "개발"
 - tapOn: "모아페이"
 - extendedWaitUntil:

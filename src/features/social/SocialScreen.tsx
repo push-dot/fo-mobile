@@ -8,7 +8,7 @@ import { useColors } from '../../theme'
 import { Button, Chip, GlassButton, Icon, Text, TopBar } from '../../ui'
 import { AuthorRow, Band, ImageGrid } from './parts'
 
-export const openPost = (id: string) => router.push({ pathname: '/(tabs)/(social)/posts/[id]', params: { id } })
+export const openPost = (id: string) => router.push({ pathname: '/posts/[id]', params: { id } })
 
 function PostCard({ post }: { post: Post }) {
   return (
@@ -61,7 +61,7 @@ export function SocialScreen() {
                 {
                   icon: 'search',
                   label: '검색',
-                  onPress: () => router.push({ pathname: '/(tabs)/(home)/search', params: { tab: 'posts' } }),
+                  onPress: () => router.push({ pathname: '/search', params: { tab: 'posts' } }),
                 },
               ]}
             />

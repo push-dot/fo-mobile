@@ -11,9 +11,17 @@ name: 마이 → 설정 → 로그아웃
     element: "로그아웃"
     direction: DOWN
 - tapOn: "로그아웃"
-- tapOn:
-    text: "로그아웃"
-    index: 1
+# Retap if the confirm alert did not open (dropped first tap, see _tap_sheet_button.yaml).
+- runFlow:
+    when:
+      notVisible: "취소"
+    commands:
+      - tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "취소"
+    timeout: 5000
+# While the alert is up only its window is in the hierarchy, so this is the alert button.
+- tapOn: "로그아웃"
 - extendedWaitUntil:
     visible: "Google로 계속하기"
     timeout: 10000

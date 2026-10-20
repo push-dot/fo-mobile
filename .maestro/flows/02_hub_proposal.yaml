@@ -13,5 +13,8 @@ name: 허브 → 프로필 → 제안하기
 - tapOn: "제안하기"
 - tapOn: "어떤 이야기를 나누고 싶은지 적어 주세요"
 - inputText: "Coffee chat?"
-- tapOn: "제안 보내기"
+- runFlow:
+    file: _tap_sheet_button.yaml
+    env:
+      TEXT: "제안 보내기"
 - assertNotVisible: "제안 보내기"

@@ -225,7 +225,7 @@ function Posts() {
         <Pressable
           key={p.id}
           accessibilityRole="button"
-          onPress={() => router.push(`/(tabs)/(social)/posts/${p.id}`)}
+          onPress={() => router.push(`/posts/${p.id}`)}
           style={({ pressed }) => ({
             gap: 4,
             paddingVertical: 14,

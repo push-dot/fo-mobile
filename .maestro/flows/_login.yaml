@@ -1,4 +1,6 @@
 appId: app.push.mobile
+tags:
+  - subflow
 ---
 - launchApp:
     clearState: true

@@ -296,7 +296,7 @@ function PostRow({ p, q, onOpen }: { p: Post; q: string; onOpen: () => void }) {
       accessibilityRole="button"
       onPress={() => {
         onOpen()
-        router.push(`/(tabs)/(social)/posts/${p.id}`)
+        router.push(`/posts/${p.id}`)
       }}
       style={{ paddingHorizontal: 20, paddingVertical: 12, gap: 2 }}
     >

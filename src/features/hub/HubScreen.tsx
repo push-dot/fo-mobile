@@ -93,7 +93,7 @@ export function HubScreen() {
         <Pressable
           accessibilityRole="search"
           accessibilityLabel="이름, 직무, 기술 검색"
-          onPress={() => router.push({ pathname: '/(tabs)/(home)/search', params: { tab: 'people' } } as unknown as Href)}
+          onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
         >
           <Surface style={{ height: 48, borderRadius: 24, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Icon name="search" size={20} color="t3" />

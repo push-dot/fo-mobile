@@ -23,8 +23,19 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={!!session}>
             <Stack.Screen name="(tabs)" />
-            {/* Conversation lives outside (tabs) so the tab bar hides there (feature-spec 15). */}
+            {/* Screens drawn without a tab bar live outside (tabs): hiding the Android tab bar
+                leaves its area untouchable, and the boards show none here (feature-spec 15). */}
             <Stack.Screen name="chat/[id]" />
+            <Stack.Screen name="postings/[id]" />
+            <Stack.Screen name="profiles/[id]" />
+            <Stack.Screen name="posts/[id]" />
+            <Stack.Screen name="notifications" />
+            <Stack.Screen name="search" />
+            <Stack.Screen name="offers/index" />
+            <Stack.Screen name="offers/[id]" />
+            <Stack.Screen name="settings/index" />
+            <Stack.Screen name="settings/visibility" />
+            <Stack.Screen name="docs/[id]" />
           </Stack.Protected>
           <Stack.Protected guard={!session}>
             <Stack.Screen name="sign-in" />

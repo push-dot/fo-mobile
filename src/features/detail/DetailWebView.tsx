@@ -53,7 +53,6 @@ export function DetailWebView({ path, onTitle }: Props) {
         style={{ backgroundColor: c.bg }}
         originWhitelist={[WEB_BASE_URL]}
         setSupportMultipleWindows={false}
-        decelerationRate="normal"
       />
       {failed ? (
         <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', gap: 16, backgroundColor: c.bg }}>

@@ -1,4 +1,9 @@
-# Maestro E2E for fo-mobile, run against the mock API (EXPO_PUBLIC_API_MOCK=1).
+# Maestro E2E for fo-mobile, run against the mock API. Start Metro with .env.local set to
+# EXPO_PUBLIC_API_MOCK=1 and any EXPO_PUBLIC_DEV_AUTH_TOKEN (shows the dev-token sign-in);
+# shell env vars do not override .env.local here.
 # Android inputText is ASCII-only, so typed values are English/URLs.
 flows:
   - flows/*
+# _*.yaml are subflows called through runFlow.
+excludeTags:
+  - subflow
