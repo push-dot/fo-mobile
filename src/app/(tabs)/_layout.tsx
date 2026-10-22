@@ -1,6 +1,6 @@
 import { NativeTabs } from 'expo-router/native-tabs'
 
-export default function TabsLayout() {
+const TabsLayout = () => {
   return (
     // Android: label every tab like the design boards (Material hides unselected labels by default).
     <NativeTabs minimizeBehavior="onScrollDown" labelVisibilityMode="labeled">
@@ -30,3 +30,5 @@ export default function TabsLayout() {
     </NativeTabs>
   )
 }
+
+export default TabsLayout

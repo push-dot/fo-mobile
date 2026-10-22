@@ -1,3 +1,5 @@
-import { MyScreen } from '../../../features/my/MyScreen'
+import MyScreen from '@/screens/my/my-screen'
 
-export default MyScreen
+const My = () => <MyScreen />
+
+export default My

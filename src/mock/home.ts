@@ -1,6 +1,6 @@
 // Mock routes for the home area (search, notifications). Owned by that area's screens.
 import type { AppNotification, Post, Profile } from '@push/api-client'
-import { searchHangul } from '../lib/hangul-search'
+import { searchHangul } from '@/shared/utility'
 import { postings } from './postings'
 import { mock, page } from './server'
 

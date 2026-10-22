@@ -11,7 +11,7 @@ import type {
   Source,
   UserRef,
 } from '@push/api-client'
-import type { CalendarEvent, ResumeDraft } from '../features/my/api'
+import type { CalendarEvent, ResumeDraft } from '../features/my/types'
 import { mock, page } from './server'
 
 const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
@@ -473,6 +473,7 @@ let settings: Settings = {
   defaultTone: 'as_is',
   chatRetentionDays: 30,
   allowAiReadMyFiles: true,
+  aiAccessMode: 'AUTO',
 }
 mock('DELETE', 'me', () => null)
 mock('GET', 'me/settings', () => ({ data: settings }))

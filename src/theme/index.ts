@@ -8,7 +8,6 @@ export const useShadow = () => (useColorScheme() === 'dark' ? shadow.dark : shad
 
 type Weight = '400' | '500' | '600' | '700' | '800'
 
-// iOS embeds Pretendard (expo-font plugin); Android uses the system Korean font (Noto Sans KR), per design.
 const PRETENDARD: Record<Weight, string> = {
   '400': 'Pretendard-Regular',
   '500': 'Pretendard-Medium',

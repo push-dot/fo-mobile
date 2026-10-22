@@ -1,12 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
 import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
-import { useSession } from '../lib/session'
+import { queryClient } from '@/providers'
+import { useSession } from '@/shared/infrastructure'
 
-const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } })
-
-export default function RootLayout() {
+const RootLayout = () => {
   const scheme = useColorScheme()
   const { ready, session, load } = useSession()
 
@@ -17,14 +16,11 @@ export default function RootLayout() {
   if (!ready) return null
 
   return (
-    // ThemeProvider sets a non-white background so NativeTabs don't flash white on iOS 26.
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={!!session}>
             <Stack.Screen name="(tabs)" />
-            {/* Screens drawn without a tab bar live outside (tabs): hiding the Android tab bar
-                leaves its area untouchable, and the boards show none here (feature-spec 15). */}
             <Stack.Screen name="chat/[id]" />
             <Stack.Screen name="postings/[id]" />
             <Stack.Screen name="profiles/[id]" />
@@ -45,3 +41,5 @@ export default function RootLayout() {
     </ThemeProvider>
   )
 }
+
+export default RootLayout

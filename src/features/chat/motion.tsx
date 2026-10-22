@@ -25,7 +25,7 @@ type AppearProps = {
 }
 
 /** Plays once on mount. */
-export function Appear({ children, style, kind = 'up', delay = 0, duration }: AppearProps) {
+export const Appear = ({ children, style, kind = 'up', delay = 0, duration }: AppearProps) => {
   const reduce = useReduceMotion()
   const v = useState(() => new Animated.Value(0))[0]
   useEffect(() => {
@@ -61,7 +61,7 @@ export function Appear({ children, style, kind = 'up', delay = 0, duration }: Ap
 }
 
 /** Looping opacity 1 → low → 1 (running dots, shimmer stand-in). Stops under Reduce Motion. */
-export function usePulse(active: boolean, period = 1000, low = 0.25) {
+export const usePulse = (active: boolean, period = 1000, low = 0.25) => {
   const reduce = useReduceMotion()
   const v = useState(() => new Animated.Value(1))[0]
   useEffect(() => {
@@ -82,7 +82,7 @@ export function usePulse(active: boolean, period = 1000, low = 0.25) {
 }
 
 /** Scale pop 0.3 → 1.2 → 1 when `on` flips true (todo check 350ms, tool done 300ms). */
-export function usePop(on: boolean, duration = 350) {
+export const usePop = (on: boolean, duration = 350) => {
   const reduce = useReduceMotion()
   const v = useState(() => new Animated.Value(1))[0]
   const was = useRef(on)

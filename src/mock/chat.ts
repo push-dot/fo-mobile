@@ -1,7 +1,7 @@
 // Mock routes for the chat area. Owned by that area's screens.
 // Sample data follows the AI 채팅 artboards (김서준, 모아페이 …).
 import type { LinkKind, Message, UserLink } from '@push/api-client'
-import type { ConversationRow, ChatDoc, QsData, RunInput } from '../features/chat/api'
+import type { ConversationRow, ChatDoc, QsData, RunInput } from '../features/chat/api/client'
 import { kindOf } from '../features/chat/links'
 import type { Approval, ChatEvent, ChatItem, Choice, Step } from '../features/chat/types'
 import { mock, page } from './server'

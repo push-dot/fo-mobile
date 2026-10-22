@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router'
-import { ProfileDetailScreen } from '../../features/detail/ProfileDetailScreen'
+import ProfileDetailScreen from '@/screens/hub/profile-detail-screen'
 
-export default function Screen() {
+const Profile = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   return <ProfileDetailScreen id={id} />
 }
+
+export default Profile

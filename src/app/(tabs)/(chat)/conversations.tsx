@@ -1,3 +1,5 @@
-import { ConversationsScreen } from '../../../features/chat/ConversationsScreen'
+import ConversationsScreen from '@/screens/chat/conversations-screen'
 
-export default ConversationsScreen
+const Conversations = () => <ConversationsScreen />
+
+export default Conversations

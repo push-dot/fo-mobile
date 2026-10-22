@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router'
-import { PostDetailScreen } from '../../features/social/PostDetailScreen'
+import PostDetailScreen from '@/screens/social/post-detail-screen'
 
-export default function Screen() {
+const Post = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   return <PostDetailScreen id={id} />
 }
+
+export default Post

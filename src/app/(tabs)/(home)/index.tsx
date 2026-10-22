@@ -1,3 +1,5 @@
-import { HomeScreen } from '../../../features/home/HomeScreen'
+import HomeScreen from '@/screens/home/home-screen'
 
-export default HomeScreen
+const Home = () => <HomeScreen />
+
+export default Home

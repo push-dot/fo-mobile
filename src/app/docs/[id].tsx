@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router'
-import { DocViewerScreen } from '../../features/my/DocViewerScreen'
+import DocViewerScreen from '@/screens/my/doc-viewer-screen'
 
-export default function Route() {
+const Doc = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   return <DocViewerScreen id={id} />
 }
+
+export default Doc

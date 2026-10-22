@@ -1,3 +1,5 @@
-import { SettingsVisibilityScreen } from '../../features/my/SettingsScreen'
+import SettingsVisibilityScreen from '@/screens/my/settings-visibility-screen'
 
-export default SettingsVisibilityScreen
+const SettingsVisibility = () => <SettingsVisibilityScreen />
+
+export default SettingsVisibility

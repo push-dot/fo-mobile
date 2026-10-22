@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router'
 
-export default function TabStack() {
-  return <Stack screenOptions={{ headerShown: false }} />
-}
+const TabStack = () => <Stack screenOptions={{ headerShown: false }} />
+
+export default TabStack

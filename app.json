@@ -40,7 +40,8 @@
             "./assets/fonts/Pretendard-ExtraBold.otf"
           ]
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "scheme": "push",
     "experiments": {

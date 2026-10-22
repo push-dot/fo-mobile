@@ -1,3 +1,5 @@
-import { ChatHomeScreen } from '../../../features/chat/ChatHomeScreen'
+import ChatHomeScreen from '@/screens/chat/chat-home-screen'
 
-export default ChatHomeScreen
+const Chat = () => <ChatHomeScreen />
+
+export default Chat

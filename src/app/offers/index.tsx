@@ -1,3 +1,5 @@
-import { OffersScreen } from '../../features/my/OffersScreen'
+import OffersScreen from '@/screens/my/offers-screen'
 
-export default OffersScreen
+const Offers = () => <OffersScreen />
+
+export default Offers

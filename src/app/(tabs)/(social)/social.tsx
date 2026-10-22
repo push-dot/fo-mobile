@@ -1,3 +1,5 @@
-import { SocialScreen } from '../../../features/social/SocialScreen'
+import SocialScreen from '@/screens/social/social-screen'
 
-export default SocialScreen
+const Social = () => <SocialScreen />
+
+export default Social

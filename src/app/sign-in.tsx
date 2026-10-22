@@ -1,3 +1,5 @@
-import { SignInScreen } from '../features/auth/SignInScreen'
+import SignInScreen from '@/screens/auth/sign-in-screen'
 
-export default SignInScreen
+const SignIn = () => <SignInScreen />
+
+export default SignIn

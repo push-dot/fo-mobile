@@ -1,3 +1,5 @@
-import { ComposeScreen } from '../../../features/social/ComposeScreen'
+import ComposeScreen from '@/screens/social/compose-screen'
 
-export default ComposeScreen
+const Compose = () => <ComposeScreen />
+
+export default Compose

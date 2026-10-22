@@ -1,3 +1,5 @@
-import { SettingsScreen } from '../../features/my/SettingsScreen'
+import SettingsScreen from '@/screens/my/settings-screen'
 
-export default SettingsScreen
+const Settings = () => <SettingsScreen />
+
+export default Settings

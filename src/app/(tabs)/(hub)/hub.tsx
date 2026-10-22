@@ -1,3 +1,5 @@
-import { HubScreen } from '../../../features/hub/HubScreen'
+import HubScreen from '@/screens/hub/hub-screen'
 
-export default HubScreen
+const Hub = () => <HubScreen />
+
+export default Hub

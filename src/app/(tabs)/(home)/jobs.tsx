@@ -1,3 +1,5 @@
-import { JobListScreen } from '../../../features/jobs/JobListScreen'
+import JobListScreen from '@/screens/jobs/job-list-screen'
 
-export default JobListScreen
+const Jobs = () => <JobListScreen />
+
+export default Jobs

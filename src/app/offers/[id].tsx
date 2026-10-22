@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router'
-import { OfferDetailScreen } from '../../features/my/OfferDetailScreen'
+import OfferDetailScreen from '@/screens/my/offer-detail-screen'
 
-export default function Route() {
+const OfferDetail = () => {
   const { id, box } = useLocalSearchParams<{ id: string; box?: 'received' | 'sent' }>()
   return <OfferDetailScreen id={id} box={box === 'sent' ? 'sent' : 'received'} />
 }
+
+export default OfferDetail

@@ -1,4 +1,3 @@
-// Values copied from the Claude Design canvas CSS (.light / .dark, type classes).
 export const palette = {
   light: {
     bg: '#FFFFFF',
@@ -56,7 +55,6 @@ export const palette = {
 
 export type Colors = { [K in keyof typeof palette.light]: string }
 
-// letterSpacing in the CSS is em-based (-.02em default); converted to px per size.
 const ls = (size: number, em: number) => size * em
 
 export const type = {
@@ -71,10 +69,8 @@ export const type = {
 
 export type TypeName = keyof typeof type
 
-// radius-xs/sm/md/lg/xl/pill from the design system.
 export const radius = { xs: 6, sm: 12, md: 16, lg: 20, xl: 28, pill: 999 } as const
 
-// shadow-pop (menus, floating cards) and shadow-glass (iOS glass) approximated for RN.
 export const shadow = {
   light: {
     pop: { shadowColor: '#16191D', shadowOpacity: 0.1, shadowRadius: 14, shadowOffset: { width: 0, height: 8 } },
