@@ -1,9 +1,10 @@
 import type { Posting } from '@push/api-client'
+import { careerLabel } from '@push/shared'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { BottomSheet, Button, Chip, Icon, Text } from '@/shared/components'
-import { brandOf, careerLabel } from '@/shared/utility'
+import { brandOf } from '@/shared/utility'
 import { useChatBookmarks, useStartChat } from './api/hooks'
 import { Mark, Note, PageModal } from './components'
 

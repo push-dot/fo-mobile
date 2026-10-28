@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { Offer } from '@push/api-client'
+import { careerLabel } from '@push/shared'
 import {
   Avatar,
   clock,
@@ -36,7 +37,6 @@ import {
   TextField,
   TopBar,
 } from '@/shared/components'
-import { careerLabel } from '@/shared/utility'
 import { fontFor, radius, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
@@ -152,6 +152,8 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
   const meId = box === 'received' ? o.recipient.id : o.sender.id
   const pending = box === 'received' && (o.status === 'SENT' || o.status === 'READ')
   const p = o.posting
+  const career = full ? careerLabel(full) : null
+  const careerText = !career || career === '신입' ? career : `경력 ${career}`
 
   return (
     <KeyboardAvoidingView
@@ -223,7 +225,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
                   {p.title}
                 </Text>
                 <Text v="c1" color="t3" numberOfLines={1}>
-                  {[full?.location, full && `경력 ${careerLabel(full)}`, full?.deadline ? dday(full.deadline) : null]
+                  {[full?.location, careerText, full?.deadline ? dday(full.deadline) : null]
                     .filter(Boolean)
                     .join(' · ')}
                 </Text>

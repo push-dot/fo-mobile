@@ -2,8 +2,8 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, stageBadge, type Profile } from '@push/api-client'
+import { careerLabel } from '@push/shared'
 import { Badge, Chip, Icon, SegmentedControl, Text } from '@/shared/components'
-import { careerLabel } from '@/shared/utility'
 import { useColors } from '../../../theme'
 import {
   useFollowToggle,
