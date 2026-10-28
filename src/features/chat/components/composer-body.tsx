@@ -1,9 +1,9 @@
 import type { AccessMode } from '@push/api-client'
 import type { Ref } from 'react'
 import { Pressable, TextInput, View, type TextInputInstance } from 'react-native'
-import { fontFor, useColors } from '../../theme'
+import { fontFor, useColors } from '../../../theme'
 import { Icon, Text } from '@/shared/components'
-import { ModePicker } from './components'
+import ModePicker from './mode-picker'
 
 export type ComposerProps = {
   value: string

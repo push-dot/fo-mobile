@@ -1,13 +1,15 @@
 import type { LinkKind, UserLink } from '@push/api-client'
 import { useState } from 'react'
-import { Alert, Pressable, ScrollView, Share, View } from 'react-native'
-import { useColors } from '../../theme'
+import { Alert, Pressable, ScrollView, View } from 'react-native'
+import { useColors } from '../../../theme'
 import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Switch, Text, TextField, type BadgeTone, type IconName } from '@/shared/components'
-import { openLink } from './api/files'
-import { kindOf } from './links'
+import { openUrl, shareMessage } from '../../../shared/infrastructure'
+import { kindOf } from '../utils/links'
 import { useAddLink, useDeleteLink, useMyLinks } from '@/features/my'
-import { useStartChat } from './api/hooks'
-import { GroupTitle, Note, PageModal } from './components'
+import { useStartChat } from '../api/hooks'
+import GroupTitle from './group-title'
+import Note from './note'
+import PageModal from './page-modal'
 
 const KINDS: { key: LinkKind; label: string }[] = [
   { key: 'job', label: '공고' },
@@ -57,9 +59,9 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
 
   const act = (l: UserLink, what: 'open' | 'copy' | 'use' | 'delete') => {
     setMenu(null)
-    if (what === 'open') void openLink(l.url)
+    if (what === 'open') void openUrl(l.url)
     // shortcut: no clipboard module installed; the share sheet has 복사. Swap for expo-clipboard when added.
-    if (what === 'copy') void Share.share({ message: l.url })
+    if (what === 'copy') void shareMessage({ message: l.url })
     if (what === 'use') {
       onUse()
       void start(l.title, l.kind === 'job' ? `${l.url} 공고에 맞춰 내 서류를 고쳐 주세요` : `${l.url} 내용을 근거로 써 주세요`)

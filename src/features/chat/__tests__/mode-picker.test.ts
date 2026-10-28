@@ -14,8 +14,8 @@ vi.mock('@/shared/infrastructure', () => ({
 }))
 vi.mock('@/features/my', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
 
-const { answer, pickAccessMode, send, useChatStore, usePrefs } = await import('../store')
-const { emptyChat } = await import('../reducer')
+const { answer, pickAccessMode, send, useChatStore, usePrefs } = await import('../stores')
+const { emptyChat } = await import('../utils/reducer')
 
 async function* frames(...evs: StreamEvent[]) {
   yield* evs

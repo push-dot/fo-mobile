@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterMentions, insertMention, mentionQuery, type MentionGroup } from '../mentions'
+import { filterMentions, insertMention, mentionQuery, type MentionGroup } from '../utils/mentions'
 
 const groups: MentionGroup[] = [
   { title: '북마크 공고', items: [{ id: 'p', kind: 'job', title: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 · 서울 강남구' }] },

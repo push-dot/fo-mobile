@@ -1,4 +1,4 @@
-import type { ChatEvent, ChatItem, ChatState } from './types'
+import type { ChatEvent, ChatItem, ChatState } from '../types'
 
 export const emptyChat: ChatState = { items: [], working: null, approval: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null }
 

@@ -1,56 +1,10 @@
-import { type Conversation, type DataEnvelope, type ListEnvelope } from '@push/api-client'
+import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api-client'
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi, type PickedFile } from '@/features/my'
 import { MICRO_CREDITS_PER_CREDIT } from '../constants'
-import { QS_NEEDS, quickStartFrom, type QsSources } from '../quick-start-data'
+import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
-
-/** Conversation plus the list badges (확인 필요 / 작업 중) and last progress line the design needs. */
-export type ConversationRow = Conversation & { status?: 'NEEDS_APPROVAL' | 'RUNNING' | null; lastLine?: string }
-
-export type ChatDoc = { id: string; fileName: string; size: number; createdAt: string; aiMade?: boolean }
-
-export type Account = {
-  email: string | null
-  plan: 'FREE' | 'PRO' | 'ULTRA'
-  credits: { used: number; total: number } | null
-}
-
-export type QsItem = {
-  id: string
-  title: string
-  /** Line above the title (company) */
-  over?: string
-  sub?: string
-  logo?: { text: string; color: string }
-  avatar?: { text: string; color: string }
-  badge?: { label: string; tone: 'ac' | 'grey' | 'red' | 'green' | 'orange' }
-  note?: { label: string; ac?: boolean }
-  meta?: string
-  /** Message preview under the person line (제안 답장). */
-  body?: string
-  date?: { dow: string; day: string; color: 'red' | 'orange' | 'green' }
-  /** Which segment tab the item belongs to (0 = first). */
-  seg?: number
-  selected?: boolean
-}
-
-/** Ingredients for one quick-start sheet; copy and layout live in quick-starts.ts. */
-export type QsData = {
-  segments?: string[]
-  items: QsItem[]
-  doc?: string
-  chips?: string[]
-  calendar?: { connected: boolean }
-}
-
-export type RunInput = {
-  conversationId: string
-  text?: string
-  answer?: { approvalId: string; choice: number }
-  resolve?: { approvalId: string; optionId: string }
-  interrupted?: boolean
-}
+import type { Account, ChatDoc, ConversationRow, QsData, RunInput } from './schemas'
 
 // shortcut: endpoints @push/api-client lacks go through the shared client directly; move them into
 // @push/api-client once push-be ships them.
@@ -97,3 +51,26 @@ export const chatApi = {
     return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]])))
   },
 }
+
+export const createConversation = api.conversations.create
+
+export const renameConversation = api.conversations.rename
+
+export const archiveConversation = api.conversations.archive
+
+export const fetchMyProfile = api.me.profile
+
+export const fetchMentionBookmarks = () => api.me.bookmarks({ limit: 20 })
+
+export const fetchArtifactBytes = async (downloadUrl: string) =>
+  new Uint8Array(await (await c.raw('GET', downloadUrl)).arrayBuffer())
+
+export const updateAiAccessMode = (mode: AccessMode) => api.me.updateSettings({ aiAccessMode: mode })
+
+export const streamConversation = api.conversations.stream
+
+export const followConversation = api.conversations.follow
+
+export const resolveConversationApproval = api.conversations.resolveApproval
+
+export const fetchConversationMessages = (id: string) => api.conversations.messages(id, { limit: 50 })

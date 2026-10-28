@@ -1,7 +1,7 @@
 import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
-import { applyEvent, emptyChat } from '../reducer'
-import { errorText, fromStream } from '../stream'
+import { applyEvent, emptyChat } from '../utils/reducer'
+import { errorText, fromStream } from '../utils/stream'
 import type { ChatEvent, ChatState } from '../types'
 
 async function* frames(...evs: StreamEvent[]) {

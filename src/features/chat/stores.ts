@@ -1,10 +1,18 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode } from '@push/api-client'
-import { api, API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
-import { chatApi, type RunInput } from './api/client'
+import { API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
+import {
+  chatApi,
+  fetchConversationMessages,
+  followConversation,
+  resolveConversationApproval,
+  streamConversation,
+  updateAiAccessMode,
+} from './api/fetchers'
+import type { RunInput } from './api/schemas'
 import { DEFAULT_ACCESS_MODE } from './constants'
-import { applyEvent, emptyChat } from './reducer'
-import { errorText, fromStream } from './stream'
+import { applyEvent, emptyChat } from './utils/reducer'
+import { errorText, fromStream } from './utils/stream'
 import type { ChatEvent, ChatState } from './types'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
@@ -17,7 +25,7 @@ export const pickAccessMode = async (mode: AccessMode) => {
   const prev = usePrefs.getState().accessMode
   usePrefs.setState({ accessMode: mode })
   try {
-    return await api.me.updateSettings({ aiAccessMode: mode })
+    return await updateAiAccessMode(mode)
   } catch (err) {
     usePrefs.setState({ accessMode: prev })
     throw err
@@ -50,15 +58,15 @@ const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGe
 const streamed = (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> => {
   const id = input.conversationId
   const body = { text: input.text ?? '', accessMode: usePrefs.getState().accessMode }
-  return fromStream(api.conversations.stream(id, body, signal), (after) => api.conversations.follow(id, after, signal))
+  return fromStream(streamConversation(id, body, signal), (after) => followConversation(id, after, signal))
 }
 
 const resolved = async function* (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> {
   const id = input.conversationId
   const { approvalId, optionId } = input.resolve!
-  const r = await api.conversations.resolveApproval(id, approvalId, optionId)
+  const r = await resolveConversationApproval(id, approvalId, optionId)
   if (!r.jobId) return
-  yield* fromStream(api.conversations.follow(id, undefined, signal), (after) => api.conversations.follow(id, after, signal))
+  yield* fromStream(followConversation(id, undefined, signal), (after) => followConversation(id, after, signal))
 }
 
 const startRun = async (input: RunInput) => {
@@ -124,7 +132,7 @@ export const stop = (id: string) => {
 
 export const hydrate = async (id: string) => {
   if (get(id).items.length || runs.has(id)) return
-  const res = await api.conversations.messages(id, { limit: 50 })
+  const res = await fetchConversationMessages(id)
   // push-be pages newest first; the transcript reads oldest first.
   for (const m of [...res.data].reverse()) {
     dispatch(id, m.role === 'USER' ? { type: 'user', id: m.id, text: m.text } : { type: 'agentText', id: m.id, text: m.text })

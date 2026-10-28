@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { kindOf } from '../links'
+import { kindOf } from '../utils/links'
 
 describe('kindOf', () => {
   it('picks the kind from the address', () => {

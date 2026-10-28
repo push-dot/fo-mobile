@@ -1,6 +1,6 @@
 import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { fromStream } from '../stream'
+import { fromStream } from '../utils/stream'
 
 async function* frames(...evs: StreamEvent[]) {
   yield* evs

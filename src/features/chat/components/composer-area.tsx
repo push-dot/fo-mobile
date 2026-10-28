@@ -1,15 +1,15 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
-import { useColors, useShadow } from '../../theme'
+import { useColors, useShadow } from '../../../theme'
 import { Glass, Icon, Text } from '@/shared/components'
-import { pickChatAttachment } from './api/files'
-import { useAccessMode, useMentionGroups } from './api/hooks'
+import { pickDocument } from '../../../shared/infrastructure'
+import { useAccessMode, useMentionGroups } from '../api/hooks'
 import { Composer } from './composer'
 import { FileTag } from './items'
-import { filterMentions, insertMention, mentionQuery, type MentionItem } from './mentions'
+import { filterMentions, insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import { Appear } from './motion'
-import { Mark } from './components'
-import { QUICK_STARTS, type QuickStart } from './quick-starts'
+import Mark from './mark'
+import { CHAT_ATTACHMENT_OPTIONS, QUICK_STARTS, type QuickStart } from '../constants'
 
 type Props = {
   placeholder: string
@@ -45,7 +45,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
     setAttachment(undefined)
   }
   const attach = async () => {
-    const r = await pickChatAttachment()
+    const r = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
     if (!r.canceled && r.assets[0]) setAttachment(r.assets[0].name)
   }
   const pick = (m: MentionItem) => {

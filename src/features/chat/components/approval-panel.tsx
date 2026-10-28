@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Animated, Platform, Pressable, View } from 'react-native'
+import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { radius, useColors } from '../../theme'
+import { radius, useColors } from '../../../theme'
 import { Badge, Button, Glass, Icon, Text } from '@/shared/components'
 import { FileTag } from './items'
-import { SPRING, useReduceMotion } from './motion'
-import type { Approval, ApprovalSection, Choice } from './types'
+import { SPRING } from '../constants'
+import { useReduceMotion } from '../hooks'
+import type { Approval, ApprovalSection, Choice } from '../types'
 
 type Props = {
   approval: Approval
@@ -28,7 +29,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
   const numbered = !approval.submit && approval.sections.length === 1 && approval.sections[0]!.kind === 'choices' && !approval.sections[0]!.multi
 
   useEffect(() => {
-    Animated.timing(rise, { toValue: 1, duration: 420, easing: SPRING, useNativeDriver: true }).start()
+    Animated.timing(rise, { toValue: 1, duration: 420, easing: Easing.bezier(...SPRING), useNativeDriver: true }).start()
   }, [rise])
 
   const toggle = (si: number, i: number, multi?: boolean) =>

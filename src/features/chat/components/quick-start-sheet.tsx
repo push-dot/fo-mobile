@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
-import { useColors } from '../../theme'
+import { useColors } from '../../../theme'
 import { Badge, BottomSheet, Chip, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
-import { type QsItem } from './api/client'
+import { type QsItem } from '../api/schemas'
 import { FileTag } from './items'
-import { useChatDocs, useQuickStart, useStartChat } from './api/hooks'
-import { Mark, Pick } from './components'
-import { CALENDAR_TASKS, type QuickStart } from './quick-starts'
+import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
+import Mark from './mark'
+import Pick from './pick'
+import { CALENDAR_TASKS, type QuickStart } from '../constants'
 
 /** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. */
 export const QuickStartSheet = ({ qs, onClose }: { qs: QuickStart | null; onClose: () => void }) => {

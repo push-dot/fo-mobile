@@ -1,10 +1,12 @@
-import { Pressable, Share, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { GlassButton, Icon, Text } from '@/shared/components'
-import { type ChatDoc } from './api/client'
-import { useChatDocs, useUploadChatDoc } from './api/hooks'
+import { shareMessage } from '@/shared/infrastructure'
+import { type ChatDoc } from '../api/schemas'
+import { useChatDocs, useUploadChatDoc } from '../api/hooks'
 import { FileTag } from './items'
-import { Note, PageModal } from './components'
-import { ago } from './utility'
+import Note from './note'
+import PageModal from './page-modal'
+import { ago } from '../utils'
 
 const size = (b: number) => (b >= 1_000_000 ? `${(b / 1_000_000).toFixed(1)}MB` : `${Math.round(b / 1000)}KB`)
 const meta = (d: ChatDoc) => (d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${size(d.size)} · ${ago(d.createdAt)}`)
@@ -29,7 +31,7 @@ export const DocsModal = ({ visible, onClose }: { visible: boolean; onClose: () 
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`${d.fileName} 공유`}
-            onPress={() => void Share.share({ message: d.fileName })}
+            onPress={() => void shareMessage({ message: d.fileName })}
             style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
           >
             <Icon name="share" size={20} color="t3" />

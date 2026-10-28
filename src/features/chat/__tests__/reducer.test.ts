@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyEvent, emptyChat, formatElapsed } from '../reducer'
+import { applyEvent, emptyChat, formatElapsed } from '../utils/reducer'
 import type { ChatEvent, ChatState } from '../types'
 
 const run = (events: ChatEvent[], from: ChatState = emptyChat) => events.reduce(applyEvent, from)

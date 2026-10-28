@@ -1,10 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors, useShadow } from '@/theme'
 import { BottomSheet, Glass, GlassButton, Icon, Text, TextField, type IconName } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
 import {
   answer,
   ApprovalPanel,
@@ -64,7 +65,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const menu: { icon: IconName; label: string; danger?: boolean; onPress: () => void }[] = [
     { icon: 'edit', label: '이름 바꾸기', onPress: () => setRenaming(conv?.title ?? '') },
     { icon: 'doc', label: '쓴 서류·공고 보기', onPress: () => setDocs(true) },
-    { icon: 'share', label: '대화 공유', onPress: () => void Share.share({ title: conv?.title, message: shareText() }) },
+    { icon: 'share', label: '대화 공유', onPress: () => void shareMessage({ title: conv?.title, message: shareText() }) },
     {
       icon: 'x',
       label: '대화 삭제',

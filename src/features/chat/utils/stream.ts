@@ -1,6 +1,6 @@
 import type { StreamEvent, StreamOption } from '@push/api-client'
-import { CHOICE_QUESTION, DEFAULT_ERROR_TEXT, ERROR_TEXT, FIT_ROWS, queueBusyText, SAY_LABEL } from './constants'
-import type { Approval, ChatEvent } from './types'
+import { CHOICE_QUESTION, DEFAULT_ERROR_TEXT, ERROR_TEXT, FIT_ROWS, queueBusyText, SAY_LABEL } from '../constants'
+import type { Approval, ChatEvent } from '../types'
 
 export const errorText = (code?: string, retryAfterSec?: number) =>
   code === 'QUEUE_BUSY' && retryAfterSec ? queueBusyText(retryAfterSec) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT

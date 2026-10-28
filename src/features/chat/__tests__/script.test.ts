@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import '../../../mock/chat'
 import { mockFetch } from '../../../mock/server'
-import { applyEvent, emptyChat } from '../reducer'
+import { applyEvent, emptyChat } from '../utils/reducer'
 import type { ChatState, Step } from '../types'
 
 const run = async (body: object): Promise<Step[]> => {

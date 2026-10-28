@@ -1,6 +1,6 @@
 import type { Application, Offer, Posting } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { quickStartFrom } from '../quick-start-data'
+import { quickStartFrom } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')

@@ -1,6 +1,6 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
 import { dday, givenName, stageTone, timeAgo, tintOf } from '@/features/my'
-import type { QsData, QsItem } from './api/client'
+import type { QsData, QsItem } from '../api/schemas'
 
 export type QsSources = {
   bookmarks?: Posting[]
