@@ -34,7 +34,7 @@ import {
   type ProfileSection,
 } from '@/features/my'
 import { BottomSheet, Button, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
-import { searchHangul } from '@/shared/utility'
+import { searchHangul } from '@push/shared'
 import { fontFor, radius, useColors } from '@/theme'
 
 const TITLES: Record<ProfileSection, string> = {

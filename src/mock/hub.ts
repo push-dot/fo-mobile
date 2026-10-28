@@ -1,7 +1,7 @@
 // Mock routes for the hub area. Owned by that area's screens.
 import type { Offer, Profile } from '@push/api-client'
 import { tenureOf } from '../features/hub/utility/filters'
-import { searchHangul } from '@/shared/utility'
+import { searchHangul } from '@push/shared'
 import { mock, page } from './server'
 
 const base = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYears' | 'careerStatus'> & Partial<Profile>): Profile => ({

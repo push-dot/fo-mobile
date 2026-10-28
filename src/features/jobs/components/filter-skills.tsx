@@ -1,6 +1,6 @@
+import { searchHangul } from '@push/shared'
 import { useState } from 'react'
 import { Chip, Text, TextField } from '../../../shared/components'
-import { searchHangul } from '../../../shared/utility'
 import { useProfile } from '../api/hooks'
 import { POPULAR_SKILLS, SKILL_CATALOG } from '../constants'
 import FilterGroup from './filter-group'

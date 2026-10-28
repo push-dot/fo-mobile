@@ -1,5 +1,5 @@
+import { matchHangul } from '@push/shared'
 import { Text as RNText } from 'react-native'
-import { matchHangul } from '../../../shared/utility'
 import { fontFor, useColors } from '../../../theme'
 
 const Highlight = ({ text, q }: { text: string; q: string }) => {

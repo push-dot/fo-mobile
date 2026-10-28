@@ -1,4 +1,4 @@
-import { matchHangul, searchHangul } from '@/shared/utility'
+import { matchHangul, searchHangul } from '@push/shared'
 
 export type MentionItem = {
   id: string
