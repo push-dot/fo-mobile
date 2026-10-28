@@ -7,8 +7,8 @@ const DocRow = ({ doc, on, onPress }: { doc: ApplyDoc; on: boolean; onPress: () 
   const c = useColors()
   return (
     <Pressable
-      accessibilityRole={doc.kind === 'portfolio' ? 'checkbox' : 'radio'}
-      accessibilityState={doc.kind === 'portfolio' ? { checked: on } : { selected: on }}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: on }}
       onPress={onPress}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 }}
     >

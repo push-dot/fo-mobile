@@ -1,22 +1,9 @@
-import { router, type Href } from 'expo-router'
+import { router } from 'expo-router'
 import { ActivityIndicator, SectionList, View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
-import { groupLabel, NotificationRow, useNotifications, useReadNotifications } from '@/features/notifications'
+import { groupLabel, notificationHref, NotificationRow, useNotifications, useReadNotifications } from '@/features/notifications'
 import { Button, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
-
-const hrefOf = ({ target }: AppNotification): Href => {
-  switch (target.kind) {
-    case 'posting':
-      return `/postings/${target.id}`
-    case 'offer':
-      return `/offers/${target.id}`
-    case 'post':
-      return `/posts/${target.id}`
-    case 'conversation':
-      return `/chat/${target.id}`
-  }
-}
 
 const NotificationsScreen = () => {
   const c = useColors()
@@ -30,7 +17,8 @@ const NotificationsScreen = () => {
 
   const open = (n: AppNotification) => {
     if (!n.readAt) read.mutate([n.id])
-    router.push(hrefOf(n))
+    const href = notificationHref(n)
+    if (href) router.push(href)
   }
 
   return (

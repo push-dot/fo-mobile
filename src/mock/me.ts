@@ -15,6 +15,7 @@ import type { CalendarEvent, ResumeDraft } from '../features/my/types'
 import { mock, page } from './server'
 
 const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
+const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, headline: '' }
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 const H = 3_600_000
 const D = 24 * H
@@ -302,11 +303,12 @@ mock('GET', 'me/commented-posts', ({ query }) => page(commented, query))
 // 제안함
 // push-be embeds only a posting stub in offers.
 const offerPosting: OfferPosting = { id: 'p1', company: '모아페이', title: '백엔드 엔지니어 (Kotlin·Spring) · 결제 플랫폼팀', imageUrl: null }
-const user = (id: string, displayName: string, affiliation: string) => ({
+const user = (id: string, displayName: string, companyName: string, headline: string) => ({
   id,
   displayName,
   avatarUrl: null,
-  affiliation,
+  companyName,
+  headline,
 })
 const offer = (
   o: Pick<Offer, 'id' | 'sender' | 'recipient' | 'message' | 'status' | 'createdAt'> &
@@ -319,7 +321,7 @@ const offer = (
 const received: Offer[] = [
   offer({
     id: 'o1',
-    sender: user('u-jihyun', '오지현', '모아페이 · 결제 플랫폼팀 채용 담당'),
+    sender: user('u-jihyun', '오지현', '모아페이', '결제 플랫폼팀 채용 담당'),
     recipient: ME,
     message:
       '서준 님, 안녕하세요! 허브에서 프로필 보고 연락드려요.\n\n결제 승인 API를 다시 설계하신 경험이 지금 저희 결제 플랫폼팀의 고민과 딱 맞아서요. 시니어 포지션으로 30분 정도 가볍게 커피챗 어떠세요?',
@@ -329,7 +331,7 @@ const received: Offer[] = [
   }),
   offer({
     id: 'o2',
-    sender: user('u-doyun', '박도윤', '하루랩스 · iOS 개발자'),
+    sender: user('u-doyun', '박도윤', '하루랩스', 'iOS 개발자'),
     recipient: ME,
     message:
       '주말 사이드 프로젝트를 같이 하실 백엔드 개발자를 찾고 있어요. 정산 쪽 경험이 있으시면 큰 도움이 될 것 같아요.',
@@ -338,7 +340,7 @@ const received: Offer[] = [
   }),
   offer({
     id: 'o3',
-    sender: user('u-jiwoo', '최지우', '파도AI · 데이터 엔지니어'),
+    sender: user('u-jiwoo', '최지우', '파도AI', '데이터 엔지니어'),
     recipient: ME,
     message: '정산 데이터 파이프라인 경험을 듣고 싶어요. 30분 정도 이야기 나눌 수 있을까요?',
     status: 'ACCEPTED',
@@ -346,7 +348,7 @@ const received: Offer[] = [
   }),
   offer({
     id: 'o4',
-    sender: user('u-greenticket', '그린티켓 채용팀', '그린티켓 · 서버 개발자 포지션'),
+    sender: user('u-greenticket', '그린티켓 채용팀', '그린티켓', '서버 개발자 포지션'),
     recipient: ME,
     message: '서버 개발자 포지션에 관심 있으시면 이야기 나눠 보고 싶어요.',
     status: 'DECLINED',
@@ -356,24 +358,24 @@ const received: Offer[] = [
 const sent: Offer[] = [
   offer({
     id: 'o5',
-    sender: ME,
-    recipient: user('u-haeun', '이하은', '누리클라우드 · 프론트엔드 개발자'),
+    sender: ME_SENDER,
+    recipient: user('u-haeun', '이하은', '누리클라우드', '프론트엔드 개발자'),
     message: '디자인 시스템 경험이 인상 깊어서 커피챗 제안드려요.',
     status: 'SENT',
     createdAt: ago(D + 5 * H),
   }),
   offer({
     id: 'o6',
-    sender: ME,
-    recipient: user('u-jiwoo', '최지우', '파도AI · 데이터 엔지니어'),
+    sender: ME_SENDER,
+    recipient: user('u-jiwoo', '최지우', '파도AI', '데이터 엔지니어'),
     message: '정산 데이터 파이프라인 이야기를 나눠 보고 싶어요.',
     status: 'ACCEPTED',
     createdAt: on(10, 14, 9),
   }),
   offer({
     id: 'o7',
-    sender: ME,
-    recipient: user('u-minjae', '정민재', '별빛게임즈 · DevOps'),
+    sender: ME_SENDER,
+    recipient: user('u-minjae', '정민재', '별빛게임즈', 'DevOps'),
     message: '쿠버네티스 운영 노하우가 궁금해요. 30분 괜찮으실까요?',
     status: 'DECLINED',
     createdAt: on(10, 3, 18),
@@ -451,7 +453,7 @@ mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
   const m: OfferMessage = {
     id: `m${Date.now()}`,
     offerId: params.id!,
-    sender: ME,
+    sender: ME_SENDER,
     body: (body as { body: string }).body,
     createdAt: new Date().toISOString(),
   }
@@ -474,8 +476,23 @@ let settings: Settings = {
   chatRetentionDays: 30,
   allowAiReadMyFiles: true,
   aiAccessMode: 'AUTO',
+  defaultEffort: 'MEDIUM',
+  confirmBeforeEdit: true,
 }
 mock('DELETE', 'me', () => null)
+mock('GET', 'auth/me', () => ({
+  data: {
+    id: 'me',
+    displayName: '김서준',
+    locale: 'ko',
+    createdAt: on(1, 5),
+    accountType: 'PERSONAL',
+    companyId: null,
+    companyRole: null,
+    email: 'seojun.kim@gmail.com',
+    provider: 'google',
+  },
+}))
 mock('GET', 'me/settings', () => ({ data: settings }))
 mock('PATCH', 'me/settings', ({ body }) => {
   settings = { ...settings, ...(body as Partial<Settings>) }

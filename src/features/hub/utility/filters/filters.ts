@@ -25,17 +25,11 @@ export const careerLine = (p: Pick<Profile, 'jobCategory' | 'tenureYears'>) =>
     .filter(Boolean)
     .join(' · ')
 
-// shortcut: push-be filters one tenure and one status; with 2+ picked we send none and narrow each page here
-// (lists can look short and the sheet count is off). Send comma lists once push-be accepts them.
 export const profileQuery = (category: JobCategory[], f: SheetFilters): ProfileFilters => ({
   category,
   explore: f.explore,
-  tenure: f.tenure.length === 1 ? f.tenure[0] : undefined,
-  status: f.status.length === 1 ? f.status[0] : undefined,
+  tenure: f.tenure,
+  status: f.status,
 })
-
-export const matchesSheet = (p: Profile, f: SheetFilters) =>
-  (f.tenure.length < 2 || (p.tenureYears != null && f.tenure.includes(tenureOf(p.tenureYears)))) &&
-  (f.status.length < 2 || (p.careerStatus != null && f.status.includes(p.careerStatus)))
 
 export const givenName = (name: string) => (name.length === 3 ? name.slice(1) : name.slice(0, 2))

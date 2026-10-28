@@ -11,6 +11,7 @@ import {
   RETENTION,
   signOutSession,
   TONES,
+  useAuthMe,
   useMyProfile,
   useSettings,
   VISIBILITY,
@@ -177,6 +178,8 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
 const SettingsScreen = () => {
   const { s, set } = useSettings()
   const { data: me } = useMyProfile()
+  const { data: account } = useAuthMe()
+  const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   const [sheet, setSheet] = useState<'contact' | 'tone' | 'retention' | null>(null)
   if (!s) {
     return (
@@ -213,7 +216,7 @@ const SettingsScreen = () => {
       <SettingsGroup>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${me?.displayName ?? ''}, ${LOGIN_LABEL}`}
+          accessibilityLabel={`${me?.displayName ?? ''}, ${login}`}
           onPress={() => router.push('/edit-profile/basic')}
           style={{ minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12 }}
         >
@@ -223,7 +226,7 @@ const SettingsScreen = () => {
               {me?.displayName}
             </Text>
             <Text v="c1" color="t3">
-              {LOGIN_LABEL}
+              {login}
             </Text>
           </View>
           <Icon name="chev" size={18} color="t4" />

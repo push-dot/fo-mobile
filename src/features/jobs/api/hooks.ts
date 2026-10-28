@@ -1,10 +1,9 @@
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Posting, PostingFilters } from '@push/api-client'
 import { api } from '../../../shared/infrastructure'
-import { POSTING_PAGE_LIMIT } from '../constants'
-import { toQuery, type Filters } from '../utility'
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+import { APPLY_DOC_LIMIT, POSTING_PAGE_LIMIT } from '../constants'
+import type { ApplyDoc } from '../types'
+import { applyDoc, toQuery, type Filters } from '../utility'
 
 export const usePostingPages = (f: PostingFilters) =>
   useInfiniteQuery({
@@ -44,12 +43,21 @@ export const usePostingLocations = (draft: Filters) =>
 export const useApplyPosting = (postingId: string, onApplied: () => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (ids: string[]) => api.postings.apply(postingId, ids.filter((id) => UUID.test(id))),
+    mutationFn: (doc: ApplyDoc | undefined) =>
+      api.postings.apply(postingId, doc?.ai ? [doc.id] : [], doc && !doc.ai ? [doc.id] : []),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['postings'] })
       onApplied()
     },
   })
 }
+
+export const useApplyDocs = (enabled: boolean) =>
+  useQuery({
+    queryKey: ['me', 'sources', 'apply'],
+    queryFn: () => api.sources.list({ limit: APPLY_DOC_LIMIT }),
+    select: (r) => r.data.map(applyDoc),
+    enabled,
+  })
 
 export const usePosting = (id: string) => useQuery({ queryKey: ['postings', 'detail', id], queryFn: () => api.postings.get(id) })

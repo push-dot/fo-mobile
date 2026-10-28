@@ -2,6 +2,7 @@ import { type Conversation, type DataEnvelope, type ListEnvelope } from '@push/a
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '../../my/api/client'
 import type { PickedFile } from '../../my/types'
+import { MICRO_CREDITS_PER_CREDIT } from '../constants'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../quick-start-data'
 import type { Step } from '../types'
 
@@ -11,10 +12,8 @@ export type ConversationRow = Conversation & { status?: 'NEEDS_APPROVAL' | 'RUNN
 export type ChatDoc = { id: string; fileName: string; size: number; createdAt: string; aiMade?: boolean }
 
 export type Account = {
-  /** null in real mode: push-be doesn't return the email. */
   email: string | null
   plan: 'FREE' | 'PRO' | 'ULTRA'
-  /** null in real mode: push-be has a balance but no plan quota to show used/total against. */
   credits: { used: number; total: number } | null
 }
 
@@ -84,11 +83,12 @@ export const chatApi = {
     await myApi.upload(file)
   },
   checkout: (planId: 'PRO' | 'ULTRA') => api.billing.checkout(planId),
-  // shortcut: push-be has no account summary (email, credit quota); real mode shows the billing plan only.
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
-    const b = await api.billing.status()
-    return { email: null, plan: b.plan ?? 'FREE', credits: null }
+    const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
+    const total = Math.round(b.monthlyMicroCredits / MICRO_CREDITS_PER_CREDIT)
+    const used = Math.round(b.spentMicroCredits / MICRO_CREDITS_PER_CREDIT)
+    return { email: me.email || null, plan: b.plan ?? 'FREE', credits: total > 0 ? { used, total } : null }
   },
   // shortcut: push-be has no chat/quick-starts; real mode assembles each sheet from existing lists (quickStartFrom).
   quickStart: async (key: string): Promise<QsData> => {

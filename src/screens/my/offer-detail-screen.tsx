@@ -172,9 +172,9 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
               </Text>
               <Badge label={badge.label} tone={badge.tone} />
             </View>
-            {who.affiliation ? (
+            {who.companyName ? (
               <Text v="c1" color="t3">
-                {who.affiliation}
+                {who.companyName}
               </Text>
             ) : null}
           </View>

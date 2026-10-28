@@ -8,6 +8,8 @@ export const ACCESS_MODES: { key: AccessMode; label: string; desc: string }[] = 
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
 export const ACCESS_MODE_TITLE = 'AI가 어떻게 실행할까요?'
 
+export const MICRO_CREDITS_PER_CREDIT = 6000
+
 export const SAY_LABEL = '직접 말하기'
 export const CHOICE_QUESTION = '어떻게 할까요?'
 

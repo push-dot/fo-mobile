@@ -30,9 +30,9 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
             {timeAgo(o.createdAt)}
           </Text>
         </View>
-        {who.affiliation ? (
+        {who.companyName ? (
           <Text v="c1" color="t3" numberOfLines={1}>
-            {who.affiliation}
+            {who.companyName}
           </Text>
         ) : null}
         <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} numberOfLines={2}>

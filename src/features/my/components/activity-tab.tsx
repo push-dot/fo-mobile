@@ -15,7 +15,7 @@ import {
   useMyPosts,
 } from '../api/hooks'
 import type { ActivitySub } from '../types'
-import { monthDay, stageTone, timeAgo } from '../utility'
+import { followState, monthDay, stageTone, timeAgo } from '../utility'
 import Avatar from './avatar'
 import CalendarView from './calendar-view'
 import Empty from './empty'
@@ -116,10 +116,11 @@ const Bookmarks = () => {
   )
 }
 
-const PersonRow = ({ p }: { p: Profile }) => {
+const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => {
   const c = useColors()
-  const [following, setFollowing] = useState(!!p.following)
-  const toggle = useFollowToggle(p.userId, setFollowing)
+  const [picked, setPicked] = useState<boolean>()
+  const following = picked ?? known
+  const toggle = useFollowToggle(p.userId, setPicked)
   return (
     <Row label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}`)}>
       <Avatar name={p.displayName} url={p.avatarUrl} />
@@ -131,23 +132,25 @@ const PersonRow = ({ p }: { p: Profile }) => {
           {p.headline}
         </Text>
       </View>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ selected: following }}
-        onPress={() => toggle.mutate(!following)}
-        hitSlop={5}
-        style={{
-          height: 34,
-          borderRadius: 17,
-          paddingHorizontal: 14,
-          justifyContent: 'center',
-          backgroundColor: following ? c.fill : c.ac,
-        }}
-      >
-        <Text v="c1" weight="700" style={{ fontSize: 14, color: following ? c.t1 : '#FFFFFF' }}>
-          {following ? '팔로잉' : '팔로우'}
-        </Text>
-      </Pressable>
+      {following === undefined ? null : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: following }}
+          onPress={() => toggle.mutate(!following)}
+          hitSlop={5}
+          style={{
+            height: 34,
+            borderRadius: 17,
+            paddingHorizontal: 14,
+            justifyContent: 'center',
+            backgroundColor: following ? c.fill : c.ac,
+          }}
+        >
+          <Text v="c1" weight="700" style={{ fontSize: 14, color: following ? c.t1 : '#FFFFFF' }}>
+            {following ? '팔로잉' : '팔로우'}
+          </Text>
+        </Pressable>
+      )}
     </Row>
   )
 }
@@ -158,6 +161,8 @@ const Follows = () => {
   const followers = useMyFollowers()
   const q = tab === 'following' ? following : followers
   const n = (r: typeof following) => r.data?.page.total ?? r.data?.data.length ?? 0
+  const known = (userId: string) =>
+    tab === 'following' ? true : followState(following.data, userId)
   return (
     <>
       <View style={{ paddingTop: 14, paddingBottom: 4, paddingHorizontal: 20 }}>
@@ -181,7 +186,7 @@ const Follows = () => {
         />
       ) : null}
       {q.data?.data.map((p) => (
-        <PersonRow key={`${tab}-${p.userId}`} p={p} />
+        <PersonRow key={`${tab}-${p.userId}`} p={p} known={known(p.userId)} />
       ))}
     </>
   )

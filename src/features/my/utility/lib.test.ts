@@ -4,15 +4,47 @@ import {
   dayTitle,
   dday,
   fileSize,
+  followState,
   monthGrid,
   offerBadge,
   overwriteWarning,
   parseYm,
   stageTone,
   timeAgo,
+  toResumeDraft,
 } from './index'
 
 describe('my lib', () => {
+  it('maps the push-be profile draft to the viewer draft', () => {
+    const d = toResumeDraft({
+      displayName: '김서준',
+      headline: '백엔드 개발자',
+      tenureYears: 4,
+      intro: '소개',
+      careers: [
+        { company: '모아페이', title: '백엔드 엔지니어', start: '2022-03', end: '' },
+        { company: '하루랩스', title: '서버 개발자', start: '2021-01', end: '2022-02' },
+      ],
+      skills: ['Kotlin'],
+    })
+    expect(d.pageCount).toBeNull()
+    expect(d.profile.careers).toEqual([
+      { company: '모아페이', role: '백엔드 엔지니어', startedOn: '2022-03', endedOn: null, description: '' },
+      { company: '하루랩스', role: '서버 개발자', startedOn: '2021-01', endedOn: '2022-02', description: '' },
+    ])
+  })
+
+  it('derives follow state only from what me/follows proves', () => {
+    const page = (ids: string[], hasMore: boolean) => ({
+      data: ids.map((userId) => ({ userId }) as never),
+      page: { nextCursor: null, hasMore },
+    })
+    expect(followState(undefined, 'a')).toBeUndefined()
+    expect(followState(page(['a'], true), 'a')).toBe(true)
+    expect(followState(page(['a'], false), 'b')).toBe(false)
+    expect(followState(page(['a'], true), 'b')).toBeUndefined()
+  })
+
   it('formats file sizes and career periods', () => {
     expect(fileSize(2_400_000)).toBe('2.4MB')
     expect(fileSize(640_000)).toBe('640KB')

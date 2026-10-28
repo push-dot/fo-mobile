@@ -96,7 +96,10 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
   { key: 'ko', label: '한국어' },
   { key: 'en', label: 'English' },
 ]
-// shortcut: Session has no login provider yet; show it from the session once push-be returns it.
-export const LOGIN_LABEL = 'Google 계정으로 로그인'
+export const LOGIN_LABEL: Record<string, string> = {
+  google: 'Google 계정으로 로그인',
+  github: 'GitHub 계정으로 로그인',
+  email: '이메일로 로그인',
+}
 
 export const INGEST_TEXT = { reading: '읽는 중', failed: '읽지 못했어요' } as const

@@ -1,8 +1,8 @@
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
-import type { Source } from '@push/api-client'
 import { BottomSheet, Button } from '@/shared/components'
 import { useRemoveSource } from '../api/hooks'
+import type { MySource } from '../types'
 
 const DocMenu = ({
   doc,
@@ -10,7 +10,7 @@ const DocMenu = ({
   onDeleted,
   viewing,
 }: {
-  doc: Source | null
+  doc: Pick<MySource, 'id' | 'fileName'> | null
   onClose: () => void
   onDeleted?: () => void
   viewing?: boolean

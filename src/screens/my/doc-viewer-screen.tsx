@@ -267,10 +267,10 @@ const DocViewerScreen = ({ id }: { id: string }) => {
             <FileTile name={s.fileName} small />
             <Text v="c1" color="t3" style={{ flex: 1 }}>
               {fileSize(s.size)}
-              {d ? ` · ${d.pageCount}쪽` : ''}
+              {d?.pageCount ? ` · ${d.pageCount}쪽` : ''}
               {s.createdAt ? ` · ${monthDay(s.createdAt)} 등록` : ''}
             </Text>
-            {d ? <Badge label={`1 / ${d.pageCount}`} tone="grey" /> : null}
+            {d?.pageCount ? <Badge label={`1 / ${d.pageCount}`} tone="grey" /> : null}
           </View>
         ) : null}
         <View style={{ paddingTop: 4, paddingHorizontal: 36 }}>

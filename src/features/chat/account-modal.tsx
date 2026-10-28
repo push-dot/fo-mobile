@@ -9,7 +9,6 @@ import { useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe, us
 import { ACCESS_MODE_TITLE, ACCESS_MODES } from './constants'
 import { Appear } from './motion'
 import { Mark, Note, PageModal, Pick } from './components'
-import { usePrefs } from './store'
 
 const TONES: { key: Tone; label: string }[] = [
   { key: 'as_is', label: '그대로' },
@@ -59,7 +58,6 @@ export const AccountModal = ({ visible, onClose }: { visible: boolean; onClose: 
 const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; account?: Account; onPlan: () => void; onClose: () => void }) => {
   const c = useColors()
   const me = useMe()
-  const prefs = usePrefs()
   const [picker, setPicker] = useState<Picker>(null)
   const settings = useMySettings(visible)
   const docs = useChatDocs(visible)
@@ -69,7 +67,7 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
   const toMy = () => (onClose(), router.navigate('/my'))
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
   const days = settings.data?.chatRetentionDays
-  const effort = EFFORTS.find((e) => e.key === prefs.effort)!
+  const effort = EFFORTS.find((e) => e.key === settings.data?.defaultEffort)
   const credits = account?.credits
 
   return (
@@ -121,9 +119,9 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
             }
           />
           <SettingsRow
-            label={`${effort.label} 작업`}
+            label={effort ? `${effort.label} 작업` : '작업 강도'}
             onPress={() =>
-              setPicker({ title: '얼마나 꼼꼼히 할까요?', options: EFFORTS.map((e) => e.label), value: EFFORTS.indexOf(effort), onPick: (i) => usePrefs.setState({ effort: EFFORTS[i]!.key }) })
+              setPicker({ title: '얼마나 꼼꼼히 할까요?', options: EFFORTS.map((e) => e.label), value: EFFORTS.indexOf(effort ?? EFFORTS[1]), onPick: (i) => save.mutate({ defaultEffort: EFFORTS[i]!.key }) })
             }
           />
           <SettingsRow

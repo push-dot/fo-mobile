@@ -1,4 +1,4 @@
-import type { ApplyDoc, SectionKind } from './types'
+import type { SectionKind } from './types'
 import type { FilterKey } from './utility'
 
 export const POSTING_PAGE_LIMIT = 20
@@ -28,9 +28,6 @@ export const SECTIONS: Record<SectionKind, { title: string; description: string 
   popular: { title: '이번 주 많이 본 공고', description: '이번 주에 사람들이 많이 본 공고예요' },
 }
 
-// shortcut: @push/api-client has no "my documents" endpoint yet; board samples until push-be exposes one.
-export const docsFor = (company: string): ApplyDoc[] => [
-  { id: 'doc-tailored', name: `${company}_백엔드_이력서_v2.pdf`, note: 'AI로 맞춘 서류 · 오늘', kind: 'tailored' },
-  { id: 'doc-original', name: '김서준_백엔드_이력서_2026.pdf', note: '원본 · 10월 12일', kind: 'original' },
-  { id: 'doc-portfolio', name: '포트폴리오_결제시스템.pdf', note: '함께 보낼 수 있어요 · 8월 3일', kind: 'portfolio' },
-]
+export const APPLY_DOC_NOTE = { ai: 'AI로 맞춘 서류', upload: '원본' } as const
+
+export const APPLY_DOC_LIMIT = 100

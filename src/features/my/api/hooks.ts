@@ -16,6 +16,8 @@ export const useUnreadOffers = () =>
 
 export const useMyProfile = () => useQuery({ queryKey: ['me', 'profile'], queryFn: api.me.profile })
 
+export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: api.auth.me })
+
 export const useSources = () =>
   useQuery({ queryKey: ['me', 'sources'], queryFn: () => myApi.sources() })
 
@@ -69,13 +71,16 @@ export const useMyBookmarks = () => {
   return { query, unbookmark }
 }
 
-export const useFollowToggle = (userId: string, setFollowing: (next: boolean) => void) =>
-  useMutation({
+export const useFollowToggle = (userId: string, setFollowing: (next: boolean) => void) => {
+  const qc = useQueryClient()
+  return useMutation({
     mutationFn: (next: boolean) =>
       next ? api.profiles.follow(userId) : api.profiles.unfollow(userId),
     onMutate: (next) => setFollowing(next),
     onError: (_e, next) => setFollowing(!next),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'follows'] }),
   })
+}
 
 export const useMyFollows = () =>
   useQuery({ queryKey: ['me', 'follows'], queryFn: () => api.me.follows(FIRST) })

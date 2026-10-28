@@ -1,4 +1,4 @@
-import type { Profile, UserRef } from '@push/api-client'
+import type { Profile, SourceItem, UserRef } from '@push/api-client'
 
 export type CalendarEventType = 'INTERVIEW' | 'DEADLINE' | 'FOLLOW_UP' | 'COFFEE_CHAT' | 'CUSTOM'
 
@@ -12,7 +12,7 @@ export type CalendarEvent = {
 }
 
 export type ResumeDraft = {
-  pageCount: number
+  pageCount: number | null
   email: string | null
   links: string[]
   profile: Pick<
@@ -21,10 +21,12 @@ export type ResumeDraft = {
   >
 }
 
+export type MySource = SourceItem & { jobId?: string }
+
 export type PickedFile = { uri: string; name: string; mimeType?: string | null; size?: number | null }
 
 export type ProfileSection = 'basic' | 'intro' | 'career' | 'skills'
 
 export type ActivitySub = 'applications' | 'calendar' | 'bookmarks' | 'follows' | 'posts'
 
-export type OfferPerson = UserRef & { affiliation?: string }
+export type OfferPerson = UserRef & { companyName?: string | null }

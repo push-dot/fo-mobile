@@ -10,7 +10,6 @@ import {
   Surface,
   appliedCount,
   filterSummary,
-  matchesSheet,
   toggle,
   useProfileList,
   type SheetFilters,
@@ -25,7 +24,7 @@ const HubScreen = () => {
   const [filterOpen, setFilterOpen] = useState(false)
 
   const list = useProfileList(category, sheet)
-  const items = list.data?.pages.flatMap((p) => p.data).filter((p) => matchesSheet(p, sheet)) ?? []
+  const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
 
   const header = (

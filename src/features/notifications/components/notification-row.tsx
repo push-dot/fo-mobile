@@ -9,6 +9,7 @@ const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: key
   OFFER: { icon: 'inbox', fg: 'green', bg: 'greenSoft' },
   DEADLINE: { icon: 'clock', fg: 'red', bg: 'redSoft' },
   COMMENT: { icon: 'chat', fg: 'orange', bg: 'orangeSoft' },
+  APPLICATION_STAGE: { icon: 'brief', fg: 'acText', bg: 'acSoft' },
 }
 
 const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => void }) => {

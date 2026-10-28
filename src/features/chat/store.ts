@@ -11,8 +11,7 @@ import type { ChatEvent, ChatState } from './types'
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
 export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
 
-// shortcut: effort has no server field yet, so it is session-only until push-be adds it.
-export const usePrefs = create<{ effort: 'LOW' | 'MEDIUM' | 'HIGH' | 'MAX'; accessMode: AccessMode }>(() => ({ effort: 'MEDIUM', accessMode: DEFAULT_ACCESS_MODE }))
+export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: DEFAULT_ACCESS_MODE }))
 
 export const pickAccessMode = async (mode: AccessMode) => {
   const prev = usePrefs.getState().accessMode

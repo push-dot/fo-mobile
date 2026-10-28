@@ -1,13 +1,14 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
-import { isJobSettled, type Source, type UploadedSource } from '@push/api-client'
+import { isJobSettled } from '@push/api-client'
 import { BottomSheet, Button, Icon, Text, type IconName } from '@/shared/components'
 import { useColors } from '../../../theme'
 import { pickResumeFile } from '../api/files'
 import { useIngestJob, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, MAX_BYTES } from '../constants'
 import { useToast } from '../hooks'
+import type { MySource } from '../types'
 import { fileSize, monthDay } from '../utility'
 import DocMenu from './doc-menu'
 import FileTile from './file-tile'
@@ -62,7 +63,7 @@ const PickRow = ({
   )
 }
 
-const DocRow = ({ doc, onMenu }: { doc: UploadedSource; onMenu: () => void }) => {
+const DocRow = ({ doc, onMenu }: { doc: MySource; onMenu: () => void }) => {
   const job = useIngestJob(doc.jobId).data
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = job?.status === 'FAILED' || job?.status === 'DEAD'
@@ -101,7 +102,7 @@ const DocsTab = () => {
   const { data, isLoading } = useSources()
   const toast = useToast()
   const [picking, setPicking] = useState(false)
-  const [menu, setMenu] = useState<Source | null>(null)
+  const [menu, setMenu] = useState<MySource | null>(null)
   const { upload, start, cancel } = useUpload(() => toast.show('이력서 파일을 올렸어요'))
 
   const pickFile = async (fromSheet = false) => {
