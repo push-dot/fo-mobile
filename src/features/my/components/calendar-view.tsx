@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { monthDay } from '@push/shared'
 import { BottomSheet, Chip, GlassButton, Text, TextField } from '@/shared/components'
 import { useColors, type Colors } from '../../../theme'
 import { useAddCalendarEvent, useCalendarEvents } from '../api/hooks'
 import type { CalendarEvent, CalendarEventType } from '../types'
-import { clock, dayTitle, dday, monthDay, monthGrid, sameDay } from '../utility'
+import { clock, dayTitle, dday, monthGrid, sameDay } from '../utility'
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 const TYPES: { key: CalendarEventType; label: string; color: keyof Colors }[] = [
@@ -34,7 +35,7 @@ const AddEvent = ({ day, visible, onClose }: { day: Date; visible: boolean; onCl
       visible={visible}
       onClose={onClose}
       title="어떤 일정을 추가할까요?"
-      description={`${monthDay(day.toISOString())} 오전 9:00`}
+      description={`${day.getMonth() + 1}월 ${day.getDate()}일 오전 9:00`}
       action={{
         label: '일정 추가하기',
         onPress: () =>

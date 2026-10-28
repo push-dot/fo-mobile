@@ -1,10 +1,9 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
-import { careerLabel } from '@push/shared'
+import { brandOf, careerLabel } from '@push/shared'
 import { useToggleBookmark } from '@/features/jobs'
 import { Icon, Text } from '../../../shared/components'
-import { brandOf } from '../../../shared/utility'
 import Highlight from './highlight'
 
 const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => void }) => {

@@ -1,5 +1,4 @@
 import { DAY, HOUR, MIN } from '../../constants'
-import { monthDay } from '../month-day'
 
 export const timeAgo = (iso: string, now = new Date()) => {
   const d = new Date(iso)
@@ -9,6 +8,6 @@ export const timeAgo = (iso: string, now = new Date()) => {
   if (diff < DAY) return `${Math.floor(diff / HOUR)}시간 전`
   if (diff < 2 * DAY) return '어제'
   if (diff < 7 * DAY) return `${Math.floor(diff / DAY)}일 전`
-  if (d.getFullYear() === now.getFullYear()) return monthDay(iso)
+  if (d.getFullYear() === now.getFullYear()) return `${d.getMonth() + 1}월 ${d.getDate()}일`
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`
 }

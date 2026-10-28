@@ -3,7 +3,6 @@ import {
   careerPeriod,
   dayTitle,
   dday,
-  fileSize,
   followState,
   monthGrid,
   offerBadge,
@@ -45,9 +44,7 @@ describe('my lib', () => {
     expect(followState(page(['a'], true), 'b')).toBeUndefined()
   })
 
-  it('formats file sizes and career periods', () => {
-    expect(fileSize(2_400_000)).toBe('2.4MB')
-    expect(fileSize(640_000)).toBe('640KB')
+  it('formats career periods', () => {
     expect(careerPeriod({ startedOn: '2022-03', endedOn: null })).toBe('2022년 3월 – 현재')
     expect(careerPeriod({ startedOn: '2021-01', endedOn: '2022-02' })).toBe(
       '2021년 1월 – 2022년 2월',

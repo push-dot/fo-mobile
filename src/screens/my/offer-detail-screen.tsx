@@ -12,14 +12,13 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { Offer } from '@push/api-client'
-import { careerLabel } from '@push/shared'
+import { careerLabel, monthDay } from '@push/shared'
 import {
   Avatar,
   clock,
   counterpart,
   dday,
   Logo,
-  monthDay,
   offerBadge,
   useOffer,
   useOfferDecision,

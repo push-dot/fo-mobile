@@ -3,11 +3,10 @@ import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { JOB_CATEGORIES, type Profile } from '@push/api-client'
+import { fileSize, monthDay } from '@push/shared'
 import {
   DocMenu,
   FileTile,
-  fileSize,
-  monthDay,
   overwriteWarning,
   tenureLabel,
   useApplyResumeProfile,
