@@ -5,7 +5,8 @@ import { Alert, Pressable, View } from 'react-native'
 import { fontFor, useColors } from '../../theme'
 import { Badge, BottomSheet, Button, GlassButton, Icon, SegmentedControl, SettingsGroup, SettingsRow, Text } from '@/shared/components'
 import { type Account } from './api/client'
-import { useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe, useMySettings, useUpdateChatSettings } from './api/hooks'
+import { useMySettings, useUpdateSettings } from '@/features/my'
+import { useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe } from './api/hooks'
 import { ACCESS_MODE_TITLE, ACCESS_MODES } from './constants'
 import { Appear } from './motion'
 import { Mark, Note, PageModal, Pick } from './components'
@@ -61,7 +62,7 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
   const [picker, setPicker] = useState<Picker>(null)
   const settings = useMySettings(visible)
   const docs = useChatDocs(visible)
-  const save = useUpdateChatSettings()
+  const save = useUpdateSettings()
   const access = useAccessMode()
   const mode = ACCESS_MODES.find((m) => m.key === access.mode)!
   const toMy = () => (onClose(), router.navigate('/my'))

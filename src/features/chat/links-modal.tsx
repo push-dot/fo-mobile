@@ -5,7 +5,8 @@ import { useColors } from '../../theme'
 import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Switch, Text, TextField, type BadgeTone, type IconName } from '@/shared/components'
 import { openLink } from './api/files'
 import { kindOf } from './links'
-import { useAddLink, useDeleteLink, useMyLinks, useStartChat } from './api/hooks'
+import { useAddLink, useDeleteLink, useMyLinks } from '@/features/my'
+import { useStartChat } from './api/hooks'
 import { GroupTitle, Note, PageModal } from './components'
 
 const KINDS: { key: LinkKind; label: string }[] = [

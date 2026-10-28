@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
-import { jobQuery, type Offer, type Posting, type Profile, type Settings } from '@push/api-client'
+import { jobQuery, type LinkKind, type Offer, type Posting, type Profile, type Settings } from '@push/api-client'
 import { api } from '../../../shared/infrastructure'
 import type { CalendarEvent, PickedFile } from '../types'
 import { myApi } from './client'
@@ -47,6 +47,42 @@ export const useSettings = () => {
     onSuccess: (s) => qc.setQueryData(key, s),
   })
   return { s: q.data, set: m.mutate }
+}
+
+export const useMySettings = (enabled: boolean) =>
+  useQuery({ queryKey: ['me', 'settings'], queryFn: api.me.settings, enabled })
+
+export const useUpdateSettings = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (patch: Partial<Settings>) => api.me.updateSettings(patch),
+    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
+    onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useBookmarkList = (enabled: boolean) =>
+  useQuery({ queryKey: ['me', 'bookmarks', 'chat'], queryFn: () => api.me.bookmarks({ limit: 100 }), enabled })
+
+export const useMyLinks = (enabled: boolean) =>
+  useQuery({ queryKey: ['me', 'links'], queryFn: () => api.me.links(undefined, { limit: 100 }), enabled })
+
+export const useDeleteLink = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.me.deleteLink(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'links'] }),
+    onError: () => Alert.alert('지우지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useAddLink = (onAdded: () => void) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body: { url: string; kind?: LinkKind; aiRead: boolean }) => api.me.addLink(body),
+    onSuccess: () => (void qc.invalidateQueries({ queryKey: ['me', 'links'] }), onAdded()),
+    onError: () => Alert.alert('추가하지 못했어요', '링크 주소를 확인해 주세요.'),
+  })
 }
 
 // shortcut: lists load the first 50 items; switch to useInfiniteQuery if people keep more than that.

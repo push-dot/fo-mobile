@@ -33,3 +33,5 @@ export const ERROR_TEXT: Record<string, string> = {
 }
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
+// Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
+export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const

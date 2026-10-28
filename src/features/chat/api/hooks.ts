@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { LinkKind, Settings } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
+import { useMyLinks, useMySettings } from '@/features/my'
 import { api, useSession } from '../../../shared/infrastructure'
+import { CHAT_DOCS_KEY } from '../constants'
 import { QUICK_STARTS } from '../quick-starts'
 import type { MentionGroup } from '../mentions'
 import { forget, pickAccessMode, send, usePrefs } from '../store'
@@ -63,11 +64,8 @@ export const useMe = () => {
   return { name, given: name.length > 2 ? name.slice(-2) : name, profile: profile.data }
 }
 
-export const useChatBookmarks = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'bookmarks', 'chat'], queryFn: () => api.me.bookmarks({ limit: 100 }), enabled })
-
 export const useChatDocs = (enabled = true) =>
-  useQuery({ queryKey: ['chat', 'docs'], queryFn: chatApi.docs, enabled })
+  useQuery({ queryKey: CHAT_DOCS_KEY, queryFn: chatApi.docs, enabled })
 
 export const useUploadChatDoc = () => {
   const qc = useQueryClient()
@@ -79,7 +77,7 @@ export const useUploadChatDoc = () => {
       if ((f.size ?? 0) > 20_000_000) throw new Error('too big')
       await chatApi.addDoc(f)
     },
-    onSuccess: () => Promise.all([qc.invalidateQueries({ queryKey: ['chat', 'docs'] }), qc.invalidateQueries({ queryKey: ['me', 'sources'] })]),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
     onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : '잠시 뒤에 다시 해 주세요.'),
   })
 }
@@ -103,18 +101,6 @@ export const useCheckoutUltra = () =>
     onError: () => Alert.alert('결제 화면을 열지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 
-export const useMySettings = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'settings'], queryFn: api.me.settings, enabled })
-
-export const useUpdateChatSettings = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (patch: Partial<Settings>) => api.me.updateSettings(patch),
-    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
-    onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
-  })
-}
-
 export const useAccessMode = () => {
   const qc = useQueryClient()
   const server = useMySettings(true).data?.aiAccessMode
@@ -133,31 +119,10 @@ export const useAccessMode = () => {
 export const useQuickStart = (key: string) =>
   useQuery({ queryKey: ['chat', 'quick-start', key], queryFn: () => chatApi.quickStart(key) })
 
-export const useMyLinks = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'links'], queryFn: () => api.me.links(undefined, { limit: 100 }), enabled })
-
-export const useDeleteLink = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => api.me.deleteLink(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'links'] }),
-    onError: () => Alert.alert('지우지 못했어요', '잠시 뒤에 다시 해 주세요.'),
-  })
-}
-
-export const useAddLink = (onAdded: () => void) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (body: { url: string; kind?: LinkKind; aiRead: boolean }) => api.me.addLink(body),
-    onSuccess: () => (void qc.invalidateQueries({ queryKey: ['me', 'links'] }), onAdded()),
-    onError: () => Alert.alert('추가하지 못했어요', '링크 주소를 확인해 주세요.'),
-  })
-}
-
 export const useMentionGroups = (): MentionGroup[] => {
   const bookmarks = useQuery({ queryKey: ['me', 'bookmarks', 'mention'], queryFn: () => api.me.bookmarks({ limit: 20 }) })
   const docs = useChatDocs()
-  const links = useQuery({ queryKey: ['me', 'links'], queryFn: () => api.me.links(undefined, { limit: 50 }) })
+  const links = useMyLinks(true)
   return useMemo(
     () => [
       {
