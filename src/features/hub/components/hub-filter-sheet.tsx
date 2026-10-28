@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native'
 import { CAREER_STATUSES, TENURES, type JobCategory } from '@push/api-client'
 import { BottomSheet, Chip, Text } from '../../../shared/components'
 import { useProfileCount } from '../api/hooks'
-import { EMPTY_SHEET, profileQuery, toggle, type SheetFilters } from '../utility'
+import { EMPTY_SHEET, profileQuery, toggle, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
 
 type Props = {

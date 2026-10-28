@@ -1,6 +1,6 @@
 import type { SourceItem } from '@push/api-client'
-import { APPLY_DOC_NOTE } from '../../constants'
-import type { ApplyDoc } from '../../types'
+import { APPLY_DOC_NOTE } from '../constants'
+import type { ApplyDoc } from '../types'
 
 const day = (iso: string) => {
   const d = new Date(iso)

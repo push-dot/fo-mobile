@@ -11,3 +11,4 @@ export {
   hapticImpactLight,
   hapticNotify,
 } from './platform'
+export { shareMessage } from './platform'

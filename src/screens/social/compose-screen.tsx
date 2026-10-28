@@ -1,11 +1,12 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useState, type ReactNode } from 'react'
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
-import { MAX_IMAGES, categoryLabel, pickPostImages, useCreatePost, type SocialImage } from '@/features/social'
+import { MAX_IMAGES, POST_IMAGE_OPTIONS, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
 import { BottomSheet, Button, Glass, GlassButton, Icon, SettingsGroup, SettingsRow, Text } from '@/shared/components'
+import { pickImage } from '@/shared/infrastructure'
 import { fontFor, useColors } from '@/theme'
 
 const ComposeScreen = () => {
@@ -21,9 +22,11 @@ const ComposeScreen = () => {
   const ready = !!category && title.trim().length > 0 && body.trim().length > 0 && !submit.isPending
 
   const pick = async () => {
-    const picked = await pickPostImages(images.length)
-    if (!picked) return
-    setImages((prev) => [...prev, ...picked].slice(0, MAX_IMAGES))
+    const res = await pickImage({ ...POST_IMAGE_OPTIONS, selectionLimit: MAX_IMAGES - images.length })
+    if (res.canceled) return
+    const ok = acceptedPostImages(res.assets.map(toSocialImage))
+    if (ok.length < res.assets.length) Alert.alert('올릴 수 없는 사진이 있어요', 'JPG, PNG, WEBP, HEIC 사진만 장당 10MB까지 올릴 수 있어요.')
+    setImages((prev) => [...prev, ...ok].slice(0, MAX_IMAGES))
   }
 
   const field = (children: ReactNode, style: object) =>

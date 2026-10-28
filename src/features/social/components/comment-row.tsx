@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import type { Comment } from '@push/api-client'
 import { Text } from '../../../shared/components'
-import { timeAgo } from '../utility'
+import { timeAgo } from '../utils'
 import Avatar from './avatar'
 
 const CommentRow = ({ comment, reply, onReply }: { comment: Comment; reply: boolean; onReply: () => void }) => {

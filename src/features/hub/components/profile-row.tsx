@@ -4,7 +4,7 @@ import type { Profile } from '@push/api-client'
 import { Badge, Icon, Text } from '../../../shared/components'
 import { useColors } from '../../../theme'
 import { STATUS_TONE } from '../constants'
-import { careerLine, statusLabel } from '../utility'
+import { careerLine, statusLabel } from '../utils'
 import Avatar from './avatar'
 
 const ProfileRow = ({ p }: { p: Profile }) => {

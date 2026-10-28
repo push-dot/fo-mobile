@@ -5,7 +5,7 @@ import { Text } from '../../../shared/components'
 import { assetUrl } from '../../../shared/utility'
 import { fontFor } from '../../../theme'
 import { AVATAR_COLORS } from '../constants'
-import { givenName } from '../utility'
+import { givenName } from '../utils'
 
 const Avatar = ({ user, size }: { user: UserRef; size: number }) => {
   if (user.avatarUrl) {

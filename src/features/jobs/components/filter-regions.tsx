@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { usePostingLocations } from '../api/hooks'
-import { SIDOS, formatCount, sidoOf, type Filters } from '../utility'
+import { SIDOS, formatCount, sidoOf, type Filters } from '../utils'
 import FilterRow from './filter-row'
 import { useColors } from '../../../theme'
 

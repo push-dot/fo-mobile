@@ -1,5 +1,5 @@
 import type { SectionKind } from './types'
-import type { FilterKey } from './utility'
+import type { FilterKey } from './utils'
 
 export const POSTING_PAGE_LIMIT = 20
 

@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { Text } from '../../../shared/components'
 import { assetUrl } from '../../../shared/utility'
 import { FILLS } from '../constants'
-import { givenName } from '../utility'
+import { givenName } from '../utils'
 
 const fillFor = (id: string) => FILLS[[...id].reduce((n, ch) => n + ch.charCodeAt(0), 0) % FILLS.length]!
 

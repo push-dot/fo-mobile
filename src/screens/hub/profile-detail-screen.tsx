@@ -1,7 +1,7 @@
 import { CAREER_STATUSES } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Platform, Pressable, Share, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import {
   ProfileAction,
   ProposalSheet,
@@ -13,6 +13,7 @@ import {
   useViewerId,
 } from '@/features/hub'
 import { DetailWebView, Glass, Text, TopBar } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
 const ProfileDetailScreen = ({ id }: { id: string }) => {
@@ -44,7 +45,7 @@ const ProfileDetailScreen = ({ id }: { id: string }) => {
           </Text>
         </Pressable>
       )}
-      <ProfileAction icon="share" label="공유" onPress={() => void Share.share({ message: profileShareMessage(id, p) })} />
+      <ProfileAction icon="share" label="공유" onPress={() => void shareMessage({ message: profileShareMessage(id, p) })} />
       {self ? null : <ProfileAction icon="paper" label="제안하기" onPress={() => p && setProposing(true)} />}
     </View>
   )

@@ -1,33 +1,30 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ApiError, type JobCategory, type ProfileFilters } from '@push/api-client'
-import { api, useSession } from '../../../shared/infrastructure'
-import { OFFER_BOOKMARKS_LIMIT } from '../constants'
-import { profileQuery, type SheetFilters } from '../utility'
-
-export const useViewerId = () => useSession((s) => s.session?.user.id)
+import type { SheetFilters } from '../utils'
+import { fetchOfferBookmarks, fetchProfile, fetchProfileCount, fetchProfileList, followProfile, sendProfileOffer, unfollowProfile } from './fetchers'
 
 export const useProfileList = (category: JobCategory[], sheet: SheetFilters) =>
   useInfiniteQuery({
     queryKey: ['profiles', 'list', category, sheet],
-    queryFn: ({ pageParam }) => api.profiles.list({ ...profileQuery(category, sheet), cursor: pageParam }),
+    queryFn: ({ pageParam }) => fetchProfileList(category, sheet, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
   })
 
 export const useProfileCount = (key: unknown[], query: ProfileFilters, enabled: boolean) =>
-  useQuery({ queryKey: ['profiles', 'count', ...key], queryFn: () => api.profiles.list({ ...query, limit: 1 }), enabled }).data?.page.total
+  useQuery({ queryKey: ['profiles', 'count', ...key], queryFn: () => fetchProfileCount(query), enabled }).data?.page.total
 
 export const useOfferBookmarks = (visible: boolean) =>
   useQuery({
     queryKey: ['me', 'bookmarks', 'offer-pick'],
-    queryFn: () => api.me.bookmarks({ limit: OFFER_BOOKMARKS_LIMIT }),
+    queryFn: fetchOfferBookmarks,
     enabled: visible,
   })
 
 export const useSendOffer = (userId: string, message: string, postingId: string | undefined, onDone: () => void, onFail: (message: string) => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => api.profiles.offer(userId, { message: message.trim(), postingId }),
+    mutationFn: () => sendProfileOffer(userId, message.trim(), postingId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['profiles'] })
       onDone()
@@ -37,12 +34,12 @@ export const useSendOffer = (userId: string, message: string, postingId: string 
   })
 }
 
-export const useProfile = (id: string) => useQuery({ queryKey: ['profiles', 'detail', id], queryFn: () => api.profiles.get(id) })
+export const useProfile = (id: string) => useQuery({ queryKey: ['profiles', 'detail', id], queryFn: () => fetchProfile(id) })
 
 export const useFollow = (id: string) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (on: boolean) => (on ? api.profiles.follow(id) : api.profiles.unfollow(id)),
+    mutationFn: (on: boolean) => (on ? followProfile(id) : unfollowProfile(id)),
     onSettled: () => qc.invalidateQueries({ queryKey: ['profiles'] }),
   })
 }

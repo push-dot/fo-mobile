@@ -2,6 +2,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import * as Haptics from 'expo-haptics'
 import * as ImagePicker from 'expo-image-picker'
 import * as WebBrowser from 'expo-web-browser'
+import { Share } from 'react-native'
 
 export const openBrowser = (url: string) => WebBrowser.openBrowserAsync(url)
 
@@ -21,3 +22,5 @@ export const hapticNotify = (kind: 'success' | 'warning') =>
   Haptics.notificationAsync(
     kind === 'success' ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning,
   )
+
+export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content)

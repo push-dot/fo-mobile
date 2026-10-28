@@ -1,6 +1,6 @@
 // Mock routes for the hub area. Owned by that area's screens.
 import type { Offer, Profile } from '@push/api-client'
-import { tenureOf } from '../features/hub/utility/filters'
+import { tenureOf } from '../features/hub/utils/filters'
 import { searchHangul } from '@push/shared'
 import { mock, page } from './server'
 

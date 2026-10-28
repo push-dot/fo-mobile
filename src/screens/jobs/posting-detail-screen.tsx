@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Platform, Share, View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApplySheet, PostingToast, postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
 import { Button, DetailWebView, GlassButton, TopBar } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
 const PostingDetailScreen = ({ id }: { id: string }) => {
@@ -32,7 +33,7 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
               {
                 icon: 'share',
                 label: '공유',
-                onPress: () => void Share.share({ message: postingShareMessage(id, p) }),
+                onPress: () => void shareMessage({ message: postingShareMessage(id, p) }),
               },
             ]}
           />

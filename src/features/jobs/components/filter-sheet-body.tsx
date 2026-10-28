@@ -4,7 +4,7 @@ import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client
 import { BottomSheet, Text } from '../../../shared/components'
 import { usePostingCount } from '../api/hooks'
 import { FILTER_TITLES } from '../constants'
-import { EMPTY, formatCount, toggle, toggleRegion, type FilterKey, type Filters } from '../utility'
+import { EMPTY, formatCount, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
 import FilterOptions from './filter-options'
 import FilterRegions from './filter-regions'
 import FilterSkills from './filter-skills'

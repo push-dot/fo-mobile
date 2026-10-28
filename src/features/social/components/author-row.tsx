@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import type { Post } from '@push/api-client'
 import { Text } from '../../../shared/components'
-import { categoryLabel, timeAgo } from '../utility'
+import { categoryLabel, timeAgo } from '../utils'
 import Avatar from './avatar'
 
 const AuthorRow = ({ post, size }: { post: Post; size: number }) => {

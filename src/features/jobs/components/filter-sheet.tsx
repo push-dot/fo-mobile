@@ -1,4 +1,4 @@
-import type { FilterKey, Filters } from '../utility'
+import type { FilterKey, Filters } from '../utils'
 import FilterSheetBody from './filter-sheet-body'
 
 type Props = {

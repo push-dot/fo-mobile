@@ -1,4 +1,4 @@
-import { DAY, HOUR, MIN } from '../../constants'
+import { DAY, HOUR, MIN } from '../constants'
 
 export const timeAgo = (iso: string, now: Date = new Date()) => {
   const d = new Date(iso)
