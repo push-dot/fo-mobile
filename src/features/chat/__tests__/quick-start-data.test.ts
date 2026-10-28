@@ -1,6 +1,11 @@
 import type { Application, Offer, Posting } from '@push/api-client'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { quickStartFrom } from '../quick-start-data'
+
+vi.mock('@/features/my', async () => {
+  const utils = await import('../../my/utility')
+  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, tintOf: utils.tintOf }
+})
 
 const now = new Date('2026-10-21T09:00:00')
 const posting = (id: string, deadline: string | null) => ({ id, company: '모아페이', title: '백엔드', location: '서울', deadline }) as Posting

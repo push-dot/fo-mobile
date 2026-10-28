@@ -12,6 +12,7 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
+vi.mock('@/features/my', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
 
 const { answer, pickAccessMode, send, useChatStore, usePrefs } = await import('../store')
 const { emptyChat } = await import('../reducer')
