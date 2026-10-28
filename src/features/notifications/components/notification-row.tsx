@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native'
 import type { AppNotification, NotificationType } from '@push/api-client'
 import { Icon, Text, type IconName } from '../../../shared/components'
 import { useColors, type Colors } from '../../../theme'
-import { timeLabel } from '../utility'
+import { timeLabel } from '../utils'
 
 const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: keyof Colors }> = {
   AI_DONE: { icon: 'spark', fg: 'acText', bg: 'acSoft' },

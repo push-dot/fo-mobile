@@ -1,3 +1,4 @@
-export * from './api/hooks'
+export * from './api'
 export * from './components'
 export * from './constants'
+export * from './hooks'

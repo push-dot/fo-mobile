@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router'
 import type { AppNotification } from '@push/api-client'
-import { MY_TAB_PATH } from '../../constants'
+import { MY_TAB_PATH } from '../constants'
 
 export const notificationHref = ({ target }: Pick<AppNotification, 'target'>): Href | null => {
   switch (target.kind) {
