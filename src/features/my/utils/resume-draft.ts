@@ -1,5 +1,5 @@
 import type { ProfileDraft } from '@push/api-client'
-import type { ResumeDraft } from '../../types'
+import type { ResumeDraft } from '../types'
 
 export const toResumeDraft = (d: ProfileDraft): ResumeDraft => ({
   pageCount: null,

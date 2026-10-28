@@ -4,10 +4,10 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-nat
 import { isJobSettled } from '@push/api-client'
 import { fileSize, monthDay } from '@push/shared'
 import { BottomSheet, Button, Icon, Text, type IconName } from '@/shared/components'
+import { pickDocument } from '@/shared/infrastructure'
 import { useColors } from '../../../theme'
-import { pickResumeFile } from '../api/files'
 import { useIngestJob, useSources, useUpload } from '../api/hooks'
-import { INGEST_TEXT, MAX_BYTES } from '../constants'
+import { INGEST_TEXT, MAX_BYTES, RESUME_DOCUMENT_OPTIONS } from '../constants'
 import { useToast } from '../hooks'
 import type { MySource } from '../types'
 import DocMenu from './doc-menu'
@@ -108,7 +108,7 @@ const DocsTab = () => {
   const pickFile = async (fromSheet = false) => {
     setPicking(false)
     if (fromSheet) await new Promise((r) => setTimeout(r, 400))
-    const res = await pickResumeFile()
+    const res = await pickDocument(RESUME_DOCUMENT_OPTIONS)
     const file = res.canceled ? null : res.assets[0]
     if (!file) return
     if ((file.size ?? 0) > MAX_BYTES)

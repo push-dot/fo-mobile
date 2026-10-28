@@ -1,5 +1,5 @@
 import type { Offer } from '@push/api-client'
-import type { OfferPerson } from '../../types'
+import type { OfferPerson } from '../types'
 
 type Box = 'received' | 'sent'
 

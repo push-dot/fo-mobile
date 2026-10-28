@@ -1,4 +1,4 @@
-import { DAY } from '../../constants'
+import { DAY } from '../constants'
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 export const dayDiff = (a: Date, b: Date) =>

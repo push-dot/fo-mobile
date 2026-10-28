@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { useColors } from '../../../theme'
-import { fileKind } from '../utility'
+import { fileKind } from '../utils'
 
 const FileTile = ({ name, small, reading }: { name: string; small?: boolean; reading?: boolean }) => {
   const c = useColors()

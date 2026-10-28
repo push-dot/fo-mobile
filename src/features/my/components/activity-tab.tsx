@@ -15,7 +15,7 @@ import {
   useMyPosts,
 } from '../api/hooks'
 import type { ActivitySub } from '../types'
-import { followState, stageTone, timeAgo } from '../utility'
+import { followState, stageTone, timeAgo } from '../utils'
 import Avatar from './avatar'
 import CalendarView from './calendar-view'
 import Empty from './empty'

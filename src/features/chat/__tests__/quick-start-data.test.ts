@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { quickStartFrom } from '../quick-start-data'
 
 vi.mock('@/features/my', async () => {
-  const utils = await import('../../my/utility')
+  const utils = await import('../../my/utils')
   return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, tintOf: utils.tintOf }
 })
 

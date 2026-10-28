@@ -2,38 +2,67 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
-import { jobQuery, type LinkKind, type Offer, type Posting, type Profile, type Settings } from '@push/api-client'
-import { api } from '../../../shared/infrastructure'
+import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
 import type { CalendarEvent, PickedFile } from '../types'
-import { myApi } from './client'
+import {
+  acceptOffer,
+  addLink,
+  declineOffer,
+  deleteLink,
+  fetchAuthMe,
+  fetchBookmarkList,
+  fetchCommentedPosts,
+  fetchFollowers,
+  fetchFollows,
+  fetchLinks,
+  fetchMyApplications,
+  fetchMyBookmarks,
+  fetchMyPosts,
+  fetchMyProfile,
+  fetchOffer,
+  fetchOfferMessages,
+  fetchOffers,
+  fetchPosting,
+  fetchSettings,
+  fetchSource,
+  fetchUnreadOffers,
+  followProfile,
+  ingestJobQuery,
+  myApi,
+  sendOfferMessage,
+  unfollowProfile,
+  unbookmarkPosting,
+  updateProfile,
+  updateSettings,
+} from './fetchers'
 
 export const useUnreadOffers = () =>
   useQuery({
     queryKey: ['me', 'offers', 'received', 'unread'],
-    queryFn: () => api.me.offers('received', { limit: 50 }),
+    queryFn: fetchUnreadOffers,
     select: (r) => r.data.filter((o) => !o.readAt).length,
   })
 
-export const useMyProfile = () => useQuery({ queryKey: ['me', 'profile'], queryFn: api.me.profile })
+export const useMyProfile = () => useQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
 
-export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: api.auth.me })
+export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: fetchAuthMe })
 
 export const useSources = () =>
   useQuery({ queryKey: ['me', 'sources'], queryFn: () => myApi.sources() })
 
-export const useIngestJob = (jobId: string | undefined) => useQuery(jobQuery(api.jobs, jobId))
+export const useIngestJob = (jobId: string | undefined) => useQuery(ingestJobQuery(jobId))
 
 type Box = 'received' | 'sent'
 
 export const useOffers = (box: Box) =>
-  useQuery({ queryKey: ['me', 'offers', box], queryFn: () => api.me.offers(box, { limit: 50 }) })
+  useQuery({ queryKey: ['me', 'offers', box], queryFn: () => fetchOffers(box) })
 
 export const useSettings = () => {
   const qc = useQueryClient()
   const key = ['me', 'settings']
-  const q = useQuery({ queryKey: key, queryFn: api.me.settings })
+  const q = useQuery({ queryKey: key, queryFn: fetchSettings })
   const m = useMutation({
-    mutationFn: (patch: Partial<Settings>) => api.me.updateSettings(patch),
+    mutationFn: (patch: Partial<Settings>) => updateSettings(patch),
     onMutate: async (patch) => {
       await qc.cancelQueries({ queryKey: key })
       const prev = qc.getQueryData<Settings>(key)
@@ -50,27 +79,27 @@ export const useSettings = () => {
 }
 
 export const useMySettings = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'settings'], queryFn: api.me.settings, enabled })
+  useQuery({ queryKey: ['me', 'settings'], queryFn: fetchSettings, enabled })
 
 export const useUpdateSettings = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (patch: Partial<Settings>) => api.me.updateSettings(patch),
+    mutationFn: (patch: Partial<Settings>) => updateSettings(patch),
     onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
     onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
 
 export const useBookmarkList = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'bookmarks', 'chat'], queryFn: () => api.me.bookmarks({ limit: 100 }), enabled })
+  useQuery({ queryKey: ['me', 'bookmarks', 'chat'], queryFn: fetchBookmarkList, enabled })
 
 export const useMyLinks = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'links'], queryFn: () => api.me.links(undefined, { limit: 100 }), enabled })
+  useQuery({ queryKey: ['me', 'links'], queryFn: fetchLinks, enabled })
 
 export const useDeleteLink = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => api.me.deleteLink(id),
+    mutationFn: deleteLink,
     onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'links'] }),
     onError: () => Alert.alert('지우지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
@@ -79,29 +108,27 @@ export const useDeleteLink = () => {
 export const useAddLink = (onAdded: () => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (body: { url: string; kind?: LinkKind; aiRead: boolean }) => api.me.addLink(body),
+    mutationFn: (body: { url: string; kind?: LinkKind; aiRead: boolean }) => addLink(body),
     onSuccess: () => (void qc.invalidateQueries({ queryKey: ['me', 'links'] }), onAdded()),
     onError: () => Alert.alert('추가하지 못했어요', '링크 주소를 확인해 주세요.'),
   })
 }
 
 // shortcut: lists load the first 50 items; switch to useInfiniteQuery if people keep more than that.
-const FIRST = { limit: 50 }
-
 export const useMyApplications = () =>
   useQuery({
     queryKey: ['applications', 'my-list'],
-    queryFn: () => api.applications.list(FIRST),
+    queryFn: fetchMyApplications,
   })
 
 export const useMyBookmarks = () => {
   const qc = useQueryClient()
   const query = useQuery({
     queryKey: ['me', 'bookmarks', 'my-list'],
-    queryFn: () => api.me.bookmarks(FIRST),
+    queryFn: fetchMyBookmarks,
   })
   const unbookmark = useMutation({
-    mutationFn: (p: Posting) => api.postings.unbookmark(p.id),
+    mutationFn: unbookmarkPosting,
     onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
   })
   return { query, unbookmark }
@@ -110,8 +137,7 @@ export const useMyBookmarks = () => {
 export const useFollowToggle = (userId: string, setFollowing: (next: boolean) => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (next: boolean) =>
-      next ? api.profiles.follow(userId) : api.profiles.unfollow(userId),
+    mutationFn: (next: boolean) => (next ? followProfile(userId) : unfollowProfile(userId)),
     onMutate: (next) => setFollowing(next),
     onError: (_e, next) => setFollowing(!next),
     onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'follows'] }),
@@ -119,20 +145,20 @@ export const useFollowToggle = (userId: string, setFollowing: (next: boolean) =>
 }
 
 export const useMyFollows = () =>
-  useQuery({ queryKey: ['me', 'follows'], queryFn: () => api.me.follows(FIRST) })
+  useQuery({ queryKey: ['me', 'follows'], queryFn: fetchFollows })
 
 export const useMyFollowers = () =>
   useQuery({
     queryKey: ['me', 'followers'],
-    queryFn: () => api.me.followers(FIRST),
+    queryFn: fetchFollowers,
   })
 
-export const useMyPosts = () => useQuery({ queryKey: ['me', 'posts'], queryFn: () => api.me.posts(FIRST) })
+export const useMyPosts = () => useQuery({ queryKey: ['me', 'posts'], queryFn: fetchMyPosts })
 
 export const useMyCommentedPosts = () =>
   useQuery({
     queryKey: ['me', 'commented-posts'],
-    queryFn: () => api.me.commentedPosts(FIRST),
+    queryFn: fetchCommentedPosts,
   })
 
 export const useCalendarEvents = (from: string, to: string) =>
@@ -153,7 +179,7 @@ export const useAddCalendarEvent = (onAdded: () => void) => {
 }
 
 export const useSource = (id: string) =>
-  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => api.sources.get(id) })
+  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => fetchSource(id) })
 
 export const useResumeDraft = (id: string) =>
   useQuery({
@@ -175,7 +201,7 @@ export const useRemoveSource = (onRemoved: () => void) => {
 export const useApplyResumeProfile = (onDone: () => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (patch: Partial<Profile>) => api.me.updateProfile(patch),
+    mutationFn: (patch: Partial<Profile>) => updateProfile(patch),
     onSuccess: (p) => {
       qc.setQueryData(['me', 'profile'], p)
       onDone()
@@ -190,7 +216,7 @@ type Patch = Partial<Profile> & { avatarKey?: string }
 export const useSaveProfile = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (patch: Patch) => api.me.updateProfile(patch),
+    mutationFn: (patch: Patch) => updateProfile(patch),
     onSuccess: (p) => {
       qc.setQueryData(['me', 'profile'], p)
       router.back()
@@ -203,7 +229,7 @@ export const useOffer = (id: string) => {
   const qc = useQueryClient()
   const query = useQuery({
     queryKey: ['me', 'offer', id],
-    queryFn: () => api.me.offer(id),
+    queryFn: () => fetchOffer(id),
   })
   const o = query.data
   useEffect(() => {
@@ -220,21 +246,21 @@ export const useOfferDecision = (id: string, reply: string, onAccepted: () => vo
     void qc.invalidateQueries({ queryKey: ['me', 'offer', id, 'messages'] })
   }
   const accept = useMutation({
-    mutationFn: () => api.me.acceptOffer(id, reply.trim() || undefined),
+    mutationFn: () => acceptOffer(id, reply.trim() || undefined),
     onSuccess: (next) => {
       onAccepted()
       done(next)
     },
     onError: () => Alert.alert('수락하지 못했어요', '잠시 뒤에 다시 시도해 주세요.'),
   })
-  const decline = useMutation({ mutationFn: () => api.me.declineOffer(id), onSuccess: done })
+  const decline = useMutation({ mutationFn: () => declineOffer(id), onSuccess: done })
   return { accept, decline }
 }
 
 export const useOfferPosting = (postingId: string | undefined) =>
   useQuery({
     queryKey: ['postings', 'detail', postingId],
-    queryFn: () => api.postings.get(postingId!),
+    queryFn: () => fetchPosting(postingId!),
     enabled: !!postingId,
   })
 
@@ -243,10 +269,10 @@ export const useOfferMessages = (offerId: string, onSent: () => void) => {
   const key = ['me', 'offer', offerId, 'messages']
   const query = useQuery({
     queryKey: key,
-    queryFn: () => api.me.offerMessages(offerId, { limit: 100 }),
+    queryFn: () => fetchOfferMessages(offerId),
   })
   const send = useMutation({
-    mutationFn: (body: string) => api.me.sendOfferMessage(offerId, body),
+    mutationFn: (body: string) => sendOfferMessage(offerId, body),
     onSuccess: () => {
       onSent()
       void qc.invalidateQueries({ queryKey: key })

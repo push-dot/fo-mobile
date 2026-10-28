@@ -6,9 +6,12 @@ export { signIn, signOut, deleteAccount, signInWithDevToken } from './auth'
 export {
   openBrowser,
   openAuthSession,
+  openUrl,
   pickDocument,
   pickImage,
   hapticImpactLight,
   hapticNotify,
+  saveToCache,
+  shareFile,
 } from './platform'
 export { shareMessage } from './platform'

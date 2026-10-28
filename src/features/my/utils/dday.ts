@@ -1,4 +1,4 @@
-import { dayDiff } from '../day-diff'
+import { dayDiff } from './day-diff'
 
 export const dday = (iso: string, now = new Date()) => {
   const n = dayDiff(new Date(iso), now)

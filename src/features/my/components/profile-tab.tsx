@@ -6,7 +6,7 @@ import { Badge, Button, Icon, Text } from '@/shared/components'
 import { useColors } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
 import type { ProfileSection } from '../types'
-import { careerPeriod, tenureLabel } from '../utility'
+import { careerPeriod, tenureLabel } from '../utils'
 import Avatar from './avatar'
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)

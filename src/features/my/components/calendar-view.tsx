@@ -5,7 +5,7 @@ import { BottomSheet, Chip, GlassButton, Text, TextField } from '@/shared/compon
 import { useColors, type Colors } from '../../../theme'
 import { useAddCalendarEvent, useCalendarEvents } from '../api/hooks'
 import type { CalendarEvent, CalendarEventType } from '../types'
-import { clock, dayTitle, dday, monthGrid, sameDay } from '../utility'
+import { clock, dayTitle, dday, monthGrid, sameDay } from '../utils'
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 const TYPES: { key: CalendarEventType; label: string; color: keyof Colors }[] = [

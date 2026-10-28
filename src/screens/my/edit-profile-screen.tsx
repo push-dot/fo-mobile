@@ -23,8 +23,8 @@ import {
   Avatar,
   careerPeriod,
   FieldLabel,
+  AVATAR_IMAGE_OPTIONS,
   parseYm,
-  pickAvatarImage,
   SheetHeader,
   SKILL_CATALOG,
   tenureLabel,
@@ -34,6 +34,7 @@ import {
   type ProfileSection,
 } from '@/features/my'
 import { BottomSheet, Button, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
+import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
 import { fontFor, radius, useColors } from '@/theme'
 
@@ -186,7 +187,7 @@ const EditBasic = ({ p }: { p: Profile }) => {
   const [sheet, setSheet] = useState<'job' | 'years' | null>(null)
 
   const pickPhoto = async () => {
-    const res = await pickAvatarImage()
+    const res = await pickImage(AVATAR_IMAGE_OPTIONS)
     const a = res.canceled ? null : res.assets[0]
     if (!a) return
     setPhoto({ uri: a.uri })

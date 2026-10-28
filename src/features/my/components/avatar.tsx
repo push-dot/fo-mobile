@@ -2,7 +2,7 @@ import { Image } from 'expo-image'
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { assetUrl } from '@/shared/utility'
-import { givenName, tintOf } from '../utility'
+import { givenName, tintOf } from '../utils'
 
 const Avatar = ({
   name,

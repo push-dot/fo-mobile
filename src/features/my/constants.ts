@@ -66,6 +66,15 @@ export const DOC_TYPES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ]
+
+export const AVATAR_IMAGE_OPTIONS = {
+  mediaTypes: ['images' as const],
+  allowsEditing: true,
+  aspect: [1, 1] as [number, number],
+  quality: 0.8,
+}
+
+export const RESUME_DOCUMENT_OPTIONS = { type: DOC_TYPES, copyToCacheDirectory: true }
 export const MAX_BYTES = 20 * 1024 * 1024
 
 export const TONES: { key: Tone; label: string }[] = [

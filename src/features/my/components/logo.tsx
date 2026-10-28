@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
-import { tintOf } from '../utility'
+import { tintOf } from '../utils'
 
 const Logo = ({ name, size = 48 }: { name: string; size?: number }) => {
   return (

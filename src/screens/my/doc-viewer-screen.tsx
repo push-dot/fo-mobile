@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { JOB_CATEGORIES, type Profile } from '@push/api-client'
 import { fileSize, monthDay } from '@push/shared'
@@ -16,6 +16,7 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { Badge, BottomSheet, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
 type Part = 'basic' | 'intro' | 'career' | 'skills'
@@ -245,7 +246,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
               {
                 icon: 'share',
                 label: '공유',
-                onPress: () => s && void Share.share({ message: s.fileName }),
+                onPress: () => s && void shareMessage({ message: s.fileName }),
               },
               { icon: 'more', label: '더 보기', onPress: () => setMenu(true) },
             ]}
