@@ -44,6 +44,7 @@
   },
   "scripts": {
     "start": "expo start",
+    "start:test": "EXPO_PUBLIC_API_BASE_URL=https://push-be-staging.youngjoon568.workers.dev/api/v1 expo start",
     "ios": "expo run:ios",
     "android": "expo run:android",
     "typecheck": "tsc --noEmit",
