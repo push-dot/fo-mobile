@@ -10,13 +10,14 @@ import type { Approval, ApprovalSection, Choice } from '../types'
 
 type Props = {
   approval: Approval
-  /** Picked an answer: `text` becomes the user bubble, `choice` the index sent back. */
-  onAnswer: (text: string, choice: number) => void
+  /** Picked an answer: `text` becomes the user bubble, `choice` the index or indexes sent back. */
+  onAnswer: (text: string, choice: number | number[]) => void
   /** "직접 말하기" / 변경: hand the floor back to the composer. */
   onSay: () => void
 }
 
 const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
+const isStop = (c: Choice) => c.label === '그만하기' || c.label === '그만할게요'
 
 /** Replaces the composer until answered (design_system ApprovalPanel). */
 export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
@@ -52,7 +53,11 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
             choice={ch}
             on={sel[si]!.includes(i)}
             square={!numbered}
-            onPress={() => (numbered ? pickNumbered(i, ch) : toggle(si, i, s.multi))}
+            onPress={() => {
+              if (numbered) return pickNumbered(i, ch)
+              if (s.multi && isStop(ch)) return onAnswer(ch.label, i)
+              toggle(si, i, s.multi)
+            }}
           />
         ))
       case 'chips':
@@ -125,7 +130,22 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
           {approval.secondary ? (
             <Button style={{ flex: 1 }} variant="secondary" label={approval.secondary} onPress={() => onAnswer(approval.secondary!, 1)} />
           ) : null}
-          <Button style={{ flex: 1 }} label={approval.submit} onPress={() => onAnswer(approval.answer ?? approval.submit!, 0)} />
+          <Button
+            style={{ flex: 1 }}
+            label={approval.submit}
+            disabled={approval.sections.some((s, i) => s.kind === 'choices' && s.multi && !(sel[i]?.length))}
+            onPress={() => {
+              const si = approval.sections.findIndex((s) => s.kind === 'choices' && s.multi)
+              const section = si >= 0 ? approval.sections[si] : undefined
+              if (section?.kind === 'choices') {
+                const picks = sel[si] ?? []
+                if (!picks.length) return
+                onAnswer(picks.map((i) => section.items[i]!.label).join(', '), picks)
+                return
+              }
+              onAnswer(approval.answer ?? approval.submit!, 0)
+            }}
+          />
         </View>
       ) : null}
       {approval.foot ? (

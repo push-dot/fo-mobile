@@ -1,7 +1,9 @@
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useColors } from '../../../theme'
 import { Badge, BottomSheet, Chip, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
+import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
 import { FileTag } from './items'
 import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
@@ -42,13 +44,14 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
   const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i) => sel.includes(i.id))
-  const input = { picked, url, chips, option, doc, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
+  const documentId = docs.data?.find((x) => x.fileName === doc)?.id
+  const input = { picked, url, chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
     if (!r) return
     onClose()
-    void start(r.title, r.message, undefined, undefined, r.intent)
+    void start(r.title, r.message, undefined, undefined, r.intent, r.context)
   }
 
   const toggle = (id: string) =>
@@ -72,7 +75,28 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
       ) : (
         <>
           {qs.layout === 'link' ? (
-            <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="공고 링크" />
+            <View style={{ gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text v="c1" weight="700" color="t3">
+                  복사한 링크
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="붙여넣기"
+                  hitSlop={8}
+                  onPress={() => {
+                    void readClipboard().then((text) => {
+                      if (text.trim()) setUrl(text.trim())
+                    })
+                  }}
+                >
+                  <Text v="c1" weight="700" color="acText">
+                    붙여넣기
+                  </Text>
+                </Pressable>
+              </View>
+              <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="공고 링크" />
+            </View>
           ) : null}
 
           {qs.layout === 'match' ? (
@@ -81,7 +105,7 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                 {chips.map((ch) => (
                   <Chip key={ch} label={ch} on removable onPress={() => setChips((cur) => cur.filter((x) => x !== ch))} />
                 ))}
-                <Chip label="+ 조건 추가" onPress={() => setAdding('')} />
+                <Chip label="조건 추가" onPress={() => setAdding('')} />
               </View>
               {adding !== null ? (
                 <TextField
@@ -114,7 +138,15 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             />
           ) : null}
 
-          {qs.layout === 'calendar' ? <Calendar items={d.items} connected={!!d.calendar?.connected} task={task} setTask={setTask} /> : null}
+          {qs.layout === 'calendar' ? (
+            <Calendar
+              items={d.items}
+              connected={!!d.calendar?.connected}
+              task={task}
+              setTask={setTask}
+              onChange={() => router.push({ pathname: '/my', params: { tab: 'activity', sub: 'calendar' } })}
+            />
+          ) : null}
 
           {qs.layout === 'cards' ? (
             <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } : { gap: 8 }}>
@@ -365,7 +397,7 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
   )
 }
 
-const Calendar = ({ items, connected, task, setTask }: { items: QsItem[]; connected: boolean; task: number; setTask: (n: number) => void }) => {
+const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem[]; connected: boolean; task: number; setTask: (n: number) => void; onChange: () => void }) => {
   const c = useColors()
   return (
     <>
@@ -423,6 +455,11 @@ const Calendar = ({ items, connected, task, setTask }: { items: QsItem[]; connec
         <Text v="b2" style={{ flex: 1 }}>
           {connected ? 'Google 캘린더와 연결됨' : 'Google 캘린더와 연결 안 됨'}
         </Text>
+        <Pressable accessibilityRole="button" accessibilityLabel="캘린더 변경" onPress={onChange} hitSlop={8}>
+          <Text v="c1" weight="700" color="acText">
+            변경
+          </Text>
+        </Pressable>
       </View>
     </>
   )

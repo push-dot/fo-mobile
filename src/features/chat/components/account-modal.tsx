@@ -73,7 +73,6 @@ export const AccountModal = ({
 }
 
 const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; account?: Account; onPlan: () => void; onClose: () => void }) => {
-  const c = useColors()
   const me = useMe()
   const [picker, setPicker] = useState<Picker>(null)
   const settings = useMySettings(visible)
@@ -85,7 +84,6 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
   const days = settings.data?.chatRetentionDays
   const effort = EFFORTS.find((e) => e.key === settings.data?.defaultEffort)
-  const credits = account?.credits
 
   return (
     <>
@@ -94,32 +92,10 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
         <Text v="h2" style={{ marginTop: 6 }}>
           {me.name}
         </Text>
-        {account?.email ? (
-          <Text v="b2" color="t3">
-            {account.email}
-          </Text>
-        ) : null}
       </View>
       <View style={{ paddingHorizontal: 20, paddingTop: 14, gap: 22 }}>
         <SettingsGroup>
           <SettingsRow label={account?.plan ?? ' '} onPress={onPlan} />
-          {credits ? (
-            <View style={{ paddingVertical: 14, gap: 8 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text v="b1">사용량</Text>
-                <Text v="b1" color="t2" style={{ fontVariant: ['tabular-nums'] }}>
-                  {credits.used.toLocaleString()} / {credits.total.toLocaleString()} 크레딧
-                </Text>
-              </View>
-              <View
-                accessibilityRole="progressbar"
-                accessibilityValue={{ min: 0, max: credits.total, now: credits.used }}
-                style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}
-              >
-                <View style={{ width: `${Math.min(100, (credits.used / credits.total) * 100)}%`, height: '100%', backgroundColor: c.ac }} />
-              </View>
-            </View>
-          ) : null}
         </SettingsGroup>
         <View>
           <SettingsGroup title="AI가 참고하는 내 정보" note="대화를 시작할 때 AI가 이 정보부터 읽어요.">
@@ -130,7 +106,7 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
         </View>
         <SettingsGroup title="대화">
           <SettingsRow
-            label={tone ? `${tone.label} 말투` : '답변 말투'}
+            label={tone ? `${tone.label} 말투` : '그대로'}
             onPress={() =>
               setPicker({ title: '어떤 말투로 답할까요?', options: TONES.map((t) => t.label), value: TONES.indexOf(tone ?? TONES[0]!), onPick: (i) => save.mutate({ defaultTone: TONES[i]!.key }) })
             }
@@ -177,12 +153,10 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
 }
 
 const PLANS = [
-  { key: 'ULTRA', monthly: 29000, credits: 20000, features: ['월 20,000 크레딧 · 지금의 4배', '역량 보완 프로젝트 무제한', '대화 기록 무제한 보관'] },
-  { key: 'PRO', monthly: 7900, credits: 5000, features: [] },
-  { key: 'FREE', monthly: 0, credits: 300, features: [] },
+  { key: 'ULTRA', price: '$100', usage: 'PRO의 4배 사용량', features: ['PRO의 4배 사용량', '역량 보완 프로젝트 무제한'] },
+  { key: 'PRO', price: '$30', usage: 'FREE의 15배 사용량', features: [] },
+  { key: 'FREE', price: '무료', usage: '기본 사용량', features: [] },
 ] as const
-
-const won = (n: number) => (n ? `${n.toLocaleString()}원` : '무료')
 
 const PlanPage = ({ account }: { account: Account }) => {
   const c = useColors()
@@ -196,15 +170,10 @@ const PlanPage = ({ account }: { account: Account }) => {
       <View style={{ marginHorizontal: 20, borderRadius: 22, padding: 20, gap: 10, backgroundColor: c.acSoft, borderWidth: 2, borderColor: c.ac }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 22, lineHeight: 28, ...fontFor('800'), color: c.t1 }}>ULTRA</Text>
-          <View style={{ height: 22, paddingHorizontal: 7, borderRadius: 6, backgroundColor: c.ac, justifyContent: 'center' }}>
-            <Text v="c2" weight="700" style={{ color: '#FFFFFF' }}>
-              추천
-            </Text>
-          </View>
           {current === 'ULTRA' ? <Badge label="지금 쓰는 중" /> : null}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-          <Text style={{ fontSize: 24, lineHeight: 30, ...fontFor('700'), color: c.t1 }}>{won(ultra.monthly)}</Text>
+          <Text style={{ fontSize: 24, lineHeight: 30, ...fontFor('700'), color: c.t1 }}>{ultra.price}</Text>
           <Text v="b2" color="t3">
             / 월
           </Text>
@@ -229,10 +198,10 @@ const PlanPage = ({ account }: { account: Account }) => {
               {p.key === current ? <Badge label="지금 쓰는 중" /> : null}
             </View>
             <Text v="b1" weight="700">
-              {p.monthly ? `${won(p.monthly)} / 월` : '무료'}
+              {p.key === 'FREE' ? p.price : `${p.price} / 월`}
             </Text>
             <Text v="c1" color="t3">
-              월 {p.credits.toLocaleString()} 크레딧
+              {p.usage}
             </Text>
           </View>
         ))}
@@ -245,7 +214,7 @@ const PlanPage = ({ account }: { account: Account }) => {
           <SettingsRow label="크레딧 구매" right={<Button label="구매" size="sm" variant="secondary" onPress={promptCreditPurchase} />} />
         </SettingsGroup>
       </View>
-      <Note>매월 1일에 요금제 크레딧이 다시 채워져요.</Note>
+      <Note>요금제마다 쓸 수 있는 양이 달라요</Note>
     </Appear>
   )
 }

@@ -528,7 +528,9 @@ export const Item = ({
         <UsageExhausted onPlan={() => onUsage('plan')} onCredits={() => onUsage('credits')} />
       ) : (
         <Appear style={{ flexDirection: 'row', gap: 10 }}>
-          <Dot color={c.red} top={7} />
+          <Text v="b2" weight="700" color="red">
+            !
+          </Text>
           <Text v="b2" weight="600" color="red" style={{ flex: 1 }}>
             {item.text}
           </Text>

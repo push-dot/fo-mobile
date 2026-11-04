@@ -1,25 +1,24 @@
 import type { StreamEvent, StreamOption } from '@push/api-client'
-import { CHOICE_QUESTION, DEFAULT_ERROR_TEXT, ERROR_TEXT, FIT_ROWS, queueBusyText, SAY_LABEL } from '../constants'
+import { CHOICE_QUESTION, DEFAULT_ERROR_TEXT, ERROR_TEXT, FIT_ROWS, MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PREVENTION_QUESTION, queueBusyText } from '../constants'
 import type { Approval, ChatEvent } from '../types'
 
 export const errorText = (code?: string, retryAfterSec?: number) =>
   code === 'QUEUE_BUSY' && retryAfterSec ? queueBusyText(retryAfterSec) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-const ask = (id: string, question: string, options: StreamOption[], recommended?: string, foot?: string, detail?: string): ChatEvent => {
+const ask = (id: string, question: string, options: StreamOption[], recommended?: string, foot?: string, detail?: string, multiple?: boolean): ChatEvent => {
   const approval: Approval = {
     id,
     question,
-    foot,
+    foot: multiple && question === PREVENTION_QUESTION ? MULTI_PICK_FOOT : foot,
     detail,
+    submit: multiple ? MULTI_PICK_SUBMIT : undefined,
     optionIds: options.map((o) => o.id),
     sections: [
       {
         kind: 'choices',
         selected: [],
-        items: [
-          ...options.map((o) => (o.id === recommended ? { label: o.label, badge: { label: '추천', tone: 'ac' as const } } : { label: o.label })),
-          { label: SAY_LABEL },
-        ],
+        ...(multiple ? { multi: true as const } : {}),
+        items: options.map((o) => (o.id === recommended ? { label: o.label, badge: { label: '추천', tone: 'ac' as const } } : { label: o.label })),
       },
     ],
   }
@@ -37,9 +36,9 @@ const map = (ev: StreamEvent): ChatEvent | null => {
       return { type: 'tool', id: `tool-${ev.name}`, name: ev.name, action: ev.summary, state: ev.state, error }
     }
     case 'approval':
-      return ask(ev.id, ev.title, ev.options, undefined, ev.summary)
+      return ask(ev.id, ev.kind === 'TOOL_ACTION' ? ev.summary || ev.title : ev.title, ev.options, undefined, ev.kind === 'TOOL_ACTION' ? undefined : ev.summary)
     case 'choice': {
-      if (!ev.auto) return ask(ev.id, ev.title ?? CHOICE_QUESTION, ev.options, ev.recommended, undefined, ev.detail)
+      if (!ev.auto) return ask(ev.id, ev.title ?? CHOICE_QUESTION, ev.options, ev.recommended, undefined, ev.detail, ev.multiple)
       const picked = ev.options.find((o) => o.id === ev.recommended)
       return picked ? { type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked.label}` } : null
     }

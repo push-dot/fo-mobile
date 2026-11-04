@@ -95,4 +95,13 @@ describe('server approvals', () => {
     expect(api.conversations.stream).toHaveBeenCalledWith('c4', { text: '제목만 바꿔 줘', accessMode: 'AUTO' }, expect.anything())
     expect(chat('c4').approval).toBeNull()
   })
+
+  it('sends every picked id when the card allows several', async () => {
+    api.conversations.resolveApproval.mockResolvedValue({ id: 'ap1', status: 'APPROVED', optionId: 'resume', optionIds: ['resume', 'portfolio'], jobId: 'j1' })
+    pending('c5', ['resume', 'portfolio', 'cover_letter', 'cancel'])
+    answer('c5', '이력서, 포트폴리오', [0, 1])
+    await settled('c5')
+    expect(api.conversations.resolveApproval).toHaveBeenCalledWith('c5', 'ap1', 'resume', ['resume', 'portfolio'])
+    expect(api.conversations.stream).not.toHaveBeenCalled()
+  })
 })

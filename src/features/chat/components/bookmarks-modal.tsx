@@ -60,7 +60,9 @@ export const BookmarksModal = ({ visible, onClose, onDone }: { visible: boolean;
           <View style={{ gap: 8 }}>
             <Button
               label="이 공고에 맞춰 대화 시작"
-              onPress={() => go(() => void start(`${picked.company} ${picked.title}`, `${picked.company} ${picked.title} 공고에 맞춰 내 이력서를 고쳐 주세요`))}
+              onPress={() =>
+                go(() => void start(`${picked.company} ${picked.title}`, `${picked.company} ${picked.title} 공고에 맞춰 내 이력서를 고쳐 주세요`, undefined, undefined, 'match_posting'))
+              }
             />
             <Button label="공고 보기" variant="secondary" onPress={() => go(() => router.push(`/postings/${picked.id}`))} />
           </View>

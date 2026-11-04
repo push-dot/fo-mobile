@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors, useShadow } from '@/theme'
-import { BottomSheet, Glass, GlassButton, Icon, Text, TextField, type IconName } from '@/shared/components'
+import { BottomSheet, Glass, GlassButton, Icon, Mascot, Text, TextField, type IconName } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import {
   answer,
@@ -116,12 +116,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
         ))}
       </ScrollView>
 
-      <Header
-        title={conv?.title ?? ''}
-        onDrawer={() => setDrawer(true)}
-        onNew={() => router.dismissTo('/chat')}
-        onMore={() => setMore(true)}
-      />
+      <Header onDrawer={() => setDrawer(true)} onNew={() => router.dismissTo('/chat')} onMore={() => setMore(true)} />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         {fresh ? (
@@ -193,7 +188,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   )
 }
 
-const Header = ({ title, onDrawer, onNew, onMore }: { title: string; onDrawer: () => void; onNew: () => void; onMore: () => void }) => {
+const Header = ({ onDrawer, onNew, onMore }: { onDrawer: () => void; onNew: () => void; onMore: () => void }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
@@ -206,9 +201,9 @@ const Header = ({ title, onDrawer, onNew, onMore }: { title: string; onDrawer: (
       )}
       <View style={{ marginTop: insets.top, height: 56, flexDirection: 'row', alignItems: 'center', paddingHorizontal: ios ? 12 : 8, gap: 8 }}>
         <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: onDrawer }]} />
-        <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
-          {title}
-        </Text>
+        <View accessibilityRole="header" accessibilityLabel="Push" style={{ flex: 1, alignItems: 'center' }}>
+          <Mascot size={36} />
+        </View>
         <GlassButton
           actions={[
             { icon: 'edit', label: '새 대화', onPress: onNew },

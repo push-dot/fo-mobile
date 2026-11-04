@@ -54,7 +54,7 @@ describe('harness events', () => {
     const [ap] = await map({ type: 'approval', id: 'ap1', kind: 'TOOL_ACTION', title: '메일을 보낼까요?', options: [{ id: 'approve', label: '실행' }, { id: 'reject', label: '취소' }] })
     expect(ap).toMatchObject({ type: 'approval', approval: { id: 'ap1', question: '메일을 보낼까요?', optionIds: ['approve', 'reject'] } })
     const s = play([ap!])
-    expect(s.approval?.sections[0]).toMatchObject({ kind: 'choices', items: [{ label: '실행' }, { label: '취소' }, { label: '직접 말하기' }] })
+    expect(s.approval?.sections[0]).toMatchObject({ kind: 'choices', items: [{ label: '실행' }, { label: '취소' }] })
     const [ch] = await map({ type: 'choice', id: 'g1', options: [{ id: 'more', label: '더 하기' }, { id: 'cancel', label: '그만하기' }], recommended: 'more' })
     expect(ch).toMatchObject({ type: 'approval', approval: { id: 'g1', optionIds: ['more', 'cancel'] } })
   })

@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
 import { useColors, useShadow } from '../../../theme'
-import { Glass, Icon, Text } from '@/shared/components'
+import { BottomSheet, Glass, Icon, Text, TextField } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
 import { useAccessMode, useMentionGroups } from '../api/hooks'
 import { Composer } from './composer'
@@ -29,6 +29,9 @@ type Props = {
 export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut, onTyping, above, inputRef }: Props) => {
   const [text, setText] = useState('')
   const [attachment, setAttachment] = useState<string>()
+  const [materials, setMaterials] = useState(false)
+  const [materialKind, setMaterialKind] = useState<'github' | 'posting' | null>(null)
+  const [materialText, setMaterialText] = useState('')
   const own = useRef<TextInputInstance>(null)
   const ref = inputRef ?? own
   const query = mentionQuery(text)
@@ -44,9 +47,17 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
     change('')
     setAttachment(undefined)
   }
-  const attach = async () => {
+  const closeMaterials = () => (setMaterials(false), setMaterialKind(null), setMaterialText(''))
+  const attachFile = async () => {
+    closeMaterials()
     const r = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
     if (!r.canceled && r.assets[0]) setAttachment(r.assets[0].name)
+  }
+  const takeMaterial = () => {
+    const value = materialText.trim()
+    if (!value) return
+    change(text ? `${text} ${value}` : value)
+    closeMaterials()
   }
   const pick = (m: MentionItem) => {
     if (m.kind === 'shortcut') {
@@ -69,7 +80,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         placeholder={placeholder}
         working={working}
         onStop={onStop}
-        onAttach={() => void attach()}
+        onAttach={() => setMaterials(true)}
         // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         // shortcut: no speech dependency; the keyboard's dictation key handles voice for now.
@@ -79,6 +90,43 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         accessMode={access.mode}
         onAccessMode={access.pick}
       />
+      <BottomSheet
+        visible={materials}
+        onClose={closeMaterials}
+        title="자료 고르기"
+        action={materialKind ? { label: '넣기', onPress: takeMaterial, disabled: !materialText.trim() } : undefined}
+      >
+        {materialKind ? (
+          <TextField
+            value={materialText}
+            onChangeText={setMaterialText}
+            placeholder={materialKind === 'github' ? 'https://github.com/' : 'https://'}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            autoFocus
+            onSubmitEditing={takeMaterial}
+            accessibilityLabel={materialKind === 'github' ? 'GitHub 링크' : '공고 링크'}
+          />
+        ) : (
+          <View style={{ gap: 4 }}>
+            <Text v="c1" weight="700" color="t3">
+              다른 곳에서
+            </Text>
+            {(
+              [
+                ['파일', () => void attachFile()],
+                ['GitHub 링크', () => setMaterialKind('github')],
+                ['공고 붙여넣기', () => setMaterialKind('posting')],
+              ] as const
+            ).map(([label, onPress]) => (
+              <Pressable key={label} accessibilityRole="button" onPress={onPress} style={{ minHeight: 48, justifyContent: 'center' }}>
+                <Text v="b1">{label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </BottomSheet>
     </View>
   )
 }

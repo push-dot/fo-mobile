@@ -1,3 +1,4 @@
+import * as Clipboard from 'expo-clipboard'
 import * as DocumentPicker from 'expo-document-picker'
 import { File, Paths } from 'expo-file-system'
 import * as Haptics from 'expo-haptics'
@@ -5,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker'
 import * as ExpoLinking from 'expo-linking'
 import * as Sharing from 'expo-sharing'
 import * as WebBrowser from 'expo-web-browser'
-import { Linking, Share } from 'react-native'
+import { Linking, Platform, Share } from 'react-native'
 
 export const openBrowser = (url: string) => WebBrowser.openBrowserAsync(url)
 
@@ -38,5 +39,14 @@ export const shareFile = (uri: string, dialogTitle: string) => Sharing.shareAsyn
 export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content)
 
 export const openUrl = (url: string) => Linking.openURL(url)
+
+export const readClipboard = async () => {
+  if (Platform.OS === 'web') {
+    const clip = globalThis.navigator?.clipboard
+    if (!clip?.readText) return ''
+    return clip.readText()
+  }
+  return Clipboard.getStringAsync()
+}
 
 export const openSystemSettings = () => ExpoLinking.openSettings()

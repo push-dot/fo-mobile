@@ -21,7 +21,7 @@ const TabsLayout = () => {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(chat)">
         <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
-        <NativeTabs.Trigger.Label>AI 채팅</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>에이전트</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(my)">
         <NativeTabs.Trigger.Icon sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} md="person" />

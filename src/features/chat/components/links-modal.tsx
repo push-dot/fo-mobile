@@ -2,7 +2,7 @@ import type { LinkKind, UserLink } from '@push/api-client'
 import { useState } from 'react'
 import { Alert, Pressable, ScrollView, View } from 'react-native'
 import { useColors } from '../../../theme'
-import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Switch, Text, TextField, type BadgeTone, type IconName } from '@/shared/components'
+import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Icon3D, Text, TextField, type BadgeTone, type IconName } from '@/shared/components'
 import { openUrl, shareMessage } from '../../../shared/infrastructure'
 import { kindOf } from '../utils/links'
 import { useAddLink, useDeleteLink, useMyLinks } from '@/features/my'
@@ -56,6 +56,7 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
   const all = q.data?.data ?? []
   const shown = kind ? all.filter((l) => l.kind === kind) : all
   const remove = useDeleteLink()
+  const restore = useAddLink(() => {})
 
   const act = (l: UserLink, what: 'open' | 'copy' | 'use' | 'delete') => {
     setMenu(null)
@@ -64,12 +65,29 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
     if (what === 'copy') void shareMessage({ message: l.url })
     if (what === 'use') {
       onUse()
-      void start(l.title, l.kind === 'job' ? `${l.url} 공고에 맞춰 내 서류를 고쳐 주세요` : `${l.url} 내용을 근거로 써 주세요`)
+      void start(
+        l.title,
+        l.kind === 'job' ? `${l.url} 공고에 맞춰 내 서류를 고쳐 주세요` : `${l.url} 내용을 근거로 써 주세요`,
+        undefined,
+        undefined,
+        l.kind === 'job' ? 'match_posting' : undefined,
+      )
     }
     if (what === 'delete')
-      Alert.alert('링크를 지울까요?', l.title, [
+      Alert.alert('이 링크를 삭제할까요?', l.title, [
         { text: '취소', style: 'cancel' },
-        { text: '삭제', style: 'destructive', onPress: () => remove.mutate(l.id) },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () =>
+            remove.mutate(l.id, {
+              onSuccess: () =>
+                Alert.alert('링크를 삭제했어요', undefined, [
+                  { text: '확인', style: 'cancel' },
+                  { text: '되돌리기', onPress: () => restore.mutate({ url: l.url, kind: l.kind, aiRead: true }) },
+                ]),
+            }),
+        },
       ])
   }
 
@@ -99,7 +117,7 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
               )
             })}
           </View>
-          <Note>AI 채팅에서 @언급으로 불러오거나, 서류를 고칠 때 근거로 써요.</Note>
+          <Note>에이전트에서 @언급으로 불러오거나, 서류를 고칠 때 근거로 써요.</Note>
         </>
       )}
 
@@ -109,7 +127,7 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
               [
                 ['open', 'ext', '열기'],
                 ['copy', 'copy', '링크 복사'],
-                ['use', 'chat', 'AI 채팅에서 쓰기'],
+                ['use', 'chat', '에이전트에서 쓰기'],
                 ['delete', 'x', '삭제'],
               ] as const
             ).map(([k, icon, label]) => (
@@ -158,11 +176,10 @@ const LinkRow = ({ link, onMore }: { link: UserLink; onMore: () => void }) => {
 }
 
 const Empty = ({ onAdd }: { onAdd: (k: LinkKind | 'auto') => void }) => {
-  const c = useColors()
   return (
     <View style={{ alignItems: 'center', gap: 10, paddingTop: 80, paddingHorizontal: 32 }}>
-      <View style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: c.acSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-        <Icon name="link" size={30} color="acText" />
+      <View style={{ marginBottom: 6 }}>
+        <Icon3D name="link" size={64} />
       </View>
       <Text v="h2">아직 모아 둔 링크가 없어요</Text>
       <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
@@ -182,7 +199,6 @@ const AddLinkSheet = ({ open, onClose }: { open: LinkKind | 'auto' | null; onClo
   const c = useColors()
   const [url, setUrl] = useState('')
   const [picked, setPicked] = useState<LinkKind | null>(null)
-  const [aiRead, setAiRead] = useState(true)
   const preset = open && open !== 'auto' ? open : null
   const kind = picked ?? preset ?? (url.trim() ? kindOf(url) : null)
   const full = /^https?:\/\//.test(url.trim()) ? url.trim() : `https://${url.trim()}`
@@ -195,7 +211,7 @@ const AddLinkSheet = ({ open, onClose }: { open: LinkKind | 'auto' | null; onClo
       onClose={close}
       title="링크 추가"
       description="링크를 붙여넣으면 종류를 알아서 골라요."
-      action={{ label: '추가하기', onPress: () => add.mutate({ url: full, kind: kind ?? undefined, aiRead }), disabled: !valid || add.isPending }}
+      action={{ label: '추가하기', onPress: () => add.mutate({ url: full, kind: kind ?? undefined, aiRead: true }), disabled: !valid || add.isPending }}
     >
       <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="링크 주소" />
       <View style={{ gap: 8 }}>
@@ -213,7 +229,6 @@ const AddLinkSheet = ({ open, onClose }: { open: LinkKind | 'auto' | null; onClo
         <Text v="b2" style={{ flex: 1 }}>
           추가하면 AI가 README와 커밋을 읽어 둬요
         </Text>
-        <Switch label="AI가 읽어 두기" value={aiRead} onValueChange={setAiRead} />
       </View>
     </BottomSheet>
   )

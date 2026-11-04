@@ -15,6 +15,7 @@ export {
   hapticNotify,
   saveToCache,
   shareFile,
+  readClipboard,
 } from './platform'
 export { shareMessage } from './platform'
 export { readNotificationPermission } from './notification-permission'

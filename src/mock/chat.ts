@@ -2,6 +2,7 @@
 // Sample data follows the AI 채팅 artboards (김서준, 모아페이 …).
 import type { LinkKind, Message, UserLink } from '@push/api-client'
 import type { Approval, ChatDoc, ChatEvent, ChatItem, Choice, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
+import { MULTI_PICK_FOOT, MULTI_PICK_SUBMIT } from '../features/chat/constants'
 import { kindOf } from '../features/chat/utils/links'
 import { mock, page } from './server'
 
@@ -24,7 +25,7 @@ const conv = (id: string, title: string, min: number, lastLine: string, status: 
 const conversations: ConversationRow[] = [
   conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'),
   conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'),
-  conv('c-career', '경력기술서 다듬기', 60 * 24, 'PDF로 저장했어요 · 적합도 8.2'),
+  conv('c-career', '경력기술서 다듬기', 60 * 24, 'Push 프로필에 저장했어요 · 적합도 8.2'),
   conv('c-pado', '파도AI 자기소개서 초안', 60 * 24 * 4, '초안 v1을 만들었어요'),
   conv('c-nuri', '누리클라우드 자기소개서', 60 * 24 * 8, '지원 동기 문단을 줄였어요'),
 ]
@@ -108,8 +109,8 @@ const done = s(200, { type: 'done', at: 0 })
 
 const RESUME = '김서준_백엔드_이력서_2026.pdf'
 const MOA = '모아페이 · 백엔드 엔지니어'
-const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'PDF로 만들기']
-const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'PDF로 만들기']
+const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'Push 프로필에 저장하기']
+const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필에 저장하기']
 const JD_LINES = ['필수 · Kotlin 또는 Java 4년 이상', '필수 · Spring Boot 운영', '필수 · RDBMS 설계와 튜닝', '필수 · 대용량 트래픽 처리', '필수 · 결제·정산 도메인 이해', '우대 · Kafka · 장애 대응 · MSA']
 
 const tailorRead: Step[] = [
@@ -147,24 +148,20 @@ const tailorFit = (labels: string[], added = -1): Step[] => [
       { n: 15, sign: '', text: '결제 장애 대응 매뉴얼 작성' },
     ],
   }),
-  ask(numbered('tailor-apply', '경력 섹션을 이렇게 바꿀까요?', ['네, 반영해 주세요', '네, 이번 대화에선 묻지 않기', { label: '아니요, 다르게 해 주세요', hint: '직접 말하기' }])),
+  ask(numbered('tailor-apply', '이 수정을 적용할까요?', ['적용', '그대로 두기'])),
 ]
 
-const finish = (company: string, score: string): Step[] => [
+const finish = (score: string): Step[] => [
   s(400, agent('done', `다 됐어요! 적합도를 **${score}**로 올렸어요.`, ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요'])),
-  s(200, { type: 'file', id: 'pdf', name: '김서준_모아페이_백엔드.pdf', meta: 'A4 1쪽 · 186KB' }),
-  s(200, { type: 'actions', id: 'actions', company }),
-  done,
+  ask(numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기'], 'PDF는 Push 프로필에서 내보낼 수 있어요.')),
 ]
 
 const tailorDone = (labels: string[]): Step[] => [
   s(300, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '반영했어요 · 2줄 추가, 1줄 삭제')),
   s(200, todo('todo', labels, labels.length - 1)),
-  s(200, status('PDF로 굽는 중…', '모양 잡는 중…')),
-  s(200, tool('pdf-make', 'PDF 만들기', '모던 템플릿', 'run', 'A4 1쪽에 맞추는 중')),
-  s(1600, tool('pdf-make', 'PDF 만들기', '모던 템플릿', 'ok', 'A4 1쪽 · 186KB')),
+  s(200, status('Push 프로필에 저장하는 중…')),
   s(200, todo('todo', labels, labels.length)),
-  ...finish('모아페이', '6.9 → 8.1'),
+  ...finish('6.9 → 8.1'),
 ]
 
 const tailorResume: Step[] = [
@@ -192,11 +189,7 @@ const say = (id: string, text: string): Step[] => [s(600, agent(id, text)), done
 const ph0: Step[] = [
   s(300, status('생각하는 중…')),
   s(600, agent('ph0', '좋아요! 시작하기 전에 하나만 여쭤볼게요.')),
-  ask(numbered('ph0', '어떤 방식으로 진행할까요?', [
-    { label: '지금 이력서로 공고에 맞춰 고치기', desc: '이력서·포트폴리오·GitHub를 근거로 다시 써요' },
-    { label: '필요한 프로젝트 경험까지 만들기', desc: '공고에 맞는 프로젝트를 기획하고 완성까지 도와요' },
-    '직접 말하기',
-  ])),
+  ask(numbered('ph0', '어떤 방식으로 진행할까요?', ['이력서부터 쓸게요', '경험부터 정리할게요', '그만하기'])),
 ]
 const ph0Input: Step[] = [
   s(500, agent('ph0i', 'Push에 있는 자료부터 찾아볼게요.')),
@@ -204,9 +197,9 @@ const ph0Input: Step[] = [
   s(1200, tool('find', '자료 찾기', '마이 › 서류 · 북마크 공고', 'ok', '이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개')),
   ask({
     id: 'ph0-input',
-    question: '무엇을 만들까요?',
+    question: '어떤 산출물을 만들까요?',
     sections: [
-      { kind: 'choices', multi: true, items: [{ label: '이력서' }, { label: '포트폴리오' }, { label: '자소서' }], selected: [0] },
+      { kind: 'choices', items: [{ label: '이력서' }, { label: '포트폴리오' }, { label: '자기소개서' }, { label: '그만하기' }], selected: [0] },
       {
         kind: 'rows',
         title: '가져올 자료',
@@ -216,10 +209,10 @@ const ph0Input: Step[] = [
           { tag: 'link', title: 'github.com/seojun-kim', sub: '이력서에서 찾았어요' },
         ],
       },
-      { kind: 'chips', title: '말투', options: ['그대로', '전문적인', '자신감 있는', '간결한', '기술 중심', '친근한'], selected: [0] },
+      { kind: 'chips', title: '말투', options: ['전문적으로', '자신 있게', '짧게', '기술 중심으로', '협업 중심으로', '원래 말투로', '그만하기'], selected: [0] },
     ],
     submit: '이대로 진행',
-    answer: '이력서만 · 자료 3개 · 말투 그대로',
+    answer: '1번, 지금 이력서로 할게요',
   }),
 ]
 const ph0Start: Step[] = [
@@ -272,7 +265,7 @@ const ph2: Step[] = [
     ],
     keywords: ['결제 승인', '정산 배치', 'Kafka', '장애 대응'],
   }),
-  ask(numbered('ph2', '이 전략대로 초안을 쓸까요?', ['네, 써 주세요', { label: '전략을 바꿀래요', hint: '직접 말하기' }])),
+  ask(numbered('ph2', '이 전략대로 초안을 쓸까요?', ['초안 쓸게요', '피드백만 볼게요', '그만하기'])),
 ]
 const PH3 = ['요약', '경력', '프로젝트', '기술 스택', '학력']
 const ph3: Step[] = [
@@ -296,7 +289,7 @@ const ph3: Step[] = [
       { sign: '-', text: '사내 동아리 활동 세부 내용' },
     ],
   }),
-  ask(numbered('ph3-review', '첫 초안이에요. 마음에 드세요?', ['좋아요, 계속해 주세요', { label: '이 부분 고쳐 주세요', hint: '직접 말하기' }], '수정은 3번까지 할 수 있어요 · 1/3')),
+  ask(numbered('ph3-review', '첫 번째 초안(v1)이에요. 이대로 검토할까요?', ['검토할게요', '그만하기'])),
 ]
 const ph3Boost: Step[] = [
   s(200, status('점수 올리는 중…')),
@@ -305,73 +298,27 @@ const ph3Boost: Step[] = [
   s(200, tool('boost2', '점수 올리기 2회', '도메인 경험', 'run', '도메인 맥락을 다시 쓰는 중')),
   s(1300, tool('boost2', '점수 올리기 2회', '도메인 경험', 'ok', '7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요')),
   s(300, { type: 'fit', id: 'boost', score: 8.3, from: 6.9, delta: '+1.4 · 목표 달성', note: '목표 8.0 · 가장 낮은 항목: 도메인 6.0' }),
-  ask(numbered('ph3-boost', '지금 8.3점이에요. 더 올려 볼까요?', ['이대로 품질 검사로 넘어가기', { label: '한 번 더 올리기', hint: '도메인 집중' }], '최대 5번까지 할 수 있어요 · 2/5')),
-]
-const ph4Quality: Step[] = [
-  s(200, status('꼼꼼히 보는 중…')),
-  s(200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장마다 보는 중')),
-  s(1500, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
-  s(200, {
-    type: 'diff', id: 'diff4',
-    lines: [
-      { n: 8, sign: '-', text: '결제 트랜젝션 처리 성능 개선' },
-      { n: 8, sign: '+', text: '결제 트랜잭션 처리 성능 개선' },
-      { n: 12, sign: '-', text: '모아페이 · 2022.04–현재' },
-      { n: 12, sign: '+', text: '모아페이 · 2022.03–현재' },
-    ],
-  }),
-  ask({
-    id: 'ph4-quality',
-    question: '추천 수정도 반영할까요?',
-    sections: [{
-      kind: 'choices', multi: true, selected: [0, 1],
-      items: [{ label: '가운데점(·) 나열을 쉼표로' }, { label: '경력 본문의 현재형 문장 2곳' }, { label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }],
-    }],
-    submit: '2개 반영하고 디자인으로',
-  }),
+  ask({ ...numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기']), detail: '적합도 6.9 → 8.3' }),
 ]
 const ph4Design: Step[] = [
-  s(300, tool('fix', '추천 수정 반영', '2개', 'ok', '쉼표 정리 · 현재형 문장 고침')),
-  s(500, agent('tpl', '템플릿을 골라 주세요. 처음이라면 심플을 추천해요.')),
-  ask({
-    id: 'ph4-design',
-    question: '어떤 템플릿으로 만들까요?',
-    sections: [
-      { kind: 'templates', items: [{ label: '심플', recommended: true }, { label: '모던' }, { label: '크리에이티브' }, { label: 'ATS' }], selected: [0] },
-      { kind: 'choices', multi: true, selected: [0], items: [{ label: '프로필 사진 넣기', desc: '마이 › 프로필 사진을 써요 · 모든 템플릿' }] },
-    ],
-    submit: '심플로 만들기',
-  }),
-]
-const ph5: Step[] = [
-  s(200, status('모양 잡는 중…')),
-  s(300, tool('design', '디자인 적용', '심플', 'ok', 'A4 1쪽 · 여백과 줄 간격 맞춤')),
-  s(300, tool('photo', '프로필 사진', '마이 › 프로필', 'ok', '헤더 왼쪽 원형 80px')),
-  s(200, status('PDF로 굽는 중…')),
-  s(200, tool('pdf-make', 'PDF 만들기', '김서준_모아페이_백엔드.pdf', 'run', 'ATS가 읽을 수 있게 텍스트를 살려서 만드는 중')),
-  s(200, { type: 'file', id: 'pdf', name: '김서준_모아페이_백엔드.pdf', progress: 0.2 }),
-  s(800, { type: 'file', id: 'pdf', name: '김서준_모아페이_백엔드.pdf', progress: 0.6 }),
-  s(800, { type: 'file', id: 'pdf', name: '김서준_모아페이_백엔드.pdf', progress: 1 }),
-  s(200, tool('pdf-make', 'PDF 만들기', '김서준_모아페이_백엔드.pdf', 'ok', 'A4 1쪽 · 186KB')),
-  ...finish('모아페이', '6.9 → 8.3'),
+  ask(numbered('ph4-design', '검증을 마쳤어요. 어떤 디자인을 적용할까요?', ['클래식', '모던', '컴팩트', 'ATS', '그만하기'])),
 ]
 const ph2xApproach: Step[] = [
   s(200, status('공고 뜯어보는 중…')),
   s(300, tool('jd', '공고 분석', MOA, 'run', '필수 스택을 뽑는 중')),
   s(1300, tool('jd', '공고 분석', MOA, 'ok', '필수 스택 5개 · 서비스 도메인: 결제·정산')),
-  s(400, agent('x', '공고에 필요한 경험을 만들 방향을 골라 주세요. 둘 다 골라도 돼요.')),
+  s(400, agent('x', '공고에 필요한 경험을 만들 방향을 골라 주세요.')),
+  ask(numbered('ph2x-approach', '어떤 접근 방식으로 진행할까요?', ['병목을 만들게요', '문제를 예방할게요', '그만하기'])),
+]
+const ph2xLevel: Step[] = [
+  ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약으로', '중간 제약으로', '강한 제약으로', '그만하기'])),
+]
+const PREVENT = ['성능', '보안', '확장성', '안정성', '유지보수', '데이터 무결성', '그만하기']
+const ph2xPrevent: Step[] = [
   ask({
-    id: 'ph2x-approach',
-    question: '어떤 방식으로 경험을 만들까요?',
-    sections: [
-      { kind: 'choices', multi: true, selected: [0], items: [{ label: '일부러 병목 넣기', desc: '병목을 넣고 해결 과정을 경험으로 만들어요' }] },
-      { kind: 'chips', options: ['L1 가벼운', 'L2 중간', 'L3 극한'], selected: [1] },
-      { kind: 'choices', multi: true, selected: [0], items: [{ label: '문제 예방하기', desc: '장애를 미리 막는 설계 경험을 만들어요' }] },
-      { kind: 'chips', multi: true, options: ['성능', '보안', '안정성', '데이터 무결성', '확장성'], selected: [2, 3] },
-    ],
-    submit: '고르기 완료',
-    answer: '병목 L2 · 안정성 · 데이터 무결성',
-    foot: '여러 개 고를 수 있어요',
+    ...numbered('ph2x-prevent', '어떤 문제를 예방할까요?', PREVENT, MULTI_PICK_FOOT),
+    submit: MULTI_PICK_SUBMIT,
+    sections: [{ kind: 'choices', multi: true, selected: [], items: PREVENT.map((label) => ({ label })) }],
   }),
 ]
 const ph2xBlueprints: Step[] = [
@@ -380,32 +327,15 @@ const ph2xBlueprints: Step[] = [
   s(1200, tool('check', '방향 검증', '5개 기준', 'ok', '공고 연관성·임팩트·실현 가능성 모두 통과')),
   s(300, tool('bp', '기획서 만들기', '4개', 'run', '기획서를 쓰는 중')),
   s(1500, tool('bp', '기획서 만들기', '4개', 'ok', '공고 스택과 70% 이상 일치', ['retry-queue.md', 'settle-batch.md', 'payment-outbox.md', 'rate-limiter.md'])),
-  ask({
-    id: 'ph2x-bp',
-    question: '어떤 프로젝트를 만들까요?',
-    sections: [{
-      kind: 'choices', multi: true, selected: [0],
-      items: [
-        { label: '결제 승인 재시도 큐', desc: 'L2 · 안정성 · Kotlin, Kafka', badge: { label: '통과', tone: 'green' } },
-        { label: '정산 배치 병렬화', desc: 'L2 · 데이터 무결성 · Spring Batch', badge: { label: '통과', tone: 'green' } },
-        { label: '결제 이벤트 아웃박스', desc: 'L2 · 무결성 · Kafka, JPA', badge: { label: '조건부', tone: 'orange' } },
-        { label: '가맹점 API 레이트 리미터', desc: 'L2 · 안정성 · Redis', badge: { label: '통과', tone: 'green' } },
-      ],
-    }],
-    submit: '1개 시작',
-    secondary: '기획서만 받기',
-  }),
+  ask(numbered('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['기획만 볼게요', '그만하기'])),
 ]
 
 const applyRun: Step[] = [
   s(200, status('지원 준비하는 중…')),
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
-  s(900, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 김서준_모아페이_백엔드.pdf')),
+  s(900, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · Push 프로필')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(numbered('apply', '모아페이 백엔드 엔지니어에 지원할까요?', [
-    { label: '네, 지원할게요', desc: '방금 만든 이력서로 지원해요 · 마이 › 내 활동에 기록돼요' },
-    '한 번 더 볼게요',
-  ], '지원하면 취소할 수 없어요')),
+  ask(numbered('apply', '이 공고에 지원해요', ['실행', '취소'])),
 ]
 
 const generic = (text: string): Step[] => [
@@ -418,22 +348,29 @@ const generic = (text: string): Step[] => [
 
 /** Approval id → choice → next steps. */
 const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
-  'tailor-apply': (c, l) => (c < 2 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '반영하지 않았어요')), ...say('redo', '어떻게 바꾸면 좋을지 말해 주세요. 그대로 다시 고쳐 볼게요.')]),
+  'tailor-apply': (c, l) => (c === 0 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '그대로 뒀어요')), ...say('leave', '이 수정은 적용하지 않았어요.')]),
   'fail-choice': (c) =>
     c === 0 ? say('paste', '공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.')
       : c === 1 ? tailorFit(TODO)
         : say('pick', '북마크한 공고 중에서 골라 주세요. @언급으로 불러올 수 있어요.'),
-  ph0: (c) => (c === 0 ? ph0Input : c === 1 ? ph2xApproach : say('free', '어떻게 진행할지 편하게 말해 주세요.')),
+  present: (c) => say(c === 0 ? 'seen' : 'bye', c === 0 ? 'Push 프로필에서 결과를 볼 수 있어요.' : '알겠어요. 필요할 때 다시 불러 주세요.'),
+  ph0: (c) => (c === 0 ? ph0Input : c === 1 ? ph2xApproach : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph0-input': () => ph0Start,
   'ph0-start': (c) => (c === 0 ? ph1 : c === 1 ? ph0Input : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph1-fit': (c) => (c === 0 ? ph2 : c === 1 ? say('fb', '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.') : say('score', '적합도는 6.9점이에요. 필요하면 언제든 고쳐 드릴게요.')),
-  ph2: (c) => (c === 0 ? ph3 : say('strategy-redo', '어떤 부분을 바꿀지 말해 주세요.')),
-  'ph3-review': (c) => (c === 0 ? ph3Boost : say('review-redo', '고칠 부분을 말해 주세요.')),
-  'ph3-boost': (c) => (c === 0 ? ph4Quality : ph3Boost),
-  'ph4-quality': () => ph4Design,
-  'ph4-design': () => ph5,
-  'ph2x-approach': () => ph2xBlueprints,
-  'ph2x-bp': (c) => say('bp-done', c === 0 ? '결제 승인 재시도 큐를 시작할게요. 기획서와 할 일을 내 서류에 저장했어요.' : '기획서 4개를 내 서류에 저장했어요.'),
+  ph2: (c) => (c === 0 ? ph3 : c === 1 ? say('fb-only', '피드백만 정리해 드릴게요. 초안은 쓰지 않았어요.') : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph3-review': (c) => (c === 0 ? ph3Boost : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph3-boost': (c) =>
+    c === 0
+      ? [s(400, agent('stall', '최대 5번까지 올렸어요.')), ...ph4Design]
+      : c === 1
+        ? ph4Design
+        : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.'),
+  'ph4-design': (c) => (c === 4 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : [s(200, status('Push 프로필에 저장하는 중…')), ...finish('6.9 → 8.3')]),
+  'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph2x-level': (c) => (c === 3 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
+  'ph2x-prevent': (c) => (c === 6 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
+  'ph2x-bp': (c) => (c === 0 ? say('bp-done', '기획서 4개를 내 서류에 저장했어요.') : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   apply: (c) =>
     c === 0
       ? [s(300, tool('apply', '지원하기', MOA, 'ok', '지원했어요 · 마이 › 내 활동에 기록했어요')), ...say('applied', '지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.')]
@@ -626,7 +563,7 @@ const quick: Record<string, QsData> = {
   },
   post: {
     items: [
-      { id: 'p1', title: '결제 승인 API p99를 절반으로 줄인 이야기', sub: '개발 · 이력서 경력에서', selected: true },
+      { id: 'p1', title: '결제 승인 API p95를 절반 아래로 줄인 이야기', sub: '개발 · 이력서 경력에서', selected: true },
       { id: 'p2', title: '4년차 백엔드 이직 준비 후기', sub: '커리어 · 지원 현황에서' },
       { id: 'p3', title: 'Kafka 정산 파이프라인 만들어 본 후기', sub: '개발 · 역량 보완 프로젝트에서' },
     ],

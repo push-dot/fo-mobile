@@ -6,6 +6,7 @@ import { Alert } from 'react-native'
 import { useMyLinks, useMySettings } from '@/features/my'
 import { openBrowser, pickDocument, saveToCache, shareFile, useSession } from '../../../shared/infrastructure'
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, QUICK_STARTS } from '../constants'
+import { ago } from '../utils/ago'
 import { cacheName } from '../utils/cache-name'
 import type { MentionGroup } from '../utils/mentions'
 import { CREDIT_PURCHASE } from '../utils/usage'
@@ -28,16 +29,16 @@ import type { ConversationRow } from './schemas'
 export const useStartChat = () => {
   const qc = useQueryClient()
   const run = useCallback(
-    async (title: string, message: string, attachment?: string, replace?: boolean, intent?: ChatIntent) => {
+    async (title: string, message: string, attachment?: string, replace?: boolean, intent?: ChatIntent, context?: { documentId?: string }) => {
       try {
         const conv = await createConversation(title.slice(0, 300))
         void qc.invalidateQueries({ queryKey: ['conversations'] })
         if (replace) router.replace(`/chat/${conv.id}`)
         else router.push(`/chat/${conv.id}`)
-        send(conv.id, message, attachment, intent)
+        send(conv.id, message, attachment, intent, context)
       } catch (err) {
         if (isConsentRequired(err)) {
-          holdOpen({ title, message, attachment, intent })
+          holdOpen({ title, message, attachment, intent, context })
           askConsent(true)
           return
         }
@@ -47,7 +48,7 @@ export const useStartChat = () => {
     [qc],
   )
   useEffect(() => {
-    bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent))
+    bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent, p.context))
   }, [run])
   return run
 }
@@ -188,7 +189,7 @@ export const useMentionGroups = (): MentionGroup[] => {
       },
       {
         title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? 'AI로 만듦' : `${Math.round(d.size / 1000)}KB`, tag: d.fileName.split('.').pop()!.toUpperCase() })),
+        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB`, tag: d.fileName.split('.').pop()!.toUpperCase() })),
       },
       {
         title: '내 링크',

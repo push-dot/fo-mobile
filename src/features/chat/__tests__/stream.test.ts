@@ -64,7 +64,7 @@ describe('fromStream', () => {
         detail: '적합도 6.9 → 7.4 (+0.5)',
         sections: [
           {
-            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '그만하기' }, { label: '직접 말하기' }],
+            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '그만하기' }],
           },
         ],
       },
