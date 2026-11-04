@@ -3,7 +3,6 @@ import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, useColors } from '../../../theme'
 import { Badge, Button, Glass, Icon, Text } from '@/shared/components'
-import { FileTag } from './items'
 import { SPRING } from '../constants'
 import { useReduceMotion } from '../hooks'
 import type { Approval, ApprovalSection, Choice } from '../types'
@@ -87,9 +86,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
                       {r.tag}
                     </Text>
                   </View>
-                ) : (
-                  <FileTag tag={r.tag} w={28} h={34} />
-                )}
+                ) : null}
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text v="b2" weight="700" numberOfLines={1}>
                     {r.title}

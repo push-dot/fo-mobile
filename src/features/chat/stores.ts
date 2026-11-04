@@ -166,7 +166,7 @@ export const send = (id: string, text: string, attachment?: string, intent?: Cha
     return answer(id, text, first && first.kind === 'choices' ? first.items.length - 1 : 0)
   }
   dispatch(id, { type: 'user', id: `u-${Date.now()}`, text, attachment })
-  void startRun({ conversationId: id, text, interrupted: s.interrupted, intent, context })
+  void startRun({ conversationId: id, text, attachment, interrupted: s.interrupted, intent, context })
 }
 
 export const answer = (id: string, text: string, choice: number | number[]) => {

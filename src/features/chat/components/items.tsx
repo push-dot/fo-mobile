@@ -7,7 +7,9 @@ import { useOpenArtifact } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
 import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
+import { resultActions, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
 import { Appear } from './motion'
+import Mark from './mark'
 import { UsageExhausted } from './usage-exhausted'
 import type { ChatItem, ToolState } from '../types'
 
@@ -367,26 +369,12 @@ const FitCard = ({ item }: { item: Of<'fit'> }) => {
   )
 }
 
-/** File tag: 40×48 page with the type at the bottom (PDF red, others violet). */
-export const FileTag = ({ tag, w = 40, h = 48 }: { tag: string; w?: number; h?: number }) => {
-  const c = useColors()
-  const pdf = tag === 'PDF'
-  return (
-    <View style={{ width: w, height: h, borderRadius: 8, backgroundColor: pdf ? c.redSoft : c.acSoft, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: h > 40 ? 6 : 4 }}>
-      <Text weight="800" style={{ fontSize: w > 32 ? 10 : 8, lineHeight: 12, color: pdf ? c.red : c.ac }}>
-        {tag}
-      </Text>
-    </View>
-  )
-}
-
 const FileCard = ({ item }: { item: Of<'file'> }) => {
   const c = useColors()
   const open = useOpenArtifact()
   const share = () => (item.url ? open.mutate({ url: item.url, name: item.name }) : void shareMessage({ message: item.name, title: item.name }))
   const body = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 }}>
-      <FileTag tag={item.tag ?? 'PDF'} />
       <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
         <Text v="b2" weight="700" numberOfLines={1}>
           {item.name}
@@ -417,6 +405,61 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
       ) : (
         <View style={{ borderRadius: 16, borderWidth: 1, borderColor: c.line }}>{body}</View>
       )}
+    </Appear>
+  )
+}
+
+const ResultCard = ({
+  item,
+  onApply,
+  onConvert,
+  onView,
+  convertPending,
+}: {
+  item: Of<'result'>
+  onApply: () => void
+  onConvert: () => void
+  onView: () => void
+  convertPending?: boolean
+}) => {
+  const chrome = resultChrome(item)
+  const title = resultTitle(item)
+  const actions = resultActions(item)
+  const c = useColors()
+  const share = () => void shareMessage({ message: title, title })
+  const press = (id: ResultActionId) => (id === 'apply' ? onApply() : id === 'convert' ? onConvert() : onView())
+  return (
+    <Appear style={{ gap: 8 }}>
+      {item.taskLine ? (
+        <Text v="b2" weight="700">
+          {item.taskLine}
+        </Text>
+      ) : null}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        {chrome.initials ? <Mark text={chrome.initials} color={c.ac} size={44} round /> : null}
+        <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+          <Text v="b1" weight="700" numberOfLines={1}>
+            {title}
+          </Text>
+          <Text v="c1" color="t3">
+            {resultMeta(item)}
+          </Text>
+        </View>
+        {chrome.share ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={share} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="share" size={22} color="t2" />
+          </Pressable>
+        ) : null}
+      </View>
+      {actions.map((action, index) => (
+        <Button
+          key={`${action.id}-${index}`}
+          label={action.label}
+          variant={index === 0 ? 'primary' : 'secondary'}
+          disabled={action.id === 'convert' && convertPending}
+          onPress={() => press(action.id)}
+        />
+      ))}
     </Appear>
   )
 }
@@ -473,10 +516,16 @@ export const Item = ({
   item,
   onAction,
   onUsage,
+  onConvert,
+  onView,
+  resultPending,
 }: {
   item: ChatItem
   onAction: (text: string) => void
   onUsage?: (action: 'plan' | 'credits') => void
+  onConvert?: (item: Of<'result'>) => void
+  onView?: (item: Of<'result'>) => void
+  resultPending?: boolean
 }) => {
   const c = useColors()
   switch (item.type) {
@@ -507,12 +556,15 @@ export const Item = ({
       return <FileCard item={item} />
     case 'paper':
       return <Paper item={item} />
-    case 'actions':
+    case 'result':
       return (
-        <Appear style={{ gap: 8 }}>
-          <Button label={`${item.company}에 바로 지원하기`} onPress={() => onAction(`${item.company}에 바로 지원해 줘`)} />
-          <Button label="내 서류에 저장" variant="secondary" onPress={() => onAction('내 서류에 저장해 줘')} />
-        </Appear>
+        <ResultCard
+          item={item}
+          onApply={() => onAction(`${item.company ?? ''}에 바로 지원해 줘`)}
+          onConvert={() => onConvert?.(item)}
+          onView={() => onView?.(item)}
+          convertPending={resultPending}
+        />
       )
     case 'worked':
       return (

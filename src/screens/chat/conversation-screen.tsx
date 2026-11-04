@@ -7,6 +7,7 @@ import { useColors, useShadow } from '@/theme'
 import { BottomSheet, Glass, GlassButton, Icon, Mascot, Text, TextField, type IconName } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { usePersonalPurchase } from '@/features/billing'
+import { useConvertDocument } from '@/features/my'
 import {
   answer,
   ApprovalPanel,
@@ -40,6 +41,9 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const reduce = useReduceMotion()
   const chat = useChat(id)
   const purchase = usePersonalPurchase()
+  const convert = useConvertDocument((documentId) => {
+    router.push(`/docs/push/${documentId}`)
+  })
   const list = useConversationList()
   const conv = list.data?.data.find((x) => x.id === id)
   const [drawer, setDrawer] = useState(false)
@@ -109,6 +113,9 @@ const ConversationScreen = ({ id }: { id: string }) => {
             key={it.id}
             item={it}
             onAction={(text) => send(id, text)}
+            onConvert={(card) => convert.mutate(card.documentId)}
+            onView={(card) => router.push(`/docs/push/${card.documentId}`)}
+            resultPending={convert.isPending}
             onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : purchase.buyCredits())}
           />
         ))}

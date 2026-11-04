@@ -5,7 +5,6 @@ import { useColors } from '../../../theme'
 import { Badge, BottomSheet, Chip, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
-import { FileTag } from './items'
 import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
 import Pick from './pick'
@@ -203,7 +202,6 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                 onPress={() => setPickingDoc((v) => !v)}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: c.bg2 }}
               >
-                <FileTag tag={doc.split('.').pop()!.toUpperCase()} w={28} h={34} />
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text v="c2" weight="600" color="t3">
                     {qs.docLabel}
@@ -264,7 +262,6 @@ const DocField = ({
         onPress={onToggle}
         style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: c.bg2 }}
       >
-        <FileTag tag={doc.split('.').pop()!.toUpperCase()} w={28} h={34} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text v="c2" weight="600" color="t3">
             {label}

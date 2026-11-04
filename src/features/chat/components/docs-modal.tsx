@@ -3,7 +3,6 @@ import { GlassButton, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { type ChatDoc } from '../api/schemas'
 import { useChatDocs, useUploadChatDoc } from '../api/hooks'
-import { FileTag } from './items'
 import Note from './note'
 import PageModal from './page-modal'
 import { ago } from '../utils'
@@ -19,7 +18,6 @@ export const DocsModal = ({ visible, onClose }: { visible: boolean; onClose: () 
     <PageModal visible={visible} onClose={onClose} title="내 서류" right={<GlassButton actions={[{ icon: 'plus', label: '서류 올리기', onPress: () => upload.mutate() }]} />}>
       {docs.data?.map((d) => (
         <View key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 12, paddingHorizontal: 20 }}>
-          <FileTag tag={d.fileName.split('.').pop()!.toUpperCase()} />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="b1" weight="700" numberOfLines={1}>
               {d.fileName}

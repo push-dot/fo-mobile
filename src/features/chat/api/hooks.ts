@@ -179,7 +179,7 @@ export const useMentionGroups = (): MentionGroup[] => {
       },
       {
         title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB`, tag: d.fileName.split('.').pop()!.toUpperCase() })),
+        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
       },
       {
         title: '내 링크',

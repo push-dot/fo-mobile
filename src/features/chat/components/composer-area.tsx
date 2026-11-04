@@ -5,7 +5,6 @@ import { BottomSheet, Glass, Icon, Text, TextField } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
 import { useAccessMode, useMentionGroups } from '../api/hooks'
 import { Composer } from './composer'
-import { FileTag } from './items'
 import { filterMentions, insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import { Appear } from './motion'
 import Mark from './mark'
@@ -160,12 +159,6 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                   style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 12, backgroundColor: hl || pressed ? c.fill : 'transparent' })}
                 >
                   {m.kind === 'job' ? <Mark text={m.tag ?? ''} color="#1F3A8A" size={36} /> : null}
-                  {m.kind === 'doc' ? <FileTag tag={m.tag ?? 'PDF'} w={30} h={36} /> : null}
-                  {m.kind === 'link' ? (
-                    <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.fill2, alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon name="link" size={18} color="t2" />
-                    </View>
-                  ) : null}
                   {m.kind === 'shortcut' ? (
                     <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.acSoft, alignItems: 'center', justifyContent: 'center' }}>
                       <Icon name="spark" size={18} color="acText" />

@@ -110,6 +110,12 @@ const done = s(200, { type: 'done', at: 0 })
 const RESUME = '김서준_백엔드_이력서_2026.pdf'
 const MOA = '모아페이 · 백엔드 엔지니어'
 const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'Push 프로필에 저장하기']
+const PROFILE_TODO = ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장']
+const FILE_TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'PDF로 만들기']
+const PROFILE_TASK = '프로필 수정 · Push 프로필 · 경력'
+const FILE_TASK = '이력서 수정 · 올린 파일 · 경력'
+const FILE_PAGE = 'A4 1쪽 · 186KB'
+const FILE_SAVED = '내 서류에 자동 저장됨'
 const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필에 저장하기']
 const JD_LINES = ['필수 · Kotlin 또는 Java 4년 이상', '필수 · Spring Boot 운영', '필수 · RDBMS 설계와 튜닝', '필수 · 대용량 트래픽 처리', '필수 · 결제·정산 도메인 이해', '우대 · Kafka · 장애 대응 · MSA']
 
@@ -153,7 +159,49 @@ const tailorFit = (labels: string[], added = -1): Step[] => [
 
 const finish = (score: string): Step[] => [
   s(400, agent('done', `다 됐어요! 적합도를 **${score}**로 올렸어요.`, ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요'])),
+  s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
+  s(200, {
+    type: 'result',
+    id: 'result',
+    source: 'profile',
+    taskLine: PROFILE_TASK,
+    checklist: PROFILE_TODO,
+    name: '김서준',
+    headline: '백엔드 엔지니어',
+    title: '김서준 · 백엔드 엔지니어',
+    subtitle: 'Push 프로필 · 방금 수정',
+    documentId: 'd1',
+    company: '모아페이',
+    actions: [
+      { id: 'apply', label: '모아페이에 바로 지원하기' },
+      { id: 'view', label: '프로필 보기' },
+    ],
+  }),
+  done,
   ask(numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기'], 'PDF는 Push 프로필에서 내보낼 수 있어요.')),
+]
+
+const fileRun = (name: string): Step[] => [
+  s(400, agent('done', '다 됐어요! 올린 파일로 이력서를 고쳤어요.')),
+  s(200, todo('todo', FILE_TODO, FILE_TODO.length)),
+  s(200, {
+    type: 'result',
+    id: 'result',
+    source: 'external',
+    taskLine: FILE_TASK,
+    checklist: FILE_TODO,
+    fileName: name,
+    pageLine: FILE_PAGE,
+    savedLine: FILE_SAVED,
+    cardMeta: `${FILE_PAGE} · ${FILE_SAVED}`,
+    documentId: 'src-upload',
+    company: '모아페이',
+    actions: [
+      { id: 'apply', label: '모아페이에 바로 지원하기' },
+      { id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' },
+    ],
+  }),
+  done,
 ]
 
 const tailorDone = (labels: string[]): Step[] => [
@@ -286,7 +334,7 @@ const ph3: Step[] = [
   s(1500, todo('todo3', PH3, 3)),
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
-  s(200, { type: 'file', id: 'v1', tag: 'v1', name: '이력서 초안 v1', meta: '1쪽 · 방금', preview: true }),
+  s(200, { type: 'file', id: 'v1', name: '이력서 초안 v1', meta: '1쪽 · 방금', preview: true }),
   s(200, {
     type: 'diff', id: 'diff3',
     lines: [
@@ -390,7 +438,8 @@ const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
 const scenario = new Map<string, { prefix: string; labels: string[] }>()
 let seq = 0
 
-const pick = (text: string, interrupted: boolean): { steps: Step[]; labels?: string[] } | null => {
+const pick = (text: string, interrupted: boolean, attachment?: string): { steps: Step[]; labels?: string[] } | null => {
+  if (attachment) return { steps: fileRun(attachment) }
   if (/지원해/.test(text)) return { steps: applyRun }
   if (/저장해/.test(text)) return { steps: [s(300, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 마이 › 서류')), done] }
   if (/실패|채용 페이지/.test(text)) return { steps: failRun, labels: TODO }
@@ -418,7 +467,7 @@ mock('POST', 'chat/runs', ({ body }) => {
     scenario.set(id, state)
     steps = tailorResume
   } else {
-    const p = pick(b.text ?? '', false)!
+    const p = pick(b.text ?? '', false, b.attachment)!
     state = { prefix: `r${++seq}`, labels: p.labels ?? TODO }
     scenario.set(id, state)
     steps = p.steps

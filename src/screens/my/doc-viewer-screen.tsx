@@ -5,7 +5,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fileSize, monthDay } from '@push/shared'
 import {
   DocMenu,
-  FileTile,
   PREVIEW_HEADINGS,
   Toast,
   useConvertDocument,
@@ -157,7 +156,6 @@ const DocViewerScreen = ({ id }: { id: string }) => {
               paddingHorizontal: 20,
             }}
           >
-            <FileTile name={s.fileName} small />
             <Text v="c1" color="t3" style={{ flex: 1 }}>
               {fileSize(s.size)}
               {d?.pageCount ? ` · ${d.pageCount}쪽` : ''}

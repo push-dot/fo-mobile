@@ -42,6 +42,7 @@ export type QsData = {
 export type RunInput = {
   conversationId: string
   text?: string
+  attachment?: string
   answer?: { approvalId: string; choice: number }
   resolve?: { approvalId: string; optionId: string; optionIds?: string[] }
   interrupted?: boolean

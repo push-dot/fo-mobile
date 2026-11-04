@@ -43,7 +43,37 @@ const map = (ev: StreamEvent): ChatEvent | null => {
       return picked ? { type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked.label}` } : null
     }
     case 'file':
-      return { type: 'file', id: `file-${ev.fileId}`, name: ev.name, tag: /\.([^.]+)$/.exec(ev.name)?.[1]?.toUpperCase(), url: ev.downloadUrl, preview: true }
+      return { type: 'file', id: `file-${ev.fileId}`, name: ev.name, url: ev.downloadUrl, preview: true }
+    case 'result':
+      return ev.source === 'external'
+        ? {
+            type: 'result',
+            id: `result-${ev.documentId}`,
+            source: ev.source,
+            taskLine: ev.taskLine,
+            checklist: ev.checklist,
+            documentId: ev.documentId,
+            company: ev.company,
+            actions: ev.actions,
+            fileName: ev.fileName,
+            pageLine: ev.pageLine,
+            savedLine: ev.savedLine,
+            cardMeta: ev.cardMeta,
+          }
+        : {
+            type: 'result',
+            id: `result-${ev.documentId}`,
+            source: ev.source,
+            taskLine: ev.taskLine,
+            checklist: ev.checklist,
+            documentId: ev.documentId,
+            company: ev.company,
+            actions: ev.actions,
+            name: ev.name,
+            headline: ev.headline,
+            title: ev.title,
+            subtitle: ev.subtitle,
+          }
     case 'todo':
       return { type: 'todo', id: 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state })) }
     case 'diff':

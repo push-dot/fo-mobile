@@ -13,7 +13,6 @@ import { useToast, useUndoRemove } from '../hooks'
 import type { HubDocument, MySource } from '../types'
 import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
 import DocMenu from './doc-menu'
-import FileTile from './file-tile'
 import ListTitle from './list-title'
 import PushDocView from './push-doc-view'
 import Row from './row'
@@ -78,7 +77,6 @@ const DocRow = ({ doc, onMenu }: { doc: MySource; onMenu: () => void }) => {
   }
   return (
     <Row label={doc.fileName} onPress={() => router.push(`/docs/${doc.id}`)}>
-      <FileTile name={doc.fileName} reading={reading} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="700" numberOfLines={1}>
           {doc.fileName}
@@ -250,7 +248,6 @@ const DocsTab = () => {
         <ListTitle title={UPLOADS_TITLE} count={docs.length + (upload ? 1 : 0)} top={26} />
         {upload ? (
           <Row>
-            <FileTile name={upload.name} />
             <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
               <Text v="b1" weight="700" numberOfLines={1}>
                 {upload.name}

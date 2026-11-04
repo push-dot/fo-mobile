@@ -1,3 +1,4 @@
+import type { ResultAction } from '@push/api-client'
 import type { BadgeTone } from '@/shared/components'
 
 // Transcript model (feature-spec 15.2). Items render in order; control events change run state.
@@ -29,9 +30,36 @@ export type ChatItem =
       note?: string
     }
   /** `url` is relative to the API base (server artifacts). */
-  | { type: 'file'; id: string; name: string; meta?: string; tag?: string; progress?: number; preview?: boolean; url?: string }
+  | { type: 'file'; id: string; name: string; meta?: string; progress?: number; preview?: boolean; url?: string }
   | { type: 'paper'; id: string; label: string; heading: string; lines: string[] }
-  | { type: 'actions'; id: string; company: string }
+  | {
+      type: 'result'
+      id: string
+      source: 'external'
+      taskLine: string
+      checklist: string[]
+      documentId: string
+      company?: string
+      actions: ResultAction[]
+      fileName: string
+      pageLine: string
+      savedLine?: string
+      cardMeta?: string
+    }
+  | {
+      type: 'result'
+      id: string
+      source: 'profile'
+      taskLine: string
+      checklist: string[]
+      documentId: string
+      company?: string
+      actions: ResultAction[]
+      name: string
+      headline: string
+      title: string
+      subtitle: string
+    }
   | { type: 'worked'; id: string; seconds: number }
   | { type: 'error'; id: string; text: string; code?: string }
 
