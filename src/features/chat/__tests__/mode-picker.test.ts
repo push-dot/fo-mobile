@@ -96,6 +96,31 @@ describe('server approvals', () => {
     expect(chat('c4').approval).toBeNull()
   })
 
+  it.each([
+    ['c-feedback', 'feedback', '반영해서 수정할게요', ['continue', 'cancel'], 0, 'continue'],
+    ['c-continue', 'start-document', '이어서 작성하기', ['continue', 'cancel'], 0, 'continue'],
+    ['c-fit', 'analyze', '피드백만 받을게요', ['continue', 'feedback', 'score'], 1, 'feedback'],
+  ])('answers %s with the server option id', async (id, approvalId, text, optionIds, index, optionId) => {
+    api.conversations.resolveApproval.mockResolvedValue({ id: approvalId, status: 'APPROVED', optionId, jobId: 'j1' })
+    useChatStore.setState({
+      chats: {
+        [id]: {
+          ...emptyChat,
+          approval: {
+            id: approvalId,
+            question: text,
+            optionIds,
+            sections: [{ kind: 'choices', items: optionIds.map(() => ({ label: text })), selected: [] }],
+          },
+        },
+      },
+    })
+    answer(id, text, index)
+    await settled(id)
+    expect(api.conversations.resolveApproval).toHaveBeenCalledWith(id, approvalId, optionId)
+    expect(api.conversations.stream).not.toHaveBeenCalled()
+  })
+
   it('sends every picked id when the card allows several', async () => {
     api.conversations.resolveApproval.mockResolvedValue({ id: 'ap1', status: 'APPROVED', optionId: 'resume', optionIds: ['resume', 'portfolio'], jobId: 'j1' })
     pending('c5', ['resume', 'portfolio', 'cover_letter', 'cancel'])

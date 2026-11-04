@@ -251,6 +251,13 @@ const ph1: Step[] = [
   s(400, agent('fitmsg', '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.')),
   ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])),
 ]
+const feedbackOnly: Step[] = [
+  s(600, agent('fb', '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.')),
+  ask(numbered('feedback', '피드백을 반영해서 수정할까요?', ['반영해서 수정할게요', '그만하기'])),
+]
+const startDocument: Step[] = [
+  ask(numbered('start-document', '이어서 작성할까요?', ['이어서 작성하기', '그만하기'])),
+]
 const ph2: Step[] = [
   s(200, status('궁리하는 중…')),
   s(200, tool('strategy', '전략 세우기', '공고 요건 ↔ 내 경력', 'run', '섹션마다 할 일을 정하는 중')),
@@ -357,7 +364,9 @@ const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
   ph0: (c) => (c === 0 ? ph0Input : c === 1 ? ph2xApproach : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph0-input': () => ph0Start,
   'ph0-start': (c) => (c === 0 ? ph1 : c === 1 ? ph0Input : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
-  'ph1-fit': (c) => (c === 0 ? ph2 : c === 1 ? say('fb', '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.') : say('score', '적합도는 6.9점이에요. 필요하면 언제든 고쳐 드릴게요.')),
+  'ph1-fit': (c) => (c === 0 ? ph2 : c === 1 ? feedbackOnly : say('score', '적합도는 6.9점이에요. 필요하면 언제든 고쳐 드릴게요.')),
+  feedback: (c) => (c === 0 ? ph2 : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
+  'start-document': (c) => (c === 0 ? say('cont', '멈춘 곳부터 이어서 할게요.') : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   ph2: (c) => (c === 0 ? ph3 : c === 1 ? say('fb-only', '피드백만 정리해 드릴게요. 초안은 쓰지 않았어요.') : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-review': (c) => (c === 0 ? ph3Boost : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-boost': (c) =>
@@ -398,6 +407,10 @@ mock('POST', 'chat/runs', ({ body }) => {
   let state = scenario.get(id)
   if (b.answer && state) {
     steps = (next[b.answer.approvalId] ?? ((_c: number) => generic(b.text ?? '')))(b.answer.choice, state.labels)
+  } else if (!state && find(id)?.status === 'RUNNING') {
+    state = { prefix: `r${++seq}`, labels: TODO }
+    scenario.set(id, state)
+    steps = startDocument
   } else if (b.interrupted && state && !pick(b.text ?? '', true)) {
     // Talking after 중지 resumes the stopped work with the new request folded in (ChatInterrupt).
     // Fresh ids: the stopped lines stay in the transcript and the resumed work continues below them.

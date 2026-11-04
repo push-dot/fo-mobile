@@ -95,6 +95,62 @@ describe('server gate labels', () => {
     expect(JSON.stringify(saved)).not.toContain('PDF로')
   })
 
+  it('renders feedback, continue, and fit-check gates from the server options', async () => {
+    const [feedback] = await map({
+      type: 'choice',
+      id: 'feedback',
+      kind: 'RESUME_GATE',
+      gate: 'feedback',
+      title: '피드백을 반영해서 수정할까요?',
+      options: [
+        { id: 'continue', label: '반영해서 수정할게요' },
+        { id: 'cancel', label: '그만하기' },
+      ],
+    })
+    expect(feedback).toMatchObject({
+      type: 'approval',
+      approval: { id: 'feedback', question: '피드백을 반영해서 수정할까요?', optionIds: ['continue', 'cancel'] },
+    })
+    expect(labels(feedback!)).toEqual(['반영해서 수정할게요', '그만하기'])
+
+    const [cont] = await map({
+      type: 'choice',
+      id: 'start-document',
+      kind: 'RESUME_GATE',
+      gate: 'start_document',
+      title: '이어서 작성할까요?',
+      options: [
+        { id: 'continue', label: '이어서 작성하기' },
+        { id: 'cancel', label: '그만하기' },
+      ],
+    })
+    expect(cont).toMatchObject({
+      type: 'approval',
+      approval: { id: 'start-document', question: '이어서 작성할까요?', optionIds: ['continue', 'cancel'] },
+    })
+    expect(labels(cont!)).toEqual(['이어서 작성하기', '그만하기'])
+
+    const [fit] = await map({
+      type: 'choice',
+      id: 'analyze',
+      kind: 'RESUME_GATE',
+      gate: 'analyze',
+      title: '이 공고에 맞춰 이력서를 고칠까요?',
+      options: [
+        { id: 'continue', label: '네, 맞춰서 고쳐 주세요' },
+        { id: 'feedback', label: '피드백만 받을게요' },
+        { id: 'score', label: '점수만 보고 끝낼게요' },
+      ],
+    })
+    expect(fit).toMatchObject({
+      type: 'approval',
+      approval: { id: 'analyze', question: '이 공고에 맞춰 이력서를 고칠까요?', optionIds: ['continue', 'feedback', 'score'] },
+    })
+    expect(labels(fit!)).toEqual(['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])
+    const state = applyEvent(emptyChat, fit!)
+    expect(state.approval?.question).toBe('이 공고에 맞춰 이력서를 고칠까요?')
+  })
+
   it('keeps a multi choice as a checkbox card', async () => {
     const [ev] = await map({
       type: 'choice',

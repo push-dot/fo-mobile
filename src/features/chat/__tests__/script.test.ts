@@ -9,6 +9,16 @@ const run = async (body: object): Promise<Step[]> => {
   return ((await res.json()) as { data: Step[] }).data
 }
 const play = (s: ChatState, steps: Step[]) => steps.reduce((acc, st) => applyEvent(acc, st.event), applyEvent(s, { type: 'start', at: 0 }))
+const choiceLabels = (s: ChatState) => {
+  const section = s.approval?.sections[0]
+  return section?.kind === 'choices' ? section.items.map((i) => i.label) : []
+}
+const reachFit = async (id: string) => {
+  let s = play(emptyChat, await run({ conversationId: id, text: '이력서 만들어 주세요' }))
+  s = play(s, await run({ conversationId: id, text: '이력서부터 쓸게요', answer: { approvalId: 'ph0', choice: 0 } }))
+  s = play(s, await run({ conversationId: id, text: '이대로 진행', answer: { approvalId: 'ph0-input', choice: 0 } }))
+  return play(s, await run({ conversationId: id, text: '네, 시작해 주세요', answer: { approvalId: 'ph0-start', choice: 0 } }))
+}
 
 describe('scripted runs (mock)', () => {
   it('tailor: works, asks, then finishes on approval', async () => {
@@ -36,6 +46,30 @@ describe('scripted runs (mock)', () => {
     s = play(s, await run({ conversationId: 'p1', text: '예방', answer: { approvalId: 'ph2x-approach', choice: 1 } }))
     expect(s.approval?.id).toBe('ph2x-prevent')
     expect(s.approval?.sections[0]).toMatchObject({ kind: 'choices', multi: true })
+  }, 10_000)
+
+  it('fit check, feedback only, then the feedback card', async () => {
+    let s = await reachFit('fit1')
+    expect(s.approval?.question).toBe('이 공고에 맞춰 이력서를 고칠까요?')
+    expect(choiceLabels(s)).toEqual(['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])
+    s = play(s, await run({ conversationId: 'fit1', text: '피드백만 받을게요', answer: { approvalId: 'ph1-fit', choice: 1 } }))
+    expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({
+      text: '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.',
+    })
+    expect(s.approval?.question).toBe('피드백을 반영해서 수정할까요?')
+    expect(choiceLabels(s)).toEqual(['반영해서 수정할게요', '그만하기'])
+    s = play(s, await run({ conversationId: 'fit1', text: '그만하기', answer: { approvalId: 'feedback', choice: 1 } }))
+    expect(s.approval).toBeNull()
+    expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '알겠어요. 필요할 때 다시 불러 주세요.' })
+  }, 10_000)
+
+  it('an in-progress document asks to continue', async () => {
+    let s = play(emptyChat, await run({ conversationId: 'c-dotori', text: '이어서 봐 주세요' }))
+    expect(s.approval?.question).toBe('이어서 작성할까요?')
+    expect(choiceLabels(s)).toEqual(['이어서 작성하기', '그만하기'])
+    s = play(s, await run({ conversationId: 'c-dotori', text: '이어서 작성하기', answer: { approvalId: 'start-document', choice: 0 } }))
+    expect(s.approval).toBeNull()
+    expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '멈춘 곳부터 이어서 할게요.' })
   }, 10_000)
 
   it('talking after stop resumes with the added to-do', async () => {
