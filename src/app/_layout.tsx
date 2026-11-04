@@ -1,12 +1,17 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
 import { useEffect } from 'react'
+import { Appearance } from 'react-native'
 import { queryClient } from '@/providers'
+import { ToastHost } from '@/shared/components'
 import { useSession } from '@/shared/infrastructure'
-import { useThemeMode, useThemePreference } from '@/theme'
+import { sheetOptions } from '@/shared/navigation'
+import { useColors, useThemeMode, useThemePreference } from '@/theme'
 
 const RootLayout = () => {
   const mode = useThemeMode()
+  const c = useColors()
+  const themeChoice = useThemePreference((s) => s.choice)
   const { ready, session, load } = useSession()
   const themeReady = useThemePreference((s) => s.ready)
   const loadTheme = useThemePreference((s) => s.load)
@@ -15,6 +20,9 @@ const RootLayout = () => {
     void load()
     void loadTheme()
   }, [load, loadTheme])
+
+  // Native sheets, menus and alerts follow the in-app theme, not only the system one.
+  useEffect(() => Appearance.setColorScheme(themeChoice === 'system' ? 'unspecified' : themeChoice), [themeChoice])
 
   if (!ready || !themeReady) return null
 
@@ -40,6 +48,7 @@ const RootLayout = () => {
             <Stack.Screen name="activity/follows" />
             <Stack.Screen name="activity/posts" />
             <Stack.Screen name="activity/applications/[id]" />
+            <Stack.Screen name="access-mode" options={sheetOptions(c)} />
           </Stack.Protected>
           <Stack.Protected guard={!session}>
             <Stack.Screen name="sign-in" />
@@ -49,6 +58,7 @@ const RootLayout = () => {
             <Stack.Screen name="phone-registered" />
           </Stack.Protected>
         </Stack>
+        <ToastHost />
       </QueryClientProvider>
     </ThemeProvider>
   )

@@ -94,7 +94,6 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         attachment={file?.name}
         onClearAttachment={() => setFile(undefined)}
         accessMode={access.mode}
-        onAccessMode={access.pick}
       />
       <BottomSheet
         visible={materials}
