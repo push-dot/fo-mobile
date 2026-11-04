@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ApiError, QueueBusyError, type AccessMode } from '@push/api-client'
+import { ApiError, QueueBusyError, type AccessMode, type ChatIntent } from '@push/api-client'
 import { API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
 import {
   chatApi,
@@ -12,6 +12,7 @@ import {
 import type { RunInput } from './api/schemas'
 import { DEFAULT_ACCESS_MODE } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
+import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream } from './utils/stream'
 import type { ChatEvent, ChatState } from './types'
 
@@ -20,6 +21,45 @@ export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => (
 export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
 
 export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: DEFAULT_ACCESS_MODE }))
+
+export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
+
+type PendingOpen = { title: string; message: string; attachment?: string; intent?: ChatIntent }
+
+let pendingConsent: RunInput | null = null
+let pendingOpen: PendingOpen | null = null
+let openChat: ((p: PendingOpen) => void) | null = null
+
+export const askConsent = (force = false) => {
+  const s = useConsentPrompt.getState()
+  if (force || !s.dismissed) useConsentPrompt.setState({ open: true })
+}
+
+export const holdOpen = (p: PendingOpen) => {
+  pendingOpen = p
+}
+
+export const bindOpenChat = (fn: (p: PendingOpen) => void) => {
+  openChat = fn
+}
+
+export const laterConsent = () => {
+  pendingConsent = null
+  pendingOpen = null
+  useConsentPrompt.setState({ open: false, dismissed: true })
+}
+
+export const consentTurnedOff = () => useConsentPrompt.setState({ dismissed: false, open: false })
+
+export const grantConsent = () => {
+  useConsentPrompt.setState({ open: false, dismissed: true })
+  const next = pendingConsent
+  pendingConsent = null
+  const open = pendingOpen
+  pendingOpen = null
+  if (next) void startRun(next)
+  else if (open) openChat?.(open)
+}
 
 export const pickAccessMode = async (mode: AccessMode) => {
   const prev = usePrefs.getState().accessMode
@@ -57,7 +97,7 @@ const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGe
 
 const streamed = (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> => {
   const id = input.conversationId
-  const body = { text: input.text ?? '', accessMode: usePrefs.getState().accessMode }
+  const body = { text: input.text ?? '', accessMode: usePrefs.getState().accessMode, ...(input.intent ? { intent: input.intent } : {}) }
   return fromStream(streamConversation(id, body, signal), (after) => followConversation(id, after, signal))
 }
 
@@ -81,8 +121,18 @@ const startRun = async (input: RunInput) => {
     if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
   } catch (err) {
     if (ctrl.signal.aborted) return
+    if (isConsentRequired(err)) {
+      pendingConsent = input
+      useChatStore.setState((s) => {
+        const cur = s.chats[id]
+        if (!cur) return s
+        return { chats: { ...s.chats, [id]: { ...cur, working: null, runStartedAt: null } } }
+      })
+      askConsent(true)
+      return
+    }
     const text = errorText(err instanceof ApiError ? err.code : undefined, err instanceof QueueBusyError ? err.retryAfterSec : undefined)
-    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text })
+    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: err instanceof ApiError ? err.code : undefined })
   } finally {
     if (runs.get(id) === ctrl) runs.delete(id)
   }
@@ -94,7 +144,7 @@ const startRun = async (input: RunInput) => {
   }
 }
 
-export const send = (id: string, text: string, attachment?: string) => {
+export const send = (id: string, text: string, attachment?: string, intent?: ChatIntent) => {
   const s = get(id)
   if (s.working) return dispatch(id, { type: 'queue', text })
   if (s.approval?.optionIds) {
@@ -108,7 +158,7 @@ export const send = (id: string, text: string, attachment?: string) => {
     return answer(id, text, first && first.kind === 'choices' ? first.items.length - 1 : 0)
   }
   dispatch(id, { type: 'user', id: `u-${Date.now()}`, text, attachment })
-  void startRun({ conversationId: id, text, interrupted: s.interrupted })
+  void startRun({ conversationId: id, text, interrupted: s.interrupted, intent })
 }
 
 export const answer = (id: string, text: string, choice: number) => {

@@ -5,8 +5,10 @@ import { Badge, Button, Glass, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { useOpenArtifact } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
+import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
 import { Appear } from './motion'
+import { UsageExhausted } from './usage-exhausted'
 import type { ChatItem, ToolState } from '../types'
 
 type Of<K extends ChatItem['type']> = Extract<ChatItem, { type: K }>
@@ -467,7 +469,15 @@ export const Glyph = ({ still, size = 17, color }: { still?: boolean; size?: num
 }
 
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
-export const Item = ({ item, onAction }: { item: ChatItem; onAction: (text: string) => void }) => {
+export const Item = ({
+  item,
+  onAction,
+  onUsage,
+}: {
+  item: ChatItem
+  onAction: (text: string) => void
+  onUsage?: (action: 'plan' | 'credits') => void
+}) => {
   const c = useColors()
   switch (item.type) {
     case 'user':
@@ -514,7 +524,9 @@ export const Item = ({ item, onAction }: { item: ChatItem; onAction: (text: stri
         </Appear>
       )
     case 'error':
-      return (
+      return isUsageExhausted(item.code) && onUsage ? (
+        <UsageExhausted onPlan={() => onUsage('plan')} onCredits={() => onUsage('credits')} />
+      ) : (
         <Appear style={{ flexDirection: 'row', gap: 10 }}>
           <Dot color={c.red} top={7} />
           <Text v="b2" weight="600" color="red" style={{ flex: 1 }}>

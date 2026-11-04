@@ -13,6 +13,7 @@ import {
   TONES,
   useAuthMe,
   useMyProfile,
+  useReferenceConsent,
   useSettings,
   VISIBILITY,
 } from '@/features/my'
@@ -27,6 +28,7 @@ import {
   TopBar,
 } from '@/shared/components'
 import { useColors } from '@/theme'
+import { CONSENT_TOGGLE, CONSENT_TOGGLE_NOTE, CONSENT_TOGGLE_SUB, consentTurnedOff, grantConsent } from '@/features/chat'
 
 const Pick = <K extends string | number,>({
   title,
@@ -177,6 +179,7 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
 
 const SettingsScreen = () => {
   const { s, set } = useSettings()
+  const consent = useReferenceConsent()
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
@@ -289,6 +292,24 @@ const SettingsScreen = () => {
         <SettingsRow
           label="내 자료 읽기 허용"
           right={sw('allowAiReadMyFiles', '내 자료 읽기 허용')}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup note={CONSENT_TOGGLE_NOTE}>
+        <SettingsRow
+          label={CONSENT_TOGGLE}
+          sub={CONSENT_TOGGLE_SUB}
+          right={
+            <Switch
+              label={CONSENT_TOGGLE}
+              value={!!consent.data?.referenceData}
+              onValueChange={(v) =>
+                consent.save(v, {
+                  onSuccess: () => (v ? grantConsent() : consentTurnedOff()),
+                })
+              }
+            />
+          }
         />
       </SettingsGroup>
 

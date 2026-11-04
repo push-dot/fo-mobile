@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text } from '@/shared/components'
-import { ChatDrawer, ComposerArea, QUICK_STARTS, QuickStartSheet, useStartChat, type QuickStart } from '@/features/chat'
+import { ChatDrawer, ComposerArea, ConsentSheet, ConversationsModal, QUICK_STARTS, QuickStartSheet, useStartChat, type QuickStart } from '@/features/chat'
 
 const ChatHomeScreen = () => {
   const c = useColors()
@@ -12,6 +12,7 @@ const ChatHomeScreen = () => {
   const [typing, setTyping] = useState(false)
   const [qs, setQs] = useState<QuickStart | null>(null)
   const [drawer, setDrawer] = useState(false)
+  const [listOpen, setListOpen] = useState(false)
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -39,7 +40,9 @@ const ChatHomeScreen = () => {
         />
       </View>
       <QuickStartSheet qs={qs} onClose={() => setQs(null)} />
-      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} />
+      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} onSeeAll={() => setListOpen(true)} />
+      <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} />
+      <ConsentSheet />
     </KeyboardAvoidingView>
   )
 }

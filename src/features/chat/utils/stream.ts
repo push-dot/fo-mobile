@@ -5,11 +5,12 @@ import type { Approval, ChatEvent } from '../types'
 export const errorText = (code?: string, retryAfterSec?: number) =>
   code === 'QUEUE_BUSY' && retryAfterSec ? queueBusyText(retryAfterSec) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-const ask = (id: string, question: string, options: StreamOption[], recommended?: string, foot?: string): ChatEvent => {
+const ask = (id: string, question: string, options: StreamOption[], recommended?: string, foot?: string, detail?: string): ChatEvent => {
   const approval: Approval = {
     id,
     question,
     foot,
+    detail,
     optionIds: options.map((o) => o.id),
     sections: [
       {
@@ -38,7 +39,7 @@ const map = (ev: StreamEvent): ChatEvent | null => {
     case 'approval':
       return ask(ev.id, ev.title, ev.options, undefined, ev.summary)
     case 'choice': {
-      if (!ev.auto) return ask(ev.id, ev.title ?? CHOICE_QUESTION, ev.options, ev.recommended)
+      if (!ev.auto) return ask(ev.id, ev.title ?? CHOICE_QUESTION, ev.options, ev.recommended, undefined, ev.detail)
       const picked = ev.options.find((o) => o.id === ev.recommended)
       return picked ? { type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked.label}` } : null
     }
@@ -51,7 +52,7 @@ const map = (ev: StreamEvent): ChatEvent | null => {
     case 'fit':
       return { type: 'fit', id: `fit-${Date.now()}`, score: ev.score, caption: ev.topGap, rows: FIT_ROWS.map((r) => ({ label: r.label, score: ev.parts[r.key] })) }
     case 'error':
-      return { type: 'error', id: `err-${Date.now()}`, text: errorText(ev.error.code) }
+      return { type: 'error', id: `err-${Date.now()}`, text: errorText(ev.error.code), code: ev.error.code }
     case 'cancelled':
       return { type: 'stop' }
     case 'done':

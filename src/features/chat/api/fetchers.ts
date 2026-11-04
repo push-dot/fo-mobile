@@ -26,7 +26,7 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
 }
 
 export const chatApi = {
-  conversations: (q: { limit?: number } = {}) => c.get<ListEnvelope<ConversationRow>>('conversations', { query: q }),
+  conversations: (q: { limit?: number; archived?: 'true' } = {}) => c.get<ListEnvelope<ConversationRow>>('conversations', { query: q }),
   /** Mock-only: the scripted agent run for one message or approval answer. */
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
   // shortcut: push-be has no chat/docs; real mode reads 마이 › 서류 (myApi.sources) and uploads there.
@@ -57,6 +57,14 @@ export const createConversation = api.conversations.create
 export const renameConversation = api.conversations.rename
 
 export const archiveConversation = api.conversations.archive
+
+export const pinConversation = (id: string, expectedRevision: number, pinned: boolean) =>
+  c.patch<DataEnvelope<ConversationRow>>(`conversations/${id}`, { body: { expectedRevision, pinned } })
+
+export const unarchiveConversation = (id: string, expectedRevision: number) =>
+  c.post<DataEnvelope<ConversationRow>>(`conversations/${id}/unarchive`, { body: { expectedRevision } })
+
+export const deleteConversation = (id: string) => c.delete<void>(`conversations/${id}`)
 
 export const fetchMyProfile = api.me.profile
 

@@ -62,6 +62,10 @@ export const fetchAuthMe = api.auth.me
 
 export const fetchSettings = api.me.settings
 
+export const fetchConsents = () => api.me.consents()
+
+export const updateReferenceConsent = (referenceData: boolean) => api.me.updateConsents(referenceData)
+
 export const updateSettings = api.me.updateSettings
 
 export const fetchBookmarkList = () => api.me.bookmarks({ limit: 100 })

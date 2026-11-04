@@ -48,7 +48,7 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
     if (!r) return
     onClose()
-    void start(r.title, r.message)
+    void start(r.title, r.message, undefined, undefined, r.intent)
   }
 
   const toggle = (id: string) =>
@@ -140,6 +140,15 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             </View>
           ) : null}
 
+          {qs.listLabel ? (
+            <>
+              <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} docs={docs.data} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
+              <Text v="c1" weight="700" color="t3">
+                {qs.listLabel}
+              </Text>
+            </>
+          ) : null}
+
           {['pick', 'deadline', 'status', 'reply'].includes(qs.layout) ? (
             <View>
               {visible.map((it) => (
@@ -154,7 +163,7 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             </View>
           ) : null}
 
-          {qs.docLabel && doc ? (
+          {qs.docLabel && doc && !qs.listLabel ? (
             <>
               <Pressable
                 accessibilityRole="button"
@@ -197,6 +206,63 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
       )}
     </BottomSheet>
   )
+}
+
+const DocField = ({
+  label,
+  doc,
+  picking,
+  docs,
+  onToggle,
+  onPick,
+}: {
+  label?: string
+  doc?: string
+  picking: boolean
+  docs?: { id: string; fileName: string }[]
+  onToggle: () => void
+  onPick: (name: string) => void
+}) => {
+  const c = useColors()
+  return label && doc ? (
+    <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${label} ${doc}, 변경`}
+        onPress={onToggle}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: c.bg2 }}
+      >
+        <FileTag tag={doc.split('.').pop()!.toUpperCase()} w={28} h={34} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text v="c2" weight="600" color="t3">
+            {label}
+          </Text>
+          <Text v="b2" weight="700" numberOfLines={1}>
+            {doc}
+          </Text>
+        </View>
+        <Text v="c1" weight="700" color="acText">
+          변경
+        </Text>
+      </Pressable>
+      {picking
+        ? docs?.map((x) => (
+            <Pressable
+              key={x.id}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: x.fileName === doc }}
+              onPress={() => onPick(x.fileName)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48, paddingHorizontal: 4 }}
+            >
+              <Pick on={x.fileName === doc} />
+              <Text v="b2" numberOfLines={1} style={{ flex: 1 }}>
+                {x.fileName}
+              </Text>
+            </Pressable>
+          ))
+        : null}
+    </>
+  ) : null
 }
 
 const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; on: boolean; onPress?: () => void }) => {

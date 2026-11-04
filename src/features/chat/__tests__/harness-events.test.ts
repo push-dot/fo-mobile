@@ -80,9 +80,9 @@ describe('harness events', () => {
   })
 
   it('explains pre-stream errors', () => {
-    expect(errorText('INSUFFICIENT_CREDITS')).toBe('크레딧이 모자라요. 요금제에서 충전할 수 있어요.')
+    expect(errorText('INSUFFICIENT_CREDITS')).toBe('이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.')
     expect(errorText('QUEUE_BUSY', 30)).toBe('지금 요청이 많아요. 30초 뒤에 다시 보내 주세요.')
     expect(errorText('PLAN_REQUIRED')).toContain('요금제')
-    expect(errorText('INTEGRATION_REQUIRED')).toBe('AI 키를 연결해야 쓸 수 있어요.')
+    expect(errorText('INTEGRATION_REQUIRED')).toBe('작업을 이어가지 못했어요. 다시 보내 주세요.')
   })
 })

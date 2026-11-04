@@ -1,12 +1,12 @@
 import type { Tone } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Alert, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { fontFor, useColors } from '../../../theme'
-import { Badge, BottomSheet, Button, GlassButton, Icon, SegmentedControl, SettingsGroup, SettingsRow, Text } from '@/shared/components'
+import { Badge, BottomSheet, Button, GlassButton, Icon, SettingsGroup, SettingsRow, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
 import { useMySettings, useUpdateSettings } from '@/features/my'
-import { useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe } from '../api/hooks'
+import { promptCreditPurchase, useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe } from '../api/hooks'
 import { ACCESS_MODE_TITLE, ACCESS_MODES } from '../constants'
 import { Appear } from './motion'
 import Mark from './mark'
@@ -33,8 +33,21 @@ const RETENTION = [7, 30, 90, 365]
 type Picker = { title: string; options: string[]; value: number; onPick: (i: number) => void } | null
 
 /** 계정 modal (ChatAccount) with the 요금제 page inside it (PlanUpgrade). */
-export const AccountModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
-  const [page, setPage] = useState<'account' | 'plan'>('account')
+export const AccountModal = ({
+  visible,
+  onClose,
+  initialPage = 'account',
+}: {
+  visible: boolean
+  onClose: () => void
+  initialPage?: 'account' | 'plan'
+}) => {
+  const [page, setPage] = useState<'account' | 'plan'>(initialPage)
+  const [seen, setSeen] = useState(visible)
+  if (visible !== seen) {
+    setSeen(visible)
+    if (visible) setPage(initialPage)
+  }
   const close = () => (setPage('account'), onClose())
   const account = useChatAccount(visible)
   const checkout = useCheckoutUltra()
@@ -173,8 +186,6 @@ const won = (n: number) => (n ? `${n.toLocaleString()}원` : '무료')
 
 const PlanPage = ({ account }: { account: Account }) => {
   const c = useColors()
-  const [period, setPeriod] = useState<'month' | 'year'>('year')
-  const price = (m: number) => (period === 'year' ? Math.round((m * 0.8) / 100) * 100 : m)
   const [ultra, ...rest] = PLANS
   const current = account.plan
   return (
@@ -182,16 +193,6 @@ const PlanPage = ({ account }: { account: Account }) => {
       <Text v="h1" style={{ fontSize: 25, lineHeight: 34, paddingTop: 6, paddingHorizontal: 24, paddingBottom: 16 }}>
         {'더 많이 맡기고\n더 빨리 붙어요'}
       </Text>
-      <View style={{ paddingHorizontal: 20, paddingBottom: 16 }}>
-        <SegmentedControl
-          items={[
-            { key: 'month', label: '월간' },
-            { key: 'year', label: '연간 -20%' },
-          ]}
-          value={period}
-          onChange={setPeriod}
-        />
-      </View>
       <View style={{ marginHorizontal: 20, borderRadius: 22, padding: 20, gap: 10, backgroundColor: c.acSoft, borderWidth: 2, borderColor: c.ac }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 22, lineHeight: 28, ...fontFor('800'), color: c.t1 }}>ULTRA</Text>
@@ -203,15 +204,10 @@ const PlanPage = ({ account }: { account: Account }) => {
           {current === 'ULTRA' ? <Badge label="지금 쓰는 중" /> : null}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-          <Text style={{ fontSize: 24, lineHeight: 30, ...fontFor('700'), color: c.t1 }}>{won(price(ultra.monthly))}</Text>
+          <Text style={{ fontSize: 24, lineHeight: 30, ...fontFor('700'), color: c.t1 }}>{won(ultra.monthly)}</Text>
           <Text v="b2" color="t3">
             / 월
           </Text>
-          {period === 'year' ? (
-            <Text v="c1" color="t4" style={{ marginLeft: 6, textDecorationLine: 'line-through' }}>
-              {won(ultra.monthly)}
-            </Text>
-          ) : null}
         </View>
         <View style={{ gap: 7, marginTop: 2 }}>
           {ultra.features.map((f) => (
@@ -233,7 +229,7 @@ const PlanPage = ({ account }: { account: Account }) => {
               {p.key === current ? <Badge label="지금 쓰는 중" /> : null}
             </View>
             <Text v="b1" weight="700">
-              {p.monthly ? `${won(price(p.monthly))} / 월` : '무료'}
+              {p.monthly ? `${won(p.monthly)} / 월` : '무료'}
             </Text>
             <Text v="c1" color="t3">
               월 {p.credits.toLocaleString()} 크레딧
@@ -242,15 +238,11 @@ const PlanPage = ({ account }: { account: Account }) => {
         ))}
       </View>
       <Text v="c1" color="t3" style={{ paddingTop: 14, paddingHorizontal: 24 }}>
-        {period === 'year' ? '연간 결제는 한 번에 청구돼요 · 언제든 해지할 수 있어요' : '매달 결제돼요 · 언제든 해지할 수 있어요'}
+        매달 결제돼요 · 언제든 해지할 수 있어요
       </Text>
       <View style={{ marginTop: 22, marginHorizontal: 20 }}>
         <SettingsGroup>
-          <SettingsRow
-            label="크레딧 충전"
-            sub={account.credits ? `남은 크레딧 ${(account.credits.total - account.credits.used).toLocaleString()}` : undefined}
-            right={<Button label="충전" size="sm" variant="secondary" onPress={() => Alert.alert('크레딧 충전', '추가 구매는 곧 열려요. 지금은 요금제를 올려 크레딧을 늘릴 수 있어요.')} />}
-          />
+          <SettingsRow label="크레딧 구매" right={<Button label="구매" size="sm" variant="secondary" onPress={promptCreditPurchase} />} />
         </SettingsGroup>
       </View>
       <Note>매월 1일에 요금제 크레딧이 다시 채워져요.</Note>

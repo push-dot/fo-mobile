@@ -29,11 +29,16 @@ const conversations: ConversationRow[] = [
   conv('c-nuri', '누리클라우드 자기소개서', 60 * 24 * 8, '지원 동기 문단을 줄였어요'),
 ]
 const archived = new Set<string>()
-const live = () => conversations.filter((c) => !archived.has(c.id)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+let referenceData = false
+const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)
 
-mock('GET', 'conversations', ({ query }) => page(live(), query))
+mock('GET', 'conversations', ({ query }) =>
+  page(query.get('archived') === 'true' ? byRecent(conversations.filter((c) => archived.has(c.id))) : live(), query),
+)
 mock('POST', 'conversations', ({ body }) => {
+  if (!referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
   const b = body as { title: string }
   const c = conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, '')
   conversations.push(c)
@@ -42,12 +47,27 @@ mock('POST', 'conversations', ({ body }) => {
 mock('PATCH', 'conversations/:id', ({ params, body }) => {
   const c = find(params.id!)
   if (!c) return { status: 404, body: { error: { code: 'NOT_FOUND', message: 'conversation' } } }
-  Object.assign(c, { title: (body as { title?: string }).title ?? c.title, revision: c.revision + 1 })
+  const b = body as { title?: string; pinned?: boolean }
+  Object.assign(c, { title: b.title ?? c.title, pinned: b.pinned ?? c.pinned, revision: c.revision + 1 })
   return { data: c }
 })
 mock('POST', 'conversations/:id/archive', ({ params }) => {
   archived.add(params.id!)
   return { data: find(params.id!) }
+})
+mock('POST', 'conversations/:id/unarchive', ({ params }) => {
+  archived.delete(params.id!)
+  return { data: find(params.id!) }
+})
+mock('DELETE', 'conversations/:id', ({ params }) => {
+  const i = conversations.findIndex((c) => c.id === params.id)
+  if (i >= 0) conversations.splice(i, 1)
+  archived.delete(params.id!)
+})
+mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null } }))
+mock('PUT', 'me/consents', ({ body }) => {
+  referenceData = (body as { referenceData?: boolean }).referenceData === true
+  return { data: { referenceData, updatedAt: new Date().toISOString() } }
 })
 mock('GET', 'conversations/:id/messages', ({ params, query }) => {
   const c = find(params.id!)

@@ -1,4 +1,4 @@
-import { type Conversation } from '@push/api-client'
+import { type ChatIntent, type Conversation } from '@push/api-client'
 
 /** Conversation plus the list badges (확인 필요 / 작업 중) and last progress line the design needs. */
 export type ConversationRow = Conversation & { status?: 'NEEDS_APPROVAL' | 'RUNNING' | null; lastLine?: string }
@@ -45,5 +45,6 @@ export type RunInput = {
   answer?: { approvalId: string; choice: number }
   resolve?: { approvalId: string; optionId: string }
   interrupted?: boolean
+  intent?: ChatIntent
 }
 

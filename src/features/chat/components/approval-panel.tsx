@@ -114,6 +114,11 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay }: Props) => {
       <Text v="h3" accessibilityRole="header" style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: 4, paddingBottom: 8 }}>
         {approval.question}
       </Text>
+      {approval.detail ? (
+        <Text v="b2" color="t2" style={{ paddingHorizontal: 4, paddingBottom: 8 }}>
+          {approval.detail}
+        </Text>
+      ) : null}
       {approval.sections.map(section)}
       {approval.submit ? (
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>

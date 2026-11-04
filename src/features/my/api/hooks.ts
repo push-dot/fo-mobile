@@ -23,6 +23,7 @@ import {
   fetchOfferMessages,
   fetchOffers,
   fetchPosting,
+  fetchConsents,
   fetchSettings,
   fetchSource,
   fetchUnreadOffers,
@@ -33,6 +34,7 @@ import {
   unfollowProfile,
   unbookmarkPosting,
   updateProfile,
+  updateReferenceConsent,
   updateSettings,
 } from './fetchers'
 
@@ -44,6 +46,17 @@ export const useUnreadOffers = () =>
   })
 
 export const useMyProfile = () => useQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
+
+export const useReferenceConsent = () => {
+  const qc = useQueryClient()
+  const q = useQuery({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
+  const m = useMutation({
+    mutationFn: updateReferenceConsent,
+    onSuccess: (data) => qc.setQueryData(['me', 'consents'], data),
+    onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+  return { data: q.data, save: m.mutate, saving: m.isPending }
+}
 
 export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: fetchAuthMe })
 

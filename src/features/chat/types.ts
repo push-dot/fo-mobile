@@ -33,7 +33,7 @@ export type ChatItem =
   | { type: 'paper'; id: string; label: string; heading: string; lines: string[] }
   | { type: 'actions'; id: string; company: string }
   | { type: 'worked'; id: string; seconds: number }
-  | { type: 'error'; id: string; text: string }
+  | { type: 'error'; id: string; text: string; code?: string }
 
 export type Choice = { label: string; desc?: string; hint?: string; badge?: { label: string; tone: BadgeTone } }
 
@@ -53,6 +53,7 @@ export type Approval = {
   /** What the user bubble says after submit; defaults to the button label. */
   answer?: string
   foot?: string
+  detail?: string
   optionIds?: string[]
 }
 

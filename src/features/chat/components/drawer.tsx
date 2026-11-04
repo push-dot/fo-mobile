@@ -21,7 +21,17 @@ export const statusBadge = (s: ConversationRow['status']) =>
   s === 'NEEDS_APPROVAL' ? <Badge label="확인 필요" tone="orange" /> : s === 'RUNNING' ? <Badge label="작업 중" tone="ac" /> : null
 
 /** Full-width slide bar over the tab bar (ChatDrawer). `currentId` is set inside a conversation. */
-export const ChatDrawer = ({ visible, onClose, currentId }: { visible: boolean; onClose: () => void; currentId?: string }) => {
+export const ChatDrawer = ({
+  visible,
+  onClose,
+  currentId,
+  onSeeAll,
+}: {
+  visible: boolean
+  onClose: () => void
+  currentId?: string
+  onSeeAll?: () => void
+}) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { width } = useWindowDimensions()
@@ -136,7 +146,8 @@ export const ChatDrawer = ({ visible, onClose, currentId }: { visible: boolean; 
           ))}
           <Pressable
             accessibilityRole="button"
-            onPress={() => (onClose(), router.push('/conversations'))}
+            accessibilityLabel="최근 대화 모두 보기"
+            onPress={() => (onClose(), onSeeAll?.())}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingVertical: 12, paddingHorizontal: 14, minHeight: 44 }}
           >
             <Text v="b2" weight="600" color="t2">

@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { type ChatIntent } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { useMyLinks, useMySettings } from '@/features/my'
@@ -7,30 +8,48 @@ import { openBrowser, pickDocument, saveToCache, shareFile, useSession } from '.
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, QUICK_STARTS } from '../constants'
 import { cacheName } from '../utils/cache-name'
 import type { MentionGroup } from '../utils/mentions'
-import { forget, pickAccessMode, send, usePrefs } from '../stores'
+import { CREDIT_PURCHASE } from '../utils/usage'
+import { isConsentRequired } from '../utils/consent'
+import { askConsent, bindOpenChat, forget, holdOpen, pickAccessMode, send, usePrefs } from '../stores'
 import {
   archiveConversation,
   chatApi,
   createConversation,
+  deleteConversation,
   fetchArtifactBytes,
   fetchMentionBookmarks,
   fetchMyProfile,
+  pinConversation,
   renameConversation,
+  unarchiveConversation,
 } from './fetchers'
+import type { ConversationRow } from './schemas'
 
 export const useStartChat = () => {
   const qc = useQueryClient()
-  return async (title: string, message: string, attachment?: string, replace?: boolean) => {
-    try {
-      const conv = await createConversation(title.slice(0, 300))
-      void qc.invalidateQueries({ queryKey: ['conversations'] })
-      if (replace) router.replace(`/chat/${conv.id}`)
-      else router.push(`/chat/${conv.id}`)
-      send(conv.id, message, attachment)
-    } catch {
-      Alert.alert('대화를 시작하지 못했어요', '잠시 뒤에 다시 해 주세요.')
-    }
-  }
+  const run = useCallback(
+    async (title: string, message: string, attachment?: string, replace?: boolean, intent?: ChatIntent) => {
+      try {
+        const conv = await createConversation(title.slice(0, 300))
+        void qc.invalidateQueries({ queryKey: ['conversations'] })
+        if (replace) router.replace(`/chat/${conv.id}`)
+        else router.push(`/chat/${conv.id}`)
+        send(conv.id, message, attachment, intent)
+      } catch (err) {
+        if (isConsentRequired(err)) {
+          holdOpen({ title, message, attachment, intent })
+          askConsent(true)
+          return
+        }
+        Alert.alert('대화를 시작하지 못했어요', '잠시 뒤에 다시 해 주세요.')
+      }
+    },
+    [qc],
+  )
+  useEffect(() => {
+    bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent))
+  }, [run])
+  return run
 }
 
 export const useConversationList = () =>
@@ -48,21 +67,49 @@ export const useRenameConversation = (id: string, revision: number | undefined) 
   })
 }
 
-export const useArchiveConversation = (id: string, revision: number | undefined) => {
+export const usePinConversation = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => {
-      if (revision === undefined) throw new Error('missing conversation')
-      return archiveConversation(id, revision)
-    },
-    onSuccess: () => {
-      forget(id)
-      void qc.invalidateQueries({ queryKey: ['conversations'] })
-      router.dismissTo('/chat')
-    },
-    onError: () => Alert.alert('대화를 지우지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    mutationFn: (row: ConversationRow) => pinConversation(row.id, row.revision, !row.pinned),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
+    onError: () => Alert.alert('고정을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
+
+export const useArchiveConversation = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (row: ConversationRow) => archiveConversation(row.id, row.revision),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
+    onError: () => Alert.alert('보관하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useUnarchiveConversation = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (row: ConversationRow) => unarchiveConversation(row.id, row.revision),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
+    onError: () => Alert.alert('보관을 해제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useDeleteConversation = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteConversation(id),
+    onSuccess: (_d, id) => {
+      forget(id)
+      void qc.invalidateQueries({ queryKey: ['conversations'] })
+    },
+    onError: () => Alert.alert('대화를 삭제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useArchivedConversations = (enabled: boolean) =>
+  useQuery({ queryKey: ['conversations', 'archived'], queryFn: () => chatApi.conversations({ archived: 'true', limit: 100 }), enabled })
+
+export const promptCreditPurchase = () => Alert.alert(CREDIT_PURCHASE.title, CREDIT_PURCHASE.body)
 
 export const useMe = () => {
   const session = useSession((s) => s.session)

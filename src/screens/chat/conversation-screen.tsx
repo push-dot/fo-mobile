@@ -10,20 +10,25 @@ import {
   answer,
   ApprovalPanel,
   AWAITING_TEXT,
+  AccountModal,
   ChatDrawer,
   ComposerArea,
+  ConsentSheet,
+  ConversationsModal,
+  DELETE_CONFIRM,
   DocsModal,
   hydrate,
   Item,
   Queued,
   Appear,
   QuickStartSheet,
+  promptCreditPurchase,
   send,
   StatusRow,
   stop,
-  useArchiveConversation,
   useChat,
   useConversationList,
+  useDeleteConversation,
   useReduceMotion,
   useRenameConversation,
   type QuickStart,
@@ -37,6 +42,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const list = useConversationList()
   const conv = list.data?.data.find((x) => x.id === id)
   const [drawer, setDrawer] = useState(false)
+  const [listOpen, setListOpen] = useState(false)
+  const [planOpen, setPlanOpen] = useState(false)
   const [more, setMore] = useState(false)
   const [docs, setDocs] = useState(false)
   const [renaming, setRenaming] = useState<string | null>(null)
@@ -54,7 +61,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const saying = !!chat.approval && sayingFor === chat.approval.id
 
   const rename = useRenameConversation(id, conv?.revision)
-  const remove = useArchiveConversation(id, conv?.revision)
+  const remove = useDeleteConversation()
 
   const shareText = () =>
     chat.items
@@ -71,9 +78,9 @@ const ConversationScreen = ({ id }: { id: string }) => {
       label: '대화 삭제',
       danger: true,
       onPress: () =>
-        Alert.alert('대화를 삭제할까요?', '이 대화에서만 쓰던 자료도 함께 보관돼요.', [
-          { text: '취소', style: 'cancel' },
-          { text: '삭제', style: 'destructive', onPress: () => remove.mutate() },
+        Alert.alert(DELETE_CONFIRM.title, DELETE_CONFIRM.body, [
+          { text: DELETE_CONFIRM.cancel, style: 'cancel' },
+          { text: DELETE_CONFIRM.confirm, style: 'destructive', onPress: () => remove.mutate(id, { onSuccess: () => router.dismissTo('/chat') }) },
         ]),
     },
   ]
@@ -97,7 +104,12 @@ const ConversationScreen = ({ id }: { id: string }) => {
         keyboardDismissMode="interactive"
       >
         {chat.items.map((it) => (
-          <Item key={it.id} item={it} onAction={(text) => send(id, text)} />
+          <Item
+            key={it.id}
+            item={it}
+            onAction={(text) => send(id, text)}
+            onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : promptCreditPurchase())}
+          />
         ))}
         {chat.queue.map((t, i) => (
           <Queued key={`${i}-${t}`} text={t} />
@@ -173,7 +185,10 @@ const ConversationScreen = ({ id }: { id: string }) => {
       </BottomSheet>
       <DocsModal visible={docs} onClose={() => setDocs(false)} />
       <QuickStartSheet qs={qs} onClose={() => setQs(null)} />
-      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} currentId={id} />
+      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} currentId={id} onSeeAll={() => setListOpen(true)} />
+      <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} currentId={id} onDeleted={() => router.dismissTo('/chat')} />
+      <AccountModal visible={planOpen} initialPage="plan" onClose={() => setPlanOpen(false)} />
+      <ConsentSheet />
     </View>
   )
 }

@@ -1,6 +1,7 @@
 import type { AccessMode } from '@push/api-client'
 import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
+import { usageExhausted } from './utils/usage'
 
 // Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.
 export const SPRING = [0.2, 0.9, 0.25, 1] as const
@@ -27,17 +28,27 @@ export const FIT_ROWS = [
   { key: 'keyword', label: '키워드' },
 ] as const
 
-const CREDITS_TEXT = '크레딧이 모자라요. 요금제에서 충전할 수 있어요.'
+const USAGE_BODY = usageExhausted('FREE').body
 export const ERROR_TEXT: Record<string, string> = {
-  FEATURE_DISABLED: CREDITS_TEXT,
-  INSUFFICIENT_CREDITS: CREDITS_TEXT,
+  FEATURE_DISABLED: USAGE_BODY,
+  INSUFFICIENT_CREDITS: USAGE_BODY,
   PLAN_REQUIRED: '요금제를 올리면 쓸 수 있어요.',
   QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
-  INTEGRATION_REQUIRED: 'AI 키를 연결해야 쓸 수 있어요.',
   APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
 }
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
+
+export const CONSENT_TITLE = '에이전트를 쓰려면 동의가 필요해요'
+export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 AI가 참고 자료로 써요.'
+export const CONSENT_MORE = '자세히 보기'
+export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
+export const CONSENT_AGREE = '동의하고 시작하기'
+export const CONSENT_LATER = '나중에'
+export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 에이전트를 쓸 수 없어요.'
+export const CONSENT_TOGGLE = '참고 데이터 제공'
+export const CONSENT_TOGGLE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
+export const CONSENT_TOGGLE_NOTE = '끄면 에이전트를 쓸 수 없어요.'
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
@@ -72,8 +83,9 @@ export type QuickStart = {
   multi?: boolean
   grid?: boolean
   docLabel?: string
+  listLabel?: string
   custom?: string
-  start: (i: QsInput) => { title: string; message: string } | null | undefined
+  start: (i: QsInput) => { title: string; message: string; intent?: 'boost' } | null | undefined
 }
 
 const one = (i: QsInput) => i.picked[0]
@@ -100,6 +112,14 @@ export const QUICK_STARTS: QuickStart[] = [
     key: 'fit', label: '적합도 보기', icon: 'chart', layout: 'pick', action: '적합도 보기', docLabel: '비교할 서류',
     title: '어떤 공고로 볼까요?', description: '서류는 고치지 않고 적합도 점수만 보여 드려요.',
     start: (i) => one(i) && { title: `${one(i)!.over} 적합도`, message: `${one(i)!.over} ${one(i)!.title} 공고 기준으로 ${i.doc} 적합도 점수만 보여 주세요` },
+  },
+  {
+    key: 'boost', label: '점수 올리기', icon: 'chart', layout: 'pick', action: '점수 올리기 시작', docLabel: '올릴 서류', listLabel: '공고',
+    title: '어떤 서류의 점수를 올릴까요?', description: '공고에 맞춰 서류를 여러 번 고치며 적합도 점수를 올려요. 최대 5번까지 해요.',
+    start: (i) => {
+      const job = one(i)
+      return job && i.doc ? { title: `${job.over} 점수 올리기`, message: `${job.over} ${job.title} 공고에 맞춰 ${i.doc} 점수를 올려 주세요`, intent: 'boost' as const } : null
+    },
   },
   {
     key: 'deadline', label: '마감 임박 공고 정리', icon: 'bookmark', layout: 'deadline', action: '준비할 일 정리하기',

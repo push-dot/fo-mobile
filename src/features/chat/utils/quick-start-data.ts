@@ -34,6 +34,7 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
   switch (key) {
     case 'gap':
     case 'fit':
+    case 'boost':
       return { doc: s.doc, items: bookmarks.map((p, i) => job(p, { sub: p.location, selected: i === 0 })) }
     case 'deadline':
       return {
@@ -87,6 +88,7 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   link: ['doc'],
   gap: ['bookmarks', 'doc'],
   fit: ['bookmarks', 'doc'],
+  boost: ['bookmarks', 'doc'],
   deadline: ['bookmarks'],
   status: ['applications'],
   calendar: ['connected'],
