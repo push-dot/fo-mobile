@@ -86,7 +86,8 @@ mock('GET', 'postings', ({ query }) => {
   let list = filter(query)
   const sort = query.get('sort')
   // Home sections reuse the list: ?sort=deadline → 마감 7일 이내 (feature-spec 3.3).
-  if (sort === 'deadline') list = list.filter((p) => days(p.deadline) <= 7).sort((a, b) => days(a.deadline) - days(b.deadline))
+  if (query.get('deadlineWithin') === '7' || sort === 'deadline') list = list.filter((p) => days(p.deadline) <= 7)
+  if (sort === 'deadline') list = list.sort((a, b) => days(a.deadline) - days(b.deadline))
   else if (sort === 'popular') list = list.filter((p) => views[p.id]).sort((a, b) => views[b.id]! - views[a.id]!)
   else list = [...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   return page(list, query, true)

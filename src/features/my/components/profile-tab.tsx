@@ -2,7 +2,9 @@ import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { CAREER_STATUSES, JOB_CATEGORIES } from '@push/api-client'
+import { profileShareMessage } from '@/features/hub'
 import { Badge, Button, Icon, Text } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
 import type { ProfileSection } from '../types'
@@ -72,14 +74,16 @@ const ProfileTab = () => {
             허브에 이렇게 보여요 · 팔로워 {p.followerCount}
           </Text>
         </View>
-        <Button
-          label="기본 정보 편집"
-          icon="edit"
-          variant="secondary"
-          size="sm"
-          onPress={() => edit('basic')}
-          style={{ marginTop: 10 }}
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 }}>
+          <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />
+          <Button
+            label="공유"
+            icon="share"
+            variant="secondary"
+            size="sm"
+            onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })}
+          />
+        </View>
       </View>
 
       <Section title="소개" onEdit={() => edit('intro')} gap={6}>

@@ -4,6 +4,7 @@ import { EMPTY, chipText, toQuery, toggleRegion } from './filters'
 describe('jobs filters', () => {
   it('labels chips in sheet order', () => {
     expect(chipText('category', EMPTY)).toBe('직군')
+    expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('개발')
     expect(chipText('category', { ...EMPTY, category: ['data', 'dev'] })).toBe('개발 외 1')
     expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6'] })).toBe('4–6년')
   })

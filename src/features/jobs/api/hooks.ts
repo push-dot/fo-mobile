@@ -52,7 +52,7 @@ export const useApplyDocs = (enabled: boolean) =>
   useQuery({
     queryKey: ['me', 'sources', 'apply'],
     queryFn: fetchApplyDocs,
-    select: (r) => r.data.map(applyDoc),
+    select: (r) => r.data.map((item) => applyDoc(item)),
     enabled,
   })
 

@@ -12,9 +12,10 @@ import {
   filterSummary,
   toggle,
   useProfileList,
+  useViewerId,
   type SheetFilters,
 } from '@/features/hub'
-import { Badge, Chip, Icon, LoadingNote, Text, TopBar } from '@/shared/components'
+import { Badge, Button, Chip, Icon, LoadingNote, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const HubScreen = () => {
@@ -23,9 +24,14 @@ const HubScreen = () => {
   const [sheet, setSheet] = useState<SheetFilters>(EMPTY_SHEET)
   const [filterOpen, setFilterOpen] = useState(false)
 
+  const viewerId = useViewerId()
   const list = useProfileList(category, sheet)
   const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
+  const reset = () => {
+    setCategory([])
+    setSheet(EMPTY_SHEET)
+  }
 
   const header = (
     <View>
@@ -65,7 +71,18 @@ const HubScreen = () => {
             허브
           </Text>
         }
-        right={<FilterButton count={appliedCount(sheet)} onPress={() => setFilterOpen(true)} />}
+        right={
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            {viewerId ? (
+              <Pressable accessibilityRole="button" onPress={() => router.push(`/profiles/${viewerId}` as Href)}>
+                <Text v="b2" weight="700" color="acText">
+                  내 프로필 보기
+                </Text>
+              </Pressable>
+            ) : null}
+            <FilterButton count={appliedCount(sheet)} onPress={() => setFilterOpen(true)} />
+          </View>
+        }
       />
       <FlatList
         data={items}
@@ -75,10 +92,17 @@ const HubScreen = () => {
         ListEmptyComponent={
           list.isPending ? (
             <LoadingNote style={{ marginTop: 32 }} />
-          ) : (
+          ) : list.isError ? (
             <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 32 }}>
-              {list.isError ? '프로필을 불러오지 못했어요.' : '조건에 맞는 프로필이 없어요.'}
+              프로필을 불러오지 못했어요.
             </Text>
+          ) : (
+            <View style={{ alignItems: 'center', gap: 12, marginTop: 32 }}>
+              <Text v="b2" color="t3">
+                조건에 맞는 프로필이 없어요.
+              </Text>
+              <Button label="필터 초기화" variant="secondary" size="sm" onPress={reset} />
+            </View>
           )
         }
         onEndReached={() => list.hasNextPage && !list.isFetchingNextPage && list.fetchNextPage()}

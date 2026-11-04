@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native'
 import type { AppNotification, NotificationType } from '@push/api-client'
 import { Icon, Text, type IconName } from '../../../shared/components'
 import { useColors, type Colors } from '../../../theme'
-import { timeLabel } from '../utils'
+import { notificationTitle, timeLabel } from '../utils'
 
 const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: keyof Colors }> = {
   AI_DONE: { icon: 'spark', fg: 'acText', bg: 'acSoft' },
@@ -19,7 +19,7 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${unread ? '안 읽음, ' : ''}${n.title}, ${n.body}, ${timeLabel(n.createdAt)}`}
+      accessibilityLabel={`${unread ? '안 읽음, ' : ''}${notificationTitle(n)}, ${n.body}, ${timeLabel(n.createdAt)}`}
       onPress={onPress}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: 20, paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
     >
@@ -29,7 +29,7 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <View style={{ flexDirection: 'row', gap: 6 }}>
           <Text v="c1" weight="600" color="t3" style={{ flex: 1 }}>
-            {n.title}
+            {notificationTitle(n)}
           </Text>
           <Text v="c2" color="t3">
             {timeLabel(n.createdAt)}

@@ -68,9 +68,12 @@ const SocialScreen = () => {
                 <Button label="다시 불러오기" variant="secondary" size="sm" onPress={() => q.refetch()} />
               </>
             ) : (
-              <Text v="b2" color="t3">
-                아직 올라온 글이 없어요
-              </Text>
+              <>
+                <Text v="b2" color="t3">
+                  아직 올라온 글이 없어요
+                </Text>
+                <Button label="글쓰기" size="sm" onPress={() => router.push('/(tabs)/(social)/compose')} />
+              </>
             )}
           </View>
         }

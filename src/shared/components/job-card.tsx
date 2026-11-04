@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
-import { brandOf, careerLabel } from '@push/shared'
+import { brandOf, cardCareerLabel } from '@push/shared'
 import { radius } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
@@ -50,7 +50,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           {p.title}
         </Text>
         <Text v="c2" color="t3" numberOfLines={1}>
-          {p.location} · {careerLabel(p)}
+          {p.location} · {cardCareerLabel(p)}
         </Text>
       </View>
     </Pressable>

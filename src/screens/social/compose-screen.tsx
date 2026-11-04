@@ -63,7 +63,7 @@ const ComposeScreen = () => {
           onChangeText={setTitle}
           maxLength={100}
           accessibilityLabel="제목"
-          placeholder="제목"
+          placeholder="제목을 입력해 주세요"
           placeholderTextColor={c.t4}
           style={[{ fontSize: 22, letterSpacing: -0.66, color: c.t1, paddingVertical: 6, paddingHorizontal: 4 }, fontFor('800')]}
         />

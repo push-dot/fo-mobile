@@ -8,7 +8,7 @@ import ImageGrid from './image-grid'
 const PostHeader = ({ post }: { post: Post }) => {
   return (
     <View style={{ gap: 14, paddingTop: 4, paddingBottom: 14 }}>
-      <AuthorRow post={post} size={40} />
+      <AuthorRow post={post} size={40} showViews />
       <Text v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
         {post.title}
       </Text>

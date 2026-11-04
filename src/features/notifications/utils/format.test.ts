@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { groupLabel, timeLabel } from './format'
+import { groupLabel, notificationTitle, timeLabel } from './format'
 
 const now = new Date(2026, 9, 20, 15, 0)
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).toISOString()
@@ -17,5 +17,12 @@ describe('notification time labels', () => {
     expect(groupLabel(at(20, 1), now)).toBe('오늘')
     expect(groupLabel(at(16, 1), now)).toBe('이번 주')
     expect(groupLabel(at(1, 1), now)).toBe('이전')
+  })
+})
+
+describe('notificationTitle', () => {
+  it('names deadline alerts 마감 임박 공고', () => {
+    expect(notificationTitle({ type: 'DEADLINE', title: '마감 임박' })).toBe('마감 임박 공고')
+    expect(notificationTitle({ type: 'OFFER', title: '제안 받음' })).toBe('제안 받음')
   })
 })

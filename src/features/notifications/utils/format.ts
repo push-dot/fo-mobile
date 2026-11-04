@@ -1,3 +1,5 @@
+export const notificationTitle = (n: { type: string; title: string }) => (n.type === 'DEADLINE' ? '마감 임박 공고' : n.title)
+
 const DAY = 86_400_000
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
 

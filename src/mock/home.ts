@@ -58,9 +58,9 @@ const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 const notifications: AppNotification[] = [
   { id: 'n1', type: 'AI_DONE', title: 'AI 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.4', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: ago(10) },
   { id: 'n2', type: 'OFFER', title: '제안 받음', body: '오지현 님이 결제 플랫폼팀 커피챗을 제안했어요.', target: { kind: 'offer', id: 'o1' }, readAt: null, createdAt: ago(120) },
-  { id: 'n3', type: 'DEADLINE', title: '마감 임박', body: '북마크한 파도AI 데이터 분석가 공고가 2일 남았어요.', target: { kind: 'posting', id: 'p2' }, readAt: null, createdAt: ago(180) },
+  { id: 'n3', type: 'DEADLINE', title: '마감 임박 공고', body: '북마크한 파도AI 데이터 분석가 공고가 2일 남았어요.', target: { kind: 'posting', id: 'p2' }, readAt: null, createdAt: ago(180) },
   { id: 'n4', type: 'COMMENT', title: '댓글과 답글', body: '박도윤 님이 내 글에 답글을 남겼어요. “저도 같은 고민이었어요!”', target: { kind: 'post', id: 's1' }, readAt: ago(60 * 20), createdAt: ago(60 * 26) },
-  { id: 'n5', type: 'DEADLINE', title: '마감 임박', body: '도토리증권 서버 개발자 (Go) 공고가 3일 남았어요.', target: { kind: 'posting', id: 'p3' }, readAt: ago(60 * 48), createdAt: ago(60 * 72) },
+  { id: 'n5', type: 'DEADLINE', title: '마감 임박 공고', body: '도토리증권 서버 개발자 (Go) 공고가 3일 남았어요.', target: { kind: 'posting', id: 'p3' }, readAt: ago(60 * 48), createdAt: ago(60 * 72) },
   { id: 'n6', type: 'AI_DONE', title: 'AI 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: ago(60 * 90), createdAt: ago(60 * 96) },
 ]
 

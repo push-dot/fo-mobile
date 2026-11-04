@@ -35,6 +35,9 @@ const ApplySheet = ({ postingId, company, visible, onClose, onApplied, title }: 
           <DocRow key={d.id} doc={d} on={d.id === doc?.id} onPress={() => setPicked(d.id)} />
         ))}
       </View>
+      <Text v="c1" color="t3">
+        함께 보낼 수 있어요
+      </Text>
       <Text v="c1" color={apply.isError ? 'red' : 't3'}>
         {apply.isError ? '지원하지 못했어요. 잠시 후 다시 눌러 주세요.' : '지원하면 마이 › 내 활동 › 지원활동에 기록돼요.'}
       </Text>

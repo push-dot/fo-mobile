@@ -7,8 +7,15 @@ const day = (iso: string) => {
   return `${d.getMonth() + 1}월 ${d.getDate()}일`
 }
 
-export const applyDoc = (s: SourceItem): ApplyDoc => {
+const sameDay = (iso: string, now: Date) => {
+  const d = new Date(iso)
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
+}
+
+export const applyDoc = (s: SourceItem, now = new Date()): ApplyDoc => {
   const ai = s.origin === 'AI'
   const label = ai ? APPLY_DOC_NOTE.ai : APPLY_DOC_NOTE.upload
-  return { id: s.id, name: s.fileName, ai, note: s.createdAt ? `${label} · ${day(s.createdAt)}` : label }
+  if (!s.createdAt) return { id: s.id, name: s.fileName, ai, note: label }
+  const when = sameDay(s.createdAt, now) ? '오늘' : day(s.createdAt)
+  return { id: s.id, name: s.fileName, ai, note: `${label} · ${when}` }
 }
