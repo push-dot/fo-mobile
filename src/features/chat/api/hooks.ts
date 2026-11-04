@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { type ChatIntent } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
-import { useMyLinks, useMySettings } from '@/features/my'
+import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, saveToCache, shareFile, useSession } from '../../../shared/infrastructure'
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, QUICK_STARTS } from '../constants'
 import { ago } from '../utils/ago'
@@ -23,12 +23,12 @@ import {
   renameConversation,
   unarchiveConversation,
 } from './fetchers'
-import type { ConversationRow } from './schemas'
+import type { ConversationRow, RunInput } from './schemas'
 
 export const useStartChat = () => {
   const qc = useQueryClient()
   const run = useCallback(
-    async (title: string, message: string, attachment?: string, replace?: boolean, intent?: ChatIntent, context?: { documentId?: string }) => {
+    async (title: string, message: string, attachment?: string | PickedFile, replace?: boolean, intent?: ChatIntent, context?: RunInput['context']) => {
       try {
         const conv = await createConversation(title.slice(0, 300))
         void qc.invalidateQueries({ queryKey: ['conversations'] })

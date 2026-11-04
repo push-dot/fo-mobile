@@ -1,4 +1,5 @@
 import type { ResultAction } from '@push/api-client'
+import type { PickedFile } from '@/features/my'
 import type { BadgeTone } from '@/shared/components'
 
 // Transcript model (feature-spec 15.2). Items render in order; control events change run state.
@@ -94,7 +95,7 @@ export type ChatEvent =
   | { type: 'token'; text: string }
   | { type: 'approval'; approval: Approval }
   | { type: 'answer'; text: string }
-  | { type: 'queue'; text: string }
+  | { type: 'queue'; text: string; file?: PickedFile }
   | { type: 'dequeue' }
   | { type: 'stop' }
   | { type: 'done'; at: number; awaiting?: Awaiting }
@@ -105,7 +106,7 @@ export type ChatState = {
   working: { verbs: string[]; startedAt: number } | null
   approval: Approval | null
   awaiting: Awaiting | null
-  queue: string[]
+  queue: { text: string; file?: PickedFile }[]
   interrupted: boolean
   runStartedAt: number | null
 }

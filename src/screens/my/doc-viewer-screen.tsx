@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fileSize, monthDay } from '@push/shared'
+import { useStartChat } from '@/features/chat'
 import {
   DocMenu,
   PREVIEW_HEADINGS,
@@ -115,9 +116,12 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
   )
 }
 
+const FIX_UPLOADED_DOC = '이 서류를 고쳐 줘'
+
 const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const start = useStartChat()
   const [sheet, setSheet] = useState(false)
   const [menu, setMenu] = useState(false)
   const doc = useSource(id)
@@ -192,7 +196,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           label="AI로 고치기"
           icon="spark"
           variant="secondary"
-          onPress={() => router.push('/(tabs)/(chat)/chat')}
+          onPress={() => void start(FIX_UPLOADED_DOC, FIX_UPLOADED_DOC, undefined, undefined, undefined, { evidenceIds: [id] })}
         />
         <Button
           label="지원 서류용 프로필로 만들기"

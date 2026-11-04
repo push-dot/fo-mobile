@@ -47,6 +47,6 @@ export type RunInput = {
   resolve?: { approvalId: string; optionId: string; optionIds?: string[] }
   interrupted?: boolean
   intent?: ChatIntent
-  context?: { documentId?: string }
+  context?: { documentId?: string; evidenceIds?: string[] }
 }
 

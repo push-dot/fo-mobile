@@ -60,7 +60,7 @@ describe('applyEvent', () => {
 
   it('queues messages sent while working', () => {
     const s = run([{ type: 'queue', text: 'a' }, { type: 'queue', text: 'b' }, { type: 'dequeue' }])
-    expect(s.queue).toEqual(['b'])
+    expect(s.queue).toEqual([{ text: 'b' }])
   })
 
   it('error ends the run and shows the message', () => {

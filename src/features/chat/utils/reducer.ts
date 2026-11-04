@@ -27,7 +27,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     case 'answer':
       return { ...s, approval: null, awaiting: null, items: [...s.items, { type: 'user', id: `ans-${s.items.length}`, text: e.text }] }
     case 'queue':
-      return { ...s, queue: [...s.queue, e.text] }
+      return { ...s, queue: [...s.queue, { text: e.text, ...(e.file ? { file: e.file } : {}) }] }
     case 'dequeue':
       return { ...s, queue: s.queue.slice(1) }
     case 'stop':

@@ -119,8 +119,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
             onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : purchase.buyCredits())}
           />
         ))}
-        {chat.queue.map((t, i) => (
-          <Queued key={`${i}-${t}`} text={t} />
+        {chat.queue.map((item, i) => (
+          <Queued key={`${i}-${item.text}`} text={item.text} />
         ))}
       </ScrollView>
 

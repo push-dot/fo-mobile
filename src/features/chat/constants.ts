@@ -41,6 +41,7 @@ export const ERROR_TEXT: Record<string, string> = {
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
 }
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
+export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
 
 export const CONSENT_TITLE = '에이전트를 쓰려면 동의가 필요해요'
 export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 AI가 참고 자료로 써요.'
@@ -66,7 +67,7 @@ export const CHAT_DOC_TYPES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ]
-export const CHAT_ATTACHMENT_OPTIONS = { type: CHAT_ATTACHMENT_TYPES, copyToCacheDirectory: false }
+export const CHAT_ATTACHMENT_OPTIONS = { type: CHAT_ATTACHMENT_TYPES, copyToCacheDirectory: true }
 export const CHAT_DOC_OPTIONS = { type: CHAT_DOC_TYPES, copyToCacheDirectory: true }
 
 export type QsLayout = 'link' | 'match' | 'pick' | 'deadline' | 'status' | 'calendar' | 'cards' | 'reply'

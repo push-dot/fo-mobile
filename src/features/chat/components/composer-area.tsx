@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
+import { MAX_BYTES, SIZE_LIMIT, type PickedFile } from '@/features/my'
 import { useColors, useShadow } from '../../../theme'
 import { BottomSheet, Glass, Icon, Text, TextField } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
@@ -12,7 +13,7 @@ import { CHAT_ATTACHMENT_OPTIONS, QUICK_STARTS, type QuickStart } from '../const
 
 type Props = {
   placeholder: string
-  onSend: (text: string, attachment?: string) => void
+  onSend: (text: string, attachment?: PickedFile) => void
   working?: boolean
   onStop?: () => void
   /** Picked a 바로가기 from the @ list. */
@@ -27,7 +28,7 @@ type Props = {
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
 export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut, onTyping, above, inputRef }: Props) => {
   const [text, setText] = useState('')
-  const [attachment, setAttachment] = useState<string>()
+  const [file, setFile] = useState<PickedFile>()
   const [materials, setMaterials] = useState(false)
   const [materialKind, setMaterialKind] = useState<'github' | 'posting' | null>(null)
   const [materialText, setMaterialText] = useState('')
@@ -42,15 +43,21 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
   }
   const submit = () => {
     if (!text.trim()) return
-    onSend(text.trim(), attachment)
+    onSend(text.trim(), file)
     change('')
-    setAttachment(undefined)
+    setFile(undefined)
   }
   const closeMaterials = () => (setMaterials(false), setMaterialKind(null), setMaterialText(''))
   const attachFile = async () => {
     closeMaterials()
     const r = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
-    if (!r.canceled && r.assets[0]) setAttachment(r.assets[0].name)
+    const asset = r.canceled ? undefined : r.assets[0]
+    if (!asset) return
+    if ((asset.size ?? 0) > MAX_BYTES) {
+      Alert.alert(SIZE_LIMIT.title, SIZE_LIMIT.body)
+      return
+    }
+    setFile({ uri: asset.uri, name: asset.name, mimeType: asset.mimeType, size: asset.size })
   }
   const takeMaterial = () => {
     const value = materialText.trim()
@@ -84,8 +91,8 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         // shortcut: no speech dependency; the keyboard's dictation key handles voice for now.
         onMic={() => ref.current?.focus()}
-        attachment={attachment}
-        onClearAttachment={() => setAttachment(undefined)}
+        attachment={file?.name}
+        onClearAttachment={() => setFile(undefined)}
         accessMode={access.mode}
         onAccessMode={access.pick}
       />

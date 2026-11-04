@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode, type ChatIntent } from '@push/api-client'
+import { myApi, type PickedFile } from '@/features/my'
+import { queryClient } from '@/providers/query-client'
 import { API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
 import {
   chatApi,
@@ -10,7 +12,7 @@ import {
   updateAiAccessMode,
 } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { DEFAULT_ACCESS_MODE } from './constants'
+import { DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream } from './utils/stream'
@@ -24,7 +26,22 @@ export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: 
 
 export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
 
-type PendingOpen = { title: string; message: string; attachment?: string; intent?: ChatIntent; context?: { documentId?: string } }
+type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
+
+type Outgoing = RunInput & { file?: PickedFile }
+
+const posted = ({ file: _, ...rest }: Outgoing): RunInput => rest
+
+const withUpload = async (input: Outgoing): Promise<RunInput | undefined> => {
+  if (!input.file || API_MOCK) return posted(input)
+  try {
+    const source = await myApi.upload(input.file)
+    void queryClient.invalidateQueries({ queryKey: ['me', 'sources'] })
+    return posted({ ...input, context: { ...input.context, evidenceIds: [source.id] } })
+  } catch {
+    return undefined
+  }
+}
 
 let pendingConsent: RunInput | null = null
 let pendingOpen: PendingOpen | null = null
@@ -98,11 +115,16 @@ const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGe
 const streamed = (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> => {
   const id = input.conversationId
   const documentId = input.context?.documentId
+  const evidenceIds = input.context?.evidenceIds
+  const context = {
+    ...(documentId ? { documentId } : {}),
+    ...(evidenceIds?.length ? { evidenceIds } : {}),
+  }
   const body = {
     text: input.text ?? '',
     accessMode: usePrefs.getState().accessMode,
     ...(input.intent ? { intent: input.intent } : {}),
-    ...(documentId ? { context: { documentId } } : {}),
+    ...(documentId || evidenceIds?.length ? { context } : {}),
   }
   return fromStream(streamConversation(id, body, signal), (after) => followConversation(id, after, signal))
 }
@@ -117,20 +139,26 @@ const resolved = async function* (input: RunInput, signal: AbortSignal): AsyncGe
   yield* fromStream(followConversation(id, undefined, signal), (after) => followConversation(id, after, signal))
 }
 
-const startRun = async (input: RunInput) => {
+const startRun = async (input: Outgoing) => {
   const id = input.conversationId
   const ctrl = new AbortController()
   runs.set(id, ctrl)
   dispatch(id, { type: 'start', at: Date.now() })
+  let run: RunInput | undefined
   try {
-    for await (const e of (input.resolve ? resolved : API_MOCK ? scripted : streamed)(input, ctrl.signal)) {
-      dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
+    run = await withUpload(input)
+    if (!run) {
+      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
+    } else {
+      for await (const e of (run.resolve ? resolved : API_MOCK ? scripted : streamed)(run, ctrl.signal)) {
+        dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
+      }
+      if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
     }
-    if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
   } catch (err) {
     if (ctrl.signal.aborted) return
     if (isConsentRequired(err)) {
-      pendingConsent = input
+      pendingConsent = run ?? posted(input)
       useChatStore.setState((s) => {
         const cur = s.chats[id]
         if (!cur) return s
@@ -147,14 +175,22 @@ const startRun = async (input: RunInput) => {
   // Messages sent while the agent worked go out one by one once it finishes.
   const s = get(id)
   if (!s.working && !s.approval && s.queue.length) {
+    const next = s.queue[0]!
     dispatch(id, { type: 'dequeue' })
-    send(id, s.queue[0]!)
+    send(id, next.text, next.file)
   }
 }
 
-export const send = (id: string, text: string, attachment?: string, intent?: ChatIntent, context?: { documentId?: string }) => {
+const fileOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' || !attachment ? undefined : attachment)
+
+const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' ? attachment : attachment?.name)
+
+export const send = (id: string, text: string, attachment?: string | PickedFile, intent?: ChatIntent, context?: RunInput['context']) => {
   const s = get(id)
-  if (s.working) return dispatch(id, { type: 'queue', text })
+  if (s.working) {
+    const file = fileOf(attachment)
+    return dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })
+  }
   if (s.approval?.optionIds) {
     // The server reads free text as the gate answer or as rejecting the pending approval.
     dispatch(id, { type: 'answer', text })
@@ -165,8 +201,9 @@ export const send = (id: string, text: string, attachment?: string, intent?: Cha
     const first = s.approval.sections.find((x) => x.kind === 'choices')
     return answer(id, text, first && first.kind === 'choices' ? first.items.length - 1 : 0)
   }
-  dispatch(id, { type: 'user', id: `u-${Date.now()}`, text, attachment })
-  void startRun({ conversationId: id, text, attachment, interrupted: s.interrupted, intent, context })
+  const name = nameOf(attachment)
+  dispatch(id, { type: 'user', id: `u-${Date.now()}`, text, attachment: name })
+  void startRun({ conversationId: id, text, attachment: name, file: fileOf(attachment), interrupted: s.interrupted, intent, context })
 }
 
 export const answer = (id: string, text: string, choice: number | number[]) => {
