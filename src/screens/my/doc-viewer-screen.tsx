@@ -1,155 +1,41 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { JOB_CATEGORIES, type Profile } from '@push/api-client'
 import { fileSize, monthDay } from '@push/shared'
 import {
   DocMenu,
   FileTile,
-  overwriteWarning,
-  tenureLabel,
-  useApplyResumeProfile,
-  useMyProfile,
+  PREVIEW_HEADINGS,
+  Toast,
+  useConvertDocument,
   useResumeDraft,
   useSource,
+  useUndoRemove,
   type ResumeDraft,
 } from '@/features/my'
-import { Badge, BottomSheet, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { Badge, BottomSheet, Button, GlassButton, Text, TopBar } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
-type Part = 'basic' | 'intro' | 'career' | 'skills'
-const PARTS: { key: Part; label: string }[] = [
-  { key: 'basic', label: '기본 정보' },
-  { key: 'intro', label: '소개' },
-  { key: 'career', label: '경력' },
-  { key: 'skills', label: '기술 스택' },
-]
-
-const summary = (key: Part, d: ResumeDraft['profile']) => {
-  switch (key) {
-    case 'basic':
-      return `이름 · 헤드라인 · ${JOB_CATEGORIES.find((j) => j.key === d.jobCategory)?.label ?? ''} ${tenureLabel(d.tenureYears)}`
-    case 'intro':
-      return d.intro
-    case 'career':
-      return `${d.careers.map((c) => c.company).join(', ')} · ${d.careers.length}건`
-    case 'skills':
-      return d.skills.length > 2
-        ? `${d.skills.slice(0, 2).join(', ')} 외 ${d.skills.length - 2}개`
-        : d.skills.join(', ')
-  }
-}
-
-const patchFor = (picked: Part[], d: ResumeDraft['profile']): Partial<Profile> => ({
-  ...(picked.includes('basic')
-    ? {
-        displayName: d.displayName,
-        headline: d.headline,
-        jobCategory: d.jobCategory,
-        tenureYears: d.tenureYears,
-      }
-    : {}),
-  ...(picked.includes('intro') ? { intro: d.intro } : {}),
-  ...(picked.includes('career') ? { careers: d.careers } : {}),
-  ...(picked.includes('skills') ? { skills: d.skills } : {}),
-})
-
-const ToProfileSheet = ({
-  draft,
-  visible,
-  onClose,
-}: {
-  draft: ResumeDraft['profile']
-  visible: boolean
-  onClose: () => void
-}) => {
-  const c = useColors()
-  const { data: current } = useMyProfile()
-  const [picked, setPicked] = useState<Part[]>(['basic', 'intro', 'career'])
-  const apply = useApplyResumeProfile(onClose)
-  const filled: Record<Part, boolean> = {
-    basic: false,
-    intro: !!current?.intro,
-    career: !!current?.careers.length,
-    skills: !!current?.skills.length,
-  }
-  const warning = overwriteWarning(
-    PARTS.filter((p) => picked.includes(p.key) && filled[p.key]).map((p) => p.label),
-  )
-  const toggle = (k: Part) =>
-    setPicked((xs) => (xs.includes(k) ? xs.filter((x) => x !== k) : [...xs, k]))
-
+const ToProfileSheet = ({ id, visible, onClose }: { id: string; visible: boolean; onClose: () => void }) => {
+  const convert = useConvertDocument((documentId) => {
+    onClose()
+    router.push(`/docs/push/${documentId}`)
+  })
   return (
     <BottomSheet
       visible={visible}
       onClose={onClose}
       title="이 이력서로 프로필을 채울까요?"
-      description="고른 항목만 허브 프로필에 반영돼요. 반영한 뒤에도 섹션별로 고칠 수 있어요."
+      description="지원 서류용 프로필로 만들어요."
       action={{
-        label: apply.isPending ? '반영하는 중' : `${picked.length}개 항목 반영하기`,
-        onPress: () => apply.mutate(patchFor(picked, draft)),
-        disabled: !picked.length || apply.isPending,
+        label: convert.isPending ? '만드는 중' : '지원 서류용 프로필로 만들기',
+        onPress: () => convert.mutate(id),
+        disabled: convert.isPending,
       }}
     >
-      <View>
-        {PARTS.map((p) => {
-          const on = picked.includes(p.key)
-          return (
-            <Pressable
-              key={p.key}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: on }}
-              onPress={() => toggle(p.key)}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}
-            >
-              <View
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: on ? c.ac : 'transparent',
-                  borderWidth: on ? 0 : 2,
-                  borderColor: c.t4,
-                }}
-              >
-                {on ? <Icon name="check" size={14} color="#FFFFFF" /> : null}
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text v="b1" weight="600">
-                  {p.label}
-                </Text>
-                <Text v="c1" color="t3" numberOfLines={1}>
-                  {summary(p.key, draft)}
-                </Text>
-              </View>
-            </Pressable>
-          )
-        })}
-      </View>
-      {warning ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            paddingVertical: 12,
-            paddingHorizontal: 14,
-            borderRadius: 14,
-            backgroundColor: c.orangeSoft,
-          }}
-        >
-          <Text v="c1" weight="800" color="orange">
-            !
-          </Text>
-          <Text v="c1" style={{ flex: 1 }}>
-            {warning}
-          </Text>
-        </View>
-      ) : null}
+      <View />
     </BottomSheet>
   )
 }
@@ -200,7 +86,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       <Text color="t2" style={{ fontSize: 10.5, lineHeight: 15 }}>
         {p.intro}
       </Text>
-      {head('경력')}
+      {head(PREVIEW_HEADINGS[0])}
       {p.careers.map((cr) => (
         <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: 2 }}>
           <Text weight="700" style={{ fontSize: 11, lineHeight: 15 }}>
@@ -216,7 +102,13 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
           ) : null}
         </View>
       ))}
-      {head('기술 스택')}
+      {head(PREVIEW_HEADINGS[1])}
+      {(d.projects ?? []).map((project) => (
+        <Text key={project} color="t2" style={{ fontSize: 10, lineHeight: 14 }}>
+          {project}
+        </Text>
+      ))}
+      {head(PREVIEW_HEADINGS[2])}
       <Text color="t2" style={{ fontSize: 10, lineHeight: 14 }}>
         {p.skills.join(' · ')}
       </Text>
@@ -231,6 +123,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
   const [menu, setMenu] = useState(false)
   const doc = useSource(id)
   const draft = useResumeDraft(id)
+  const undo = useUndoRemove(() => router.back())
   const s = doc.data
   const d = draft.data
 
@@ -304,22 +197,16 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           onPress={() => router.push('/(tabs)/(chat)/chat')}
         />
         <Button
-          label="내 프로필로 전환"
+          label="지원 서류용 프로필로 만들기"
           icon="user"
           disabled={!d}
           onPress={() => setSheet(true)}
           style={{ flex: 1 }}
         />
       </View>
-      {d ? (
-        <ToProfileSheet draft={d.profile} visible={sheet} onClose={() => setSheet(false)} />
-      ) : null}
-      <DocMenu
-        doc={menu ? (s ?? null) : null}
-        viewing
-        onClose={() => setMenu(false)}
-        onDeleted={() => router.back()}
-      />
+      <ToProfileSheet id={id} visible={sheet} onClose={() => setSheet(false)} />
+      <DocMenu doc={menu ? (s ?? null) : null} viewing onClose={() => setMenu(false)} onDelete={() => s && undo.ask(s)} />
+      <Toast text={undo.toast.text} action={undo.toast.action} onHide={undo.toast.hide} />
     </View>
   )
 }

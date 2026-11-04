@@ -1,7 +1,7 @@
 import { jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
-import type { CalendarEvent, MySource, PickedFile, ResumeDraft } from '../types'
-import { toResumeDraft } from '../utils'
+import type { CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
+import { profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
 
 const c = http
 
@@ -12,7 +12,13 @@ export const myApi = {
   // shortcut: first 100 uploads only; page once the docs tab loads more on scroll.
   sources: async (): Promise<ListEnvelope<MySource>> => {
     const r = await api.sources.list({ kind: 'UPLOAD', limit: 100 })
-    return { ...r, data: r.data.map((s) => ({ ...s, jobId: uploaded.get(s.id) })) }
+    return {
+      ...r,
+      data: r.data.map((s) => {
+        const raw = s as MySource
+        return { ...raw, jobId: uploaded.get(s.id) ?? raw.jobId }
+      }),
+    }
   },
   upload: async (file: PickedFile) => {
     const form = new FormData()
@@ -109,6 +115,19 @@ export const fetchPosting = (id: string) => api.postings.get(id)
 export const fetchOfferMessages = (offerId: string) => api.me.offerMessages(offerId, { limit: 100 })
 
 export const sendOfferMessage = (offerId: string, body: string) => api.me.sendOfferMessage(offerId, body)
+
+export const fetchDocuments = () => c.get<ListEnvelope<HubDocument>>('documents', { query: { limit: 50 } })
+
+export const fetchDocument = (id: string) => c.get<DataEnvelope<HubDocument>>(`documents/${id}`)
+
+export const fetchDocumentVersions = (id: string) =>
+  c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })
+
+export const convertDocumentProfile = async (id: string) =>
+  (await c.post<DataEnvelope<{ documentId: string }>>(`documents/${id}/profile`, { body: profileConvertBody() })).data
+
+export const setDocumentBaseProfile = async (id: string) =>
+  (await c.post<DataEnvelope<{ documentId: string }>>(setBaseProfilePath(id), { body: {} })).data
 
 export const uploadAvatarImage = async (file: { uri: string; fileName?: string | null; mimeType?: string | null }) => {
   const form = new FormData()

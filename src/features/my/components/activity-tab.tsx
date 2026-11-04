@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, stageBadge, type Profile } from '@push/api-client'
 import { careerLabel, monthDay } from '@push/shared'
-import { Badge, Chip, Icon, SegmentedControl, Text } from '@/shared/components'
+import { Badge, Chip, Icon, Text } from '@/shared/components'
 import { useColors } from '../../../theme'
 import {
   useFollowToggle,
@@ -15,7 +15,7 @@ import {
   useMyPosts,
 } from '../api/hooks'
 import type { ActivitySub } from '../types'
-import { followState, stageTone, timeAgo } from '../utils'
+import { emptyCta, followSeeAll, followerSee, postsSeeAll, stageTone, timeAgo } from '../utils'
 import Avatar from './avatar'
 import CalendarView from './calendar-view'
 import Empty from './empty'
@@ -40,12 +40,18 @@ const Applications = () => {
   return (
     <>
       <ListTitle title="지원한 공고" count={data?.page.total ?? list.length} />
-      {list.length === 0 ? <Empty text="아직 지원한 공고가 없어요." /> : null}
+      {list.length === 0 ? (
+        <Empty
+          text={emptyCta('applications').title}
+          action={emptyCta('applications').action}
+          onAction={() => router.push(emptyCta('applications').href)}
+        />
+      ) : null}
       {list.map((a) => (
         <Row
           key={a.id}
           label={`${a.company} ${a.title} ${stageBadge(a.stage)}`}
-          onPress={() => router.push(`/postings/${a.jobId}`)}
+          onPress={() => router.push(`/activity/applications/${a.id}`)}
         >
           <Logo name={a.company} />
           <View style={{ flex: 1, minWidth: 0 }}>
@@ -74,7 +80,13 @@ const Bookmarks = () => {
   return (
     <>
       <ListTitle title="북마크한 공고" count={list.length} />
-      {list.length === 0 ? <Empty text="북마크한 공고가 없어요." /> : null}
+      {list.length === 0 ? (
+        <Empty
+          text={emptyCta('bookmarks').title}
+          action={emptyCta('bookmarks').action}
+          onAction={() => router.push(emptyCta('bookmarks').href)}
+        />
+      ) : null}
       {list.map((p) => (
         <Pressable
           key={p.id}
@@ -155,67 +167,64 @@ const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => 
   )
 }
 
+const SeeAll = ({ label, onPress }: { label: string; onPress: () => void }) => (
+  <Pressable accessibilityRole="button" onPress={onPress} style={{ paddingVertical: 14, paddingHorizontal: 20 }}>
+    <Text v="b2" weight="700">
+      {label}
+    </Text>
+  </Pressable>
+)
+
 const Follows = () => {
-  const [tab, setTab] = useState<'following' | 'followers'>('following')
   const following = useMyFollows()
   const followers = useMyFollowers()
-  const q = tab === 'following' ? following : followers
-  const n = (r: typeof following) => r.data?.page.total ?? r.data?.data.length ?? 0
-  const known = (userId: string) =>
-    tab === 'following' ? true : followState(following.data, userId)
+  const people = following.data?.data ?? []
+  const followingCount = following.data?.page.total ?? people.length
+  const followerCount = followers.data?.page.total ?? followers.data?.data.length ?? 0
   return (
     <>
-      <View style={{ paddingTop: 14, paddingBottom: 4, paddingHorizontal: 20 }}>
-        <SegmentedControl
-          items={[
-            { key: 'following', label: `팔로잉 ${n(following)}` },
-            { key: 'followers', label: `팔로워 ${n(followers)}` },
-          ]}
-          value={tab}
-          onChange={setTab}
-        />
-      </View>
-      {q.isLoading ? <Loading /> : null}
-      {q.data?.data.length === 0 ? (
-        <Empty
-          text={
-            tab === 'following'
-              ? '아직 팔로우한 사람이 없어요.'
-              : '아직 나를 팔로우한 사람이 없어요.'
-          }
-        />
-      ) : null}
-      {q.data?.data.map((p) => (
-        <PersonRow key={`${tab}-${p.userId}`} p={p} known={known(p.userId)} />
+      {following.isLoading ? <Loading /> : null}
+      {people.slice(0, 3).map((p) => (
+        <PersonRow key={p.userId} p={p} known />
       ))}
+      {people.length === 0 && !following.isLoading ? (
+        <Empty
+          text={emptyCta('follows').title}
+          action={emptyCta('follows').action}
+          onAction={() => router.push(emptyCta('follows').href)}
+        />
+      ) : (
+        <SeeAll
+          label={followSeeAll(followingCount)}
+          onPress={() => router.push({ pathname: '/activity/follows', params: { box: 'following' } })}
+        />
+      )}
+      <SeeAll
+        label={followerSee(followerCount)}
+        onPress={() => router.push({ pathname: '/activity/follows', params: { box: 'followers' } })}
+      />
     </>
   )
 }
 
 const Posts = () => {
   const c = useColors()
-  const [tab, setTab] = useState<'mine' | 'commented'>('mine')
   const mine = useMyPosts()
   const commented = useMyCommentedPosts()
-  const q = tab === 'mine' ? mine : commented
-  const n = (r: typeof mine) => r.data?.page.total ?? r.data?.data.length ?? 0
+  const posts = mine.data?.data ?? []
+  const postCount = mine.data?.page.total ?? posts.length
+  const commentCount = commented.data?.page.total ?? commented.data?.data.length ?? 0
   return (
     <>
-      <View style={{ paddingTop: 14, paddingBottom: 4, paddingHorizontal: 20 }}>
-        <SegmentedControl
-          items={[
-            { key: 'mine', label: `내가 쓴 글 ${n(mine)}` },
-            { key: 'commented', label: `댓글 단 글 ${n(commented)}` },
-          ]}
-          value={tab}
-          onChange={setTab}
+      {mine.isLoading ? <Loading /> : null}
+      {posts.length === 0 && !mine.isLoading ? (
+        <Empty
+          text={emptyCta('posts').title}
+          action={emptyCta('posts').action}
+          onAction={() => router.push(emptyCta('posts').href)}
         />
-      </View>
-      {q.isLoading ? <Loading /> : null}
-      {q.data?.data.length === 0 ? (
-        <Empty text={tab === 'mine' ? '아직 쓴 글이 없어요.' : '아직 댓글 단 글이 없어요.'} />
       ) : null}
-      {q.data?.data.map((p) => (
+      {posts.slice(0, 3).map((p) => (
         <Pressable
           key={p.id}
           accessibilityRole="button"
@@ -248,6 +257,16 @@ const Posts = () => {
           </View>
         </Pressable>
       ))}
+      {posts.length > 0 ? (
+        <SeeAll
+          label={postsSeeAll(postCount)}
+          onPress={() => router.push({ pathname: '/activity/posts', params: { box: 'mine' } })}
+        />
+      ) : null}
+      <SeeAll
+        label={`댓글 단 글 ${commentCount}개 보기`}
+        onPress={() => router.push({ pathname: '/activity/posts', params: { box: 'commented' } })}
+      />
     </>
   )
 }

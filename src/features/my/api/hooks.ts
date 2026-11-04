@@ -23,7 +23,11 @@ import {
   fetchOfferMessages,
   fetchOffers,
   fetchPosting,
+  convertDocumentProfile,
   fetchConsents,
+  fetchDocument,
+  fetchDocuments,
+  fetchDocumentVersions,
   fetchSettings,
   fetchSource,
   fetchUnreadOffers,
@@ -31,6 +35,7 @@ import {
   ingestJobQuery,
   myApi,
   sendOfferMessage,
+  setDocumentBaseProfile,
   unfollowProfile,
   unbookmarkPosting,
   updateProfile,
@@ -62,6 +67,43 @@ export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: fet
 
 export const useSources = () =>
   useQuery({ queryKey: ['me', 'sources'], queryFn: () => myApi.sources() })
+
+export const useDocuments = () => useQuery({ queryKey: ['documents'], queryFn: fetchDocuments })
+
+export const useDocument = (id: string) =>
+  useQuery({ queryKey: ['documents', id], queryFn: () => fetchDocument(id), enabled: !!id })
+
+export const useDocumentVersions = (id: string) =>
+  useQuery({
+    queryKey: ['documents', id, 'versions'],
+    queryFn: () => fetchDocumentVersions(id),
+    enabled: !!id,
+  })
+
+export const useConvertDocument = (onDone: (documentId: string) => void) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => convertDocumentProfile(id),
+    onSuccess: (data) => {
+      void qc.invalidateQueries({ queryKey: ['documents'] })
+      if (data.documentId) onDone(data.documentId)
+    },
+    onError: () => Alert.alert('지원 서류용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
+
+export const useSetBaseProfile = (onDone: () => void) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => setDocumentBaseProfile(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['me', 'profile'] })
+      void qc.invalidateQueries({ queryKey: ['documents'] })
+      onDone()
+    },
+    onError: () => Alert.alert('기본 프로필로 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+}
 
 export const useIngestJob = (jobId: string | undefined) => useQuery(ingestJobQuery(jobId))
 
@@ -290,7 +332,6 @@ export const useOfferMessages = (offerId: string, onSent: () => void) => {
       onSent()
       void qc.invalidateQueries({ queryKey: key })
     },
-    onError: () => Alert.alert('메시지를 보내지 못했어요', '잠시 뒤에 다시 보내 주세요.'),
   })
   return { data: query.data, send }
 }

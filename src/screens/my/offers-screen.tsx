@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import type { Offer } from '@push/api-client'
-import { Avatar, counterpart, Empty, offerBadge, Row, timeAgo, useOffers } from '@/features/my'
+import { Avatar, counterpart, Empty, OFFER_EMPTY_ACTION, offerBadge, Row, timeAgo, useOffers } from '@/features/my'
 import { Badge, SegmentedControl, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
@@ -74,6 +74,8 @@ const OffersScreen = () => {
         {q.data?.data.length === 0 ? (
           <Empty
             text={box === 'received' ? '아직 받은 제안이 없어요.' : '아직 보낸 제안이 없어요.'}
+            action={box === 'received' ? OFFER_EMPTY_ACTION : undefined}
+            onAction={box === 'received' ? () => router.push('/edit-profile/basic') : undefined}
           />
         ) : null}
         {q.data?.data.map((o) => (

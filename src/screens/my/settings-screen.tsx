@@ -6,8 +6,13 @@ import {
   Avatar,
   CONTACT,
   deleteAccountSession,
+  AGENT_NOTE,
+  AGENT_TITLE,
   LANGS,
   LOGIN_LABEL,
+  NOTIFICATION_ROWS,
+  REFERENCE_LABEL,
+  REFERENCE_SUB,
   RETENTION,
   signOutSession,
   TONES,
@@ -16,6 +21,7 @@ import {
   useReferenceConsent,
   useSettings,
   VISIBILITY,
+  WITHDRAW_BODY,
 } from '@/features/my'
 import {
   BottomSheet,
@@ -27,8 +33,8 @@ import {
   Text,
   TopBar,
 } from '@/shared/components'
-import { useColors } from '@/theme'
-import { CONSENT_TOGGLE, CONSENT_TOGGLE_NOTE, CONSENT_TOGGLE_SUB, consentTurnedOff, grantConsent } from '@/features/chat'
+import { THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { consentTurnedOff, grantConsent } from '@/features/chat'
 
 const Pick = <K extends string | number,>({
   title,
@@ -177,8 +183,15 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
   )
 }
 
+const NOTIFY_SUB: Partial<Record<(typeof NOTIFICATION_ROWS)[number]['key'], string>> = {
+  notifyDeadline: '북마크한 공고 마감 3일 전',
+  notifyAiDone: '앱을 닫아도 끝나면 알려 드려요',
+}
+
 const SettingsScreen = () => {
   const { s, set } = useSettings()
+  const theme = useThemePreference((state) => state.choice)
+  const setTheme = useThemePreference((state) => state.setChoice)
   const consent = useReferenceConsent()
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
@@ -202,7 +215,7 @@ const SettingsScreen = () => {
   const withdraw = () =>
     Alert.alert(
       '회원 탈퇴할까요?',
-      '유료 구독은 바로 해지돼요. 30일 안에 다시 로그인하면 계정이 복구되고, 30일이 지나면 이력서·서류·글·댓글이 모두 삭제돼요. 삭제된 뒤에는 되돌릴 수 없어요.',
+      WITHDRAW_BODY,
       [
         { text: '취소', style: 'cancel' },
         {
@@ -241,21 +254,36 @@ const SettingsScreen = () => {
           label="언어"
           right={<LanguageSelect value={s.locale} onPick={(locale) => set({ locale })} />}
         />
+        <SettingsRow
+          label="테마"
+          right={
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {THEME_CHOICES.map((choice) => (
+                <Pressable
+                  key={choice.key}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: theme === choice.key }}
+                  onPress={() => void setTheme(choice.key)}
+                >
+                  <Text v="c1" weight={theme === choice.key ? '700' : '400'}>
+                    {choice.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          }
+        />
       </SettingsGroup>
 
       <SettingsGroup title="알림">
-        <SettingsRow
-          label="마감 임박 공고"
-          sub="북마크한 공고 마감 3일 전"
-          right={sw('notifyDeadline', '마감 임박 공고')}
-        />
-        <SettingsRow label="제안 받음" right={sw('notifyOffer', '제안 받음')} />
-        <SettingsRow label="댓글과 답글" right={sw('notifyComment', '댓글과 답글')} />
-        <SettingsRow
-          label="AI 작업 완료"
-          sub="앱을 닫아도 끝나면 알려 드려요"
-          right={sw('notifyAiDone', 'AI 작업 완료')}
-        />
+        {NOTIFICATION_ROWS.map((row) => (
+          <SettingsRow
+            key={row.key}
+            label={row.label}
+            sub={NOTIFY_SUB[row.key]}
+            right={sw(row.key, row.label)}
+          />
+        ))}
       </SettingsGroup>
 
       <SettingsGroup title="허브 공개">
@@ -272,10 +300,7 @@ const SettingsScreen = () => {
         />
       </SettingsGroup>
 
-      <SettingsGroup
-        title="AI 채팅"
-        note="마이 이력서와 북마크 공고를 AI가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요."
-      >
+      <SettingsGroup title={AGENT_TITLE} note={AGENT_NOTE}>
         <SettingsRow
           label="기본 말투"
           value={TONES.find((t) => t.key === s.defaultTone)?.label ?? ''}
@@ -293,15 +318,12 @@ const SettingsScreen = () => {
           label="내 자료 읽기 허용"
           right={sw('allowAiReadMyFiles', '내 자료 읽기 허용')}
         />
-      </SettingsGroup>
-
-      <SettingsGroup note={CONSENT_TOGGLE_NOTE}>
         <SettingsRow
-          label={CONSENT_TOGGLE}
-          sub={CONSENT_TOGGLE_SUB}
+          label={REFERENCE_LABEL}
+          sub={REFERENCE_SUB}
           right={
             <Switch
-              label={CONSENT_TOGGLE}
+              label={REFERENCE_LABEL}
               value={!!consent.data?.referenceData}
               onValueChange={(v) =>
                 consent.save(v, {

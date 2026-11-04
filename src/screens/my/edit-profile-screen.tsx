@@ -21,10 +21,14 @@ import {
 } from '@push/api-client'
 import {
   Avatar,
+  careerDeleteCopy,
   careerPeriod,
   FieldLabel,
   AVATAR_IMAGE_OPTIONS,
+  skillOrderHint,
   parseYm,
+  Toast,
+  useToast,
   SheetHeader,
   SKILL_CATALOG,
   tenureLabel,
@@ -402,6 +406,7 @@ const toCareer = (d: CareerDraft): Career | null => {
 const EditCareer = ({ p }: { p: Profile }) => {
   const c = useColors()
   const save = useSaveProfile()
+  const toast = useToast()
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const parsed = items.map(toCareer)
@@ -524,8 +529,27 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Pressable
                     accessibilityRole="button"
                     onPress={() => {
-                      setItems((xs) => xs.filter((_, j) => j !== i))
-                      setOpen(null)
+                      const removed = it
+                      Alert.alert(careerDeleteCopy.title, careerDeleteCopy.body, [
+                        { text: '취소', style: 'cancel' },
+                        {
+                          text: careerDeleteCopy.confirm,
+                          style: 'destructive',
+                          onPress: () => {
+                            setItems((xs) => xs.filter((_, j) => j !== i))
+                            setOpen(null)
+                            toast.show(careerDeleteCopy.toast, {
+                              action: careerDeleteCopy.undo,
+                              onAction: () =>
+                                setItems((xs) => {
+                                  const next = [...xs]
+                                  next.splice(i, 0, removed)
+                                  return next
+                                }),
+                            })
+                          },
+                        },
+                      ])
                     }}
                     style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}
                   >
@@ -551,6 +575,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
           }}
         />
       </ScrollView>
+      <Toast text={toast.text} action={toast.action} onHide={toast.hide} />
     </>
   )
 }
@@ -669,7 +694,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
         </View>
         {/* shortcut: long press moves a chip one place earlier (no drag library installed). */}
         <Text v="c1" color="t3">
-          길게 눌러 순서를 바꿀 수 있어요. 앞의 5개가 허브 목록에 보여요.
+          {skillOrderHint}
         </Text>
       </ScrollView>
     </>

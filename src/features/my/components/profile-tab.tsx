@@ -8,7 +8,7 @@ import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
 import type { ProfileSection } from '../types'
-import { careerPeriod, tenureLabel } from '../utils'
+import { careerPeriod, profileCountLabels, tenureLabel } from '../utils'
 import Avatar from './avatar'
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
@@ -68,11 +68,24 @@ const ProfileTab = () => {
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
           {status ? <Badge label={status} tone={p.careerStatus === 'seeking' ? 'ac' : 'grey'} /> : null}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-          <Icon name="people" size={14} color="t3" />
-          <Text v="c1" color="t3">
-            허브에 이렇게 보여요 · 팔로워 {p.followerCount}
-          </Text>
+        <View style={{ flexDirection: 'row', gap: 16, marginTop: 6 }}>
+          {(
+            [
+              [profileCountLabels(p).following, '/activity/follows', 'following'],
+              [profileCountLabels(p).followers, '/activity/follows', 'followers'],
+              [profileCountLabels(p).posts, '/activity/posts', 'mine'],
+            ] as const
+          ).map(([label, pathname, box]) => (
+            <Pressable
+              key={label}
+              accessibilityRole="button"
+              onPress={() => router.push({ pathname, params: { box } })}
+            >
+              <Text v="c1" weight="700">
+                {label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 }}>
           <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />

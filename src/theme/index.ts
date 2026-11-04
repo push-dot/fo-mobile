@@ -1,10 +1,20 @@
 import { Platform, useColorScheme } from 'react-native'
+import { themeMode } from './mode'
+import { useThemePreference } from './preference'
 import { palette, shadow, type Colors } from './tokens'
 
 export * from './tokens'
+export * from './mode'
+export { useThemePreference } from './preference'
 
-export const useColors = (): Colors => (useColorScheme() === 'dark' ? palette.dark : palette.light)
-export const useShadow = () => (useColorScheme() === 'dark' ? shadow.dark : shadow.light)
+export const useThemeMode = (): 'light' | 'dark' => {
+  const system = useColorScheme()
+  const choice = useThemePreference((s) => s.choice)
+  return themeMode(choice, system === 'dark' ? 'dark' : system === 'light' ? 'light' : null)
+}
+
+export const useColors = (): Colors => (useThemeMode() === 'dark' ? palette.dark : palette.light)
+export const useShadow = () => (useThemeMode() === 'dark' ? shadow.dark : shadow.light)
 
 type Weight = '400' | '500' | '600' | '700' | '800'
 

@@ -1,18 +1,21 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
+import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { BottomSheet, Button, Icon, Text, type IconName } from '@/shared/components'
 import { pickDocument } from '@/shared/infrastructure'
 import { useColors } from '../../../theme'
-import { useIngestJob, useSources, useUpload } from '../api/hooks'
+import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, MAX_BYTES, RESUME_DOCUMENT_OPTIONS } from '../constants'
-import { useToast } from '../hooks'
-import type { MySource } from '../types'
+import { useToast, useUndoRemove } from '../hooks'
+import type { HubDocument, MySource } from '../types'
+import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
 import DocMenu from './doc-menu'
 import FileTile from './file-tile'
 import ListTitle from './list-title'
+import PushDocView from './push-doc-view'
 import Row from './row'
 import Toast from './toast'
 
@@ -64,9 +67,15 @@ const PickRow = ({
 }
 
 const DocRow = ({ doc, onMenu }: { doc: MySource; onMenu: () => void }) => {
+  const qc = useQueryClient()
   const job = useIngestJob(doc.jobId).data
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
-  const failed = job?.status === 'FAILED' || job?.status === 'DEAD'
+  const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
+  const retry = () => {
+    // shortcut: no re-ingest route; refetch the job and the file list.
+    void qc.invalidateQueries({ queryKey: ['ai-job', doc.jobId] })
+    void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
+  }
   return (
     <Row label={doc.fileName} onPress={() => router.push(`/docs/${doc.id}`)}>
       <FileTile name={doc.fileName} reading={reading} />
@@ -85,6 +94,13 @@ const DocRow = ({ doc, onMenu }: { doc: MySource; onMenu: () => void }) => {
           </Text>
         )}
       </View>
+      {failed ? (
+        <Pressable accessibilityRole="button" onPress={retry} hitSlop={8}>
+          <Text v="c1" weight="700" color="acText">
+            {RETRY_LABEL}
+          </Text>
+        </Pressable>
+      ) : null}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="더 보기"
@@ -97,12 +113,41 @@ const DocRow = ({ doc, onMenu }: { doc: MySource; onMenu: () => void }) => {
   )
 }
 
+const PushRow = ({ doc, onPress }: { doc: HubDocument; onPress: () => void }) => {
+  const apps = useMyApplications()
+  const application = apps.data?.data.find((a) => a.id === doc.applicationId) ?? null
+  const lines = pushCardLines(doc, application)
+  return (
+    <Row label={lines.title} onPress={onPress}>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        {lines.company ? (
+          <Text v="c1" color="t3" numberOfLines={1}>
+            {lines.company}
+          </Text>
+        ) : null}
+        <Text v="b1" weight="700" numberOfLines={1}>
+          {lines.title}
+        </Text>
+        {lines.score ? (
+          <Text v="c1" color="t3">
+            {lines.score}
+          </Text>
+        ) : null}
+      </View>
+      <Icon name="chev" size={18} color="t4" />
+    </Row>
+  )
+}
+
 const DocsTab = () => {
   const c = useColors()
   const { data, isLoading } = useSources()
+  const push = useDocuments()
   const toast = useToast()
+  const undo = useUndoRemove()
   const [picking, setPicking] = useState(false)
   const [menu, setMenu] = useState<MySource | null>(null)
+  const [openId, setOpenId] = useState<string | null>(null)
   const { upload, start, cancel } = useUpload(() => toast.show('이력서 파일을 올렸어요'))
 
   const pickFile = async (fromSheet = false) => {
@@ -111,13 +156,15 @@ const DocsTab = () => {
     const res = await pickDocument(RESUME_DOCUMENT_OPTIONS)
     const file = res.canceled ? null : res.assets[0]
     if (!file) return
-    if ((file.size ?? 0) > MAX_BYTES)
-      return Alert.alert('20MB까지 올릴 수 있어요', '파일 크기를 줄여서 다시 올려 주세요.')
+    if ((file.size ?? 0) > MAX_BYTES) return Alert.alert(SIZE_LIMIT.title, SIZE_LIMIT.body)
     void start(file)
   }
 
   if (isLoading) return <ActivityIndicator style={{ marginTop: 60 }} />
-  const docs = data?.data ?? []
+  const docs = (data?.data ?? []).filter((d) => d.id !== undo.hiddenId)
+  const pushDocs = push.data?.data ?? []
+  const preview = pushDocs.slice(0, 3)
+  const notice = undo.toast.text ? undo.toast : toast
   const sheet = (
     <BottomSheet visible={picking} onClose={() => setPicking(false)} title="서류 가져오기">
       <View>
@@ -139,7 +186,7 @@ const DocsTab = () => {
     </BottomSheet>
   )
 
-  if (docs.length === 0 && !upload) {
+  if (docs.length === 0 && preview.length === 0 && !upload && !push.isLoading) {
     return (
       <View
         style={{
@@ -175,7 +222,7 @@ const DocsTab = () => {
           <Button label="AI로 만들기" variant="secondary" onPress={openChat} />
         </View>
         {sheet}
-        <Toast text={toast.text} onHide={toast.hide} />
+        <Toast text={notice.text} action={notice.action} onHide={notice.hide} />
       </View>
     )
   }
@@ -183,7 +230,24 @@ const DocsTab = () => {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <ListTitle title="내 서류" count={docs.length + (upload ? 1 : 0)} top={26} />
+        {preview.length > 0 ? (
+          <>
+            <ListTitle title={PUSH_DOCS_TITLE} count={pushDocs.length} top={26} />
+            {preview.map((d) => (
+              <PushRow key={d.id} doc={d} onPress={() => setOpenId(d.id)} />
+            ))}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push('/docs/push')}
+              style={{ paddingVertical: 12, paddingHorizontal: 20 }}
+            >
+              <Text v="b2" weight="700" color="acText">
+                {pushSeeAll(pushDocs.length)}
+              </Text>
+            </Pressable>
+          </>
+        ) : null}
+        <ListTitle title={UPLOADS_TITLE} count={docs.length + (upload ? 1 : 0)} top={26} />
         {upload ? (
           <Row>
             <FileTile name={upload.name} />
@@ -232,12 +296,15 @@ const DocsTab = () => {
           />
         </View>
         <Text v="c1" color="t3" style={{ textAlign: 'center', paddingTop: 10 }}>
-          PDF, DOCX 파일을 20MB까지 올릴 수 있어요.
+          {SIZE_LIMIT.footnote}
         </Text>
       </ScrollView>
       {sheet}
-      <DocMenu doc={menu} onClose={() => setMenu(null)} />
-      <Toast text={toast.text} onHide={toast.hide} />
+      <DocMenu doc={menu} onClose={() => setMenu(null)} onDelete={() => menu && undo.ask(menu)} />
+      <Modal visible={!!openId} animationType="slide" onRequestClose={() => setOpenId(null)}>
+        {openId ? <PushDocView id={openId} onClose={() => setOpenId(null)} /> : null}
+      </Modal>
+      <Toast text={notice.text} action={notice.action} onHide={notice.hide} />
     </View>
   )
 }

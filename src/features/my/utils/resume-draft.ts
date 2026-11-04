@@ -5,6 +5,7 @@ export const toResumeDraft = (d: ProfileDraft): ResumeDraft => ({
   pageCount: null,
   email: null,
   links: [],
+  projects: [],
   profile: {
     displayName: d.displayName,
     headline: d.headline,

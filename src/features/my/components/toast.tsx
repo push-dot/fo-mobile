@@ -1,9 +1,17 @@
 import { useEffect } from 'react'
-import { AccessibilityInfo, Platform, View } from 'react-native'
+import { AccessibilityInfo, Platform, Pressable, View } from 'react-native'
 import { Glass, Icon, Text } from '@/shared/components'
 import { useColors } from '../../../theme'
 
-const Toast = ({ text, onHide }: { text: string | null; onHide: () => void }) => {
+const Toast = ({
+  text,
+  action,
+  onHide,
+}: {
+  text: string | null
+  action?: { label: string; onPress: () => void } | null
+  onHide: () => void
+}) => {
   const c = useColors()
   useEffect(() => {
     if (!text) return
@@ -34,9 +42,16 @@ const Toast = ({ text, onHide }: { text: string | null; onHide: () => void }) =>
       >
         <Icon name="check" size={14} color="#FFFFFF" />
       </View>
-      <Text v="b2" weight="600" style={{ color: Platform.OS === 'ios' ? c.t1 : c.bg }}>
+      <Text v="b2" weight="600" style={{ flex: 1, color: Platform.OS === 'ios' ? c.t1 : c.bg }}>
         {text}
       </Text>
+      {action ? (
+        <Pressable accessibilityRole="button" onPress={action.onPress} hitSlop={8}>
+          <Text v="b2" weight="700" style={{ color: Platform.OS === 'ios' ? c.acText : c.bg }}>
+            {action.label}
+          </Text>
+        </Pressable>
+      ) : null}
     </View>
   )
   return (

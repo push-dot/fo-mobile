@@ -5,7 +5,7 @@ import { BottomSheet, Chip, GlassButton, Text, TextField } from '@/shared/compon
 import { useColors, type Colors } from '../../../theme'
 import { useAddCalendarEvent, useCalendarEvents } from '../api/hooks'
 import type { CalendarEvent, CalendarEventType } from '../types'
-import { clock, dayTitle, dday, monthGrid, sameDay } from '../utils'
+import { CALENDAR_ADD, clock, dayTitle, dday, monthGrid, sameDay } from '../utils'
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 const TYPES: { key: CalendarEventType; label: string; color: keyof Colors }[] = [
@@ -97,7 +97,7 @@ const CalendarView = () => {
         <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
         <GlassButton
           actions={[
-            { icon: 'plus', label: '일정 추가', active: true, onPress: () => setAdding(true) },
+            { icon: 'plus', label: CALENDAR_ADD, active: true, onPress: () => setAdding(true) },
           ]}
         />
       </View>

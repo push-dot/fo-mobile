@@ -19,6 +19,8 @@ import {
   counterpart,
   dday,
   Logo,
+  OFFER_DECLINE,
+  OFFER_FAIL_LINE,
   offerBadge,
   useOffer,
   useOfferDecision,
@@ -120,6 +122,11 @@ const Thread = ({ offer, meId }: { offer: Offer; meId: string }) => {
           <Icon name="up" size={20} color={canSend ? '#FFFFFF' : c.t4} />
         </Pressable>
       </View>
+      {send.isError ? (
+        <Text v="c1" color="red">
+          {OFFER_FAIL_LINE}
+        </Text>
+      ) : null}
     </View>
   )
 }
@@ -285,7 +292,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
             onPress={() =>
               Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
                 { text: '취소', style: 'cancel' },
-                { text: '거절하기', style: 'destructive', onPress: () => decline.mutate() },
+                { text: OFFER_DECLINE, style: 'destructive', onPress: () => decline.mutate() },
               ])
             }
           />

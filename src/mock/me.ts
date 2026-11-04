@@ -11,7 +11,7 @@ import type {
   Source,
   UserRef,
 } from '@push/api-client'
-import type { CalendarEvent, ResumeDraft } from '@/features/my'
+import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { mock, page } from './server'
 
 const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
@@ -50,6 +50,8 @@ let profile: Profile = {
   ],
   skills: ['Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'AWS'],
   followerCount: 12,
+  followingCount: 18,
+  postCount: 8,
   resumeSourceId: 's1',
   updatedAt: ago(D),
 }
@@ -81,7 +83,7 @@ const src = (id: string, fileName: string, size: number, createdAt: string): Sou
 let sources: Source[] = [
   src('s1', '김서준_백엔드_이력서_2026.pdf', 2_400_000, on(10, 12)),
   src('s2', '경력기술서_모아페이.docx', 640_000, on(9, 28)),
-  src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)),
+  { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
 mock('GET', 'sources', ({ query }) => page(sources, query))
@@ -166,13 +168,69 @@ const app = (
   createdAt: at,
 })
 const applications: Application[] = [
-  app('a1', 'p1', '모아페이', '백엔드 엔지니어 (Kotlin·Spring)', 'INTERVIEW', on(10, 14)),
+  { ...app('a1', 'p1', '모아페이', '백엔드 엔지니어 (Kotlin·Spring)', 'INTERVIEW', on(10, 14)), fitScore: 86 },
   app('a2', 'p3', '도토리증권', '서버 개발자 (Go)', 'SCREENING', on(10, 10)),
   app('a3', 'p8', '별빛게임즈', 'DevOps 엔지니어', 'APPLIED', on(10, 16)),
   app('a4', 'p7', '라온헬스', '백엔드 개발자 (Java)', 'ACCEPTED', on(9, 22)),
   app('a5', 'p6', '새벽마켓', '결제 플랫폼 엔지니어', 'REJECTED', on(9, 8)),
 ]
 mock('GET', 'applications', ({ query }) => page(applications, query))
+
+let documents: HubDocument[] = [
+  {
+    id: 'd1',
+    revision: 2,
+    applicationId: 'a1',
+    title: '모아페이 백엔드',
+    kind: 'HUB_PROFILE',
+    status: 'DRAFT',
+    latestVersionId: 'v1',
+    updatedAt: on(10, 14),
+  },
+]
+
+mock('GET', 'documents', ({ query }) => page(documents, query))
+mock('GET', 'documents/:id', ({ params }) => {
+  const doc = documents.find((d) => d.id === params.id)
+  return doc
+    ? { data: doc }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
+})
+mock('GET', 'documents/:id/versions', ({ params }) =>
+  params.id
+    ? {
+        data: [{ id: 'v1', blocks: [{ id: 'b1', text: '결제 승인 API를 설계해 p99 지연을 줄였어요.' }] }],
+        page: { nextCursor: null, hasMore: false },
+      }
+    : { data: [], page: { nextCursor: null, hasMore: false } },
+)
+mock('POST', 'documents/:id/base-profile', ({ params }) => {
+  const doc = documents.find((d) => d.id === params.id)
+  if (!doc) return { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
+  profile = { ...profile, headline: doc.title.slice(0, 120), updatedAt: new Date().toISOString() }
+  return { data: { documentId: doc.id, profileUserId: 'me' } }
+})
+mock('POST', 'documents/:id/profile', ({ params, body }) => {
+  if (body && typeof body === 'object' && 'target' in body) {
+    return { status: 400, body: { error: { code: 'FIELD', message: 'target is not sent' } } }
+  }
+  let doc = documents.find((d) => d.id === params.id)
+  if (!doc) {
+    const source = sources.find((s) => s.id === params.id)
+    doc = {
+      id: `d${Date.now()}`,
+      revision: 1,
+      applicationId: null,
+      title: source?.fileName ?? '지원 서류용 프로필',
+      kind: 'HUB_PROFILE',
+      status: 'DRAFT',
+      latestVersionId: 'v1',
+      updatedAt: new Date().toISOString(),
+    }
+    documents = [doc, ...documents]
+  }
+  return { data: { documentId: doc.id, applicationId: doc.applicationId } }
+})
 
 // 캘린더 (local route until push-be /calendar is wired)
 const ev = (
@@ -467,6 +525,7 @@ let settings: Settings = {
   notifyOffer: true,
   notifyComment: false,
   notifyAiDone: true,
+  notifyApplicationStage: true,
   locale: 'ko',
   profilePublic: true,
   careerStatusVisibility: 'everyone',

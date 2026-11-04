@@ -15,13 +15,30 @@ export type ResumeDraft = {
   pageCount: number | null
   email: string | null
   links: string[]
+  projects?: string[]
   profile: Pick<
     Profile,
     'displayName' | 'headline' | 'jobCategory' | 'tenureYears' | 'intro' | 'careers' | 'skills'
   >
 }
 
-export type MySource = SourceItem & { jobId?: string }
+export type MySource = SourceItem & { jobId?: string; status?: string }
+
+export type HubDocument = {
+  id: string
+  revision: number
+  applicationId: string | null
+  title: string
+  kind: string
+  status: string
+  latestVersionId: string | null
+  updatedAt: string
+}
+
+export type DocVersion = {
+  id: string
+  blocks: { id: string; text: string }[]
+}
 
 export type PickedFile = { uri: string; name: string; mimeType?: string | null; size?: number | null }
 
