@@ -35,7 +35,6 @@ export const chatApi = {
     if (API_MOCK) return data(c.post<DataEnvelope<ChatDoc>>('chat/docs', { body: { fileName: file.name, size: file.size ?? 0 } }))
     await myApi.upload(file)
   },
-  checkout: (planId: 'PRO' | 'ULTRA') => api.billing.checkout(planId),
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])

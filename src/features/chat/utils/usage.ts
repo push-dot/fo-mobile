@@ -7,8 +7,3 @@ export const usageExhausted = (plan: string) =>
     : { body: FREE_BODY, actions: ['요금제 올리기', '크레딧 구매'] as const }
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
-
-export const CREDIT_PURCHASE = {
-  title: '크레딧 구매',
-  body: '추가 구매는 곧 열려요. 지금은 요금제를 올려 사용량을 늘릴 수 있어요.',
-} as const

@@ -4,12 +4,11 @@ import { type ChatIntent } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { useMyLinks, useMySettings } from '@/features/my'
-import { openBrowser, pickDocument, saveToCache, shareFile, useSession } from '../../../shared/infrastructure'
+import { pickDocument, saveToCache, shareFile, useSession } from '../../../shared/infrastructure'
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, QUICK_STARTS } from '../constants'
 import { ago } from '../utils/ago'
 import { cacheName } from '../utils/cache-name'
 import type { MentionGroup } from '../utils/mentions'
-import { CREDIT_PURCHASE } from '../utils/usage'
 import { isConsentRequired } from '../utils/consent'
 import { askConsent, bindOpenChat, forget, holdOpen, pickAccessMode, send, usePrefs } from '../stores'
 import {
@@ -110,8 +109,6 @@ export const useDeleteConversation = () => {
 export const useArchivedConversations = (enabled: boolean) =>
   useQuery({ queryKey: ['conversations', 'archived'], queryFn: () => chatApi.conversations({ archived: 'true', limit: 100 }), enabled })
 
-export const promptCreditPurchase = () => Alert.alert(CREDIT_PURCHASE.title, CREDIT_PURCHASE.body)
-
 export const useMe = () => {
   const session = useSession((s) => s.session)
   const profile = useQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
@@ -150,13 +147,6 @@ export const useOpenArtifact = () =>
       await shareFile(uri, name)
     },
     onError: () => Alert.alert('파일을 열지 못했어요', '잠시 뒤에 다시 해 주세요.'),
-  })
-
-export const useCheckoutUltra = () =>
-  useMutation({
-    mutationFn: () => chatApi.checkout('ULTRA'),
-    onSuccess: ({ url }) => void openBrowser(url),
-    onError: () => Alert.alert('결제 화면을 열지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 
 export const useAccessMode = () => {

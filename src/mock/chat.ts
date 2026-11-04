@@ -584,4 +584,3 @@ const quick: Record<string, QsData> = {
 }
 mock('GET', 'chat/quick-starts/:key', ({ params }) => ({ data: quick[params.key!] ?? { items: [] } }))
 
-mock('POST', 'billing/checkout', () => ({ data: { url: 'https://push.example/checkout', expiresAt: ago(-30) } }))

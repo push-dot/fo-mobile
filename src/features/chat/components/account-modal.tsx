@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { fontFor, useColors } from '../../../theme'
 import { Badge, BottomSheet, Button, GlassButton, Icon, SettingsGroup, SettingsRow, Text } from '@/shared/components'
+import { usePersonalPurchase } from '@/features/billing'
 import { type Account } from '../api/schemas'
 import { useMySettings, useUpdateSettings } from '@/features/my'
-import { promptCreditPurchase, useAccessMode, useChatAccount, useChatDocs, useCheckoutUltra, useMe } from '../api/hooks'
+import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
 import { ACCESS_MODE_TITLE, ACCESS_MODES } from '../constants'
 import { Appear } from './motion'
 import Mark from './mark'
@@ -50,7 +51,7 @@ export const AccountModal = ({
   }
   const close = () => (setPage('account'), onClose())
   const account = useChatAccount(visible)
-  const checkout = useCheckoutUltra()
+  const purchase = usePersonalPurchase()
   const plan = page === 'plan' && account.data
   // One modal for both pages: 요금제 navigates inside the sheet instead of stacking another.
   return (
@@ -63,11 +64,11 @@ export const AccountModal = ({
         !plan ? undefined : account.data!.plan === 'ULTRA' ? (
           <Button label="지금 ULTRA를 쓰고 있어요" disabled />
         ) : (
-          <Button label="ULTRA로 업그레이드" onPress={() => checkout.mutate()} disabled={checkout.isPending} />
+          <Button label="ULTRA로 업그레이드" onPress={() => purchase.buyPlan('ULTRA')} disabled={purchase.pending} />
         )
       }
     >
-      {plan ? <PlanPage account={account.data!} /> : <AccountPage visible={visible} account={account.data} onPlan={() => setPage('plan')} onClose={close} />}
+      {plan ? <PlanPage account={account.data!} purchase={purchase} /> : <AccountPage visible={visible} account={account.data} onPlan={() => setPage('plan')} onClose={close} />}
     </PageModal>
   )
 }
@@ -158,16 +159,24 @@ const PLANS = [
   { key: 'FREE', price: '무료', usage: '기본 사용량', features: [] },
 ] as const
 
-const PlanPage = ({ account }: { account: Account }) => {
+const PlanPage = ({ account, purchase }: { account: Account; purchase: ReturnType<typeof usePersonalPurchase> }) => {
   const c = useColors()
   const [ultra, ...rest] = PLANS
   const current = account.plan
+  const buy = (plan: 'PRO' | 'ULTRA') => {
+    if (!purchase.pending && plan !== current) purchase.buyPlan(plan)
+  }
   return (
     <Appear kind="fade">
       <Text v="h1" style={{ fontSize: 25, lineHeight: 34, paddingTop: 6, paddingHorizontal: 24, paddingBottom: 16 }}>
         {'더 많이 맡기고\n더 빨리 붙어요'}
       </Text>
-      <View style={{ marginHorizontal: 20, borderRadius: 22, padding: 20, gap: 10, backgroundColor: c.acSoft, borderWidth: 2, borderColor: c.ac }}>
+      <Pressable
+        accessibilityRole="button"
+        disabled={purchase.pending || current === 'ULTRA'}
+        onPress={() => buy('ULTRA')}
+        style={{ marginHorizontal: 20, borderRadius: 22, padding: 20, gap: 10, backgroundColor: c.acSoft, borderWidth: 2, borderColor: c.ac }}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 22, lineHeight: 28, ...fontFor('800'), color: c.t1 }}>ULTRA</Text>
           {current === 'ULTRA' ? <Badge label="지금 쓰는 중" /> : null}
@@ -186,11 +195,14 @@ const PlanPage = ({ account }: { account: Account }) => {
             </View>
           ))}
         </View>
-      </View>
+      </Pressable>
       <View style={{ flexDirection: 'row', gap: 8, paddingTop: 12, paddingHorizontal: 20 }}>
         {rest.map((p) => (
-          <View
+          <Pressable
             key={p.key}
+            accessibilityRole="button"
+            disabled={purchase.pending || p.key === 'FREE' || p.key === current}
+            onPress={() => (p.key === 'PRO' ? buy('PRO') : undefined)}
             style={{ flex: 1, padding: 16, borderRadius: 20, gap: 4, backgroundColor: c.bg2, borderWidth: 1.5, borderColor: p.key === current ? c.line : 'transparent' }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -203,7 +215,7 @@ const PlanPage = ({ account }: { account: Account }) => {
             <Text v="c1" color="t3">
               {p.usage}
             </Text>
-          </View>
+          </Pressable>
         ))}
       </View>
       <Text v="c1" color="t3" style={{ paddingTop: 14, paddingHorizontal: 24 }}>
@@ -211,7 +223,8 @@ const PlanPage = ({ account }: { account: Account }) => {
       </Text>
       <View style={{ marginTop: 22, marginHorizontal: 20 }}>
         <SettingsGroup>
-          <SettingsRow label="크레딧 구매" right={<Button label="구매" size="sm" variant="secondary" onPress={promptCreditPurchase} />} />
+          <SettingsRow label="크레딧 구매" right={<Button label="구매" size="sm" variant="secondary" onPress={purchase.buyCredits} disabled={purchase.pending} />} />
+          <SettingsRow label="구매 복원" onPress={purchase.pending ? undefined : purchase.restore} />
         </SettingsGroup>
       </View>
       <Note>요금제마다 쓸 수 있는 양이 달라요</Note>

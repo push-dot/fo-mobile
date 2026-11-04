@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors, useShadow } from '@/theme'
 import { BottomSheet, Glass, GlassButton, Icon, Mascot, Text, TextField, type IconName } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
+import { usePersonalPurchase } from '@/features/billing'
 import {
   answer,
   ApprovalPanel,
@@ -22,7 +23,6 @@ import {
   Queued,
   Appear,
   QuickStartSheet,
-  promptCreditPurchase,
   send,
   StatusRow,
   stop,
@@ -39,6 +39,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const insets = useSafeAreaInsets()
   const reduce = useReduceMotion()
   const chat = useChat(id)
+  const purchase = usePersonalPurchase()
   const list = useConversationList()
   const conv = list.data?.data.find((x) => x.id === id)
   const [drawer, setDrawer] = useState(false)
@@ -108,7 +109,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
             key={it.id}
             item={it}
             onAction={(text) => send(id, text)}
-            onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : promptCreditPurchase())}
+            onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : purchase.buyCredits())}
           />
         ))}
         {chat.queue.map((t, i) => (
