@@ -80,7 +80,7 @@ const dotColor = (c: Colors, s: ToolState) => ({ run: c.t3, ok: c.green, err: c.
 /** ⎿ elbow before a result line. */
 const Elbow = () => {
   const c = useColors()
-  return <View style={{ width: 10, height: 10, marginTop: 2, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: c.t4, borderBottomLeftRadius: 3 }} />
+  return <View style={{ width: 10, height: 10, marginTop: 2, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: c.deco, borderBottomLeftRadius: 3 }} />
 }
 
 export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
@@ -167,7 +167,7 @@ const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
           height: 18,
           borderRadius: 5,
           borderWidth: now ? 2 : 1.5,
-          borderColor: done ? c.t3 : now ? c.ac : c.t4,
+          borderColor: done ? c.t3 : now ? c.ac : c.deco,
           backgroundColor: done ? c.t3 : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
@@ -597,7 +597,7 @@ export const Queued = ({ text }: { text: string }) => {
   return (
     <Appear
       kind="bubble"
-      style={{ alignSelf: 'flex-end', maxWidth: '82%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.t4 }}
+      style={{ alignSelf: 'flex-end', maxWidth: '82%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.deco }}
     >
       <Icon name="clock" size={14} color="t2" />
       <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>

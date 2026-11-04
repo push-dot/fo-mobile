@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
+import type { IconName } from '@push/design-system'
 import { useColors } from '../../theme'
 import Icon from './icon'
-import type { IconName } from './icon-data'
 import Text from './text'
 
 export type GlassAction = {

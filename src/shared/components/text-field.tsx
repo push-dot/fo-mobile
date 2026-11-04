@@ -1,7 +1,7 @@
 import { TextInput, View, type TextInputProps } from 'react-native'
+import type { IconName } from '@push/design-system'
 import { fontFor, radius, useColors } from '../../theme'
 import Icon from './icon'
-import type { IconName } from './icon-data'
 import Text from './text'
 
 type Props = TextInputProps & { icon?: IconName; label?: string; max?: number }

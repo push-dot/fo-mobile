@@ -5,6 +5,7 @@
   "dependencies": {
     "@expo/ui": "~58.0.21",
     "@push/api-client": "workspace:*",
+    "@push/design-system": "workspace:*",
     "@push/shared": "workspace:*",
     "@tanstack/react-query": "^5.104.0",
     "expo": "~58.0.16",

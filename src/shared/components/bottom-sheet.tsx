@@ -23,7 +23,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
   const ios = Platform.OS === 'ios'
   const body = (
     <View style={{ paddingTop: 12, paddingHorizontal: 16, paddingBottom: ios ? 16 : 16 + insets.bottom, gap: 14, maxHeight: '100%', flexShrink: 1 }}>
-      <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.t4, opacity: 0.6, alignSelf: 'center' }} />
+      <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
       {title ? (
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
           <View style={{ flex: 1, gap: 2 }}>
