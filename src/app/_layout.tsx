@@ -35,6 +35,10 @@ const RootLayout = () => {
           </Stack.Protected>
           <Stack.Protected guard={!session}>
             <Stack.Screen name="sign-in" />
+            <Stack.Screen name="phone" />
+            <Stack.Screen name="verify-phone" />
+            <Stack.Screen name="signup-terms" />
+            <Stack.Screen name="phone-registered" />
           </Stack.Protected>
         </Stack>
       </QueryClientProvider>

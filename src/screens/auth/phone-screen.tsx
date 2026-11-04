@@ -1,0 +1,94 @@
+import { useState } from 'react'
+import { View } from 'react-native'
+import { router } from 'expo-router'
+import {
+  PHONE_BODY,
+  PHONE_TITLE,
+  PhoneField,
+  SEND_CODE,
+  formatNational,
+  mapPhoneAuthError,
+  nationalDigits,
+  phoneFailureLine,
+  sendPhoneCode,
+  toE164,
+  usePhoneAuth,
+} from '@/features/auth'
+import { Button, Text, TopBar } from '@/shared/components'
+import { useColors } from '@/theme'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+const PhoneScreen = () => {
+  const c = useColors()
+  const insets = useSafeAreaInsets()
+  const email = usePhoneAuth((state) => state.email)
+  const digits = usePhoneAuth((state) => state.digits)
+  const setDigits = usePhoneAuth((state) => state.setDigits)
+  const setCooldown = usePhoneAuth((state) => state.setCooldown)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const e164 = toE164(digits)
+
+  const send = () => {
+    if (!e164) return
+    setBusy(true)
+    setError(null)
+    sendPhoneCode(e164)
+      .then((sent) => {
+        setCooldown(Date.now() + sent.cooldownSeconds * 1000)
+        router.push('/verify-phone')
+      })
+      .catch((caught: unknown) => {
+        const mapped = mapPhoneAuthError(caught)
+        if (mapped.kind === 'cooldown') {
+          setCooldown(Date.now() + mapped.retryAfterSec * 1000)
+          router.push('/verify-phone')
+          return
+        }
+        setError(phoneFailureLine(mapped))
+      })
+      .finally(() => setBusy(false))
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <TopBar onBack={() => router.back()} />
+      <View style={{ paddingHorizontal: 24, paddingTop: 12, gap: 10 }}>
+        {email ? (
+          <Text v="c1" color="t3">
+            {email}
+          </Text>
+        ) : null}
+        <Text accessibilityRole="header" v="h1">
+          {PHONE_TITLE}
+        </Text>
+        <Text v="b2" color="t3">
+          {PHONE_BODY}
+        </Text>
+        <View style={{ marginTop: 18 }}>
+          <PhoneField
+            value={formatNational(digits)}
+            onChange={(next) => {
+              const incoming = nationalDigits(next)
+              if (incoming === digits && next.length < formatNational(digits).length) {
+                setDigits(digits.slice(0, -1))
+                return
+              }
+              setDigits(incoming)
+            }}
+          />
+        </View>
+        {error ? (
+          <Text v="c1" color="red" accessibilityRole="alert">
+            {error}
+          </Text>
+        ) : null}
+      </View>
+      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
+        <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} />
+      </View>
+    </View>
+  )
+}
+
+export default PhoneScreen
