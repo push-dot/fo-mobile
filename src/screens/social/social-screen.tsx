@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, usePosts } from '@/features/social'
-import { Button, Chip, GlassButton, Text, TopBar } from '@/shared/components'
+import { Button, Chip, GlassButton, LoadingNote, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const SocialScreen = () => {
@@ -59,7 +59,7 @@ const SocialScreen = () => {
         ListEmptyComponent={
           <View style={{ padding: 40, alignItems: 'center', gap: 12 }}>
             {q.isPending ? (
-              <ActivityIndicator />
+              <LoadingNote />
             ) : q.isError ? (
               <>
                 <Text v="b2" color="t3">

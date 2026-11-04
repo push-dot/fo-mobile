@@ -21,8 +21,6 @@ export const useToggleBookmark = () => {
   return mutate
 }
 
-export const useGridTotal = (filters: PostingFilters) => usePostingPages(filters).data?.pages[0]?.page.total
-
 export const usePostingCount = (draft: Filters) =>
   useQuery({
     queryKey: ['postings', 'count', toQuery(draft)],

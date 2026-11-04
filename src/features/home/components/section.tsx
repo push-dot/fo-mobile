@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
-import { ActivityIndicator, FlatList, Pressable, View } from 'react-native'
+import { FlatList, Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import type { SectionKind } from '@/features/jobs'
-import { Icon, JobCard, Text } from '../../../shared/components'
+import { Icon, JobCard, LoadingNote, StatusNote, Text } from '../../../shared/components'
 import { useHomePostings } from '../api/hooks'
+import { SECTION_ERROR_LINES, SECTION_RETRY_LABEL } from '../constants'
 
 const Section = ({ kind, title, onBookmark }: { kind: SectionKind; title: string; onBookmark: (posting: Posting) => void }) => {
   const q = useHomePostings(kind)
@@ -29,11 +30,11 @@ const Section = ({ kind, title, onBookmark }: { kind: SectionKind; title: string
         </Pressable>
       </View>
       {q.isPending ? (
-        <ActivityIndicator style={{ height: 196 }} />
+        <View style={{ height: 196, alignItems: 'center', justifyContent: 'center' }}>
+          <LoadingNote />
+        </View>
       ) : q.isError ? (
-        <Text v="b2" color="t3" style={{ paddingHorizontal: 20 }}>
-          공고를 불러오지 못했어요. 잠시 후 다시 열어 주세요.
-        </Text>
+        <StatusNote lines={SECTION_ERROR_LINES} action={{ label: SECTION_RETRY_LABEL, onPress: () => q.refetch() }} />
       ) : (
         <FlatList
           horizontal

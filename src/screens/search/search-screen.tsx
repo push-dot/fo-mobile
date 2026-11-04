@@ -1,5 +1,5 @@
 import { useDeferredValue, useState } from 'react'
-import { ActivityIndicator, FlatList, Pressable, ScrollView, View } from 'react-native'
+import { FlatList, Pressable, ScrollView, View } from 'react-native'
 import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
 import {
@@ -7,13 +7,18 @@ import {
   POPULAR_TERMS,
   PostingRow,
   PostRow,
+  SEARCH_CLEAR_LABEL,
+  SEARCH_EMPTY_BODY,
+  SEARCH_ERROR_LINES,
+  SEARCH_RETRY_LABEL,
   SearchBar,
+  searchEmptyTitle,
   TABS,
   useRecentSearches,
   useSearch,
   type SearchTab,
 } from '@/features/search'
-import { Chip, Icon, Text } from '@/shared/components'
+import { Chip, Icon, LoadingNote, StatusNote, Text } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
@@ -135,11 +140,15 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
           }
           ListEmptyComponent={
             active.isPending ? (
-              <ActivityIndicator style={{ marginTop: 40 }} />
+              <LoadingNote style={{ marginTop: 40 }} />
+            ) : active.isError ? (
+              <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ marginTop: 40 }} />
             ) : (
-              <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 40, paddingHorizontal: 20 }}>
-                {active.isError ? '검색하지 못했어요. 잠시 후 다시 시도해 주세요.' : `‘${q}’에 맞는 결과가 없어요. 다른 말로 찾아보세요.`}
-              </Text>
+              <StatusNote
+                lines={[searchEmptyTitle(q), SEARCH_EMPTY_BODY]}
+                action={{ label: SEARCH_CLEAR_LABEL, onPress: () => setText('') }}
+                style={{ marginTop: 40 }}
+              />
             )
           }
         />

@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { Pressable } from 'react-native'
 import type { Post } from '@push/api-client'
+import { postInfo } from '@/features/social'
 import { Text } from '../../../shared/components'
 import Highlight from './highlight'
 
@@ -21,7 +22,10 @@ const PostRow = ({ p, q, onOpen }: { p: Post; q: string; onOpen: () => void }) =
         <Highlight text={p.body} q={q} />
       </Text>
       <Text v="c2" color="t3">
-        {p.author.displayName} · 댓글 {p.commentCount}
+        {postInfo(p)}
+      </Text>
+      <Text v="c2" color="t3">
+        댓글 {p.commentCount}
       </Text>
     </Pressable>
   )

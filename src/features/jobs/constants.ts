@@ -2,6 +2,8 @@ import type { SectionKind } from './types'
 import type { FilterKey } from './utils'
 
 export const POSTING_PAGE_LIMIT = 20
+export const JOBS_EMPTY_LINES = ['조건에 맞는 공고가 없어요.', '필터를 줄여 보세요.'] as const
+export const RESET_FILTERS_LABEL = '필터 초기화'
 
 export const FILTER_KEYS: FilterKey[] = ['category', 'skills', 'careerYears', 'location', 'employmentType']
 

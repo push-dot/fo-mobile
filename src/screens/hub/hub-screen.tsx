@@ -14,7 +14,7 @@ import {
   useProfileList,
   type SheetFilters,
 } from '@/features/hub'
-import { Badge, Chip, Icon, Text, TopBar } from '@/shared/components'
+import { Badge, Chip, Icon, LoadingNote, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const HubScreen = () => {
@@ -74,7 +74,7 @@ const HubScreen = () => {
         ListHeaderComponent={header}
         ListEmptyComponent={
           list.isPending ? (
-            <ActivityIndicator style={{ marginTop: 32 }} />
+            <LoadingNote style={{ marginTop: 32 }} />
           ) : (
             <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 32 }}>
               {list.isError ? '프로필을 불러오지 못했어요.' : '조건에 맞는 프로필이 없어요.'}

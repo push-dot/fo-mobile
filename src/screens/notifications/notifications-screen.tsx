@@ -1,14 +1,25 @@
 import { router } from 'expo-router'
-import { ActivityIndicator, SectionList, View } from 'react-native'
+import { SectionList, View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
-import { groupLabel, notificationHref, NotificationRow, useNotifications, useReadNotifications } from '@/features/notifications'
-import { Button, Text, TopBar } from '@/shared/components'
+import {
+  groupLabel,
+  NOTIFICATION_EMPTY,
+  NOTIFICATION_SETTINGS_LABEL,
+  notificationHref,
+  NotificationRow,
+  openNotificationSettings,
+  useNotificationSettingsVisible,
+  useNotifications,
+  useReadNotifications,
+} from '@/features/notifications'
+import { Button, LoadingNote, StatusNote, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const NotificationsScreen = () => {
   const c = useColors()
   const q = useNotifications()
   const read = useReadNotifications()
+  const settingsVisible = useNotificationSettingsVisible()
   const items = q.data?.data ?? []
   const sections = ['오늘', '이번 주', '이전']
     .map((title) => ({ title, data: items.filter((n) => groupLabel(n.createdAt) === title) }))
@@ -41,11 +52,17 @@ const NotificationsScreen = () => {
         renderItem={({ item }) => <NotificationRow n={item} onPress={() => open(item)} />}
         ListEmptyComponent={
           q.isPending ? (
-            <ActivityIndicator style={{ marginTop: 40 }} />
-          ) : (
+            <LoadingNote style={{ marginTop: 40 }} />
+          ) : q.isError ? (
             <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 40 }}>
-              {q.isError ? '알림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.' : '아직 받은 알림이 없어요.'}
+              알림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
             </Text>
+          ) : (
+            <StatusNote
+              lines={[NOTIFICATION_EMPTY]}
+              action={settingsVisible ? { label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings } : undefined}
+              style={{ marginTop: 40 }}
+            />
           )
         }
       />

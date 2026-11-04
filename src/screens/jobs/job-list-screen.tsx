@@ -10,11 +10,11 @@ import {
   formatCount,
   isEmpty,
   toQuery,
-  useGridTotal,
+  usePostingPages,
   type FilterKey,
   type Filters,
 } from '@/features/jobs'
-import { Chip, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { Chip, GlassButton, Icon, LOADING_LABEL, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const JobListScreen = () => {
@@ -22,7 +22,8 @@ const JobListScreen = () => {
   const [filters, setFilters] = useState<Filters>(EMPTY)
   const [open, setOpen] = useState<FilterKey | null>(null)
   const query = { ...toQuery(filters), sort: 'latest' as const }
-  const total = useGridTotal(query)
+  const pages = usePostingPages(query)
+  const total = pages.data?.pages[0]?.page.total
 
   const header = (
     <View style={{ backgroundColor: c.bg }}>
@@ -34,7 +35,7 @@ const JobListScreen = () => {
       </ScrollView>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 }}>
         <Text v="c1" weight="600" color="t3">
-          {total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
+          {pages.isPending ? LOADING_LABEL : total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
           <Text v="c1" weight="600" color="t2">
@@ -53,7 +54,7 @@ const JobListScreen = () => {
         onBack={() => router.back()}
         right={<GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />}
       />
-      <PostingGrid filters={query} header={header} />
+      <PostingGrid filters={query} header={header} loadingLabel={false} onReset={() => setFilters(EMPTY)} />
       <FilterSheet
         kind={open}
         value={filters}

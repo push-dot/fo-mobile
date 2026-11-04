@@ -2,6 +2,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import { File, Paths } from 'expo-file-system'
 import * as Haptics from 'expo-haptics'
 import * as ImagePicker from 'expo-image-picker'
+import * as ExpoLinking from 'expo-linking'
 import * as Sharing from 'expo-sharing'
 import * as WebBrowser from 'expo-web-browser'
 import { Linking, Share } from 'react-native'
@@ -37,3 +38,5 @@ export const shareFile = (uri: string, dialogTitle: string) => Sharing.shareAsyn
 export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content)
 
 export const openUrl = (url: string) => Linking.openURL(url)
+
+export const openSystemSettings = () => ExpoLinking.openSettings()

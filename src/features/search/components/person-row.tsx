@@ -1,12 +1,14 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
+import { careerLine } from '@/features/hub'
 import { Text } from '../../../shared/components'
 import { useColors } from '../../../theme'
 import Highlight from './highlight'
 
 const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void }) => {
   const c = useColors()
+  const career = careerLine(p)
   return (
     <Pressable
       accessibilityRole="button"
@@ -28,6 +30,11 @@ const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void
         <Text v="c1" color="t3" numberOfLines={1}>
           <Highlight text={p.headline} q={q} />
         </Text>
+        {career ? (
+          <Text v="c1" color="t3" numberOfLines={1}>
+            {career}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   )
