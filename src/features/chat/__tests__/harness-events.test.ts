@@ -119,5 +119,6 @@ describe('harness events', () => {
     expect(errorText('QUEUE_BUSY', 30)).toBe('지금 요청이 많아요. 30초 뒤에 다시 보내 주세요.')
     expect(errorText('PLAN_REQUIRED')).toContain('요금제')
     expect(errorText('INTEGRATION_REQUIRED')).toBe('작업을 이어가지 못했어요. 다시 보내 주세요.')
+    expect(errorText('NOT_CONFIGURED')).toBe('지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.')
   })
 })

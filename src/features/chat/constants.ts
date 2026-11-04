@@ -39,6 +39,7 @@ export const ERROR_TEXT: Record<string, string> = {
   QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
   APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
+  NOT_CONFIGURED: '지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
 }
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
