@@ -18,7 +18,10 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
     env:
       TEXT: "공고 .*개 보기"
 - assertVisible: "개발"
-- tapOn: "모아페이"
+# Open the first dev posting; mock postings past their deadline drop out of the list.
+- tapOn:
+    text: ".*개발자.*"
+    index: 0
 - extendedWaitUntil:
     visible: "지원하기"
     timeout: 20000

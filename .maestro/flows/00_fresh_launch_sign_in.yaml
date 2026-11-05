@@ -1,0 +1,10 @@
+appId: app.push.mobile
+name: 첫 실행 → 로그인 화면
+---
+# A signed-out launch has to land on sign-in, not on the phone-number step.
+- clearKeychain
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Google로 시작하기"
+    timeout: 60000

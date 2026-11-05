@@ -2,12 +2,30 @@ appId: app.push.mobile
 tags:
   - subflow
 ---
+# clearState does not clear the iOS keychain, where expo-secure-store keeps the session.
+- clearKeychain
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "개발 토큰으로 들어가기"
+    visible: "휴대폰 번호를 입력해 주세요|개발 토큰으로 들어가기"
     timeout: 60000
+# App bug: a signed-out launch opens /phone instead of /sign-in (00_fresh_launch_sign_in.yaml).
+# Open sign-in directly so the other flows still run; drop this once that bug is fixed.
+- runFlow:
+    when:
+      notVisible: "개발 토큰으로 들어가기"
+    commands:
+      - openLink: "push://sign-in"
+      - waitForAnimationToEnd
+      # iOS asks "'Push'에서 열겠습니까?" before opening a custom-scheme link.
+      - runFlow:
+          when:
+            visible: "열기"
+          commands:
+            - tapOn: "열기"
+- runFlow: _dismiss_logbox.yaml
 - tapOn: "개발 토큰으로 들어가기"
 - extendedWaitUntil:
     visible: "새로 올라온 공고"
     timeout: 20000
+- runFlow: _dismiss_logbox.yaml
