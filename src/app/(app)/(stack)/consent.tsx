@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Pressable } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useReferenceConsent } from '@/features/my'
 import { CONSENT_AGREE, CONSENT_BODY, CONSENT_DETAIL, CONSENT_FOOT, CONSENT_LATER, CONSENT_MORE, CONSENT_TITLE, grantConsent, laterConsent, useConsentPrompt } from '@/features/chat'
-import { Button, Sheet, Text } from '@/shared/components'
+import { Button, Sheet, Text, hitSlopTo } from '@/shared/components'
+import { spacing } from '@/theme'
 
 const ConsentScreen = () => {
   const consent = useReferenceConsent()
@@ -15,19 +16,18 @@ const ConsentScreen = () => {
     [],
   )
   return (
-    <Sheet
-      title={CONSENT_TITLE}
-      description={CONSENT_BODY}
-      action={{ label: CONSENT_AGREE, disabled: consent.saving, onPress: () => consent.save(true, { onSuccess: () => (grantConsent(), router.back()) }) }}
-    >
-      <Pressable accessibilityRole="button" onPress={() => setMore((v) => !v)}>
-        <Text v="b2" weight="700" color="acText">
+    <Sheet title={CONSENT_TITLE} description={CONSENT_BODY}>
+      <Pressable accessibilityRole="button" hitSlop={hitSlopTo(18)} onPress={() => setMore((v) => !v)} style={{ alignSelf: 'flex-start' }}>
+        <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
           {CONSENT_MORE}
         </Text>
       </Pressable>
       {more ? <Text v="b2" color="t2">{CONSENT_DETAIL}</Text> : null}
-      <Button variant="secondary" label={CONSENT_LATER} onPress={() => (laterConsent(), router.back())} />
-      <Text v="c1" color="t3">
+      <View style={{ gap: spacing[2] }}>
+        <Button label={CONSENT_AGREE} disabled={consent.saving} onPress={() => consent.save(true, { onSuccess: () => (grantConsent(), router.back()) })} />
+        <Button variant="secondary" label={CONSENT_LATER} onPress={() => (laterConsent(), router.back())} />
+      </View>
+      <Text v="c1" color="t3" style={{ textAlign: 'center' }}>
         {CONSENT_FOOT}
       </Text>
     </Sheet>

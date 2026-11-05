@@ -22,7 +22,7 @@ import {
   type SearchTab,
 } from '@/features/search'
 import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
   const c = useColors()
@@ -45,7 +45,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
         <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
           {recent.terms.length ? (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: spacing[1] }}>
                 <Text v="h3" accessibilityRole="header">
                   최근 검색
                 </Text>
@@ -60,7 +60,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                   <Pressable
                     accessibilityRole="button"
                     onPress={() => setText(t)}
-                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 20, paddingVertical: 12 }}
+                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingLeft: spacing[5], paddingVertical: spacing[3] }}
                   >
                     <Icon name="clock" size={18} color="t3" />
                     <Text v="b1" style={{ flex: 1 }} numberOfLines={1}>
@@ -71,7 +71,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                     accessibilityRole="button"
                     accessibilityLabel={`${t} 지우기`}
                     onPress={() => recent.remove(t)}
-                    style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: 8 }}
+                    style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: spacing[2] }}
                   >
                     <Icon name="x" size={16} color="t4" />
                   </Pressable>
@@ -80,11 +80,11 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             </>
           ) : null}
           {popular.length ? (
-            <Text v="h3" accessibilityRole="header" style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12 }}>
+            <Text v="h3" accessibilityRole="header" style={{ paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[3] }}>
               지금 많이 찾는 검색어
             </Text>
           ) : null}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, columnGap: 12 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing[5], columnGap: spacing[3] }}>
             {popular.map(({ term: t }, i) => (
               <Pressable
                 key={t}
@@ -94,7 +94,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                   setText(t)
                   recent.add(t)
                 }}
-                style={{ width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 }}
+                style={{ width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3] }}
               >
                 <Text v="b1" weight="700" color="acText" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
                   {i + 1}
@@ -113,22 +113,22 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ paddingBottom: 32 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
           onEndReached={() => active.hasNextPage && !active.isFetchingNextPage && active.fetchNextPage()}
           ListHeaderComponent={
             <>
-              <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingTop: 6, paddingBottom: 4 }}>
+              <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
                 {TABS.map((t) => {
                   const n = totalOf(t.key)
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>
               {active.isPending ? (
-                <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 }}>
+                <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: spacing[1] }}>
                   <Skeleton width={120} height={12} />
                 </View>
               ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 4 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: spacing[1] }}>
                   <Text v="c1" weight="600" color="t3" numberOfLines={1} style={{ flex: 1 }}>
                     ‘{q}’ {TABS.find((t) => t.key === tab)!.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}{TABS.find((t) => t.key === tab)!.unit}
                   </Text>
@@ -138,7 +138,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                         accessibilityLabel={`정렬, ${SEARCH_SORTS.find((s) => s.key === sort)?.label}`}
                         actions={SEARCH_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
                       >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, minHeight: 44 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], minHeight: 44 }}>
                           <Text v="c1" weight="600" color="t2">
                             {SEARCH_SORTS.find((s) => s.key === sort)?.label}
                           </Text>
@@ -146,7 +146,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                         </View>
                       </Menu>
                     ) : (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
                         <Text v="c1" weight="600" color="t2">
                           {SEARCH_SORTS[0]?.label}
                         </Text>
@@ -171,12 +171,12 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             active.isPending ? (
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
-              <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ marginTop: 40 }} />
+              <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ flex: 1, justifyContent: 'center' }} />
             ) : (
               <StatusNote
                 lines={[searchEmptyTitle(q), SEARCH_EMPTY_BODY]}
                 action={{ label: SEARCH_CLEAR_LABEL, onPress: () => setText('') }}
-                style={{ marginTop: 40 }}
+                style={{ flex: 1, justifyContent: 'center' }}
               />
             )
           }

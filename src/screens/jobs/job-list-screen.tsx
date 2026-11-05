@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { FILTER_KEYS, POSTING_SORTS, PostingGrid, chipText, formatCount, isEmpty, toQuery, useJobListStore, usePostingPages, EMPTY } from '@/features/jobs'
 import { Chip, GlassButton, Icon, Menu, Skeleton, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const JobListScreen = () => {
   const c = useColors()
@@ -20,18 +20,18 @@ const JobListScreen = () => {
 
   const header = (
     <View style={{ backgroundColor: c.bg }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 4 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
         <Chip label="전체" on={isEmpty(filters)} onPress={() => setFilters(EMPTY)} />
         {FILTER_KEYS.map((k) => (
           <Chip key={k} label={chipText(k, filters)} menu on={filters[k].length > 0} onPress={() => router.push({ pathname: '/job-filter', params: { kind: k } })} />
         ))}
       </ScrollView>
       {pages.isPending ? (
-        <View style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 }}>
+        <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[5], paddingBottom: spacing[3] }}>
           <Skeleton width={80} height={12} />
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[5], paddingBottom: spacing[3] }}>
           <Text v="c1" weight="600" color="t3">
             {total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
           </Text>
@@ -39,7 +39,7 @@ const JobListScreen = () => {
             accessibilityLabel={`정렬, ${sortLabel}`}
             actions={POSTING_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, minHeight: 44 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], minHeight: 44 }}>
               <Text v="c1" weight="600" color="t2">
                 {sortLabel}
               </Text>

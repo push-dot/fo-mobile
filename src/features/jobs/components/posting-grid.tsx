@@ -2,9 +2,10 @@ import { router } from 'expo-router'
 import type { ReactElement } from 'react'
 import { ActivityIndicator, FlatList, useWindowDimensions, View } from 'react-native'
 import type { PostingFilters } from '@push/api-client'
-import { JobCard, StatusNote, Text } from '../../../shared/components'
+import { JobCard, StatusNote } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
 import { JOBS_EMPTY_LINES, RESET_FILTERS_LABEL } from '../constants'
+import { spacing } from '../../../theme'
 import PostingGridSkeleton from './posting-grid-skeleton'
 
 type Props = {
@@ -15,9 +16,11 @@ type Props = {
 
 const Gap = () => <View style={{ height: 22 }} />
 
+const EMPTY_NOTE = { flex: 1, justifyContent: 'center', paddingHorizontal: 40, paddingBottom: 160 } as const
+
 const PostingGrid = ({ filters, header, onReset }: Props) => {
   const { width } = useWindowDimensions()
-  const cardWidth = Math.floor((width - 40 - 12) / 2)
+  const cardWidth = Math.floor((width - spacing[5] * 2 - spacing[3]) / 2)
   const q = usePostingPages(filters)
   const toggleBookmark = useToggleBookmark()
   const items = q.data?.pages.flatMap((p) => p.data) ?? []
@@ -28,8 +31,8 @@ const PostingGrid = ({ filters, header, onReset }: Props) => {
       numColumns={2}
       contentInsetAdjustmentBehavior="automatic"
       ListHeaderComponent={header}
-      columnWrapperStyle={{ gap: 12, paddingHorizontal: 20 }}
-      contentContainerStyle={{ paddingBottom: 32 }}
+      columnWrapperStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
       ItemSeparatorComponent={Gap}
       renderItem={({ item }) => (
         <JobCard posting={item} width={cardWidth} onPress={() => router.push(`/postings/${item.id}`)} onBookmark={() => toggleBookmark(item)} />
@@ -40,20 +43,16 @@ const PostingGrid = ({ filters, header, onReset }: Props) => {
         q.isPending ? (
           <PostingGridSkeleton cardWidth={cardWidth} />
         ) : q.isError ? (
-          <View style={{ paddingHorizontal: 20, paddingTop: 40, alignItems: 'center' }}>
-            <Text v="b2" color="t3">
-              공고를 불러오지 못했어요. 잠시 후 다시 열어 주세요.
-            </Text>
-          </View>
+          <StatusNote lines={['공고를 불러오지 못했어요.', '잠시 후 다시 열어 주세요.']} style={EMPTY_NOTE} />
         ) : (
           <StatusNote
             lines={JOBS_EMPTY_LINES}
             action={onReset ? { label: RESET_FILTERS_LABEL, onPress: onReset } : undefined}
-            style={{ paddingTop: 40 }}
+            style={EMPTY_NOTE}
           />
         )
       }
-      ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ marginTop: 8 }} /> : undefined}
+      ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ marginTop: spacing[2] }} /> : undefined}
     />
   )
 }

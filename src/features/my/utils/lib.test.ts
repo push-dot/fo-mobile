@@ -13,6 +13,7 @@ import {
   toDayParam,
   ymToDate,
   stageTone,
+  postedAt,
   timeAgo,
   toResumeDraft,
 } from './index'
@@ -75,6 +76,13 @@ describe('my lib', () => {
     expect(dday(new Date(2026, 9, 22, 18).toISOString(), now)).toBe('D-2')
     expect(timeAgo(new Date(2026, 9, 20, 8).toISOString(), now)).toBe('2시간 전')
     expect(timeAgo(new Date(2026, 9, 2).toISOString(), now)).toBe('10월 2일')
+  })
+
+  it('dates posts older than yesterday as month and day', () => {
+    const now = new Date(2026, 9, 20, 10)
+    expect(postedAt(new Date(2026, 9, 18, 20).toISOString(), now)).toBe('어제')
+    expect(postedAt(new Date(2026, 9, 17, 12).toISOString(), now)).toBe('10월 17일')
+    expect(postedAt(new Date(2025, 2, 1).toISOString(), now)).toBe('2025. 3. 1.')
   })
 
   it('maps stages and offer states to badges', () => {

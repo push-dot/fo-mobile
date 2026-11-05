@@ -4,10 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import {
   APPLE,
-  APPLE_BG,
   APPLE_START,
   GITHUB,
-  GITHUB_BG,
   GITHUB_START,
   COMPACT_HEIGHT,
   GOOGLE,
@@ -27,7 +25,7 @@ import {
 } from '@/features/auth'
 import { DEV_AUTH_TOKEN, signIn, signInWithApple, signInWithDevToken, type SignInOutcome } from '@/shared/infrastructure'
 import { Mascot, Text } from '@/shared/components'
-import { radius, useColors } from '@/theme'
+import { radius, spacing, useColors } from '@/theme'
 
 const devToken = __DEV__ ? DEV_AUTH_TOKEN : undefined
 
@@ -69,7 +67,7 @@ const SignInScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ marginTop: insets.top + (compact ? LOGO_TOP_COMPACT : LOGO_TOP), alignItems: 'center', gap: 20, paddingHorizontal: 28 }}>
+      <View style={{ marginTop: insets.top + (compact ? LOGO_TOP_COMPACT : LOGO_TOP), alignItems: 'center', gap: spacing[5], paddingHorizontal: 28 }}>
         <View accessible accessibilityRole="image" accessibilityLabel={LOGO_LABEL} style={{ marginBottom: 10 }}>
           <Mascot size={compact ? LOGO_SIZE_COMPACT : LOGO_SIZE} />
         </View>
@@ -78,17 +76,17 @@ const SignInScreen = () => {
         </Text>
       </View>
 
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 24, gap: 12 }}>
+      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 24, gap: spacing[3] }}>
         <ProviderButton label={GOOGLE_START} logo={GOOGLE} bg={c.card} fg={c.t1} border={c.line} disabled={busy} onPress={() => run('google')} />
         {apple ? (
-          <ProviderButton label={APPLE_START} logo={APPLE} bg={APPLE_BG} fg="#FFFFFF" disabled={busy} onPress={() => run('apple')} />
+          <ProviderButton label={APPLE_START} logo={APPLE} bg={c.t1} fg={c.bg} disabled={busy} onPress={() => run('apple')} />
         ) : null}
-        <ProviderButton label={GITHUB_START} logo={GITHUB} bg={GITHUB_BG} fg="#FFFFFF" disabled={busy} onPress={() => run('github')} />
+        <ProviderButton label={GITHUB_START} logo={GITHUB} bg={c.t1} fg={c.bg} disabled={busy} onPress={() => run('github')} />
         <Pressable
           accessibilityRole="button"
           disabled={busy}
           onPress={startPhone}
-          style={{ alignSelf: 'center', minHeight: 44, paddingHorizontal: 16, justifyContent: 'center' }}
+          style={{ alignSelf: 'center', minHeight: 44, paddingHorizontal: spacing[4], justifyContent: 'center' }}
         >
           <Text weight="600" color="t2">
             {PHONE_START}
@@ -110,12 +108,12 @@ const SignInScreen = () => {
       {failure ? (
         <View
           accessibilityRole="alert"
-          style={{ position: 'absolute', left: 20, right: 20, top: insets.top + 16, flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 16, borderRadius: radius.lg, backgroundColor: c.redSoft }}
+          style={{ position: 'absolute', left: 20, right: 20, top: insets.top + 16, flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], padding: spacing[4], borderRadius: radius.lg, backgroundColor: c.redSoft }}
         >
           <Text weight="800" color="red">
             !
           </Text>
-          <View style={{ flex: 1, gap: 4 }}>
+          <View style={{ flex: 1, gap: spacing[1] }}>
             <Text weight="700">{failure.title}</Text>
             <Text v="c1" color="t2">
               {failure.body}

@@ -3,12 +3,14 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
 ---
 - runFlow: _login.yaml
 - assertVisible: "마감 임박 공고"
+- takeScreenshot: 01_home_jobs_apply-01
 - tapOn:
     text: "채용공고"
     index: 0
 - extendedWaitUntil:
     visible: "공고 .*개"
     timeout: 10000
+- takeScreenshot: 01_home_jobs_apply-02
 - tapOn: "직군"
 - tapOn: "개발"
 # The count on the button refetches after each pick; let it settle before applying.
@@ -17,7 +19,8 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
     file: _tap_sheet_button.yaml
     env:
       TEXT: "공고 .*개 보기"
-- assertVisible: "개발"
+- assertVisible: ".*개발.*"
+- takeScreenshot: 01_home_jobs_apply-03
 # Open the first dev posting; mock postings past their deadline drop out of the list.
 - tapOn:
     text: ".*개발자.*"
@@ -25,8 +28,10 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
 - extendedWaitUntil:
     visible: "지원하기"
     timeout: 20000
+- takeScreenshot: 01_home_jobs_apply-04
 - tapOn: "지원하기"
 - tapOn: "이 서류로 지원하기"
 - extendedWaitUntil:
     visible: "지원 완료"
     timeout: 10000
+- takeScreenshot: 01_home_jobs_apply-05

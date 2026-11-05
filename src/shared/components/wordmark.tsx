@@ -1,9 +1,12 @@
+import { useColors } from '../../theme'
 import Text from './text'
 
-const Wordmark = ({ size = 22 }: { size?: number }) => {
+const Wordmark = ({ size = 24 }: { size?: number }) => {
+  const c = useColors()
+  const lineHeight = Math.round((size * 7) / 6)
   return (
-    <Text v="h1" style={{ fontSize: size, lineHeight: size * 1.3 }}>
-      Push<Text v="h1" color="ac" style={{ fontSize: size, lineHeight: size * 1.3 }}>.</Text>
+    <Text v="h1" style={{ fontSize: size, lineHeight }}>
+      Push<Text v="h1" style={{ fontSize: size, lineHeight, color: c.ac }}>.</Text>
     </Text>
   )
 }

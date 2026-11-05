@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { EVENT_TYPES, fromDayParam, useAddCalendarEvent, type CalendarEventType } from '@/features/my'
 import { Chip, DatePicker, Sheet, Text, TextField } from '@/shared/components'
+import { spacing } from '@/theme'
 import { withTime } from '@/shared/utility'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
@@ -33,7 +34,7 @@ const AddEventSheetScreen = () => {
         onPress: () => add.mutate({ type, title: title.trim(), startsAt: withTime(date, time).toISOString() }),
       }}
     >
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
         <View style={{ flex: 1 }}>
           <DatePicker label="날짜" mode="date" value={date} onChange={setDate} />
         </View>
@@ -42,7 +43,7 @@ const AddEventSheetScreen = () => {
         </View>
       </View>
       <TextField accessibilityLabel="일정 이름" value={title} onChangeText={setTitle} placeholder="일정 이름" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
         {EVENT_TYPES.map((t) => (
           <Chip key={t.key} label={t.label} on={type === t.key} onPress={() => setType(t.key)} />
         ))}

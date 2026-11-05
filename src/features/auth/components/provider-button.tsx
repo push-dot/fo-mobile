@@ -28,10 +28,10 @@ const ProviderButton = ({
     style={({ pressed }) => ({ opacity: disabled ? 0.45 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] })}
   >
     <View
-      style={{ height: 56, borderRadius: radius.md, backgroundColor: bg, borderWidth: border ? 1 : 0, borderColor: border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+      style={{ height: 56, borderRadius: radius.md, backgroundColor: bg, borderWidth: border ? 1 : 0, borderColor: border, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 96, gap: 10 }}
     >
-      <SvgXml xml={logo} width={20} height={20} />
-      <Text v="h3" weight="700" style={{ color: fg, fontSize: 17 }}>
+      <SvgXml xml={logo} width={20} height={20} color={fg} />
+      <Text v="h3" style={{ color: fg }}>
         {label}
       </Text>
     </View>

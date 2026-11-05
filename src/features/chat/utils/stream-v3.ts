@@ -1,6 +1,7 @@
 import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
-import type { Approval, ApprovalSection, ChatEvent, ChatItem, Choice } from '../types'
+import { MULTI_PICK_FOOT } from '../constants'
+import type { Approval, ApprovalSection, ChatEvent, ChatItem, Choice, TemplateLayout } from '../types'
 
 /** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
 export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
@@ -14,12 +15,16 @@ export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
 
 export const planTone = (tag: string): BadgeTone => PLAN_TAG_TONE[tag] ?? 'grey'
 
-const choiceOf = (o: StreamOption): Choice => ({
+const toggleChoiceOf = (o: StreamOption): Choice => ({
   label: o.label,
-  ...(o.desc ? { desc: o.desc } : {}),
-  ...(o.sub ? { hint: o.sub } : {}),
+  ...(o.desc ?? o.sub ? { desc: (o.desc ?? o.sub)! } : {}),
   ...(o.badge ? { badge: { label: o.badge, tone: 'ac' as const } } : {}),
 })
+
+const templateLayoutOf = (o: StreamOption): TemplateLayout => {
+  const key = `${o.id} ${o.label}`.toLowerCase()
+  return key.includes('modern') || key.includes('모던') ? 'modern' : key.includes('compact') || key.includes('컴팩트') ? 'compact' : key.includes('ats') ? 'ats' : 'classic'
+}
 
 const picked = (ids: string[] | undefined, selected: string[] | undefined) =>
   (ids ?? []).flatMap((id, i) => (selected?.includes(id) ? [i] : []))
@@ -58,7 +63,7 @@ const sectionOf = (raw: ChoiceSection | { kind: string }, recommended?: string):
       return {
         id: s.id,
         kind: 'toggle',
-        items: s.options.map(choiceOf),
+        items: s.options.map(toggleChoiceOf),
         ids: s.options.map((o) => o.id),
         selected: picked(s.options.map((o) => o.id), s.selected),
       }
@@ -69,6 +74,7 @@ const sectionOf = (raw: ChoiceSection | { kind: string }, recommended?: string):
         items: s.options.map((o) => ({
           id: o.id,
           label: o.label,
+          layout: templateLayoutOf(o),
           ...(o.badge === '추천' || o.id === recommended ? { recommended: true } : {}),
         })),
         selected: picked(s.options.map((o) => o.id), s.selected),
@@ -94,10 +100,11 @@ export const approvalFromSections = (ev: Extract<StreamEvent, { type: 'choice' }
   const submit: ChoiceSubmit | undefined = ev.submit
   const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
   const cancel = ev.options.find((o) => o.id === 'cancel')
+  const multi = sections.some((s) => (s.kind === 'chips' || s.kind === 'choices') && s.multi)
   return {
     id: ev.id,
     question: ev.title ?? '',
-    detail: ev.detail,
+    ...(multi ? { foot: MULTI_PICK_FOOT } : {}),
     sections,
     optionIds: ['submit', ...answerableIds(sections), ...(cancel ? ['cancel'] : [])],
     ...(cancel ? { secondary: cancel.label } : {}),

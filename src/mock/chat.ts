@@ -583,6 +583,11 @@ const docs: ChatDoc[] = [
   { id: 'd3', fileName: '포트폴리오_결제시스템.pdf', size: 8_100_000, createdAt: '2026-08-03T09:00:00+09:00' },
   { id: 'd4', fileName: '모아페이_맞춤_이력서_v2.pdf', size: 186_000, createdAt: ago(10), aiMade: true },
 ]
+/** 내 서류 and 마이 › 서류 are one list; DELETE sources/:id (me.ts) calls this too. */
+export const removeChatDoc = (id: string) => {
+  const i = docs.findIndex((d) => d.id === id)
+  if (i >= 0) docs.splice(i, 1)
+}
 mock('GET', 'chat/docs', () => ({ data: docs }))
 mock('POST', 'chat/docs', ({ body }) => {
   const b = body as { fileName: string; size: number }

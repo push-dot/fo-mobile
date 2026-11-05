@@ -130,7 +130,6 @@ describe('agent stream for the new design', () => {
     expect(review).toMatchObject({
       type: 'approval',
       approval: {
-        detail: '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.',
         foot: PICK_HINT,
         sections: [{ items: [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, { label: '모던', desc: '깔끔한 한 단' }, { label: '그만하기' }] }],
       },

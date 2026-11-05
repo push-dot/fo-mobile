@@ -1,7 +1,8 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
-import { cardCareerLabel } from '@push/shared'
+import { careerLabel, cardCareerLabel } from '@push/shared'
 import { dday, givenName, stageTone, timeAgo, tintOf } from '@/features/my'
-import type { QsData, QsItem } from '../api/schemas'
+import type { ChatDoc, QsData, QsItem } from '../api/schemas'
+import type { QuickStart } from '../constants'
 
 export type QsSources = {
   bookmarks?: Posting[]
@@ -19,6 +20,8 @@ export type QsSources = {
 
 const DAY = 86_400_000
 const ACTIVE = new Set(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER'])
+// 합격 is listed under 진행 중 but starts unchecked: there is nothing left to organize.
+const PRESELECT = new Set(['APPLIED', 'SCREENING', 'INTERVIEW'])
 
 const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem> = {}): QsItem => ({
   id: p.id,
@@ -62,16 +65,17 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
           .sort((a, b) => a.deadline!.localeCompare(b.deadline!))
           .map((p) => {
             const label = dday(p.deadline!, now)
-            return job(p, { badge: { label, tone: label === 'D-Day' || Number(label.slice(2)) <= 3 ? 'red' : 'orange' } })
+            return job(p, { badge: { label, tone: label === 'D-Day' || Number(label.slice(2)) <= 3 ? 'red' : 'grey' } })
           }),
       }
     case 'status': {
-      const all = (s.applications ?? []).map((a) =>
-        job({ id: a.id, company: a.company, title: a.title }, { badge: { label: stageBadge(a.stage), tone: stageTone(a.stage) }, selected: ACTIVE.has(a.stage) }),
-      )
-      const active = all.filter((it) => it.selected)
+      const all = (s.applications ?? []).map((a) => ({
+        active: ACTIVE.has(a.stage),
+        item: job({ id: a.id, company: a.company, title: a.title }, { badge: { label: stageBadge(a.stage), tone: stageTone(a.stage) }, selected: PRESELECT.has(a.stage) }),
+      }))
+      const active = all.filter((x) => x.active).map((x) => x.item)
       // An active application is listed under both tabs (same id, so one pick).
-      return { segments: [`진행 중 ${active.length}`, `전체 ${all.length}`], items: [...active, ...all.map((it) => ({ ...it, seg: 1 }))] }
+      return { segments: [`진행 중 ${active.length}`, `전체 ${all.length}`], items: [...active, ...all.map((x) => ({ ...x.item, seg: 1 }))] }
     }
     case 'reply':
       return {
@@ -97,8 +101,8 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
         items: [
           { id: 'headline', title: '헤드라인', sub: '한 줄 소개', selected: true },
           { id: 'intro', title: '소개', sub: '3~4문장', selected: true },
-          { id: 'careers', title: '경력', sub: s.profile?.careers ? `경력 · ${s.profile.careers.length}건` : '회사 · 역할' },
-          { id: 'skills', title: '기술 스택', sub: s.profile?.skills ? `기술 스택 · ${s.profile.skills.length}개` : '쓰는 기술' },
+          { id: 'careers', title: '경력', sub: s.profile?.careers && `${s.profile.careers.length}건` },
+          { id: 'skills', title: '기술 스택', sub: s.profile?.skills && `${s.profile.skills.length}개` },
         ],
       }
     case 'calendar':
@@ -107,6 +111,20 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
       return { doc: s.doc, items: [] }
   }
 }
+
+export const initialPicks = (qs: Pick<QuickStart, 'layout' | 'multi'>, items: QsItem[]) => {
+  const chosen = items.filter((i) => i.selected).map((i) => i.id)
+  return chosen.length || qs.layout !== 'cards' || qs.multi ? chosen : items.slice(0, 1).map((i) => i.id)
+}
+
+export const docMeta = (d: Pick<ChatDoc, 'fileName' | 'size' | 'createdAt'>) => {
+  const at = new Date(d.createdAt)
+  const size = d.size >= 1_000_000 ? `${(d.size / 1_000_000).toFixed(1)}MB` : `${Math.max(1, Math.round(d.size / 1000))}KB`
+  return `${d.fileName.split('.').pop()!.toUpperCase()} · ${size} · ${at.getMonth() + 1}월 ${at.getDate()}일`
+}
+
+export const postingMeta = (p: Posting, now = new Date()) =>
+  [p.location, p.careerMin === 0 && !p.careerMax ? careerLabel(p) : `경력 ${careerLabel(p)}`, p.deadline && dday(p.deadline, now)].filter(Boolean).join(' · ')
 
 export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   link: ['doc'],

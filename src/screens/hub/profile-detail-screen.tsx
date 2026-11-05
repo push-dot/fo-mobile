@@ -4,7 +4,7 @@ import { Platform, Pressable, View } from 'react-native'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
 import { DetailWebView, Glass, Text, TopBar } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const ProfileDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
@@ -16,7 +16,7 @@ const ProfileDetailScreen = ({ id }: { id: string }) => {
   const self = me === id
 
   const actions = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing[1] }}>
       {self ? null : (
         <Pressable
           accessibilityRole="button"

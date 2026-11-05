@@ -1,10 +1,12 @@
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, TextInput, View } from 'react-native'
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
 import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, threadComments, useComments, usePost } from '@/features/social'
 import { Glass, Icon, Menu, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
-import { useColors } from '@/theme'
+import { radius, spacing, useColors } from '@/theme'
+
+const moreButton = { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
 
 const PostDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
@@ -31,11 +33,15 @@ const PostDetailScreen = ({ id }: { id: string }) => {
               },
             ]}
           >
-            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-              <Glass style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
+            {Platform.OS === 'ios' ? (
+              <Glass interactive style={moreButton}>
                 <Icon name="more" size={22} color="t1" />
               </Glass>
-            </View>
+            ) : (
+              <View style={moreButton}>
+                <Icon name="more" size={22} color="t1" />
+              </View>
+            )}
           </Menu>
         }
       />
@@ -55,11 +61,11 @@ const PostDetailScreen = ({ id }: { id: string }) => {
                 }}
               />
             )}
-            contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 16 }}
+            contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[4] }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
             onEndReached={() => comments.hasNextPage && !comments.isFetchingNextPage && comments.fetchNextPage()}
-            ListFooterComponent={comments.isPending || comments.isFetchingNextPage ? <ActivityIndicator style={{ padding: 16 }} /> : undefined}
+            ListFooterComponent={comments.isPending || comments.isFetchingNextPage ? <ActivityIndicator style={{ padding: spacing[4] }} /> : undefined}
           />
           <CommentComposer postId={id} replyTo={replyTo} onClearReply={() => setReplyTo(null)} inputRef={inputRef} />
         </KeyboardAvoidingView>

@@ -1,6 +1,9 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
+import { onAccent, radius } from '../../../theme'
 import { tintOf } from '../utils'
+
+const LOGO_RADIUS: Record<number, number> = { 44: 14, 48: 15, 56: 16 }
 
 const Logo = ({ name, size = 48 }: { name: string; size?: number }) => {
   return (
@@ -8,20 +11,13 @@ const Logo = ({ name, size = 48 }: { name: string; size?: number }) => {
       style={{
         width: size,
         height: size,
-        borderRadius: Math.round(size * 0.31),
+        borderRadius: LOGO_RADIUS[size] ?? radius.sm,
         backgroundColor: tintOf(name),
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Text
-        weight="800"
-        style={{
-          color: '#FFFFFF',
-          fontSize: Math.round(size * 0.375),
-          lineHeight: Math.round(size * 0.5),
-        }}
-      >
+      <Text v={size >= 56 ? 'h2' : 'h3'} weight="800" style={{ color: onAccent }}>
         {[...name][0]}
       </Text>
     </View>

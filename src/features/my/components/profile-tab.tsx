@@ -1,15 +1,25 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
-import { ActivityIndicator, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { CAREER_STATUSES, JOB_CATEGORIES } from '@push/api-client'
 import { profileShareMessage } from '@/features/hub'
-import { Badge, Button, Icon, Text } from '@/shared/components'
+import { Badge, Button, Icon, SkeletonRows, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { useColors } from '../../../theme'
+import { radius, spacing, useColors } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
 import type { ProfileSection } from '../types'
 import { careerPeriod, profileCountLabels, tenureLabel } from '../utils'
 import Avatar from './avatar'
+
+
+const LOADING_ROWS = {
+  count: 4,
+  lead: { size: 48, radius: radius.pill },
+  lines: [
+    { width: '60%', height: 16 },
+    { width: '40%', height: 12 },
+  ],
+} as const
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
 
@@ -25,7 +35,7 @@ const Section = ({
   children: ReactNode
 }) => {
   return (
-    <View style={{ paddingHorizontal: 20, gap }}>
+    <View style={{ paddingHorizontal: spacing[5], gap }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text v="h3" accessibilityRole="header">
           {title}
@@ -34,10 +44,9 @@ const Section = ({
           accessibilityRole="button"
           accessibilityLabel={`${title} 편집`}
           onPress={onEdit}
-          hitSlop={6}
-          style={{ width: 44, height: 44, alignItems: 'flex-end', justifyContent: 'center' }}
+          style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Icon name="edit" size={20} color="t3" />
+          <Icon name="edit" size={18} color="t3" />
         </Pressable>
       </View>
       {children}
@@ -48,15 +57,15 @@ const Section = ({
 const ProfileTab = () => {
   const c = useColors()
   const { data: p, isLoading } = useMyProfile()
-  if (isLoading || !p) return <ActivityIndicator style={{ marginTop: 60 }} />
+  if (isLoading || !p) return <SkeletonRows {...LOADING_ROWS} />
   const job = JOB_CATEGORIES.find((j) => j.key === p.jobCategory)?.label ?? ''
   const status = CAREER_STATUSES.find((s) => s.key === p.careerStatus)?.label ?? ''
 
   return (
-    <View style={{ gap: 22, paddingTop: 22, paddingBottom: 40 }}>
-      <View style={{ alignItems: 'center', gap: 6, paddingHorizontal: 20 }}>
+    <View style={{ gap: spacing[6], paddingTop: spacing[6], paddingBottom: spacing[6] }}>
+      <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
         <Avatar name={p.displayName} url={p.avatarUrl} size={84} />
-        <Text v="h1" style={{ marginTop: 6 }}>
+        <Text v="h1">
           {p.displayName}
         </Text>
         {p.headline ? (
@@ -64,11 +73,11 @@ const ProfileTab = () => {
             {p.headline}
           </Text>
         ) : null}
-        <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
+        <View style={{ flexDirection: 'row', gap: spacing[2] }}>
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
           {status ? <Badge label={status} tone={p.careerStatus === 'seeking' ? 'ac' : 'grey'} /> : null}
         </View>
-        <View style={{ flexDirection: 'row', gap: 16, marginTop: 6 }}>
+        <View style={{ flexDirection: 'row', gap: spacing[4], marginTop: spacing[2] }}>
           {(
             [
               [profileCountLabels(p).following, '/activity/follows', 'following'],
@@ -81,7 +90,7 @@ const ProfileTab = () => {
               accessibilityRole="button"
               onPress={() => router.push({ pathname, params: { box } })}
             >
-              <Text v="b2">
+              <Text v="b2" color="t2">
                 <Text v="b2" weight="700">
                   {count}
                 </Text>{' '}
@@ -90,7 +99,7 @@ const ProfileTab = () => {
             </Pressable>
           ))}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: spacing[2] }}>
           <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />
           <Button
             label="공유"
@@ -102,13 +111,13 @@ const ProfileTab = () => {
         </View>
       </View>
 
-      <Section title="소개" onEdit={() => edit('intro')} gap={6}>
+      <Section title="소개" onEdit={() => edit('intro')} gap={spacing[2]}>
         <Text v="b2" color={p.intro ? 't2' : 't3'}>
           {p.intro || '아직 소개가 없어요. 3~4문장으로 나를 소개해 보세요.'}
         </Text>
       </Section>
 
-      <Section title="경력" onEdit={() => edit('career')} gap={12}>
+      <Section title="경력" onEdit={() => edit('career')} gap={spacing[3]}>
         {p.careers.length === 0 ? (
           <Text v="b2" color="t3">
             아직 등록한 경력이 없어요.
@@ -117,21 +126,21 @@ const ProfileTab = () => {
           p.careers.map((cr, i) => {
             const last = i === p.careers.length - 1
             return (
-              <View key={`${cr.company}-${i}`} style={{ flexDirection: 'row', gap: 14 }}>
-                <View style={{ alignItems: 'center', paddingTop: 6 }}>
+              <View key={`${cr.company}-${i}`} style={{ flexDirection: 'row', gap: spacing[4] }}>
+                <View style={{ alignItems: 'center', paddingTop: spacing[2] }}>
                   <View
                     style={{
                       width: 10,
                       height: 10,
-                      borderRadius: 5,
+                      borderRadius: radius.xs,
                       backgroundColor: cr.endedOn ? c.t4 : c.ac,
                     }}
                   />
                   {!last ? (
-                    <View style={{ flex: 1, width: 2, backgroundColor: c.line, marginTop: 4 }} />
+                    <View style={{ flex: 1, width: 2, backgroundColor: c.line, marginTop: spacing[1] }} />
                   ) : null}
                 </View>
-                <View style={{ flex: 1, paddingBottom: last ? 0 : 12 }}>
+                <View style={{ flex: 1, paddingBottom: last ? 0 : spacing[3] }}>
                   <Text v="b1" weight="700">
                     {cr.company} · {cr.role}
                   </Text>
@@ -139,7 +148,7 @@ const ProfileTab = () => {
                     {careerPeriod(cr)}
                   </Text>
                   {cr.description ? (
-                    <Text v="b2" color="t2" style={{ marginTop: 4 }}>
+                    <Text v="b2" color="t2" style={{ marginTop: spacing[1] }}>
                       {cr.description}
                     </Text>
                   ) : null}
@@ -150,13 +159,13 @@ const ProfileTab = () => {
         )}
       </Section>
 
-      <Section title="기술 스택" onEdit={() => edit('skills')} gap={10}>
+      <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[2]}>
         {p.skills.length === 0 ? (
           <Text v="b2" color="t3">
             아직 등록한 기술이 없어요.
           </Text>
         ) : (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
             {p.skills.map((s) => (
               <Badge key={s} label={s} tone="grey" />
             ))}

@@ -6,7 +6,9 @@ name: 홈 → 검색 → 많이 찾는 검색어 → 결과
 - extendedWaitUntil:
     visible: "지금 많이 찾는 검색어"
     timeout: 10000
+- takeScreenshot: 06_search_trending-01
 - tapOn: "1위 프론트엔드"
 - extendedWaitUntil:
     visible: "‘프론트엔드’ 공고.*"
     timeout: 10000
+- takeScreenshot: 06_search_trending-02

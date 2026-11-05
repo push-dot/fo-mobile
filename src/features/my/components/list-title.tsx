@@ -1,10 +1,11 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
+import { spacing } from '../../../theme'
 
 const ListTitle = ({
   title,
   count,
-  top = 14,
+  top = spacing[4],
 }: {
   title: string
   count?: number
@@ -17,8 +18,8 @@ const ListTitle = ({
         alignItems: 'baseline',
         justifyContent: 'space-between',
         paddingTop: top,
-        paddingBottom: 4,
-        paddingHorizontal: 20,
+        paddingBottom: spacing[1],
+        paddingHorizontal: spacing[5],
       }}
     >
       <Text v="h2" accessibilityRole="header">

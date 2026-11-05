@@ -1,4 +1,4 @@
-import { DatePicker as SwiftDatePicker, HStack, Picker, Text } from '@expo/ui/swift-ui'
+import { DatePicker as SwiftDatePicker, HStack, Picker, Text as SText } from '@expo/ui/swift-ui'
 import {
   accessibilityLabel as a11yLabel,
   datePickerStyle,
@@ -8,13 +8,15 @@ import {
   tag,
 } from '@expo/ui/swift-ui/modifiers'
 import { View } from 'react-native'
-import { radius, useColors } from '../../theme'
-import { clampMonth, startOfMonth, yearsBetween } from '../utility'
+import { radius, spacing, useColors } from '../../theme'
+import { clampMonth, yearsBetween } from '../utility'
 import { MONTHS } from './constants'
 import type { DatePickerProps } from './date-picker.android'
+import Menu from './menu.ios'
 import NativeHost from './native-host'
+import Text from './text'
 
-/** iOS: compact SwiftUI DatePicker; month mode is a year menu plus a month menu (SwiftUI has no month-only picker). */
+// SwiftUI has no month-only picker, so month mode is a year menu plus a month menu.
 const DatePicker = ({
   value,
   onChange,
@@ -37,38 +39,44 @@ const DatePicker = ({
         />
       </NativeHost>
     )
-  const shown = value ?? startOfMonth(new Date())
   const pick = (year: number, month: number) =>
     onChange(clampMonth(new Date(year, month - 1, 1), min, max))
+  const field = { minHeight: 48, borderRadius: radius.md, backgroundColor: c[surface], justifyContent: 'center', alignItems: 'flex-start' } as const
+  if (!value) {
+    const month = new Date().getMonth() + 1
+    return (
+      <View style={[field, { paddingHorizontal: spacing[4] }]}>
+        <Menu
+          accessibilityLabel={`${label} 연도`}
+          actions={yearsBetween(min, max).map((y) => ({ key: String(y), label: `${y}년`, onPress: () => pick(y, month) }))}
+        >
+          <Text v="b1" color="t3">
+            {label}
+          </Text>
+        </Menu>
+      </View>
+    )
+  }
   return (
-    <View
-      style={{
-        minHeight: 48,
-        borderRadius: radius.md,
-        backgroundColor: c[surface],
-        paddingHorizontal: 8,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}
-    >
+    <View style={[field, { paddingHorizontal: spacing[2] }]}>
       <NativeHost matchContents>
         <HStack spacing={0}>
           <Picker
-            selection={shown.getFullYear()}
-            onSelectionChange={(y) => pick(y, shown.getMonth() + 1)}
+            selection={value.getFullYear()}
+            onSelectionChange={(y) => pick(y, value.getMonth() + 1)}
             modifiers={[pickerStyle('menu'), fixedSize(), a11yLabel(`${label} 연도`)]}
           >
             {yearsBetween(min, max).map((y) => (
-              <Text key={y} modifiers={[tag(y)]}>{`${y}년`}</Text>
+              <SText key={y} modifiers={[tag(y)]}>{`${y}년`}</SText>
             ))}
           </Picker>
           <Picker
-            selection={shown.getMonth() + 1}
-            onSelectionChange={(m) => pick(shown.getFullYear(), m)}
+            selection={value.getMonth() + 1}
+            onSelectionChange={(m) => pick(value.getFullYear(), m)}
             modifiers={[pickerStyle('menu'), fixedSize(), a11yLabel(`${label} 월`)]}
           >
             {MONTHS.map((m) => (
-              <Text key={m} modifiers={[tag(m)]}>{`${m}월`}</Text>
+              <SText key={m} modifiers={[tag(m)]}>{`${m}월`}</SText>
             ))}
           </Picker>
         </HStack>

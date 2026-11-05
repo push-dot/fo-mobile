@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import type { UserRef } from '@push/api-client'
 import { Text } from '../../../shared/components'
 import { assetUrl } from '../../../shared/utility'
-import { fontFor } from '../../../theme'
+import { fontFor, onAccent } from '../../../theme'
 import { AVATAR_COLORS } from '../constants'
 import { givenName } from '../utils'
 
@@ -23,7 +23,7 @@ const Avatar = ({ user, size }: { user: UserRef; size: number }) => {
         justifyContent: 'center',
       }}
     >
-      <Text style={[{ color: '#FFFFFF', fontSize: Math.round(size * 0.36), lineHeight: size }, fontFor('700')]}>
+      <Text style={[{ color: onAccent, fontSize: Math.round(size * 0.36), lineHeight: size }, fontFor('700')]}>
         {givenName(user.displayName)}
       </Text>
     </View>

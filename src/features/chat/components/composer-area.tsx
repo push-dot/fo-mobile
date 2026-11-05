@@ -1,16 +1,17 @@
 import { router } from 'expo-router'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { brandOf } from '@push/shared'
 import { Alert, Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
 import { MAX_BYTES, SIZE_LIMIT, type PickedFile } from '@/features/my'
-import { useColors, useShadow } from '../../../theme'
-import { Glass, Icon, Text } from '@/shared/components'
+import { onAccent, radius, spacing, useColors, useShadow } from '../../../theme'
+import { Chip, Icon, Text, type IconName } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
 import { useAccessMode, useMentionGroups } from '../api/hooks'
 import { Composer } from './composer'
 import { filterMentions, insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import { Appear } from './motion'
 import Mark from './mark'
-import { CHAT_ATTACHMENT_OPTIONS, QUICK_STARTS, type QuickStart } from '../constants'
+import { CHAT_ATTACHMENT_OPTIONS, MENTION_SHORTCUT_KEYS, QUICK_STARTS, type QuickStart } from '../constants'
 import { useMaterialBridge } from '../stores'
 import { materialsPath, quickStartPath } from '../utils/sheet-routes'
 
@@ -84,7 +85,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, a
   }
 
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: spacing[2] }}>
       {query !== null ? <MentionPopover query={query} onPick={pick} /> : above}
       <Composer
         inputRef={ref}
@@ -107,77 +108,67 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, a
   )
 }
 
+const SHORTCUT_ICON: Record<(typeof MENTION_SHORTCUT_KEYS)[number], IconName> = { link: 'link', gap: 'search', fit: 'chart' }
+
 const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionItem) => void }) => {
   const c = useColors()
   const shadow = useShadow()
+  const ios = Platform.OS === 'ios'
   const groups = filterMentions(useMentionGroups(), query)
-  let first = true
-  const body = (
-    <ScrollView style={{ maxHeight: 320 }} contentContainerStyle={{ padding: 8 }} keyboardShouldPersistTaps="always">
-      {groups.length === 0 ? (
-        <Text v="b2" color="t3" style={{ padding: 10 }}>
-          “{query}”에 맞는 항목이 없어요
-        </Text>
-      ) : (
-        groups.map((g) => (
-          <View key={g.title}>
-            <Text v="c2" weight="700" color="t3" style={{ paddingTop: 8, paddingHorizontal: 10, paddingBottom: 4 }}>
-              {g.title}
-            </Text>
-            {g.items.map((m) => {
-              const hl = first
-              first = false
-              return (
-                <Pressable
-                  key={m.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${g.title}, ${m.title}`}
-                  onPress={() => onPick(m)}
-                  style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 12, backgroundColor: hl || pressed ? c.fill : 'transparent' })}
-                >
-                  {m.kind === 'job' ? <Mark text={m.tag ?? ''} color="#1F3A8A" size={36} /> : null}
-                  {m.kind === 'shortcut' ? (
-                    <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.acSoft, alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon name="spark" size={18} color="acText" />
-                    </View>
-                  ) : null}
-                  <View style={{ flex: 1, minWidth: 0 }}>
-                    <Text v="b2" weight="600" numberOfLines={1}>
-                      {m.hit ? (
-                        <>
-                          {m.title.slice(0, m.hit.start)}
-                          <Text v="b2" weight="700" color="acText">
-                            {m.title.slice(m.hit.start, m.hit.end)}
-                          </Text>
-                          {m.title.slice(m.hit.end)}
-                        </>
-                      ) : (
-                        m.title
-                      )}
-                    </Text>
-                    {m.sub ? (
-                      <Text v="c2" color="t3" numberOfLines={1}>
-                        {m.sub}
-                      </Text>
-                    ) : null}
-                  </View>
-                </Pressable>
-              )
-            })}
-          </View>
-        ))
-      )}
-    </ScrollView>
-  )
+  const firstId = query ? groups.find((g) => g.items[0]?.kind !== 'shortcut')?.items[0]?.id : undefined
   return (
     <Appear duration={250}>
-      {Platform.OS === 'ios' ? (
-        <Glass surface="sheet" style={{ borderRadius: 26, overflow: 'hidden' }}>
-          {body}
-        </Glass>
-      ) : (
-        <View style={[shadow.pop, { borderRadius: 20, backgroundColor: c.card, borderWidth: 1, borderColor: c.line, elevation: 8 }]}>{body}</View>
-      )}
+      <View style={[shadow.pop, { borderRadius: ios ? 26 : radius.lg, backgroundColor: ios ? c.bg : c.card, borderWidth: 1, borderColor: c.line, elevation: 8, overflow: 'hidden' }]}>
+        <ScrollView style={{ maxHeight: 320 }} contentContainerStyle={{ padding: spacing[2] }} keyboardShouldPersistTaps="always">
+          {groups.length === 0 ? (
+            <Text v="b2" color="t3" style={{ padding: 10 }}>
+              “{query}”에 맞는 항목이 없어요
+            </Text>
+          ) : (
+            groups.map((g) => (
+              <View key={g.title}>
+                <Text v="c2" weight="700" color="t3" style={{ paddingTop: spacing[2], paddingHorizontal: 10, paddingBottom: spacing[1] }}>
+                  {g.title}
+                </Text>
+                {g.items[0]?.kind === 'shortcut' ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[1] }}>
+                    {g.items.map((m) => (
+                      <Chip key={m.id} label={m.title} onPress={() => onPick(m)} lead={<Icon name={SHORTCUT_ICON[m.id as keyof typeof SHORTCUT_ICON] ?? 'spark'} size={15} color="t2" />} />
+                    ))}
+                  </ScrollView>
+                ) : (
+                  g.items.map((m) => (
+                    <Pressable
+                      key={m.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${g.title}, ${m.title}`}
+                      onPress={() => onPick(m)}
+                      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 10, borderRadius: radius.sm, backgroundColor: m.id === firstId || pressed ? c.fill : 'transparent' })}
+                    >
+                      {m.kind === 'job' ? <Mark text={m.tag ?? ''} color={brandOf(m.tag ?? '')} size={36} /> : null}
+                      {m.kind === 'link' ? (
+                        <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: brandOf(m.title), alignItems: 'center', justifyContent: 'center' }}>
+                          <Icon name="brief" size={18} color={onAccent} />
+                        </View>
+                      ) : null}
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <Text v="b2" weight="600" numberOfLines={1}>
+                          {m.title}
+                        </Text>
+                        {m.sub ? (
+                          <Text v="c2" color="t3" numberOfLines={1}>
+                            {m.sub}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </Pressable>
+                  ))
+                )}
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </View>
     </Appear>
   )
 }

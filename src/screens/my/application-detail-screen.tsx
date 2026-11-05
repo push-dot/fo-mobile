@@ -1,6 +1,5 @@
 import { router } from 'expo-router'
-import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Pressable, ScrollView, View } from 'react-native'
 import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
@@ -8,6 +7,9 @@ import {
   FitRing,
   fitTen,
   INTERVIEW_PREP,
+  ListSkeleton,
+  Empty,
+  emptyCta,
   Logo,
   PostingSection,
   StageTracker,
@@ -15,20 +17,19 @@ import {
   useMyApplications,
   usePostingDetail,
 } from '@/features/my'
-import { Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { openBrowser, shareMessage } from '@/shared/infrastructure'
-import { useColors } from '@/theme'
+import { radius, spacing, useColors } from '@/theme'
+
 
 const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const { data, isLoading } = useMyApplications()
   const item = data?.data.find((a) => a.id === id)
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
   const doc = docs.data?.data.find((d) => d.applicationId === id)
-  const android = Platform.OS === 'android'
   const career = p ? careerLabel(p) : null
   const score = fitTen(item?.fitScore)
 
@@ -47,13 +48,15 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           ) : null
         }
       />
-      {isLoading || !item ? (
-        <ActivityIndicator style={{ marginTop: 40 }} />
+      {isLoading ? (
+        <ListSkeleton />
+      ) : !item ? (
+        <Empty text={emptyCta('applications').title} />
       ) : (
-        <ScrollView contentContainerStyle={{ paddingTop: 4, paddingHorizontal: 20, paddingBottom: 32, gap: 24 }}>
+        <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120, gap: spacing[6] }}>
           <View style={{ gap: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <Logo name={item.company} size={40} />
+              <Logo name={item.company} size={44} />
               <Text v="b2" weight="700">
                 {item.company}
               </Text>
@@ -71,8 +74,8 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           </View>
           <StageTracker a={item} />
           {score ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 20, borderRadius: 20, backgroundColor: c.bg2 }}>
-              <FitRing score={score} size={56} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: spacing[5], borderRadius: radius.card, backgroundColor: c.bg2 }}>
+              <FitRing score={score} size={64} />
               <Text v="c1" weight="700" color="t3">
                 내 적합도
               </Text>
@@ -93,7 +96,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 }}
             >
               <Icon name="ext" size={16} color="t3" />
-              <Text v="c1" weight="600" color="t2">
+              <Text v="c1" weight="600" color="t3">
                 원문 보기 · {item.company} 채용 사이트
               </Text>
               <Icon name="chev" size={14} color="t4" />
@@ -101,21 +104,12 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           ) : null}
         </ScrollView>
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          gap: 8,
-          paddingTop: 14,
-          paddingHorizontal: 16,
-          paddingBottom: insets.bottom + (android ? 10 : 6),
-          backgroundColor: c.bg,
-          borderTopWidth: android ? 1 : 0,
-          borderTopColor: c.line,
-        }}
-      >
+      {item ? (
+        <CtaBar>
         <Button label="지원한 서류" variant="secondary" disabled={!doc} onPress={() => doc && router.push(`/docs/push/${doc.id}`)} />
         <Button label={INTERVIEW_PREP} onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')} style={{ flex: 1 }} />
-      </View>
+        </CtaBar>
+      ) : null}
     </View>
   )
 }

@@ -1,10 +1,20 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import type { Offer } from '@push/api-client'
 import { Avatar, counterpart, Empty, OFFER_EMPTY_ACTION, offerBadge, personLine, Row, timeAgo, useOffers } from '@/features/my'
-import { Badge, SegmentedControl, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { Badge, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
+import type { SkeletonRowsShape } from '@/shared/components'
+import { radius, spacing, useColors } from '@/theme'
+
+const OFFER_SKELETON: SkeletonRowsShape = {
+  count: 5,
+  lead: { size: 48, radius: radius.pill },
+  lines: [
+    { width: '40%', height: 16 },
+    { width: '90%', height: 14 },
+  ],
+}
 
 type Box = 'received' | 'sent'
 
@@ -20,8 +30,8 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
       onPress={() => router.push(`/offers/${o.id}${o.status === 'ACCEPTED' ? '/messages' : ''}?box=${box}`)}
     >
       <Avatar name={who.displayName} url={who.avatarUrl} />
-      <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
           <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
             {who.displayName}
           </Text>
@@ -41,7 +51,7 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
       </View>
       {unread ? (
         <View
-          style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c.ac, marginTop: 8 }}
+          style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac, marginTop: spacing[2] }}
         />
       ) : null}
     </Row>
@@ -59,7 +69,7 @@ const OffersScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={box === 'received' ? '받은 제안' : '제안함'} onBack={() => router.back()} />
-      <View style={{ paddingTop: 4, paddingBottom: 6, paddingHorizontal: 20 }}>
+      <View style={{ paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[5] }}>
         <SegmentedControl
           items={[
             { key: 'received', label: `받은 제안 ${n(received)}` },
@@ -69,8 +79,8 @@ const OffersScreen = () => {
           onChange={setBox}
         />
       </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {q.isLoading ? <ActivityIndicator style={{ marginTop: 40 }} /> : null}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
+        {q.isLoading ? <SkeletonRows {...OFFER_SKELETON} /> : null}
         {q.data?.data.length === 0 ? (
           <Empty
             text={box === 'received' ? '아직 받은 제안이 없어요.' : '아직 보낸 제안이 없어요.'}
@@ -81,11 +91,13 @@ const OffersScreen = () => {
         {q.data?.data.map((o) => (
           <OfferRow key={o.id} o={o} box={box} />
         ))}
-        <Text v="c2" color="t3" style={{ paddingTop: 18, paddingHorizontal: 24, lineHeight: 17 }}>
-          {box === 'received'
-            ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
-            : '상대가 읽으면 ‘읽음’으로 바뀌고, 수락하면 대화를 시작할 수 있어요.'}
-        </Text>
+        {q.data?.data.length ? (
+          <Text v="c2" color="t3" style={{ paddingTop: spacing[5], paddingHorizontal: spacing[6] }}>
+            {box === 'received'
+              ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
+              : '상대가 읽으면 ‘읽음’으로 바뀌고, 수락하면 대화를 시작할 수 있어요.'}
+          </Text>
+        ) : null}
       </ScrollView>
     </View>
   )

@@ -3,10 +3,15 @@ name: 마이 → 설정 → 로그아웃
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- tapOn: "마이"
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "마이"
+      READY: "김서준"
 - extendedWaitUntil:
     visible: "김서준"
     timeout: 10000
+- takeScreenshot: 05_my_settings_logout-01
 - tapOn: "설정"
 - scrollUntilVisible:
     element: "로그아웃"
@@ -21,6 +26,7 @@ name: 마이 → 설정 → 로그아웃
 - extendedWaitUntil:
     visible: "취소"
     timeout: 5000
+- takeScreenshot: 05_my_settings_logout-02
 # iOS keeps the settings row under the alert in the hierarchy, so pick the alert's button.
 - tapOn:
     text: "로그아웃"
@@ -28,3 +34,4 @@ name: 마이 → 설정 → 로그아웃
 - extendedWaitUntil:
     visible: "Google로 시작하기"
     timeout: 10000
+- takeScreenshot: 05_my_settings_logout-03

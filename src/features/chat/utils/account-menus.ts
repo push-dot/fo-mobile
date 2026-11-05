@@ -1,4 +1,5 @@
 import type { AccessMode, Tone } from '@push/api-client'
+import type { Account } from '../api/schemas'
 import { TONES } from '@/features/my'
 import type { MenuAction } from '@/shared/components'
 import { ACCESS_MODES } from '../constants'
@@ -10,3 +11,21 @@ export const toneMenu = (current: Tone | undefined, onPick: (tone: Tone) => void
 /** 계정 › 실행 방식: inline menu, the current mode checked. */
 export const accessMenu = (current: AccessMode, onPick: (mode: AccessMode) => void): MenuAction[] =>
   ACCESS_MODES.map((m) => ({ key: m.key, label: m.label, selected: m.key === current, onPress: () => onPick(m.key) }))
+
+export const EFFORTS = [
+  { key: 'LOW', label: '가볍게' },
+  { key: 'MEDIUM', label: '보통 강도로' },
+  { key: 'HIGH', label: '꼼꼼하게' },
+  { key: 'MAX', label: '최대 강도로' },
+] as const
+export type Effort = (typeof EFFORTS)[number]['key']
+export const RETENTION_DAYS = [7, 30, 90, 365] as const
+
+export const effortMenu = (current: Effort | undefined, onPick: (effort: Effort) => void): MenuAction[] =>
+  EFFORTS.map((e) => ({ key: e.key, label: e.label, selected: e.key === (current ?? 'MEDIUM'), onPress: () => onPick(e.key) }))
+
+export const retentionMenu = (current: number | undefined, onPick: (days: number) => void): MenuAction[] =>
+  RETENTION_DAYS.map((d) => ({ key: String(d), label: `${d}일`, selected: d === (current ?? 30), onPress: () => onPick(d) }))
+
+export const usagePercent = (credits: Account['credits'] | undefined) =>
+  credits && credits.total > 0 ? Math.min(100, Math.max(0, Math.round((credits.used / credits.total) * 100))) : null

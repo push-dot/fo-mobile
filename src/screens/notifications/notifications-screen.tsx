@@ -15,7 +15,7 @@ import {
   useReadNotifications,
 } from '@/features/notifications'
 import { Button, Skeleton, SkeletonRows, StatusNote, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const NotificationsScreen = () => {
   const c = useColors()
@@ -46,8 +46,9 @@ const NotificationsScreen = () => {
         keyExtractor={(n) => n.id}
         contentInsetAdjustmentBehavior="automatic"
         stickySectionHeadersEnabled={false}
+        contentContainerStyle={{ flexGrow: 1 }}
         renderSectionHeader={({ section }) => (
-          <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: 24, paddingTop: section.title === sections[0]?.title ? 6 : 22, paddingBottom: 8 }}>
+          <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: spacing[6], paddingTop: section.title === sections[0]?.title ? spacing[2] : 22, paddingBottom: spacing[2] }}>
             {section.title}
           </Text>
         )}
@@ -55,7 +56,7 @@ const NotificationsScreen = () => {
         ListEmptyComponent={
           q.isPending ? (
             <View>
-              <View style={{ paddingHorizontal: 24, paddingVertical: 8 }}>
+              <View style={{ paddingHorizontal: spacing[6], paddingVertical: spacing[2] }}>
                 <Skeleton width={40} height={12} />
               </View>
               <SkeletonRows {...NOTIFICATION_SKELETON} />
@@ -65,10 +66,11 @@ const NotificationsScreen = () => {
               알림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
             </Text>
           ) : (
-            <View style={{ alignItems: 'center', marginTop: 40 }}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingVertical: 60, paddingHorizontal: 32 }}>
               <EmptyBell />
               <StatusNote
                 lines={[NOTIFICATION_EMPTY]}
+                style={{ gap: spacing[3] }}
                 action={settingsVisible ? { label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings } : undefined}
               />
             </View>

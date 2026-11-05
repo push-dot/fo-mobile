@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import { Button, Sheet, Text, useConfirmStore } from '@/shared/components'
+import { spacing } from '@/theme'
 
 const ConfirmSheetScreen = () => {
   const request = useConfirmStore((s) => s.request)
@@ -15,16 +16,16 @@ const ConfirmSheetScreen = () => {
   if (!request) return null
 
   return (
-    <Sheet>
-      <View accessibilityRole="alert" style={{ gap: 6 }}>
-        <Text v="h3" accessibilityRole="header">
+    <Sheet gap={spacing[2]}>
+      <View accessibilityRole="alert" style={{ gap: spacing[2] }}>
+        <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {request.title}
         </Text>
         <Text v="b2" color="t2">
           {request.body}
         </Text>
       </View>
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 2 }}>
+      <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
         <Button label={request.cancel ?? '취소'} variant="secondary" onPress={() => router.back()} style={{ flex: 1 }} />
         <Button
           label={request.confirm}

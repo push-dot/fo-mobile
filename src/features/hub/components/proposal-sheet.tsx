@@ -1,7 +1,7 @@
 import { brandOf } from '@push/shared'
-import { View } from 'react-native'
-import { Chip, Text, TextField } from '../../../shared/components'
-import { useColors } from '../../../theme'
+import { Platform, ScrollView, View } from 'react-native'
+import { Chip, GlassButton, Text, TextField } from '../../../shared/components'
+import { spacing, useColors } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
 
@@ -18,13 +18,22 @@ type Props = {
   onMessage: (message: string) => void
   onPosting: (id: string | undefined) => void
   onError: (message: string | null) => void
+  onClose: () => void
 }
 
-const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError }: Props) => {
+const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
+
+const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError, onClose }: Props) => {
   const c = useColors()
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+        {Platform.OS === 'ios' ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null}
+        <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
+          제안하기
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
         <Avatar userId={userId} name={name} size={44} />
         <View style={{ flex: 1 }}>
           <Text v="b1" weight="700">
@@ -48,18 +57,19 @@ const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, e
         placeholder="어떤 이야기를 나누고 싶은지 적어 주세요"
       />
       {postings.length ? (
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: spacing[3] }}>
           <Text v="b2" weight="700">
             함께 보낼 공고 (선택)
           </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: -bleed }} contentContainerStyle={{ gap: spacing[2], paddingRight: bleed }}>
             {postings.map((p) => (
               <Chip
                 key={p.id}
+                check
                 label={`${p.company} · ${p.title}`}
                 lead={
                   <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
-                    <Text weight="700" style={{ color: c.card, fontSize: 11, lineHeight: 14 }}>
+                    <Text weight="700" style={{ color: c.card }}>
                       {[...p.company][0]}
                     </Text>
                   </View>
@@ -68,7 +78,7 @@ const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, e
                 onPress={() => onPosting(postingId === p.id ? undefined : p.id)}
               />
             ))}
-          </View>
+          </ScrollView>
         </View>
       ) : null}
       <Text v="c1" color="t3">

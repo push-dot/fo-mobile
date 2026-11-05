@@ -1,0 +1,12 @@
+appId: app.push.mobile
+tags:
+  - subflow
+---
+# Android sometimes drops the first tap on a native tab right after login; tap again until the tab's screen shows.
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: ${TAB}
+      - extendedWaitUntil:
+          visible: ${READY}
+          timeout: 6000

@@ -4,6 +4,7 @@ import type { Posting } from '@push/api-client'
 import { brandOf, careerLabel } from '@push/shared'
 import { useToggleBookmark } from '@/features/jobs'
 import { Icon, Text } from '../../../shared/components'
+import { onAccent, radius, spacing } from '../../../theme'
 import Highlight from './highlight'
 
 const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => void }) => {
@@ -16,10 +17,10 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
         onOpen()
         router.push(`/postings/${p.id}`)
       }}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 16, paddingHorizontal: 20, paddingVertical: 12 }}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], paddingHorizontal: spacing[5], paddingVertical: spacing[3] }}
     >
-      <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
-        <Text v="h3" weight="800" style={{ color: '#FFFFFF', fontSize: 21, lineHeight: 26 }}>
+      <View style={{ width: 56, height: 56, borderRadius: radius.md, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
+        <Text v="h3" weight="800" style={{ color: onAccent, fontSize: 21, lineHeight: 26 }}>
           {[...p.company][0]}
         </Text>
       </View>
@@ -39,7 +40,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
         accessibilityLabel={p.bookmarked ? '북마크 해제' : '북마크'}
         accessibilityState={{ selected: p.bookmarked }}
         onPress={() => toggleBookmark(p)}
-        style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -10 }}
+        hitSlop={14}
       >
         <Icon name="bookmark" size={20} color={p.bookmarked ? 'acText' : 't4'} filled={p.bookmarked} />
       </Pressable>

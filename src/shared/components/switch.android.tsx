@@ -23,8 +23,8 @@ const Switch = ({
           checkedTrackColor: c.ac,
           checkedThumbColor: onAccent,
           uncheckedTrackColor: c.fill2,
-          uncheckedThumbColor: c.t3,
-          uncheckedBorderColor: c.t3,
+          uncheckedThumbColor: onAccent,
+          uncheckedBorderColor: c.fill2,
         }}
         modifiers={[semantics({ contentDescription: label })]}
       />

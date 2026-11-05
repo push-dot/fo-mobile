@@ -26,7 +26,6 @@ const ProposalSheetScreen = () => {
     // The sheet is taller than the space above the keyboard, so it scrolls to reach 제안 보내기 and a drag hides the keyboard.
     <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
       <Sheet
-        title="제안하기"
         action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}
       >
         <ProposalSheet
@@ -40,6 +39,7 @@ const ProposalSheetScreen = () => {
           onMessage={setMessage}
           onPosting={setPostingId}
           onError={setError}
+          onClose={() => router.back()}
         />
       </Sheet>
     </ScrollView>

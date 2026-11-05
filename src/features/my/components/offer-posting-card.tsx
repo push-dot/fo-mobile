@@ -1,13 +1,15 @@
 import { router } from 'expo-router'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import type { OfferPosting } from '@push/api-client'
 import { careerLabel } from '@push/shared'
-import { Glass, Icon, Text } from '@/shared/components'
+import { Icon, Text } from '@/shared/components'
+import { radius, spacing, useColors } from '../../../theme'
 import { usePostingDetail } from '../api/hooks'
 import { dday } from '../utils'
 import Logo from './logo'
 
-const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
+const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact?: boolean }) => {
+  const c = useColors()
   const { data: full } = usePostingDetail(posting.id)
   const career = full ? careerLabel(full) : null
   const careerText = !career || career === '신입' ? career : `경력 ${career}`
@@ -17,14 +19,17 @@ const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
       accessibilityLabel={`함께 보낸 공고 ${posting.company} ${posting.title}`}
       onPress={() => router.push(`/postings/${posting.id}`)}
     >
-      <Glass
+      <View
         style={{
-          borderRadius: 16,
-          paddingVertical: 14,
-          paddingHorizontal: 16,
+          borderRadius: radius.card,
+          paddingVertical: compact ? spacing[3] : spacing[4],
+          paddingHorizontal: spacing[4],
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 12,
+          gap: spacing[3],
+          backgroundColor: Platform.OS === 'ios' ? c.bg2 : c.bg,
+          borderWidth: Platform.OS === 'ios' ? 0 : 1,
+          borderColor: c.line,
         }}
       >
         <Logo name={posting.company} size={44} />
@@ -39,8 +44,8 @@ const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
             {[full?.location, careerText, full?.deadline ? dday(full.deadline) : null].filter(Boolean).join(' · ')}
           </Text>
         </View>
-        <Icon name="chev" size={18} color="t4" />
-      </Glass>
+        <Icon name="chev" size={18} color="t3" />
+      </View>
     </Pressable>
   )
 }

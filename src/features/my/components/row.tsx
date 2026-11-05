@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
 import { Pressable } from 'react-native'
-import { radius, useColors } from '../../../theme'
+import { radius, spacing, useColors } from '../../../theme'
 
 const Row = ({
   children,
@@ -25,7 +25,7 @@ const Row = ({
         alignItems: top ? 'flex-start' : 'center',
         gap: 14,
         paddingVertical: 14,
-        paddingHorizontal: 20,
+        paddingHorizontal: spacing[5],
         backgroundColor: pressed ? c.fill : 'transparent',
         borderRadius: radius.xs,
       })}

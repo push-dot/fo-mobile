@@ -12,6 +12,7 @@ import type {
   UserRef,
 } from '@push/api-client'
 import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
+import { removeChatDoc } from './chat'
 import { mock, page } from './server'
 
 const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
@@ -100,6 +101,7 @@ mock('GET', 'sources/:id', ({ params }) => {
 })
 mock('DELETE', 'sources/:id', ({ params }) => {
   sources = sources.filter((x) => x.id !== params.id)
+  removeChatDoc(params.id!)
 })
 mock('POST', 'sources', async ({ body }) => {
   // RN FormData keeps the appended file object (uri, name, type, size) in getParts().

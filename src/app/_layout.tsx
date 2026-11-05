@@ -1,11 +1,12 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Appearance } from 'react-native'
 import { queryClient } from '@/providers'
 import { ToastHost } from '@/shared/components'
 import { useSession } from '@/shared/infrastructure'
-import { useThemePreference } from '@/theme'
+import { useThemeMode, useThemePreference } from '@/theme'
 import { useDesignFonts } from '@/theme/fonts-loader'
 import { DesignThemeProvider } from '@/theme/provider'
 
@@ -15,6 +16,7 @@ const RootLayout = () => {
   const themeReady = useThemePreference((s) => s.ready)
   const loadTheme = useThemePreference((s) => s.load)
   const fontsReady = useDesignFonts()
+  const mode = useThemeMode()
 
   useEffect(() => {
     void load()
@@ -45,6 +47,7 @@ const RootLayout = () => {
           </Stack.Protected>
         </Stack>
         <ToastHost />
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       </QueryClientProvider>
     </DesignThemeProvider>
   )

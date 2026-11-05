@@ -15,7 +15,7 @@ import {
 } from '@/features/auth'
 import { signIn, signInWithApple, type SignInOutcome } from '@/shared/infrastructure'
 import { Button, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
@@ -66,15 +66,15 @@ const PhoneRegisteredScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 24, gap: 10 }}>
+      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3], gap: 10 }}>
         <Text accessibilityRole="header" v="h1">
           {REGISTERED_TITLE}
         </Text>
-        <Text v="b2" color="t3">
+        <Text v="b2" color="t2">
           {registeredBody(providers)}
         </Text>
         {failure ? (
-          <View accessibilityRole="alert" style={{ gap: 4 }}>
+          <View accessibilityRole="alert" style={{ gap: spacing[1] }}>
             <Text v="c1" weight="700" color="red">
               {failure.title}
             </Text>
@@ -84,7 +84,7 @@ const PhoneRegisteredScreen = () => {
           </View>
         ) : null}
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16, gap: 10 }}>
+      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16, gap: spacing[2] }}>
         <Button label={list} disabled={busy || target == null} onPress={press} />
         <Button
           label={OTHER_NUMBER}

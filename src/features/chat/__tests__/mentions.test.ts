@@ -25,9 +25,6 @@ describe('mentions', () => {
     const out = filterMentions(groups, '모아')
     expect(out.map((g) => g.title)).toEqual(['북마크 공고', '마이 › 서류'])
     expect(out[1]!.items.map((i) => i.id)).toEqual(['d1'])
-    // Highlight range is on the title only; the job matched through its sub.
-    expect(out[0]!.items[0]!.hit).toBeNull()
-    expect(out[1]!.items[0]!.hit).toMatchObject({ start: 6, end: 8 })
   })
 
   it('matches choseong while typing', () => {

@@ -8,3 +8,4 @@ name: 첫 실행 → 로그인 화면
 - extendedWaitUntil:
     visible: "Google로 시작하기"
     timeout: 60000
+- takeScreenshot: 00_fresh_launch_sign_in-01

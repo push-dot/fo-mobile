@@ -2,6 +2,7 @@ import { Image } from 'expo-image'
 import { View } from 'react-native'
 import { Text } from '../../../shared/components'
 import { assetUrl } from '../../../shared/utility'
+import { onAccent } from '../../../theme'
 import { FILLS } from '../constants'
 import { givenName } from '../utils'
 
@@ -12,7 +13,7 @@ const Avatar = ({ userId, name, url, size }: { userId: string; name: string; url
   if (url) return <Image source={assetUrl(url)} style={box} accessibilityIgnoresInvertColors />
   return (
     <View style={[box, { backgroundColor: fillFor(userId), alignItems: 'center', justifyContent: 'center' }]}>
-      <Text weight="700" style={{ color: '#FFFFFF', fontSize: size / 3, lineHeight: size / 2.2 }}>
+      <Text weight="700" style={{ color: onAccent, fontSize: size / 3, lineHeight: size / 2.2 }}>
         {givenName(name)}
       </Text>
     </View>

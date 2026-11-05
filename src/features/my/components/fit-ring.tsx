@@ -23,7 +23,7 @@ const FitRing = ({ score, size = 44 }: { score: string; size?: number }) => {
           fill="none"
         />
       </Svg>
-      <Text weight="800" style={{ fontSize: Math.round(size * 0.34), color: c.t1 }}>
+      <Text v={size >= 56 ? 'h3' : 'b2'} weight="800">
         {score}
       </Text>
     </View>

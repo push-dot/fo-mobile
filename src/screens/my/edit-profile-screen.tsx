@@ -30,8 +30,6 @@ import {
   parseYm,
   dateToYm,
   ymToDate,
-  Toast,
-  useToast,
   SheetHeader,
   SKILL_CATALOG,
   tenureLabel,
@@ -40,12 +38,38 @@ import {
   useSaveProfile,
   type ProfileSection,
 } from '@/features/my'
-import { askConfirm, BottomSheet, Button, DatePicker, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
+import {
+  askConfirm,
+  Button,
+  Chip,
+  DatePicker,
+  Icon,
+  Menu,
+  SegmentedControl,
+  showToast,
+  SkeletonRows,
+  Switch,
+  Text,
+  TextField,
+  type MenuAction,
+} from '@/shared/components'
 import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
-import { fontFor, radius, useColors } from '@/theme'
+import { fontFor, radius, spacing, type, useColors } from '@/theme'
 
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
+
+
+const FORM = { paddingHorizontal: spacing[5], paddingBottom: spacing[6], gap: spacing[4] } as const
+
+const LOADING_ROWS = {
+  count: 4,
+  lead: { size: 48, radius: radius.pill },
+  lines: [
+    { width: '60%', height: 16 },
+    { width: '40%', height: 12 },
+  ],
+} as const
 
 const TITLES: Record<ProfileSection, string> = {
   basic: '기본 정보',
@@ -61,6 +85,7 @@ const Input = ({
   placeholder,
   multiline,
   keyboardType,
+  invalid,
 }: {
   value: string
   onChangeText: (t: string) => void
@@ -68,6 +93,7 @@ const Input = ({
   placeholder?: string
   multiline?: boolean
   keyboardType?: 'numbers-and-punctuation'
+  invalid?: boolean
 }) => {
   const c = useColors()
   return (
@@ -84,9 +110,11 @@ const Input = ({
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
           backgroundColor: c.bg,
-          paddingHorizontal: 16,
-          paddingTop: multiline ? 12 : 0,
-          fontSize: 16,
+          borderWidth: 1.5,
+          borderColor: invalid ? c.red : 'transparent',
+          paddingHorizontal: spacing[4],
+          paddingTop: multiline ? spacing[3] : 0,
+          fontSize: type.b1.fontSize,
           color: c.t1,
           textAlignVertical: multiline ? 'top' : 'center',
         },
@@ -99,82 +127,33 @@ const Input = ({
 const SelectField = ({
   label,
   value,
-  onPress,
+  actions,
 }: {
   label: string
   value: string
-  onPress: () => void
+  actions: MenuAction[]
 }) => {
   const c = useColors()
   return (
-    <View style={{ flex: 1, gap: 8 }}>
+    <View style={{ flex: 1, gap: spacing[2] }}>
       <FieldLabel>{label}</FieldLabel>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${label} ${value}`}
-        onPress={onPress}
-        style={{
-          minHeight: 56,
-          borderRadius: radius.md,
-          backgroundColor: c.fill,
-          paddingHorizontal: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Text v="b1">{value}</Text>
-        <Icon name="down" size={18} color="t3" />
-      </Pressable>
-    </View>
-  )
-}
-
-const PickSheet = <K extends string | number,>({
-  title,
-  items,
-  value,
-  onPick,
-  onClose,
-  visible,
-}: {
-  title: string
-  items: { key: K; label: string }[]
-  value: K | null
-  onPick: (k: K) => void
-  onClose: () => void
-  visible: boolean
-}) => {
-  const c = useColors()
-  return (
-    <BottomSheet visible={visible} onClose={onClose} title={title}>
-      {items.map((it) => (
-        <Pressable
-          key={it.key}
-          accessibilityRole="button"
-          accessibilityState={{ selected: it.key === value }}
-          onPress={() => (onPick(it.key), onClose())}
+      <Menu actions={actions} accessibilityLabel={`${label} ${value}`} stretch>
+        <View
           style={{
-            minHeight: 48,
+            minHeight: 56,
+            borderRadius: radius.md,
+            backgroundColor: c.fill,
+            paddingHorizontal: spacing[4],
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 14,
-            borderRadius: 12,
-            backgroundColor: it.key === value ? c.acSoft : 'transparent',
+            justifyContent: 'space-between',
           }}
         >
-          <Text
-            v="b1"
-            weight={it.key === value ? '700' : '400'}
-            color={it.key === value ? 'acText' : 't1'}
-            style={{ flex: 1 }}
-          >
-            {it.label}
-          </Text>
-          {it.key === value ? <Icon name="check" size={18} color="acText" /> : null}
-        </Pressable>
-      ))}
-    </BottomSheet>
+          <Text v="b1">{value}</Text>
+          <Icon name="down" size={18} color="t3" />
+        </View>
+      </Menu>
+    </View>
   )
 }
 
@@ -193,7 +172,6 @@ const EditBasic = ({ p }: { p: Profile }) => {
   const [status, setStatus] = useState<CareerStatus | null>(p.careerStatus)
   const [offers, setOffers] = useState(p.openToOffers)
   const [photo, setPhoto] = useState<{ uri: string; key?: string } | null>(null)
-  const [sheet, setSheet] = useState<'job' | 'years' | null>(null)
 
   const pickPhoto = async () => {
     const res = await pickImage(AVATAR_IMAGE_OPTIONS)
@@ -229,10 +207,10 @@ const EditBasic = ({ p }: { p: Profile }) => {
         }
       />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 14 }}
+        contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="프로필 사진 바꾸기"
@@ -246,7 +224,7 @@ const EditBasic = ({ p }: { p: Profile }) => {
                 bottom: -2,
                 width: 24,
                 height: 24,
-                borderRadius: 12,
+                borderRadius: radius.sm,
                 backgroundColor: c.t1,
                 borderWidth: 2,
                 borderColor: c.bg,
@@ -265,11 +243,11 @@ const EditBasic = ({ p }: { p: Profile }) => {
             {'사진은 허브 프로필과\n이력서 템플릿에 함께 쓰여요.'}
           </Text>
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: spacing[2] }}>
           <FieldLabel>이름</FieldLabel>
           <TextField accessibilityLabel="이름" value={name} onChangeText={setName} maxLength={20} />
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: spacing[2] }}>
           <FieldLabel>헤드라인</FieldLabel>
           <View>
             <TextField
@@ -279,24 +257,36 @@ const EditBasic = ({ p }: { p: Profile }) => {
               maxLength={40}
               style={{ paddingRight: 44 }}
             />
-            <Text v="c2" color="t3" style={{ position: 'absolute', right: 16, top: 20 }}>
-              {headline.length}/40
-            </Text>
+            <View pointerEvents="none" style={{ position: 'absolute', right: spacing[4], top: 0, bottom: 0, justifyContent: 'center' }}>
+              <Text v="c2" color="t3">
+                {headline.length}/40
+              </Text>
+            </View>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: 'row', gap: spacing[3] }}>
           <SelectField
             label="직군"
             value={JOB_CATEGORIES.find((j) => j.key === job)?.label ?? ''}
-            onPress={() => setSheet('job')}
+            actions={JOB_CATEGORIES.map((j) => ({
+              key: j.key,
+              label: j.label,
+              selected: j.key === job,
+              onPress: () => setJob(j.key),
+            }))}
           />
           <SelectField
             label="연차"
             value={years == null ? '' : YEARS[Math.min(years, 20)]!.label}
-            onPress={() => setSheet('years')}
+            actions={YEARS.map((y) => ({
+              key: String(y.key),
+              label: y.label,
+              selected: y.key === Math.min(years ?? -1, 20),
+              onPress: () => setYears(y.key),
+            }))}
           />
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: spacing[2] }}>
           <FieldLabel>커리어 상태</FieldLabel>
           <SegmentedControl items={CAREER_STATUSES} value={status} onChange={setStatus} />
         </View>
@@ -305,11 +295,11 @@ const EditBasic = ({ p }: { p: Profile }) => {
             minHeight: 56,
             borderRadius: radius.md,
             backgroundColor: c.fill,
-            paddingHorizontal: 16,
-            paddingVertical: 10,
+            paddingHorizontal: spacing[4],
+            paddingVertical: spacing[3],
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
+            gap: spacing[3],
           }}
         >
           <View style={{ flex: 1 }}>
@@ -321,22 +311,6 @@ const EditBasic = ({ p }: { p: Profile }) => {
           <Switch label="제안 받기" value={offers} onValueChange={setOffers} />
         </View>
       </ScrollView>
-      <PickSheet
-        title="어떤 직군인가요?"
-        items={JOB_CATEGORIES}
-        value={job}
-        onPick={setJob}
-        visible={sheet === 'job'}
-        onClose={() => setSheet(null)}
-      />
-      <PickSheet
-        title="몇 년차인가요?"
-        items={YEARS}
-        value={Math.min(years ?? 0, 20)}
-        onPick={setYears}
-        visible={sheet === 'years'}
-        onClose={() => setSheet(null)}
-      />
     </>
   )
 }
@@ -352,7 +326,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
         onSave={() => save.mutate({ intro: intro.trim() })}
       />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 14 }}
+        contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
         <TextField
@@ -369,6 +343,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
           label="에이전트로 다듬기"
           icon="spark"
           variant="secondary"
+          size="md"
           onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
         />
         <Text v="c1" color="t3">
@@ -411,21 +386,25 @@ const toCareer = (d: CareerDraft): Career | null => {
 const EditCareer = ({ p }: { p: Profile }) => {
   const c = useColors()
   const save = useSaveProfile()
-  const toast = useToast()
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const parsed = items.map(toCareer)
   const removeAt = (i: number, item: CareerDraft) => {
     setItems((xs) => xs.filter((_, j) => j !== i))
     setOpen(null)
-    toast.show(careerDeleteCopy.toast, {
-      action: careerDeleteCopy.undo,
-      onAction: () =>
-        setItems((xs) => {
-          const next = [...xs]
-          next.splice(i, 0, item)
-          return next
-        }),
+    showToast({
+      message: careerDeleteCopy.toast,
+      action: {
+        label: careerDeleteCopy.undo,
+        onPress: () => {
+          setItems((xs) => {
+            const next = [...xs]
+            next.splice(i, 0, item)
+            return next
+          })
+          setOpen(i)
+        },
+      },
     })
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
@@ -450,7 +429,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
         onSave={() => save.mutate({ careers: parsed as Career[] })}
       />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 14 }}
+        contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
         {items.map((it, i) => {
@@ -460,16 +439,16 @@ const EditCareer = ({ p }: { p: Profile }) => {
           const end = it.current ? null : parseYm(it.end)
           const period = start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null
           return (
-            <View key={i} style={{ padding: 16, borderRadius: 18, backgroundColor: c.bg2, gap: 6 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View key={i} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="위로 옮기기"
                   disabled={i === 0}
                   onPress={() => moveUp(i)}
-                  hitSlop={10}
+                  hitSlop={spacing[3]}
                 >
-                  <Icon name="menu" size={18} color="t4" />
+                  <Icon name="drag-handle" size={18} color="t4" />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
@@ -479,7 +458,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     flex: 1,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: 8,
+                    gap: spacing[2],
                     minHeight: 32,
                   }}
                 >
@@ -490,24 +469,26 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Icon name={expanded ? 'up' : 'down'} size={18} color="t3" />
                 </Pressable>
               </View>
-              {!valid && !expanded ? (
-                <Text v="c1" color="red" style={{ paddingLeft: 26 }}>
-                  {CAREER_MISSING}
-                </Text>
-              ) : period ? (
-                <Text v="c1" color="t3" style={{ paddingLeft: 26 }}>
+              {period ? (
+                <Text v="c1" color="t3" style={{ paddingLeft: spacing[6] }}>
                   {period}
                 </Text>
               ) : null}
               {expanded ? (
-                <View style={{ gap: 8, paddingTop: 8 }}>
+                <View style={{ gap: spacing[2], paddingTop: spacing[2] }}>
                   <Input
                     label="회사"
                     value={it.company}
+                    invalid={!valid && !it.company.trim()}
                     onChangeText={(t) => set(i, { company: t })}
                   />
-                  <Input label="직무" value={it.role} onChangeText={(t) => set(i, { role: t })} />
-                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                  <Input
+                    label="직무"
+                    value={it.role}
+                    invalid={!valid && !it.role.trim()}
+                    onChangeText={(t) => set(i, { role: t })}
+                  />
+                  <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
                       <DatePicker
                         label="시작"
@@ -524,8 +505,8 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         minHeight: 48,
                         borderRadius: radius.md,
                         backgroundColor: c.bg,
-                        paddingLeft: 16,
-                        paddingRight: 8,
+                        paddingLeft: spacing[4],
+                        paddingRight: spacing[2],
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -541,7 +522,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   </View>
                   {!it.current ? (
                     <DatePicker
-                      label="종료"
+                      label="종료 (2024.02)"
                       mode="month"
                       surface="bg"
                       value={ymToDate(it.end)}
@@ -575,7 +556,12 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         '/(app)/(stack)/(tabs)/(my)/confirm',
                       )
                     }
-                    style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'center' }}
+                    style={{
+                      height: 40,
+                      paddingHorizontal: spacing[3],
+                      justifyContent: 'center',
+                      alignSelf: 'center',
+                    }}
                   >
                     <Text v="b2" weight="600" color="red">
                       이 경력 삭제하기
@@ -590,6 +576,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
           label="경력 추가"
           icon="plus"
           variant="secondary"
+          size="md"
           onPress={() => {
             setItems((xs) => [
               ...xs,
@@ -599,7 +586,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
           }}
         />
       </ScrollView>
-      <Toast text={toast.text} action={toast.action} onHide={toast.hide} />
     </>
   )
 }
@@ -633,7 +619,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
         onSave={() => save.mutate({ skills })}
       />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 14 }}
+        contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
         <TextField
@@ -650,11 +636,11 @@ const EditSkills = ({ p }: { p: Profile }) => {
         {hits.length ? (
           <View
             style={{
-              marginTop: -6,
-              borderRadius: 16,
+              marginTop: -spacing[2],
+              borderRadius: radius.card,
               backgroundColor: c.bg2,
-              paddingVertical: 4,
-              paddingHorizontal: 6,
+              paddingVertical: spacing[1],
+              paddingHorizontal: spacing[2],
             }}
           >
             {hits.map(({ item, match }) => {
@@ -668,10 +654,10 @@ const EditSkills = ({ p }: { p: Profile }) => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: spacing[2],
                     height: 44,
-                    paddingHorizontal: 14,
-                    borderRadius: 12,
+                    paddingHorizontal: spacing[3],
+                    borderRadius: radius.sm,
                   }}
                 >
                   <Icon name="plus" size={16} color="t3" />
@@ -687,33 +673,19 @@ const EditSkills = ({ p }: { p: Profile }) => {
             })}
           </View>
         ) : null}
-        <Text v="b2" weight="700" style={{ marginTop: 6 }}>
+        <Text v="b2" weight="700" style={{ marginTop: spacing[2] }}>
           내 기술 {skills.length}개
         </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           {skills.map((s, i) => (
-            <Pressable
+            <Chip
               key={s}
-              accessibilityRole="button"
-              accessibilityLabel={`${s} 삭제`}
-              accessibilityHint="길게 누르면 앞으로 옮겨요"
+              label={s}
+              on
+              removable
               onPress={() => setSkills((xs) => xs.filter((x) => x !== s))}
               onLongPress={() => moveEarlier(i)}
-              style={{
-                height: 34,
-                borderRadius: 17,
-                paddingHorizontal: 14,
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 6,
-                backgroundColor: c.t1,
-              }}
-            >
-              <Text v="c1" weight="600" style={{ fontSize: 14, color: c.bg }}>
-                {s}
-              </Text>
-              <Icon name="x" size={12} color={c.bg} />
-            </Pressable>
+            />
           ))}
         </View>
         {/* shortcut: long press moves a chip one place earlier (no drag library installed). */}
@@ -742,7 +714,7 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
         paddingBottom: insets.bottom,
       }}
     >
-      {p ? <Form p={p} /> : <ActivityIndicator style={{ marginTop: 60 }} />}
+      {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
     </KeyboardAvoidingView>
   )
 }

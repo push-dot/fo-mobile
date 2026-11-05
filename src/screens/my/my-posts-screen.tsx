@@ -1,9 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES } from '@push/api-client'
 import { Icon, Text, TopBar } from '@/shared/components'
-import { timeAgo, useMyCommentedPosts, useMyPosts } from '@/features/my'
-import { useColors } from '@/theme'
+import { Empty, emptyCta, ListSkeleton, postedAt, useMyCommentedPosts, useMyPosts } from '@/features/my'
+import { spacing, useColors } from '@/theme'
 
 const MyPostsScreen = () => {
   const c = useColors()
@@ -12,31 +12,39 @@ const MyPostsScreen = () => {
   const mine = useMyPosts()
   const replies = useMyCommentedPosts()
   const query = commented ? replies : mine
+  const posts = query.data?.data ?? []
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={commented ? '댓글 단 글' : '내가 쓴 글'} onBack={() => router.back()} />
       {query.isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} />
+        <ListSkeleton />
       ) : (
-        <ScrollView>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: 14, paddingBottom: 4, paddingHorizontal: 20 }}>
-            {query.data?.page.total ?? query.data?.data.length ?? 0}개
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+            {query.data?.page.total ?? posts.length}개
           </Text>
-          {(query.data?.data ?? []).map((p) => (
+          {posts.length === 0 && !commented ? (
+            <Empty
+              text={emptyCta('posts').title}
+              action={emptyCta('posts').action}
+              onAction={() => router.push(emptyCta('posts').href)}
+            />
+          ) : null}
+          {posts.map((p) => (
             <Pressable
               key={p.id}
               accessibilityRole="button"
               onPress={() => router.push(`/posts/${p.id}`)}
-              style={{ gap: 4, paddingVertical: 14, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: c.line }}
+              style={{ gap: spacing[1], paddingVertical: spacing[3], paddingHorizontal: spacing[5], borderBottomWidth: 1, borderBottomColor: c.line }}
             >
               <Text v="c2" color="t3">
-                {POST_CATEGORIES.find((k) => k.key === p.category)?.label} · {timeAgo(p.createdAt)}
+                {POST_CATEGORIES.find((k) => k.key === p.category)?.label} · {postedAt(p.createdAt)}
               </Text>
               <Text v="b1" weight="700" numberOfLines={1}>
                 {p.title}
               </Text>
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View style={{ flexDirection: 'row', gap: spacing[3] }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
                   <Icon name="chat" size={14} color="t3" />
                   <Text v="c1" color="t3">
                     댓글 {p.commentCount}

@@ -1,5 +1,5 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
-import { palette, radius, type } from '@/theme/tokens'
+import { palette, radius, spacing, type } from '@/theme/tokens'
 
 type El = ReactElement<Record<string, unknown>>
 
@@ -44,7 +44,9 @@ export const stubs = {
     SingleChoiceSegmentedButtonRow: 'SegmentedRow',
     SegmentedButton: compound('SegmentedButton', ['Label']),
     DropdownMenu: compound('DropdownMenu', ['Trigger', 'Items']),
-    DropdownMenuItem: compound('DropdownMenuItem', ['Text']),
+    DropdownMenuItem: compound('DropdownMenuItem', ['Text', 'LeadingIcon']),
+    HorizontalDivider: 'CDivider',
+    RNHostView: 'CRNHostView',
     DatePickerDialog: 'DatePickerDialog',
     TimePickerDialog: 'TimePickerDialog',
   },
@@ -52,7 +54,9 @@ export const stubs = {
   theme: {
     palette,
     radius,
+    spacing,
     type,
+    hitSlopTo: () => ({}),
     useColors: () => palette.light,
     useThemeMode: () => 'light' as const,
     fontFor: () => ({}),

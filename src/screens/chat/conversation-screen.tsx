@@ -1,10 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useNavigation } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useColors } from '@/theme'
-import { BottomSheet, GlassButton, Icon, Mascot, Menu, Text, TextField } from '@/shared/components'
+import { radius, spacing, useColors } from '@/theme'
+import { askConfirm, Glass, GlassButton, Icon, Mascot, Menu, Text, type MenuAction } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { usePersonalPurchase } from '@/features/billing'
 import { useConvertDocument } from '@/features/my'
@@ -12,19 +12,21 @@ import {
   answer,
   ApprovalPanel,
   AWAITING_TEXT,
-  AccountModal,
+  AwaitingRow,
   ComposerArea,
   ConsentSheet,
   OPEN_DRAWER,
   DELETE_CONFIRM,
-  DocsModal,
   headerMenu,
   hydrate,
   Item,
   Queued,
   Appear,
+  accountPath,
+  docsPath,
   materialsPath,
   quickStartPath,
+  renamePath,
   send,
   StatusRow,
   stop,
@@ -34,8 +36,8 @@ import {
   useDeleteConversation,
   usePinConversation,
   useReduceMotion,
-  useRenameConversation,
 } from '@/features/chat'
+
 
 const ConversationScreen = ({ id }: { id: string }) => {
   const c = useColors()
@@ -49,9 +51,6 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const list = useConversationList()
   const conv = list.data?.data.find((x) => x.id === id)
   const navigation = useNavigation()
-  const [planOpen, setPlanOpen] = useState(false)
-  const [docs, setDocs] = useState(false)
-  const [renaming, setRenaming] = useState<string | null>(null)
   const [sayingFor, setSayingFor] = useState<string>()
   const [bottomH, setBottomH] = useState(160)
   const [fresh, setFresh] = useState(false)
@@ -64,7 +63,6 @@ const ConversationScreen = ({ id }: { id: string }) => {
   }, [id])
   const saying = !!chat.approval && sayingFor === chat.approval.id
 
-  const rename = useRenameConversation(id, conv?.revision)
   const remove = useDeleteConversation()
   const pin = usePinConversation()
   const archive = useArchiveConversation()
@@ -78,29 +76,29 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const menu = headerMenu(!!conv?.pinned).map((action) => ({
     key: action.id,
     label: action.label,
+    systemImage: action.systemImage,
     destructive: action.destructive,
     onPress: () => {
-      if (action.id === 'rename') setRenaming(conv?.title ?? '')
-      else if (action.id === 'docs') setDocs(true)
+      if (action.id === 'rename') router.push(renamePath(id))
+      else if (action.id === 'docs') router.push(docsPath())
       else if (action.id === 'share') void shareMessage({ title: conv?.title, message: shareText() })
       else if (action.id === 'pin' && conv) pin.mutate(conv)
       else if (action.id === 'archive' && conv) archive.mutate(conv, { onSuccess: () => router.dismissTo('/chat') })
       else if (action.id === 'delete')
-        Alert.alert(DELETE_CONFIRM.title, DELETE_CONFIRM.body, [
-          { text: DELETE_CONFIRM.cancel, style: 'cancel' },
-          { text: DELETE_CONFIRM.confirm, style: 'destructive', onPress: () => remove.mutate(id, { onSuccess: () => router.dismissTo('/chat') }) },
-        ])
+        askConfirm({ ...DELETE_CONFIRM, danger: true, onConfirm: () => remove.mutate(id, { onSuccess: () => router.dismissTo('/chat') }) })
     },
   }))
 
+  const company = chat.items.findLast((i) => i.type === 'result')?.company
   const placeholder = chat.working ? '작업 중에도 말할 수 있어요' : chat.items.length ? '더 고칠 부분이 있으면 말해 주세요' : '공고 링크를 붙여넣어 보세요'
   const showPanel = chat.approval && !saying
+  const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScrollView
         ref={scroll}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: 20, paddingTop: insets.top + 64, paddingBottom: bottomH + 16 }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: insets.top + 64, paddingBottom: bottomH + spacing[4] }}
         onScroll={(e) => {
           const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent
           atBottom.current = contentOffset.y + layoutMeasurement.height >= contentSize.height - 48
@@ -119,7 +117,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
             onConvert={(card) => convert.mutate(card.documentId)}
             onView={(card) => router.push(`/docs/push/${card.documentId}`)}
             resultPending={convert.isPending}
-            onUsage={(action) => (action === 'plan' ? setPlanOpen(true) : purchase.buyCredits())}
+            resultAwaiting={!!chat.approval && it.id === lastResultId}
+            onUsage={(action) => (action === 'plan' ? router.push(accountPath('plan')) : purchase.buyCredits())}
           />
         ))}
         {chat.queue.map((item, i) => (
@@ -127,15 +126,15 @@ const ConversationScreen = ({ id }: { id: string }) => {
         ))}
       </ScrollView>
 
-      <Header onDrawer={() => navigation.dispatch(OPEN_DRAWER)} onNew={() => router.dismissTo('/chat')} menu={menu} />
+      <Header onDrawer={() => navigation.dispatch(OPEN_DRAWER)} title={company} menu={menu} />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         {fresh ? (
-          <Appear kind="fade" style={{ alignItems: 'center', paddingBottom: 8 }}>
+          <Appear kind="fade" style={{ alignItems: 'center', paddingBottom: spacing[2] }}>
             <Pressable
               accessibilityRole="button"
               onPress={() => (scroll.current?.scrollToEnd({ animated: !reduce }), setFresh(false))}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, height: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: c.t1 }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], height: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: c.t1 }}
             >
               <Icon name="down" size={16} color={c.bg} />
               <Text v="c1" weight="700" style={{ color: c.bg }}>
@@ -155,7 +154,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
               onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialsPath()))}
             />
           ) : (
-            <View style={{ paddingHorizontal: 12, paddingBottom: Math.max(insets.bottom, 6) }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: Math.max(insets.bottom, 6) }}>
               <ComposerArea
                 inputRef={input}
                 placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
@@ -167,9 +166,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
                   chat.working ? (
                     <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} />
                   ) : chat.awaiting ? (
-                    <Text v="c1" weight="600" color="t3" style={{ paddingHorizontal: 8 }}>
-                      {AWAITING_TEXT[chat.awaiting]}
-                    </Text>
+                    <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} />
                   ) : null
                 }
               />
@@ -178,29 +175,30 @@ const ConversationScreen = ({ id }: { id: string }) => {
         </View>
       </KeyboardAvoidingView>
 
-      <BottomSheet
-        visible={renaming !== null}
-        onClose={() => setRenaming(null)}
-        title="대화 이름을 바꿀까요?"
-        action={{
-          label: '이름 바꾸기',
-          disabled: !renaming?.trim() || !conv,
-          onPress: () => (rename.mutate(renaming!.trim()), setRenaming(null)),
-        }}
-      >
-        <TextField value={renaming ?? ''} onChangeText={setRenaming} max={300} autoFocus accessibilityLabel="대화 이름" />
-      </BottomSheet>
-      <DocsModal visible={docs} onClose={() => setDocs(false)} />
-      <AccountModal visible={planOpen} initialPage="plan" onClose={() => setPlanOpen(false)} />
       <ConsentSheet />
     </View>
   )
 }
 
-const Header = ({ onDrawer, onNew, menu }: { onDrawer: () => void; onNew: () => void; menu: { key: string; label: string; destructive?: boolean; onPress: () => void }[] }) => {
+const Header = ({ onDrawer, title, menu }: { onDrawer: () => void; title?: string; menu: MenuAction[] }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
+  const pill = (
+    <View style={{ height: 44, minWidth: 76, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingLeft: title ? spacing[3] : 0, paddingRight: title ? spacing[4] : 0 }}>
+      <Mascot size={36} />
+      {title ? (
+        <Text v="b2" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
+          {title}
+        </Text>
+      ) : null}
+    </View>
+  )
+  const more = (
+    <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="more" size={22} color="t1" />
+    </View>
+  )
   return (
     <View style={{ position: 'absolute', left: 0, right: 0, top: 0 }} pointerEvents="box-none">
       {ios ? (
@@ -208,16 +206,13 @@ const Header = ({ onDrawer, onNew, menu }: { onDrawer: () => void; onNew: () => 
       ) : (
         <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: insets.top + 56, backgroundColor: c.bg }} />
       )}
-      <View style={{ marginTop: insets.top, height: 56, flexDirection: 'row', alignItems: 'center', paddingHorizontal: ios ? 12 : 8, gap: 8 }}>
+      <View style={{ marginTop: insets.top, height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: ios ? spacing[3] : spacing[2] }}>
         <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: onDrawer }]} />
-        <View accessibilityRole="header" accessibilityLabel="Push" style={{ flex: 1, alignItems: 'center' }}>
-          <Mascot size={36} />
+        <View accessibilityRole="header" accessibilityLabel={title ? `Push · ${title}` : 'Push'} style={{ flex: 1, alignItems: 'center', paddingHorizontal: spacing[2] }}>
+          {ios ? <Glass style={{ borderRadius: radius.pill, maxWidth: '100%' }}>{pill}</Glass> : pill}
         </View>
-        <GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: onNew }]} />
         <Menu accessibilityLabel="대화 더 보기" actions={menu}>
-          <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="more" size={22} color="t1" />
-          </View>
+          {ios ? <Glass interactive style={{ borderRadius: radius.pill }}>{more}</Glass> : more}
         </Menu>
       </View>
     </View>

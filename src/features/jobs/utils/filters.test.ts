@@ -4,19 +4,18 @@ import { EMPTY, chipText, toQuery, toggleRegion } from './filters'
 describe('jobs filters', () => {
   it('labels chips in sheet order', () => {
     expect(chipText('category', EMPTY)).toBe('직군')
-    expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('개발')
-    expect(chipText('category', { ...EMPTY, category: ['data', 'dev'] })).toBe('개발 외 1')
-    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6'] })).toBe('경력 4–6년')
-  })
-
-  it('career chip keeps the 경력 prefix', () => {
-    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6', '7-9'] })).toBe('경력 4–6년 외 1')
     expect(chipText('careerYears', EMPTY)).toBe('경력')
   })
 
-  it('category chip shows the value only', () => {
-    expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('개발')
-    expect(chipText('employmentType', { ...EMPTY, employmentType: ['full_time'] })).toBe('정규직')
+  it('prefixes a single pick with the filter title', () => {
+    expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('직군 · 개발')
+    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6'] })).toBe('경력 · 4–6년')
+    expect(chipText('location', { ...EMPTY, location: ['제주'] })).toBe('지역 · 제주')
+  })
+
+  it('shows the first pick and the rest count for several picks', () => {
+    expect(chipText('category', { ...EMPTY, category: ['data', 'dev'] })).toBe('개발 외 1')
+    expect(chipText('skills', { ...EMPTY, skills: ['Kotlin', 'Go', 'Rust'] })).toBe('Kotlin 외 2')
   })
 
   it('sends only set filters', () => {

@@ -1,72 +1,58 @@
-import type { ReactNode } from 'react'
-import { Platform, Pressable, View, type StyleProp, type ViewStyle } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { onAccent, radius, useColors } from '../../theme'
-import Glass from './glass'
+import { onAccent, platformTheme, spacing, type, useColors, type Colors, type TypeName } from '../../theme'
+import GlassPressable from './glass-pressable'
 import Icon from './icon'
 import Text from './text'
+
+type Size = 'lg' | 'md' | 'pill' | 'sm'
+type Variant = 'primary' | 'secondary' | 'danger'
 
 type Props = {
   label: string
   onPress?: () => void
-  variant?: 'primary' | 'secondary' | 'danger'
-  size?: 'lg' | 'sm'
+  variant?: Variant
+  size?: Size
   icon?: IconName
   disabled?: boolean
   style?: StyleProp<ViewStyle>
 }
 
-const Button = ({
-  label,
-  onPress,
-  variant = 'primary',
-  size = 'lg',
-  icon,
-  disabled,
-  style,
-}: Props) => {
+const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHorizontal: number; text: TypeName; fontSize: number }> = {
+  lg: { minHeight: 56, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'button', fontSize: type.button.fontSize },
+  md: { minHeight: 48, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'b2', fontSize: type.b2.fontSize },
+  pill: { minHeight: 44, borderRadius: 22, paddingHorizontal: spacing[5], text: 'c1', fontSize: 14 },
+  sm: { minHeight: 40, borderRadius: platformTheme.buttonSmRadius, paddingHorizontal: 14, text: 'c1', fontSize: 14 },
+}
+
+const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
+  primary: { glass: false, fill: 'ac', pressedFill: 'acPress', ink: 'accent' },
+  secondary: { glass: true, fill: 'fill', ink: 't1' },
+  danger: { glass: false, fill: 'red', ink: 'accent' },
+}
+
+const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabled, style }: Props) => {
   const c = useColors()
-  const sm = size === 'sm'
-  const fg = variant === 'secondary' ? c.t1 : onAccent
-  const box: ViewStyle = {
-    height: sm ? 40 : 56,
-    borderRadius: sm ? radius.sm : radius.md,
-    paddingHorizontal: sm ? 14 : 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  }
-  const content: ReactNode = (
-    <>
-      {icon ? <Icon name={icon} size={16} color={fg} /> : null}
-      <Text v={sm ? 'c1' : 'h3'} weight="700" style={{ color: fg, fontSize: sm ? 14 : 17 }}>
-        {label}
-      </Text>
-    </>
-  )
-  const glassSecondary = variant === 'secondary' && Platform.OS === 'ios'
+  const s = SIZES[size]
+  const v = VARIANTS[variant]
+  const fg = v.ink === 'accent' ? onAccent : c.t1
   return (
-    <Pressable
+    <GlassPressable
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
-        { opacity: disabled ? 0.45 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
-        style,
-      ]}
+      glass={v.glass}
+      fill={v.fill}
+      pressedFill={v.pressedFill}
+      style={[{ minHeight: s.minHeight, borderRadius: s.borderRadius }, style]}
+      contentStyle={{ paddingHorizontal: s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
     >
-      {glassSecondary ? (
-        <Glass interactive style={box}>
-          {content}
-        </Glass>
-      ) : (
-        <View style={[box, { backgroundColor: variant === 'primary' ? c.ac : variant === 'danger' ? c.red : c.fill }]}>
-          {content}
-        </View>
-      )}
-    </Pressable>
+      {icon ? <Icon name={icon} size={16} color={fg} /> : null}
+      <Text v={s.text} weight="700" style={{ color: fg, fontSize: s.fontSize }}>
+        {label}
+      </Text>
+    </GlassPressable>
   )
 }
 

@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import type { AppNotification, NotificationType } from '@push/api-client'
 import { Icon, Text, type IconName } from '../../../shared/components'
-import { useColors, type Colors } from '../../../theme'
+import { radius, spacing, useColors, type Colors } from '../../../theme'
 import { notificationTitle, timeLabel } from '../utils'
 
 const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: keyof Colors }> = {
@@ -21,13 +21,13 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
       accessibilityRole="button"
       accessibilityLabel={`${unread ? '안 읽음, ' : ''}${notificationTitle(n)}, ${n.body}, ${timeLabel(n.createdAt)}`}
       onPress={onPress}
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: 20, paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: spacing[5], paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
     >
       <View style={{ width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: c[k.bg] }}>
         <Icon name={k.icon} size={22} color={k.fg} />
       </View>
-      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
+      <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
+        <View style={{ flexDirection: 'row', gap: spacing[2] }}>
           <Text v="c1" weight="600" color="t3" style={{ flex: 1 }}>
             {notificationTitle(n)}
           </Text>
@@ -35,11 +35,11 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
             {timeLabel(n.createdAt)}
           </Text>
         </View>
-        <Text v="b2" color={unread ? 't1' : 't2'}>
+        <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'}>
           {n.body}
         </Text>
       </View>
-      <View style={{ width: 8, height: 8, borderRadius: 4, marginTop: 8, backgroundColor: unread ? c.ac : 'transparent' }} />
+      <View style={{ width: 8, height: 8, borderRadius: radius.xs, marginTop: spacing[2], backgroundColor: unread ? c.ac : 'transparent' }} />
     </Pressable>
   )
 }

@@ -2,7 +2,15 @@ import { useEffect, useId } from 'react'
 import { create } from 'zustand'
 import { TOAST_MS } from './constants'
 
-export type ToastInput = { message: string; action?: { label: string; onPress: () => void } }
+export type ToastTone = 'success' | 'error'
+export type ToastInput = {
+  message: string
+  action?: { label: string; onPress: () => void }
+  /** Leading status icon (iOS only; Material snackbars carry no icon). Leave unset on undo/action toasts. */
+  tone?: ToastTone
+  /** Distance above the bottom safe inset, to clear a CTA bar. Defaults to TOAST_BOTTOM_GAP. */
+  bottom?: number
+}
 export type Toast = ToastInput & { id: number }
 
 type State = { current: Toast | null; hosts: string[] }

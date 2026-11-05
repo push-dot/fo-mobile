@@ -66,6 +66,36 @@ describe('stream v3', () => {
     ])
   })
 
+  it('draws the recommended (else first) single-choice row selected, and none for multi', () => {
+    const options = [{ id: 'a', label: '하나' }, { id: 'b', label: '둘' }]
+    const sel = (ev: StreamEvent) => {
+      const [out] = mapEvent(ev)
+      return out?.type === 'approval' ? out.approval : undefined
+    }
+    expect(sel({ type: 'choice', id: 'x', options })?.sections[0]).toMatchObject({ selected: [0] })
+    expect(sel({ type: 'choice', id: 'x', options, recommended: 'b' })?.sections[0]).toMatchObject({ selected: [1] })
+    const multi = sel({ type: 'choice', id: 'x', options, multiple: true })
+    expect(multi?.sections[0]).toMatchObject({ selected: [] })
+    expect(multi?.foot).toBe('여러 개 고를 수 있어요')
+  })
+
+  it('a sectioned multi card carries the multi foot; toggle rows put sub on the second line; templates get a layout', () => {
+    const [ev] = mapEvent({
+      type: 'choice',
+      id: 'g',
+      options: [],
+      sections: [
+        { id: 'p', kind: 'chips', multiple: true, options: [{ id: 'perf', label: '성능' }], selected: [] },
+        { id: 'q', kind: 'toggle', options: [{ id: 'tone', label: '말투 통일하기', sub: '“~했음”과 “~했습니다”가 섞였어요' }], selected: [] },
+        { id: 't', kind: 'thumbnails', options: [{ id: 'MODERN', label: '모던' }, { id: 'ATS', label: 'ATS' }, { id: 'X', label: '컴팩트' }, { id: 'CLASSIC', label: '클래식' }], selected: [] },
+      ],
+    })
+    const a = ev?.type === 'approval' ? ev.approval : undefined
+    expect(a?.foot).toBe('여러 개 고를 수 있어요')
+    expect(a?.sections[1]).toMatchObject({ items: [{ label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }] })
+    expect(a?.sections[2]).toMatchObject({ items: [{ layout: 'modern' }, { layout: 'ats' }, { layout: 'compact' }, { layout: 'classic' }] })
+  })
+
   it('multi-section choice skips the number list', () => {
     const [ev] = mapEvent({
       type: 'choice',

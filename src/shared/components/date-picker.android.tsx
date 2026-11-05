@@ -1,7 +1,7 @@
 import { DatePickerDialog, TimePickerDialog } from '@expo/ui/jetpack-compose'
 import { useState } from 'react'
 import { Pressable } from 'react-native'
-import { radius, useColors } from '../../theme'
+import { radius, spacing, useColors } from '../../theme'
 import { formatDay, formatMonth, formatTime, fromPickerUtc, startOfMonth, toPickerUtc, withTime } from '../utility'
 import Icon from './icon'
 import NativeHost from './native-host'
@@ -32,7 +32,7 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={() => setOpen(true)}
-        style={{ minHeight: 56, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 }}
+        style={{ minHeight: 56, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
       >
         <Text v="b1" color={value ? 't1' : 't4'} style={{ flex: 1 }}>
           {value ? FORMAT[mode](value) : label}

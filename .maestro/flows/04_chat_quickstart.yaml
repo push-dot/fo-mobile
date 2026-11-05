@@ -3,7 +3,11 @@ name: 에이전트 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- tapOn: "에이전트"
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "에이전트"
+      READY: "(동의하고 시작하기|공고 링크로 맞추기)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"
@@ -12,6 +16,7 @@ name: 에이전트 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000
+- takeScreenshot: 04_chat_quickstart-01
 - tapOn: "공고 링크로 맞추기"
 - tapOn: "공고 링크"
 - inputText: "https://careers.moapay.kr/jobs/1182"
@@ -22,6 +27,7 @@ name: 에이전트 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 - extendedWaitUntil:
     visible: "이 수정을 적용할까요?"
     timeout: 60000
+- takeScreenshot: 04_chat_quickstart-02
 # The approval panel slides up; a tap during the slide can land on 그대로 두기.
 - waitForAnimationToEnd
 # iOS reads the numbered option as one label, "1. 적용".
@@ -29,3 +35,4 @@ name: 에이전트 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요.*"
     timeout: 60000
+- takeScreenshot: 04_chat_quickstart-03

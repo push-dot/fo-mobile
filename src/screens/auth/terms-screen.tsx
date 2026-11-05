@@ -16,7 +16,7 @@ import {
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
 import { Button, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const blank = () => Object.fromEntries(TERM_ROWS.map((row) => [row.id, false]))
@@ -57,17 +57,17 @@ const TermsScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
         <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
           {TERMS_TITLE}
         </Text>
-        <Text v="b2" color="t2" style={{ marginTop: 8 }}>
+        <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
           {TERMS_BODY}
         </Text>
-        <View style={{ marginTop: 24 }}>
+        <View style={{ marginTop: spacing[6] }}>
           <TermsAllRow checked={all} onPress={toggleAll} />
         </View>
-        <View style={{ paddingTop: 8 }}>
+        <View style={{ paddingTop: spacing[2] }}>
           {TERM_ROWS.map((row) => (
             <TermRow
               key={row.id}

@@ -3,26 +3,27 @@ import { Pressable, View } from 'react-native'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
 import { GlassButton, Text } from '@/shared/components'
-import { useColors, type Colors } from '../../../theme'
+import { radius, spacing, tile, useColors, type Colors } from '../../../theme'
 import { useCalendarEvents } from '../api/hooks'
 import { EVENT_TYPES } from '../constants'
 import type { CalendarEvent, CalendarEventType } from '../types'
-import { CALENDAR_ADD, clock, dayTitle, dday, monthGrid, sameDay, toDayParam } from '../utils'
+import { clock, dayTitle, dday, monthGrid, sameDay, toDayParam } from '../utils'
+
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
-const EVENT_COLOR: Record<CalendarEventType, keyof Colors> = {
-  INTERVIEW: 'ac',
-  DEADLINE: 'red',
-  FOLLOW_UP: 'green',
-  COFFEE_CHAT: 'orange',
-  CUSTOM: 't4',
+const EVENT_COLOR: Record<CalendarEventType, (c: Colors) => string> = {
+  INTERVIEW: (c) => c.ac,
+  DEADLINE: (c) => c.red,
+  FOLLOW_UP: () => tile.sky,
+  COFFEE_CHAT: (c) => c.orange,
+  CUSTOM: (c) => c.t4,
 }
 const typeOf = (k: CalendarEventType) => ({ ...EVENT_TYPES.find((t) => t.key === k)!, color: EVENT_COLOR[k] })
 
 const subline = (e: CalendarEvent) => {
   const mins = e.endsAt ? Math.round((Date.parse(e.endsAt) - Date.parse(e.startsAt)) / 60_000) : 0
   const dur = mins >= 60 ? `${mins / 60}시간` : mins > 0 ? `${mins}분` : ''
-  return [dur, e.notes].filter(Boolean).join(' · ')
+  return [e.notes, dur].filter(Boolean).join(' · ')
 }
 
 const CalendarView = () => {
@@ -46,10 +47,10 @@ const CalendarView = () => {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 4,
-          paddingTop: 14,
-          paddingBottom: 6,
-          paddingHorizontal: 20,
+          gap: spacing[1],
+          paddingTop: spacing[4],
+          paddingBottom: spacing[2],
+          paddingHorizontal: spacing[5],
         }}
       >
         <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
@@ -59,12 +60,12 @@ const CalendarView = () => {
         <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
         <GlassButton
           actions={[
-            { icon: 'plus', label: CALENDAR_ADD, active: true, onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) },
+            { icon: 'plus', label: '일정 추가', active: true, onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) },
           ]}
         />
       </View>
 
-      <View style={{ flexDirection: 'row', paddingHorizontal: 12 }}>
+      <View style={{ flexDirection: 'row', paddingHorizontal: spacing[3] }}>
         {WEEK.map((w, i) => (
           <Text
             key={w}
@@ -81,9 +82,9 @@ const CalendarView = () => {
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
-          paddingTop: 4,
-          paddingBottom: 8,
-          paddingHorizontal: 12,
+          paddingTop: spacing[1],
+          paddingBottom: spacing[2],
+          paddingHorizontal: spacing[3],
         }}
       >
         {cells.map((d) => {
@@ -98,38 +99,37 @@ const CalendarView = () => {
               accessibilityLabel={`${dayTitle(d, today)}${types.length ? `, 일정 ${onDay(d).length}개` : ''}`}
               accessibilityState={{ selected: isSel }}
               onPress={() => setSelected(d)}
-              style={{ width: `${100 / 7}%`, height: 44, alignItems: 'center', gap: 2 }}
+              style={{ width: `${100 / 7}%`, height: 42, alignItems: 'center', gap: spacing[1] }}
             >
               <View
                 style={{
                   width: 30,
                   height: 30,
-                  borderRadius: 15,
+                  borderRadius: radius.pill,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: isSel ? c.t1 : 'transparent',
                 }}
               >
                 <Text
+                  v="b2"
                   weight={isSel || isToday ? '800' : '600'}
                   style={{
-                    fontSize: 14,
-                    lineHeight: 18,
                     color: isSel ? c.bg : isToday ? c.acText : inMonth ? c.t1 : c.t4,
                   }}
                 >
                   {d.getDate()}
                 </Text>
               </View>
-              <View style={{ flexDirection: 'row', gap: 2, height: 5 }}>
+              <View style={{ flexDirection: 'row', gap: spacing[1], height: 5 }}>
                 {types.slice(0, 3).map((t) => (
                   <View
                     key={t}
                     style={{
                       width: 5,
                       height: 5,
-                      borderRadius: 3,
-                      backgroundColor: c[typeOf(t).color],
+                      borderRadius: radius.pill,
+                      backgroundColor: typeOf(t).color(c),
                     }}
                   />
                 ))}
@@ -139,10 +139,10 @@ const CalendarView = () => {
         })}
       </View>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, paddingBottom: 12, paddingHorizontal: 20 }}>
-        {[...EVENT_TYPES.map((t) => ({ label: t.label, color: c[EVENT_COLOR[t.key]] })), { label: 'Google 캘린더', color: c.green }].map((l) => (
-          <View key={l.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: l.color }} />
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: spacing[3], rowGap: spacing[1], paddingBottom: spacing[3], paddingHorizontal: spacing[5] }}>
+        {[...EVENT_TYPES.map((t) => ({ label: t.label, color: EVENT_COLOR[t.key](c) })), { label: 'Google 캘린더', color: c.green }].map((l) => (
+          <View key={l.label} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+            <View style={{ width: 6, height: 6, borderRadius: radius.pill, backgroundColor: l.color }} />
             <Text v="c2" weight="600" color="t3">
               {l.label}
             </Text>
@@ -155,18 +155,18 @@ const CalendarView = () => {
           flexDirection: 'row',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          paddingTop: 16,
-          paddingHorizontal: 20,
+          paddingTop: spacing[4],
+          paddingHorizontal: spacing[5],
         }}
       >
         <Text v="h3">{dayTitle(selected, today)}</Text>
         {data ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
             <View
               style={{
                 width: 6,
                 height: 6,
-                borderRadius: 3,
+                borderRadius: radius.pill,
                 backgroundColor: data.google.connected ? c.green : c.t4,
               }}
             />
@@ -177,7 +177,7 @@ const CalendarView = () => {
         ) : null}
       </View>
       {dayEvents.length === 0 ? (
-        <Text v="b2" color="t3" style={{ paddingVertical: 20, paddingHorizontal: 20 }}>
+        <Text v="b2" color="t3" style={{ paddingVertical: 36, paddingHorizontal: spacing[5], textAlign: 'center' }}>
           이날은 일정이 없어요.
         </Text>
       ) : (
@@ -190,17 +190,17 @@ const CalendarView = () => {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 12,
-                paddingVertical: 12,
-                paddingHorizontal: 20,
+                gap: spacing[3],
+                paddingVertical: spacing[3],
+                paddingHorizontal: spacing[5],
               }}
             >
               <View
                 style={{
                   width: 4,
                   alignSelf: 'stretch',
-                  borderRadius: 2,
-                  backgroundColor: c[t.color],
+                  borderRadius: radius.pill,
+                  backgroundColor: t.color(c),
                 }}
               />
               <View style={{ flex: 1, minWidth: 0 }}>

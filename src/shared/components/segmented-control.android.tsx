@@ -1,6 +1,6 @@
 import { SegmentedButton, SingleChoiceSegmentedButtonRow, Text } from '@expo/ui/jetpack-compose'
 import { fillMaxWidth, weight } from '@expo/ui/jetpack-compose/modifiers'
-import { useColors } from '../../theme'
+import { useColors, useThemeMode } from '../../theme'
 import NativeHost from './native-host'
 
 export type SegmentedControlProps<K extends string> = {
@@ -12,6 +12,7 @@ export type SegmentedControlProps<K extends string> = {
 /** Android: Material 3 single-choice segmented buttons. */
 const SegmentedControl = <K extends string,>({ items, value, onChange }: SegmentedControlProps<K>) => {
   const c = useColors()
+  const dark = useThemeMode() === 'dark'
   return (
     <NativeHost matchContents={{ vertical: true }}>
       <SingleChoiceSegmentedButtonRow modifiers={[fillMaxWidth()]}>
@@ -21,12 +22,12 @@ const SegmentedControl = <K extends string,>({ items, value, onChange }: Segment
             selected={it.key === value}
             onClick={() => onChange(it.key)}
             colors={{
-              activeContainerColor: c.acSoft,
-              activeContentColor: c.acText,
-              activeBorderColor: c.ac,
-              inactiveContainerColor: c.bg,
-              inactiveContentColor: c.t2,
-              inactiveBorderColor: c.line,
+              activeContainerColor: dark ? c.fill2 : c.bg,
+              activeContentColor: c.t1,
+              activeBorderColor: c.fill,
+              inactiveContainerColor: c.fill,
+              inactiveContentColor: c.t3,
+              inactiveBorderColor: c.fill,
             }}
             modifiers={[weight(1)]}
           >

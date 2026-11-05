@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { radius, selectedRing, useColors } from '../../../theme'
-import { Badge, Button, Glass, Icon, Text, hitSlopTo } from '@/shared/components'
+import { onAccent, radius, selectedRing, spacing, type, useColors, useShadow } from '../../../theme'
+import { Badge, Button, Icon, Text, hitSlopTo } from '@/shared/components'
 import { SPRING } from '../constants'
 import { useReduceMotion } from '../hooks'
-import type { Approval, ApprovalSection, Choice } from '../types'
+import type { Approval, ApprovalSection, Choice, TemplateLayout } from '../types'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../utils/stream-v3'
 
 type Props = {
@@ -24,6 +24,7 @@ const isStop = (c: Choice) => c.label === '그만하기' || c.label === '그만�
 /** Replaces the composer until answered (design_system ApprovalPanel). */
 export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props) => {
   const c = useColors()
+  const shadow = useShadow()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   const reduce = useReduceMotion()
@@ -55,14 +56,15 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
 
   const section = (s: ApprovalSection, si: number) => {
     switch (s.kind) {
-      case 'choices':
-        return s.items.map((ch, i) => (
+      case 'choices': {
+        const rows = s.items.map((ch, i) => (
           <ChoiceRow
             key={`${si}-${i}`}
             n={numbered ? i + 1 : undefined}
             choice={ch}
             on={sel[si]!.includes(i)}
             square={!numbered}
+            bare={!!s.multi && isStop(ch)}
             onPress={() => {
               if (numbered) return pickNumbered(i, ch)
               if (s.multi && isStop(ch)) return onAnswer(ch.label, i)
@@ -70,30 +72,37 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
             }}
           />
         ))
+        if (!s.multi) return rows
+        const stops = s.items.flatMap((ch, i) => (isStop(ch) ? [i] : []))
+        return (
+          <MultiGrid key={si} stop={stops.length ? <View style={{ marginTop: 2 }}>{rows[stops[0]!]}</View> : undefined}>
+            {rows.filter((_, i) => !stops.includes(i))}
+          </MultiGrid>
+        )
+      }
       case 'chips': {
         // The first chips title is usually the card question; don't print it twice.
         const title = s.title && s.title !== approval.question ? s.title : undefined
         const stop = sectioned ? approval.secondary : undefined
-        if (s.multi)
+        if (s.multi) {
+          const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare onPress={cancel} /> : null
+          const inGrid = s.options.length % 2 === 1
           return (
-            <View key={si} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View key={si}>
               {title ? <Question label={title} /> : null}
-              {s.options.map((o, i) => (
-                <View key={o} style={{ width: '48.5%' }}>
-                  <ChoiceRow choice={{ label: o }} on={sel[si]!.includes(i)} square onPress={() => toggle(si, i, true)} />
-                </View>
-              ))}
-              {stop ? (
-                <View style={{ width: '48.5%' }}>
-                  <ChoiceRow choice={{ label: stop }} on={false} square bare onPress={cancel} />
-                </View>
-              ) : null}
+              <MultiGrid stop={stopRow && !inGrid ? <View style={{ marginTop: 2 }}>{stopRow}</View> : undefined}>
+                {s.options.map((o, i) => (
+                  <ChoiceRow key={o} choice={{ label: o }} on={sel[si]!.includes(i)} square onPress={() => toggle(si, i, true)} />
+                ))}
+                {stopRow && inGrid ? stopRow : null}
+              </MultiGrid>
             </View>
           )
+        }
         return (
           <View key={si}>
             {title ? <Question label={title} /> : null}
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 4, paddingVertical: 4 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1], paddingVertical: spacing[1] }}>
               {s.options.map((o, i) => (
                 <MiniChip
                   key={o}
@@ -117,14 +126,14 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
           <View key={si}>
             <Sub label={s.title} />
             {s.items.map((r) => (
-              <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 4 }}>
+              <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
                 {r.tag === 'link' ? (
-                  <View style={{ width: 28, height: 28, borderRadius: 9, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name="link" size={16} color="t2" />
                   </View>
                 ) : r.tag.length === 1 ? (
-                  <View style={{ width: 28, height: 28, borderRadius: 9, backgroundColor: '#1F3A8A', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text weight="800" style={{ color: '#FFFFFF', fontSize: 12 }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.ac, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text v="c1" weight="800" style={{ color: onAccent }}>
                       {r.tag}
                     </Text>
                   </View>
@@ -144,9 +153,9 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
         )
       case 'templates':
         return (
-          <View key={si} style={{ flexDirection: 'row', gap: 6, paddingBottom: 4 }}>
+          <View key={si} style={{ flexDirection: 'row', gap: spacing[2], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
             {s.items.map((t, i) => (
-              <Template key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} variant={i} onPress={() => toggle(si, i)} />
+              <Template key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} layout={t.layout ?? 'classic'} onPress={() => toggle(si, i)} />
             ))}
           </View>
         )
@@ -156,23 +165,18 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   }
 
   const body = (
-    <View style={{ gap: 6, paddingTop: ios ? 22 : 20, paddingHorizontal: ios ? 14 : 16, paddingBottom: ios ? 18 : insets.bottom + 12 }}>
-      <Text v="h3" accessibilityRole="header" style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: 4, paddingBottom: 8 }}>
+    <View style={{ gap: 6, paddingTop: ios ? 22 : spacing[5], paddingHorizontal: ios ? 14 : spacing[4], paddingBottom: ios ? 18 : insets.bottom + spacing[3] }}>
+      <Text v="h3" accessibilityRole="header" style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
         {approval.question}
       </Text>
-      {approval.detail ? (
-        <Text v="b2" color="t2" style={{ paddingHorizontal: 4, paddingBottom: 8 }}>
-          {approval.detail}
-        </Text>
-      ) : null}
       {approval.sections.map(section)}
       {sectioned ? (
-        <View style={{ gap: 8, marginTop: 4 }}>
+        <View style={{ gap: spacing[2], marginTop: spacing[1] }}>
           {sectionSubmit ? <Button label={sectionSubmit} onPress={() => sendSections(sel)} /> : null}
           {approval.secondary && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
         </View>
       ) : approval.submit ? (
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[2] }}>
           {approval.secondary ? (
             <Button style={{ flex: 1 }} variant="secondary" label={approval.secondary} onPress={() => onAnswer(approval.secondary!, 1)} />
           ) : null}
@@ -199,7 +203,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
           {approval.warning}
         </Text>
       ) : approval.foot ? (
-        <Text v="c2" color="t4" style={{ textAlign: 'center', paddingTop: 6 }}>
+        <Text v="c2" color="t3" style={{ textAlign: 'center', paddingTop: 6 }}>
           {approval.foot}
         </Text>
       ) : null}
@@ -216,30 +220,33 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
       accessibilityLabel="확인 요청"
       style={[
         ios
-          ? { marginHorizontal: 8, marginBottom: Math.max(insets.bottom - 18, 8) }
-          : { backgroundColor: c.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 20, elevation: 12 },
+          ? { marginHorizontal: spacing[2], marginBottom: Math.max(insets.bottom - 18, spacing[2]), backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
+          : { backgroundColor: c.bg, borderTopLeftRadius: radius.confirmPanelTop, borderTopRightRadius: radius.confirmPanelTop, ...shadow.pop, shadowOffset: { width: 0, height: -10 }, elevation: 12 },
         motion,
       ]}
     >
-      {ios ? (
-        <Glass surface="sheet" style={{ borderRadius: 40 }}>
-          {body}
-        </Glass>
-      ) : (
-        body
-      )}
+      {body}
     </Animated.View>
   )
 }
 
+const MultiGrid = ({ children, stop }: { children: ReactNode; stop?: ReactNode }) => (
+  <View style={{ gap: spacing[2] }}>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+      {Children.map(children, (child) => (child ? <View style={{ width: '48.5%' }}>{child}</View> : null))}
+    </View>
+    {stop}
+  </View>
+)
+
 const Question = ({ label }: { label: string }) => (
-  <Text v="h3" style={{ width: '100%', fontSize: 18, lineHeight: 26, paddingTop: 12, paddingHorizontal: 4, paddingBottom: 8 }}>
+  <Text v="h3" style={{ width: '100%', fontSize: 18, lineHeight: 26, paddingTop: spacing[3], paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
     {label}
   </Text>
 )
 
 const Sub = ({ label }: { label: string }) => (
-  <Text v="c1" weight="700" color="t3" style={{ paddingTop: 10, paddingHorizontal: 4, paddingBottom: 2 }}>
+  <Text v="c1" weight="700" color="t3" style={{ paddingTop: 10, paddingHorizontal: spacing[1], paddingBottom: 2 }}>
     {label}
   </Text>
 )
@@ -256,10 +263,10 @@ const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choic
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: two ? 'flex-start' : 'center',
-        gap: 12,
+        gap: spacing[3],
         minHeight: two ? 64 : 52,
         paddingHorizontal: 14,
-        paddingVertical: two ? 12 : 0,
+        paddingVertical: two ? spacing[3] : 0,
         borderRadius: 14,
         ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
         transform: [{ scale: pressed ? 0.98 : 1 }],
@@ -278,16 +285,16 @@ const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choic
           }}
         >
           {n ? (
-            <Text v="c1" weight="800" style={{ color: on ? '#FFFFFF' : c.t2 }}>
+            <Text v="c1" weight="800" style={{ color: on ? onAccent : c.t2 }}>
               {n}
             </Text>
           ) : on ? (
-            <Icon name="check" size={14} color="#FFFFFF" />
+            <Icon name="check" size={14} color={onAccent} />
           ) : null}
         </View>
       )}
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-        <Text v="b1" weight="600" color={on ? 'acText' : 't1'} style={{ lineHeight: 22 }}>
+        <Text v="b1" weight="600" color={on ? 'acText' : 't1'} style={{ lineHeight: type.b2.lineHeight }}>
           {choice.label}
         </Text>
         {choice.desc ? (
@@ -323,29 +330,41 @@ const MiniChip = ({ label, on, onPress }: { label: string; on?: boolean; onPress
   )
 }
 
-/** Tiny page preview per template (ChatPh4Design). */
-const Template = ({ label, recommended, on, variant, onPress }: { label: string; recommended?: boolean; on: boolean; variant: number; onPress: () => void }) => {
+const THUMB_LINES = ['90%', '72%', '84%', '56%']
+
+const Template = ({ label, recommended, on, layout, onPress }: { label: string; recommended?: boolean; on: boolean; layout: TemplateLayout; onPress: () => void }) => {
   const c = useColors()
-  const line = (w: string | number, key: number) => <View key={key} style={{ height: 4, width: w as number, borderRadius: 2, backgroundColor: c.fill2 }} />
+  const line = (w: string, key: string | number, extra?: object) => <View key={key} style={{ height: 7, width: w as `${number}%`, borderRadius: 4, backgroundColor: c.fill2, ...extra }} />
+  const heading = (w: string, h: number, color: string) => line(w, 'h', { height: h, backgroundColor: color })
+  const page = {
+    classic: [heading('60%', 9, c.t2), ...THUMB_LINES.map(line)],
+    modern: [
+      <View key="h" style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+        <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: c.ac }} />
+        <View style={{ flex: 1, height: 8, borderRadius: 4, backgroundColor: c.t2 }} />
+      </View>,
+      ...THUMB_LINES.map(line),
+    ],
+    compact: [heading('64%', 7, c.t2), ...['92%', '80%', '92%', '70%', '88%', '60%'].map(line)],
+    ats: [heading('70%', 8, c.t3), ...THUMB_LINES.map(line)],
+  }[layout]
   return (
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ selected: on }}
       accessibilityLabel={recommended ? `${label}, 추천` : label}
       onPress={onPress}
-      style={{ flex: 1, gap: 8, padding: 8, borderRadius: radius.md, ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
+      style={{ flex: 1, gap: spacing[2], padding: spacing[2], borderRadius: radius.md, ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
     >
-      <View style={{ aspectRatio: 0.75, borderRadius: 6, backgroundColor: c.paper, borderWidth: 1, borderColor: c.line, padding: 6, gap: 4 }}>
-        {variant === 1 ? <View style={{ height: 10, borderRadius: 2, backgroundColor: c.acSoft }} /> : null}
-        {variant === 2 ? <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: c.fill2 }} /> : null}
-        {['100%', '80%', '100%', '60%', '90%'].map((w, i) => line(w, i))}
-      </View>
-      <View style={{ alignItems: 'center', gap: 4 }}>
-        {recommended ? <Badge label="추천" tone="ac" /> : null}
-        <Text v="c1" weight="700">
-          {label}
-        </Text>
-      </View>
+      {recommended ? (
+        <View pointerEvents="none" style={{ position: 'absolute', top: -9, left: 0, right: 0, alignItems: 'center', zIndex: 1 }}>
+          <Badge label="추천" tone="ac" />
+        </View>
+      ) : null}
+      <View style={{ height: 96, borderRadius: 10, backgroundColor: c.paper, borderWidth: 1, borderColor: c.line, padding: 9, gap: layout === 'compact' ? 3 : 5 }}>{page}</View>
+      <Text v="c1" weight="700" style={{ textAlign: 'center' }}>
+        {label}
+      </Text>
     </Pressable>
   )
 }

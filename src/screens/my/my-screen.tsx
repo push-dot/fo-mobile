@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { ActivityTab, DocsTab, MyHeader, ProfileTab, type ActivitySub } from '@/features/my'
 import { SegmentedControl } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 type Tab = 'profile' | 'docs' | 'activity'
 const TABS: { key: Tab; label: string }[] = [
@@ -41,7 +41,7 @@ const MyScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <MyHeader />
-      <View style={{ paddingTop: 4, paddingHorizontal: 20 }}>
+      <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5] }}>
         <SegmentedControl items={TABS} value={tab} onChange={pick} />
       </View>
       {tab === 'profile' ? (

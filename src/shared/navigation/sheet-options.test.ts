@@ -28,10 +28,10 @@ describe('sheetOptions', () => {
     expect(o.contentStyle).toEqual({ backgroundColor: 'transparent' })
   })
 
-  it('uses the Material 3 extra-large top corners and theme surface on Android', () => {
+  it('uses the design sheet top corners and theme surface on Android', () => {
     platform.OS = 'android'
     const o = sheetOptions(c)
-    expect(o.sheetCornerRadius).toBe(radius.xl)
+    expect(o.sheetCornerRadius).toBe(radius.sheetTop)
     expect(o.contentStyle).toEqual({ backgroundColor: c.bg })
   })
 })

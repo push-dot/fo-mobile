@@ -1,6 +1,7 @@
 import { Image } from 'expo-image'
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
+import { onAccent } from '../../../theme'
 import { assetUrl } from '@/shared/utility'
 import { givenName, tintOf } from '../utils'
 
@@ -33,7 +34,7 @@ const Avatar = ({
       <Text
         weight="700"
         style={{
-          color: '#FFFFFF',
+          color: onAccent,
           fontSize: Math.round(size * 0.31),
           lineHeight: Math.round(size * 0.4),
         }}

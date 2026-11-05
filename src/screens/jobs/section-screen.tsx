@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { View } from 'react-native'
 import { PostingGrid, SECTIONS, type SectionKind } from '@/features/jobs'
 import { Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const SectionScreen = ({ kind }: { kind: SectionKind }) => {
   const c = useColors()
@@ -14,7 +14,7 @@ const SectionScreen = ({ kind }: { kind: SectionKind }) => {
       <PostingGrid
         filters={withDeadlineWindow({ sort: kind })}
         header={
-          <Text v="b2" color="t3" style={{ paddingHorizontal: 20, paddingTop: 2, paddingBottom: 16 }}>
+          <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[4] }}>
             {s.description}
           </Text>
         }

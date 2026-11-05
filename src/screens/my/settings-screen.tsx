@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
-import { useState, type ReactNode } from 'react'
-import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, View } from 'react-native'
+import type { ReactNode } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
 import type { Settings } from '@push/api-client'
 import {
   Avatar,
@@ -9,6 +9,7 @@ import {
   AGENT_NOTE,
   AGENT_TITLE,
   LANGS,
+  NOTIFY_SUB,
   LOGIN_LABEL,
   NOTIFICATION_ROWS,
   REFERENCE_LABEL,
@@ -23,148 +24,43 @@ import {
   WITHDRAW_BODY,
 } from '@/features/my'
 import {
-  BottomSheet,
-  Glass,
   Icon,
+  Menu,
+  SegmentedControl,
   SettingsGroup,
   SettingsRow,
   Switch,
   Text,
   TopBar,
 } from '@/shared/components'
-import { THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { radius, spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
-const Pick = <K extends string | number,>({
-  title,
-  items,
-  value,
-  onPick,
-  visible,
-  onClose,
-}: {
-  title: string
-  items: { key: K; label: string }[]
-  value: K
-  onPick: (k: K) => void
-  visible: boolean
-  onClose: () => void
-}) => {
+const LanguageMenu = ({ value, onPick }: { value: Settings['locale']; onPick: (l: Settings['locale']) => void }) => {
   const c = useColors()
+  const label = LANGS.find((l) => l.key === value)?.label
   return (
-    <BottomSheet visible={visible} onClose={onClose} title={title}>
-      {items.map((it) => {
-        const on = it.key === value
-        return (
-          <Pressable
-            key={String(it.key)}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: on }}
-            onPress={() => {
-              onPick(it.key)
-              onClose()
-            }}
-            style={{
-              minHeight: 48,
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 14,
-              borderRadius: 12,
-              backgroundColor: on ? c.acSoft : 'transparent',
-            }}
-          >
-            <Text
-              v="b1"
-              weight={on ? '700' : '400'}
-              color={on ? 'acText' : 't1'}
-              style={{ flex: 1 }}
-            >
-              {it.label}
-            </Text>
-            {on ? <Icon name="check" size={18} color="acText" /> : null}
-          </Pressable>
-        )
-      })}
-    </BottomSheet>
-  )
-}
-
-const LanguageSelect = ({
-  value,
-  onPick,
-}: {
-  value: Settings['locale']
-  onPick: (l: Settings['locale']) => void
-}) => {
-  const c = useColors()
-  const [at, setAt] = useState<{ top: number; right: number } | null>(null)
-  return (
-    <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`언어 선택, ${LANGS.find((l) => l.key === value)?.label}`}
-        onPress={(e) =>
-          setAt({ top: e.nativeEvent.pageY - e.nativeEvent.locationY + 42, right: 24 })
-        }
+    <Menu
+      accessibilityLabel={`언어 선택, ${label}`}
+      actions={LANGS.map((l) => ({ key: l.key, label: l.label, selected: l.key === value, onPress: () => onPick(l.key) }))}
+    >
+      <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 4,
+          gap: spacing[1],
           height: 34,
-          paddingLeft: 12,
-          paddingRight: 10,
-          borderRadius: 10,
+          paddingHorizontal: spacing[3],
+          borderRadius: radius.sm,
           backgroundColor: c.fill,
         }}
       >
         <Text v="b2" weight="600">
-          {LANGS.find((l) => l.key === value)?.label}
+          {label}
         </Text>
         <Icon name="down" size={14} color="t1" />
-      </Pressable>
-      <Modal visible={!!at} transparent animationType="fade" onRequestClose={() => setAt(null)}>
-        <Pressable accessibilityLabel="닫기" style={{ flex: 1 }} onPress={() => setAt(null)} />
-        {at ? (
-          <Glass
-            surface="sheet"
-            style={{
-              position: 'absolute',
-              top: at.top,
-              right: at.right,
-              width: 200,
-              padding: 6,
-              borderRadius: 26,
-              backgroundColor: c.card,
-            }}
-          >
-            {LANGS.map((l) => (
-              <Pressable
-                key={l.key}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: l.key === value }}
-                onPress={() => {
-                  onPick(l.key)
-                  setAt(null)
-                }}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 10,
-                  height: 44,
-                  paddingHorizontal: 14,
-                  borderRadius: 12,
-                }}
-              >
-                <View style={{ width: 18 }}>
-                  {l.key === value ? <Icon name="check" size={18} /> : null}
-                </View>
-                <Text v="b1">{l.label}</Text>
-              </Pressable>
-            ))}
-          </Glass>
-        ) : null}
-      </Modal>
-    </>
+      </View>
+    </Menu>
   )
 }
 
@@ -174,17 +70,12 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={title} onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={{ paddingTop: 4, paddingHorizontal: 20, paddingBottom: 48, gap: 22 }}
+        contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}
       >
         {children}
       </ScrollView>
     </View>
   )
-}
-
-const NOTIFY_SUB: Partial<Record<(typeof NOTIFICATION_ROWS)[number]['key'], string>> = {
-  notifyDeadline: '북마크한 공고 마감 3일 전',
-  notifyAiDone: '앱을 닫아도 끝나면 알려 드려요',
 }
 
 const SettingsScreen = () => {
@@ -195,7 +86,6 @@ const SettingsScreen = () => {
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
-  const [sheet, setSheet] = useState<'contact' | 'tone' | null>(null)
   if (!s) {
     return (
       <Screen title="설정">
@@ -233,7 +123,7 @@ const SettingsScreen = () => {
           accessibilityRole="button"
           accessibilityLabel={`${me?.displayName ?? ''}, ${login}`}
           onPress={() => router.push('/edit-profile/basic')}
-          style={{ minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12 }}
+          style={{ minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
         >
           <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl} />
           <View style={{ flex: 1 }}>
@@ -251,24 +141,13 @@ const SettingsScreen = () => {
       <SettingsGroup title="일반" note="앱 화면과 에이전트 답변 언어가 함께 바뀌어요.">
         <SettingsRow
           label="언어"
-          right={<LanguageSelect value={s.locale} onPick={(locale) => set({ locale })} />}
+          right={<LanguageMenu value={s.locale} onPick={(locale) => set({ locale })} />}
         />
         <SettingsRow
           label="테마"
           right={
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              {THEME_CHOICES.map((choice) => (
-                <Pressable
-                  key={choice.key}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: theme === choice.key }}
-                  onPress={() => void setTheme(choice.key)}
-                >
-                  <Text v="c1" weight={theme === choice.key ? '700' : '400'}>
-                    {choice.label}
-                  </Text>
-                </Pressable>
-              ))}
+            <View style={{ width: 196 }}>
+              <SegmentedControl items={[...THEME_CHOICES]} value={theme} onChange={(k) => void setTheme(k)} />
             </View>
           }
         />
@@ -295,7 +174,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label="연락처"
           value={CONTACT.find((v) => v.key === s.contactVisibility)?.label ?? ''}
-          onPress={() => setSheet('contact')}
+          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })}
         />
       </SettingsGroup>
 
@@ -303,7 +182,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label="기본 말투"
           value={TONES.find((t) => t.key === s.defaultTone)?.label ?? ''}
-          onPress={() => setSheet('tone')}
+          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
         />
         <SettingsRow
           label="내 자료 읽기 허용"
@@ -334,22 +213,6 @@ const SettingsScreen = () => {
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>
 
-      <Pick
-        title="누구에게 연락처를 보여 줄까요?"
-        items={CONTACT}
-        value={s.contactVisibility}
-        onPick={(contactVisibility) => set({ contactVisibility })}
-        visible={sheet === 'contact'}
-        onClose={() => setSheet(null)}
-      />
-      <Pick
-        title="에이전트가 어떤 말투로 쓸까요?"
-        items={TONES}
-        value={s.defaultTone}
-        onPick={(defaultTone) => set({ defaultTone })}
-        visible={sheet === 'tone'}
-        onClose={() => setSheet(null)}
-      />
     </Screen>
   )
 }

@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandOf, cardCareerLabel } from '@push/shared'
-import { palette, radius } from '../../theme'
+import { hitSlopTo, palette, photo, radius } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
@@ -25,19 +25,19 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
         ) : (
           <>
             <LinearGradient colors={[brand, `${brand}B3`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', inset: 0 }} />
-            <Text v="h1" style={{ fontSize: 52, lineHeight: 60, color: 'rgba(255,255,255,0.92)' }}>
+            <Text v="h1" style={{ fontSize: 52, lineHeight: 60, color: photo.ink, letterSpacing: -2 }}>
               {[...p.company][0]}
             </Text>
           </>
         )}
-        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.28)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 70 }} />
+        <LinearGradient colors={['transparent', photo.shade]} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 70 }} />
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={p.bookmarked ? '북마크 해제' : '북마크'}
           accessibilityState={{ selected: p.bookmarked }}
           onPress={onBookmark}
-          hitSlop={8}
-          style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.86)', alignItems: 'center', justifyContent: 'center' }}
+          hitSlop={hitSlopTo(30)}
+          style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: radius.pill, backgroundColor: photo.button, alignItems: 'center', justifyContent: 'center' }}
         >
           <Icon name="bookmark" size={16} color={p.bookmarked ? palette.light.acText : palette.light.t1} filled={p.bookmarked} />
         </Pressable>

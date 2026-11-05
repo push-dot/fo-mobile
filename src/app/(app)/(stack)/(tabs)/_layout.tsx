@@ -17,6 +17,7 @@ const TabsLayout = () => {
   const platform = Platform.OS === 'android' ? 'android' : 'ios'
   const idle = tabColor(platform, false, c)
   const selected = tabColor(platform, true, c)
+  const android = platform === 'android'
   return (
     // Android: label every tab like the design boards (Material hides unselected labels by default).
     <NativeTabs
@@ -25,6 +26,9 @@ const TabsLayout = () => {
       tintColor={selected}
       iconColor={{ default: idle, selected }}
       labelStyle={{ default: { color: idle }, selected: { color: selected } }}
+      backgroundColor={android ? c.bg : undefined}
+      rippleColor={c.fill}
+      disableIndicator
     >
       <NativeTabs.Trigger name="(home)">
         <NativeTabs.Trigger.Icon src={ICONS.home} renderingMode="template" />

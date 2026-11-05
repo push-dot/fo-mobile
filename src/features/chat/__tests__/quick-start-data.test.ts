@@ -1,6 +1,6 @@
 import type { Application, Offer, Posting, Profile } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { quickStartFrom } from '../utils/quick-start-data'
+import { docMeta, initialPicks, postingMeta, quickStartFrom } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')
@@ -60,7 +60,33 @@ describe('quickStartFrom (real mode)', () => {
   it('hub subs count careers and skills', () => {
     const profile = { careers: [{}, {}], skills: ['Kotlin', 'Spring', 'Kafka'] } as unknown as Profile
     const subs = (p?: Profile) => quickStartFrom('hub', { profile: p }, now).items.map((i) => i.sub)
-    expect(subs(profile)).toEqual(['한 줄 소개', '3~4문장', '경력 · 2건', '기술 스택 · 3개'])
-    expect(subs(undefined)).toEqual(['한 줄 소개', '3~4문장', '회사 · 역할', '쓰는 기술'])
+    expect(subs(profile)).toEqual(['한 줄 소개', '3~4문장', '2건', '3개'])
+    expect(subs(undefined)).toEqual(['한 줄 소개', '3~4문장', undefined, undefined])
+  })
+
+  it('deadline badge is red within 3 days and grey after', () => {
+    const bookmarks = [posting('a', '2026-10-24'), posting('b', '2026-10-25')]
+    expect(quickStartFrom('deadline', { bookmarks }, now).items.map((i) => i.badge)).toEqual([{ label: 'D-3', tone: 'red' }, { label: 'D-4', tone: 'grey' }])
+  })
+
+  it('status lists 합격 under 진행 중 but leaves it unchecked', () => {
+    const apps = [{ id: 'x', company: '도토리', title: '서버', stage: 'OFFER' }, { id: 'y', company: '라온', title: '앱', stage: 'APPLIED' }] as Application[]
+    const status = quickStartFrom('status', { applications: apps }, now)
+    expect(status.items.filter((i) => !i.seg).map((i) => [i.id, !!i.selected])).toEqual([['x', false], ['y', true]])
+  })
+
+  it('single-pick cards open with the first suggestion chosen', () => {
+    const items = [{ id: 'a', title: 'A' }, { id: 'b', title: 'B' }]
+    expect(initialPicks({ layout: 'cards' }, items)).toEqual(['a'])
+    expect(initialPicks({ layout: 'cards', multi: true }, items)).toEqual([])
+    expect(initialPicks({ layout: 'pick' }, items)).toEqual([])
+    expect(initialPicks({ layout: 'cards' }, [{ id: 'a', title: 'A' }, { id: 'b', title: 'B', selected: true }])).toEqual(['b'])
+  })
+
+  it('formats 자료 고르기 row meta', () => {
+    expect(docMeta({ fileName: '이력서.pdf', size: 2_400_000, createdAt: '2026-10-12T09:00:00' })).toBe('PDF · 2.4MB · 10월 12일')
+    expect(docMeta({ fileName: '경력.docx', size: 640_000, createdAt: '2026-09-28T09:00:00' })).toBe('DOCX · 640KB · 9월 28일')
+    expect(postingMeta(posting('a', '2026-11-03'), new Date('2026-10-21T09:00:00'))).toBe('서울 강남구 · 경력 4–6년 · D-13')
+    expect(postingMeta(posting('a', null, { careerMin: 0, careerMax: null }))).toBe('서울 강남구 · 신입')
   })
 })

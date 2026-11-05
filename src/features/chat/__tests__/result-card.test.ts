@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { profileSaveCopy, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
+import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -61,5 +61,20 @@ describe('agent result cards', () => {
     const meta = resultMeta({ source: 'external', pageLine: 'A4 1쪽 · 186KB' })
     expect(meta).toBe('A4 1쪽 · 186KB')
     expect(meta).not.toContain('내 서류에 자동 저장됨')
+  })
+
+  it('picks the button look by action id, so a lone convert stays secondary', () => {
+    expect(RESULT_VARIANT).toEqual({ apply: 'primary', convert: 'secondary', view: 'secondary' })
+  })
+
+  it('hides the buttons while the card waits on an approval, or while a profile save is pending', () => {
+    expect(resultActionsFor(file)).toHaveLength(2)
+    expect(resultActionsFor(file, true)).toEqual([])
+    expect(resultActionsFor({ ...profile, pendingNote: 'x' })).toEqual([])
+  })
+
+  it('does not say "에 바로 지원해 줘" without a company', () => {
+    expect(applyText('모아페이')).toBe('모아페이에 바로 지원해 줘')
+    expect(applyText()).toBe('바로 지원해 줘')
   })
 })

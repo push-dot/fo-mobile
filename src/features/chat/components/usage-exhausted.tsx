@@ -1,25 +1,28 @@
 import { View } from 'react-native'
-import { Button, Text } from '@/shared/components'
+import { Button, Icon, Text } from '@/shared/components'
+import { radius, spacing, useColors } from '../../../theme'
 import { useChatAccount } from '../api/hooks'
 import { usageExhausted } from '../utils/usage'
 import { Appear } from './motion'
 
+
 export const UsageExhausted = ({ onPlan, onCredits }: { onPlan: () => void; onCredits: () => void }) => {
+  const c = useColors()
   const account = useChatAccount(true)
   const u = usageExhausted(account.data?.plan ?? 'FREE')
   return (
-    <Appear style={{ gap: 10 }}>
-      <Text v="b2">{u.body}</Text>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
-        {u.actions.map((label) => (
-          <Button
-            key={label}
-            style={{ flex: 1 }}
-            size="sm"
-            variant={label === '크레딧 구매' && u.actions.length > 1 ? 'secondary' : 'primary'}
-            label={label}
-            onPress={label === '요금제 올리기' ? onPlan : onCredits}
-          />
+    <Appear style={{ gap: spacing[4], padding: spacing[5], borderRadius: radius.card, backgroundColor: c.bg2 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3] }}>
+        <View style={{ width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: c.orangeSoft }}>
+          <Icon name="credit" size={20} color="orange" />
+        </View>
+        <Text v="b1" weight="700" style={{ flex: 1, paddingTop: spacing[2] }}>
+          {u.body}
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+        {u.actions.map((a) => (
+          <Button key={a.id} style={{ flex: 1 }} variant={a.variant} label={a.label} onPress={a.id === 'plan' ? onPlan : onCredits} />
         ))}
       </View>
     </Appear>

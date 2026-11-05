@@ -6,6 +6,8 @@ describe('conversation row menu', () => {
     expect(conversationRowMenu(false).map((a) => a.label)).toEqual(['이름 바꾸기', '고정', '보관', '삭제'])
     expect(conversationRowMenu(true).map((a) => a.label)).toEqual(['이름 바꾸기', '고정 해제', '보관', '삭제'])
     expect(conversationRowMenu(true)[1]).toMatchObject({ id: 'pin' })
+    expect(conversationRowMenu(false).map((a) => a.systemImage)).toEqual(['pencil', 'pin', 'archivebox', 'trash'])
+    expect(conversationRowMenu(true)[1]!.systemImage).toBe('pin.slash')
   })
 
   it('uses the decided delete and archive copy', () => {

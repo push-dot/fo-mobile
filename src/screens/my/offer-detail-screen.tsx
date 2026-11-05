@@ -1,7 +1,5 @@
 import { Redirect, router } from 'expo-router'
-import { useState } from 'react'
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Alert, Pressable, ScrollView, View } from 'react-native'
 import { monthDay } from '@push/shared'
 import {
   Avatar,
@@ -14,27 +12,26 @@ import {
   useOffer,
   useOfferDecision,
 } from '@/features/my'
-import { Badge, BottomSheet, Button, Chip, Icon, Text, TextField, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { CtaBar, Badge, Button, Chip, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { radius, spacing, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
 
 const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
-  const [replying, setReplying] = useState(false)
-  const [reply, setReply] = useState('')
   const { data: o, isLoading } = useOffer(id)
-  const { accept, decline } = useOfferDecision(id, reply, () => {
-    setReplying(false)
-    setReply('')
-  })
+  const { decline } = useOfferDecision(id, '', () => undefined)
 
   if (isLoading || !o) {
     return (
       <View style={{ flex: 1, backgroundColor: c.bg }}>
         <TopBar onBack={() => router.back()} />
-        {isLoading ? <ActivityIndicator style={{ marginTop: 60 }} /> : null}
+        {isLoading ? (
+          <View style={{ gap: spacing[4], padding: spacing[5] }}>
+            <Skeleton width="60%" height={24} />
+            <Skeleton width="100%" height={96} />
+          </View>
+        ) : null}
       </View>
     )
   }
@@ -47,19 +44,16 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
   const p = o.posting
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, backgroundColor: c.bg }}
-    >
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={{ gap: 18, paddingTop: 4, paddingHorizontal: 20, paddingBottom: 40 }}
+        contentContainerStyle={{ gap: spacing[5], paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
           <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
-          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
               <Text v="h3" accessibilityRole="header" numberOfLines={1} style={{ flexShrink: 1 }}>
                 {who.displayName}
               </Text>
@@ -77,17 +71,17 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
         </View>
         <View
           style={{
-            borderRadius: 20,
+            borderRadius: radius.card,
             backgroundColor: c.bg2,
-            paddingVertical: 16,
-            paddingHorizontal: 18,
+            paddingVertical: spacing[4],
+            paddingHorizontal: spacing[5],
           }}
         >
           <Text v="b1" style={{ lineHeight: 25 }}>
             {o.message}
           </Text>
         </View>
-        <Text v="c1" color="t3" style={{ marginTop: -8 }}>
+        <Text v="c1" color="t3" style={{ marginTop: -spacing[2] }}>
           {monthDay(o.createdAt)} {clock(o.createdAt)} · {box === 'received' ? '받음' : '보냄'}
         </Text>
 
@@ -98,13 +92,13 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
             accessibilityRole="button"
             onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
             style={{
-              paddingVertical: 16,
-              paddingHorizontal: 18,
-              borderRadius: 20,
+              paddingVertical: spacing[4],
+              paddingHorizontal: spacing[5],
+              borderRadius: radius.card,
               backgroundColor: c.acSoft,
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 12,
+              gap: spacing[3],
             }}
           >
             <Icon name="spark" size={22} color={c.ac} />
@@ -119,27 +113,15 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
             <Icon name="chev" size={18} color={c.ac} />
           </Pressable>
         ) : null}
-
       </ScrollView>
 
       {pending ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: 8,
-            paddingTop: 14,
-            paddingHorizontal: 16,
-            paddingBottom: insets.bottom + 10,
-            backgroundColor: c.bg,
-            borderTopWidth: 1,
-            borderTopColor: c.line,
-          }}
-        >
+        <CtaBar>
           <Button
             label="거절"
             variant="secondary"
             disabled={decline.isPending}
-            style={{ minWidth: 92 }}
+            style={{ paddingHorizontal: spacing[6] }}
             onPress={() =>
               Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
                 { text: '취소', style: 'cancel' },
@@ -147,31 +129,10 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
               ])
             }
           />
-          <Button label="수락하고 답장하기" onPress={() => setReplying(true)} style={{ flex: 1 }} />
-        </View>
+          <Button label="수락하고 답장하기" onPress={() => router.push(`/offers/${o.id}/reply`)} style={{ flex: 1 }} />
+        </CtaBar>
       ) : null}
-
-      <BottomSheet
-        visible={replying}
-        onClose={() => setReplying(false)}
-        title="어떻게 답장할까요?"
-        description="수락하면 내 연락처가 상대에게 보이고, 답장이 첫 메시지가 돼요."
-        action={{
-          label: accept.isPending ? '보내는 중' : '수락하고 보내기',
-          onPress: () => accept.mutate(),
-          disabled: !reply.trim() || accept.isPending,
-        }}
-      >
-        <TextField
-          accessibilityLabel="답장"
-          multiline
-          max={500}
-          value={reply}
-          onChangeText={setReply}
-          placeholder={`${who.displayName} 님에게 답장을 써 주세요.`}
-        />
-      </BottomSheet>
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 

@@ -16,7 +16,7 @@ import {
   usePhoneAuth,
 } from '@/features/auth'
 import { Button, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const PhoneScreen = () => {
@@ -55,7 +55,7 @@ const PhoneScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
         {email ? (
           <View style={{ marginBottom: 18 }}>
             <AccountPill email={email} provider={provider} />
@@ -64,7 +64,7 @@ const PhoneScreen = () => {
         <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
           {PHONE_TITLE}
         </Text>
-        <Text v="b2" color="t2" style={{ marginTop: 8 }}>
+        <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
           {PHONE_BODY}
         </Text>
         <View style={{ marginTop: 28 }}>
@@ -81,7 +81,7 @@ const PhoneScreen = () => {
           />
         </View>
         {error ? (
-          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: 12 }}>
+          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[3] }}>
             {error}
           </Text>
         ) : null}

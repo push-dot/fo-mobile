@@ -11,3 +11,11 @@ export const timeAgo = (iso: string, now = new Date()) => {
   if (d.getFullYear() === now.getFullYear()) return `${d.getMonth() + 1}월 ${d.getDate()}일`
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`
 }
+
+export const postedAt = (iso: string, now = new Date()) => {
+  if (now.getTime() - new Date(iso).getTime() < 2 * DAY) return timeAgo(iso, now)
+  const d = new Date(iso)
+  return d.getFullYear() === now.getFullYear()
+    ? `${d.getMonth() + 1}월 ${d.getDate()}일`
+    : `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`
+}

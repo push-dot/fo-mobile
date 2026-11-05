@@ -39,7 +39,7 @@ describe('fromStream', () => {
     expect(resume).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the server choice detail and options', async () => {
+  it('keeps the server choice options and leaves the detail out of the panel', async () => {
     const resume = vi.fn(() => frames())
     const out = await collect(
       fromStream(
@@ -61,7 +61,6 @@ describe('fromStream', () => {
       type: 'approval',
       approval: {
         question: '점수를 한 번 더 올릴까요?',
-        detail: '적합도 6.9 → 7.4 (+0.5)',
         sections: [
           {
             items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '그만하기' }],

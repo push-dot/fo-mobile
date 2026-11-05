@@ -16,6 +16,11 @@ export const useReduceTransparency = () => {
   return on
 }
 
+export const useGlassSurface = () => {
+  const reduce = useReduceTransparency()
+  return glassAvailable && !reduce
+}
+
 type Props = {
   children?: ReactNode
   style?: StyleProp<ViewStyle>
@@ -26,16 +31,17 @@ type Props = {
 const Glass = ({ children, style, surface = 'glass', interactive }: Props) => {
   const c = useColors()
   const boxShadow = toBoxShadow(useShadow().glass)
-  const reduce = useReduceTransparency()
+  const glass = useGlassSurface()
   if (Platform.OS === 'android') return <View style={[{ backgroundColor: c.bg2 }, style]}>{children}</View>
-  if (glassAvailable && !reduce) {
+  if (glass) {
+    // An RN boxShadow stays at rest size while interactive glass grows on press, leaving a fixed disc inside it.
     return (
-      <GlassView style={[{ boxShadow }, style]} glassEffectStyle="regular" isInteractive={interactive}>
+      <GlassView style={[interactive ? null : { boxShadow }, style]} glassEffectStyle="regular" isInteractive={interactive}>
         {children}
       </GlassView>
     )
   }
-  return <View style={[{ boxShadow, backgroundColor: reduce ? c.bg2 : c[surface] }, style]}>{children}</View>
+  return <View style={[{ boxShadow, backgroundColor: glassAvailable ? c.bg2 : c[surface] }, style]}>{children}</View>
 }
 
 export default Glass

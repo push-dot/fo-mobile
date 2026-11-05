@@ -58,10 +58,10 @@ describe('SegmentedControl (Android)', () => {
     expect(buttons.map((b) => b.props.selected)).toEqual([false, true])
     expect(findAll(tree, 'CText').map((t) => t.props.children)).toEqual(['받은', '보낸'])
     expect(buttons[0]!.props.colors).toMatchObject({
-      activeContainerColor: c.acSoft,
-      activeContentColor: c.acText,
-      activeBorderColor: c.ac,
-      inactiveBorderColor: c.line,
+      activeContainerColor: c.bg,
+      activeContentColor: c.t1,
+      inactiveContainerColor: c.fill,
+      inactiveContentColor: c.t3,
     })
     ;(buttons[0]!.props.onClick as () => void)()
     expect(onChange).toHaveBeenCalledWith('a')
@@ -84,6 +84,13 @@ describe('MenuAnchor (Android)', () => {
     ;(items[1]!.props.onClick as () => void)()
     expect(onClose).toHaveBeenCalled()
     expect(actions[1]!.onPress).toHaveBeenCalled()
+  })
+
+  it('separates the destructive item and draws a design icon as the leading icon', () => {
+    const withIcon = [{ ...actions[0]!, icon: 'share' as const }, actions[1]!]
+    const tree = MenuAnchor({ actions: withIcon, open: true, onClose: vi.fn(), children: createElement('View') })
+    expect(findAll(tree, stubs.compose.HorizontalDivider)).toHaveLength(1)
+    expect(findAll(tree, stubs.compose.DropdownMenuItem.LeadingIcon)).toHaveLength(1)
   })
 })
 

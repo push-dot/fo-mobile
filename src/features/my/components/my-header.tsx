@@ -7,7 +7,7 @@ const MyHeader = () => {
   return (
     <TopBar
       left={
-        <Text v="h1" accessibilityRole="header" style={{ fontSize: 26, lineHeight: 32 }}>
+        <Text v="h1" accessibilityRole="header">
           마이
         </Text>
       }

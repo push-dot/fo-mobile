@@ -21,7 +21,6 @@ export const SAY_LABEL = '직접 말하기'
 export const CHOICE_QUESTION = '어떻게 할까요?'
 export const MULTI_PICK_SUBMIT = '이대로 진행'
 export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
-export const PREVENTION_QUESTION = '어떤 문제를 예방할까요?'
 export const PICK_HINT = '번호를 누르거나 바로 말해도 돼요'
 export const HINTLESS_GATES = ['validate_cap']
 
@@ -135,7 +134,7 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'match', label: '나에게 맞는 공고 찾기', icon: 'target', layout: 'match', action: '공고 찾기',
     title: '이 조건으로 찾아볼까요?', description: '내 프로필과 서류에서 가져온 조건이에요. 바꿔도 돼요.',
-    start: (i) => opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId),
+    start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
     key: 'gap', label: '부족한 점 찾기', icon: 'glass', layout: 'pick', action: '부족한 점 찾기', docLabel: '비교할 서류',
@@ -212,3 +211,4 @@ export const CALENDAR_TASKS = [
 
 // DrawerActions.openDrawer(); bubbles up to the app drawer in app/(app)/_layout.tsx.
 export const OPEN_DRAWER = { type: 'OPEN_DRAWER' } as const
+export const CLOSE_DRAWER = { type: 'CLOSE_DRAWER' } as const

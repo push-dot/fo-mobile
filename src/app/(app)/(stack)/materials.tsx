@@ -1,20 +1,46 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Pressable } from 'react-native'
-import { requestMaterialFile, submitMaterialText } from '@/features/chat'
-import { Sheet, Text, TextField } from '@/shared/components'
+import { Platform, Pressable, ScrollView, useWindowDimensions, View } from 'react-native'
+import { docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs } from '@/features/chat'
+import { useBookmarkList } from '@/features/my'
+import { Button, Chip, GlassButton, Icon, Sheet, Text, TextField, type IconName } from '@/shared/components'
+import { onAccent, selectedRing, spacing, useColors } from '@/theme'
+
+type Row = { id: string; title: string; meta: string }
 
 const MaterialsScreen = () => {
+  const c = useColors()
+  const { height } = useWindowDimensions()
   const [kind, setKind] = useState<'github' | 'posting' | null>(null)
   const [text, setText] = useState('')
-  const submit = () => {
-    const value = text.trim()
-    if (!value) return
+  const [picks, setPicks] = useState<string[]>([])
+  const docs = useChatDocs()
+  const bookmarks = useBookmarkList(true)
+  const sections: { title: string; rows: Row[] }[] = [
+    { title: '마이 › 서류', rows: (docs.data ?? []).map((d) => ({ id: d.id, title: d.fileName, meta: docMeta(d) })) },
+    { title: '홈 › 북마크 공고', rows: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, title: `${p.company} · ${p.title}`, meta: postingMeta(p) })) },
+  ]
+  const toggle = (id: string) => setPicks((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))
+  const done = (value: string) => {
     submitMaterialText(value)
     router.back()
   }
+  const add = () => done(sections.flatMap((s) => s.rows).filter((r) => picks.includes(r.id)).map((r) => r.title).join(', '))
+  const submit = () => text.trim() && done(text.trim())
+  const others: [string, IconName, () => void][] = [
+    ['파일', 'doc', () => (requestMaterialFile(), router.back())],
+    ['GitHub 링크', 'github', () => setKind('github')],
+    ['공고 붙여넣기', 'paper', () => setKind('posting')],
+  ]
   return (
-    <Sheet title="자료 고르기" action={kind ? { label: '넣기', onPress: submit, disabled: !text.trim() } : undefined}>
+    <Sheet action={kind ? { label: '넣기', onPress: submit, disabled: !text.trim() } : undefined}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+        {Platform.OS === 'ios' ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} /> : null}
+        <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
+          자료 고르기
+        </Text>
+        {kind ? null : <Button size="sm" label={`${picks.length}개 추가`} disabled={!picks.length} onPress={add} />}
+      </View>
       {kind ? (
         <TextField
           value={text}
@@ -28,22 +54,58 @@ const MaterialsScreen = () => {
           accessibilityLabel={kind === 'github' ? 'GitHub 링크' : '공고 링크'}
         />
       ) : (
-        <>
-          <Text v="c1" weight="700" color="t3">
+        <ScrollView style={{ maxHeight: height * 0.6 }} contentContainerStyle={{ gap: spacing[2] }}>
+          {sections.map((s) =>
+            s.rows.length ? (
+              <View key={s.title} style={{ gap: spacing[1] }}>
+                <Text v="c1" weight="700" color="t3" style={{ paddingTop: spacing[2], paddingHorizontal: spacing[1] }}>
+                  {s.title}
+                </Text>
+                {s.rows.map((r) => {
+                  const on = picks.includes(r.id)
+                  return (
+                    <Pressable
+                      key={r.id}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: on }}
+                      onPress={() => toggle(r.id)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                        gap: spacing[3],
+                        minHeight: 64,
+                        paddingVertical: spacing[3],
+                        paddingHorizontal: 14,
+                        borderRadius: 14,
+                        ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
+                      }}
+                    >
+                      <View style={{ width: 24, height: 24, marginTop: 1, borderRadius: 7, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.ac : c.fill }}>
+                        {on ? <Icon name="check" size={14} color={onAccent} /> : null}
+                      </View>
+                      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                        <Text v="b1" weight="600" color={on ? 'acText' : 't1'} numberOfLines={1}>
+                          {r.title}
+                        </Text>
+                        <Text v="c1" weight="500" color={on ? 'acText' : 't3'} numberOfLines={1}>
+                          {r.meta}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  )
+                })}
+              </View>
+            ) : null,
+          )}
+          <Text v="c1" weight="700" color="t3" style={{ paddingTop: spacing[2], paddingHorizontal: spacing[1] }}>
             다른 곳에서
           </Text>
-          {(
-            [
-              ['파일', () => (requestMaterialFile(), router.back())],
-              ['GitHub 링크', () => setKind('github')],
-              ['공고 붙여넣기', () => setKind('posting')],
-            ] as const
-          ).map(([label, onPress]) => (
-            <Pressable key={label} accessibilityRole="button" onPress={onPress} style={{ minHeight: 48, justifyContent: 'center' }}>
-              <Text v="b1">{label}</Text>
-            </Pressable>
-          ))}
-        </>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1] }}>
+            {others.map(([label, icon, onPress]) => (
+              <Chip key={label} label={label} lead={<Icon name={icon} size={16} color="t2" />} onPress={onPress} />
+            ))}
+          </View>
+        </ScrollView>
       )}
     </Sheet>
   )

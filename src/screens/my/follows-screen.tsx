@@ -1,9 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, ScrollView, TextInput, View } from 'react-native'
-import { Avatar, followMatches, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
-import { Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { ScrollView, TextInput, View } from 'react-native'
+import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
+import { Icon, Text, TopBar } from '@/shared/components'
+import { fontFor, radius, spacing, type, useColors } from '@/theme'
+
 
 const FollowsScreen = () => {
   const c = useColors()
@@ -19,30 +20,44 @@ const FollowsScreen = () => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} />
       {following ? (
-        <TextInput
-          accessibilityLabel="이름이나 직무로 찾기"
-          value={q}
-          onChangeText={setQ}
-          placeholder="이름이나 직무로 찾기"
-          placeholderTextColor={c.t4}
+        <View
           style={{
-            marginHorizontal: 20,
-            marginTop: 8,
+            marginHorizontal: spacing[5],
+            marginVertical: spacing[2],
             height: 44,
-            borderRadius: 12,
-            backgroundColor: c.fill,
-            paddingHorizontal: 14,
-            color: c.t1,
+            borderRadius: radius.card,
+            backgroundColor: c.bg2,
+            paddingHorizontal: spacing[4],
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing[2],
           }}
-        />
+        >
+          <Icon name="search" size={16} color="t3" />
+          <TextInput
+            accessibilityLabel="이름이나 직무로 찾기"
+            value={q}
+            onChangeText={setQ}
+            placeholder="이름이나 직무로 찾기"
+            placeholderTextColor={c.t4}
+            style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1 }, fontFor('400')]}
+          />
+        </View>
       ) : null}
       {query.isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} />
+        <ListSkeleton />
       ) : (
-        <ScrollView>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: 14, paddingHorizontal: 20 }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? people.length}명
           </Text>
+          {people.length === 0 && following ? (
+            <Empty
+              text={emptyCta('follows').title}
+              action={q ? undefined : emptyCta('follows').action}
+              onAction={() => router.push(emptyCta('follows').href)}
+            />
+          ) : null}
           {people.map((p) =>
             following ? (
               <PersonRow key={p.userId} p={p} known />

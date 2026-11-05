@@ -8,12 +8,18 @@ const ULTRA_BODY = '이번 달 사용량을 다 썼어요. 크레딧을 구매�
 describe('usage exhausted copy', () => {
   it('gives FREE and PRO an upgrade and a credit purchase', () => {
     for (const plan of ['FREE', 'PRO'] as const) {
-      expect(usageExhausted(plan)).toEqual({ body: FREE_BODY, actions: ['요금제 올리기', '크레딧 구매'] })
+      expect(usageExhausted(plan)).toEqual({
+        body: FREE_BODY,
+        actions: [
+          { id: 'plan', label: '요금제 올리기', variant: 'secondary' },
+          { id: 'credits', label: '크레딧 구매', variant: 'primary' },
+        ],
+      })
     }
   })
 
   it('gives ULTRA only a credit purchase', () => {
-    expect(usageExhausted('ULTRA')).toEqual({ body: ULTRA_BODY, actions: ['크레딧 구매'] })
+    expect(usageExhausted('ULTRA')).toEqual({ body: ULTRA_BODY, actions: [{ id: 'credits', label: '크레딧 구매', variant: 'primary' }] })
   })
 
   it('drops 충전, an AI key, and a yearly discount', () => {

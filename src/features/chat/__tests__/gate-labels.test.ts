@@ -74,7 +74,8 @@ describe('server gate labels', () => {
         { id: 'cancel', label: '그만하기' },
       ],
     })
-    expect(boost).toMatchObject({ type: 'approval', approval: { question: '점수를 한 번 더 올릴까요?', detail: '적합도 6.9 → 7.4 (+0.5)' } })
+    expect(boost).toMatchObject({ type: 'approval', approval: { question: '점수를 한 번 더 올릴까요?' } })
+    expect(boost).not.toHaveProperty('approval.detail')
     expect(labels(boost!)).toEqual(['한 번 더 올리기', '여기서 멈추기', '그만하기'])
 
     const [saved] = await map({
@@ -89,7 +90,7 @@ describe('server gate labels', () => {
     })
     const state = applyEvent(emptyChat, saved!)
     expect(state.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
-    expect(state.approval?.detail).toBe('PDF는 Push 프로필에서 내보낼 수 있어요.')
+    expect(state.approval).not.toHaveProperty('detail')
     expect(labels(saved!)).toEqual(['확인했어요', '그만하기'])
     expect(JSON.stringify(saved)).not.toContain('PDF로')
   })

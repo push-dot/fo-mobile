@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
 import { Text } from '@/shared/components'
-import { useColors } from '../../../theme'
+import { onAccent, radius, spacing, useColors } from '../../../theme'
 import { useFollowToggle } from '../api/hooks'
 import Avatar from './avatar'
 import Row from './row'
+
 
 const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => {
   const c = useColors()
@@ -32,13 +33,13 @@ const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => 
           hitSlop={5}
           style={{
             height: 34,
-            borderRadius: 17,
-            paddingHorizontal: 14,
+            borderRadius: radius.chip,
+            paddingHorizontal: spacing[4],
             justifyContent: 'center',
             backgroundColor: following ? c.fill : c.ac,
           }}
         >
-          <Text v="c1" weight="700" style={{ fontSize: 14, color: following ? c.t1 : '#FFFFFF' }}>
+          <Text v="c1" weight="700" style={{ color: following ? c.t1 : onAccent }}>
             {following ? '팔로잉' : '팔로우'}
           </Text>
         </Pressable>

@@ -1,3 +1,5 @@
+import { palette, tile } from '@/theme/tokens'
+
 export const MAX_COMMENT = 1000
 export const TITLE_MAX = 100
 export const TITLE_LABEL = '제목'
@@ -12,7 +14,7 @@ export const POST_IMAGE_OPTIONS = {
   allowsMultipleSelection: true,
   quality: 0.85,
 }
-export const AVATAR_COLORS = ['#1971C2', '#D6336C', '#2F9E44', '#E8590C', '#C2255C', '#5B4CF0', '#0C8599']
+export const AVATAR_COLORS = [tile.blue, tile.pink, tile.green, tile.orange, tile.rose, palette.light.ac, tile.cyan]
 export const MIN = 60_000
 export const HOUR = 60 * MIN
 export const DAY = 24 * HOUR

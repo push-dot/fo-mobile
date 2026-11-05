@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { hideCompanyLabel, useMyProfile, useSettings, VISIBILITY } from '@/features/my'
 import { Icon, SettingsGroup, SettingsRow, Switch, Text, TopBar } from '@/shared/components'
-import { useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
   const c = useColors()
@@ -11,7 +11,7 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={title} onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={{ paddingTop: 4, paddingHorizontal: 20, paddingBottom: 48, gap: 22 }}
+        contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}
       >
         {children}
       </ScrollView>
@@ -33,7 +33,7 @@ const SettingsVisibilityScreen = () => {
   return (
     <Screen title="커리어 상태">
       <View style={{ gap: 0 }}>
-        <Text v="b2" color="t3" style={{ paddingHorizontal: 4, paddingBottom: 14 }}>
+        <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[1], paddingBottom: spacing[4] }}>
           ‘이직/구직중’ 같은 커리어 상태를 누가 볼 수 있는지 정해요.
         </Text>
         <SettingsGroup
@@ -55,8 +55,8 @@ const SettingsVisibilityScreen = () => {
                   minHeight: 64,
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 12,
-                  paddingVertical: 8,
+                  gap: spacing[3],
+                  paddingVertical: spacing[2],
                 }}
               >
                 <View style={{ flex: 1 }}>

@@ -9,13 +9,17 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "app.push.mobile",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "icon": {
+        "light": "./assets/icons/ios-light.png",
+        "dark": "./assets/icons/ios-dark.png",
+        "tinted": "./assets/icons/ios-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#5B4CF0",
+        "backgroundColor": "#16191D",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,

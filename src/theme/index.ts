@@ -1,6 +1,7 @@
-import { useColorScheme } from 'react-native'
+import { Platform, useColorScheme } from 'react-native'
 import { themeMode } from './mode'
 import { useThemePreference } from './preference'
+import { platformTokens } from './platform'
 import { palette, shadow, type Colors } from './tokens'
 
 export * from './tokens'
@@ -12,7 +13,10 @@ export { selectedRing } from './selected-ring'
 export { tabColor } from './tab-color'
 export type { TabPlatform } from './tab-color'
 export { useThemePreference } from './preference'
-export { spacing as space } from '@push/design-system'
+export { HIT_TARGET, STATUS_ROW_MIN_HEIGHT, hitSlopTo } from './hit-target'
+export { platformTokens } from './platform'
+
+export const platformTheme = platformTokens(Platform.OS === 'ios' ? 'ios' : 'android')
 
 export const useThemeMode = (): 'light' | 'dark' => {
   const system = useColorScheme()

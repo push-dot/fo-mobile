@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useColors } from '../../theme'
+import { radius, spacing, useColors } from '../../theme'
 import Button from './button'
 import Glass from './glass'
 import Text from './text'
@@ -23,7 +23,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   const body = (
-    <View style={{ paddingTop: 12, paddingHorizontal: 16, paddingBottom: ios ? 16 : 16 + insets.bottom, gap: 14, maxHeight: '100%', flexShrink: 1 }}>
+    <View style={{ paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: ios ? spacing[4] : spacing[4] + insets.bottom, gap: 14, maxHeight: '100%', flexShrink: 1 }}>
       <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
       {title ? (
         <View style={{ gap: 2 }}>
@@ -37,7 +37,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
           ) : null}
         </View>
       ) : null}
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled">
         {children}
       </ScrollView>
       {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} /> : null}
@@ -62,7 +62,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
             {body}
           </Glass>
         ) : (
-          <View style={{ backgroundColor: c.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, flexShrink: 1, height: full ? '100%' : undefined }}>
+          <View style={{ backgroundColor: c.bg, borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, flexShrink: 1, height: full ? '100%' : undefined }}>
             {body}
           </View>
         )}

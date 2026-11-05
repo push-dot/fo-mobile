@@ -1,8 +1,8 @@
 import { useState, type ComponentRef, type RefObject } from 'react'
 import { ActivityIndicator, Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Glass, Icon, Text } from '../../../shared/components'
-import { fontFor, useColors } from '../../../theme'
+import { Glass, GlassPressable, Icon, Text } from '../../../shared/components'
+import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { useCreateComment } from '../api/hooks'
 import { MAX_COMMENT } from '../constants'
 
@@ -38,34 +38,37 @@ const CommentComposer = ({
         accessibilityLabel="댓글"
         placeholder={replyTo ? '답글을 남겨 주세요' : '댓글을 남겨 주세요'}
         placeholderTextColor={c.t4}
-        style={[{ flex: 1, fontSize: 16, color: c.t1, paddingHorizontal: 4, paddingVertical: 9, minHeight: 40, maxHeight: 120 }, fontFor('400')]}
+        style={[{ flex: 1, fontSize: type.b1.fontSize, color: c.t1, paddingHorizontal: spacing[1], paddingVertical: 9, minHeight: 40, maxHeight: 120 }, fontFor('400')]}
       />
-      <Pressable
+      <GlassPressable
         accessibilityRole="button"
         accessibilityLabel="보내기"
         accessibilityState={{ disabled: !ok }}
         disabled={!ok}
         onPress={() => send.mutate({ text, parentId: replyTo?.id })}
         hitSlop={4}
-        style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: ok ? c.ac : c.fill2 }}
+        glass={false}
+        fill={ok ? 'ac' : 'fill2'}
+        pressedFill="acPress"
+        style={{ width: 40, height: 40, borderRadius: radius.pill }}
       >
-        {send.isPending ? <ActivityIndicator color={c.t4} /> : <Icon name="up" size={20} color={ok ? '#FFFFFF' : c.t4} />}
-      </Pressable>
+        {send.isPending ? <ActivityIndicator color={c.t4} /> : <Icon name="up" size={20} color={ok ? onAccent : c.t4} />}
+      </GlassPressable>
     </View>
   )
 
   return (
     <View
       style={{
-        paddingHorizontal: ios ? 16 : 12,
-        paddingTop: ios ? 6 : 8,
-        paddingBottom: ios ? Math.max(insets.bottom - 6, 8) : insets.bottom + 8,
+        paddingHorizontal: ios ? spacing[4] : spacing[3],
+        paddingTop: ios ? 6 : spacing[2],
+        paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : insets.bottom + spacing[2],
         backgroundColor: ios ? 'transparent' : c.bg,
-        gap: 8,
+        gap: spacing[2],
       }}
     >
       {replyTo ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing[2] }}>
           <Text v="c1" color="t3" style={{ flex: 1 }}>
             {replyTo.name}님에게 답글 남기는 중
           </Text>

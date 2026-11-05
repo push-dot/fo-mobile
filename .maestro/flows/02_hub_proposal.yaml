@@ -3,14 +3,20 @@ name: 허브 → 프로필 → 제안하기
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- tapOn: "허브"
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "허브"
+      READY: "추천 프로필"
 - extendedWaitUntil:
     visible: "추천 프로필"
     timeout: 10000
+- takeScreenshot: 02_hub_proposal-01
 - tapOn: ".*이하은.*"
 - extendedWaitUntil:
     visible: "제안하기"
     timeout: 20000
+- takeScreenshot: 02_hub_proposal-02
 - tapOn: "제안하기"
 - tapOn: ".*어떤 이야기를 나누고 싶은지 적어 주세요"
 - inputText: "Coffee chat?"

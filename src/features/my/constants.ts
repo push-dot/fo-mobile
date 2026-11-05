@@ -1,10 +1,14 @@
 import type { Settings, Tone } from '@push/api-client'
+import { tile } from '@push/design-system'
+import { TOAST_MS } from '@/shared/components/constants'
 import type { CalendarEventType } from './types'
 
 export const MIN = 60_000
 export const HOUR = 60 * MIN
 export const DAY = 24 * HOUR
 export const SHEET_SWAP_MS = 400
+export const UNDO_MS = TOAST_MS.action
+export const PUSH_CARD_WIDTH = 242
 export const NEXT_EVENT_DAYS = 90
 export const FOLLOW_PREVIEW = 5
 export const POST_PREVIEW = 4
@@ -19,7 +23,7 @@ export const EVENT_TYPES: { key: CalendarEventType; label: string }[] = [
   { key: 'CUSTOM', label: '직접 추가' },
 ]
 
-export const TINTS = ['#3B5BDB', '#0C8599', '#5F3DC4', '#E8590C', '#2F9E44', '#1F3A8A', '#C2255C', '#1864AB']
+export const TINTS = [tile.indigo, tile.cyan, tile.violet, tile.orange, tile.green, tile.navy, tile.rose, tile.blueDeep]
 
 // shortcut: static list; replace with a skills endpoint if push-be adds one.
 export const SKILL_CATALOG = [
@@ -115,6 +119,15 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
   { key: 'ko', label: '한국어' },
   { key: 'en', label: 'English' },
 ]
+export const SETTINGS_PICKS = {
+  contact: { field: 'contactVisibility', title: '누구에게 연락처를 보여 줄까요?', items: CONTACT },
+  tone: { field: 'defaultTone', title: '에이전트가 어떤 말투로 쓸까요?', items: TONES },
+} as const satisfies Record<string, { field: keyof Settings; title: string; items: { key: string; label: string }[] }>
+export type SettingsPickKind = keyof typeof SETTINGS_PICKS
+export const NOTIFY_SUB: Partial<Record<keyof Settings, string>> = {
+  notifyDeadline: '북마크한 공고 마감 3일 전',
+  notifyAiDone: '앱을 닫아도 끝나면 알려 드려요',
+}
 export const LOGIN_LABEL: Record<string, string> = {
   google: 'Google 계정으로 로그인',
   apple: 'Apple 계정으로 로그인',

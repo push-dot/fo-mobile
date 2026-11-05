@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { find, findAll, stubs } from './native-stubs'
+import { find, findAll } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
 vi.mock('@expo/ui', () => ({ Host: 'Host' }))
@@ -28,7 +28,7 @@ describe('SegmentedControl (iOS)', () => {
     const picker = find(tree, 'Picker')
     expect(picker.props.selection).toBe('a')
     expect(picker.props.modifiers).toContainEqual({ name: 'pickerStyle', arg: 'segmented' })
-    expect(picker.props.modifiers).toContainEqual({ name: 'tint', arg: stubs.theme.palette.light.ac })
+    expect(picker.props.modifiers).not.toContainEqual(expect.objectContaining({ name: 'tint' }))
     expect(findAll(tree, 'SText').map((t) => [t.props.children, t.props.modifiers])).toEqual([
       ['받은', [{ name: 'tag', arg: 'a' }]],
       ['보낸', [{ name: 'tag', arg: 'b' }]],
@@ -110,6 +110,18 @@ describe('DatePicker (iOS)', () => {
     expect(findAll(year, 'SText').map((t) => t.props.children)).toEqual(['2023년', '2022년', '2021년', '2020년'])
     ;(year!.props.onSelectionChange as (y: number) => void)(2020)
     expect(onChange).toHaveBeenLastCalledWith(new Date(2020, 2, 1))
+  })
+
+  it('shows the label until a year is picked when no month is set', () => {
+    const onChange = vi.fn()
+    const tree = DatePicker({ value: null, onChange, label: '종료', mode: 'month', min: new Date(2020, 0, 1), max: new Date(2021, 5, 1) })
+    expect(findAll(tree, 'Picker')).toEqual([])
+    const menu = find(tree, Menu)
+    expect(JSON.stringify(menu.props.children)).toContain('종료')
+    const years = menu.props.actions as { label: string; onPress: () => void }[]
+    expect(years.map((y) => y.label)).toEqual(['2021년', '2020년'])
+    years[1]!.onPress()
+    expect((onChange.mock.calls[0]![0] as Date).getFullYear()).toBe(2020)
   })
 
   it('keeps a picked month inside the allowed range', () => {

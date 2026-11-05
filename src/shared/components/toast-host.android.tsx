@@ -1,7 +1,8 @@
 import { Snackbar, SnackbarHost, type SnackbarHostRef } from '@expo/ui/jetpack-compose'
+import { clip, Shapes } from '@expo/ui/jetpack-compose/modifiers'
 import { useEffect, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { palette, useColors, useThemeMode } from '../../theme'
+import { palette, radius, spacing, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP } from './constants'
 import NativeHost from './native-host'
 import { hideToast, useHostedToast } from './toast-store'
@@ -23,9 +24,12 @@ const ToastHost = () => {
       })
   }, [toast])
   return (
-    <NativeHost matchContents={{ vertical: true }} style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + TOAST_BOTTOM_GAP }}>
+    <NativeHost
+      matchContents={{ vertical: true }}
+      style={{ position: 'absolute', left: spacing[4], right: spacing[4], bottom: insets.bottom + (toast?.bottom ?? TOAST_BOTTOM_GAP) }}
+    >
       <SnackbarHost ref={ref}>
-        <Snackbar containerColor={c.t1} contentColor={c.bg} actionContentColor={inverse.acText} />
+        <Snackbar containerColor={c.t1} contentColor={c.bg} actionContentColor={inverse.acText} modifiers={[clip(Shapes.RoundedCorner(radius.md))]} />
       </SnackbarHost>
     </NativeHost>
   )

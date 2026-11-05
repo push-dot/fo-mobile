@@ -73,11 +73,13 @@ export type ChatItem =
 
 export type Choice = { label: string; desc?: string; hint?: string; badge?: { label: string; tone: BadgeTone } }
 
+export type TemplateLayout = 'classic' | 'modern' | 'compact' | 'ats'
+
 export type ApprovalSection =
   | { id?: string; kind: 'choices'; items: Choice[]; selected: number[]; multi?: boolean; ids?: string[] }
   | { id?: string; kind: 'chips'; title?: string; options: string[]; selected: number[]; multi?: boolean; ids?: string[] }
   | { id?: string; kind: 'rows'; title: string; items: { id?: string; tag: string; title: string; sub: string; ac?: boolean; action?: 'change' }[] }
-  | { id?: string; kind: 'templates'; items: { id?: string; label: string; recommended?: boolean }[]; selected: number[] }
+  | { id?: string; kind: 'templates'; items: { id?: string; label: string; layout?: TemplateLayout; recommended?: boolean }[]; selected: number[] }
   | { id?: string; kind: 'toggle'; items: Choice[]; selected: number[]; ids: string[] }
 
 export type Approval = {

@@ -1,4 +1,4 @@
-import { matchHangul, searchHangul } from '@push/shared'
+import { searchHangul } from '@push/shared'
 
 export type MentionItem = {
   id: string
@@ -19,11 +19,10 @@ export const mentionQuery = (text: string): string | null => {
 /** Replaces the trailing "@query" with "@title ". */
 export const insertMention = (text: string, title: string) => text.replace(/@([^\s@]*)$/, `@${title} `)
 
-/** Keeps items whose title or sub matches (hangul-aware), drops empty groups, and marks the title match. */
 export const filterMentions = (groups: MentionGroup[], query: string) =>
   groups
     .map((g) => ({
       title: g.title,
-      items: searchHangul(g.items, query, (i) => [i.title, i.sub]).map(({ item }) => ({ ...item, hit: query ? matchHangul(item.title, query) : null })),
+      items: searchHangul(g.items, query, (i) => [i.title, i.sub]).map(({ item }) => item),
     }))
     .filter((g) => g.items.length > 0)

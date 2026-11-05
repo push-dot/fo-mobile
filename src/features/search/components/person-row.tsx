@@ -4,6 +4,7 @@ import type { Profile } from '@push/api-client'
 import { Avatar, careerLine } from '@/features/hub'
 import { Icon, Text } from '../../../shared/components'
 import Highlight from './highlight'
+import { spacing } from '../../../theme'
 
 const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void }) => {
   const career = careerLine(p)
@@ -14,7 +15,7 @@ const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void
         onOpen()
         router.push(`/profiles/${p.userId}`)
       }}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingVertical: 14 }}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: spacing[5], paddingVertical: 14 }}
     >
       <Avatar userId={p.userId} name={p.displayName} url={p.avatarUrl} size={48} />
       <View style={{ flex: 1, minWidth: 0, gap: 1 }}>

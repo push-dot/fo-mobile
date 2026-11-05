@@ -2,9 +2,10 @@ import { router, useNavigation } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { fontFor, useColors } from '@/theme'
+import { fontFor, spacing, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text } from '@/shared/components'
 import { ComposerArea, ConsentSheet, OPEN_DRAWER, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
+
 
 const ChatHomeScreen = () => {
   const c = useColors()
@@ -15,7 +16,7 @@ const ChatHomeScreen = () => {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={{ paddingTop: insets.top, height: insets.top + 56, justifyContent: 'center', paddingLeft: 12 }}>
+      <View style={{ paddingTop: insets.top, height: insets.top + 56, justifyContent: 'center', paddingLeft: spacing[3] }}>
         <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: () => navigation.dispatch(OPEN_DRAWER) }]} />
       </View>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none" accessibilityElementsHidden>
@@ -24,13 +25,13 @@ const ChatHomeScreen = () => {
         </Text>
       </View>
       {!typing ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, padding: 16 }} style={{ flexGrow: 0 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], padding: spacing[4] }} style={{ flexGrow: 0 }}>
           {QUICK_STARTS.map((q) => (
             <QuickStartPill key={q.key} qs={q} onPress={() => router.push(quickStartPath(q.key))} />
           ))}
         </ScrollView>
       ) : null}
-      <View style={{ paddingHorizontal: 12, paddingBottom: Math.max(insets.bottom, 10) }}>
+      <View style={{ paddingHorizontal: spacing[3], paddingBottom: Math.max(insets.bottom, 10) }}>
         <ComposerArea
           placeholder="공고 링크를 붙여넣어 보세요"
           onTyping={setTyping}
@@ -45,24 +46,27 @@ const ChatHomeScreen = () => {
 
 const QuickStartPill = ({ qs, onPress }: { qs: QuickStart; onPress: () => void }) => {
   const c = useColors()
-  const inner = (
-    <View style={{ height: 52, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 12, paddingRight: 18 }}>
+  const ios = Platform.OS === 'ios'
+  // iOS: the interactive glass gives the press response, so the Pressable adds none of its own.
+  const pressable = (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      android_ripple={{ color: c.fill2 }}
+      style={{ minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: spacing[3], paddingRight: spacing[5] }}
+    >
       <Icon3D name={qs.icon} size={30} />
       <Text v="b2" weight="600">
         {qs.label}
       </Text>
-    </View>
-  )
-  return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}>
-      {Platform.OS === 'ios' ? (
-        <Glass interactive style={{ borderRadius: 26 }}>
-          {inner}
-        </Glass>
-      ) : (
-        <View style={{ borderRadius: 26, backgroundColor: c.bg2 }}>{inner}</View>
-      )}
     </Pressable>
+  )
+  return ios ? (
+    <Glass interactive style={{ borderRadius: 26 }}>
+      {pressable}
+    </Glass>
+  ) : (
+    <View style={{ borderRadius: 26, overflow: 'hidden', backgroundColor: c.bg2 }}>{pressable}</View>
   )
 }
 

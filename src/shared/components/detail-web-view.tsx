@@ -2,7 +2,7 @@ import { router, type Href } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
-import { useColors, useThemeMode } from '../../theme'
+import { spacing, useColors, useThemeMode } from '../../theme'
 import { detailUrl } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
@@ -66,7 +66,7 @@ const DetailWebView = ({ path, onTitle, onBridge }: Props) => {
         setSupportMultipleWindows={false}
       />
       {failed ? (
-        <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', gap: 16, backgroundColor: c.bg }}>
+        <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', gap: spacing[4], backgroundColor: c.bg }}>
           <Text v="b2" color="t3">
             불러오지 못했어요
           </Text>

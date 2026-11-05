@@ -15,7 +15,7 @@ const Badge = ({ label, tone = 'grey' }: { label: string; tone?: BadgeTone }) =>
   } as const
   const [bg, fg] = map[tone]
   return (
-    <View style={{ height: 22, paddingHorizontal: 7, borderRadius: radius.xs, backgroundColor: bg, justifyContent: 'center', alignSelf: 'flex-start' }}>
+    <View style={{ minHeight: 22, paddingHorizontal: 7, borderRadius: radius.xs, backgroundColor: bg, justifyContent: 'center', alignSelf: 'flex-start' }}>
       <Text v="c2" weight="700" style={{ color: fg }} numberOfLines={1}>
         {label}
       </Text>
