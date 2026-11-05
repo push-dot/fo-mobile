@@ -1,8 +1,8 @@
 // Mock routes for the chat area. Owned by that area's screens.
 // Sample data follows the AI 채팅 artboards (김서준, 모아페이 …).
-import type { LinkKind, Message, UserLink } from '@push/api-client'
+import type { ConversationTurn, LinkKind, Message, UserLink } from '@push/api-client'
 import type { Approval, ChatDoc, ChatEvent, ChatItem, Choice, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
-import { MULTI_PICK_FOOT, MULTI_PICK_SUBMIT } from '../features/chat/constants'
+import { MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PICK_HINT } from '../features/chat/constants'
 import { kindOf } from '../features/chat/utils/links'
 import { mock, page } from './server'
 
@@ -23,7 +23,7 @@ const conv = (id: string, title: string, min: number, lastLine: string, status: 
 })
 
 const conversations: ConversationRow[] = [
-  conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'),
+  conv('c-moa', '모아페이 백엔드 이력서', 10, '이 수정을 적용할까요?', 'NEEDS_APPROVAL'),
   conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'),
   conv('c-career', '경력기술서 다듬기', 60 * 24, 'Push 프로필에 저장했어요 · 적합도 8.2'),
   conv('c-pado', '파도AI 자기소개서 초안', 60 * 24 * 4, '초안 v1을 만들었어요'),
@@ -98,8 +98,7 @@ const todo = (id: string, labels: string[], done: number, added = -1, title?: st
   items: labels.map((label, i) => ({ label, state: i < done ? 'done' : i === done || i === added ? 'now' : 'todo', added: i === added })),
 })
 const ask = (approval: Approval) => s(500, { type: 'approval', approval })
-const HINT = '번호를 누르거나 바로 말해도 돼요'
-const numbered = (id: string, question: string, items: (string | Choice)[], foot = HINT): Approval => ({
+const numbered = (id: string, question: string, items: (string | Choice)[], foot = PICK_HINT): Approval => ({
   id,
   question,
   sections: [{ kind: 'choices', items: items.map((x) => (typeof x === 'string' ? { label: x } : x)), selected: [0] }],
@@ -154,7 +153,7 @@ const tailorFit = (labels: string[], added = -1): Step[] => [
       { n: 15, sign: '', text: '결제 장애 대응 매뉴얼 작성' },
     ],
   }),
-  ask(numbered('tailor-apply', '이 수정을 적용할까요?', ['적용', '그대로 두기'])),
+  ask({ id: 'tailor-apply', question: '이 수정을 적용할까요?', sections: [], submit: '적용', secondary: '그대로 두기', foot: PICK_HINT }),
 ]
 
 const finish = (score: string): Step[] => [
@@ -286,7 +285,7 @@ const ph1: Step[] = [
   s(1500, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
   s(200, todo('todo1', PH1, 4)),
   s(300, {
-    type: 'fit', id: 'fit1', score: 6.9, caption: '보통 · 개선 여지 있어요',
+    type: 'fit', id: 'fit1', score: 6.9, caption: '보통 · 개선 여지 있어요', plan: 'PRO', summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
     rows: [
       { label: '기술 스택', score: 7.5 }, { label: '경험 연관성', score: 7.0 }, { label: '경력 수준', score: 8.0 },
       { label: '키워드', score: 4.5 }, { label: '도메인', score: 5.0 },
@@ -296,7 +295,6 @@ const ph1: Step[] = [
       { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
     ],
   }),
-  s(400, agent('fitmsg', '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.')),
   ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])),
 ]
 const feedbackOnly: Step[] = [
@@ -352,11 +350,14 @@ const ph3Boost: Step[] = [
   s(1300, tool('boost1', '점수 올리기 1회', '키워드 밀도', 'ok', '6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요')),
   s(200, tool('boost2', '점수 올리기 2회', '도메인 경험', 'run', '도메인 맥락을 다시 쓰는 중')),
   s(1300, tool('boost2', '점수 올리기 2회', '도메인 경험', 'ok', '7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요')),
-  s(300, { type: 'fit', id: 'boost', score: 8.3, from: 6.9, delta: '+1.4 · 목표 달성', note: '목표 8.0 · 가장 낮은 항목: 도메인 6.0' }),
+  s(300, { type: 'fit', id: 'boost', score: 8.3, from: 6.9, delta: '+1.4', note: '적합도 6.9 → 8.3 (+1.4)' }),
   ask({ ...numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기']), detail: '적합도 6.9 → 8.3' }),
 ]
 const ph4Design: Step[] = [
-  ask(numbered('ph4-design', '검증을 마쳤어요. 어떤 디자인을 적용할까요?', ['클래식', '모던', '컴팩트', 'ATS', '그만하기'])),
+  ask({
+    ...numbered('ph4-design', '검증을 마쳤어요. 어떤 디자인을 적용할까요?', [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, '모던', '컴팩트', 'ATS', '그만하기']),
+    detail: '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.',
+  }),
 ]
 const ph2xApproach: Step[] = [
   s(200, status('공고 뜯어보는 중…')),
@@ -390,7 +391,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · Push 프로필')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(numbered('apply', '이 공고에 지원해요', ['실행', '취소'])),
+  ask({ ...numbered('apply', '이 공고에 지원해요', ['실행', '취소']), foot: undefined, warning: '지원하면 취소할 수 없어요' }),
 ]
 
 const generic = (text: string): Step[] => [
@@ -484,6 +485,62 @@ mock('POST', 'chat/runs', ({ body }) => {
     c.updatedAt = new Date().toISOString()
   }
   return { data: out }
+})
+
+// ---------- stored turns ----------
+
+// What GET .../turns returns for the seeded conversations, so reopening one draws its cards again.
+const storedTurns: Record<string, ConversationTurn['events']> = {
+  'c-moa': [
+    { type: 'todo', id: 'analyze', items: PH1.map((text, i) => ({ id: String(i), text, state: 'done' as const })), seq: 1 },
+    { type: 'tool', name: 'read_resume', state: 'ok', summary: '이력서 읽기', target: RESUME, resultLine: '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개', seq: 2 },
+    { type: 'tool', name: 'analyze_posting', state: 'ok', summary: '공고 읽기', target: MOA, resultLine: '필수 5개 · 우대 3개', extra: JD_LINES, seq: 3 },
+    { type: 'tool', name: 'fit_score', state: 'ok', summary: '적합도 계산', target: '5개 항목 · 가중치 반영', resultLine: '6.9점', seq: 4 },
+    {
+      type: 'fit', score: 6.9, plan: 'PRO', band: '보통 · 개선 여지 있어요', summary: '기술 스택은 잘 맞아요. 키워드와 도메인이 약해요.',
+      parts: { techStack: 7.5, experienceLink: 7, careerLevel: 8, keyword: 4.5, domain: 5 },
+      keywords: [{ label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true }, { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false }],
+      seq: 5,
+    },
+    { type: 'token', text: '경력 섹션부터 공고에 맞게 고쳐 볼게요.', seq: 6 },
+    {
+      type: 'approval', id: 'moa-edit', kind: 'DOCUMENT_EDIT', title: '이 수정을 적용할까요?', documentId: 'd1',
+      options: [{ id: 'apply', label: '적용' }, { id: 'skip', label: '그대로 두기' }],
+      hunks: [
+        { line: 13, sign: '-', text: '결제 API 개발 및 운영' },
+        { line: 13, sign: '+', text: '결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms' },
+      ],
+      resolution: { status: 'PENDING', optionId: null },
+      seq: 7,
+    },
+  ],
+  'c-career': [
+    { type: 'todo', items: PROFILE_TODO.map((text, i) => ({ id: String(i), text, state: 'done' as const })), seq: 1 },
+    {
+      type: 'result', source: 'profile', taskLine: PROFILE_TASK, checklist: PROFILE_TODO, documentId: 'd1', company: '모아페이',
+      name: '김서준', headline: '백엔드 엔지니어', title: '김서준 · 백엔드 엔지니어', subtitle: 'Push 프로필 · 어제 수정',
+      actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }, { id: 'view', label: '프로필 보기' }],
+      summary: '다 됐어요! 적합도를 6.9 → 8.2로 올렸어요.', fitFrom: 6.9, fitTo: 8.2,
+      bullets: ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요'],
+      seq: 2,
+    },
+  ],
+}
+
+mock('GET', 'conversations/:id/turns', ({ params, query }) => {
+  const c = find(params.id!)
+  const events = c && storedTurns[c.id]
+  const turns: ConversationTurn[] = events
+    ? [{ jobId: `${c.id}-j`, status: 'DONE', createdAt: c.updatedAt, userMessageId: `${c.id}-u`, assistantMessageId: null, answer: null, events }]
+    : []
+  return page(turns, query)
+})
+// Restored cards carry server option ids; the mock has no job to resume, so answering just records it.
+mock('POST', 'conversations/:id/approvals/:approvalId', ({ params, body }) => {
+  delete storedTurns[params.id!]
+  const c = find(params.id!)
+  if (c) Object.assign(c, { status: null, lastLine: '' })
+  return { data: { id: params.approvalId, status: 'APPROVED', optionId: (body as { optionId: string }).optionId } }
 })
 
 // ---------- 내 링크 ----------

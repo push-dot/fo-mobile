@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
+import { profileSaveCopy, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -47,6 +47,14 @@ describe('agent result cards', () => {
 
   it('renders one button when apply is missing', () => {
     expect(resultButtons({ actions: [{ id: 'view', label: '프로필 보기' }, { id: 'share', label: '공유' }] })).toEqual(['프로필 보기'])
+  })
+
+  it('pre-confirm profile card', () => {
+    const note = 'PDF는 Push 프로필에서 내보낼 수 있어요.'
+    const copy = profileSaveCopy({ ...profile, pendingNote: note })
+    expect(copy).toEqual({ title: 'Push 프로필에 저장했어요', body: note, buttons: ['프로필 보기'] })
+    expect(resultTitle({ ...profile, pendingNote: note })).toBe('Push 프로필에 저장했어요')
+    expect(profileSaveCopy(profile)).toBeNull()
   })
 
   it('keeps external meta to the page line when savedLine is absent', () => {

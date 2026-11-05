@@ -14,7 +14,8 @@ export type ChatItem =
   | { type: 'think'; id: string; seconds: number }
   /** `error` replaces the ⎿ result in red (failed or interrupted). `extra` collapses as "+N줄". */
   /** `name` (server tool) lets a later event for the same tool update this line while it runs or waits. */
-  | { type: 'tool'; id: string; name?: string; action: string; target?: string; state: ToolState; result?: string; extra?: string[]; error?: string }
+  /** `warning` (retried once) turns the dot orange and leads the result line. */
+  | { type: 'tool'; id: string; name?: string; action: string; target?: string; state: ToolState; result?: string; extra?: string[]; error?: string; warning?: string }
   | { type: 'todo'; id: string; title?: string; items: { label: string; state: TodoState; added?: boolean }[] }
   | { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; tone: BadgeTone; label: string; note: string }[]; keywords: string[] }
   | { type: 'diff'; id: string; lines: { n?: number; sign: '+' | '-' | '~' | ''; text: string }[] }
@@ -29,6 +30,10 @@ export type ChatItem =
       keywords?: { label: string; ok: boolean }[]
       /** Single overall bar with a note (점수 올리기). */
       note?: string
+      /** FREE locks the part rows; PRO shows the ULTRA teaser; ULTRA shows `projected`. */
+      plan?: 'FREE' | 'PRO' | 'ULTRA'
+      summary?: string
+      projected?: { label: string; bullets: string[] }
     }
   /** `url` is relative to the API base (server artifacts). */
   | { type: 'file'; id: string; name: string; meta?: string; progress?: number; preview?: boolean; url?: string }
@@ -60,6 +65,8 @@ export type ChatItem =
       headline: string
       title: string
       subtitle: string
+      /** Set while a profile-save choice is still unanswered. */
+      pendingNote?: string
     }
   | { type: 'worked'; id: string; seconds: number }
   | { type: 'error'; id: string; text: string; code?: string }
@@ -67,10 +74,11 @@ export type ChatItem =
 export type Choice = { label: string; desc?: string; hint?: string; badge?: { label: string; tone: BadgeTone } }
 
 export type ApprovalSection =
-  | { kind: 'choices'; items: Choice[]; selected: number[]; multi?: boolean }
-  | { kind: 'chips'; title?: string; options: string[]; selected: number[]; multi?: boolean }
-  | { kind: 'rows'; title: string; items: { tag: string; title: string; sub: string; ac?: boolean }[] }
-  | { kind: 'templates'; items: { label: string; recommended?: boolean }[]; selected: number[] }
+  | { id?: string; kind: 'choices'; items: Choice[]; selected: number[]; multi?: boolean; ids?: string[] }
+  | { id?: string; kind: 'chips'; title?: string; options: string[]; selected: number[]; multi?: boolean; ids?: string[] }
+  | { id?: string; kind: 'rows'; title: string; items: { id?: string; tag: string; title: string; sub: string; ac?: boolean; action?: 'change' }[] }
+  | { id?: string; kind: 'templates'; items: { id?: string; label: string; recommended?: boolean }[]; selected: number[] }
+  | { id?: string; kind: 'toggle'; items: Choice[]; selected: number[]; ids: string[] }
 
 export type Approval = {
   id: string
@@ -78,10 +86,16 @@ export type Approval = {
   sections: ApprovalSection[]
   /** Present → picks are confirmed with this button instead of tapping a number. */
   submit?: string
+  submitLabels?: Record<string, string>
+  zeroSubmit?: string
+  /** Copied onto the latest profile result while this choice is open. */
+  pendingNote?: string
   secondary?: string
   /** What the user bubble says after submit; defaults to the button label. */
   answer?: string
   foot?: string
+  /** Server warning shown in place of the hint, e.g. 지원하면 취소할 수 없어요. */
+  warning?: string
   detail?: string
   optionIds?: string[]
 }

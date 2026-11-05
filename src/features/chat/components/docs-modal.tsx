@@ -5,10 +5,11 @@ import { type ChatDoc } from '../api/schemas'
 import { useChatDocs, useUploadChatDoc } from '../api/hooks'
 import Note from './note'
 import PageModal from './page-modal'
+import { docAiSub } from '../constants'
 import { ago } from '../utils'
 
 const size = (b: number) => (b >= 1_000_000 ? `${(b / 1_000_000).toFixed(1)}MB` : `${Math.round(b / 1000)}KB`)
-const meta = (d: ChatDoc) => (d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${size(d.size)} · ${ago(d.createdAt)}`)
+const meta = (d: ChatDoc) => (d.aiMade ? docAiSub(ago(d.createdAt)) : `${size(d.size)} · ${ago(d.createdAt)}`)
 
 /** 내 서류 modal (ChatDocs): same list as 마이 › 서류, + uploads. */
 export const DocsModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {

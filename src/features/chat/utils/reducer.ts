@@ -1,4 +1,5 @@
 import type { ChatEvent, ChatItem, ChatState } from '../types'
+import { attachPendingNote, clearPendingNote } from './stream-v3'
 
 export const emptyChat: ChatState = { items: [], working: null, approval: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null }
 
@@ -23,9 +24,9 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       return { ...s, items: [...s.items, { type: 'agentText', id: `tok-${s.items.length}`, text: e.text }] }
     }
     case 'approval':
-      return { ...s, working: null, approval: e.approval }
+      return { ...s, working: null, approval: e.approval, items: attachPendingNote(s.items, e.approval.pendingNote) }
     case 'answer':
-      return { ...s, approval: null, awaiting: null, items: [...s.items, { type: 'user', id: `ans-${s.items.length}`, text: e.text }] }
+      return { ...s, approval: null, awaiting: null, items: [...clearPendingNote(s.items), { type: 'user', id: `ans-${s.items.length}`, text: e.text }] }
     case 'queue':
       return { ...s, queue: [...s.queue, { text: e.text, ...(e.file ? { file: e.file } : {}) }] }
     case 'dequeue':

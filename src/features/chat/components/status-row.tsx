@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Animated, Platform, Pressable, View } from 'react-native'
 import { useColors } from '../../../theme'
-import { Glass, Text } from '@/shared/components'
+import { Glass, STATUS_ROW_MIN_HEIGHT, Text, hitSlopTo } from '@/shared/components'
 import { Glyph } from './items'
 import { usePulse } from '../hooks'
 import { formatElapsed } from '../utils/reducer'
@@ -30,7 +30,7 @@ export const StatusRow = ({ verbs, startedAt, onStop }: Props) => {
   const verb = verbs[i % verbs.length] ?? '생각하는 중…'
   const elapsed = formatElapsed(Math.max(0, Math.floor((now - startedAt) / 1000)))
   const row = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, height: Platform.OS === 'ios' ? 36 : 28, paddingLeft: Platform.OS === 'ios' ? 12 : 8, paddingRight: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: STATUS_ROW_MIN_HEIGHT[Platform.OS === 'ios' ? 'ios' : 'android'], paddingLeft: Platform.OS === 'ios' ? 12 : 8, paddingRight: 4 }}>
       <Glyph />
       <Animated.View style={{ opacity: shimmer }} accessibilityLiveRegion="polite">
         <Text v="b2" weight="600" color="acText">
@@ -45,7 +45,7 @@ export const StatusRow = ({ verbs, startedAt, onStop }: Props) => {
         accessibilityRole="button"
         accessibilityLabel="작업 중지"
         onPress={onStop}
-        hitSlop={8}
+        hitSlop={hitSlopTo(24)}
         style={({ pressed }) => ({ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: c.fill, transform: [{ scale: pressed ? 0.94 : 1 }] })}
       >
         <Text v="c2" weight="600" color="t3">

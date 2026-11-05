@@ -11,6 +11,12 @@ export type MenuAction = {
   selected?: boolean
 }
 
-export type MenuProps = { actions: MenuAction[]; accessibilityLabel: string; children: ReactElement }
+export type MenuProps = {
+  actions: MenuAction[]
+  accessibilityLabel: string
+  children: ReactElement
+  /** iOS: the trigger takes the parent's width (a full settings row) instead of its own. */
+  stretch?: boolean
+}
 
 export type ContextMenuProps = MenuProps & { onPress?: () => void; preview?: ReactElement }

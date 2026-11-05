@@ -1,8 +1,8 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
-import { useColors } from '../../../theme'
-import { Badge, BottomSheet, Chip, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
+import { selectedRing, useColors } from '../../../theme'
+import { Badge, BottomSheet, Button, Chip, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
 import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
@@ -11,11 +11,11 @@ import Pick from './pick'
 import { CALENDAR_TASKS, type QuickStart } from '../constants'
 
 /** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. */
-export const QuickStartSheet = ({ qs, onClose }: { qs: QuickStart | null; onClose: () => void }) => {
-  return qs ? <Sheet key={qs.key} qs={qs} onClose={onClose} /> : null
+export const QuickStartSheet = ({ qs, onClose, embedded }: { qs: QuickStart | null; onClose: () => void; embedded?: boolean }) => {
+  return qs ? <Body key={qs.key} qs={qs} onClose={onClose} embedded={embedded} /> : null
 }
 
-const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
+const Body = ({ qs, onClose, embedded }: { qs: QuickStart; onClose: () => void; embedded?: boolean }) => {
   const c = useColors()
   const start = useStartChat()
   const q = useQuickStart(qs.key)
@@ -42,7 +42,8 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   }
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
-  const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i) => sel.includes(i.id))
+  // 지원 현황 lists an active application under both tabs; pick it once.
+  const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
   const documentId = docs.data?.find((x) => x.fileName === doc)?.id
   const input = { picked, url, chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
@@ -59,14 +60,9 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const actionLabel = typeof qs.action === 'function' ? qs.action(qs.layout === 'calendar' ? task : picked.length) : qs.action
   const title = qs.layout === 'deadline' && d ? `${qs.title} ${d.items.length}개` : qs.title
 
-  return (
-    <BottomSheet
-      visible
-      onClose={onClose}
-      title={title}
-      description={qs.description}
-      action={actionLabel ? { label: actionLabel, onPress: () => go(), disabled: !d || !qs.start(input) } : undefined}
-    >
+  const action = actionLabel ? { label: actionLabel, onPress: () => go(), disabled: !d || !qs.start(input) } : undefined
+  const body = (
+    <>
       {!d ? (
         <Text v="b2" color="t3" style={{ paddingVertical: 24, textAlign: 'center' }}>
           {q.isError ? '불러오지 못했어요. 닫았다가 다시 열어 주세요.' : '불러오는 중이에요'}
@@ -182,6 +178,11 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
 
           {['pick', 'deadline', 'status', 'reply'].includes(qs.layout) ? (
             <View>
+              {!visible.length && d.empty?.[seg] ? (
+                <Text v="b2" color="t3" style={{ paddingVertical: 16, textAlign: 'center' }}>
+                  {d.empty[seg]}
+                </Text>
+              ) : null}
               {visible.map((it) => (
                 <ItemRow
                   key={it.id}
@@ -234,6 +235,19 @@ const Sheet = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
           ) : null}
         </>
       )}
+    </>
+  )
+  if (embedded) {
+    return (
+      <View style={{ gap: 12 }}>
+        {body}
+        {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} /> : null}
+      </View>
+    )
+  }
+  return (
+    <BottomSheet visible onClose={onClose} title={title} description={qs.description} action={action}>
+      {body}
     </BottomSheet>
   )
 }
@@ -369,9 +383,7 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
         padding: 14,
         borderRadius: 16,
         width: grid ? '48.5%' : undefined,
-        backgroundColor: on ? c.acSoft : c.bg2,
-        borderWidth: 2,
-        borderColor: on ? c.ac : 'transparent',
+        ...(on ? selectedRing(c) : { backgroundColor: c.bg2, borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
       }}
     >
       <Pick on={on} square />
@@ -434,7 +446,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               onPress={() => setTask(i)}
-              style={{ width: '48.5%', gap: 6, padding: 14, borderRadius: 16, backgroundColor: on ? c.acSoft : c.bg2, borderWidth: 2, borderColor: on ? c.ac : 'transparent' }}
+              style={{ width: '48.5%', gap: 6, padding: 14, borderRadius: 16, ...(on ? selectedRing(c) : { backgroundColor: c.bg2, borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
             >
               <Icon name={t.icon} size={20} color={on ? 'acText' : 't2'} />
               <Text v="b2" weight="700">

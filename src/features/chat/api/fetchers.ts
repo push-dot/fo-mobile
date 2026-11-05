@@ -2,6 +2,7 @@ import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi, type PickedFile } from '@/features/my'
 import { MICRO_CREDITS_PER_CREDIT } from '../constants'
+import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
 import type { Account, ChatDoc, ConversationRow, QsData, RunInput } from './schemas'
@@ -13,14 +14,16 @@ const c = http
 const data = async <T>(p: Promise<DataEnvelope<T>>) => (await p).data
 
 /** 내 서류 for chat: the same list as 마이 › 서류. */
-const realDocs = async (): Promise<ChatDoc[]> =>
-  (await myApi.sources()).data.map((s) => ({ id: s.id, fileName: s.fileName, size: s.size, createdAt: s.createdAt ?? new Date().toISOString() }))
+const realDocs = async (): Promise<ChatDoc[]> => (await myApi.sources()).data.map(chatDocFromSource)
 
 const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
   bookmarks: async () => (await api.me.bookmarks({ limit: 50 })).data,
   applications: async () => (await api.applications.list({ limit: 50 })).data,
   offers: async () => (await api.me.offers('received', { limit: 50 })).data,
   follows: async () => (await api.me.follows({ limit: 50 })).data,
+  recent: async () => (await api.me.postingViews({ limit: 50 })).data,
+  recommended: async () => (await api.profiles.list({ explore: 'recommended', limit: 50 })).data,
+  profile: () => api.me.profile(),
   doc: async () => (await realDocs())[0]?.fileName,
   connected: () => myApi.googleConnected(),
 }
@@ -81,3 +84,5 @@ export const followConversation = api.conversations.follow
 export const resolveConversationApproval = api.conversations.resolveApproval
 
 export const fetchConversationMessages = (id: string) => api.conversations.messages(id, { limit: 50 })
+
+export const fetchConversationTurns = (id: string) => api.conversations.turns(id, { limit: 50 })

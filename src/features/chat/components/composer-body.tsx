@@ -2,7 +2,7 @@ import type { AccessMode } from '@push/api-client'
 import type { Ref } from 'react'
 import { Pressable, TextInput, View, type TextInputInstance } from 'react-native'
 import { fontFor, useColors } from '../../../theme'
-import { Icon, Text } from '@/shared/components'
+import { Icon, Text, hitSlopTo } from '@/shared/components'
 import ModePicker from './mode-picker'
 
 export type ComposerProps = {
@@ -54,13 +54,14 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
         style={[{ fontSize: 17, lineHeight: 24, color: c.t1, maxHeight: 140, padding: 0 }, fontFor(hasText ? '600' : '400')]}
       />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} style={[round, { backgroundColor: c.fill }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>
           <Icon name="plus" size={20} />
         </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="언급"
           onPress={p.onMention}
+          hitSlop={hitSlopTo(40)}
           style={{ height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: 6 }}
         >
           <Icon name="at" size={18} />
@@ -75,13 +76,14 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
             accessibilityRole="button"
             accessibilityLabel="중지"
             onPress={p.onStop}
+            hitSlop={hitSlopTo(40, 40)}
             style={({ pressed }) => [round, { backgroundColor: c.t1, transform: [{ scale: pressed ? 0.92 : 1 }] }]}
           >
             <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c.bg }} />
           </Pressable>
         ) : (
           <>
-            <Pressable accessibilityRole="button" accessibilityLabel="음성 입력" onPress={p.onMic} style={[round, { backgroundColor: c.fill }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="음성 입력" onPress={p.onMic} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>
               <Icon name="mic" size={20} />
             </Pressable>
             <Pressable
@@ -90,6 +92,7 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
               accessibilityState={{ disabled: !hasText }}
               disabled={!hasText}
               onPress={p.onSend}
+              hitSlop={hitSlopTo(40, 40)}
               style={[round, { backgroundColor: hasText ? c.ac : c.fill2 }]}
             >
               <Icon name="up" size={20} color={hasText ? '#FFFFFF' : c.t4} />

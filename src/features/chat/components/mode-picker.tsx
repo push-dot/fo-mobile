@@ -1,7 +1,7 @@
 import type { AccessMode } from '@push/api-client'
 import { router } from 'expo-router'
 import { Pressable } from 'react-native'
-import { Icon, Text } from '@/shared/components'
+import { Icon, Text, hitSlopTo } from '@/shared/components'
 import { useColors } from '../../../theme'
 import { ACCESS_MODES } from '../constants'
 
@@ -13,6 +13,7 @@ const ModePicker = ({ value }: { value: AccessMode }) => {
       accessibilityRole="button"
       accessibilityLabel={`실행 방식, ${current.label}`}
       onPress={() => router.push('/access-mode')}
+      hitSlop={hitSlopTo(40)}
       style={{ height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: 4 }}
     >
       <Text v="c1" weight="600" style={{ fontSize: 14 }}>

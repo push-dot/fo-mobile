@@ -7,7 +7,9 @@ import { useOpenArtifact } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
 import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
-import { resultActions, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
+import { profileSaveCopy, resultActions, resultChrome, resultMeta, resultTask, resultTitle, type ResultActionId } from '../utils/result-card'
+import { fitChrome } from '../utils/fit-card'
+import { FIT_LOCKED, FIT_LOCKED_PCT, fitProjected } from '../constants'
 import { Appear } from './motion'
 import Mark from './mark'
 import { UsageExhausted } from './usage-exhausted'
@@ -90,11 +92,12 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   const pop = usePop(item.state === 'ok', 300)
   const shimmer = usePulse(item.state === 'run', 2000, 0.45)
   const extra = item.extra ?? []
+  const result = [item.warning, item.result].filter(Boolean).join(' · ')
   return (
     <Appear style={{ gap: 4 }}>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
         <Animated.View style={{ opacity: blink, transform: [{ scale: pop }] }}>
-          <Dot color={dotColor(c, item.state)} top={7} />
+          <Dot color={item.warning && item.state === 'ok' ? c.orange : dotColor(c, item.state)} top={7} />
         </Animated.View>
         <Text v="b2" style={{ flex: 1 }}>
           <Text v="b2" weight="700">
@@ -114,13 +117,13 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
             {item.error}
           </Text>
         </Appear>
-      ) : item.result ? (
+      ) : result ? (
         <Appear kind="fade" key={item.state} style={{ flexDirection: 'row', gap: 8, paddingLeft: 4 }}>
           <Elbow />
           <View style={{ flex: 1, gap: 2 }}>
             <Animated.View style={{ opacity: shimmer }}>
               <Text v="c1" color={item.state === 'run' ? 't3' : 't2'} style={{ fontSize: 14, lineHeight: 20 }}>
-                <Rich v="c1" color={item.state === 'run' ? 't3' : 't2'} style={{ fontSize: 14, lineHeight: 20 }} text={item.result} />
+                <Rich v="c1" color={item.state === 'run' ? 't3' : 't2'} style={{ fontSize: 14, lineHeight: 20 }} text={result} />
                 {extra.length && !open ? (
                   <Text
                     v="c1"
@@ -300,72 +303,153 @@ const Bar = ({ pct, low, height = 8, delay = 150 }: { pct: number; low?: boolean
   )
 }
 
-const stars = (score: number) => {
-  const n = Math.round(score / 2)
-  return '★'.repeat(n) + '☆'.repeat(5 - n)
+const FitRow = ({ label, score, index }: { label: string; score?: number; index: number }) => (
+  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+    <Text v="c1" color="t2" style={{ width: 76 }}>
+      {label}
+    </Text>
+    <Bar pct={score === undefined ? FIT_LOCKED_PCT[index % FIT_LOCKED_PCT.length]! : score * 10} low={score !== undefined && score < 6} delay={150 + index * 80} />
+    <Text v="c1" weight="700" style={{ width: 28, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
+      {score === undefined ? '' : score.toFixed(1)}
+    </Text>
+  </View>
+)
+
+/** FREE: the part rows sit under a lock pill; the real scores are never drawn. */
+const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () => void }) => {
+  const c = useColors()
+  return (
+    <View>
+      <View style={{ gap: 12, opacity: 0.35 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        {rows.map((r, i) => (
+          <FitRow key={r.label} label={r.label} index={i} />
+        ))}
+      </View>
+      <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 }}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onPlan}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.bg, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 3 }}
+        >
+          <Icon name="lock" size={14} color="t1" />
+          <Text v="c1" weight="700" style={{ flexShrink: 1, textAlign: 'center' }}>
+            {FIT_LOCKED}
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  )
 }
 
-const FitCard = ({ item }: { item: Of<'fit'> }) => {
+const Projected = ({ label, bullets }: { label: string; bullets: string[] }) => {
   const c = useColors()
-  const big = { fontSize: 22, lineHeight: 28, ...fontFor('800'), fontVariant: ['tabular-nums' as const] }
+  const [open, setOpen] = useState(false)
   return (
-    <Appear style={{ gap: 10, padding: 16, borderRadius: 18, backgroundColor: c.bg2 }}>
-      {item.from !== undefined ? (
-        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-          <Text v="c1" weight="700" color="t3">
-            적합도
-          </Text>
-          <Text style={[big, { color: c.t3 }]}>{item.from.toFixed(1)}</Text>
-          <Text color="t3">→</Text>
-          <Text style={[big, { color: c.ac }]}>{item.score.toFixed(1)}</Text>
-          <View style={{ flex: 1 }} />
-          {item.delta ? <Badge label={item.delta} tone="green" /> : null}
+    <Appear style={{ gap: 8, paddingHorizontal: 16, paddingVertical: open ? 16 : 11, borderRadius: 20, backgroundColor: c.bg2 }}>
+      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text v="b2" weight="700" style={{ flex: 1 }}>
+          {fitProjected(label)}
+        </Text>
+        <View style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }}>
+          <Icon name="chev" size={16} color="t3" />
         </View>
-      ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={{ fontSize: 34, lineHeight: 40, ...fontFor('800'), color: c.t1 }}>{item.score.toFixed(1)}</Text>
-          <Text v="b2" color="t3">
-            / 10
-          </Text>
-          <View style={{ flex: 1, alignItems: 'flex-end' }}>
-            <Text v="b2" weight="700" color="ac" accessibilityLabel={`별 ${Math.round(item.score / 2)}개`}>
-              {stars(item.score)}
+      </Pressable>
+      {open
+        ? bullets.map((b) => (
+            <Text key={b} v="b2" color="t2">
+              • {b}
             </Text>
-            {item.caption ? (
-              <Text v="c1" color="t3">
-                {item.caption}
-              </Text>
-            ) : null}
-          </View>
-        </View>
-      )}
-      {item.rows?.map((r, i) => (
-        <View key={r.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Text v="c1" color="t2" style={{ width: 76 }}>
-            {r.label}
-          </Text>
-          <Bar pct={r.score * 10} low={r.score < 6} delay={150 + i * 80} />
-          <Text v="c1" weight="700" style={{ width: 28, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
-            {r.score.toFixed(1)}
-          </Text>
-        </View>
-      ))}
-      {item.keywords ? (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {item.keywords.map((k) => (
-            <Badge key={k.label} label={k.label} tone={k.ok ? 'green' : 'orange'} />
-          ))}
-        </View>
-      ) : null}
-      {item.note ? (
+          ))
+        : null}
+    </Appear>
+  )
+}
+
+const FitCard = ({ item, onPlan }: { item: Of<'fit'>; onPlan?: () => void }) => {
+  const c = useColors()
+  const view = fitChrome(item)
+  const num = { ...fontFor('800'), fontVariant: ['tabular-nums' as const] }
+  const big = { ...num, fontSize: 40, lineHeight: 44, letterSpacing: -1.2 }
+  const mid = { ...num, fontSize: 22, lineHeight: 28 }
+  const head = item.note ? (
+    // 점수 올리기: before → after, one bar, the note.
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+      {item.from !== undefined ? (
         <>
-          <Bar pct={item.score * 10} />
-          <Text v="c1" color="t3">
-            {item.note}
-          </Text>
+          <Text style={[mid, { color: c.t3 }]}>{item.from.toFixed(1)}</Text>
+          <Text color="t3">→</Text>
         </>
       ) : null}
-    </Appear>
+      <Text style={[big, { color: c.acText }]}>{item.score.toFixed(1)}</Text>
+    </View>
+  ) : item.from !== undefined ? (
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+      <Text v="c1" weight="700" color="t3">
+        적합도
+      </Text>
+      <Text style={[mid, { color: c.t3 }]}>{item.from.toFixed(1)}</Text>
+      <Text color="t3">→</Text>
+      <Text style={[mid, { color: c.acText }]}>{item.score.toFixed(1)}</Text>
+      <View style={{ flex: 1 }} />
+      {item.delta ? <Badge label={item.delta} tone="green" /> : null}
+    </View>
+  ) : (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 12 }}>
+      <Text style={[big, { color: c.t1 }]}>{item.score.toFixed(1)}</Text>
+      <Text v="b2" color="t3" style={{ paddingBottom: 8 }}>
+        / 10
+      </Text>
+      {item.caption ? (
+        <Text v="c1" color="t3" style={{ flex: 1, textAlign: 'right', paddingBottom: 4 }}>
+          {item.caption}
+        </Text>
+      ) : null}
+    </View>
+  )
+  return (
+    <View style={{ gap: 12 }}>
+      <Appear style={{ gap: 10, padding: 16, borderRadius: 20, backgroundColor: c.bg2 }}>
+        {head}
+        {view.locked ? (
+          <LockedParts rows={item.rows ?? []} onPlan={onPlan} />
+        ) : (
+          <>
+            {item.rows?.map((r, i) => (
+              <FitRow key={r.label} label={r.label} score={r.score} index={i} />
+            ))}
+            {item.keywords ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, paddingTop: 4 }}>
+                {item.keywords.map((k) => (
+                  <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
+                ))}
+              </View>
+            ) : null}
+          </>
+        )}
+        {item.note ? (
+          <>
+            <Bar pct={item.score * 10} height={10} />
+            <Text v="c1" color="t3">
+              {item.note}
+            </Text>
+          </>
+        ) : null}
+      </Appear>
+      {view.summary ? <AgentText item={{ type: 'agentText', id: `${item.id}-summary`, text: view.summary }} /> : null}
+      {view.teaser ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onPlan}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingHorizontal: 16, borderRadius: 20, backgroundColor: c.bg2 }}
+        >
+          <Icon name="lock" size={16} color="t3" />
+          <Text v="b2" weight="600" color="t2">
+            {view.teaser}
+          </Text>
+        </Pressable>
+      ) : null}
+      {view.projected ? <Projected label={view.projected.label} bullets={view.projected.bullets} /> : null}
+    </View>
   )
 }
 
@@ -423,18 +507,15 @@ const ResultCard = ({
   convertPending?: boolean
 }) => {
   const chrome = resultChrome(item)
-  const title = resultTitle(item)
-  const actions = resultActions(item)
+  const save = profileSaveCopy(item)
+  const title = save?.title ?? resultTitle(item)
+  const actions = save ? [{ id: 'view' as const, label: '프로필 보기' }] : resultActions(item)
   const c = useColors()
   const share = () => void shareMessage({ message: title, title })
   const press = (id: ResultActionId) => (id === 'apply' ? onApply() : id === 'convert' ? onConvert() : onView())
   return (
     <Appear style={{ gap: 8 }}>
-      {item.taskLine ? (
-        <Text v="b2" weight="700">
-          {item.taskLine}
-        </Text>
-      ) : null}
+      {item.taskLine ? <ToolLine item={{ type: 'tool', id: `${item.id}-task`, state: 'ok', ...resultTask(item.taskLine) }} /> : null}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         {chrome.initials ? <Mark text={chrome.initials} color={c.ac} size={44} round /> : null}
         <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
@@ -442,7 +523,7 @@ const ResultCard = ({
             {title}
           </Text>
           <Text v="c1" color="t3">
-            {resultMeta(item)}
+            {save?.body ?? resultMeta(item)}
           </Text>
         </View>
         {chrome.share ? (
@@ -551,7 +632,7 @@ export const Item = ({
     case 'diff':
       return <Diff item={item} />
     case 'fit':
-      return <FitCard item={item} />
+      return <FitCard item={item} onPlan={onUsage ? () => onUsage('plan') : undefined} />
     case 'file':
       return <FileCard item={item} />
     case 'paper':

@@ -1,4 +1,4 @@
-import type { Application, Offer, Posting } from '@push/api-client'
+import type { Application, Offer, Posting, Profile } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { quickStartFrom } from '../utils/quick-start-data'
 
@@ -8,7 +8,9 @@ vi.mock('@/features/my', async () => {
 })
 
 const now = new Date('2026-10-21T09:00:00')
-const posting = (id: string, deadline: string | null) => ({ id, company: '모아페이', title: '백엔드', location: '서울', deadline }) as Posting
+const posting = (id: string, deadline: string | null, career = { careerMin: 4, careerMax: 6 as number | null }) =>
+  ({ id, company: '모아페이', title: '백엔드', location: '서울 강남구', deadline, ...career }) as Posting
+const person = (userId: string) => ({ userId, displayName: '오지현', headline: '프론트엔드' }) as Profile
 
 describe('quickStartFrom (real mode)', () => {
   it('lists bookmarks for 갭/적합도 and only the next 7 days for 마감 임박', () => {
@@ -21,7 +23,7 @@ describe('quickStartFrom (real mode)', () => {
 
   it('maps applications and pending offers', () => {
     const apps = [{ id: 'x', company: '도토리', title: '서버', stage: 'INTERVIEW' }, { id: 'y', company: '라온', title: '앱', stage: 'REJECTED' }] as Application[]
-    expect(quickStartFrom('status', { applications: apps }, now).items.map((i) => [i.badge?.label, !!i.selected])).toEqual([['면접', true], ['불합격', false]])
+    expect(quickStartFrom('status', { applications: apps }, now).items.filter((i) => i.seg === 1).map((i) => [i.badge?.label, !!i.selected])).toEqual([['면접', true], ['불합격', false]])
     const offer = (status: Offer['status']) =>
       ({ id: status, status, sender: { id: 's', displayName: '오지현' }, message: '커피챗 어떠세요?', posting: null, createdAt: '2026-10-21T08:00:00' }) as unknown as Offer
     const reply = quickStartFrom('reply', { offers: [offer('SENT'), offer('ACCEPTED')] }, now)
@@ -31,5 +33,34 @@ describe('quickStartFrom (real mode)', () => {
   it('leaves AI-suggested sheets empty', () => {
     expect(quickStartFrom('exp', {}, now).items).toEqual([])
     expect(quickStartFrom('calendar', { connected: true }, now).calendar).toEqual({ connected: true })
+  })
+
+  it('gap sub joins location and career', () => {
+    const gap = quickStartFrom('gap', { bookmarks: [posting('a', null)], recent: [] }, now)
+    expect(gap.items[0]!.sub).toBe('서울 강남구 · 4–6년')
+    expect(gap.segments).toEqual(['북마크 1', '최근 본 공고'])
+    expect(gap.empty).toEqual([undefined, '최근 본 공고가 없어요.'])
+  })
+
+  it('recent segment hidden without a source', () => {
+    expect(quickStartFrom('fit', { bookmarks: [posting('a', null)] }, now).segments).toBeUndefined()
+    expect(quickStartFrom('coffee', { follows: [person('u1')] }, now).segments).toBeUndefined()
+    const coffee = quickStartFrom('coffee', { follows: [person('u1')], recommended: [person('u2')] }, now)
+    expect(coffee.segments).toEqual(['팔로잉 1', '허브 추천'])
+    expect(coffee.items.map((i) => [i.id, i.seg ?? 0])).toEqual([['u1', 0], ['u2', 1]])
+  })
+
+  it('status segments split active', () => {
+    const apps = [{ id: 'x', company: '도토리', title: '서버', stage: 'INTERVIEW' }, { id: 'y', company: '라온', title: '앱', stage: 'REJECTED' }] as Application[]
+    const status = quickStartFrom('status', { applications: apps }, now)
+    expect(status.segments).toEqual(['진행 중 1', '전체 2'])
+    expect(status.items.map((i) => [i.id, i.seg ?? 0])).toEqual([['x', 0], ['x', 1], ['y', 1]])
+  })
+
+  it('hub subs count careers and skills', () => {
+    const profile = { careers: [{}, {}], skills: ['Kotlin', 'Spring', 'Kafka'] } as unknown as Profile
+    const subs = (p?: Profile) => quickStartFrom('hub', { profile: p }, now).items.map((i) => i.sub)
+    expect(subs(profile)).toEqual(['한 줄 소개', '3~4문장', '경력 · 2건', '기술 스택 · 3개'])
+    expect(subs(undefined)).toEqual(['한 줄 소개', '3~4문장', '회사 · 역할', '쓰는 기술'])
   })
 })

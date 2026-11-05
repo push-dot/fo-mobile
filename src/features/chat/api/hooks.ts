@@ -5,8 +5,9 @@ import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, saveToCache, shareFile, useSession } from '../../../shared/infrastructure'
-import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, QUICK_STARTS } from '../constants'
+import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, MENTION_SHORTCUT_KEYS, QUICK_STARTS, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
+import { LINK_KIND_LABEL } from '../utils/links'
 import { cacheName } from '../utils/cache-name'
 import type { MentionGroup } from '../utils/mentions'
 import { isConsentRequired } from '../utils/consent'
@@ -179,13 +180,13 @@ export const useMentionGroups = (): MentionGroup[] => {
       },
       {
         title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? `AI로 만듦 · ${ago(d.createdAt)}` : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
+        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
       },
       {
         title: '내 링크',
-        items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: l.url.replace(/^https?:\/\//, '') })),
+        items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
       },
-      { title: '바로가기', items: QUICK_STARTS.map((q) => ({ id: q.key, kind: 'shortcut' as const, title: q.label, sub: '' })) },
+      { title: '바로가기', items: QUICK_STARTS.filter((q) => (MENTION_SHORTCUT_KEYS as readonly string[]).includes(q.key)).map((q) => ({ id: q.key, kind: 'shortcut' as const, title: q.label, sub: '' })) },
     ],
     [bookmarks.data, docs.data, links.data],
   )

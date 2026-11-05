@@ -13,7 +13,7 @@ export const ACCESS_MODES: { key: AccessMode; label: string; desc: string }[] = 
   { key: 'BYPASS', label: '바로 실행', desc: '묻지 않고 실행해요' },
 ]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
-export const ACCESS_MODE_TITLE = 'AI가 어떻게 실행할까요?'
+export const ACCESS_MODE_TITLE = '에이전트가 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
@@ -22,14 +22,23 @@ export const CHOICE_QUESTION = '어떻게 할까요?'
 export const MULTI_PICK_SUBMIT = '이대로 진행'
 export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 export const PREVENTION_QUESTION = '어떤 문제를 예방할까요?'
+export const PICK_HINT = '번호를 누르거나 바로 말해도 돼요'
+export const HINTLESS_GATES = ['validate_cap']
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '선택을 기다리고 있어요' } as const
 
 export const FIT_ROWS = [
   { key: 'techStack', label: '기술 스택' },
   { key: 'experienceLink', label: '경험 연관성' },
+  { key: 'careerLevel', label: '경력 수준' },
   { key: 'keyword', label: '키워드' },
+  { key: 'domain', label: '도메인' },
 ] as const
+export const FIT_LOCKED = 'PRO로 올리면 항목별 점수와 약점을 볼 수 있어요'
+export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
+/** Decorative bar widths behind the FREE lock, from the design. */
+export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]
+export const fitProjected = (label: string) => `이렇게 고치면 ${label}`
 
 const USAGE_BODY = usageExhausted('FREE').body
 export const ERROR_TEXT: Record<string, string> = {
@@ -44,8 +53,21 @@ export const ERROR_TEXT: Record<string, string> = {
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
 
-export const CONSENT_TITLE = '에이전트를 쓰려면 동의가 필요해요'
-export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 AI가 참고 자료로 써요.'
+export const CONSENT_TITLE = '에이전트를 쓰려면\n동의가 필요해요'
+export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 에이전트가 참고 자료로 써요.'
+export const PLAN_HEADER = '요금제마다\n쓸 수 있는 양이 달라요'
+export const PLAN_FOOTER = ['매월 1일에 사용량이 다시 채워져요.', '언제든 해지할 수 있어요'] as const
+export const ACCOUNT_REFERENCE_TITLE = '에이전트가 참고하는 내 정보'
+export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 에이전트가 이 정보부터 읽어요.'
+export const MENTION_SHORTCUT_KEYS = ['link', 'gap', 'fit'] as const
+export const docAiSub = (ago: string) => `에이전트로 만듦 · ${ago}`
+export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
+export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크에서 지워요.`
+export const LINK_EMPTY = '아직 모아 둔 링크가 없어요.'
+export const LINK_ADD_NOTE = '추가하면 에이전트가 README와 커밋을 읽어 둬요'
+export const LINK_DELETED_TOAST = '링크를 삭제했어요'
+export const LINK_UNDO = '되돌리기'
+export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
 export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'

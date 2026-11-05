@@ -1,9 +1,10 @@
 import type { LinkKind, UserLink } from '@push/api-client'
 import { useState } from 'react'
-import { Alert, Pressable, ScrollView, View } from 'react-native'
+import { Alert, ScrollView, View } from 'react-native'
 import { useColors } from '../../../theme'
-import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Icon3D, Text, TextField, type BadgeTone, type IconName } from '@/shared/components'
+import { Badge, BottomSheet, Button, Chip, GlassButton, Icon, Menu, Text, TextField, ToastHost, showToast, type BadgeTone, type IconName } from '@/shared/components'
 import { openUrl, shareMessage } from '../../../shared/infrastructure'
+import { LINK_ADD_NOTE, LINK_DELETED_TOAST, LINK_EMPTY, LINK_UNDO, linkDeleteBody } from '../constants'
 import { kindOf } from '../utils/links'
 import { useAddLink, useDeleteLink, useMyLinks } from '@/features/my'
 import { useStartChat } from '../api/hooks'
@@ -50,7 +51,6 @@ const statusOf = (l: UserLink): { label: string; tone: BadgeTone } =>
 export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onClose: () => void; onUse: () => void }) => {
   const start = useStartChat()
   const [kind, setKind] = useState<LinkKind | null>(null)
-  const [menu, setMenu] = useState<UserLink | null>(null)
   const [adding, setAdding] = useState<LinkKind | 'auto' | null>(null)
   const q = useMyLinks(visible)
   const all = q.data?.data ?? []
@@ -59,7 +59,6 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
   const restore = useAddLink(() => {})
 
   const act = (l: UserLink, what: 'open' | 'copy' | 'use' | 'delete') => {
-    setMenu(null)
     if (what === 'open') void openUrl(l.url)
     // shortcut: no clipboard module installed; the share sheet has 복사. Swap for expo-clipboard when added.
     if (what === 'copy') void shareMessage({ message: l.url })
@@ -74,18 +73,14 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
       )
     }
     if (what === 'delete')
-      Alert.alert('이 링크를 삭제할까요?', l.title, [
+      Alert.alert('이 링크를 삭제할까요?', linkDeleteBody(l.title), [
         { text: '취소', style: 'cancel' },
         {
           text: '삭제',
           style: 'destructive',
           onPress: () =>
             remove.mutate(l.id, {
-              onSuccess: () =>
-                Alert.alert('링크를 삭제했어요', undefined, [
-                  { text: '확인', style: 'cancel' },
-                  { text: '되돌리기', onPress: () => restore.mutate({ url: l.url, kind: l.kind, aiRead: true }) },
-                ]),
+              onSuccess: () => showToast({ message: LINK_DELETED_TOAST, action: { label: LINK_UNDO, onPress: () => restore.mutate({ url: l.url, kind: l.kind, aiRead: true }) } }),
             }),
         },
       ])
@@ -93,6 +88,7 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
 
   return (
     <PageModal visible={visible} onClose={onClose} title="내 링크" right={<GlassButton actions={[{ icon: 'plus', label: '링크 추가', onPress: () => setAdding('auto') }]} />}>
+      <ToastHost />
       {q.data && all.length === 0 ? (
         <Empty onAdd={setAdding} />
       ) : (
@@ -111,7 +107,7 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
                 <View key={g.title}>
                   <GroupTitle count={items.length}>{g.title}</GroupTitle>
                   {items.map((l) => (
-                    <LinkRow key={l.id} link={l} onMore={() => setMenu(l)} />
+                    <LinkRow key={l.id} link={l} onAct={(what) => act(l, what)} />
                   ))}
                 </View>
               )
@@ -121,31 +117,12 @@ export const LinksModal = ({ visible, onClose, onUse }: { visible: boolean; onCl
         </>
       )}
 
-      <BottomSheet visible={!!menu} onClose={() => setMenu(null)} title={menu?.title}>
-        {menu
-          ? (
-              [
-                ['open', 'ext', '열기'],
-                ['copy', 'copy', '링크 복사'],
-                ['use', 'chat', '에이전트에서 쓰기'],
-                ['delete', 'x', '삭제'],
-              ] as const
-            ).map(([k, icon, label]) => (
-              <Pressable key={k} accessibilityRole="button" onPress={() => act(menu, k)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 }}>
-                <Icon name={icon} size={20} color={k === 'delete' ? 'red' : 't2'} />
-                <Text v="b1" color={k === 'delete' ? 'red' : 't1'}>
-                  {label}
-                </Text>
-              </Pressable>
-            ))
-          : null}
-      </BottomSheet>
       <AddLinkSheet open={adding} onClose={() => setAdding(null)} />
     </PageModal>
   )
 }
 
-const LinkRow = ({ link, onMore }: { link: UserLink; onMore: () => void }) => {
+const LinkRow = ({ link, onAct }: { link: UserLink; onAct: (what: 'open' | 'copy' | 'use' | 'delete') => void }) => {
   const tile = TILE[link.kind]
   const s = statusOf(link)
   return (
@@ -168,9 +145,19 @@ const LinkRow = ({ link, onMore }: { link: UserLink; onMore: () => void }) => {
         </Text>
       </View>
       <Badge label={s.label} tone={s.tone} />
-      <Pressable accessibilityRole="button" accessibilityLabel={`${link.title} 더 보기`} onPress={onMore} hitSlop={6} style={{ width: 36, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -8 }}>
-        <Icon name="more" size={20} color="t3" />
-      </Pressable>
+      <Menu
+        accessibilityLabel={`${link.title} 더 보기`}
+        actions={[
+          { key: 'open', label: '열기', onPress: () => onAct('open') },
+          { key: 'copy', label: '링크 복사', onPress: () => onAct('copy') },
+          { key: 'use', label: '에이전트에서 쓰기', onPress: () => onAct('use') },
+          { key: 'delete', label: '삭제', destructive: true, onPress: () => onAct('delete') },
+        ]}
+      >
+        <View style={{ width: 36, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -8 }}>
+          <Icon name="more" size={20} color="t3" />
+        </View>
+      </Menu>
     </View>
   )
 }
@@ -178,19 +165,8 @@ const LinkRow = ({ link, onMore }: { link: UserLink; onMore: () => void }) => {
 const Empty = ({ onAdd }: { onAdd: (k: LinkKind | 'auto') => void }) => {
   return (
     <View style={{ alignItems: 'center', gap: 10, paddingTop: 80, paddingHorizontal: 32 }}>
-      <View style={{ marginBottom: 6 }}>
-        <Icon3D name="link" size={64} />
-      </View>
-      <Text v="h2">아직 모아 둔 링크가 없어요</Text>
-      <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-        {'공고, GitHub, 포트폴리오, 블로그 링크를\n모아 두면 AI가 서류를 고칠 때 근거로 써요.'}
-      </Text>
+      <Text v="h2">{LINK_EMPTY}</Text>
       <Button label="링크 추가" icon="plus" onPress={() => onAdd('auto')} style={{ marginTop: 10, alignSelf: 'stretch' }} />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 6 }}>
-        {KINDS.slice(0, 4).map((k) => (
-          <Chip key={k.key} label={k.label} onPress={() => onAdd(k.key)} />
-        ))}
-      </View>
     </View>
   )
 }
@@ -227,7 +203,7 @@ const AddLinkSheet = ({ open, onClose }: { open: LinkKind | 'auto' | null; onClo
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: c.bg2 }}>
         <Icon name="spark" size={20} color="acText" />
         <Text v="b2" style={{ flex: 1 }}>
-          추가하면 AI가 README와 커밋을 읽어 둬요
+          {LINK_ADD_NOTE}
         </Text>
       </View>
     </BottomSheet>

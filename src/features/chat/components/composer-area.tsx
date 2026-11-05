@@ -1,8 +1,9 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { router } from 'expo-router'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Alert, Platform, Pressable, ScrollView, View, type TextInputInstance } from 'react-native'
 import { MAX_BYTES, SIZE_LIMIT, type PickedFile } from '@/features/my'
 import { useColors, useShadow } from '../../../theme'
-import { BottomSheet, Glass, Icon, Text, TextField } from '@/shared/components'
+import { Glass, Icon, Text } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
 import { useAccessMode, useMentionGroups } from '../api/hooks'
 import { Composer } from './composer'
@@ -10,6 +11,8 @@ import { filterMentions, insertMention, mentionQuery, type MentionItem } from '.
 import { Appear } from './motion'
 import Mark from './mark'
 import { CHAT_ATTACHMENT_OPTIONS, QUICK_STARTS, type QuickStart } from '../constants'
+import { useMaterialBridge } from '../stores'
+import { materialsPath, quickStartPath } from '../utils/sheet-routes'
 
 type Props = {
   placeholder: string
@@ -26,13 +29,11 @@ type Props = {
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut, onTyping, above, inputRef }: Props) => {
+export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, above, inputRef }: Props) => {
   const [text, setText] = useState('')
   const [file, setFile] = useState<PickedFile>()
-  const [materials, setMaterials] = useState(false)
-  const [materialKind, setMaterialKind] = useState<'github' | 'posting' | null>(null)
-  const [materialText, setMaterialText] = useState('')
   const own = useRef<TextInputInstance>(null)
+  const attachRef = useRef<() => Promise<void>>(async () => undefined)
   const ref = inputRef ?? own
   const query = mentionQuery(text)
   const access = useAccessMode()
@@ -47,9 +48,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
     change('')
     setFile(undefined)
   }
-  const closeMaterials = () => (setMaterials(false), setMaterialKind(null), setMaterialText(''))
-  const attachFile = async () => {
-    closeMaterials()
+  const attachFile = useCallback(async () => {
     const r = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
     const asset = r.canceled ? undefined : r.assets[0]
     if (!asset) return
@@ -58,18 +57,27 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
       return
     }
     setFile({ uri: asset.uri, name: asset.name, mimeType: asset.mimeType, size: asset.size })
-  }
-  const takeMaterial = () => {
-    const value = materialText.trim()
-    if (!value) return
-    change(text ? `${text} ${value}` : value)
-    closeMaterials()
-  }
+  }, [])
+  useEffect(
+    () => {
+      attachRef.current = attachFile
+      return useMaterialBridge.subscribe((state, prev) => {
+        if (state.text && state.text !== prev.text) {
+          const value = state.text
+          useMaterialBridge.setState({ text: null })
+          setText((current) => (current ? `${current} ${value}` : value))
+          onTyping?.(true)
+        }
+        if (state.file > prev.file) void attachRef.current()
+      })
+    },
+    [attachFile, onTyping],
+  )
   const pick = (m: MentionItem) => {
     if (m.kind === 'shortcut') {
       change(text.replace(/@([^\s@]*)$/, ''))
       const qs = QUICK_STARTS.find((q) => q.key === m.id)
-      if (qs) onShortcut(qs)
+      if (qs) router.push(quickStartPath(qs.key))
       return
     }
     change(insertMention(text, m.title))
@@ -86,7 +94,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         placeholder={placeholder}
         working={working}
         onStop={onStop}
-        onAttach={() => setMaterials(true)}
+        onAttach={() => router.push(materialsPath())}
         // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         // shortcut: no speech dependency; the keyboard's dictation key handles voice for now.
@@ -95,43 +103,6 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onShortcut,
         onClearAttachment={() => setFile(undefined)}
         accessMode={access.mode}
       />
-      <BottomSheet
-        visible={materials}
-        onClose={closeMaterials}
-        title="자료 고르기"
-        action={materialKind ? { label: '넣기', onPress: takeMaterial, disabled: !materialText.trim() } : undefined}
-      >
-        {materialKind ? (
-          <TextField
-            value={materialText}
-            onChangeText={setMaterialText}
-            placeholder={materialKind === 'github' ? 'https://github.com/' : 'https://'}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            autoFocus
-            onSubmitEditing={takeMaterial}
-            accessibilityLabel={materialKind === 'github' ? 'GitHub 링크' : '공고 링크'}
-          />
-        ) : (
-          <View style={{ gap: 4 }}>
-            <Text v="c1" weight="700" color="t3">
-              다른 곳에서
-            </Text>
-            {(
-              [
-                ['파일', () => void attachFile()],
-                ['GitHub 링크', () => setMaterialKind('github')],
-                ['공고 붙여넣기', () => setMaterialKind('posting')],
-              ] as const
-            ).map(([label, onPress]) => (
-              <Pressable key={label} accessibilityRole="button" onPress={onPress} style={{ minHeight: 48, justifyContent: 'center' }}>
-                <Text v="b1">{label}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-      </BottomSheet>
     </View>
   )
 }

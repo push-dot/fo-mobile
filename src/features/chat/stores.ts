@@ -6,6 +6,7 @@ import { API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructu
 import {
   chatApi,
   fetchConversationMessages,
+  fetchConversationTurns,
   followConversation,
   resolveConversationApproval,
   streamConversation,
@@ -16,6 +17,7 @@ import { DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream } from './utils/stream'
+import { restoreTurns } from './utils/turns'
 import type { ChatEvent, ChatState } from './types'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
@@ -25,6 +27,11 @@ export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyC
 export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: DEFAULT_ACCESS_MODE }))
 
 export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
+
+/** 자료 고르기 sheet writes back into the composer. File picks stay in the composer. */
+export const useMaterialBridge = create<{ text: string | null; file: number }>(() => ({ text: null, file: 0 }))
+export const submitMaterialText = (text: string) => useMaterialBridge.setState({ text })
+export const requestMaterialFile = () => useMaterialBridge.setState((s) => ({ file: s.file + 1 }))
 
 type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
@@ -49,7 +56,8 @@ let openChat: ((p: PendingOpen) => void) | null = null
 
 export const askConsent = (force = false) => {
   const s = useConsentPrompt.getState()
-  if (force || !s.dismissed) useConsentPrompt.setState({ open: true })
+  if (!(force || !s.dismissed) || s.open) return
+  useConsentPrompt.setState({ open: true })
 }
 
 export const holdOpen = (p: PendingOpen) => {
@@ -136,8 +144,11 @@ const resolved = async function* (input: RunInput, signal: AbortSignal): AsyncGe
     ? await resolveConversationApproval(id, approvalId, optionId, optionIds)
     : await resolveConversationApproval(id, approvalId, optionId)
   if (!r.jobId) return
-  yield* fromStream(followConversation(id, undefined, signal), (after) => followConversation(id, after, signal))
+  yield* followed(input, signal)
 }
+
+const followed = (input: RunInput, signal: AbortSignal) =>
+  fromStream(followConversation(input.conversationId, undefined, signal), (after) => followConversation(input.conversationId, after, signal))
 
 const startRun = async (input: Outgoing) => {
   const id = input.conversationId
@@ -150,7 +161,7 @@ const startRun = async (input: Outgoing) => {
     if (!run) {
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
     } else {
-      for await (const e of (run.resolve ? resolved : API_MOCK ? scripted : streamed)(run, ctrl.signal)) {
+      for await (const e of (run.resolve ? resolved : run.follow ? followed : API_MOCK ? scripted : streamed)(run, ctrl.signal)) {
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
       if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
@@ -230,9 +241,21 @@ export const stop = (id: string) => {
   void hapticNotify('warning')
 }
 
+const busy = (id: string) => get(id).items.length > 0 || runs.has(id)
+
 export const hydrate = async (id: string) => {
-  if (get(id).items.length || runs.has(id)) return
-  const res = await fetchConversationMessages(id)
+  if (busy(id)) return
+  const [res, turns] = await Promise.all([fetchConversationMessages(id), fetchConversationTurns(id).catch(() => null)])
+  if (busy(id)) return
+  const [newest, ...older] = turns?.data ?? []
+  if (newest) {
+    // Joined tokens keep their first seq, so a running job is replayed whole instead of resumed after it.
+    const active = newest.status === 'RUNNING' || newest.status === 'PENDING'
+    const chat = restoreTurns([active ? { ...newest, events: [] } : newest, ...older], res.data)
+    useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: chat } }))
+    if (active && !API_MOCK) void startRun({ conversationId: id, follow: true })
+    return
+  }
   // push-be pages newest first; the transcript reads oldest first.
   for (const m of [...res.data].reverse()) {
     dispatch(id, m.role === 'USER' ? { type: 'user', id: m.id, text: m.text } : { type: 'agentText', id: m.id, text: m.text })

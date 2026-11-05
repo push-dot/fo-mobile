@@ -1,28 +1,19 @@
-import type { Tone } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { fontFor, useColors } from '../../../theme'
-import { Badge, BottomSheet, Button, GlassButton, Icon, SettingsGroup, SettingsRow, Text } from '@/shared/components'
+import { Badge, BottomSheet, Button, GlassButton, Icon, Menu, SettingsGroup, SettingsRow, Text } from '@/shared/components'
 import { usePersonalPurchase } from '@/features/billing'
 import { type Account } from '../api/schemas'
-import { useMySettings, useUpdateSettings } from '@/features/my'
+import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
-import { ACCESS_MODE_TITLE, ACCESS_MODES } from '../constants'
+import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
+import { accessMenu, toneMenu } from '../utils/account-menus'
 import { Appear } from './motion'
 import Mark from './mark'
-import Note from './note'
 import PageModal from './page-modal'
 import Pick from './pick'
 
-const TONES: { key: Tone; label: string }[] = [
-  { key: 'as_is', label: '그대로' },
-  { key: 'professional', label: '전문적인' },
-  { key: 'confident', label: '자신감 있는' },
-  { key: 'concise', label: '간결한' },
-  { key: 'technical', label: '기술 중심' },
-  { key: 'friendly', label: '친근한' },
-]
 const EFFORTS = [
   { key: 'LOW', label: '가볍게' },
   { key: 'MEDIUM', label: '보통 강도로' },
@@ -99,32 +90,29 @@ const AccountPage = ({ visible, account, onPlan, onClose }: { visible: boolean; 
           <SettingsRow label={account?.plan ?? ' '} onPress={onPlan} />
         </SettingsGroup>
         <View>
-          <SettingsGroup title="AI가 참고하는 내 정보" note="대화를 시작할 때 AI가 이 정보부터 읽어요.">
+          <SettingsGroup title={ACCOUNT_REFERENCE_TITLE} note={ACCOUNT_REFERENCE_NOTE}>
             <SettingsRow label={me.profile?.headline || '희망 직무'} onPress={toMy} />
             <SettingsRow label={me.profile?.tenureYears != null ? `${me.profile.tenureYears}년차` : '연차'} onPress={toMy} />
             <SettingsRow label={docs.data?.find((d) => !d.aiMade)?.fileName ?? '기본 서류'} onPress={toMy} />
           </SettingsGroup>
         </View>
         <SettingsGroup title="대화">
-          <SettingsRow
-            label={tone ? `${tone.label} 말투` : '그대로'}
-            onPress={() =>
-              setPicker({ title: '어떤 말투로 답할까요?', options: TONES.map((t) => t.label), value: TONES.indexOf(tone ?? TONES[0]!), onPick: (i) => save.mutate({ defaultTone: TONES[i]!.key }) })
-            }
-          />
+          <Menu stretch accessibilityLabel="말투" actions={toneMenu(tone?.key, (defaultTone) => save.mutate({ defaultTone }))}>
+            <View>
+              <SettingsRow label={tone ? `${tone.label} 말투` : '그대로'} right={<Icon name="chev" size={18} color="t4" />} />
+            </View>
+          </Menu>
           <SettingsRow
             label={effort ? `${effort.label} 작업` : '작업 강도'}
             onPress={() =>
               setPicker({ title: '얼마나 꼼꼼히 할까요?', options: EFFORTS.map((e) => e.label), value: EFFORTS.indexOf(effort ?? EFFORTS[1]), onPick: (i) => save.mutate({ defaultEffort: EFFORTS[i]!.key }) })
             }
           />
-          <SettingsRow
-            label={mode.label}
-            sub={mode.desc}
-            onPress={() =>
-              setPicker({ title: ACCESS_MODE_TITLE, options: ACCESS_MODES.map((m) => m.label), value: ACCESS_MODES.indexOf(mode), onPick: (i) => access.pick(ACCESS_MODES[i]!.key) })
-            }
-          />
+          <Menu stretch accessibilityLabel="실행 방식" actions={accessMenu(mode.key, access.pick)}>
+            <View>
+              <SettingsRow label={mode.label} sub={mode.desc} right={<Icon name="chev" size={18} color="t4" />} />
+            </View>
+          </Menu>
           <SettingsRow
             label={days ? `대화 기록 ${days}일 보관` : '대화 기록 보관'}
             onPress={() =>
@@ -169,7 +157,7 @@ const PlanPage = ({ account, purchase }: { account: Account; purchase: ReturnTyp
   return (
     <Appear kind="fade">
       <Text v="h1" style={{ fontSize: 25, lineHeight: 34, paddingTop: 6, paddingHorizontal: 24, paddingBottom: 16 }}>
-        {'더 많이 맡기고\n더 빨리 붙어요'}
+        {PLAN_HEADER}
       </Text>
       <Pressable
         accessibilityRole="button"
@@ -218,16 +206,19 @@ const PlanPage = ({ account, purchase }: { account: Account; purchase: ReturnTyp
           </Pressable>
         ))}
       </View>
-      <Text v="c1" color="t3" style={{ paddingTop: 14, paddingHorizontal: 24 }}>
-        매달 결제돼요 · 언제든 해지할 수 있어요
-      </Text>
+      <View style={{ paddingTop: 14, paddingHorizontal: 24, gap: 4 }}>
+        {PLAN_FOOTER.map((line) => (
+          <Text key={line} v="c1" color="t3">
+            {line}
+          </Text>
+        ))}
+      </View>
       <View style={{ marginTop: 22, marginHorizontal: 20 }}>
         <SettingsGroup>
           <SettingsRow label="크레딧 구매" right={<Button label="구매" size="sm" variant="secondary" onPress={purchase.buyCredits} disabled={purchase.pending} />} />
           <SettingsRow label="구매 복원" onPress={purchase.pending ? undefined : purchase.restore} />
         </SettingsGroup>
       </View>
-      <Note>요금제마다 쓸 수 있는 양이 달라요</Note>
     </Appear>
   )
 }

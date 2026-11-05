@@ -1,91 +1,162 @@
 import type { StreamEvent, StreamOption } from '@push/api-client'
-import { CHOICE_QUESTION, DEFAULT_ERROR_TEXT, ERROR_TEXT, FIT_ROWS, MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PREVENTION_QUESTION, queueBusyText } from '../constants'
-import type { Approval, ChatEvent } from '../types'
+import {
+  CHOICE_QUESTION,
+  DEFAULT_ERROR_TEXT,
+  ERROR_TEXT,
+  FIT_ROWS,
+  HINTLESS_GATES,
+  MULTI_PICK_FOOT,
+  MULTI_PICK_SUBMIT,
+  PICK_HINT,
+  PREVENTION_QUESTION,
+  queueBusyText,
+} from '../constants'
+import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
+import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
 export const errorText = (code?: string, retryAfterSec?: number) =>
   code === 'QUEUE_BUSY' && retryAfterSec ? queueBusyText(retryAfterSec) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-const ask = (id: string, question: string, options: StreamOption[], recommended?: string, foot?: string, detail?: string, multiple?: boolean): ChatEvent => {
+type Ask = { id: string; question: string; options: StreamOption[]; detail?: string; multiple?: boolean; warning?: string; hint?: boolean }
+
+const choiceOf = (o: StreamOption): Choice => ({
+  label: o.label,
+  ...(o.desc ? { desc: o.desc } : {}),
+  ...(o.badge ? { badge: { label: o.badge, tone: 'ac' as const } } : {}),
+})
+
+const ask = ({ id, question, options, detail, multiple, warning, hint = true }: Ask): ChatEvent => {
   const approval: Approval = {
     id,
     question,
-    foot: multiple && question === PREVENTION_QUESTION ? MULTI_PICK_FOOT : foot,
+    foot: multiple ? (question === PREVENTION_QUESTION ? MULTI_PICK_FOOT : undefined) : warning || !hint ? undefined : PICK_HINT,
+    warning,
     detail,
     submit: multiple ? MULTI_PICK_SUBMIT : undefined,
     optionIds: options.map((o) => o.id),
-    sections: [
-      {
-        kind: 'choices',
-        selected: [],
-        ...(multiple ? { multi: true as const } : {}),
-        items: options.map((o) => (o.id === recommended ? { label: o.label, badge: { label: '추천', tone: 'ac' as const } } : { label: o.label })),
-      },
-    ],
+    sections: [{ kind: 'choices', selected: [], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
   }
   return { type: 'approval', approval }
 }
 
-const map = (ev: StreamEvent): ChatEvent | null => {
+/** The edit card: preview of the change, then 그대로 두기 · 적용 side by side. */
+const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] => {
+  const [apply, keep] = ev.options
+  const approval: Approval = {
+    id: ev.id,
+    question: ev.title,
+    detail: ev.summary,
+    foot: PICK_HINT,
+    optionIds: ev.options.map((o) => o.id),
+    sections: [],
+    ...(apply ? { submit: apply.label } : {}),
+    ...(keep ? { secondary: keep.label } : {}),
+  }
+  const diff: ChatItem[] = ev.hunks?.length ? [{ type: 'diff', id: `diff-${ev.id}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }] : []
+  return [...diff, { type: 'approval', approval }]
+}
+
+const fitOf = (ev: Extract<StreamEvent, { type: 'fit' }>): ChatItem => {
+  const rows = FIT_ROWS.flatMap((r) => {
+    const score = ev.parts?.[r.key]
+    return score === undefined ? [] : [{ label: r.label, score }]
+  })
+  const caption = ev.band ?? ev.topGap
+  return {
+    type: 'fit',
+    id: `fit-${ev.seq ?? Date.now()}`,
+    score: ev.score,
+    ...(ev.from !== undefined ? { from: ev.from } : {}),
+    ...(ev.delta ? { delta: ev.delta } : {}),
+    ...(ev.note ? { note: ev.note } : {}),
+    ...(caption ? { caption } : {}),
+    ...(ev.plan ? { plan: ev.plan } : {}),
+    ...(ev.summary ? { summary: ev.summary } : {}),
+    ...(rows.length ? { rows } : {}),
+    ...(ev.keywords?.length ? { keywords: ev.keywords } : {}),
+    ...(ev.projected ? { projected: { label: ev.projected.label, bullets: ev.projected.bullets } } : {}),
+  }
+}
+
+/** 다 됐어요! line above the result card, with the score change in bold. */
+const doneLine = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] => {
+  if (!ev.summary) return []
+  const change = ev.fitFrom !== undefined && ev.fitTo !== undefined ? `${ev.fitFrom.toFixed(1)} → ${ev.fitTo.toFixed(1)}` : ''
+  const text = change ? ev.summary.replace(change, `**${change}**`) : ev.summary
+  return [{ type: 'agentText', id: `done-${ev.documentId}`, text, ...(ev.bullets?.length ? { bullets: ev.bullets } : {}) }]
+}
+
+const resultOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem => {
+  const base = { type: 'result' as const, id: `result-${ev.documentId}`, taskLine: ev.taskLine, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
+  return ev.source === 'external'
+    ? { ...base, source: ev.source, fileName: ev.fileName, pageLine: ev.pageLine, savedLine: ev.savedLine, cardMeta: ev.cardMeta }
+    : { ...base, source: ev.source, name: ev.name, headline: ev.headline, title: ev.title, subtitle: ev.subtitle }
+}
+
+/** One server frame → transcript events (an edit card or a result can add a line before itself). */
+export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
   switch (ev.type) {
     case 'token':
-      return { type: 'token', text: ev.text }
+      return [{ type: 'token', text: ev.text }]
     case 'status':
-      return { type: 'status', verbs: [ev.text] }
+      return [{ type: 'status', verbs: [ev.text] }]
     case 'tool': {
       const error = ev.state === 'err' && typeof ev.result?.error === 'string' ? ev.result.error : undefined
-      return { type: 'tool', id: `tool-${ev.name}`, name: ev.name, action: ev.summary, state: ev.state, error }
+      return [
+        {
+          type: 'tool',
+          id: `tool-${ev.name}`,
+          name: ev.name,
+          action: ev.summary,
+          state: ev.state,
+          error,
+          ...(ev.target ? { target: ev.target } : {}),
+          ...(ev.resultLine ? { result: ev.resultLine } : {}),
+          ...(ev.extra?.length ? { extra: ev.extra } : {}),
+          ...(ev.warning ? { warning: ev.warning } : {}),
+        },
+      ]
     }
     case 'approval':
-      return ask(ev.id, ev.kind === 'TOOL_ACTION' ? ev.summary || ev.title : ev.title, ev.options, undefined, ev.kind === 'TOOL_ACTION' ? undefined : ev.summary)
+      if (ev.kind === 'DOCUMENT_EDIT') return askEdit(ev)
+      return [ask({ id: ev.id, question: ev.summary || ev.title, options: ev.options, warning: ev.foot })]
     case 'choice': {
-      if (!ev.auto) return ask(ev.id, ev.title ?? CHOICE_QUESTION, ev.options, ev.recommended, undefined, ev.detail, ev.multiple)
+      // push-be #224 auto mode still sends sections; the auto line wins.
+      if (!ev.auto && ev.sections?.length) return [{ type: 'approval', approval: approvalFromSections(ev) }]
+      if (!ev.auto) {
+        const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
+        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, detail: ev.detail, multiple: ev.multiple, hint: !HINTLESS_GATES.includes(ev.gate ?? '') })
+        if (event.type === 'approval' && pending) event.approval.pendingNote = pending
+        return [event]
+      }
       const picked = ev.options.find((o) => o.id === ev.recommended)
-      return picked ? { type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked.label}` } : null
+      return picked ? [{ type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked.label}` }] : []
     }
+    case 'think':
+      return [mapThink(ev)]
+    case 'plan':
+      return [mapPlan(ev)]
+    case 'paper':
+      return [mapPaper(ev)]
     case 'file':
-      return { type: 'file', id: `file-${ev.fileId}`, name: ev.name, url: ev.downloadUrl, preview: true }
+      return [{ type: 'file', id: `file-${ev.fileId}`, name: ev.name, url: ev.downloadUrl, preview: true }]
     case 'result':
-      return ev.source === 'external'
-        ? {
-            type: 'result',
-            id: `result-${ev.documentId}`,
-            source: ev.source,
-            taskLine: ev.taskLine,
-            checklist: ev.checklist,
-            documentId: ev.documentId,
-            company: ev.company,
-            actions: ev.actions,
-            fileName: ev.fileName,
-            pageLine: ev.pageLine,
-            savedLine: ev.savedLine,
-            cardMeta: ev.cardMeta,
-          }
-        : {
-            type: 'result',
-            id: `result-${ev.documentId}`,
-            source: ev.source,
-            taskLine: ev.taskLine,
-            checklist: ev.checklist,
-            documentId: ev.documentId,
-            company: ev.company,
-            actions: ev.actions,
-            name: ev.name,
-            headline: ev.headline,
-            title: ev.title,
-            subtitle: ev.subtitle,
-          }
+      return [...doneLine(ev), resultOf(ev)]
     case 'todo':
-      return { type: 'todo', id: 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state })) }
+      return [{ type: 'todo', id: ev.id ? `todo-${ev.id}` : 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state, ...(i.added ? { added: true } : {}) })) }]
     case 'diff':
-      return { type: 'diff', id: `diff-${ev.revisionId}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }
+      return [{ type: 'diff', id: `diff-${ev.revisionId}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }]
     case 'fit':
-      return { type: 'fit', id: `fit-${Date.now()}`, score: ev.score, caption: ev.topGap, rows: FIT_ROWS.map((r) => ({ label: r.label, score: ev.parts[r.key] })) }
+      return [fitOf(ev)]
     case 'error':
-      return { type: 'error', id: `err-${Date.now()}`, text: errorText(ev.error.code), code: ev.error.code }
+      return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code), code: ev.error.code }]
     case 'cancelled':
-      return { type: 'stop' }
+      return [{ type: 'stop' }]
     case 'done':
-      return { type: 'done', at: 0, awaiting: ev.awaiting }
+      return [{ type: 'done', at: 0, awaiting: ev.awaiting }]
+    default:
+      // push-be #224: a type this build does not know must not stop the stream.
+      return []
   }
 }
 
@@ -103,8 +174,7 @@ export const fromStream = async function* (
     for await (const ev of source) {
       got = true
       if (ev.seq !== undefined) seq = ev.seq
-      const e = map(ev)
-      if (e) yield e
+      yield* mapEvent(ev)
       if (ev.type === 'done' || ev.type === 'error' || ev.type === 'cancelled') return
     }
     if (!got && source !== first) return

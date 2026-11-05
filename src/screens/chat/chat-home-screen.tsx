@@ -1,16 +1,16 @@
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text } from '@/shared/components'
-import { ChatDrawer, ComposerArea, ConsentSheet, ConversationsModal, QUICK_STARTS, QuickStartSheet, useStartChat, type QuickStart } from '@/features/chat'
+import { ChatDrawer, ComposerArea, ConsentSheet, ConversationsModal, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
 
 const ChatHomeScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const start = useStartChat()
   const [typing, setTyping] = useState(false)
-  const [qs, setQs] = useState<QuickStart | null>(null)
   const [drawer, setDrawer] = useState(false)
   const [listOpen, setListOpen] = useState(false)
 
@@ -27,7 +27,7 @@ const ChatHomeScreen = () => {
       {!typing ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, padding: 16 }} style={{ flexGrow: 0 }}>
           {QUICK_STARTS.map((q) => (
-            <QuickStartPill key={q.key} qs={q} onPress={() => setQs(q)} />
+            <QuickStartPill key={q.key} qs={q} onPress={() => router.push(quickStartPath(q.key))} />
           ))}
         </ScrollView>
       ) : null}
@@ -35,11 +35,10 @@ const ChatHomeScreen = () => {
         <ComposerArea
           placeholder="공고 링크를 붙여넣어 보세요"
           onTyping={setTyping}
-          onShortcut={setQs}
+          onShortcut={() => undefined}
           onSend={(text, attachment) => void start(text.length > 30 ? `${text.slice(0, 30)}…` : text, text, attachment)}
         />
       </View>
-      <QuickStartSheet qs={qs} onClose={() => setQs(null)} />
       <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} onSeeAll={() => setListOpen(true)} />
       <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} />
       <ConsentSheet />

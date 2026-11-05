@@ -1,9 +1,20 @@
-export type RowAction = 'pin' | 'archive' | 'delete'
+export type RowAction = 'rename' | 'pin' | 'archive' | 'delete'
+export type HeaderAction = 'rename' | 'docs' | 'share' | 'pin' | 'archive' | 'delete'
 
-export const conversationRowMenu = (pinned: boolean): { id: RowAction; label: string }[] => [
+export const headerMenu = (pinned: boolean): { id: HeaderAction; label: string; destructive?: boolean }[] => [
+  { id: 'rename', label: '이름 바꾸기' },
+  { id: 'docs', label: '쓴 서류·공고 보기' },
+  { id: 'share', label: '대화 공유' },
   { id: 'pin', label: pinned ? '고정 해제' : '고정' },
   { id: 'archive', label: '보관' },
-  { id: 'delete', label: '삭제' },
+  { id: 'delete', label: '대화 삭제', destructive: true },
+]
+
+export const conversationRowMenu = (pinned: boolean): { id: RowAction; label: string; destructive?: boolean }[] => [
+  { id: 'rename', label: '이름 바꾸기' },
+  { id: 'pin', label: pinned ? '고정 해제' : '고정' },
+  { id: 'archive', label: '보관' },
+  { id: 'delete', label: '삭제', destructive: true },
 ]
 
 export const DELETE_CONFIRM = {

@@ -1,10 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useColors, useShadow } from '@/theme'
-import { BottomSheet, Glass, GlassButton, Icon, Mascot, Text, TextField, type IconName } from '@/shared/components'
+import { useColors } from '@/theme'
+import { BottomSheet, GlassButton, Icon, Mascot, Menu, Text, TextField } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { usePersonalPurchase } from '@/features/billing'
 import { useConvertDocument } from '@/features/my'
@@ -19,20 +19,23 @@ import {
   ConversationsModal,
   DELETE_CONFIRM,
   DocsModal,
+  headerMenu,
   hydrate,
   Item,
   Queued,
   Appear,
-  QuickStartSheet,
+  materialsPath,
+  quickStartPath,
   send,
   StatusRow,
   stop,
   useChat,
   useConversationList,
+  useArchiveConversation,
   useDeleteConversation,
+  usePinConversation,
   useReduceMotion,
   useRenameConversation,
-  type QuickStart,
 } from '@/features/chat'
 
 const ConversationScreen = ({ id }: { id: string }) => {
@@ -49,10 +52,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const [drawer, setDrawer] = useState(false)
   const [listOpen, setListOpen] = useState(false)
   const [planOpen, setPlanOpen] = useState(false)
-  const [more, setMore] = useState(false)
   const [docs, setDocs] = useState(false)
   const [renaming, setRenaming] = useState<string | null>(null)
-  const [qs, setQs] = useState<QuickStart | null>(null)
   const [sayingFor, setSayingFor] = useState<string>()
   const [bottomH, setBottomH] = useState(160)
   const [fresh, setFresh] = useState(false)
@@ -67,6 +68,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
 
   const rename = useRenameConversation(id, conv?.revision)
   const remove = useDeleteConversation()
+  const pin = usePinConversation()
+  const archive = useArchiveConversation()
 
   const shareText = () =>
     chat.items
@@ -74,21 +77,23 @@ const ConversationScreen = ({ id }: { id: string }) => {
       .filter(Boolean)
       .join('\n')
 
-  const menu: { icon: IconName; label: string; danger?: boolean; onPress: () => void }[] = [
-    { icon: 'edit', label: '이름 바꾸기', onPress: () => setRenaming(conv?.title ?? '') },
-    { icon: 'doc', label: '쓴 서류·공고 보기', onPress: () => setDocs(true) },
-    { icon: 'share', label: '대화 공유', onPress: () => void shareMessage({ title: conv?.title, message: shareText() }) },
-    {
-      icon: 'x',
-      label: '대화 삭제',
-      danger: true,
-      onPress: () =>
+  const menu = headerMenu(!!conv?.pinned).map((action) => ({
+    key: action.id,
+    label: action.label,
+    destructive: action.destructive,
+    onPress: () => {
+      if (action.id === 'rename') setRenaming(conv?.title ?? '')
+      else if (action.id === 'docs') setDocs(true)
+      else if (action.id === 'share') void shareMessage({ title: conv?.title, message: shareText() })
+      else if (action.id === 'pin' && conv) pin.mutate(conv)
+      else if (action.id === 'archive' && conv) archive.mutate(conv, { onSuccess: () => router.dismissTo('/chat') })
+      else if (action.id === 'delete')
         Alert.alert(DELETE_CONFIRM.title, DELETE_CONFIRM.body, [
           { text: DELETE_CONFIRM.cancel, style: 'cancel' },
           { text: DELETE_CONFIRM.confirm, style: 'destructive', onPress: () => remove.mutate(id, { onSuccess: () => router.dismissTo('/chat') }) },
-        ]),
+        ])
     },
-  ]
+  }))
 
   const placeholder = chat.working ? '작업 중에도 말할 수 있어요' : chat.items.length ? '더 고칠 부분이 있으면 말해 주세요' : '공고 링크를 붙여넣어 보세요'
   const showPanel = chat.approval && !saying
@@ -124,7 +129,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
         ))}
       </ScrollView>
 
-      <Header onDrawer={() => setDrawer(true)} onNew={() => router.dismissTo('/chat')} onMore={() => setMore(true)} />
+      <Header onDrawer={() => setDrawer(true)} onNew={() => router.dismissTo('/chat')} menu={menu} />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         {fresh ? (
@@ -148,6 +153,8 @@ const ConversationScreen = ({ id }: { id: string }) => {
               approval={chat.approval!}
               onAnswer={(text, choice) => answer(id, text, choice)}
               onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
+              // The picked material lands in the composer; sending it re-asks the gate with that material.
+              onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialsPath()))}
             />
           ) : (
             <View style={{ paddingHorizontal: 12, paddingBottom: Math.max(insets.bottom, 6) }}>
@@ -157,7 +164,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
                 working={!!chat.working}
                 onStop={() => stop(id)}
                 onSend={(text, attachment) => send(id, text, attachment)}
-                onShortcut={setQs}
+                onShortcut={(qs) => router.push(quickStartPath(qs.key))}
                 above={
                   chat.working ? (
                     <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} />
@@ -173,7 +180,6 @@ const ConversationScreen = ({ id }: { id: string }) => {
         </View>
       </KeyboardAvoidingView>
 
-      <MoreMenu visible={more} items={menu} onClose={() => setMore(false)} />
       <BottomSheet
         visible={renaming !== null}
         onClose={() => setRenaming(null)}
@@ -187,7 +193,6 @@ const ConversationScreen = ({ id }: { id: string }) => {
         <TextField value={renaming ?? ''} onChangeText={setRenaming} max={300} autoFocus accessibilityLabel="대화 이름" />
       </BottomSheet>
       <DocsModal visible={docs} onClose={() => setDocs(false)} />
-      <QuickStartSheet qs={qs} onClose={() => setQs(null)} />
       <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} currentId={id} onSeeAll={() => setListOpen(true)} />
       <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} currentId={id} onDeleted={() => router.dismissTo('/chat')} />
       <AccountModal visible={planOpen} initialPage="plan" onClose={() => setPlanOpen(false)} />
@@ -196,7 +201,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   )
 }
 
-const Header = ({ onDrawer, onNew, onMore }: { onDrawer: () => void; onNew: () => void; onMore: () => void }) => {
+const Header = ({ onDrawer, onNew, menu }: { onDrawer: () => void; onNew: () => void; menu: { key: string; label: string; destructive?: boolean; onPress: () => void }[] }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
@@ -212,56 +217,14 @@ const Header = ({ onDrawer, onNew, onMore }: { onDrawer: () => void; onNew: () =
         <View accessibilityRole="header" accessibilityLabel="Push" style={{ flex: 1, alignItems: 'center' }}>
           <Mascot size={36} />
         </View>
-        <GlassButton
-          actions={[
-            { icon: 'edit', label: '새 대화', onPress: onNew },
-            { icon: 'more', label: '더 보기', onPress: onMore },
-          ]}
-        />
+        <GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: onNew }]} />
+        <Menu accessibilityLabel="대화 더 보기" actions={menu}>
+          <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="more" size={22} color="t1" />
+          </View>
+        </Menu>
       </View>
     </View>
-  )
-}
-
-const MoreMenu = ({ visible, items, onClose }: { visible: boolean; items: { icon: IconName; label: string; danger?: boolean; onPress: () => void }[]; onClose: () => void }) => {
-  const c = useColors()
-  const shadow = useShadow()
-  const insets = useSafeAreaInsets()
-  const ios = Platform.OS === 'ios'
-  const body = (
-    <View style={{ padding: 6 }}>
-      {items.map((m, i) => (
-        <View key={m.label}>
-          {m.danger && i > 0 ? <View style={{ height: 1, backgroundColor: c.line, marginVertical: 4, marginHorizontal: 10 }} /> : null}
-          <Pressable
-            accessibilityRole="menuitem"
-            onPress={() => (onClose(), m.onPress())}
-            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, height: 44, paddingHorizontal: 14, borderRadius: 12, backgroundColor: pressed ? c.fill : 'transparent' })}
-          >
-            <View style={{ width: 22, alignItems: 'center' }}>
-              <Icon name={m.icon} size={20} color={m.danger ? 'red' : 't1'} />
-            </View>
-            <Text v="b1" color={m.danger ? 'red' : 't1'}>
-              {m.label}
-            </Text>
-          </Pressable>
-        </View>
-      ))}
-    </View>
-  )
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable accessibilityLabel="메뉴 닫기" style={{ flex: 1 }} onPress={onClose} />
-      <View accessibilityRole="menu" style={{ position: 'absolute', top: insets.top + 58, right: 12, width: 236 }}>
-        {ios ? (
-          <Glass surface="sheet" style={{ borderRadius: 26 }}>
-            {body}
-          </Glass>
-        ) : (
-          <View style={[shadow.pop, { borderRadius: 20, backgroundColor: c.card, elevation: 8 }]}>{body}</View>
-        )}
-      </View>
-    </Modal>
   )
 }
 
