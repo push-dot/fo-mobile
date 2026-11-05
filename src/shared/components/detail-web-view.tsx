@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { useColors, useThemeMode } from '../../theme'
+import { detailUrl } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import Text from './text'
@@ -53,7 +54,8 @@ const DetailWebView = ({ path, onTitle, onBridge }: Props) => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <WebView<object>
         ref={ref}
-        source={{ uri: `${WEB_BASE_URL}${path}${API_MOCK ? '?mock=1' : ''}` }}
+        key={mode}
+        source={{ uri: detailUrl(WEB_BASE_URL, path, mode, API_MOCK) }}
         injectedJavaScriptBeforeContentLoaded={boot}
         injectedJavaScript={applyZoom}
         textZoom={zoom}
