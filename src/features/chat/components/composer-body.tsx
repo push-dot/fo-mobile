@@ -19,7 +19,6 @@ export type ComposerProps = {
   attachment?: string
   onClearAttachment: () => void
   accessMode: AccessMode
-  onAccessMode: (mode: AccessMode) => void
   inputRef?: Ref<TextInputInstance>
 }
 
@@ -69,7 +68,7 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
             언급
           </Text>
         </Pressable>
-        <ModePicker value={p.accessMode} onChange={p.onAccessMode} />
+        <ModePicker value={p.accessMode} />
         <View style={{ flex: 1 }} />
         {p.working && !hasText ? (
           <Pressable

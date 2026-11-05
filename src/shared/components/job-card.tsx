@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandOf, cardCareerLabel } from '@push/shared'
-import { radius } from '../../theme'
+import { palette, radius } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
@@ -39,7 +39,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           hitSlop={8}
           style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.86)', alignItems: 'center', justifyContent: 'center' }}
         >
-          <Icon name="bookmark" size={16} color={p.bookmarked ? '#4A3BDF' : '#16191D'} filled={p.bookmarked} />
+          <Icon name="bookmark" size={16} color={p.bookmarked ? palette.light.acText : palette.light.t1} filled={p.bookmarked} />
         </Pressable>
       </View>
       <View style={{ gap: 2 }}>

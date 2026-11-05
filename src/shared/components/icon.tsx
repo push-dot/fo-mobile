@@ -1,6 +1,6 @@
 import { SvgXml } from 'react-native-svg'
+import { LINE_ICONS, type IconName } from '@push/design-system'
 import { useColors, type Colors } from '../../theme'
-import { LINE_ICONS, type IconName } from './icon-data'
 
 type Props = { name: IconName; size?: number; color?: keyof Colors | (string & {}); filled?: boolean }
 

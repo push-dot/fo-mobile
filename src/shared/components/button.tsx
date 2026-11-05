@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { Platform, Pressable, View, type StyleProp, type ViewStyle } from 'react-native'
-import { radius, useColors } from '../../theme'
+import type { IconName } from '@push/design-system'
+import { onAccent, radius, useColors } from '../../theme'
 import Glass from './glass'
 import Icon from './icon'
-import type { IconName } from './icon-data'
 import Text from './text'
 
 type Props = {
@@ -16,10 +16,18 @@ type Props = {
   style?: StyleProp<ViewStyle>
 }
 
-const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabled, style }: Props) => {
+const Button = ({
+  label,
+  onPress,
+  variant = 'primary',
+  size = 'lg',
+  icon,
+  disabled,
+  style,
+}: Props) => {
   const c = useColors()
   const sm = size === 'sm'
-  const fg = variant === 'primary' ? '#FFFFFF' : c.t1
+  const fg = variant === 'primary' ? onAccent : c.t1
   const box: ViewStyle = {
     height: sm ? 40 : 56,
     borderRadius: sm ? radius.sm : radius.md,
@@ -44,7 +52,10 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabl
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [{ opacity: disabled ? 0.45 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }, style]}
+      style={({ pressed }) => [
+        { opacity: disabled ? 0.45 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
+        style,
+      ]}
     >
       {glassSecondary ? (
         <Glass interactive style={box}>
