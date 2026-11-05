@@ -1,7 +1,15 @@
 import { Switch as RNSwitch } from 'react-native'
-import { useColors } from '../../theme'
+import { onAccent, useColors } from '../../theme'
 
-const Switch = ({ value, onValueChange, label }: { value: boolean; onValueChange: (v: boolean) => void; label: string }) => {
+const Switch = ({
+  value,
+  onValueChange,
+  label,
+}: {
+  value: boolean
+  onValueChange: (v: boolean) => void
+  label: string
+}) => {
   const c = useColors()
   return (
     <RNSwitch
@@ -9,7 +17,7 @@ const Switch = ({ value, onValueChange, label }: { value: boolean; onValueChange
       value={value}
       onValueChange={onValueChange}
       trackColor={{ true: c.ac, false: c.fill2 }}
-      thumbColor="#FFFFFF"
+      thumbColor={onAccent}
       ios_backgroundColor={c.fill2}
     />
   )

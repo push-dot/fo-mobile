@@ -27,7 +27,14 @@ export const stubs = {
     HStack: 'HStack',
     ContextMenu: compound('ContextMenu', ['Trigger', 'Items', 'Preview']),
   },
-  swiftUIModifiers: modifiers(['pickerStyle', 'tag', 'controlSize', 'datePickerStyle', 'labelsHidden', 'accessibilityLabel']),
+  swiftUIModifiers: modifiers([
+    'pickerStyle',
+    'tag',
+    'controlSize',
+    'datePickerStyle',
+    'labelsHidden',
+    'accessibilityLabel',
+  ]),
   compose: {
     Switch: 'CSwitch',
     Text: 'CText',
@@ -40,7 +47,15 @@ export const stubs = {
     TimePickerDialog: 'TimePickerDialog',
   },
   composeModifiers: modifiers(['semantics', 'fillMaxWidth', 'fillMaxSize', 'weight']),
-  theme: { palette, radius, type, useColors: () => palette.light, useThemeMode: () => 'light', fontFor: () => ({}) },
+  theme: {
+    palette,
+    radius,
+    type,
+    useColors: () => palette.light,
+    useThemeMode: () => 'light' as const,
+    fontFor: () => ({}),
+    onAccent: palette.light.bg,
+  },
 }
 
 const children = (node: ReactNode): ReactNode[] => {
@@ -50,7 +65,8 @@ const children = (node: ReactNode): ReactNode[] => {
   return [node, ...children(props.children as ReactNode), ...children(props.label as ReactNode)]
 }
 
-export const findAll = (tree: ReactNode, type: unknown) => children(tree).filter((n): n is El => isValidElement(n) && n.type === type)
+export const findAll = (tree: ReactNode, type: unknown) =>
+  children(tree).filter((n): n is El => isValidElement(n) && n.type === type)
 
 export const find = (tree: ReactNode, type: unknown) => {
   const [first] = findAll(tree, type)

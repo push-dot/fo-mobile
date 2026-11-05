@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { useColors } from '../../theme'
+import { onAccent, useColors } from '../../theme'
 import Icon from './icon'
 import Text from './text'
 
@@ -25,8 +25,21 @@ const GlassActionButton = ({ a, width }: { a: GlassAction; width: number }) => {
     >
       <Icon name={a.icon} size={22} color={a.active ? c.acText : c.t1} filled={a.active} />
       {a.badge ? (
-        <View style={{ position: 'absolute', top: 4, right: 2, minWidth: 18, height: 18, paddingHorizontal: 5, borderRadius: 9, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center' }}>
-          <Text v="c2" weight="800" style={{ color: '#FFFFFF', fontSize: 11, lineHeight: 18 }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 4,
+            right: 2,
+            minWidth: 18,
+            height: 18,
+            paddingHorizontal: 5,
+            borderRadius: 9,
+            backgroundColor: c.red,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text v="c2" weight="800" style={{ color: onAccent, fontSize: 11, lineHeight: 18 }}>
             {a.badge > 99 ? '99+' : a.badge}
           </Text>
         </View>

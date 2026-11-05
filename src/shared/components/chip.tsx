@@ -1,5 +1,6 @@
 import { Platform, Pressable, View } from 'react-native'
 import { radius, useColors } from '../../theme'
+import { HIT_TARGET } from './hit-target'
 import Glass from './glass'
 import Icon from './icon'
 import Text from './text'
@@ -17,7 +18,15 @@ const Chip = ({ label, on, onPress, menu, check, removable }: Props) => {
   const c = useColors()
   const fg = on ? c.bg : c.t2
   const inner = (
-    <View style={{ height: 34, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+    <View
+      style={{
+        minHeight: HIT_TARGET,
+        paddingHorizontal: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+      }}
+    >
       {check && on ? <Icon name="check" size={14} color={fg} /> : null}
       <Text v="c1" weight="600" style={{ fontSize: 14, color: fg }} numberOfLines={1}>
         {label}
