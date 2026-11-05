@@ -19,7 +19,7 @@ const Sheet = ({ title, description, children, action }: Props) => {
   const android = Platform.OS === 'android'
   return (
     <View style={{ paddingTop: android ? 16 : 28, paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 16), gap: 14 }}>
-      {android ? <View style={{ width: 32, height: 4, borderRadius: 2, backgroundColor: c.t4, alignSelf: 'center', marginBottom: 4 }} /> : null}
+      {android ? <View style={{ width: 32, height: 4, borderRadius: 2, backgroundColor: c.deco, alignSelf: 'center', marginBottom: 4 }} /> : null}
       {title ? (
         <View style={{ gap: 2 }}>
           <Text v="h2" accessibilityRole="header">

@@ -13,6 +13,9 @@ vi.mock('@expo/ui/jetpack-compose/modifiers', async () => (await import('./nativ
 vi.mock('@/theme', async () => (await import('./native-stubs')).stubs.theme)
 vi.mock('@/shared/utility/asset-url', () => ({}))
 vi.mock('@/shared/components/icon', () => ({ default: 'Icon' }))
+vi.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }))
+vi.mock('../button', () => ({ default: 'Button' }))
+vi.mock('../text', () => ({ default: 'Text' }))
 
 const { default: Switch } = await import('../switch.android')
 const { default: SegmentedControl } = await import('../segmented-control.android')
@@ -21,6 +24,7 @@ const { default: NativeHost } = await import('../native-host')
 const { default: Menu } = await import('../menu.android')
 const { default: ContextMenu } = await import('../context-menu.android')
 const { default: DatePicker } = await import('../date-picker.android')
+const { default: Sheet } = await import('../sheet')
 
 const c = palette.light
 const actions = [
@@ -98,6 +102,17 @@ describe('Menu and ContextMenu (Android)', () => {
     expect(row.props.onPress).toBe(onPress)
     ;(row.props.onLongPress as () => void)()
     expect(state.set).toHaveBeenCalledWith(true)
+  })
+})
+
+describe('Sheet (Android)', () => {
+  it('paints the drag handle with deco, the colour the canvas keeps for a grabber', () => {
+    const handle = findAll(Sheet({ children: '본문' }), 'View').find((view) => {
+      const style = view.props.style as { backgroundColor?: string } | undefined
+      return style?.backgroundColor != null
+    })
+    expect(handle?.props.style).toMatchObject({ backgroundColor: c.deco })
+    expect(c.deco).not.toBe(c.t4)
   })
 })
 
