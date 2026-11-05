@@ -1,0 +1,69 @@
+appId: app.push.mobile
+name: 홈 → 검색 → 결과 · 사람 · 게시글 · 결과 없음
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- tapOn: "검색"
+- extendedWaitUntil:
+    visible: "지금 많이 찾는 검색어"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*프론트엔드.*"
+    timeout: 10000
+# iOS shows the autofocused screen without a keyboard, so there is nothing to hide (hideKeyboard fails there).
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- waitForAnimationToEnd
+- takeScreenshot: Search
+- tapOn: "검색어|회사, 직무, 기술 검색"
+# Android inputText is ASCII only, so it searches a recent term instead of ‘백엔드’.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+      - tapOn: "모아페이"
+      - extendedWaitUntil:
+          visible: "‘모아페이’ 공고.*"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: SearchResult
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "백엔드"
+      - extendedWaitUntil:
+          visible: "‘백엔드’ 공고.*"
+          timeout: 10000
+      - runFlow: _hide_kbd.yaml
+      - waitForAnimationToEnd
+      - takeScreenshot: SearchResult
+      - tapOn: "사람.*"
+      - extendedWaitUntil:
+          visible: "‘백엔드’ 사람.*"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: HomeStates.3
+      - tapOn: "게시글.*"
+      - extendedWaitUntil:
+          visible: "‘백엔드’ 게시글.*"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: HomeStates.4
+      - tapOn: "검색어 지우기"
+      # The clear button takes the field's focus, so typing needs a tap on the field first.
+      - tapOn: "검색어|회사, 직무, 기술 검색"
+      - inputText: "데브옵스 인턴"
+      - extendedWaitUntil:
+          visible: "‘데브옵스 인턴’에 맞는 결과가 없어요.*"
+          timeout: 10000
+      # The board shows the empty result under the 공고 chip, the last tab used here was 게시글.
+      - tapOn: "공고.*"
+      - runFlow: _hide_kbd.yaml
+      - waitForAnimationToEnd
+      - takeScreenshot: HomeStates.2

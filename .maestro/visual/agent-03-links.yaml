@@ -1,0 +1,82 @@
+appId: app.push.mobile
+name: 에이전트 · 내 링크 → 추가 → ⋯ 메뉴 → 삭제 → 모두 지워 빈 상태
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- tapOn: "대화 목록 열기"
+- extendedWaitUntil:
+    visible: "최근 대화"
+    timeout: 10000
+- tapOn: "내 링크"
+- extendedWaitUntil:
+    visible: "에이전트에서 @언급으로 불러오거나.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MyLinks
+- tapOn: "링크 추가"
+- extendedWaitUntil:
+    visible: "추가하기"
+    timeout: 5000
+- inputText: "github.com/seojun-kim/payment-gateway"
+- waitForAnimationToEnd
+- takeScreenshot: MyLinkAdd
+# Dismiss the add sheet through its scrim; with the keyboard up it reaches y=11% on iOS, so 15-25% is inside it and _close_sheet taps higher.
+- tapOn:
+    point: "50%,25%"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "추가하기"
+    file: _close_sheet.yaml
+    env:
+      TITLE: "추가하기"
+- tapOn:
+    text: ".*더 보기"
+    index: 0
+- extendedWaitUntil:
+    visible: "에이전트에서 쓰기"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: MyLinkMenu
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "이 링크를 삭제할까요?"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: DeleteLink.1
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "링크를 삭제했어요"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: DeleteLink.2
+# Delete the rest (6 seeded links remain; the added one is not saved).
+- repeat:
+    times: 6
+    commands:
+      # Android: with one link left its row sits at the bottom, under the snackbar of the previous delete, which swallows the ⋯ tap.
+      - runFlow:
+          when:
+            platform: Android
+            visible: "전체 1"
+          commands:
+            - extendedWaitUntil:
+                notVisible: "링크를 삭제했어요"
+                timeout: 30000
+      - tapOn:
+          text: ".*더 보기"
+          index: 0
+          retryTapIfNoChange: true
+      - tapOn: "삭제"
+      - extendedWaitUntil:
+          visible: "이 링크를 삭제할까요?"
+          timeout: 5000
+      - tapOn: "삭제"
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "아직 모아 둔 링크가 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MyLinksEmpty

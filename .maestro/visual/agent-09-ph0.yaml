@@ -1,0 +1,42 @@
+appId: app.push.mobile
+name: 에이전트 · Phase 0 진행 방식 → 산출물과 자료 → 분석 시작 → Phase 1 → 적합도 확인
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 백엔드 공고에 맞춰 이력서 만들어 주세요"
+      EN: "make resume"
+- extendedWaitUntil:
+    visible: "어떤 방식으로 진행할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0
+- tapOn: ".*이력서부터 쓸게요"
+- extendedWaitUntil:
+    visible: "어떤 산출물을 만들까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0Input
+# The closing 말투 chip sends the card.
+- tapOn: "원래 말투로"
+- extendedWaitUntil:
+    visible: "이대로 분석을 시작할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0Start
+- tapOn: ".*네, 시작해 주세요"
+# The list stops following the stream (a 새 내용 pill shows), so the running line sits below the fold until it is scrolled to.
+- scrollUntilVisible:
+    element: ".*필수·우대 스택을 뽑는 중.*"
+    timeout: 40000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh1
+- extendedWaitUntil:
+    visible: "이 공고에 맞춰 이력서를 고칠까요?"
+    timeout: 40000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh1Fit

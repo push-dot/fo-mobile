@@ -1,0 +1,49 @@
+appId: app.push.mobile
+name: 채용공고 → 기술 스택 · 지역 · 고용형태 필터 · 빈 상태
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _open_jobs.yaml
+- tapOn: "기술 스택"
+- extendedWaitUntil:
+    visible: "내 프로필 기술"
+    timeout: 10000
+- tapOn: "Kotlin"
+- tapOn: "Spring Boot"
+- tapOn: "Kafka"
+- extendedWaitUntil:
+    visible: "공고 214개 보기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: FilterSkill
+- runFlow:
+    file: _apply_region.yaml
+    env:
+      TEXT: "공고 214개 보기"
+- tapOn: "전체"
+- waitForAnimationToEnd
+# iOS merges a row's label and count into one element, Android keeps them apart.
+- tapOn: "지역"
+- tapOn: "강남구(.*214)?"
+- tapOn: "서초구(.*96)?"
+- tapOn: "마포구(.*88)?"
+- extendedWaitUntil:
+    visible: "공고 398개 보기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: FilterRegion
+- runFlow:
+    file: _apply_region.yaml
+    env:
+      TEXT: "공고 398개 보기"
+- tapOn: "전체"
+- waitForAnimationToEnd
+- runFlow: _scroll_chips.yaml
+- tapOn: "고용형태"
+- tapOn: "정규직"
+- extendedWaitUntil:
+    visible: "공고 1,021개 보기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: FilterType

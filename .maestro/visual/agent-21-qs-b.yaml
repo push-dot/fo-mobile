@@ -1,0 +1,31 @@
+appId: app.push.mobile
+name: 에이전트 · 빠른 시작 시트 (마감 · 현황 · 캘린더 · 허브)
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _qs.yaml
+    env:
+      LABEL: "마감 임박 공고 정리"
+      WAIT: "서류 준비됨"
+      SHOT: QsDeadline
+- runFlow:
+    file: _qs.yaml
+    env:
+      LABEL: "지원 현황 정리"
+      WAIT: "3개 정리하기"
+      SHOT: QsStatus
+- runFlow:
+    file: _qs.yaml
+    env:
+      LABEL: "캘린더 관리"
+      WAIT: "Google 캘린더와 연결됨"
+      SHOT: QsInterview
+- runFlow:
+    file: _qs.yaml
+    env:
+      LABEL: "허브 프로필 다듬기"
+      WAIT: ".*바탕이 될 서류.*"
+      SHOT: QsHub

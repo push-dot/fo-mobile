@@ -1,0 +1,49 @@
+appId: app.push.mobile
+name: 인증번호 틀림 · 만료 · 5번 초과
+tags:
+  - visual
+---
+# The mock reads the code's tail: 482111 wrong, 482222 expired, 482333 too many tries (mock/home.ts).
+- runFlow: _phone_code.yaml
+- inputText: "482111"
+- runFlow: _hide_kbd.yaml
+- tapOn: "확인"
+- extendedWaitUntil:
+    visible: "인증번호가 맞지 않아요.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: SignInErrors.1
+- tapOn: "번호 바꾸기"
+- tapOn: "인증번호 받기"
+- extendedWaitUntil:
+    visible: "인증번호를 입력해 주세요"
+    timeout: 10000
+- inputText: "482222"
+- runFlow: _hide_kbd.yaml
+- tapOn: "확인"
+- extendedWaitUntil:
+    visible: "인증번호가 만료됐어요.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: SignInErrors.2
+- tapOn: "번호 바꾸기"
+- tapOn: "인증번호 받기"
+- extendedWaitUntil:
+    visible: "인증번호를 입력해 주세요"
+    timeout: 10000
+- inputText: "482333"
+- runFlow: _hide_kbd.yaml
+- tapOn: "확인"
+- extendedWaitUntil:
+    visible: "인증번호를 5번 잘못 입력했어요"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: AuthCodeLimit

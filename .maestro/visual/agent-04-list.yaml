@@ -1,0 +1,60 @@
+appId: app.push.mobile
+name: 에이전트 · 대화 목록 → 길게 누름 → 삭제 확인 → 고정된 대화 → 보관한 대화
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow: _open_list.yaml
+- extendedWaitUntil:
+    visible: ".*누리클라우드 자기소개서.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatList
+- takeScreenshot: ChatDrawerAll
+- longPressOn: ".*모아페이 백엔드 이력서.*"
+- extendedWaitUntil:
+    visible: "이름 바꾸기"
+    timeout: 5000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: ChatListPress.1
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - takeScreenshot: ChatListPress.3
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "대화를 삭제할까요?"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: ChatDeleteConfirm
+- tapOn: "취소"
+- waitForAnimationToEnd
+# 경력기술서 다듬기 is seeded pinned, so its menu offers 고정 해제.
+- longPressOn: ".*경력기술서 다듬기.*"
+- extendedWaitUntil:
+    visible: "고정 해제"
+    timeout: 5000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: ChatListPress.2
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - takeScreenshot: ChatListPress.4
+- runFlow: _dismiss_menu.yaml
+- tapOn: "보관한 대화"
+- extendedWaitUntil:
+    visible: "보관 해제"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: ChatArchived

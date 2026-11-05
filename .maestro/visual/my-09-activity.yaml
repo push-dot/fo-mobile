@@ -1,0 +1,58 @@
+appId: app.push.mobile
+name: 마이 내 활동 → 지원한 공고 상세 → 캘린더 → 일정 추가
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "내 활동"
+- extendedWaitUntil:
+    visible: "지원한 공고"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MyActivity
+
+# The row's accessibility label is "<company> <title> <stage>".
+- tapOn: ".*백엔드 엔지니어 \\(Kotlin·Spring\\).*"
+- extendedWaitUntil:
+    visible: "면접 진행 중"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MyAppliedJob
+- tapOn: "뒤로"
+
+- tapOn: "캘린더"
+- extendedWaitUntil:
+    visible: "Google 캘린더"
+    timeout: 10000
+# The mock events are all in October 2026 and the calendar opens on the device's month, so step back from November.
+- runFlow:
+    when:
+      visible: "2026년 11월"
+    commands:
+      - tapOn: "이전 달"
+- extendedWaitUntil:
+    visible: ".*일정 .*개.*"
+    timeout: 10000
+# The board selects 10월 21일 (the day after its "today").
+- tapOn:
+    text: ".*10월 21일.*"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: MyCalendar
+
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # "일정 추가" is the + button; "일정 추가하기" is the sheet's own submit button.
+      - tapOn: "일정 추가"
+      - extendedWaitUntil:
+          visible: "어떤 일정을 추가할까요?"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: MyCalendarStates.1

@@ -1,0 +1,23 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Opens the quick-start pill ${LABEL}, waits for ${WAIT} (text that shows once the sheet data has loaded), shoots ${SHOT}, closes.
+---
+- runFlow:
+    file: _pill.yaml
+    env:
+      LABEL: ${LABEL}
+      DIR: left
+- tapOn: ${LABEL}
+- extendedWaitUntil:
+    visible: ${WAIT}
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ${SHOT}
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: ${WAIT}
+- extendedWaitUntil:
+    notVisible: ${WAIT}
+    timeout: 5000

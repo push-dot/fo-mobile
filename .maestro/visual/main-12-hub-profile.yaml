@@ -1,0 +1,44 @@
+appId: app.push.mobile
+name: 허브 → 프로필 상세 → 제안하기 시트
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "허브"
+- extendedWaitUntil:
+    visible: "추천 프로필"
+    timeout: 10000
+- tapOn: ".*이하은.*"
+- extendedWaitUntil:
+    visible: "제안하기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: ".*React로 사용자 경험을 다듬어요.*"
+    timeout: 30000
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: ProfileDetail
+- tapOn: "제안하기"
+- extendedWaitUntil:
+    visible: ".*이하은 님에게.*"
+    timeout: 10000
+- tapOn: ".*어떤 이야기를 나누고 싶은지 적어 주세요"
+# Android inputText is ASCII only, so its message differs from the board's Korean one.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "안녕하세요, 하은 님! 누리클라우드에서 디자인 시스템을 만드신 경험이 인상 깊었어요. 저희 팀 프론트엔드 포지션으로 가볍게 커피챗 나눠 보고 싶어요."
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - inputText: "Hello, I would like to have a coffee chat."
+# The keyboard covers the chips; tapping sheet text closes it, as a user would.
+- tapOn: ".*이하은 님에게.*"
+- tapOn:
+    text: ".*모아페이 · 백엔드.*"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: ProposalSheet

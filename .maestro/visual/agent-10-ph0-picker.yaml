@@ -1,0 +1,28 @@
+appId: app.push.mobile
+name: 에이전트 · Phase 0-I 자료 고르기 시트
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 백엔드 공고에 맞춰 이력서 만들어 주세요"
+      EN: "make resume"
+- extendedWaitUntil:
+    visible: "어떤 방식으로 진행할까요?"
+    timeout: 30000
+- tapOn: ".*이력서부터 쓸게요"
+- extendedWaitUntil:
+    visible: "어떤 산출물을 만들까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- tapOn:
+    text: "변경"
+    index: 0
+- extendedWaitUntil:
+    visible: "자료 고르기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0Picker

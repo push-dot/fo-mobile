@@ -1,0 +1,14 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Sidebar → 모두 보기 → the full conversation list modal.
+---
+- tapOn: "대화 목록 열기"
+- extendedWaitUntil:
+    visible: "최근 대화 모두 보기"
+    timeout: 10000
+- tapOn: "최근 대화 모두 보기"
+- extendedWaitUntil:
+    visible: "대화 검색"
+    timeout: 10000
+- waitForAnimationToEnd

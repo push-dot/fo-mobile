@@ -1,0 +1,24 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# From a conversation back to the 에이전트 first screen (pushed route: edge swipe on iOS, back on Android).
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard:
+          optional: true
+      - back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: "1%,50%"
+          end: "80%,50%"
+          duration: 300
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- waitForAnimationToEnd

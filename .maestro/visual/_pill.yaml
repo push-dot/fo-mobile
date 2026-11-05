@@ -1,0 +1,43 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Brings the quick-start pill ${LABEL} into view by swiping the pill row itself
+# (scrollUntilVisible swipes from the screen centre, which is not on the row), then nudges it off the edge.
+# ${DIR}: left (reveal pills further right) or right (back to the first pills). Swipe points are
+# literals because Maestro validates them when it parses every file, before any env is set.
+---
+- runFlow:
+    when:
+      true: ${DIR == 'left'}
+    commands:
+      - repeat:
+          while:
+            notVisible: ${LABEL}
+          times: 12
+          commands:
+            - swipe:
+                start: 85%,74%
+                end: 30%,74%
+                duration: 400
+      - swipe:
+          start: 70%,74%
+          end: 55%,74%
+          duration: 300
+- runFlow:
+    when:
+      true: ${DIR == 'right'}
+    commands:
+      - repeat:
+          while:
+            notVisible: ${LABEL}
+          times: 12
+          commands:
+            - swipe:
+                start: 15%,74%
+                end: 85%,74%
+                duration: 400
+      - swipe:
+          start: 55%,74%
+          end: 70%,74%
+          duration: 300
+- waitForAnimationToEnd

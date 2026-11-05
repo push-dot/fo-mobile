@@ -1,0 +1,68 @@
+appId: app.push.mobile
+name: 에이전트 · 외부 파일 완료 (저장됨 · 공고 없음 · 저장 실패) + 결과 확인 + 더 보기
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-done"
+      EN: "ext-done"
+- extendedWaitUntil:
+    visible: ".* 동안 작업했어요"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatDone
+- tapOn: "대화 더 보기"
+- extendedWaitUntil:
+    visible: "쓴 서류·공고 보기"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: ChatMore
+- runFlow: _agent-dismiss-menu.yaml
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-nojob"
+      EN: "ext-nojob"
+- extendedWaitUntil:
+    visible: ".* 동안 작업했어요"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatDoneNoJob
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-nosave"
+      EN: "ext-nosave"
+- extendedWaitUntil:
+    visible: ".* 동안 작업했어요"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatDoneSaveFail
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-ok"
+      EN: "ext-ok"
+- extendedWaitUntil:
+    visible: "내 서류에 저장했어요. 결과를 확인할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh6ResultFile
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-fail"
+      EN: "ext-fail"
+- extendedWaitUntil:
+    visible: "내 서류에 저장하지 못했어요. 결과를 확인할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh6ResultFail

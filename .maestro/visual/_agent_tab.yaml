@@ -1,0 +1,17 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Enter the 에이전트 tab and accept the reference-data consent (the mock starts with it off).
+---
+- tapOn: "에이전트"
+- extendedWaitUntil:
+    visible: "동의하고 시작하기"
+    timeout: 10000
+- tapOn: "동의하고 시작하기"
+- extendedWaitUntil:
+    notVisible: "동의하고 시작하기"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- waitForAnimationToEnd

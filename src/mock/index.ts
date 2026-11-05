@@ -2,7 +2,7 @@
 import './postings'
 import './home'
 import './hub'
-import './social'
 import './me'
+import './social'
 import './chat'
 export { mockFetch } from './server'

@@ -1,0 +1,54 @@
+appId: app.push.mobile
+name: 마이 제안함 → 받은·보낸 제안 → 제안 상세 → 거절 확인·답장 시트
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "받은 제안 .*개"
+- extendedWaitUntil:
+    visible: ".*오지현.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ProposalInbox
+
+- tapOn: "보낸 제안.*"
+- extendedWaitUntil:
+    visible: ".*이하은.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ProposalSent
+
+- tapOn: "받은 제안 4"
+- extendedWaitUntil:
+    visible: ".*오지현.*"
+    timeout: 10000
+- tapOn: ".*오지현.*"
+- extendedWaitUntil:
+    visible: "수락하고 답장하기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ProposalDetail
+
+# The state boards are iOS only.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "거절"
+      - extendedWaitUntil:
+          visible: "이 제안을 거절할까요?"
+          timeout: 5000
+      - waitForAnimationToEnd
+      - takeScreenshot: ProposalStates.4
+      - tapOn: "취소"
+      - tapOn: "수락하고 답장하기"
+      - extendedWaitUntil:
+          visible: "어떻게 답장할까요?"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: ProposalStates.2

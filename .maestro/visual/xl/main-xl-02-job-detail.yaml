@@ -1,0 +1,32 @@
+appId: app.push.mobile
+name: 공고 상세 · 큰 글씨
+tags:
+  - visual
+---
+# Run with the system text size raised (xl/ is a separate run).
+- runFlow: ../../flows/_login.yaml
+- runFlow: ../_open_jobs.yaml
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 15000
+- tapOn:
+    text: ".*모아페이.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "지원하기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: ".*조금만 고치면 8점대예요.*"
+    timeout: 30000
+    optional: true
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: JobDetailXL.1
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - takeScreenshot: JobDetailXL.2

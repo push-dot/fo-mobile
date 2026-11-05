@@ -1,0 +1,7 @@
+# Visual tours: navigate to each design artboard state against the mock API and take a
+# screenshot named after the artboard (handoff screens/<Name>.png). Run by push-e2e/visual/visual.sh,
+# never by gate.sh. xl/ holds the large-text tours, run with the system text size raised.
+flows:
+  - "*"
+excludeTags:
+  - subflow

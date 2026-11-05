@@ -1,0 +1,41 @@
+appId: app.push.mobile
+name: 에이전트 · 경험 만들기 · 접근 → 병목 강도 → 검증 실패 → 기획서 고르기
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "필요한 프로젝트 경험까지 만들어 주세요"
+      EN: "ph2x"
+- extendedWaitUntil:
+    visible: "어떤 접근 방식으로 진행할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh2XApproach
+- tapOn: ".*병목을 만들게요"
+- extendedWaitUntil:
+    visible: "병목 강도를 어느 정도로 할까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh2XLevel
+# The first pick fails verification in the mock; picking again passes.
+- tapOn: ".*중간 제약으로"
+- extendedWaitUntil:
+    visible: "검증을 통과하지 못했어요.*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatVerifyFail
+- tapOn: ".*다시 고르기"
+- extendedWaitUntil:
+    visible: "병목 강도를 어느 정도로 할까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- tapOn: ".*중간 제약으로"
+- extendedWaitUntil:
+    visible: "어떤 프로젝트를 구현할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh2XBlueprints

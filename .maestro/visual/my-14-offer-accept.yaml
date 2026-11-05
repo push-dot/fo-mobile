@@ -1,0 +1,78 @@
+appId: app.push.mobile
+name: 마이 제안함 → 제안 수락 → 대화 → 보내지 못한 메시지
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "받은 제안 .*개"
+- extendedWaitUntil:
+    visible: ".*오지현.*"
+    timeout: 10000
+- tapOn: ".*오지현.*"
+- extendedWaitUntil:
+    visible: "수락하고 답장하기"
+    timeout: 10000
+- tapOn: "수락하고 답장하기"
+- extendedWaitUntil:
+    visible: "어떻게 답장할까요?"
+    timeout: 10000
+# iOS types the board's Korean text; Android inputText is ASCII only, so its first bubble reads "Thank you".
+- tapOn: "답장.*"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요."
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - inputText: "Thank you"
+- tapOn: "수락하고 보내기"
+# The mock holds the accept for 3s so 보내는 중 is on screen; no waitForAnimationToEnd for this timing board.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "보내는 중"
+          timeout: 5000
+      - takeScreenshot: ProposalStates.3
+- extendedWaitUntil:
+    visible: ".*목요일 저녁 7시.*"
+    timeout: 20000
+
+# The mock fails these two bodies so the 보내지 못했어요 line shows.
+- tapOn: "메시지.*"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "좋아요. 그때 뵐게요!"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - inputText: "fail"
+- tapOn: "보내기"
+- extendedWaitUntil:
+    visible: ".*메시지를 보내지 못했어요.*"
+    timeout: 10000
+# hideKeyboard fails on iOS; a tap on a static bubble dismisses the keyboard there (the date labels have scrolled off by now).
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: ".*목요일 저녁 7시.*"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- waitForAnimationToEnd
+- takeScreenshot: ProposalChat

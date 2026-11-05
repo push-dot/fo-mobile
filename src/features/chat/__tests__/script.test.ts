@@ -37,7 +37,7 @@ describe('scripted runs (mock)', () => {
     ])
     expect(s.items.find((i) => i.type === 'result')).toMatchObject({
       source: 'profile',
-      taskLine: '프로필 수정 · Push 프로필 · 경력',
+      taskLine: '',
       checklist: ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장'],
       name: '김서준',
       title: '김서준 · 백엔드 엔지니어',
@@ -45,7 +45,7 @@ describe('scripted runs (mock)', () => {
       documentId: 'd1',
     })
     expect(s.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
-    expect(s.items.some((i) => i.type === 'worked')).toBe(true)
+    expect(s.items.some((i) => i.type === 'worked')).toBe(false)
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
   }, 10_000)
 
@@ -55,7 +55,7 @@ describe('scripted runs (mock)', () => {
     expect(todo && todo.type === 'todo' ? todo.items.at(-1)?.label : '').toBe('PDF로 만들기')
     expect(s.items.find((i) => i.type === 'result')).toMatchObject({
       source: 'external',
-      taskLine: '이력서 수정 · 올린 파일 · 경력',
+      taskLine: '',
       fileName: '김서준_모아페이_백엔드.pdf',
       pageLine: 'A4 1쪽 · 186KB',
       cardMeta: 'A4 1쪽 · 186KB · 내 서류에 자동 저장됨',
@@ -84,8 +84,9 @@ describe('scripted runs (mock)', () => {
     expect(choiceLabels(s)).toEqual(['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])
     s = play(s, await run({ conversationId: 'fit1', text: '피드백만 받을게요', answer: { approvalId: 'ph1-fit', choice: 1 } }))
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({
-      text: '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.',
+      text: '이 공고 기준으로 고칠 점이에요.',
     })
+    expect(s.items.find((i) => i.type === 'plan')).toMatchObject({ rows: expect.arrayContaining([expect.objectContaining({ tag: '키워드' })]) })
     expect(s.approval?.question).toBe('피드백을 반영해서 수정할까요?')
     expect(choiceLabels(s)).toEqual(['반영해서 수정할게요', '그만하기'])
     s = play(s, await run({ conversationId: 'fit1', text: '그만하기', answer: { approvalId: 'feedback', choice: 1 } }))

@@ -1,0 +1,40 @@
+appId: app.push.mobile
+name: 에이전트 · 대화를 모두 지워 빈 상태 (iOS 전용 패널)
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - runFlow: _agent_tab.yaml
+      - runFlow: _open_list.yaml
+      - runFlow:
+          file: _delete_conv.yaml
+          env:
+            TITLE: "모아페이 백엔드 이력서"
+      - runFlow:
+          file: _delete_conv.yaml
+          env:
+            TITLE: "도토리증권 공고 갭 분석"
+      - runFlow:
+          file: _delete_conv.yaml
+          env:
+            TITLE: "경력기술서 다듬기"
+      - runFlow:
+          file: _delete_conv.yaml
+          env:
+            TITLE: "파도AI 자기소개서 초안"
+      - runFlow:
+          file: _delete_conv.yaml
+          env:
+            TITLE: "누리클라우드 자기소개서"
+      - extendedWaitUntil:
+          visible: "아직 대화가 없어요"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatListEmpty.1
+      - takeScreenshot: ChatListEmpty.2
+      - takeScreenshot: ChatDrawerAllEmpty.1
+      - takeScreenshot: ChatDrawerAllEmpty.2

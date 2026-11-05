@@ -1,0 +1,24 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Brings the chat thread back to its end. Content that streams in while the scroll animation runs can stop the follow-the-end
+# scroll; the 새 내용 pill then shows and a tap scrolls to the end. An open gate hides the pill from accessibility, so swipe then.
+# Swipe points are literals (see _pill.yaml), above the composer and below the header.
+---
+- runFlow:
+    when:
+      notVisible: "새 내용"
+    commands:
+      - repeat:
+          times: 3
+          commands:
+            - swipe:
+                start: 50%,45%
+                end: 50%,18%
+                duration: 300
+- runFlow:
+    when:
+      visible: "새 내용"
+    commands:
+      - tapOn: "새 내용"
+- waitForAnimationToEnd

@@ -1,0 +1,22 @@
+appId: app.push.mobile
+name: 소셜 피드 → 게시물 상세
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "소셜"
+- extendedWaitUntil:
+    visible: "직장 생활"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*3년차 백엔드.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: Social
+- tapOn: ".*판교 점심 지도.*"
+- extendedWaitUntil:
+    visible: ".*두 번째 국밥집.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: PostDetail

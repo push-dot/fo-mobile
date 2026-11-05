@@ -20,7 +20,12 @@ const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, 
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 const H = 3_600_000
 const D = 24 * H
-const on = (m: number, d: number, h = 9, min = 0) => new Date(2026, m - 1, d, h, min).toISOString()
+const on = (m: number, d: number, h = 12, min = 0) => new Date(2026, m - 1, d, h, min).toISOString()
+// Boards draw counts larger than the first page (18명, 8개); only `total` is reported, like push-be.
+const withTotal = <T>(items: T[], query: URLSearchParams, total: number) => {
+  const r = page(items, query)
+  return { ...r, page: { ...r.page, total } }
+}
 const tomorrowAt = (h: number) => {
   const d = new Date(Date.now() + D)
   d.setHours(h, 0, 0, 0)
@@ -37,7 +42,7 @@ let profile: Profile = {
   careerStatus: 'seeking',
   openToOffers: true,
   intro:
-    '4년 동안 결제·정산 시스템을 설계하고 운영했어요. 트래픽이 몰리는 기간에도 장애 없는 결제를 만드는 데 집중해 왔어요.\n\n요즘은 Kafka 기반 이벤트 처리와 부하 테스트에 관심이 많아요.',
+    '4년 동안 결제·정산 시스템을 설계하고 운영했어요. 트래픽이 몰리는 기간에도 장애 없는 결제를 만드는 데 집중해 왔어요.',
   careers: [
     {
       company: '모아페이',
@@ -54,7 +59,7 @@ let profile: Profile = {
       description: '',
     },
   ],
-  skills: ['Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'AWS'],
+  skills: ['Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'Kafka'],
   followerCount: 12,
   followingCount: 18,
   postCount: 8,
@@ -62,6 +67,9 @@ let profile: Profile = {
   updatedAt: ago(D),
 }
 
+// Followed people, shared with hub.ts. 이하은 starts unfollowed (프로필 상세 board shows 팔로우); me/follows marks everyone it lists.
+export const following = new Set<string>()
+export const myProfile = () => profile
 mock('GET', 'me/profile', () => ({ data: profile }))
 mock('PATCH', 'me/profile', ({ body }) => {
   const { avatarKey, ...patch } = body as Partial<Profile> & { avatarKey?: string }
@@ -86,13 +94,30 @@ const src = (id: string, fileName: string, size: number, createdAt: string): Sou
   status: 'READY',
   createdAt,
 })
-let sources: Source[] = [
+let sources: (Source & { jobId?: string })[] = [
   src('s1', '김서준_백엔드_이력서_2026.pdf', 2_400_000, on(10, 12)),
-  src('s2', '경력기술서_모아페이.docx', 640_000, on(9, 28)),
+  { ...src('s2', '경력기술서_모아페이.docx', 640_000, on(9, 28)), jobId: 'j-read' },
   { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
 mock('GET', 'sources', ({ query }) => page(sources, query))
+// s2 stays 읽는 중: its ingest job never settles.
+mock('GET', 'ai/jobs/:id', ({ params }) =>
+  params.id === 'j-read'
+    ? {
+        data: {
+          id: 'j-read',
+          type: 'INGEST',
+          status: 'RUNNING',
+          progress: null,
+          result: null,
+          error: null,
+          createdAt: on(9, 28),
+          updatedAt: on(9, 28),
+        },
+      }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '작업을 찾지 못했어요' } } },
+)
 mock('GET', 'sources/:id', ({ params }) => {
   const s = sources.find((x) => x.id === params.id)
   return s
@@ -141,7 +166,7 @@ const draft: ResumeDraft = {
         startedOn: '2022-03',
         endedOn: null,
         description:
-          '결제 승인 API를 다시 설계해 p99 지연을 420ms에서 180ms로 줄였어요. Kafka로 승인 이벤트를 분리해 하루 280만 건을 처리했어요.',
+          '결제 승인 API를 다시 설계해 p95 응답 시간을 320ms에서 140ms로 줄였어요\nKafka로 승인 이벤트를 분리해 하루 280만 건을 처리했어요',
       },
       {
         company: '하루랩스',
@@ -180,30 +205,39 @@ const applications: Application[] = [
   app('a3', 'p8', '별빛게임즈', 'DevOps 엔지니어', 'APPLIED', on(10, 16)),
   app('a4', 'p7', '라온헬스', '백엔드 개발자 (Java)', 'ACCEPTED', on(9, 22)),
   app('a5', 'p6', '새벽마켓', '결제 플랫폼 엔지니어', 'REJECTED', on(9, 8)),
+  // Applications behind the Push 서류 cards; the 지원활동 header counts only the first five.
+  ...(
+    [
+      ['a6', '다온뱅크', '서버 개발자', 76],
+      ['a7', '해솔페이', '결제 플랫폼 개발', 69],
+      ['a8', '모아페이', '백엔드 엔지니어', 81],
+      ['a9', '온다컴퍼니', '플랫폼 백엔드', 81],
+      ['a10', '리프페이', '서버 엔지니어', 72],
+    ] as const
+  ).map(([id, company, title, fitScore]) => ({
+    ...app(id, 'p1', company, title, 'READY', on(10, 1)),
+    appliedAt: null,
+    fitScore,
+  })),
 ]
-mock('GET', 'applications', ({ query }) => page(applications, query))
+mock('GET', 'applications', ({ query }) => withTotal(applications, query, 5))
 
+const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
+  id,
+  revision: 1,
+  applicationId,
+  title,
+  kind: 'HUB_PROFILE',
+  status: 'DRAFT',
+  latestVersionId: 'v1',
+  updatedAt,
+})
 let documents: HubDocument[] = [
-  {
-    id: 'd1',
-    revision: 2,
-    applicationId: 'a1',
-    title: '모아페이 백엔드',
-    kind: 'HUB_PROFILE',
-    status: 'DRAFT',
-    latestVersionId: 'v1',
-    updatedAt: on(10, 14),
-  },
-  {
-    id: 'd2',
-    revision: 1,
-    applicationId: null,
-    title: '김서준_백엔드_이력서_2026',
-    kind: 'HUB_PROFILE',
-    status: 'DRAFT',
-    latestVersionId: 'v1',
-    updatedAt: on(10, 12),
-  },
+  pushDoc('d1', 'a6', '서버 개발자 이력서', on(10, 15)),
+  pushDoc('d2', 'a7', '경력기술서', on(10, 2)),
+  pushDoc('d3', 'a8', '백엔드 엔지니어 이력서', on(10, 20)),
+  pushDoc('d4', 'a9', '플랫폼 백엔드 이력서', on(9, 24)),
+  pushDoc('d5', 'a10', '서버 엔지니어 이력서', on(9, 11)),
 ]
 
 mock('GET', 'documents', ({ query }) => page(documents, query))
@@ -234,14 +268,39 @@ const hubContent = {
     docText('paragraph', 'Kotlin, Spring Boot, Kafka, MySQL, Redis'),
   ],
 }
-mock('GET', 'documents/:id/versions', ({ params }) =>
-  params.id
-    ? {
-        data: [{ id: 'v1', blocks: [{ id: 'b1', text: '결제 승인 API를 설계해 p99 지연을 줄였어요.' }], content: hubContent }],
-        page: { nextCursor: null, hasMore: false },
-      }
-    : { data: [], page: { nextCursor: null, hasMore: false } },
-)
+// 지원 서류용 프로필(허브형) made from an uploaded file: the draft the profile tab already shows.
+const profileContent = {
+  type: 'doc',
+  content: [
+    docText('heading', '헤드라인'),
+    docText('paragraph', '결제 시스템을 만드는 백엔드 개발자'),
+    docText('heading', '소개'),
+    docText(
+      'paragraph',
+      '4년 동안 결제·정산 시스템을 설계하고 운영했어요. 트래픽이 몰리는 기간에도 장애 없는 결제를 만드는 데 집중해 왔어요.',
+    ),
+    docText('heading', '경력'),
+    docText('paragraph', '모아페이 | 백엔드 엔지니어 | 2022-03-01 |  | 결제 승인 API와 정산 배치를 맡고 있어요.'),
+    docText('paragraph', '하루랩스 | 서버 개발자 | 2021-01-01 | 2022-02-28'),
+    docText('heading', '기술 스택'),
+    docText('paragraph', 'Kotlin, Spring Boot, JPA, MySQL, Kafka'),
+  ],
+}
+mock('GET', 'documents/:id/versions', ({ params }) => {
+  const doc = documents.find((d) => d.id === params.id)
+  return {
+    data: doc
+      ? [
+          {
+            id: 'v1',
+            blocks: [{ id: 'b1', text: '결제 승인 API를 설계해 p95 응답 시간을 줄였어요.' }],
+            content: doc.applicationId ? hubContent : profileContent,
+          },
+        ]
+      : [],
+    page: { nextCursor: null, hasMore: false },
+  }
+})
 mock('POST', 'documents/:id/base-profile', ({ params }) => {
   const doc = documents.find((d) => d.id === params.id)
   if (!doc) return { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
@@ -300,10 +359,6 @@ const events: CalendarEvent[] = [
   ev('e6', 'DEADLINE', '파도AI 데이터 분석가', on(10, 22, 23, 59), {
     notes: '서류 확정이 필요해요',
   }),
-  ev('e7', 'COFFEE_CHAT', '최지우 님과 커피챗', on(10, 23, 12, 30), {
-    endsAt: on(10, 23, 13),
-    notes: '강남역',
-  }),
   ev('e8', 'DEADLINE', '그린티켓 그로스 마케터', on(10, 24, 23, 59)),
   ev('e9', 'FOLLOW_UP', '도토리증권 결과 확인', on(10, 27, 10)),
   ev('e10', 'INTERVIEW', '별빛게임즈 1차 면접', on(10, 29, 16), {
@@ -312,16 +367,24 @@ const events: CalendarEvent[] = [
   }),
   ev('e11', 'CUSTOM', '부하 테스트 스터디', on(10, 29, 20)),
   ev('e12', 'FOLLOW_UP', '모아페이 면접 후기 보내기', on(10, 30, 10)),
-  ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
-    endsAt: tomorrowAt(16),
-    notes: 'Google Meet',
-    applicationId: 'a1',
+  ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
+  ev('e15', 'COFFEE_CHAT', '오지현 님과 커피챗', on(10, 21, 18, 30), {
+    notes: '받은 제안을 수락해서 잡힌 일정이에요',
   }),
 ]
+// The board lists the 면접 once on the calendar and once on the application, so this one is only
+// served to the application's next-event query. shortcut: told apart by `from`, which is the
+// current time there and a local midnight on the calendar grid; drop when /calendar is real.
+const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
+  endsAt: tomorrowAt(16),
+  notes: 'Google Meet',
+  applicationId: 'a1',
+})
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
   const to = query.get('to') ?? '9999'
-  return page(events.filter((e) => e.startsAt >= from && e.startsAt < to), query)
+  const list = Date.parse(from) % 60_000 === 0 ? events : [...events, nextInterview]
+  return page(list.filter((e) => e.startsAt >= from && e.startsAt < to), query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
 mock('POST', 'calendar/events', ({ body }) => {
@@ -348,20 +411,28 @@ const person = (userId: string, displayName: string, headline: string): Profile 
   resumeSourceId: null,
   following: true,
 })
+// Ids match hub.ts so a row opens that person's hub profile.
 const follows = [
-  person('u-haeun', '이하은', 'React로 사용자 경험을 다듬어요'),
-  person('u-taeyun', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
-  person('u-jiwoo', '최지우', '데이터 파이프라인 · Spark · Airflow'),
-  person('u-doyun', '박도윤', 'SwiftUI로 앱을 만드는 iOS 개발자'),
-  person('u-minjae', '정민재', '쿠버네티스 운영이 즐거운 DevOps'),
+  person('u2', '이하은', 'React로 사용자 경험을 다듬어요'),
+  person('u1', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
+  person('u4', '최지우', '데이터 파이프라인 · Spark · Airflow'),
+  person('u3', '박도윤', 'SwiftUI로 앱을 만드는 iOS 개발자'),
+  person('u5', '정민재', '쿠버네티스 운영이 즐거운 DevOps'),
+  person('u-seoyun', '한서윤', '디자인 시스템을 만드는 프론트엔드'),
+  person('u-jiho', '오지호', '추천 시스템 · ML 엔지니어'),
+  person('u-sua', '윤수아', 'QA 자동화에 진심인 엔지니어'),
+  person('u-geonwoo', '임건우', '결제 보안 · 인증 서버'),
 ]
 const followers = [
   { ...follows[0]!, following: true },
   { ...person('u-jihyun', '오지현', '모아페이 결제 플랫폼팀 채용 담당'), following: false },
   { ...follows[2]!, following: true },
 ]
-mock('GET', 'me/follows', ({ query }) => page(follows, query))
-mock('GET', 'me/followers', ({ query }) => page(followers, query))
+mock('GET', 'me/follows', ({ query }) => {
+  for (const f of follows) following.add(f.userId)
+  return withTotal(follows, query, 18)
+})
+mock('GET', 'me/followers', ({ query }) => withTotal(followers, query, 12))
 
 // 게시글
 const post = (
@@ -385,25 +456,50 @@ const post = (
 })
 const myPosts = [
   post('mp1', 'career', '연봉 협상 전에 정리하면 좋은 것들', 18, 412, ago(D + 2 * H)),
-  post('mp2', 'dev', '결제 승인 API p99를 절반으로 줄인 이야기', 31, 1204, on(10, 9)),
+  post('mp2', 'dev', '결제 승인 API p95를 절반 아래로 줄인 이야기', 31, 1204, on(10, 9)),
   post('mp3', 'work', '4년차 백엔드, 사이드 프로젝트 어떻게 하세요?', 24, 388, on(9, 21)),
+  post('mp4', 'dev', 'Kafka 컨슈머 랙, 이렇게 잡았어요', 12, 640, on(9, 3)),
+  post('mp5', 'career', '이직 준비하면서 바꾼 이력서 3가지', 41, 2310, on(8, 27)),
+  post('mp6', 'dev', 'Redis 분산 락, 생각보다 까다로웠던 점', 9, 530, on(8, 14)),
+  post('mp7', 'work', '팀 옮기고 첫 한 달 동안 한 일', 15, 702, on(7, 30)),
+  post('mp8', 'dev', '정산 배치를 Spring Batch로 옮긴 후기', 22, 1480, on(7, 11)),
 ]
 const commented = [
   post('cp1', 'dev', 'Kafka 컨슈머 랙, 다들 어떻게 모니터링하세요?', 42, 2310, ago(3 * H), {
-    id: 'u-minjae',
+    id: 'u5',
     displayName: '정민재',
   }),
   post('cp2', 'coffeechat', '판교 근처 백엔드 커피챗 하실 분', 12, 530, on(10, 11), {
-    id: 'u-taeyun',
+    id: 'u1',
     displayName: '김태윤',
   }),
 ]
 mock('GET', 'me/posts', ({ query }) => page(myPosts, query))
-mock('GET', 'me/commented-posts', ({ query }) => page(commented, query))
+// social.ts owns `posts/:id` and 404s my ids, so index.ts loads this file first and these patterns
+// (regex, not :params) catch the mp* ids only. shortcut: only mp1 has a body and comments.
+mock('GET', 'posts/mp[0-9]+', ({ path }) => {
+  const p = myPosts.find((x) => x.id === path.split('/').pop())
+  return p
+    ? { data: { ...p, body: '연봉 협상 전에 정리해 두면 좋은 것들을 적어 봤어요. 시장 시세, 내가 만든 성과, 포기할 수 있는 조건 순서로 정리하면 대화가 훨씬 편해져요.' } }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '게시물을 찾을 수 없어요' } } }
+})
+mock('GET', 'posts/mp[0-9]+/comments', ({ path, query }) =>
+  page(
+    path.includes('mp1/')
+      ? [
+          { id: 'mc-1', author: { id: 'u-subin', displayName: '이수빈', avatarUrl: null }, body: '시세는 어디서 확인하세요? 저도 협상 전에 정리해 보고 싶어요.', parentId: null, createdAt: ago(D) },
+          { id: 'mc-2', author: ME, body: '지인 두세 분께 여쭤보고 공고 연봉 범위를 같이 봤어요.', parentId: 'mc-1', createdAt: ago(D - H) },
+        ]
+      : [],
+    query,
+  ),
+)
+mock('GET', 'me/commented-posts', ({ query }) => withTotal(commented, query, 9))
 
 // 제안함
 // push-be embeds only a posting stub in offers.
-const offerPosting: OfferPosting = { id: 'p1', company: '모아페이', title: '백엔드 엔지니어 (Kotlin·Spring) · 결제 플랫폼팀', imageUrl: null }
+// p25 lives in postings.ts so the card can read its location, career and deadline.
+const offerPosting: OfferPosting = { id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', imageUrl: null }
 const user = (id: string, displayName: string, companyName: string, headline: string) => ({
   id,
   displayName,
@@ -428,11 +524,11 @@ const received: Offer[] = [
       '서준 님, 안녕하세요! 허브에서 프로필 보고 연락드려요.\n\n결제 승인 API를 다시 설계하신 경험이 지금 저희 결제 플랫폼팀의 고민과 딱 맞아서요. 시니어 포지션으로 30분 정도 가볍게 커피챗 어떠세요?',
     posting: offerPosting,
     status: 'SENT',
-    createdAt: ago(2 * H),
+    createdAt: on(10, 20, 1, 42),
   }),
   offer({
     id: 'o2',
-    sender: user('u-doyun', '박도윤', '하루랩스', 'iOS 개발자'),
+    sender: user('u3', '박도윤', '하루랩스', 'iOS 개발자'),
     recipient: ME_SENDER,
     message:
       '주말 사이드 프로젝트를 같이 하실 백엔드 개발자를 찾고 있어요. 정산 쪽 경험이 있으시면 큰 도움이 될 것 같아요.',
@@ -441,7 +537,7 @@ const received: Offer[] = [
   }),
   offer({
     id: 'o3',
-    sender: user('u-jiwoo', '최지우', '파도AI', '데이터 엔지니어'),
+    sender: user('u4', '최지우', '파도AI', '데이터 엔지니어'),
     recipient: ME_SENDER,
     message: '정산 데이터 파이프라인 경험을 듣고 싶어요. 30분 정도 이야기 나눌 수 있을까요?',
     status: 'ACCEPTED',
@@ -460,7 +556,7 @@ const sent: Offer[] = [
   offer({
     id: 'o5',
     sender: ME_SENDER,
-    recipient: user('u-haeun', '이하은', '누리클라우드', '프론트엔드 개발자'),
+    recipient: user('u2', '이하은', '누리클라우드', '프론트엔드 개발자'),
     message: '디자인 시스템 경험이 인상 깊어서 커피챗 제안드려요.',
     status: 'SENT',
     createdAt: ago(D + 5 * H),
@@ -468,7 +564,7 @@ const sent: Offer[] = [
   offer({
     id: 'o6',
     sender: ME_SENDER,
-    recipient: user('u-jiwoo', '최지우', '파도AI', '데이터 엔지니어'),
+    recipient: user('u4', '최지우', '파도AI', '데이터 엔지니어'),
     message: '정산 데이터 파이프라인 이야기를 나눠 보고 싶어요.',
     status: 'ACCEPTED',
     createdAt: on(10, 14, 9),
@@ -476,7 +572,7 @@ const sent: Offer[] = [
   offer({
     id: 'o7',
     sender: ME_SENDER,
-    recipient: user('u-minjae', '정민재', '별빛게임즈', 'DevOps'),
+    recipient: user('u5', '정민재', '별빛게임즈', 'DevOps'),
     message: '쿠버네티스 운영 노하우가 궁금해요. 30분 괜찮으실까요?',
     status: 'DECLINED',
     createdAt: on(10, 3, 18),
@@ -494,7 +590,7 @@ const messages: Record<string, OfferMessage[]> = {
     {
       id: 'm2',
       offerId: 'o3',
-      sender: { id: 'u-jiwoo', displayName: '최지우' },
+      sender: { id: 'u4', displayName: '최지우' },
       body: '좋아요. 강남역 근처에서 12시 반에 봬요.',
       createdAt: on(10, 14, 13),
     },
@@ -503,7 +599,7 @@ const messages: Record<string, OfferMessage[]> = {
     {
       id: 'm3',
       offerId: 'o6',
-      sender: { id: 'u-jiwoo', displayName: '최지우' },
+      sender: { id: 'u4', displayName: '최지우' },
       body: '제안 고마워요. 이번 주 금요일 저녁 괜찮으세요?',
       createdAt: on(10, 15, 9),
     },
@@ -522,7 +618,12 @@ const update = (id: string, patch: Partial<Offer>) => {
   return { data: o }
 }
 
-mock('GET', 'me/offers', ({ query }) => page(query.get('box') === 'sent' ? sent : received, query))
+// The 받은 제안 board's first row previews the opening line and 2시간 전; the detail keeps the full message and its date.
+const o1Row = (o: Offer): Offer =>
+  o.id === 'o1'
+    ? { ...o, message: '결제 플랫폼팀 시니어 포지션으로 가볍게 커피챗 어떠세요? 승인 API 개선하신 경험이 딱 저희 팀 고민이에요.', createdAt: ago(2 * H + 10 * 60_000) }
+    : o
+mock('GET', 'me/offers', ({ query }) => page(query.get('box') === 'sent' ? sent : received.map(o1Row), query))
 mock('GET', 'me/offers/:id', ({ params }) => {
   const o = findOffer(params.id!)
   if (!o) return notFound
@@ -534,9 +635,29 @@ mock('GET', 'me/offers/:id', ({ params }) => {
     })
   return { data: o }
 })
-mock('POST', 'me/offers/:id/accept', ({ params, body }) => {
+// Accepting o1 lands in the thread the 제안함 board draws, opened by the typed reply; the 3s wait
+// keeps the 보내는 중 button on screen.
+const o1Thread = (reply?: string): OfferMessage[] => [
+  {
+    id: 'm-o1-1',
+    offerId: 'o1',
+    sender: ME,
+    body: reply || '제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요.',
+    createdAt: on(10, 20, 9, 10),
+  },
+  {
+    id: 'm-o1-2',
+    offerId: 'o1',
+    sender: { id: 'u-jihyun', displayName: '오지현' },
+    body: '목요일 저녁 7시, 강남역 근처 어떠세요?',
+    createdAt: on(10, 20, 10, 2),
+  },
+]
+mock('POST', 'me/offers/:id/accept', async ({ params, body }) => {
+  await new Promise((r) => setTimeout(r, 3000))
   const reply = (body as { reply?: string } | undefined)?.reply
-  if (reply)
+  if (params.id === 'o1') messages.o1 = o1Thread(reply)
+  else if (reply)
     (messages[params.id!] ??= []).push({
       id: `m${Date.now()}`,
       offerId: params.id!,
@@ -550,7 +671,11 @@ mock('POST', 'me/offers/:id/decline', ({ params }) => update(params.id!, { statu
 mock('GET', 'me/offers/:id/messages', ({ params, query }) =>
   page(messages[params.id!] ?? [], query),
 )
+// The 보내지 못했어요 board needs a send that fails; the tour types one of these.
+const FAILING_BODIES = ['좋아요. 그때 뵐게요!', 'fail']
 mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
+  if (FAILING_BODIES.includes((body as { body: string }).body))
+    return { status: 500, body: { error: { code: 'INTERNAL', message: '메시지를 보내지 못했어요' } } }
   const m: OfferMessage = {
     id: `m${Date.now()}`,
     offerId: params.id!,

@@ -1,0 +1,22 @@
+appId: app.push.mobile
+name: 에이전트 · 경험 만들기 · 예방할 문제
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "필요한 프로젝트 경험까지 만들어 주세요"
+      EN: "ph2x"
+- extendedWaitUntil:
+    visible: "어떤 접근 방식으로 진행할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- tapOn: ".*문제를 예방할게요"
+- extendedWaitUntil:
+    visible: "어떤 문제를 예방할까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh2XPrevent

@@ -1,0 +1,32 @@
+appId: app.push.mobile
+name: 에이전트 · 진행 상태 (자동 선택 · 답 기다림, iOS 전용 패널)
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - runFlow: _agent_tab.yaml
+      - runFlow:
+          file: _say.yaml
+          env:
+            KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
+            EN: "auto-pick"
+      - extendedWaitUntil:
+          visible: ".* 동안 작업했어요"
+          timeout: 30000
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatStates.1
+      - runFlow: _back_home.yaml
+      - runFlow:
+          file: _say.yaml
+          env:
+            KO: "경력 섹션을 공고에 맞게 고쳐 줘"
+            EN: "await"
+      - extendedWaitUntil:
+          visible: "확인을 기다리고 있어요"
+          timeout: 30000
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatStates.2

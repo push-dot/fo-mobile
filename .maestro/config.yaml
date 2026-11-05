@@ -7,3 +7,5 @@ flows:
 # _*.yaml are subflows called through runFlow.
 excludeTags:
   - subflow
+  # visual/ tours only take screenshots for the design comparison (push-e2e/visual/visual.sh).
+  - visual

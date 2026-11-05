@@ -1,0 +1,18 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Lowers the chat keyboard after _say. iOS hideKeyboard fails and Return would send, so a tap on the static thread text ${TEXT}
+# does it (the thread scroll view dismisses the keyboard on a tap outside the composer); Android uses hideKeyboard.
+---
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: ${TEXT}
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard:
+          optional: true
+- waitForAnimationToEnd

@@ -1,0 +1,50 @@
+appId: app.push.mobile
+name: 에이전트 · 오류 (사용 불가 · 그 밖의 오류 · 사용량 소진 · 읽기 실패)
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "err-unavailable"
+      EN: "err-unavailable"
+- extendedWaitUntil:
+    visible: "지금은 에이전트를 쓸 수 없어요.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatErrUnavailable
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "err-other"
+      EN: "err-other"
+- extendedWaitUntil:
+    visible: "작업을 이어가지 못했어요.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatErrOther
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "err-credit"
+      EN: "err-credit"
+- extendedWaitUntil:
+    visible: "이번 달 사용량을 다 썼어요.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatNoCredit
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "fail"
+      EN: "fail"
+- extendedWaitUntil:
+    visible: "어떻게 할까요?"
+    timeout: 40000
+- waitForAnimationToEnd
+- takeScreenshot: ChatErrors

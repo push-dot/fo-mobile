@@ -1,0 +1,12 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Home shortcut to the 채용공고 list, waiting for the total so filter taps land on a loaded list.
+---
+- tapOn:
+    text: "채용공고"
+    index: 0
+- extendedWaitUntil:
+    visible: "공고 .*개"
+    timeout: 15000
+- waitForAnimationToEnd

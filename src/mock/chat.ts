@@ -2,7 +2,7 @@
 // Sample data follows the AI 채팅 artboards (김서준, 모아페이 …).
 import type { ConversationTurn, LinkKind, Message, UserLink } from '@push/api-client'
 import type { Approval, ChatDoc, ChatEvent, ChatItem, Choice, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
-import { MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PICK_HINT } from '../features/chat/constants'
+import { DEFAULT_ERROR_TEXT, ERROR_TEXT, MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PICK_HINT } from '../features/chat/constants'
 import { kindOf } from '../features/chat/utils/links'
 import { mock, page } from './server'
 
@@ -10,26 +10,31 @@ const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 
 // ---------- conversations ----------
 
-const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null): ConversationRow => ({
+// `at` pins the date the design draws ("10월 16일"); otherwise it is `min` minutes ago.
+const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null, at?: string): ConversationRow => ({
   id,
   revision: 1,
   applicationId: null,
   title,
   pinned: false,
-  createdAt: ago(min + 30),
-  updatedAt: ago(min),
+  createdAt: at ?? ago(min + 30),
+  updatedAt: at ?? ago(min),
   status,
   lastLine,
 })
 
 const conversations: ConversationRow[] = [
-  conv('c-moa', '모아페이 백엔드 이력서', 10, '이 수정을 적용할까요?', 'NEEDS_APPROVAL'),
+  conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'),
   conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'),
-  conv('c-career', '경력기술서 다듬기', 60 * 24, 'Push 프로필에 저장했어요 · 적합도 8.2'),
-  conv('c-pado', '파도AI 자기소개서 초안', 60 * 24 * 4, '초안 v1을 만들었어요'),
-  conv('c-nuri', '누리클라우드 자기소개서', 60 * 24 * 8, '지원 동기 문단을 줄였어요'),
+  // ChatListPress draws this row pinned.
+  { ...conv('c-career', '경력기술서 다듬기', 60 * 30, 'PDF로 저장했어요 · 적합도 8.2'), pinned: true },
+  conv('c-pado', '파도AI 자기소개서 초안', 0, '초안 v1을 만들었어요', null, '2026-10-16T03:00:00.000Z'),
+  conv('c-nuri', '누리클라우드 자기소개서', 0, '지원 동기 문단을 줄였어요', null, '2026-10-12T03:00:00.000Z'),
+  conv('a-toss', '토스 백엔드 이력서', 0, '적합도 7.4 · PDF로 저장했어요', null, '2026-09-28T03:00:00.000Z'),
+  conv('a-line', '라인 커버레터 초안', 0, '초안 v2를 만들었어요', null, '2026-09-14T03:00:00.000Z'),
+  conv('a-baemin', '배민 공고 갭 분석', 0, '경력 섹션을 고쳤어요', null, '2026-08-30T03:00:00.000Z'),
 ]
-const archived = new Set<string>()
+const archived = new Set(['a-toss', 'a-line', 'a-baemin'])
 let referenceData = false
 const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
@@ -98,24 +103,26 @@ const todo = (id: string, labels: string[], done: number, added = -1, title?: st
   items: labels.map((label, i) => ({ label, state: i < done ? 'done' : i === done || i === added ? 'now' : 'todo', added: i === added })),
 })
 const ask = (approval: Approval) => s(500, { type: 'approval', approval })
-const numbered = (id: string, question: string, items: (string | Choice)[], foot = PICK_HINT): Approval => ({
+const numbered = (id: string, question: string, items: (string | Choice)[], foot = PICK_HINT, selected = [0]): Approval => ({
   id,
   question,
-  sections: [{ kind: 'choices', items: items.map((x) => (typeof x === 'string' ? { label: x } : x)), selected: [0] }],
+  sections: [{ kind: 'choices', items: items.map((x) => (typeof x === 'string' ? { label: x } : x)), selected }],
   foot,
 })
 const done = s(200, { type: 'done', at: 0 })
 
 const RESUME = '김서준_백엔드_이력서_2026.pdf'
 const MOA = '모아페이 · 백엔드 엔지니어'
-const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'Push 프로필에 저장하기']
 const PROFILE_TODO = ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장']
-const FILE_TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'PDF로 만들기']
+const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'PDF로 만들기']
+const FILE_TODO = TODO
 const PROFILE_TASK = '프로필 수정 · Push 프로필 · 경력'
-const FILE_TASK = '이력서 수정 · 올린 파일 · 경력'
 const FILE_PAGE = 'A4 1쪽 · 186KB'
 const FILE_SAVED = '내 서류에 자동 저장됨'
-const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필에 저장하기']
+const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'PDF로 만들기']
+const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
+// Hold a running line this long so a screenshot can catch it.
+const DWELL = 8000
 const JD_LINES = ['필수 · Kotlin 또는 Java 4년 이상', '필수 · Spring Boot 운영', '필수 · RDBMS 설계와 튜닝', '필수 · 대용량 트래픽 처리', '필수 · 결제·정산 도메인 이해', '우대 · Kafka · 장애 대응 · MSA']
 
 const tailorRead: Step[] = [
@@ -131,9 +138,9 @@ const tailorRead: Step[] = [
 
 const tailorFit = (labels: string[], added = -1): Step[] => [
   s(200, todo('todo', labels, 2, added)),
-  s(100, status('맞춰보는 중…', '견주어 보는 중…', '따져 보는 중…')),
-  s(200, tool('fit', '적합도 계산', '5개 항목', 'run', '기술 스택을 비교하는 중')),
-  s(1300, tool('fit', '적합도 계산', '5개 항목', 'run', '경험 연관성을 비교하는 중')),
+  s(100, status(added < 0 ? '맞춰보는 중…' : '다시 맞춰보는 중…', '견주어 보는 중…', '따져 보는 중…')),
+  s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
+  s(DWELL, tool('fit', '적합도 계산', '5개 항목', 'run', '경험 연관성을 비교하는 중')),
   s(1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
   s(300, {
     type: 'fit', id: 'fitcard', score: 8.1, from: 6.9, delta: '+1.2 예상',
@@ -156,14 +163,15 @@ const tailorFit = (labels: string[], added = -1): Step[] => [
   ask({ id: 'tailor-apply', question: '이 수정을 적용할까요?', sections: [], submit: '적용', secondary: '그대로 두기', foot: PICK_HINT }),
 ]
 
-const finish = (score: string): Step[] => [
-  s(400, agent('done', `다 됐어요! 적합도를 **${score}**로 올렸어요.`, ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요'])),
-  s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
+// The to-do list closes before the summary, and the edit line already says what changed, so the card draws no task line of its own.
+const finish = (score: string, josa = '로'): Step[] => [
+  s(400, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
+  s(200, agent('done', `다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`, BULLETS)),
   s(200, {
     type: 'result',
     id: 'result',
     source: 'profile',
-    taskLine: PROFILE_TASK,
+    taskLine: '',
     checklist: PROFILE_TODO,
     name: '김서준',
     headline: '백엔드 엔지니어',
@@ -176,35 +184,46 @@ const finish = (score: string): Step[] => [
       { id: 'view', label: '프로필 보기' },
     ],
   }),
-  done,
-  ask(numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기'], 'PDF는 Push 프로필에서 내보낼 수 있어요.')),
+  ask({ ...numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기']), pendingNote: 'PDF는 Push 프로필에서 내보낼 수 있어요.' }),
 ]
 
-const fileRun = (name: string): Step[] => [
-  s(400, agent('done', '다 됐어요! 올린 파일로 이력서를 고쳤어요.')),
-  s(200, todo('todo', FILE_TODO, FILE_TODO.length)),
-  s(200, {
-    type: 'result',
-    id: 'result',
-    source: 'external',
-    taskLine: FILE_TASK,
-    checklist: FILE_TODO,
-    fileName: name,
-    pageLine: FILE_PAGE,
-    savedLine: FILE_SAVED,
-    cardMeta: `${FILE_PAGE} · ${FILE_SAVED}`,
-    documentId: 'src-upload',
-    company: '모아페이',
-    actions: [
-      { id: 'apply', label: '모아페이에 바로 지원하기' },
-      { id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' },
-    ],
-  }),
-  done,
-]
+// Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
+const EXT_FILE = '김서준_모아페이_백엔드.pdf'
+const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; gate?: string; josa?: string }): Step[] => {
+  const labels = o.todo ?? FILE_TODO
+  const job = o.job ?? true
+  const saved = o.saved ?? true
+  return [
+    s(200, tool('edit', '이력서 수정', '올린 파일 · 경력', 'ok', '반영했어요 · 2줄 추가, 1줄 삭제')),
+    s(200, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
+    s(200, todo('todo', labels, labels.length)),
+    s(300, agent('done', o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`, BULLETS)),
+    s(200, {
+      type: 'result',
+      id: 'result',
+      source: 'external',
+      taskLine: '',
+      checklist: labels,
+      fileName: o.fileName ?? EXT_FILE,
+      pageLine: FILE_PAGE,
+      ...(saved ? { savedLine: FILE_SAVED } : {}),
+      cardMeta: saved ? `${FILE_PAGE} · ${FILE_SAVED}` : FILE_PAGE,
+      documentId: 'src-upload',
+      ...(job ? { company: '모아페이' } : {}),
+      actions: o.gate
+        ? []
+        : [
+            ...(job ? [{ id: 'apply', label: '모아페이에 바로 지원하기' }] : []),
+            ...(saved ? [{ id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' }] : []),
+          ],
+    }),
+    o.gate ? ask(numbered('ext-gate', o.gate, ['확인했어요', '그만하기'])) : done,
+  ]
+}
+const fileRun = (): Step[] => ext({})
 
 const tailorDone = (labels: string[]): Step[] => [
-  s(300, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '반영했어요 · 2줄 추가, 1줄 삭제')),
+  s(300, tool('edit', '프로필 수정', 'Push 프로필 · 경력', 'ok', '반영했어요 · 2줄 추가, 1줄 삭제')),
   s(200, todo('todo', labels, labels.length - 1)),
   s(200, status('Push 프로필에 저장하는 중…')),
   s(200, todo('todo', labels, labels.length)),
@@ -251,12 +270,12 @@ const ph0Input: Step[] = [
         kind: 'rows',
         title: '가져올 자료',
         items: [
-          { tag: 'PDF', title: RESUME, sub: '마이 › 서류', ac: true },
-          { tag: '모', title: '백엔드 엔지니어 (Kotlin·Spring)', sub: '홈 › 북마크 공고', ac: true },
-          { tag: 'link', title: 'github.com/seojun-kim', sub: '이력서에서 찾았어요' },
+          { tag: 'PDF', title: RESUME, sub: '마이 › 서류', ac: true, action: 'change' },
+          { tag: '모', title: '백엔드 엔지니어 (Kotlin·Spring)', sub: '홈 › 북마크 공고', ac: true, action: 'change' },
+          { tag: 'link', title: 'github.com/seojun-kim', sub: '이력서에서 찾았어요', action: 'change' },
         ],
       },
-      { kind: 'chips', title: '말투', options: ['전문적으로', '자신 있게', '짧게', '기술 중심으로', '협업 중심으로', '원래 말투로', '그만하기'], selected: [0] },
+      { kind: 'chips', title: '어떤 말투로 쓸까요?', options: ['전문적으로', '자신 있게', '짧게', '기술 중심으로', '협업 중심으로', '원래 말투로', '그만하기'], selected: [0] },
     ],
     submit: '이대로 진행',
     answer: '1번, 지금 이력서로 할게요',
@@ -265,6 +284,26 @@ const ph0Input: Step[] = [
 const ph0Start: Step[] = [
   s(400, tool('input', '입력 정리', undefined, 'ok', `이력서 **${RESUME}**\n공고 **${MOA}**\nGitHub **github.com/seojun-kim** · 말투 **그대로**`)),
   ask(numbered('ph0-start', '이대로 분석을 시작할까요?', ['네, 시작해 주세요', '자료를 바꿀래요', '그만할게요'])),
+]
+// The analysis card by plan: FREE locks the part rows, PRO teases ULTRA, ULTRA unfolds the projection.
+const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
+  s(300, {
+    type: 'fit', id: 'fit1', score: 6.9, caption: '보통 · 개선 여지 있어요', plan, summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
+    rows: [
+      { label: '기술 스택', score: 7.5 }, { label: '경험 연관성', score: 7.0 }, { label: '경력 수준', score: 8.0 },
+      { label: '키워드', score: 4.5 }, { label: '도메인', score: 5.0 },
+    ],
+    keywords: [
+      { label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true },
+      { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
+    ],
+    ...(plan === 'ULTRA' ? { projected: { label: '8점대', bullets: ['승인 API 성과를 숫자로 보여 주기', 'Kafka를 기술 스택 맨 앞으로 옮기기', '정산 도메인 경험을 한 줄 추가하기'] } } : {}),
+  }),
+  { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])), wait: gateWait },
+]
+const ph1Plan = (plan: 'FREE' | 'ULTRA', gateWait?: number): Step[] => [
+  s(200, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
+  ...ph1Fit(plan, gateWait),
 ]
 const PH1 = ['이력서 읽기', 'GitHub 살펴보기', '공고 분석', '적합도 계산']
 const ph1: Step[] = [
@@ -278,30 +317,30 @@ const ph1: Step[] = [
   s(300, agent('repo', '이력서에 없는 저장소 **payment-retry-lab**을 찾았어요. 경험으로 넣을지 분석이 끝나면 여쭤볼게요.')),
   s(200, todo('todo1', PH1, 2)),
   s(200, tool('jd', '공고 읽기', MOA, 'run', '필수·우대 스택을 뽑는 중')),
-  s(1500, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
+  s(DWELL, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
   s(200, todo('todo1', PH1, 3)),
   s(200, status('맞춰보는 중…')),
   s(200, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'run', '항목별 점수를 내는 중')),
   s(1500, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
   s(200, todo('todo1', PH1, 4)),
-  s(300, {
-    type: 'fit', id: 'fit1', score: 6.9, caption: '보통 · 개선 여지 있어요', plan: 'PRO', summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
-    rows: [
-      { label: '기술 스택', score: 7.5 }, { label: '경험 연관성', score: 7.0 }, { label: '경력 수준', score: 8.0 },
-      { label: '키워드', score: 4.5 }, { label: '도메인', score: 5.0 },
-    ],
-    keywords: [
-      { label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true },
-      { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
-    ],
-  }),
-  ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])),
+  ...ph1Fit('PRO'),
 ]
 const feedbackOnly: Step[] = [
-  s(600, agent('fb', '키워드에 결제 승인·정산 배치를 넣고, payment-retry-lab을 경험으로 쓰면 좋아요.')),
+  s(300, tool('fbt', '피드백 정리', '공고 요건 ↔ 내 이력서', 'ok', '고칠 점 3개')),
+  s(400, agent('fb', '이 공고 기준으로 고칠 점이에요.')),
+  s(300, {
+    type: 'plan', id: 'fbplan', title: '', meta: '',
+    rows: [
+      { tag: '키워드', tone: 'ac', label: 'Kafka, 정산 배치가 없어요', note: '경험 문장에 직접 넣어 주세요' },
+      { tag: '도메인', tone: 'orange', label: '정산 경험이 약해 보여요', note: 'payment-retry-lab을 정산 맥락으로 써 주세요' },
+      { tag: '성과', tone: 'green', label: '숫자가 부족해요', note: '승인 API 개선 결과를 수치로 보여 주세요' },
+    ],
+    keywords: [],
+  }),
   ask(numbered('feedback', '피드백을 반영해서 수정할까요?', ['반영해서 수정할게요', '그만하기'])),
 ]
 const startDocument: Step[] = [
+  s(400, agent('resume-note', '작성 중인 이력서 초안(v1)이 있어요.')),
   ask(numbered('start-document', '이어서 작성할까요?', ['이어서 작성하기', '그만하기'])),
 ]
 const ph2: Step[] = [
@@ -329,7 +368,7 @@ const ph3: Step[] = [
     type: 'paper', id: 'paper', label: '이력서 초안 v1', heading: '김서준 · 백엔드 개발자',
     lines: ['모아페이 · 백엔드 엔지니어 · 2022.03–현재', '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms', '• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을'],
   }),
-  s(1500, todo('todo3', PH3, 3)),
+  s(DWELL, todo('todo3', PH3, 3)),
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
   s(200, { type: 'file', id: 'v1', name: '이력서 초안 v1', meta: '1쪽 · 방금', preview: true }),
@@ -351,13 +390,58 @@ const ph3Boost: Step[] = [
   s(200, tool('boost2', '점수 올리기 2회', '도메인 경험', 'run', '도메인 맥락을 다시 쓰는 중')),
   s(1300, tool('boost2', '점수 올리기 2회', '도메인 경험', 'ok', '7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요')),
   s(300, { type: 'fit', id: 'boost', score: 8.3, from: 6.9, delta: '+1.4', note: '적합도 6.9 → 8.3 (+1.4)' }),
-  ask({ ...numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기']), detail: '적합도 6.9 → 8.3' }),
+  ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
-const ph4Design: Step[] = [
-  ask({
-    ...numbered('ph4-design', '검증을 마쳤어요. 어떤 디자인을 적용할까요?', [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, '모던', '컴팩트', 'ATS', '그만하기']),
-    detail: '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.',
+const ph4Quality: Step[] = [
+  s(200, status('검사하는 중…')),
+  s(300, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장을 하나씩 보는 중')),
+  s(1200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
+  s(200, {
+    type: 'diff', id: 'qdiff',
+    lines: [
+      { n: 8, sign: '-', text: '결제 트랜젝션 처리 성능 개선' },
+      { n: 8, sign: '+', text: '결제 트랜잭션 처리 성능 개선' },
+      { n: 12, sign: '-', text: '모아페이 · 2022.04–현재' },
+      { n: 12, sign: '+', text: '모아페이 · 2022.03–현재' },
+    ],
   }),
+  ask({
+    id: 'ph4-quality',
+    question: '추천 수정도 반영할까요?',
+    sections: [
+      {
+        kind: 'toggle',
+        items: [{ label: '가운데점(·) 나열을 쉼표로' }, { label: '경력 본문의 현재형 문장 2곳' }, { label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }],
+        selected: [0, 1],
+        ids: ['dots', 'tense', 'tone'],
+      },
+    ],
+    submit: '{n}개 반영하고 디자인으로',
+    zeroSubmit: '그대로 디자인으로',
+  }),
+]
+const TEMPLATES = ['클래식', '모던', '컴팩트', 'ATS']
+const ph4Design: Step[] = [
+  s(300, tool('applied', '추천 수정 반영', '2개', 'ok', '쉼표 정리 · 현재형 문장 고침')),
+  s(400, agent('tpl', '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
+  ask({
+    id: 'ph4-design',
+    question: '검증을 마쳤어요. 어떤 디자인을 적용할까요?',
+    sections: [
+      { kind: 'templates', items: TEMPLATES.map((label, i) => ({ id: `t${i}`, label, ...(i === 0 ? { recommended: true } : {}) })), selected: [0] },
+      { kind: 'toggle', items: [{ label: '프로필 사진 넣기', desc: '마이 › 프로필 사진을 써요 · 모든 템플릿' }], selected: [], ids: ['photo'] },
+    ],
+    submit: '클래식으로 만들기',
+    submitLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' },
+    secondary: '그만하기',
+  }),
+]
+const ph5: Step[] = [
+  s(200, status('정리하는 중…')),
+  s(300, tool('design', '디자인 적용', '모던', 'ok', 'A4 1쪽 · 여백과 줄 간격 맞춤')),
+  s(300, tool('photo', '프로필 사진', '마이 › 프로필', 'ok', '헤더 왼쪽 원형 80px')),
+  s(300, tool('save', 'Push 프로필', '마이 › 프로필', 'run', 'Push 프로필에 저장하는 중…')),
+  s(DWELL, tool('save', 'Push 프로필', '마이 › 프로필', 'ok', '저장했어요')),
 ]
 const ph2xApproach: Step[] = [
   s(200, status('공고 뜯어보는 중…')),
@@ -367,7 +451,7 @@ const ph2xApproach: Step[] = [
   ask(numbered('ph2x-approach', '어떤 접근 방식으로 진행할까요?', ['병목을 만들게요', '문제를 예방할게요', '그만하기'])),
 ]
 const ph2xLevel: Step[] = [
-  ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약으로', '중간 제약으로', '강한 제약으로', '그만하기'])),
+  ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약으로', '중간 제약으로', '강한 제약으로', '그만하기'], PICK_HINT, [1])),
 ]
 const PREVENT = ['성능', '보안', '확장성', '안정성', '유지보수', '데이터 무결성', '그만하기']
 const ph2xPrevent: Step[] = [
@@ -382,7 +466,17 @@ const ph2xBlueprints: Step[] = [
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'ok', '공고 연관성·임팩트·실현 가능성 모두 통과')),
   s(300, tool('bp', '기획서 만들기', '4개', 'run', '기획서를 쓰는 중')),
-  s(1500, tool('bp', '기획서 만들기', '4개', 'ok', '공고 스택과 70% 이상 일치', ['retry-queue.md', 'settle-batch.md', 'payment-outbox.md', 'rate-limiter.md'])),
+  s(1500, tool('bp', '기획서 만들기', '4개', 'ok', '공고 스택과 70% 이상 일치')),
+  s(300, {
+    type: 'plan', id: 'bplan', title: '프로젝트 기획서', meta: '4개',
+    rows: [
+      { tag: '통과', tone: 'green', label: '결제 승인 재시도 큐', note: '안정성 · Kotlin, Kafka' },
+      { tag: '통과', tone: 'green', label: '정산 배치 병렬화', note: '데이터 무결성 · Spring Batch' },
+      { tag: '조건부', tone: 'orange', label: '결제 이벤트 아웃박스', note: '무결성 · Kafka, JPA' },
+      { tag: '통과', tone: 'green', label: '가맹점 API 레이트 리미터', note: '안정성 · Redis' },
+    ],
+    keywords: [],
+  }),
   ask(numbered('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['기획만 볼게요', '그만하기'])),
 ]
 
@@ -409,7 +503,7 @@ const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
     c === 0 ? say('paste', '공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.')
       : c === 1 ? tailorFit(TODO)
         : say('pick', '북마크한 공고 중에서 골라 주세요. @언급으로 불러올 수 있어요.'),
-  present: (c) => say(c === 0 ? 'seen' : 'bye', c === 0 ? 'Push 프로필에서 결과를 볼 수 있어요.' : '알겠어요. 필요할 때 다시 불러 주세요.'),
+  present: (c) => (c === 0 ? [done] : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   ph0: (c) => (c === 0 ? ph0Input : c === 1 ? ph2xApproach : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph0-input': () => ph0Start,
   'ph0-start': (c) => (c === 0 ? ph1 : c === 1 ? ph0Input : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
@@ -420,11 +514,14 @@ const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
   'ph3-review': (c) => (c === 0 ? ph3Boost : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-boost': (c) =>
     c === 0
-      ? [s(400, agent('stall', '최대 5번까지 올렸어요.')), ...ph4Design]
+      ? [s(400, agent('stall', '최대 5번까지 올렸어요.')), ...ph4Quality]
       : c === 1
-        ? ph4Design
+        ? ph4Quality
         : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.'),
-  'ph4-design': (c) => (c === 4 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : [s(200, status('Push 프로필에 저장하는 중…')), ...finish('6.9 → 8.3')]),
+  'ph4-quality': () => ph4Design,
+  'ph4-design': (c) => (c === -1 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1', '으로')]),
+  'ph2x-verify': (c) => (c === 0 ? ph2xLevel : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ext-gate': (c) => (c === 0 ? [done] : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('bye', '알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-level': (c) => (c === 3 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
   'ph2x-prevent': (c) => (c === 6 ? say('bye', '알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
@@ -436,17 +533,72 @@ const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
 }
 
 // Per conversation: id prefix for the current scenario (so continuations update the same lines) and its to-do labels.
-const scenario = new Map<string, { prefix: string; labels: string[] }>()
+const scenario = new Map<string, { prefix: string; labels: string[]; verified?: boolean }>()
 let seq = 0
 
-const pick = (text: string, interrupted: boolean, attachment?: string): { steps: Step[]; labels?: string[] } | null => {
-  if (attachment) return { steps: fileRun(attachment) }
-  if (/지원해/.test(text)) return { steps: applyRun }
+const verifyFail: Step[] = [
+  s(200, status('검증하는 중…')),
+  s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
+  s(1200, { type: 'tool', id: 'check', action: '방향 검증', target: '5개 기준', state: 'err' }),
+  ask(numbered('ph2x-verify', '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', ['다시 고르기', '그만하기'])),
+]
+const autoPick: Step[] = [
+  s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
+  s(400, agent('auto1', '자동으로 골랐어요: 모던 템플릿')),
+  s(400, agent('auto2', '자동으로 골랐어요: 경력 섹션부터 고치기')),
+  s(300, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
+  done,
+]
+const awaitReply: Step[] = [
+  s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건')),
+  s(400, agent('await', '경력 섹션을 이렇게 바꿀게요. 승인 API 성과를 숫자로 보여 주고, Kafka 경험을 맨 앞으로 옮겨요.')),
+  s(200, { type: 'done', at: 0, awaiting: 'approval' }),
+]
+const fail = (id: string, code: string, text: string): Step[] => [s(300, { type: 'error', id, text, code })]
+
+// Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
+const TOKENS: Record<string, Step[]> = {
+  'err-unavailable': fail('err', 'NOT_CONFIGURED', ERROR_TEXT.NOT_CONFIGURED!),
+  'err-credit': fail('err', 'INSUFFICIENT_CREDITS', ERROR_TEXT.INSUFFICIENT_CREDITS!),
+  'err-other': [s(300, agent('hi', '좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('err', 'UNKNOWN', DEFAULT_ERROR_TEXT)],
+  'ext-done': ext({}),
+  'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'PDF로 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
+  'ext-nosave': ext({ saved: false }),
+  'ext-ok': ext({ josa: '으로', gate: '내 서류에 저장했어요. 결과를 확인할까요?' }),
+  'ext-fail': ext({ josa: '으로', saved: false, gate: '내 서류에 저장하지 못했어요. 결과를 확인할까요?' }),
+  'ph1-free': ph1Plan('FREE'),
+  'ph1-ultra': ph1Plan('ULTRA'),
+  // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.
+  'ph1-ultra-open': ph1Plan('ULTRA', DWELL + 4000),
+  'auto-pick': autoPick,
+  // Jump straight to a phase: the design draws each phase under its own user line.
+  analyze: ph1,
+  boost: ph3Boost,
+  // ChatPh4Quality draws the quality check right under this line, without the boost card.
+  quality: ph4Quality,
+  '품질 검사로 넘어가기': ph4Quality,
+  'ph2x': ph2xApproach,
+  '네, 시작해 주세요': ph1,
+  '피드백만 받을게요': feedbackOnly,
+  '좋아요, 계속해 주세요': ph3Boost,
+  '필요한 프로젝트 경험까지 만들어 주세요': ph2xApproach,
+}
+
+const pick = (text: string, interrupted: boolean, attachment?: string, intent?: string): { steps: Step[]; labels?: string[] } | null => {
+  const token = TOKENS[text.trim()]
+  if (token) return { steps: token }
+  if (attachment) return { steps: fileRun() }
+  if (intent === 'fit') return { steps: ph1 }
+  if (intent === 'boost') return { steps: ph3Boost }
+  if (intent === 'experience') return { steps: ph2xApproach }
+  if (/지원해|^apply$/.test(text)) return { steps: applyRun }
   if (/저장해/.test(text)) return { steps: [s(300, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 마이 › 서류')), done] }
-  if (/실패|채용 페이지/.test(text)) return { steps: failRun, labels: TODO }
-  if (/만들어 주세요/.test(text)) return { steps: ph0 }
+  if (/실패|채용 페이지|^fail$/.test(text)) return { steps: failRun, labels: TODO }
+  if (/만들어 주세요|^make resume$/.test(text)) return { steps: ph0 }
+  if (/PDF로 만들어 줘/.test(text)) return { steps: autoPick }
+  if (/경력 섹션을 공고에 맞게/.test(text)) return { steps: awaitReply }
   if (interrupted) return null
-  if (/맞춰|고쳐/.test(text)) return { steps: [...tailorRead, ...tailorFit(TODO)], labels: TODO }
+  if (/맞춰|고쳐|^tailor/.test(text)) return { steps: [...tailorRead, ...tailorFit(TODO)], labels: TODO }
   return { steps: generic(text) }
 }
 
@@ -456,19 +608,22 @@ mock('POST', 'chat/runs', ({ body }) => {
   let steps: Step[]
   let state = scenario.get(id)
   if (b.answer && state) {
-    steps = (next[b.answer.approvalId] ?? ((_c: number) => generic(b.text ?? '')))(b.answer.choice, state.labels)
+    // The first 병목 강도 pick fails verification (ChatVerifyFail); picking again passes.
+    const verifying = b.answer.approvalId === 'ph2x-level' && b.answer.choice !== 3 && !state.verified
+    if (verifying) state.verified = true
+    steps = verifying ? verifyFail : (next[b.answer.approvalId] ?? ((_c: number) => generic(b.text ?? '')))(b.answer.choice, state.labels)
   } else if (!state && find(id)?.status === 'RUNNING') {
     state = { prefix: `r${++seq}`, labels: TODO }
     scenario.set(id, state)
     steps = startDocument
-  } else if (b.interrupted && state && !pick(b.text ?? '', true)) {
+  } else if (b.interrupted && state && !pick(b.text ?? '', true, undefined, b.intent)) {
     // Talking after 중지 resumes the stopped work with the new request folded in (ChatInterrupt).
     // Fresh ids: the stopped lines stay in the transcript and the resumed work continues below them.
     state = { prefix: `r${++seq}`, labels: TODO_PLUS }
     scenario.set(id, state)
     steps = tailorResume
   } else {
-    const p = pick(b.text ?? '', false, b.attachment)!
+    const p = pick(b.text ?? '', false, b.attachment, b.intent)!
     state = { prefix: `r${++seq}`, labels: p.labels ?? TODO }
     scenario.set(id, state)
     steps = p.steps
@@ -514,6 +669,8 @@ const storedTurns: Record<string, ConversationTurn['events']> = {
       seq: 7,
     },
   ],
+  // ChatResume: the draft stopped at its review gate. The gate card itself needs an app card for a stale gate.
+  'c-dotori': [{ type: 'tool', name: 'write_draft', state: 'ok', summary: '초안 쓰기', target: '이력서 v1', resultLine: '1쪽 · 섹션 5개 · 말투 그대로', seq: 1 }],
   'c-career': [
     { type: 'todo', items: PROFILE_TODO.map((text, i) => ({ id: String(i), text, state: 'done' as const })), seq: 1 },
     {
@@ -531,7 +688,7 @@ mock('GET', 'conversations/:id/turns', ({ params, query }) => {
   const c = find(params.id!)
   const events = c && storedTurns[c.id]
   const turns: ConversationTurn[] = events
-    ? [{ jobId: `${c.id}-j`, status: 'DONE', createdAt: c.updatedAt, userMessageId: `${c.id}-u`, assistantMessageId: null, answer: null, events }]
+    ? [{ jobId: `${c.id}-j`, status: 'DONE', createdAt: c.updatedAt, userMessageId: c.id === 'c-dotori' ? null : `${c.id}-u`, assistantMessageId: null, answer: null, events }]
     : []
   return page(turns, query)
 })
@@ -552,7 +709,7 @@ const links: UserLink[] = [
   { id: 'l4', kind: 'github', url: 'https://github.com/seojun-kim', title: 'seojun-kim', status: null, fitCount: 0, aiRead: true, createdAt: ago(9000) },
   { id: 'l5', kind: 'github', url: 'https://github.com/seojun-kim/settle-pipeline', title: 'settle-pipeline', status: null, fitCount: 0, aiRead: true, createdAt: ago(8000) },
   { id: 'l6', kind: 'portfolio', url: 'https://seojun.notion.site', title: '김서준 포트폴리오', status: null, fitCount: 0, aiRead: false, createdAt: ago(20000) },
-  { id: 'l7', kind: 'blog', url: 'https://velog.io/@seojun/p99', title: '결제 승인 API p99 절반으로 줄이기', status: null, fitCount: 0, aiRead: false, createdAt: ago(30000) },
+  { id: 'l7', kind: 'blog', url: 'https://velog.io/@seojun/p95', title: '결제 승인 API p95 절반 아래로 줄이기', status: null, fitCount: 0, aiRead: false, createdAt: ago(30000) },
 ]
 
 mock('GET', 'me/links', ({ query }) => {
@@ -620,6 +777,8 @@ const quick: Record<string, QsData> = {
   match: { items: [], chips: ['개발 · 백엔드', '경력 4–6년', '서울', 'Kotlin', 'Spring Boot'] },
   gap: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
   fit: { segments: ['북마크 4', '최근 본 공고'], items: [JOBS[0]!, { ...JOBS[1]!, selected: true }, JOBS[2]!, ...RECENT], doc: RESUME },
+  // The design draws the job as one "company · title" line, so it has no overline.
+  boost: { items: [{ ...JOBS[0]!, over: '', title: '모아페이 · 백엔드 엔지니어 (Kotlin·Spring)', sub: '', selected: true }], doc: RESUME },
   deadline: {
     items: [
       job('d-pado', '파도AI', '데이터 분석가', '', '파', '#862E9C', { badge: { label: 'D-2', tone: 'red' }, note: { label: '서류 없음' } }),
@@ -635,11 +794,12 @@ const quick: Record<string, QsData> = {
       job('s-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: '서류', tone: 'ac' }, selected: true }),
       job('s-star', '별빛게임즈', 'DevOps 엔지니어', '', '별', '#1864AB', { badge: { label: '지원함', tone: 'grey' }, selected: true }),
       job('s-raon', '라온헬스', '백엔드 개발자 (Java)', '', '라', '#364FC7', { badge: { label: '합격', tone: 'green' } }),
+      // Same ids as the 진행 중 rows, as the real list has (one application listed under both tabs is one pick).
       ...[
-        job('a-moa', '모아페이', '결제 플랫폼 시니어 엔지니어', '', '모', '#1F3A8A', { badge: { label: '면접', tone: 'orange' }, seg: 1, selected: true }),
-        job('a-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: '서류', tone: 'ac' }, seg: 1, selected: true }),
-        job('a-star', '별빛게임즈', 'DevOps 엔지니어', '', '별', '#1864AB', { badge: { label: '지원함', tone: 'grey' }, seg: 1, selected: true }),
-        job('a-raon', '라온헬스', '백엔드 개발자 (Java)', '', '라', '#364FC7', { badge: { label: '합격', tone: 'green' }, seg: 1 }),
+        job('s-moa', '모아페이', '결제 플랫폼 시니어 엔지니어', '', '모', '#1F3A8A', { badge: { label: '면접', tone: 'orange' }, seg: 1, selected: true }),
+        job('s-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: '서류', tone: 'ac' }, seg: 1, selected: true }),
+        job('s-star', '별빛게임즈', 'DevOps 엔지니어', '', '별', '#1864AB', { badge: { label: '지원함', tone: 'grey' }, seg: 1, selected: true }),
+        job('s-raon', '라온헬스', '백엔드 개발자 (Java)', '', '라', '#364FC7', { badge: { label: '합격', tone: 'green' }, seg: 1 }),
         job('a-nuri', '누리클라우드', '백엔드 개발자', '', '누', '#2B8A3E', { badge: { label: '불합격', tone: 'grey' }, seg: 1 }),
         job('a-pado', '파도AI', '데이터 엔지니어', '', '파', '#862E9C', { badge: { label: '지원 취소', tone: 'grey' }, seg: 1 }),
       ],

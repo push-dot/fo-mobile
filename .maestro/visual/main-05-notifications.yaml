@@ -1,0 +1,22 @@
+appId: app.push.mobile
+name: 홈 → 알림함 → 모두 읽음
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- tapOn: "알림.*"
+- extendedWaitUntil:
+    visible: "모두 읽음"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*지원 상태가 바뀌었어요.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: Notifications
+- tapOn: "모두 읽음"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: NotificationsStates.1
