@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { router } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -13,10 +13,9 @@ import {
   ApprovalPanel,
   AWAITING_TEXT,
   AccountModal,
-  ChatDrawer,
   ComposerArea,
   ConsentSheet,
-  ConversationsModal,
+  OPEN_DRAWER,
   DELETE_CONFIRM,
   DocsModal,
   headerMenu,
@@ -49,8 +48,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
   })
   const list = useConversationList()
   const conv = list.data?.data.find((x) => x.id === id)
-  const [drawer, setDrawer] = useState(false)
-  const [listOpen, setListOpen] = useState(false)
+  const navigation = useNavigation()
   const [planOpen, setPlanOpen] = useState(false)
   const [docs, setDocs] = useState(false)
   const [renaming, setRenaming] = useState<string | null>(null)
@@ -129,7 +127,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
         ))}
       </ScrollView>
 
-      <Header onDrawer={() => setDrawer(true)} onNew={() => router.dismissTo('/chat')} menu={menu} />
+      <Header onDrawer={() => navigation.dispatch(OPEN_DRAWER)} onNew={() => router.dismissTo('/chat')} menu={menu} />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         {fresh ? (
@@ -193,8 +191,6 @@ const ConversationScreen = ({ id }: { id: string }) => {
         <TextField value={renaming ?? ''} onChangeText={setRenaming} max={300} autoFocus accessibilityLabel="대화 이름" />
       </BottomSheet>
       <DocsModal visible={docs} onClose={() => setDocs(false)} />
-      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} currentId={id} onSeeAll={() => setListOpen(true)} />
-      <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} currentId={id} onDeleted={() => router.dismissTo('/chat')} />
       <AccountModal visible={planOpen} initialPage="plan" onClose={() => setPlanOpen(false)} />
       <ConsentSheet />
     </View>

@@ -4,11 +4,11 @@ import { tabColor, useColors, useThemeMode } from '@/theme'
 
 // Tab bar icons rendered from the Claude Design line icons and the mascot (assets/tabs, @2x/@3x).
 const ICONS = {
-  home: { default: require('../../../assets/tabs/tab-home.png'), selected: require('../../../assets/tabs/tab-home-on.png') },
-  hub: { default: require('../../../assets/tabs/tab-hub.png'), selected: require('../../../assets/tabs/tab-hub-on.png') },
-  social: { default: require('../../../assets/tabs/tab-social.png'), selected: require('../../../assets/tabs/tab-social-on.png') },
-  my: { default: require('../../../assets/tabs/tab-my.png'), selected: require('../../../assets/tabs/tab-my-on.png') },
-  agent: { light: require('../../../assets/tabs/tab-agent.png'), dark: require('../../../assets/tabs/tab-agent-dark.png') },
+  home: { default: require('../../../../../assets/tabs/tab-home.png'), selected: require('../../../../../assets/tabs/tab-home-on.png') },
+  hub: { default: require('../../../../../assets/tabs/tab-hub.png'), selected: require('../../../../../assets/tabs/tab-hub-on.png') },
+  social: { default: require('../../../../../assets/tabs/tab-social.png'), selected: require('../../../../../assets/tabs/tab-social-on.png') },
+  my: { default: require('../../../../../assets/tabs/tab-my.png'), selected: require('../../../../../assets/tabs/tab-my-on.png') },
+  agent: { light: require('../../../../../assets/tabs/tab-agent.png'), dark: require('../../../../../assets/tabs/tab-agent-dark.png') },
 }
 
 const TabsLayout = () => {

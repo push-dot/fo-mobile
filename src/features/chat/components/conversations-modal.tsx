@@ -5,7 +5,7 @@ import { Alert, Modal, Platform, Pressable, ScrollView, View } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { searchHangul } from '@push/shared'
 import { useColors } from '@/theme'
-import { BottomSheet, Button, ContextMenu, GlassButton, Text, TextField, TopBar } from '@/shared/components'
+import { Badge, BottomSheet, Button, ContextMenu, GlassButton, Text, TextField, TopBar } from '@/shared/components'
 import { renameConversation } from '../api/fetchers'
 import {
   useArchiveConversation,
@@ -18,7 +18,9 @@ import {
 import type { ConversationRow } from '../api/schemas'
 import { ago } from '../utils'
 import { ARCHIVED_NOTE, ARCHIVED_TITLE, DELETE_CONFIRM, UNARCHIVE_LABEL, conversationRowMenu } from '../utils/conversation-menu'
-import { statusBadge } from './drawer'
+
+export const statusBadge = (s: ConversationRow['status']) =>
+  s === 'NEEDS_APPROVAL' ? <Badge label="확인 필요" tone="orange" /> : s === 'RUNNING' ? <Badge label="작업 중" tone="ac" /> : null
 
 const dayStart = () => new Date(new Date().setHours(0, 0, 0, 0)).getTime()
 

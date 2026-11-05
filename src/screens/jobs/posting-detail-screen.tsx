@@ -51,7 +51,7 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
           label="에이전트로 맞추기"
           variant="secondary"
           icon={android ? 'spark' : undefined}
-          onPress={() => router.push({ pathname: '/(tabs)/(chat)/chat', params: { postingId: id } })}
+          onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: id } })}
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}

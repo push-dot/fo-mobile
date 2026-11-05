@@ -11,11 +11,11 @@ describe('notificationHref', () => {
 
   it('opens my activity for calendar reminders and application stages', () => {
     expect(notificationHref({ target: { kind: 'calendar', id: 'e1' } })).toEqual({
-      pathname: '/(tabs)/(my)/my',
+      pathname: '/(app)/(stack)/(tabs)/(my)/my',
       params: { tab: 'activity', sub: 'calendar' },
     })
     expect(notificationHref({ target: { kind: 'activity', id: 'a1' } })).toEqual({
-      pathname: '/(tabs)/(my)/my',
+      pathname: '/(app)/(stack)/(tabs)/(my)/my',
       params: { tab: 'activity', sub: 'applications' },
     })
   })

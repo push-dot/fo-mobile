@@ -114,7 +114,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
         }}
       >
         <Button label="지원한 서류" variant="secondary" disabled={!doc} onPress={() => doc && router.push(`/docs/push/${doc.id}`)} />
-        <Button label={INTERVIEW_PREP} onPress={() => router.push('/(tabs)/(chat)/chat')} style={{ flex: 1 }} />
+        <Button label={INTERVIEW_PREP} onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')} style={{ flex: 1 }} />
       </View>
     </View>
   )

@@ -31,7 +31,7 @@ const SocialScreen = () => {
                 },
               ]}
             />
-            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(tabs)/(social)/compose') }]} />
+            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/(tabs)/(social)/compose') }]} />
           </>
         }
       />
@@ -73,7 +73,7 @@ const SocialScreen = () => {
                   <Text v="b2" color="t3">
                     아직 올라온 글이 없어요
                   </Text>
-                  <Button label="글쓰기" variant="secondary" size="sm" onPress={() => router.push('/(tabs)/(social)/compose')} />
+                  <Button label="글쓰기" variant="secondary" size="sm" onPress={() => router.push('/(app)/(stack)/(tabs)/(social)/compose')} />
                 </>
               )}
             </View>

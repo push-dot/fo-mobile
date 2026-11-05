@@ -1,23 +1,22 @@
-import { router } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text } from '@/shared/components'
-import { ChatDrawer, ComposerArea, ConsentSheet, ConversationsModal, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
+import { ComposerArea, ConsentSheet, OPEN_DRAWER, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
 
 const ChatHomeScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const start = useStartChat()
   const [typing, setTyping] = useState(false)
-  const [drawer, setDrawer] = useState(false)
-  const [listOpen, setListOpen] = useState(false)
+  const navigation = useNavigation()
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ paddingTop: insets.top, height: insets.top + 56, justifyContent: 'center', paddingLeft: 12 }}>
-        <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: () => setDrawer(true) }]} />
+        <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: () => navigation.dispatch(OPEN_DRAWER) }]} />
       </View>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none" accessibilityElementsHidden>
         <Text style={{ fontSize: 56, lineHeight: 60, letterSpacing: -2.8, ...fontFor('800'), color: c.t1, opacity: 0.12 }}>
@@ -39,8 +38,6 @@ const ChatHomeScreen = () => {
           onSend={(text, attachment) => void start(text.length > 30 ? `${text.slice(0, 30)}…` : text, text, attachment)}
         />
       </View>
-      <ChatDrawer visible={drawer} onClose={() => setDrawer(false)} onSeeAll={() => setListOpen(true)} />
-      <ConversationsModal visible={listOpen} onClose={() => setListOpen(false)} />
       <ConsentSheet />
     </KeyboardAvoidingView>
   )

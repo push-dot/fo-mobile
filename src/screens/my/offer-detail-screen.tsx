@@ -96,7 +96,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
         {pending && p ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/(tabs)/(chat)/chat')}
+            onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
             style={{
               paddingVertical: 16,
               paddingHorizontal: 18,

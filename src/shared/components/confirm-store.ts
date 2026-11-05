@@ -10,7 +10,7 @@ export type ConfirmRequest = {
   onConfirm: () => void
 }
 
-export type ConfirmHref = '/confirm' | '/(tabs)/(my)/confirm'
+export type ConfirmHref = '/confirm' | '/(app)/(stack)/(tabs)/(my)/confirm'
 
 type ConfirmState = { request: ConfirmRequest | null; set: (request: ConfirmRequest | null) => void }
 

@@ -369,7 +369,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
           label="에이전트로 다듬기"
           icon="spark"
           variant="secondary"
-          onPress={() => router.push('/(tabs)/(chat)/chat')}
+          onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
         />
         <Text v="c1" color="t3">
           허브 프로필 맨 위에 보여요. 3~4문장이면 충분해요.
@@ -572,7 +572,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                           danger: true,
                           onConfirm: () => removeAt(i, it),
                         },
-                        '/(tabs)/(my)/confirm',
+                        '/(app)/(stack)/(tabs)/(my)/confirm',
                       )
                     }
                     style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'center' }}

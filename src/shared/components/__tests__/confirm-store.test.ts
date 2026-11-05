@@ -19,8 +19,8 @@ describe('askConfirm', () => {
   })
 
   it('askConfirm pushes the given href', () => {
-    askConfirm({ title: '이 경력을 삭제할까요?', body: '지워요', confirm: '삭제', onConfirm: vi.fn() }, '/(tabs)/(my)/confirm')
-    expect(push).toHaveBeenCalledWith('/(tabs)/(my)/confirm')
+    askConfirm({ title: '이 경력을 삭제할까요?', body: '지워요', confirm: '삭제', onConfirm: vi.fn() }, '/(app)/(stack)/(tabs)/(my)/confirm')
+    expect(push).toHaveBeenCalledWith('/(app)/(stack)/(tabs)/(my)/confirm')
   })
 
   it('set(null) clears the request', () => {

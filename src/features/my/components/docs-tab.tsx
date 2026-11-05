@@ -18,7 +18,7 @@ import ListTitle from './list-title'
 import Row from './row'
 import Toast from './toast'
 
-const openChat = () => router.push('/(tabs)/(chat)/chat')
+const openChat = () => router.push('/(app)/(stack)/(tabs)/(chat)/chat')
 
 const PickRow = ({
   icon,
