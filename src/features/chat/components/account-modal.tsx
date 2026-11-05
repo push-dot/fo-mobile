@@ -9,7 +9,7 @@ import { TONES, tintOf, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
-import { EFFORTS, accessMenu, effortMenu, retentionMenu, toneMenu, usagePercent } from '../utils/account-menus'
+import { accessMenu, toneMenu, usagePercent } from '../utils/account-menus'
 import { Appear } from './motion'
 import Mark from './mark'
 import PageModal from './page-modal'
@@ -77,8 +77,6 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
   const leave = useLeaveSidebar()
   const toMy = () => leave(() => router.navigate('/my'))
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
-  const days = settings.data?.chatRetentionDays
-  const effort = EFFORTS.find((e) => e.key === settings.data?.defaultEffort)
   const usage = usagePercent(account?.credits)
 
   return (
@@ -105,19 +103,9 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
               <SettingsRow label={tone ? `${tone.label} 말투` : '그대로'} right={<Value />} />
             </View>
           </Menu>
-          <Menu stretch accessibilityLabel="작업 강도" actions={effortMenu(effort?.key, (defaultEffort) => save.mutate({ defaultEffort }))}>
-            <View>
-              <SettingsRow label={effort ? `${effort.label} 작업` : '작업 강도'} right={<Value />} />
-            </View>
-          </Menu>
           <Menu stretch accessibilityLabel="실행 방식" actions={accessMenu(mode.key, access.pick)}>
             <View>
               <SettingsRow label="실행 방식" right={<Value value={mode.label} />} />
-            </View>
-          </Menu>
-          <Menu stretch accessibilityLabel="대화 기록 보관" actions={retentionMenu(days ?? undefined, (chatRetentionDays) => save.mutate({ chatRetentionDays }))}>
-            <View>
-              <SettingsRow label={days ? `대화 기록 ${days}일 보관` : '대화 기록 보관'} right={<Value />} />
             </View>
           </Menu>
         </SettingsGroup>

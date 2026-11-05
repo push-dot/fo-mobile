@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { accessMenu, effortMenu, retentionMenu, toneMenu, usagePercent } from '../utils/account-menus'
+import { accessMenu, toneMenu, usagePercent } from '../utils/account-menus'
 
 vi.mock('@/features/my', async () => ({ TONES: (await import('../../my/constants')).TONES }))
 
@@ -24,18 +24,6 @@ describe('account inline menus', () => {
     expect(actions.findIndex((a) => a.selected)).toBe(2)
     actions[0]!.onPress()
     expect(pick).toHaveBeenCalledWith('ALWAYS_ASK')
-  })
-
-  it('effort and retention menus check the saved value, defaulting to 보통 and 30일', () => {
-    const pick = vi.fn()
-    expect(effortMenu('MAX', pick).findIndex((a) => a.selected)).toBe(3)
-    expect(effortMenu(undefined, pick).findIndex((a) => a.selected)).toBe(1)
-    effortMenu('MAX', pick)[0]!.onPress()
-    expect(pick).toHaveBeenCalledWith('LOW')
-    expect(retentionMenu(90, pick).map((a) => a.label)).toEqual(['7일', '30일', '90일', '365일'])
-    expect(retentionMenu(undefined, pick).findIndex((a) => a.selected)).toBe(1)
-    retentionMenu(90, pick)[3]!.onPress()
-    expect(pick).toHaveBeenCalledWith(365)
   })
 
   it('usage percent rounds, clamps and hides without credits', () => {
