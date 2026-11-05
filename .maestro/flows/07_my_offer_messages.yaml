@@ -1,0 +1,24 @@
+appId: app.push.mobile
+name: 마이 → 제안함 → 제안 메시지 → 보내기
+---
+- runFlow: _login.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "받은 제안 .*개"
+# Each offer row reads as one label: name, badge, company and message.
+- extendedWaitUntil:
+    visible: ".*최지우.*"
+    timeout: 10000
+- tapOn: ".*최지우.*"
+- extendedWaitUntil:
+    visible: "좋아요. 강남역 근처에서 12시 반에 봬요."
+    timeout: 10000
+# iOS reads the input as its label plus placeholder: "메시지 메시지를 입력해 주세요".
+- tapOn: "메시지.*"
+- inputText: "See you"
+- tapOn: "보내기"
+- extendedWaitUntil:
+    visible: "See you"
+    timeout: 10000

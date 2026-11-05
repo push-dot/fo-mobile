@@ -1,37 +1,32 @@
-import { HUB_CATEGORIES, type JobCategory } from '@push/api-client'
+import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
-import { useState } from 'react'
 import { ActivityIndicator, FlatList, Pressable, ScrollView, View } from 'react-native'
 import {
-  EMPTY_SHEET,
   FilterButton,
-  HubFilterSheet,
+  HUB_SKELETON,
   ProfileRow,
   Surface,
   appliedCount,
   filterSummary,
   toggle,
+  useHubFilterStore,
   useProfileList,
   useViewerId,
-  type SheetFilters,
 } from '@/features/hub'
-import { Badge, Button, Chip, Icon, LoadingNote, Text, TopBar } from '@/shared/components'
+import { Badge, Button, Chip, Icon, SkeletonRows, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const HubScreen = () => {
   const c = useColors()
-  const [category, setCategory] = useState<JobCategory[]>([])
-  const [sheet, setSheet] = useState<SheetFilters>(EMPTY_SHEET)
-  const [filterOpen, setFilterOpen] = useState(false)
+  const category = useHubFilterStore((s) => s.category)
+  const sheet = useHubFilterStore((s) => s.sheet)
+  const setCategory = useHubFilterStore((s) => s.setCategory)
+  const reset = useHubFilterStore((s) => s.reset)
 
   const viewerId = useViewerId()
   const list = useProfileList(category, sheet)
   const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
-  const reset = () => {
-    setCategory([])
-    setSheet(EMPTY_SHEET)
-  }
 
   const header = (
     <View>
@@ -74,13 +69,9 @@ const HubScreen = () => {
         right={
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             {viewerId ? (
-              <Pressable accessibilityRole="button" onPress={() => router.push(`/profiles/${viewerId}` as Href)}>
-                <Text v="b2" weight="700" color="acText">
-                  내 프로필 보기
-                </Text>
-              </Pressable>
+              <Button label="내 프로필" variant="secondary" size="sm" onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}
-            <FilterButton count={appliedCount(sheet)} onPress={() => setFilterOpen(true)} />
+            <FilterButton count={appliedCount(sheet)} onPress={() => router.push('/hub-filter')} />
           </View>
         }
       />
@@ -91,7 +82,7 @@ const HubScreen = () => {
         ListHeaderComponent={header}
         ListEmptyComponent={
           list.isPending ? (
-            <LoadingNote style={{ marginTop: 32 }} />
+            <SkeletonRows {...HUB_SKELETON} />
           ) : list.isError ? (
             <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 32 }}>
               프로필을 불러오지 못했어요.
@@ -109,16 +100,6 @@ const HubScreen = () => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={list.isFetchingNextPage ? <ActivityIndicator style={{ marginVertical: 16 }} /> : undefined}
         contentInsetAdjustmentBehavior="automatic"
-      />
-      <HubFilterSheet
-        visible={filterOpen}
-        onClose={() => setFilterOpen(false)}
-        category={category}
-        value={sheet}
-        onApply={(f) => {
-          setSheet(f)
-          setFilterOpen(false)
-        }}
       />
     </View>
   )

@@ -35,7 +35,7 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
             {timeLabel(n.createdAt)}
           </Text>
         </View>
-        <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'}>
+        <Text v="b2" color={unread ? 't1' : 't2'}>
           {n.body}
         </Text>
       </View>

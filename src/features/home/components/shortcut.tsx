@@ -11,7 +11,7 @@ const Shortcut = ({ label, icon, glow, opacity, href }: (typeof SHORTCUTS)[numbe
     <Pressable
       accessibilityRole="button"
       onPress={() => router.push(href)}
-      style={({ pressed }) => ({ flex: 1, height: 100, borderRadius: 22, overflow: 'hidden', backgroundColor: c.bg2, transform: [{ scale: pressed ? 0.97 : 1 }] })}
+      style={({ pressed }) => ({ flex: 1, minHeight: 100, borderRadius: 22, overflow: 'hidden', backgroundColor: c.bg2, transform: [{ scale: pressed ? 0.97 : 1 }] })}
     >
       <Svg style={{ position: 'absolute', inset: 0 }} width="100%" height="100%">
         <Defs>

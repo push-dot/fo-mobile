@@ -1,11 +1,11 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ComponentRef, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
-import { MAX_IMAGES, POST_IMAGE_OPTIONS, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
-import { BottomSheet, Button, Glass, GlassButton, Icon, SettingsGroup, SettingsRow, Text } from '@/shared/components'
+import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
+import { Button, Glass, GlassButton, Icon, Menu, Text } from '@/shared/components'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, useColors } from '@/theme'
 
@@ -14,10 +14,11 @@ const ComposeScreen = () => {
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   const [category, setCategory] = useState<PostCategory | null>(null)
-  const [picking, setPicking] = useState(false)
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [images, setImages] = useState<SocialImage[]>([])
+  const titleRef = useRef<ComponentRef<typeof TextInput>>(null)
+  const bodyRef = useRef<ComponentRef<typeof TextInput>>(null)
   const submit = useCreatePost()
   const ready = !!category && title.trim().length > 0 && body.trim().length > 0 && !submit.isPending
 
@@ -42,41 +43,64 @@ const ComposeScreen = () => {
         <Button label="게시" size="sm" disabled={!ready} onPress={() => submit.mutate({ category: category!, title, body, images })} />
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, gap: 14, paddingBottom: insets.bottom + 20 }} keyboardShouldPersistTaps="handled">
-        <Pressable accessibilityRole="button" accessibilityLabel={`카테고리, ${category ? categoryLabel(category) : '고르지 않음'}`} onPress={() => setPicking(true)}>
-          {field(
-            <>
-              <Text v="b2" color="t3">
-                카테고리
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                <Text v="b1" weight="700" color={category ? 'acText' : 't4'}>
-                  {category ? categoryLabel(category) : '골라 주세요'}
-                </Text>
-                <Icon name="down" size={16} color={category ? 'acText' : 't4'} />
-              </View>
-            </>,
-            { minHeight: 56, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+        <Menu
+          accessibilityLabel={`카테고리, ${category ? categoryLabel(category) : '고르지 않음'}`}
+          actions={POST_CATEGORIES.flatMap((x) =>
+            x.key ? [{ key: x.key, label: x.label, selected: x.key === category, onPress: () => setCategory(x.key) }] : [],
           )}
-        </Pressable>
-        <TextInput
-          value={title}
-          onChangeText={setTitle}
-          maxLength={100}
-          accessibilityLabel="제목"
-          placeholder="제목을 입력해 주세요"
-          placeholderTextColor={c.t4}
-          style={[{ fontSize: 22, letterSpacing: -0.66, color: c.t1, paddingVertical: 6, paddingHorizontal: 4 }, fontFor('800')]}
-        />
-        <TextInput
-          value={body}
-          onChangeText={setBody}
-          maxLength={5000}
-          multiline
-          accessibilityLabel="본문"
-          placeholder="나누고 싶은 이야기를 적어 주세요"
-          placeholderTextColor={c.t4}
-          style={[{ fontSize: 16, lineHeight: 26, color: c.t2, paddingHorizontal: 4, minHeight: 220, textAlignVertical: 'top' }, fontFor('400')]}
-        />
+        >
+          <View style={{ minHeight: 56, paddingHorizontal: 16, borderRadius: 16, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text v="b2" color="t3">
+              카테고리
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <Text v="b1" weight="700" color={category ? 'acText' : 't4'}>
+                {category ? categoryLabel(category) : '골라 주세요'}
+              </Text>
+              <Icon name="down" size={16} color={category ? 'acText' : 't4'} />
+            </View>
+          </View>
+        </Menu>
+        <View style={{ gap: 6 }}>
+          <Pressable accessible={false} onPress={() => titleRef.current?.focus()} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+            <Text v="c1" weight="700" color="t2">
+              {TITLE_LABEL}
+            </Text>
+            <Text v="c2" color="t3">
+              {TITLE_HINT}
+            </Text>
+          </Pressable>
+          <TextInput
+            ref={titleRef}
+            testID="compose-title"
+            value={title}
+            onChangeText={setTitle}
+            maxLength={TITLE_MAX}
+            accessibilityLabel={TITLE_LABEL}
+            placeholder="제목을 입력해 주세요"
+            placeholderTextColor={c.t4}
+            style={[{ fontSize: 22, letterSpacing: -0.66, color: c.t1, paddingTop: 4, paddingBottom: 8, paddingHorizontal: 4, borderBottomWidth: 1, borderBottomColor: c.line }, fontFor('800')]}
+          />
+        </View>
+        <View style={{ gap: 6 }}>
+          <Pressable accessible={false} onPress={() => bodyRef.current?.focus()} style={{ paddingHorizontal: 4 }}>
+            <Text v="c1" weight="700" color="t2">
+              {BODY_LABEL}
+            </Text>
+          </Pressable>
+          <TextInput
+            ref={bodyRef}
+            testID="compose-body"
+            value={body}
+            onChangeText={setBody}
+            maxLength={5000}
+            multiline
+            accessibilityLabel={BODY_LABEL}
+            placeholder="나누고 싶은 이야기를 적어 주세요"
+            placeholderTextColor={c.t4}
+            style={[{ fontSize: 16, lineHeight: 26, color: c.t2, padding: 4, minHeight: 200, textAlignVertical: 'top' }, fontFor('400')]}
+          />
+        </View>
         <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
           {images.map((a, i) => (
             <View key={a.uri}>
@@ -107,21 +131,6 @@ const ComposeScreen = () => {
           ) : null}
         </View>
       </ScrollView>
-      <BottomSheet visible={picking} onClose={() => setPicking(false)} title="어떤 이야기인가요?">
-        <SettingsGroup>
-          {POST_CATEGORIES.filter((x) => x.key).map((x) => (
-            <SettingsRow
-              key={x.key}
-              label={x.label}
-              right={x.key === category ? <Icon name="check" size={20} color="acText" /> : <View />}
-              onPress={() => {
-                setCategory(x.key)
-                setPicking(false)
-              }}
-            />
-          ))}
-        </SettingsGroup>
-      </BottomSheet>
     </KeyboardAvoidingView>
   )
 }

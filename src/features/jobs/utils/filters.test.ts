@@ -6,7 +6,17 @@ describe('jobs filters', () => {
     expect(chipText('category', EMPTY)).toBe('직군')
     expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('개발')
     expect(chipText('category', { ...EMPTY, category: ['data', 'dev'] })).toBe('개발 외 1')
-    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6'] })).toBe('4–6년')
+    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6'] })).toBe('경력 4–6년')
+  })
+
+  it('career chip keeps the 경력 prefix', () => {
+    expect(chipText('careerYears', { ...EMPTY, careerYears: ['4-6', '7-9'] })).toBe('경력 4–6년 외 1')
+    expect(chipText('careerYears', EMPTY)).toBe('경력')
+  })
+
+  it('category chip shows the value only', () => {
+    expect(chipText('category', { ...EMPTY, category: ['dev'] })).toBe('개발')
+    expect(chipText('employmentType', { ...EMPTY, employmentType: ['full_time'] })).toBe('정규직')
   })
 
   it('sends only set filters', () => {

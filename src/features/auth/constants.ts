@@ -3,6 +3,11 @@ export const GITHUB = `<svg viewBox="0 0 24 24"><path fill="#FFFFFF" d="M12 2a10
 export const GITHUB_BG = '#16191D'
 export const APPLE = `<svg viewBox="0 0 24 24"><path fill="#FFFFFF" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.8-3.5.8s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7 2-.1 2.9-2.3c.7-1 1-2 1-2.1-.1 0-1.9-.7-1.9-2.9zM14.5 6.2c.6-.8 1.1-1.9.9-3-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-.9 2.9 1 .1 2-.5 2.6-1.3z"/></svg>`
 export const APPLE_BG = '#000000'
+export const PROVIDER_MARK = {
+  google: GOOGLE,
+  apple: APPLE.replace('#FFFFFF', 'currentColor'),
+  github: GITHUB.replace('#FFFFFF', 'currentColor'),
+} as const
 
 export const PROVIDER_LABEL = { google: 'Google', apple: 'Apple', github: 'GitHub' } as const
 export const PROVIDER_ORDER = ['google', 'apple', 'github'] as const
@@ -12,11 +17,23 @@ export const GOOGLE_START = 'Google로 시작하기'
 export const APPLE_START = 'Apple로 시작하기'
 export const GITHUB_START = 'GitHub로 시작하기'
 export const PHONE_START = '휴대폰 번호로 시작하기'
+export const LOGO_LABEL = 'Push 로고'
+export const LOGO_SIZE = 148
+export const LOGO_TOP = 132
+export const LOGO_SIZE_COMPACT = 104
+export const LOGO_TOP_COMPACT = 48
+export const COMPACT_HEIGHT = 700
+
+export const FIELD_RADIUS = 20
+export const OTP_LENGTH = 6
+export const COUNTRY_CODE = '+82'
+export const COUNTRY_CODE_LABEL = '국가번호 +82'
 
 export const PHONE_TITLE = '휴대폰 번호를 입력해 주세요'
 export const PHONE_BODY = '지원 결과와 면접 일정을 알려 드릴 번호예요.\n다른 사람에게는 보이지 않아요.'
 export const SEND_CODE = '인증번호 받기'
 export const OTP_TITLE = '인증번호를 입력해 주세요'
+export const OTP_SENT_SUFFIX = '로 6자리 번호를 보냈어요.'
 export const CHANGE_NUMBER = '번호 바꾸기'
 export const CONFIRM = '확인'
 export const OTP_INVALID = '인증번호가 맞지 않아요. 다시 확인해 주세요.'

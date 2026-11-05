@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, ScrollView, TextInput, View } from 'react-native'
-import { Avatar, followMatches, Row, useMyFollowers, useMyFollows } from '@/features/my'
+import { Avatar, followMatches, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
 import { Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
@@ -40,19 +40,30 @@ const FollowsScreen = () => {
         <ActivityIndicator style={{ marginTop: 40 }} />
       ) : (
         <ScrollView>
-          {people.map((p) => (
-            <Row key={p.userId} label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}`)}>
-              <Avatar name={p.displayName} url={p.avatarUrl} />
-              <View style={{ flex: 1 }}>
-                <Text v="b1" weight="700">
-                  {p.displayName}
-                </Text>
-                <Text v="c1" color="t3" numberOfLines={1}>
-                  {p.headline}
-                </Text>
-              </View>
-            </Row>
-          ))}
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: 14, paddingHorizontal: 20 }}>
+            {query.data?.page.total ?? people.length}명
+          </Text>
+          {people.map((p) =>
+            following ? (
+              <PersonRow key={p.userId} p={p} known />
+            ) : (
+              <Row
+                key={p.userId}
+                label={p.displayName}
+                onPress={() => router.push(`/profiles/${p.userId}`)}
+              >
+                <Avatar name={p.displayName} url={p.avatarUrl} />
+                <View style={{ flex: 1 }}>
+                  <Text v="b1" weight="700">
+                    {p.displayName}
+                  </Text>
+                  <Text v="c1" color="t3" numberOfLines={1}>
+                    {p.headline}
+                  </Text>
+                </View>
+              </Row>
+            ),
+          )}
         </ScrollView>
       )}
     </View>

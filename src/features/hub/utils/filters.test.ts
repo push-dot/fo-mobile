@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profileQuery, tenureOf } from './filters'
+import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profileQuery, proposalSubtitle, tenureOf } from './filters'
 
 describe('hub filters', () => {
   it('buckets tenure years', () => {
@@ -11,7 +11,24 @@ describe('hub filters', () => {
     expect(filterSummary(f)).toBe('3–5년 · 이직/구직중')
     expect(appliedCount(f)).toBe(2)
     expect(appliedCount({ ...f, explore: 'offers' })).toBe(3)
+    expect(appliedCount({ ...EMPTY_SHEET, explore: 'received' })).toBe(1)
     expect(filterSummary(EMPTY_SHEET)).toBe('')
+  })
+
+  it('appliedCount counts received as one filter', () => {
+    expect(appliedCount({ ...EMPTY_SHEET, explore: 'received' })).toBe(1)
+  })
+
+  it('appliedCount counts offers as one filter', () => {
+    expect(appliedCount({ ...EMPTY_SHEET, explore: 'offers' })).toBe(1)
+  })
+
+  it('profileQuery passes explore=received', () => {
+    expect(profileQuery([], { ...EMPTY_SHEET, explore: 'received' }).explore).toBe('received')
+  })
+
+  it('proposalSubtitle joins career line and status', () => {
+    expect(proposalSubtitle({ jobCategory: 'dev', tenureYears: 4, careerStatus: 'seeking' })).toBe('개발 · 4년차 · 이직/구직중')
   })
 
   it('formats card lines', () => {

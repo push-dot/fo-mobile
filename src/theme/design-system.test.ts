@@ -1,6 +1,7 @@
 import { colors } from '@push/design-system'
 import { describe, expect, it } from 'vitest'
-import { NATIVE_FONTS } from './fonts'
+import { fontFor, NATIVE_FONTS } from './fonts'
+import { designFontsReady } from './fonts-ready'
 import { navigationColors } from './navigation-colors'
 import { onAccent } from './on-accent'
 import { tabColor } from './tab-color'
@@ -29,14 +30,25 @@ describe('design system wiring', () => {
     expect(tabColor('android', true, colors.light)).toBe(colors.light.t1)
   })
 
-  it('loads Pretendard under the design-system weights', () => {
+  it('loads Noto Sans KR under the design-system weights', () => {
     expect(NATIVE_FONTS).toEqual({
-      '400': 'Pretendard-Regular',
-      '500': 'Pretendard-Medium',
-      '600': 'Pretendard-SemiBold',
-      '700': 'Pretendard-Bold',
-      '800': 'Pretendard-ExtraBold',
+      '400': 'NotoSansKR-Regular',
+      '500': 'NotoSansKR-Medium',
+      '600': 'NotoSansKR-SemiBold',
+      '700': 'NotoSansKR-Bold',
+      '800': 'NotoSansKR-ExtraBold',
     })
+  })
+
+  it('applies the same Noto face file on every platform', () => {
+    expect(fontFor('700')).toEqual({ fontFamily: 'NotoSansKR-Bold' })
+    expect(fontFor('400')).not.toHaveProperty('fontWeight')
+  })
+
+  it('paints after a font load failure instead of waiting forever', () => {
+    expect(designFontsReady(false, null)).toBe(false)
+    expect(designFontsReady(true, null)).toBe(true)
+    expect(designFontsReady(false, new Error('already loaded'))).toBe(true)
   })
 
   it('on-accent ink is the design-system paper', () => {

@@ -2,6 +2,7 @@ import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect'
 import { useEffect, useState, type ReactNode } from 'react'
 import { AccessibilityInfo, Platform, View, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, useShadow } from '../../theme'
+import { toBoxShadow } from '../utility'
 
 const glassAvailable = Platform.OS === 'ios' && isGlassEffectAPIAvailable()
 
@@ -24,17 +25,17 @@ type Props = {
 
 const Glass = ({ children, style, surface = 'glass', interactive }: Props) => {
   const c = useColors()
-  const s = useShadow()
+  const boxShadow = toBoxShadow(useShadow().glass)
   const reduce = useReduceTransparency()
   if (Platform.OS === 'android') return <View style={[{ backgroundColor: c.bg2 }, style]}>{children}</View>
   if (glassAvailable && !reduce) {
     return (
-      <GlassView style={[s.glass, style]} glassEffectStyle="regular" isInteractive={interactive}>
+      <GlassView style={[{ boxShadow }, style]} glassEffectStyle="regular" isInteractive={interactive}>
         {children}
       </GlassView>
     )
   }
-  return <View style={[s.glass, { backgroundColor: reduce ? c.bg2 : c[surface] }, style]}>{children}</View>
+  return <View style={[{ boxShadow, backgroundColor: reduce ? c.bg2 : c[surface] }, style]}>{children}</View>
 }
 
 export default Glass

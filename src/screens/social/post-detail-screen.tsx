@@ -1,8 +1,9 @@
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, TextInput, View } from 'react-native'
-import { CommentComposer, CommentRow, PostHeader, threadComments, useComments, usePost } from '@/features/social'
-import { Text, TopBar } from '@/shared/components'
+import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, threadComments, useComments, usePost } from '@/features/social'
+import { Glass, Icon, Menu, Text, TopBar, showToast } from '@/shared/components'
+import { copyText, shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
 const PostDetailScreen = ({ id }: { id: string }) => {
@@ -15,7 +16,29 @@ const PostDetailScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar
+        onBack={() => router.back()}
+        right={
+          <Menu
+            accessibilityLabel="더 보기"
+            actions={[
+              { key: 'share', label: '공유하기', systemImage: 'square.and.arrow.up', onPress: () => void shareMessage({ message: postShareMessage(id, post.data) }) },
+              {
+                key: 'copy',
+                label: '링크 복사',
+                systemImage: 'link',
+                onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요' })),
+              },
+            ]}
+          >
+            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <Glass style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="more" size={22} color="t1" />
+              </Glass>
+            </View>
+          </Menu>
+        }
+      />
       {post.data ? (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
           <FlatList

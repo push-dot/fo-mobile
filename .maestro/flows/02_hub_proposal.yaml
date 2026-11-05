@@ -14,8 +14,8 @@ name: 허브 → 프로필 → 제안하기
 - tapOn: "제안하기"
 - tapOn: ".*어떤 이야기를 나누고 싶은지 적어 주세요"
 - inputText: "Coffee chat?"
-# The sheet does not move above the iOS keyboard, which covers the send button.
-- hideKeyboard
+# The keyboard covers 제안 보내기 in the native sheet; tapping sheet text closes it, as a user would.
+- tapOn: "이하은 님에게"
 - runFlow:
     file: _tap_sheet_button.yaml
     env:

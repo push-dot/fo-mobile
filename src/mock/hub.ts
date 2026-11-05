@@ -83,7 +83,7 @@ mock('POST', 'profiles/:userId/offer', ({ params, body }) => {
   const offer: Offer = {
     id: `o-${p.userId}`,
     sender: { id: 'me', displayName: '나', avatarUrl: null, companyName: null, headline: '' },
-    recipient: { id: p.userId, displayName: p.displayName },
+    recipient: { id: p.userId, displayName: p.displayName, avatarUrl: p.avatarUrl, companyName: null, headline: p.headline },
     message,
     // shortcut: posting is not resolved in the mock; postings mock owns that data.
     posting: null,

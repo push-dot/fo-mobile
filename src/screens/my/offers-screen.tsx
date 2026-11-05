@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import type { Offer } from '@push/api-client'
-import { Avatar, counterpart, Empty, OFFER_EMPTY_ACTION, offerBadge, Row, timeAgo, useOffers } from '@/features/my'
+import { Avatar, counterpart, Empty, OFFER_EMPTY_ACTION, offerBadge, personLine, Row, timeAgo, useOffers } from '@/features/my'
 import { Badge, SegmentedControl, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
@@ -17,7 +17,7 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
     <Row
       top
       label={`${who.displayName}, ${badge.label}${unread ? ', 안 읽음' : ''}`}
-      onPress={() => router.push(`/offers/${o.id}?box=${box}`)}
+      onPress={() => router.push(`/offers/${o.id}${o.status === 'ACCEPTED' ? '/messages' : ''}?box=${box}`)}
     >
       <Avatar name={who.displayName} url={who.avatarUrl} />
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
@@ -30,9 +30,9 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
             {timeAgo(o.createdAt)}
           </Text>
         </View>
-        {who.companyName ? (
+        {personLine(who) ? (
           <Text v="c1" color="t3" numberOfLines={1}>
-            {who.companyName}
+            {personLine(who)}
           </Text>
         ) : null}
         <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} numberOfLines={2}>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Modal, Platform, Pressable, ScrollView, View } from 'react-native'
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors } from '../../theme'
 import Button from './button'
@@ -15,6 +15,8 @@ type Props = {
   action?: { label: string; onPress: () => void; disabled?: boolean }
   full?: boolean
 }
+
+const notScreenSized = { position: 'absolute', top: -1, left: 0, right: 0, bottom: 0 } as const
 
 const BottomSheet = ({ visible, onClose, title, description, children, action, full }: Props) => {
   const c = useColors()
@@ -43,8 +45,9 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
   )
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable accessibilityRole="button" accessibilityLabel="닫기" onPress={onClose} style={{ flex: 1, backgroundColor: c.scrim }} />
-      <View
+      <Pressable accessibilityRole="button" accessibilityLabel="닫기" onPress={onClose} style={[notScreenSized, { backgroundColor: c.scrim }]} />
+      <KeyboardAvoidingView
+        behavior="padding"
         style={{
           position: 'absolute',
           left: ios ? 8 : 0,
@@ -63,7 +66,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
             {body}
           </View>
         )}
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   )
 }

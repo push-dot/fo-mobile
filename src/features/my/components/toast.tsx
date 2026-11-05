@@ -6,10 +6,12 @@ import { useColors } from '../../../theme'
 const Toast = ({
   text,
   action,
+  error,
   onHide,
 }: {
   text: string | null
   action?: { label: string; onPress: () => void } | null
+  error?: boolean
   onHide: () => void
 }) => {
   const c = useColors()
@@ -35,12 +37,18 @@ const Toast = ({
           width: 22,
           height: 22,
           borderRadius: 11,
-          backgroundColor: c.green,
+          backgroundColor: error ? c.red : c.green,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon name="check" size={14} color="#FFFFFF" />
+        {error ? (
+          <Text v="c1" weight="800" style={{ color: '#FFFFFF' }}>
+            !
+          </Text>
+        ) : (
+          <Icon name="check" size={14} color="#FFFFFF" />
+        )}
       </View>
       <Text v="b2" weight="600" style={{ flex: 1, color: Platform.OS === 'ios' ? c.t1 : c.bg }}>
         {text}

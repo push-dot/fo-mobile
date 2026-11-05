@@ -16,7 +16,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
         onOpen()
         router.push(`/postings/${p.id}`)
       }}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingVertical: 12 }}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 16, paddingHorizontal: 20, paddingVertical: 12 }}
     >
       <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
         <Text v="h3" weight="800" style={{ color: '#FFFFFF', fontSize: 21, lineHeight: 26 }}>
@@ -25,7 +25,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
       </View>
       <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
         <Text v="c1" weight="600" color="t3" numberOfLines={1}>
-          <Highlight text={p.company} q={q} />
+          {p.company}
         </Text>
         <Text v="b1" weight="700" numberOfLines={1}>
           <Highlight text={p.title} q={q} />
@@ -41,7 +41,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
         onPress={() => toggleBookmark(p)}
         style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -10 }}
       >
-        <Icon name="bookmark" size={22} color={p.bookmarked ? 'acText' : 't4'} filled={p.bookmarked} />
+        <Icon name="bookmark" size={20} color={p.bookmarked ? 'acText' : 't4'} filled={p.bookmarked} />
       </Pressable>
     </Pressable>
   )

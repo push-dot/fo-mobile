@@ -20,6 +20,11 @@ const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 const H = 3_600_000
 const D = 24 * H
 const on = (m: number, d: number, h = 9, min = 0) => new Date(2026, m - 1, d, h, min).toISOString()
+const tomorrowAt = (h: number) => {
+  const d = new Date(Date.now() + D)
+  d.setHours(h, 0, 0, 0)
+  return d.toISOString()
+}
 
 let profile: Profile = {
   userId: 'me',
@@ -168,7 +173,7 @@ const app = (
   createdAt: at,
 })
 const applications: Application[] = [
-  { ...app('a1', 'p1', '모아페이', '백엔드 엔지니어 (Kotlin·Spring)', 'INTERVIEW', on(10, 14)), fitScore: 86 },
+  { ...app('a1', 'p1', '모아페이', '백엔드 엔지니어 (Kotlin·Spring)', 'INTERVIEW', on(10, 14)), fitScore: 69 },
   app('a2', 'p3', '도토리증권', '서버 개발자 (Go)', 'SCREENING', on(10, 10)),
   app('a3', 'p8', '별빛게임즈', 'DevOps 엔지니어', 'APPLIED', on(10, 16)),
   app('a4', 'p7', '라온헬스', '백엔드 개발자 (Java)', 'ACCEPTED', on(9, 22)),
@@ -187,6 +192,16 @@ let documents: HubDocument[] = [
     latestVersionId: 'v1',
     updatedAt: on(10, 14),
   },
+  {
+    id: 'd2',
+    revision: 1,
+    applicationId: null,
+    title: '김서준_백엔드_이력서_2026',
+    kind: 'HUB_PROFILE',
+    status: 'DRAFT',
+    latestVersionId: 'v1',
+    updatedAt: on(10, 12),
+  },
 ]
 
 mock('GET', 'documents', ({ query }) => page(documents, query))
@@ -196,10 +211,31 @@ mock('GET', 'documents/:id', ({ params }) => {
     ? { data: doc }
     : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
 })
+const docText = (type: 'heading' | 'paragraph', text: string) => ({ type, content: [{ type: 'text', text }] })
+const hubContent = {
+  type: 'doc',
+  content: [
+    docText('heading', '헤드라인'),
+    docText('paragraph', '대규모 결제 트래픽을 견디는 서버를 만들어요'),
+    docText('heading', '소개'),
+    docText(
+      'paragraph',
+      '결제 승인과 정산 서버를 4년째 만들고 있어요. 트래픽이 몰려도 멈추지 않는 서버, 장애가 나도 돈이 새지 않는 구조를 설계하는 일을 잘해요.',
+    ),
+    docText('heading', '경력'),
+    docText(
+      'paragraph',
+      '모아페이 | 백엔드 엔지니어 | 2022-03-01 |  | 결제 승인 API를 다시 설계해 p95 응답 시간을 320ms에서 140ms로 줄이고, Kafka로 하루 280만 건을 처리했어요.',
+    ),
+    docText('paragraph', '하루랩스 | 서버 개발자 | 2021-01-01 | 2022-02-28'),
+    docText('heading', '기술 스택'),
+    docText('paragraph', 'Kotlin, Spring Boot, Kafka, MySQL, Redis'),
+  ],
+}
 mock('GET', 'documents/:id/versions', ({ params }) =>
   params.id
     ? {
-        data: [{ id: 'v1', blocks: [{ id: 'b1', text: '결제 승인 API를 설계해 p99 지연을 줄였어요.' }] }],
+        data: [{ id: 'v1', blocks: [{ id: 'b1', text: '결제 승인 API를 설계해 p99 지연을 줄였어요.' }], content: hubContent }],
         page: { nextCursor: null, hasMore: false },
       }
     : { data: [], page: { nextCursor: null, hasMore: false } },
@@ -274,6 +310,11 @@ const events: CalendarEvent[] = [
   }),
   ev('e11', 'CUSTOM', '부하 테스트 스터디', on(10, 29, 20)),
   ev('e12', 'FOLLOW_UP', '모아페이 면접 후기 보내기', on(10, 30, 10)),
+  ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
+    endsAt: tomorrowAt(16),
+    notes: 'Google Meet',
+    applicationId: 'a1',
+  }),
 ]
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
@@ -380,7 +421,7 @@ const received: Offer[] = [
   offer({
     id: 'o1',
     sender: user('u-jihyun', '오지현', '모아페이', '결제 플랫폼팀 채용 담당'),
-    recipient: ME,
+    recipient: ME_SENDER,
     message:
       '서준 님, 안녕하세요! 허브에서 프로필 보고 연락드려요.\n\n결제 승인 API를 다시 설계하신 경험이 지금 저희 결제 플랫폼팀의 고민과 딱 맞아서요. 시니어 포지션으로 30분 정도 가볍게 커피챗 어떠세요?',
     posting: offerPosting,
@@ -390,7 +431,7 @@ const received: Offer[] = [
   offer({
     id: 'o2',
     sender: user('u-doyun', '박도윤', '하루랩스', 'iOS 개발자'),
-    recipient: ME,
+    recipient: ME_SENDER,
     message:
       '주말 사이드 프로젝트를 같이 하실 백엔드 개발자를 찾고 있어요. 정산 쪽 경험이 있으시면 큰 도움이 될 것 같아요.',
     status: 'SENT',
@@ -399,7 +440,7 @@ const received: Offer[] = [
   offer({
     id: 'o3',
     sender: user('u-jiwoo', '최지우', '파도AI', '데이터 엔지니어'),
-    recipient: ME,
+    recipient: ME_SENDER,
     message: '정산 데이터 파이프라인 경험을 듣고 싶어요. 30분 정도 이야기 나눌 수 있을까요?',
     status: 'ACCEPTED',
     createdAt: on(10, 14, 10),
@@ -407,7 +448,7 @@ const received: Offer[] = [
   offer({
     id: 'o4',
     sender: user('u-greenticket', '그린티켓 채용팀', '그린티켓', '서버 개발자 포지션'),
-    recipient: ME,
+    recipient: ME_SENDER,
     message: '서버 개발자 포지션에 관심 있으시면 이야기 나눠 보고 싶어요.',
     status: 'DECLINED',
     createdAt: on(10, 2, 15),

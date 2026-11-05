@@ -53,7 +53,12 @@ describe('SegmentedControl (Android)', () => {
     const buttons = findAll(find(tree, 'SegmentedRow'), stubs.compose.SegmentedButton)
     expect(buttons.map((b) => b.props.selected)).toEqual([false, true])
     expect(findAll(tree, 'CText').map((t) => t.props.children)).toEqual(['받은', '보낸'])
-    expect(buttons[0]!.props.colors).toMatchObject({ activeContainerColor: c.acSoft, activeContentColor: c.acText })
+    expect(buttons[0]!.props.colors).toMatchObject({
+      activeContainerColor: c.acSoft,
+      activeContentColor: c.acText,
+      activeBorderColor: c.ac,
+      inactiveBorderColor: c.line,
+    })
     ;(buttons[0]!.props.onClick as () => void)()
     expect(onChange).toHaveBeenCalledWith('a')
   })

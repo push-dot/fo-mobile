@@ -1,7 +1,7 @@
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { PostingFilters } from '@push/api-client'
+import type { PostingDetail, PostingFilters } from '@push/api-client'
 import { applyDoc, toQuery, type Filters } from '../utils'
-import type { ApplyDoc } from '../types'
+import type { ApplyBody } from '../types'
 import { applyToPosting, fetchApplyDocs, fetchMyProfile, fetchPosting, fetchPostingCount, fetchPostingLocations, fetchPostingPages, togglePostingBookmark } from './fetchers'
 
 export const usePostingPages = (f: PostingFilters) =>
@@ -40,8 +40,9 @@ export const usePostingLocations = (draft: Filters) =>
 export const useApplyPosting = (postingId: string, onApplied: () => void) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (doc: ApplyDoc | undefined) => applyToPosting(postingId, doc),
+    mutationFn: (body: ApplyBody) => applyToPosting(postingId, body),
     onSuccess: () => {
+      qc.setQueryData(['postings', 'detail', postingId], (p: PostingDetail | undefined) => (p ? { ...p, applied: true } : p))
       void qc.invalidateQueries({ queryKey: ['postings'] })
       onApplied()
     },
@@ -56,4 +57,5 @@ export const useApplyDocs = (enabled: boolean) =>
     enabled,
   })
 
-export const usePosting = (id: string) => useQuery({ queryKey: ['postings', 'detail', id], queryFn: () => fetchPosting(id) })
+export const usePosting = (id: string) =>
+  useQuery({ queryKey: ['postings', 'detail', id], queryFn: () => fetchPosting(id), enabled: id.length > 0 })

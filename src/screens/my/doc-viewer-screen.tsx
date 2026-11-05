@@ -6,6 +6,7 @@ import { fileSize, monthDay } from '@push/shared'
 import { useStartChat } from '@/features/chat'
 import {
   DocMenu,
+  FIX_DOC,
   PREVIEW_HEADINGS,
   Toast,
   useConvertDocument,
@@ -14,14 +15,14 @@ import {
   useUndoRemove,
   type ResumeDraft,
 } from '@/features/my'
-import { Badge, BottomSheet, Button, GlassButton, Text, TopBar } from '@/shared/components'
+import { Badge, BottomSheet, Button, Glass, GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
 const ToProfileSheet = ({ id, visible, onClose }: { id: string; visible: boolean; onClose: () => void }) => {
-  const convert = useConvertDocument((documentId) => {
+  const convert = useConvertDocument((documentId, jobId) => {
     onClose()
-    router.push(`/docs/push/${documentId}`)
+    router.push(`/docs/push/${documentId}${jobId ? `?jobId=${jobId}` : ''}`)
   })
   return (
     <BottomSheet
@@ -116,14 +117,11 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
   )
 }
 
-const FIX_UPLOADED_DOC = '이 서류를 고쳐 줘'
-
 const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const start = useStartChat()
   const [sheet, setSheet] = useState(false)
-  const [menu, setMenu] = useState(false)
   const doc = useSource(id)
   const draft = useResumeDraft(id)
   const undo = useUndoRemove(() => router.back())
@@ -136,17 +134,27 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         title={s?.fileName ?? '서류 보기'}
         onBack={() => router.back()}
         right={
-          <GlassButton
-            actions={[
-              // shortcut: Source has no download URL yet, so 공유 shares the file name; share the file once push-be returns a URL.
-              {
-                icon: 'share',
-                label: '공유',
-                onPress: () => s && void shareMessage({ message: s.fileName }),
-              },
-              { icon: 'more', label: '더 보기', onPress: () => setMenu(true) },
-            ]}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <GlassButton
+              actions={[
+                // shortcut: Source has no download URL yet, so 공유 shares the file name; share the file once push-be returns a URL.
+                {
+                  icon: 'share',
+                  label: '공유',
+                  onPress: () => s && void shareMessage({ message: s.fileName }),
+                },
+              ]}
+            />
+            {s ? (
+              <DocMenu doc={s} viewing onDelete={() => undo.ask(s)}>
+                <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                  <Glass style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name="more" size={22} color="t1" />
+                  </Glass>
+                </View>
+              </DocMenu>
+            ) : null}
+          </View>
         }
       />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
@@ -193,13 +201,13 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         }}
       >
         <Button
-          label="AI로 고치기"
+          label="에이전트로 고치기"
           icon="spark"
           variant="secondary"
-          onPress={() => void start(FIX_UPLOADED_DOC, FIX_UPLOADED_DOC, undefined, undefined, undefined, { evidenceIds: [id] })}
+          onPress={() => void start(FIX_DOC, FIX_DOC, undefined, undefined, undefined, { evidenceIds: [id] })}
         />
         <Button
-          label="지원 서류용 프로필로 만들기"
+          label="내 프로필로 전환"
           icon="user"
           disabled={!d}
           onPress={() => setSheet(true)}
@@ -207,7 +215,6 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         />
       </View>
       <ToProfileSheet id={id} visible={sheet} onClose={() => setSheet(false)} />
-      <DocMenu doc={menu ? (s ?? null) : null} viewing onClose={() => setMenu(false)} onDelete={() => s && undo.ask(s)} />
       <Toast text={undo.toast.text} action={undo.toast.action} onHide={undo.toast.hide} />
     </View>
   )

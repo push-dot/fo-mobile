@@ -14,9 +14,11 @@ describe('theme tokens', () => {
     expect(radius).toBe(designRadius)
   })
 
-  it('turn em tracking into points and weights into strings', () => {
-    expect(type.h1).toEqual({ fontSize: 26, lineHeight: 36, fontWeight: '800', letterSpacing: 26 * -0.03 })
-    expect(type.b2).toEqual({ fontSize: 15, lineHeight: 22, fontWeight: '400', letterSpacing: 15 * -0.02 })
+  it('keeps weight off the style bag so Android does not load another face', () => {
+    expect(type.h1).toEqual({ fontSize: 26, lineHeight: 36, weight: '800', letterSpacing: 26 * -0.03 })
+    expect(type.b2).toEqual({ fontSize: 15, lineHeight: 22, weight: '400', letterSpacing: 15 * -0.02 })
+    expect(type.h1).not.toHaveProperty('fontWeight')
+    expect(type.b2).not.toHaveProperty('fontWeight')
   })
 
   it('keep the native shadows the app drew before', () => {

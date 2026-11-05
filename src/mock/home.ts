@@ -54,6 +54,13 @@ mock('GET', 'search', ({ query }) => {
   return page(hits.map((h) => h.item), query)
 })
 
+mock('GET', 'search/trending', () => ({
+  data: {
+    terms: ['프론트엔드', 'React', '신입 개발자', 'AI 엔지니어', 'PM', '재택 근무', 'Go', '데이터 분석'].map((term, i) => ({ term, count: 80 - i * 7 })),
+    skills: ['React', 'TypeScript', 'Python', 'Go', 'Kubernetes'].map((id, i) => ({ id, count: 120 - i * 11 })),
+  },
+}))
+
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 const notifications: AppNotification[] = [
   { id: 'n1', type: 'AI_DONE', title: 'AI 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.4', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: ago(10) },

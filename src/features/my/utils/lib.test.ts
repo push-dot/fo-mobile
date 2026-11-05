@@ -7,7 +7,11 @@ import {
   monthGrid,
   offerBadge,
   overwriteWarning,
+  dateToYm,
+  fromDayParam,
   parseYm,
+  toDayParam,
+  ymToDate,
   stageTone,
   timeAgo,
   toResumeDraft,
@@ -93,5 +97,31 @@ describe('my lib', () => {
       '지금 프로필의 기본 정보, 소개와 경력은 이 내용으로 바뀌어요.',
     )
     expect(overwriteWarning([])).toBeNull()
+  })
+
+  it('ymToDate parses 2022.03 to March 2022', () => {
+    expect(ymToDate('2022.03')).toEqual(new Date(2022, 2, 1))
+  })
+
+  it('ymToDate returns null for empty text', () => {
+    expect(ymToDate('')).toBeNull()
+  })
+
+  it('dateToYm pads the month', () => {
+    expect(dateToYm(new Date(2022, 2, 15))).toBe('2022.03')
+  })
+
+  it('toDayParam pads month and day', () => {
+    expect(toDayParam(new Date(2026, 9, 3))).toBe('2026-10-03')
+  })
+
+  it('fromDayParam round-trips toDayParam', () => {
+    const day = new Date(2026, 9, 23)
+    expect(fromDayParam(toDayParam(day))).toEqual(day)
+  })
+
+  it('fromDayParam rejects bad input', () => {
+    expect(fromDayParam('2026-13-01')).toBeNull()
+    expect(fromDayParam('nope')).toBeNull()
   })
 })

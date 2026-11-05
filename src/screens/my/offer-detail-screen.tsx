@@ -1,135 +1,23 @@
-import { router } from 'expo-router'
+import { Redirect, router } from 'expo-router'
 import { useState } from 'react'
-import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  TextInput,
-  View,
-} from 'react-native'
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import type { Offer } from '@push/api-client'
-import { careerLabel, monthDay } from '@push/shared'
+import { monthDay } from '@push/shared'
 import {
   Avatar,
   clock,
   counterpart,
-  dday,
-  Logo,
   OFFER_DECLINE,
-  OFFER_FAIL_LINE,
+  OfferPostingCard,
   offerBadge,
+  personLine,
   useOffer,
   useOfferDecision,
-  useOfferMessages,
-  useOfferPosting,
 } from '@/features/my'
-import {
-  Badge,
-  BottomSheet,
-  Button,
-  Chip,
-  Glass,
-  Icon,
-  Text,
-  TextField,
-  TopBar,
-} from '@/shared/components'
-import { fontFor, radius, useColors } from '@/theme'
+import { Badge, BottomSheet, Button, Chip, Icon, Text, TextField, TopBar } from '@/shared/components'
+import { useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
-
-const Thread = ({ offer, meId }: { offer: Offer; meId: string }) => {
-  const c = useColors()
-  const [text, setText] = useState('')
-  const { data, send } = useOfferMessages(offer.id, () => setText(''))
-  const canSend = !!text.trim() && !send.isPending
-  return (
-    <View style={{ gap: 10 }}>
-      <Text v="h3" accessibilityRole="header" style={{ marginTop: 4 }}>
-        메시지
-      </Text>
-      {data?.data.length === 0 ? (
-        <Text v="b2" color="t3">
-          첫 메시지를 보내 대화를 시작해 보세요.
-        </Text>
-      ) : null}
-      {data?.data.map((m) => {
-        const mine = m.sender.id === meId
-        return (
-          <View key={m.id} style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: 2 }}>
-            <View
-              style={{
-                maxWidth: '82%',
-                borderRadius: 18,
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                backgroundColor: mine ? c.ac : c.bg2,
-              }}
-            >
-              <Text v="b2" style={{ color: mine ? '#FFFFFF' : c.t1 }}>
-                {m.body}
-              </Text>
-            </View>
-            <Text v="c2" color="t3">
-              {monthDay(m.createdAt)} {clock(m.createdAt)}
-            </Text>
-          </View>
-        )
-      })}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 6 }}>
-        <TextInput
-          accessibilityLabel="메시지"
-          value={text}
-          onChangeText={setText}
-          placeholder="메시지 보내기"
-          placeholderTextColor={c.t4}
-          multiline
-          style={[
-            {
-              flex: 1,
-              minHeight: 48,
-              maxHeight: 120,
-              borderRadius: radius.md,
-              backgroundColor: c.fill,
-              paddingHorizontal: 16,
-              paddingTop: 12,
-              paddingBottom: 12,
-              fontSize: 16,
-              color: c.t1,
-            },
-            fontFor('400'),
-          ]}
-        />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="보내기"
-          accessibilityState={{ disabled: !canSend }}
-          disabled={!canSend}
-          onPress={() => send.mutate(text.trim())}
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: canSend ? c.ac : c.fill2,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Icon name="up" size={20} color={canSend ? '#FFFFFF' : c.t4} />
-        </Pressable>
-      </View>
-      {send.isError ? (
-        <Text v="c1" color="red">
-          {OFFER_FAIL_LINE}
-        </Text>
-      ) : null}
-    </View>
-  )
-}
 
 const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) => {
   const c = useColors()
@@ -141,8 +29,6 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
     setReplying(false)
     setReply('')
   })
-  const postingId = o?.posting?.id
-  const { data: full } = useOfferPosting(postingId)
 
   if (isLoading || !o) {
     return (
@@ -153,13 +39,12 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
     )
   }
 
+  if (o.status === 'ACCEPTED') return <Redirect href={`/offers/${o.id}/messages?box=${box}`} />
+
   const who = counterpart(o, box)
   const badge = offerBadge(o, box)
-  const meId = box === 'received' ? o.recipient.id : o.sender.id
   const pending = box === 'received' && (o.status === 'SENT' || o.status === 'READ')
   const p = o.posting
-  const career = full ? careerLabel(full) : null
-  const careerText = !career || career === '신입' ? career : `경력 ${career}`
 
   return (
     <KeyboardAvoidingView
@@ -180,9 +65,9 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
               </Text>
               <Badge label={badge.label} tone={badge.tone} />
             </View>
-            {who.companyName ? (
+            {personLine(who) ? (
               <Text v="c1" color="t3">
-                {who.companyName}
+                {personLine(who)}
               </Text>
             ) : null}
           </View>
@@ -206,40 +91,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
           {monthDay(o.createdAt)} {clock(o.createdAt)} · {box === 'received' ? '받음' : '보냄'}
         </Text>
 
-        {p ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`함께 보낸 공고 ${p.company} ${p.title}`}
-            onPress={() => router.push(`/postings/${p.id}`)}
-          >
-            <Glass
-              style={{
-                borderRadius: 16,
-                paddingVertical: 14,
-                paddingHorizontal: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 12,
-              }}
-            >
-              <Logo name={p.company} size={44} />
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text v="c1" weight="600" color="t3">
-                  함께 보낸 공고
-                </Text>
-                <Text v="b2" weight="700" numberOfLines={1}>
-                  {p.title}
-                </Text>
-                <Text v="c1" color="t3" numberOfLines={1}>
-                  {[full?.location, careerText, full?.deadline ? dday(full.deadline) : null]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </Text>
-              </View>
-              <Icon name="chev" size={18} color="t4" />
-            </Glass>
-          </Pressable>
-        ) : null}
+        {p ? <OfferPostingCard posting={p} /> : null}
 
         {pending && p ? (
           <Pressable
@@ -261,14 +113,13 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
                 답장 전에 이 공고에 맞춰 볼까요?
               </Text>
               <Text v="c1" color="t2">
-                AI가 적합도를 보고 이력서를 고쳐 드려요
+                에이전트가 적합도를 보고 이력서를 고쳐 드려요
               </Text>
             </View>
             <Icon name="chev" size={18} color={c.ac} />
           </Pressable>
         ) : null}
 
-        {o.status === 'ACCEPTED' ? <Thread offer={o} meId={meId} /> : null}
       </ScrollView>
 
       {pending ? (

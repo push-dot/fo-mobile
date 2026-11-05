@@ -1,40 +1,30 @@
 import { router } from 'expo-router'
-import { BottomSheet, Button } from '@/shared/components'
+import type { ReactElement } from 'react'
+import { Menu } from '@/shared/components'
 import type { MySource } from '../types'
 
 const DocMenu = ({
   doc,
-  onClose,
-  onDelete,
   viewing,
+  onDelete,
+  children,
 }: {
-  doc: Pick<MySource, 'id' | 'fileName'> | null
-  onClose: () => void
-  onDelete: () => void
+  doc: Pick<MySource, 'id' | 'fileName'>
   viewing?: boolean
-}) => {
-  return (
-    <BottomSheet visible={!!doc} onClose={onClose} title={doc?.fileName}>
-      {viewing ? null : (
-        <Button
-          label="서류 보기"
-          variant="secondary"
-          onPress={() => {
-            onClose()
-            router.push(`/docs/${doc!.id}`)
-          }}
-        />
-      )}
-      <Button
-        label="서류 삭제하기"
-        variant="secondary"
-        onPress={() => {
-          onClose()
-          onDelete()
-        }}
-      />
-    </BottomSheet>
-  )
-}
+  onDelete: () => void
+  children: ReactElement
+}) => (
+  <Menu
+    accessibilityLabel={`${doc.fileName} 더 보기`}
+    actions={[
+      ...(viewing
+        ? []
+        : [{ key: 'open', label: '서류 보기', systemImage: 'doc.text' as const, onPress: () => router.push(`/docs/${doc.id}`) }]),
+      { key: 'delete', label: '서류 삭제하기', systemImage: 'trash' as const, destructive: true, onPress: onDelete },
+    ]}
+  >
+    {children}
+  </Menu>
+)
 
 export default DocMenu

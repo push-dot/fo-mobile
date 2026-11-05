@@ -1,5 +1,6 @@
 import type { Settings } from '@push/api-client'
 import { MAX_BYTES } from '../constants'
+import { fitTen } from './fit-ten'
 
 const MB = 1024 * 1024
 
@@ -17,9 +18,9 @@ export const profileCountLabels = (profile: {
   followerCount?: number
   postCount?: number
 }) => ({
-  following: `${profile.followingCount ?? 0} 팔로잉`,
-  followers: `${profile.followerCount ?? 0} 팔로워`,
-  posts: `${profile.postCount ?? 0} 게시글`,
+  following: { count: profile.followingCount ?? 0, label: '팔로잉' },
+  followers: { count: profile.followerCount ?? 0, label: '팔로워' },
+  posts: { count: profile.postCount ?? 0, label: '게시글' },
 })
 
 export const deleteDocCopy = (fileName: string) => ({
@@ -33,11 +34,15 @@ export const deleteDocCopy = (fileName: string) => ({
 
 export const careerDeleteCopy = {
   title: '이 경력을 삭제할까요?',
-  body: '이 경력을 프로필에서 지워요.',
   confirm: '삭제',
   toast: '경력을 삭제했어요',
   undo: '되돌리기',
 } as const
+
+export const careerDeleteBody = (career: { company: string; role: string }) => {
+  const name = [career.company.trim(), career.role.trim()].filter(Boolean).join(' · ')
+  return `${name || '이'} 경력을 프로필에서 지워요.`
+}
 
 export const SIZE_LIMIT = {
   title: `${MAX_BYTES / MB}MB까지 올릴 수 있어요`,
@@ -58,9 +63,10 @@ export const SET_BASE_COPY = {
 
 export const setBaseProfilePath = (id: string) => `documents/${id}/base-profile`
 
-export const followSeeAll = (count: number) => `${count}명 전체 보기`
-export const followerSee = (count: number) => `팔로워 ${count}명 보기`
-export const postsSeeAll = (count: number) => `${count}개 전체 보기`
+export const followSeeAll = (count: number) => `${count}명 전체 보기 ›`
+export const followerSee = (count: number) => `팔로워 ${count}명 보기 ›`
+export const postsSeeAll = (count: number) => `${count}개 전체 보기 ›`
+export const commentedSee = (count: number) => `댓글 단 글 ${count}개 보기 ›`
 export const pushSeeAll = (count: number) => `전체 ${count}개 보기`
 
 export const followMatches = <T extends { displayName: string; headline: string }>(people: T[], query: string) => {
@@ -74,13 +80,13 @@ export const followMatches = <T extends { displayName: string; headline: string 
 
 export const emptyCta = (tab: 'applications' | 'bookmarks' | 'follows' | 'posts') => {
   if (tab === 'follows') {
-    return { title: '아직 팔로우한 사람이 없어요', action: '허브 둘러보기', href: '/hub' as const }
+    return { title: '아직 팔로우한 사람이 없어요.', action: '허브 둘러보기', href: '/hub' as const }
   }
-  if (tab === 'posts') return { title: '아직 쓴 글이 없어요', action: '글쓰기', href: '/compose' as const }
+  if (tab === 'posts') return { title: '아직 쓴 글이 없어요.', action: '글쓰기', href: '/compose' as const }
   if (tab === 'bookmarks') {
-    return { title: '북마크한 공고가 없어요', action: '채용공고 보기', href: '/jobs' as const }
+    return { title: '북마크한 공고가 없어요.', action: '채용공고 보기', href: '/jobs' as const }
   }
-  return { title: '아직 지원한 공고가 없어요', action: '채용공고 보기', href: '/jobs' as const }
+  return { title: '아직 지원한 공고가 없어요.', action: '채용공고 보기', href: '/jobs' as const }
 }
 
 export const showViewCount = (surface: 'feed' | 'detail' | 'my-posts' | 'my-all') => surface !== 'feed'
@@ -96,6 +102,7 @@ export const stageFlow = (stage: string) => {
 }
 
 export const INTERVIEW_PREP = 'Push 에이전트로 면접 준비'
+export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'
 export const OFFER_FAIL = '잠시 뒤에 다시 보내 주세요.'
@@ -110,12 +117,12 @@ export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | '
   { key: 'notifyDeadline', label: '마감 임박 공고' },
   { key: 'notifyOffer', label: '제안 받음' },
   { key: 'notifyComment', label: '댓글과 답글' },
-  { key: 'notifyAiDone', label: 'AI 작업 완료' },
+  { key: 'notifyAiDone', label: '에이전트 작업 완료' },
   { key: 'notifyApplicationStage', label: '지원 상태 변경' },
 ]
 
 export const AGENT_TITLE = '에이전트'
-export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 AI가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
+export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
 export const REFERENCE_LABEL = '참고 데이터 제공'
 export const REFERENCE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
 
@@ -133,9 +140,5 @@ export const pushCardLines = (
   application: { company: string; title: string; fitScore?: number | null } | null,
 ) =>
   application
-    ? {
-        title: application.title,
-        company: application.company,
-        score: application.fitScore == null ? '' : String(application.fitScore),
-      }
-    : { title: doc.title, company: '', score: '' }
+    ? { title: application.title, company: application.company, score: fitTen(application.fitScore), doc: doc.title }
+    : { title: doc.title, company: '', score: '', doc: '' }

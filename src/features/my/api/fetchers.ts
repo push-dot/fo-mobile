@@ -112,6 +112,9 @@ export const declineOffer = (id: string) => api.me.declineOffer(id)
 
 export const fetchPosting = (id: string) => api.postings.get(id)
 
+export const fetchEvents = (from: string, to: string) =>
+  c.get<ListEnvelope<CalendarEvent>>('calendar/events', { query: { from, to, limit: 100 } })
+
 export const fetchOfferMessages = (offerId: string) => api.me.offerMessages(offerId, { limit: 100 })
 
 export const sendOfferMessage = (offerId: string, body: string) => api.me.sendOfferMessage(offerId, body)
@@ -124,7 +127,7 @@ export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })
 
 export const convertDocumentProfile = async (id: string) =>
-  (await c.post<DataEnvelope<{ documentId: string }>>(`documents/${id}/profile`, { body: profileConvertBody() })).data
+  (await c.post<DataEnvelope<{ documentId: string; jobId?: string }>>(`documents/${id}/profile`, { body: profileConvertBody() })).data
 
 export const setDocumentBaseProfile = async (id: string) =>
   (await c.post<DataEnvelope<{ documentId: string }>>(setBaseProfilePath(id), { body: {} })).data

@@ -23,10 +23,10 @@ const SegmentedControl = <K extends string,>({ items, value, onChange }: Segment
             colors={{
               activeContainerColor: c.acSoft,
               activeContentColor: c.acText,
-              activeBorderColor: c.t4,
+              activeBorderColor: c.ac,
               inactiveContainerColor: c.bg,
               inactiveContentColor: c.t2,
-              inactiveBorderColor: c.t4,
+              inactiveBorderColor: c.line,
             }}
             modifiers={[weight(1)]}
           >

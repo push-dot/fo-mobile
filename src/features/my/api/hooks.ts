@@ -3,7 +3,9 @@ import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
+import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
+import { nextEventFor } from '../utils'
 import {
   acceptOffer,
   addLink,
@@ -28,6 +30,7 @@ import {
   fetchDocument,
   fetchDocuments,
   fetchDocumentVersions,
+  fetchEvents,
   fetchSettings,
   fetchSource,
   fetchUnreadOffers,
@@ -80,13 +83,13 @@ export const useDocumentVersions = (id: string) =>
     enabled: !!id,
   })
 
-export const useConvertDocument = (onDone: (documentId: string) => void) => {
+export const useConvertDocument = (onDone: (documentId: string, jobId?: string) => void) => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => convertDocumentProfile(id),
     onSuccess: (data) => {
       void qc.invalidateQueries({ queryKey: ['documents'] })
-      if (data.documentId) onDone(data.documentId)
+      if (data.documentId) onDone(data.documentId, data.jobId)
     },
     onError: () => Alert.alert('지원 서류용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
@@ -222,6 +225,16 @@ export const useCalendarEvents = (from: string, to: string) =>
     queryFn: () => myApi.calendar(from, to),
   })
 
+export const useNextEvent = (applicationId: string) =>
+  useQuery({
+    queryKey: ['calendar', 'next', applicationId],
+    queryFn: async () => {
+      const now = Date.now()
+      const r = await fetchEvents(new Date(now).toISOString(), new Date(now + NEXT_EVENT_DAYS * DAY).toISOString())
+      return nextEventFor(r.data, applicationId)
+    },
+  })
+
 export const useAddCalendarEvent = (onAdded: () => void) => {
   const qc = useQueryClient()
   return useMutation({
@@ -312,14 +325,14 @@ export const useOfferDecision = (id: string, reply: string, onAccepted: () => vo
   return { accept, decline }
 }
 
-export const useOfferPosting = (postingId: string | undefined) =>
+export const usePostingDetail = (postingId: string | undefined) =>
   useQuery({
     queryKey: ['postings', 'detail', postingId],
     queryFn: () => fetchPosting(postingId!),
     enabled: !!postingId,
   })
 
-export const useOfferMessages = (offerId: string, onSent: () => void) => {
+export const useOfferMessages = (offerId: string) => {
   const qc = useQueryClient()
   const key = ['me', 'offer', offerId, 'messages']
   const query = useQuery({
@@ -328,10 +341,7 @@ export const useOfferMessages = (offerId: string, onSent: () => void) => {
   })
   const send = useMutation({
     mutationFn: (body: string) => sendOfferMessage(offerId, body),
-    onSuccess: () => {
-      onSent()
-      void qc.invalidateQueries({ queryKey: key })
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
   })
   return { data: query.data, send }
 }

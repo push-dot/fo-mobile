@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
+import { STATUS_ROW_MIN_HEIGHT } from './hit-target'
 import Icon from './icon'
 import Text from './text'
 
@@ -14,7 +15,7 @@ type RowProps = {
 
 const SettingsRow = ({ label, sub, value, onPress, right, danger }: RowProps) => {
   const body = (
-    <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}>
+    <View style={{ minHeight: Platform.OS === 'android' ? STATUS_ROW_MIN_HEIGHT.android : STATUS_ROW_MIN_HEIGHT.ios, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}>
       <View style={{ flex: 1 }}>
         <Text v="b1" color={danger ? 'red' : 't1'}>
           {label}

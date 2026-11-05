@@ -15,12 +15,14 @@ export type DatePickerProps = {
   mode?: 'date' | 'time' | 'month'
   min?: Date
   max?: Date
+  /** Field background: 'fill' on sheets, 'bg' inside bg2 cards. */
+  surface?: 'fill' | 'bg'
 }
 
 const FORMAT = { date: formatDay, time: formatTime, month: formatMonth }
 
 /** Android: a field that opens the Material 3 date or time dialog. Month mode keeps year and month of the picked day. */
-const DatePicker = ({ value, onChange, label, mode = 'date', min, max }: DatePickerProps) => {
+const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface = 'fill' }: DatePickerProps) => {
   const c = useColors()
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
@@ -30,12 +32,12 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max }: DatePic
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={() => setOpen(true)}
-        style={{ minHeight: 56, borderRadius: radius.md, backgroundColor: c.fill, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 }}
+        style={{ minHeight: 56, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 }}
       >
         <Text v="b1" color={value ? 't1' : 't4'} style={{ flex: 1 }}>
           {value ? FORMAT[mode](value) : label}
         </Text>
-        <Icon name={mode === 'time' ? 'clock' : 'down'} size={18} color="t3" />
+        {mode === 'month' ? null : <Icon name={mode === 'time' ? 'clock' : 'calendar'} size={18} color="t3" />}
       </Pressable>
       {open ? (
         <NativeHost matchContents>

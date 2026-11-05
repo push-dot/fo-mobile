@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { View } from 'react-native'
 import { router } from 'expo-router'
 import {
+  AccountPill,
   PHONE_BODY,
   PHONE_TITLE,
   PhoneField,
@@ -22,6 +23,7 @@ const PhoneScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const email = usePhoneAuth((state) => state.email)
+  const provider = usePhoneAuth((state) => state.provider)
   const digits = usePhoneAuth((state) => state.digits)
   const setDigits = usePhoneAuth((state) => state.setDigits)
   const setCooldown = usePhoneAuth((state) => state.setCooldown)
@@ -53,19 +55,19 @@ const PhoneScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 12, gap: 10 }}>
+      <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
         {email ? (
-          <Text v="c1" color="t3">
-            {email}
-          </Text>
+          <View style={{ marginBottom: 18 }}>
+            <AccountPill email={email} provider={provider} />
+          </View>
         ) : null}
-        <Text accessibilityRole="header" v="h1">
+        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
           {PHONE_TITLE}
         </Text>
-        <Text v="b2" color="t3">
+        <Text v="b2" color="t2" style={{ marginTop: 8 }}>
           {PHONE_BODY}
         </Text>
-        <View style={{ marginTop: 18 }}>
+        <View style={{ marginTop: 28 }}>
           <PhoneField
             value={formatNational(digits)}
             onChange={(next) => {
@@ -79,7 +81,7 @@ const PhoneScreen = () => {
           />
         </View>
         {error ? (
-          <Text v="c1" color="red" accessibilityRole="alert">
+          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: 12 }}>
             {error}
           </Text>
         ) : null}

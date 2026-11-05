@@ -18,9 +18,9 @@ import { Button, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const continueWith = (outcome: SignInOutcome) => {
+const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   if (outcome.kind !== 'phone') return
-  usePhoneAuth.getState().beginSocial(outcome.pendingToken, emailFromPendingToken(outcome.pendingToken))
+  usePhoneAuth.getState().beginSocial(outcome.pendingToken, emailFromPendingToken(outcome.pendingToken), provider)
   router.replace('/phone')
 }
 
@@ -49,7 +49,7 @@ const PhoneRegisteredScreen = () => {
           setFailure(loginFailureCopy(provider))
           return
         }
-        continueWith(outcome)
+        continueWith(provider, outcome)
       })
       .catch(() => setFailure(loginFailureCopy(provider)))
       .finally(() => setBusy(false))

@@ -3,7 +3,6 @@ import { View } from 'react-native'
 import { router } from 'expo-router'
 import {
   TERM_ROWS,
-  TERMS_ALL,
   TERMS_BODY,
   TERMS_OPTIONAL,
   TERMS_REQUIRED,
@@ -11,6 +10,7 @@ import {
   TERMS_TITLE,
   TRY_AGAIN,
   TermRow,
+  TermsAllRow,
   saveTerms,
   usePhoneAuth,
 } from '@/features/auth'
@@ -57,20 +57,23 @@ const TermsScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 12, gap: 8 }}>
-        <Text accessibilityRole="header" v="h1">
+      <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
           {TERMS_TITLE}
         </Text>
-        <Text v="b2" color="t3">
+        <Text v="b2" color="t2" style={{ marginTop: 8 }}>
           {TERMS_BODY}
         </Text>
-        <View style={{ marginTop: 16 }}>
-          <TermRow label={TERMS_ALL} checked={all} onPress={toggleAll} />
+        <View style={{ marginTop: 24 }}>
+          <TermsAllRow checked={all} onPress={toggleAll} />
+        </View>
+        <View style={{ paddingTop: 8 }}>
           {TERM_ROWS.map((row) => (
             <TermRow
               key={row.id}
               label={row.label}
               badge={row.required ? TERMS_REQUIRED : TERMS_OPTIONAL}
+              required={row.required}
               checked={Boolean(checked[row.id])}
               onPress={() => setChecked((current) => ({ ...current, [row.id]: !current[row.id] }))}
             />

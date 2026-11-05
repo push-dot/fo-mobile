@@ -1,12 +1,16 @@
 import { CAREER_STATUSES, JOB_CATEGORIES, TENURES, type CareerStatus, type JobCategory, type Profile, type ProfileFilters, type Tenure } from '@push/api-client'
 
-export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: 'recommended' | 'offers' }
+export type Explore = NonNullable<ProfileFilters['explore']>
+export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: Explore }
 
 export const EMPTY_SHEET: SheetFilters = { tenure: [], status: [], explore: 'recommended' }
 
 export const tenureOf = (years: number): Tenure => (years <= 2 ? '0-2' : years <= 5 ? '3-5' : years <= 9 ? '6-9' : '10+')
 
-export const appliedCount = (f: SheetFilters) => f.tenure.length + f.status.length + (f.explore === 'offers' ? 1 : 0)
+export const appliedCount = (f: SheetFilters) => f.tenure.length + f.status.length + (f.explore === 'recommended' ? 0 : 1)
+
+export const proposalSubtitle = (p: Pick<Profile, 'jobCategory' | 'tenureYears' | 'careerStatus'>) =>
+  [careerLine(p), CAREER_STATUSES.find((s) => s.key === p.careerStatus)?.label].filter(Boolean).join(' · ')
 
 export const filterSummary = (f: SheetFilters) =>
   [...TENURES.filter((t) => f.tenure.includes(t.key)), ...CAREER_STATUSES.filter((s) => f.status.includes(s.key))]

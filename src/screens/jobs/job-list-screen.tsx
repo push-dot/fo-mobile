@@ -1,49 +1,53 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
-import {
-  EMPTY,
-  FILTER_KEYS,
-  FilterSheet,
-  PostingGrid,
-  chipText,
-  formatCount,
-  isEmpty,
-  toQuery,
-  usePostingPages,
-  type FilterKey,
-  type Filters,
-} from '@/features/jobs'
-import { Chip, GlassButton, Icon, LOADING_LABEL, Text, TopBar } from '@/shared/components'
+import { FILTER_KEYS, POSTING_SORTS, PostingGrid, chipText, formatCount, isEmpty, toQuery, useJobListStore, usePostingPages, EMPTY } from '@/features/jobs'
+import { Chip, GlassButton, Icon, Menu, Skeleton, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const JobListScreen = () => {
   const c = useColors()
-  const [filters, setFilters] = useState<Filters>(EMPTY)
-  const [open, setOpen] = useState<FilterKey | null>(null)
-  const query = { ...toQuery(filters), sort: 'latest' as const }
+  const filters = useJobListStore((s) => s.filters)
+  const sort = useJobListStore((s) => s.sort)
+  const setFilters = useJobListStore((s) => s.setFilters)
+  const setSort = useJobListStore((s) => s.setSort)
+  const reset = useJobListStore((s) => s.reset)
+  useEffect(() => reset, [reset])
+  const query = { ...toQuery(filters), sort }
   const pages = usePostingPages(query)
   const total = pages.data?.pages[0]?.page.total
+  const sortLabel = POSTING_SORTS.find((s) => s.key === sort)?.label ?? '최신순'
 
   const header = (
     <View style={{ backgroundColor: c.bg }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 4 }}>
         <Chip label="전체" on={isEmpty(filters)} onPress={() => setFilters(EMPTY)} />
         {FILTER_KEYS.map((k) => (
-          <Chip key={k} label={chipText(k, filters)} menu on={filters[k].length > 0} onPress={() => setOpen(k)} />
+          <Chip key={k} label={chipText(k, filters)} menu on={filters[k].length > 0} onPress={() => router.push({ pathname: '/job-filter', params: { kind: k } })} />
         ))}
       </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 }}>
-        <Text v="c1" weight="600" color="t3">
-          {pages.isPending ? LOADING_LABEL : total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
-        </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-          <Text v="c1" weight="600" color="t2">
-            최신순
-          </Text>
-          <Icon name="down" size={14} color="t2" />
+      {pages.isPending ? (
+        <View style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 }}>
+          <Skeleton width={80} height={12} />
         </View>
-      </View>
+      ) : (
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12 }}>
+          <Text v="c1" weight="600" color="t3">
+            {total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
+          </Text>
+          <Menu
+            accessibilityLabel={`정렬, ${sortLabel}`}
+            actions={POSTING_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, minHeight: 44 }}>
+              <Text v="c1" weight="600" color="t2">
+                {sortLabel}
+              </Text>
+              <Icon name="down" size={14} color="t2" />
+            </View>
+          </Menu>
+        </View>
+      )}
     </View>
   )
 
@@ -54,16 +58,7 @@ const JobListScreen = () => {
         onBack={() => router.back()}
         right={<GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />}
       />
-      <PostingGrid filters={query} header={header} loadingLabel={false} onReset={() => setFilters(EMPTY)} />
-      <FilterSheet
-        kind={open}
-        value={filters}
-        onClose={() => setOpen(null)}
-        onApply={(f) => {
-          setFilters(f)
-          setOpen(null)
-        }}
-      />
+      <PostingGrid filters={query} header={header} onReset={() => setFilters(EMPTY)} />
     </View>
   )
 }

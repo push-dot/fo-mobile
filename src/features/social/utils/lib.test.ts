@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { givenName, threadComments, timeAgo } from '.'
+import { givenName, postShareMessage, threadComments, timeAgo } from '.'
+import { WEB_BASE_URL } from '../../../shared/infrastructure/config'
 
 const now = new Date(2026, 9, 20, 12, 0)
 const ago = (ms: number) => new Date(now.getTime() - ms).toISOString()
@@ -28,6 +29,14 @@ describe('threadComments', () => {
     const out = threadComments([c('a'), c('b'), c('r1', 'a'), c('r2', 'zz')])
     expect(out.map((x) => [x.id, x.reply])).toEqual([['a', false], ['r1', true], ['b', false], ['r2', true]])
   })
+})
+
+it('postShareMessage puts the title above the post URL', () => {
+  expect(postShareMessage('p1', { title: '제목' })).toBe(`제목\n${WEB_BASE_URL}/posts/p1`)
+})
+
+it('postShareMessage without a post is the URL', () => {
+  expect(postShareMessage('p1')).toBe(`${WEB_BASE_URL}/posts/p1`)
 })
 
 it('givenName', () => {

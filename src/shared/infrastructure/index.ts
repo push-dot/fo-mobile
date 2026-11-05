@@ -16,6 +16,7 @@ export {
   saveToCache,
   shareFile,
   readClipboard,
+  copyText,
 } from './platform'
 export { shareMessage } from './platform'
 export { readNotificationPermission } from './notification-permission'

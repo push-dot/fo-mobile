@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { find, findAll } from './native-stubs'
+import { find, findAll, stubs } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
 vi.mock('@expo/ui', () => ({ Host: 'Host' }))
@@ -28,6 +28,7 @@ describe('SegmentedControl (iOS)', () => {
     const picker = find(tree, 'Picker')
     expect(picker.props.selection).toBe('a')
     expect(picker.props.modifiers).toContainEqual({ name: 'pickerStyle', arg: 'segmented' })
+    expect(picker.props.modifiers).toContainEqual({ name: 'tint', arg: stubs.theme.palette.light.ac })
     expect(findAll(tree, 'SText').map((t) => [t.props.children, t.props.modifiers])).toEqual([
       ['받은', [{ name: 'tag', arg: 'a' }]],
       ['보낸', [{ name: 'tag', arg: 'b' }]],

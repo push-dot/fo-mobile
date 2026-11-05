@@ -6,7 +6,9 @@ import {
   CONFIRM,
   OTP_EXPIRED,
   OTP_INVALID,
+  OTP_SENT_SUFFIX,
   OTP_TITLE,
+  OtpBoxes,
   OtpCells,
   RESEND_CODE,
   TOO_MANY_BODY,
@@ -15,7 +17,6 @@ import {
   formatNational,
   mapPhoneAuthError,
   needsTerms,
-  otpSentLine,
   phoneFailureLine,
   readConsents,
   sendPhoneCode,
@@ -108,27 +109,41 @@ const OtpScreen = () => {
       .finally(() => setBusy(false))
   }
 
+  const notice = otpError === 'invalid' ? OTP_INVALID : otpError === 'expired' ? OTP_EXPIRED : error
+
+  const status = notice ? (
+    <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={{ flex: 1 }}>
+      {notice}
+    </Text>
+  ) : remaining > 0 ? (
+    <Text v="c1" weight="600" color="t2" style={{ flex: 1, fontVariant: ['tabular-nums'] }}>
+      {countdownLabel(remaining)}
+    </Text>
+  ) : blocked ? (
+    <View style={{ flex: 1 }} />
+  ) : (
+    <Pressable accessibilityRole="button" disabled={busy} onPress={resend} style={{ flex: 1 }}>
+      <Text v="c1" weight="700" color="acText">
+        {RESEND_CODE}
+      </Text>
+    </Pressable>
+  )
+
   if (blocked) {
     return (
       <View style={{ flex: 1, backgroundColor: c.bg }}>
         <TopBar onBack={() => router.back()} />
-        <View style={{ paddingHorizontal: 24, paddingTop: 24, gap: 10 }}>
-          <Text accessibilityRole="header" v="h1">
+        <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+          <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
             {TOO_MANY_TITLE}
           </Text>
-          <Text v="b2" color="t3">
+          <Text v="b2" color="t2" style={{ marginTop: 8 }}>
             {TOO_MANY_BODY}
           </Text>
-          {remaining > 0 ? (
-            <Text v="c1" color="t3">
-              {countdownLabel(remaining)}
-            </Text>
-          ) : null}
-          {error ? (
-            <Text v="c1" color="red" accessibilityRole="alert">
-              {error}
-            </Text>
-          ) : null}
+          <View style={{ marginTop: 28, opacity: 0.5 }}>
+            <OtpBoxes value="" active={null} />
+          </View>
+          <View style={{ flexDirection: 'row', marginTop: 16 }}>{status}</View>
         </View>
         <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
           <Button label={RESEND_CODE} disabled={busy || remaining > 0} onPress={resend} />
@@ -140,14 +155,17 @@ const OtpScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: 24, paddingTop: 12, gap: 10 }}>
-        <Text accessibilityRole="header" v="h1">
+      <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
           {OTP_TITLE}
         </Text>
-        <Text v="b2" color="t3">
-          {otpSentLine(display)}
+        <Text v="b2" color="t2" style={{ marginTop: 8 }}>
+          <Text v="b2" weight="700" style={{ fontVariant: ['tabular-nums'] }}>
+            {display}
+          </Text>
+          {OTP_SENT_SUFFIX}
         </Text>
-        <View style={{ marginTop: 18 }}>
+        <View style={{ marginTop: 28 }}>
           <OtpCells
             value={code}
             onChange={(next) => {
@@ -156,39 +174,16 @@ const OtpScreen = () => {
             }}
           />
         </View>
-        {otpError === 'invalid' ? (
-          <Text v="c1" color="red" accessibilityRole="alert">
-            {OTP_INVALID}
-          </Text>
-        ) : null}
-        {otpError === 'expired' ? (
-          <Text v="c1" color="red" accessibilityRole="alert">
-            {OTP_EXPIRED}
-          </Text>
-        ) : null}
-        {error ? (
-          <Text v="c1" color="red" accessibilityRole="alert">
-            {error}
-          </Text>
-        ) : null}
-        {remaining > 0 ? (
-          <Text v="c1" color="t3">
-            {countdownLabel(remaining)}
-          </Text>
-        ) : otpError === 'expired' ? null : (
-          <Pressable accessibilityRole="button" disabled={busy} onPress={resend}>
-            <Text v="c1" weight="700" color="acText">
-              {RESEND_CODE}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
+          {status}
+          <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
+            <Text v="c1" weight="600" color="t2">
+              {CHANGE_NUMBER}
             </Text>
           </Pressable>
-        )}
+        </View>
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16, gap: 10 }}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
-          <Text v="b2" weight="700" color="t2">
-            {CHANGE_NUMBER}
-          </Text>
-        </Pressable>
+      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
         {otpError === 'expired' ? (
           <Button label={RESEND_CODE} disabled={busy || remaining > 0} onPress={resend} />
         ) : (

@@ -1,12 +1,11 @@
-import { Platform, useColorScheme } from 'react-native'
-import { NATIVE_FONTS } from './fonts'
+import { useColorScheme } from 'react-native'
 import { themeMode } from './mode'
 import { useThemePreference } from './preference'
-import { palette, shadow, type Colors, type Weight } from './tokens'
+import { palette, shadow, type Colors } from './tokens'
 
 export * from './tokens'
 export * from './mode'
-export { NATIVE_FONTS } from './fonts'
+export { fontFor, NATIVE_FONTS } from './fonts'
 export { navigationColors } from './navigation-colors'
 export { onAccent } from './on-accent'
 export { selectedRing } from './selected-ring'
@@ -23,6 +22,3 @@ export const useThemeMode = (): 'light' | 'dark' => {
 
 export const useColors = (): Colors => (useThemeMode() === 'dark' ? palette.dark : palette.light)
 export const useShadow = () => (useThemeMode() === 'dark' ? shadow.dark : shadow.light)
-
-export const fontFor = (weight: Weight) =>
-  Platform.OS === 'ios' ? { fontFamily: NATIVE_FONTS[weight] } : { fontWeight: weight }

@@ -40,6 +40,8 @@ export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Shar
 
 export const openUrl = (url: string) => Linking.openURL(url)
 
+export const copyText = (text: string) => Clipboard.setStringAsync(text)
+
 export const readClipboard = async () => {
   if (Platform.OS === 'web') {
     const clip = globalThis.navigator?.clipboard

@@ -29,11 +29,13 @@ export const stubs = {
   },
   swiftUIModifiers: modifiers([
     'pickerStyle',
+    'tint',
     'tag',
     'controlSize',
     'datePickerStyle',
     'labelsHidden',
     'accessibilityLabel',
+    'fixedSize',
   ]),
   compose: {
     Switch: 'CSwitch',

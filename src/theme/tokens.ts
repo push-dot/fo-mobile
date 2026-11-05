@@ -9,12 +9,12 @@ export type Colors = { [K in keyof typeof palette.light]: string }
 
 export type Weight = '400' | '500' | '600' | '700' | '800'
 
-type NativeType = { fontSize: number; lineHeight: number; fontWeight: Weight; letterSpacing: number }
+type NativeType = { fontSize: number; lineHeight: number; weight: Weight; letterSpacing: number }
 
 export const type = Object.fromEntries(
   Object.entries(typography).map(([name, t]) => [
     name,
-    { fontSize: t.fontSize, lineHeight: t.lineHeight, fontWeight: String(t.fontWeight), letterSpacing: t.fontSize * t.letterSpacing },
+    { fontSize: t.fontSize, lineHeight: t.lineHeight, weight: String(t.fontWeight) as Weight, letterSpacing: t.fontSize * t.letterSpacing },
   ]),
 ) as Record<keyof typeof typography, NativeType>
 

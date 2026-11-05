@@ -19,6 +19,9 @@ const MyPostsScreen = () => {
         <ActivityIndicator style={{ marginTop: 40 }} />
       ) : (
         <ScrollView>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: 14, paddingBottom: 4, paddingHorizontal: 20 }}>
+            {query.data?.page.total ?? query.data?.data.length ?? 0}개
+          </Text>
           {(query.data?.data ?? []).map((p) => (
             <Pressable
               key={p.id}

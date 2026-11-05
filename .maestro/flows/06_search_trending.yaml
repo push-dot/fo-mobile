@@ -1,0 +1,12 @@
+appId: app.push.mobile
+name: 홈 → 검색 → 많이 찾는 검색어 → 결과
+---
+- runFlow: _login.yaml
+- tapOn: "검색"
+- extendedWaitUntil:
+    visible: "지금 많이 찾는 검색어"
+    timeout: 10000
+- tapOn: "1위 프론트엔드"
+- extendedWaitUntil:
+    visible: "‘프론트엔드’ 공고.*"
+    timeout: 10000

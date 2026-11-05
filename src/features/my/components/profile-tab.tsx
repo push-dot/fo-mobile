@@ -75,13 +75,16 @@ const ProfileTab = () => {
               [profileCountLabels(p).followers, '/activity/follows', 'followers'],
               [profileCountLabels(p).posts, '/activity/posts', 'mine'],
             ] as const
-          ).map(([label, pathname, box]) => (
+          ).map(([{ count, label }, pathname, box]) => (
             <Pressable
               key={label}
               accessibilityRole="button"
               onPress={() => router.push({ pathname, params: { box } })}
             >
-              <Text v="c1" weight="700">
+              <Text v="b2">
+                <Text v="b2" weight="700">
+                  {count}
+                </Text>{' '}
                 {label}
               </Text>
             </Pressable>

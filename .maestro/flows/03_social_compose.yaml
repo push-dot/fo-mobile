@@ -10,9 +10,11 @@ name: 소셜 → 글쓰기 → 게시
 - tapOn: "글쓰기"
 - tapOn: "카테고리.*"
 - tapOn: "개발"
-- tapOn: "제목"
+- tapOn:
+    id: "compose-title"
 - inputText: "Maestro E2E post"
-- tapOn: "본문.*"
+- tapOn:
+    id: "compose-body"
 - inputText: "Written by the Maestro flow"
 - tapOn: "게시"
 - extendedWaitUntil:

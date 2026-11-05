@@ -1,21 +1,23 @@
 import { useMemo, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { monthDay } from '@push/shared'
-import { BottomSheet, Chip, GlassButton, Text, TextField } from '@/shared/components'
+import { router } from 'expo-router'
+import { GlassButton, Text } from '@/shared/components'
 import { useColors, type Colors } from '../../../theme'
-import { useAddCalendarEvent, useCalendarEvents } from '../api/hooks'
+import { useCalendarEvents } from '../api/hooks'
+import { EVENT_TYPES } from '../constants'
 import type { CalendarEvent, CalendarEventType } from '../types'
-import { CALENDAR_ADD, clock, dayTitle, dday, monthGrid, sameDay } from '../utils'
+import { CALENDAR_ADD, clock, dayTitle, dday, monthGrid, sameDay, toDayParam } from '../utils'
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
-const TYPES: { key: CalendarEventType; label: string; color: keyof Colors }[] = [
-  { key: 'INTERVIEW', label: '면접', color: 'ac' },
-  { key: 'DEADLINE', label: '마감', color: 'red' },
-  { key: 'FOLLOW_UP', label: '후속 연락', color: 'green' },
-  { key: 'COFFEE_CHAT', label: '커피챗', color: 'orange' },
-  { key: 'CUSTOM', label: '직접 추가', color: 't4' },
-]
-const typeOf = (k: CalendarEventType) => TYPES.find((t) => t.key === k)!
+const EVENT_COLOR: Record<CalendarEventType, keyof Colors> = {
+  INTERVIEW: 'ac',
+  DEADLINE: 'red',
+  FOLLOW_UP: 'green',
+  COFFEE_CHAT: 'orange',
+  CUSTOM: 't4',
+}
+const typeOf = (k: CalendarEventType) => ({ ...EVENT_TYPES.find((t) => t.key === k)!, color: EVENT_COLOR[k] })
 
 const subline = (e: CalendarEvent) => {
   const mins = e.endsAt ? Math.round((Date.parse(e.endsAt) - Date.parse(e.startsAt)) / 60_000) : 0
@@ -23,51 +25,11 @@ const subline = (e: CalendarEvent) => {
   return [dur, e.notes].filter(Boolean).join(' · ')
 }
 
-const AddEvent = ({ day, visible, onClose }: { day: Date; visible: boolean; onClose: () => void }) => {
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState<CalendarEventType>('CUSTOM')
-  const add = useAddCalendarEvent(() => {
-    setTitle('')
-    onClose()
-  })
-  return (
-    <BottomSheet
-      visible={visible}
-      onClose={onClose}
-      title="어떤 일정을 추가할까요?"
-      description={`${day.getMonth() + 1}월 ${day.getDate()}일 오전 9:00`}
-      action={{
-        label: '일정 추가하기',
-        onPress: () =>
-          add.mutate({
-            type,
-            title: title.trim(),
-            startsAt: new Date(day.getFullYear(), day.getMonth(), day.getDate(), 9).toISOString(),
-          }),
-        disabled: !title.trim() || add.isPending,
-      }}
-    >
-      <TextField
-        placeholder="일정 이름"
-        value={title}
-        onChangeText={setTitle}
-        accessibilityLabel="일정 이름"
-      />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {TYPES.map((t) => (
-          <Chip key={t.key} label={t.label} on={type === t.key} onPress={() => setType(t.key)} />
-        ))}
-      </View>
-    </BottomSheet>
-  )
-}
-
 const CalendarView = () => {
   const c = useColors()
   const today = useMemo(() => new Date(), [])
   const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
   const [selected, setSelected] = useState(today)
-  const [adding, setAdding] = useState(false)
 
   const cells = useMemo(() => monthGrid(month.getFullYear(), month.getMonth()), [month])
   const from = cells[0]!
@@ -97,7 +59,7 @@ const CalendarView = () => {
         <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
         <GlassButton
           actions={[
-            { icon: 'plus', label: CALENDAR_ADD, active: true, onPress: () => setAdding(true) },
+            { icon: 'plus', label: CALENDAR_ADD, active: true, onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) },
           ]}
         />
       </View>
@@ -177,6 +139,16 @@ const CalendarView = () => {
         })}
       </View>
 
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, paddingBottom: 12, paddingHorizontal: 20 }}>
+        {[...EVENT_TYPES.map((t) => ({ label: t.label, color: c[EVENT_COLOR[t.key]] })), { label: 'Google 캘린더', color: c.green }].map((l) => (
+          <View key={l.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: l.color }} />
+            <Text v="c2" weight="600" color="t3">
+              {l.label}
+            </Text>
+          </View>
+        ))}
+      </View>
       <View style={{ height: 10, backgroundColor: c.bg2 }} />
       <View
         style={{
@@ -251,7 +223,6 @@ const CalendarView = () => {
           )
         })
       )}
-      <AddEvent day={selected} visible={adding} onClose={() => setAdding(false)} />
     </View>
   )
 }

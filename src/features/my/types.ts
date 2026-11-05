@@ -9,6 +9,7 @@ export type CalendarEvent = {
   startsAt: string
   endsAt: string | null
   notes: string
+  applicationId?: string | null
 }
 
 export type ResumeDraft = {
@@ -38,6 +39,14 @@ export type HubDocument = {
 export type DocVersion = {
   id: string
   blocks: { id: string; text: string }[]
+  content?: unknown
+}
+
+export type HubProfile = {
+  headline: string
+  intro: string
+  careers: { company: string; role: string; startedOn: string | null; endedOn: string | null; description: string }[]
+  skills: string[]
 }
 
 export type PickedFile = { uri: string; name: string; mimeType?: string | null; size?: number | null }
@@ -46,4 +55,4 @@ export type ProfileSection = 'basic' | 'intro' | 'career' | 'skills'
 
 export type ActivitySub = 'applications' | 'calendar' | 'bookmarks' | 'follows' | 'posts'
 
-export type OfferPerson = UserRef & { companyName?: string | null }
+export type OfferPerson = UserRef & { companyName?: string | null; headline?: string }

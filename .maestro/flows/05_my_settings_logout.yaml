@@ -26,6 +26,5 @@ name: 마이 → 설정 → 로그아웃
     text: "로그아웃"
     rightOf: "취소"
 - extendedWaitUntil:
-    # Sign-in, or /phone while the 00_fresh_launch_sign_in.yaml bug is open.
-    visible: "Google로 시작하기|휴대폰 번호를 입력해 주세요"
+    visible: "Google로 시작하기"
     timeout: 10000

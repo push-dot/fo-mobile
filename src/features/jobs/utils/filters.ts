@@ -1,7 +1,8 @@
 import {
-  CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES, chipLabel,
+  CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES,
   type CareerYears, type EmploymentType, type JobCategory, type PostingFilters,
 } from '@push/api-client'
+import { FILTER_TITLES } from '../constants'
 
 export type Filters = {
   category: JobCategory[]
@@ -24,19 +25,23 @@ export const toQuery = (f: Filters): PostingFilters =>
 const labelsOf = <K extends string>(list: { key: K; label: string }[], keys: K[]) =>
   list.filter((x) => keys.includes(x.key)).map((x) => x.label)
 
+const valueText = (selected: string[]) => (selected.length === 0 ? null : selected.length === 1 ? selected[0]! : `${selected[0]} 외 ${selected.length - 1}`)
+
 export const chipText = (key: FilterKey, f: Filters): string => {
-  switch (key) {
-    case 'category':
-      return chipLabel('직군', labelsOf(JOB_CATEGORIES, f.category))
-    case 'skills':
-      return chipLabel('기술 스택', f.skills)
-    case 'careerYears':
-      return chipLabel('경력', labelsOf(CAREER_YEARS, f.careerYears))
-    case 'location':
-      return chipLabel('지역', f.location)
-    case 'employmentType':
-      return chipLabel('고용형태', labelsOf(EMPLOYMENT_TYPES, f.employmentType))
-  }
+  const selected =
+    key === 'category'
+      ? labelsOf(JOB_CATEGORIES, f.category)
+      : key === 'skills'
+        ? f.skills
+        : key === 'careerYears'
+          ? labelsOf(CAREER_YEARS, f.careerYears)
+          : key === 'location'
+            ? f.location
+            : labelsOf(EMPLOYMENT_TYPES, f.employmentType)
+  const value = valueText(selected)
+  if (!value) return FILTER_TITLES[key]
+  if (key === 'careerYears') return `경력 ${value}`
+  return value
 }
 
 export const SIDOS = ['서울', '경기', '인천', '부산', '대전', '원격'] as const

@@ -4,30 +4,35 @@ import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
 import {
   PersonRow,
-  POPULAR_TERMS,
   PostingRow,
   PostRow,
   SEARCH_CLEAR_LABEL,
   SEARCH_EMPTY_BODY,
   SEARCH_ERROR_LINES,
   SEARCH_RETRY_LABEL,
+  SEARCH_SKELETON,
+  SEARCH_SORTS,
   SearchBar,
   searchEmptyTitle,
   TABS,
   useRecentSearches,
   useSearch,
+  useTrending,
+  type SearchSort,
   type SearchTab,
 } from '@/features/search'
-import { Chip, Icon, LoadingNote, StatusNote, Text } from '@/shared/components'
+import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
   const c = useColors()
   const [text, setText] = useState('')
   const [tab, setTab] = useState<SearchTab>(initialTab)
+  const [sort, setSort] = useState<SearchSort>('relevance')
   const q = useDeferredValue(text.trim())
   const recent = useRecentSearches()
-  const results = { postings: useSearch(q, 'postings'), people: useSearch(q, 'people'), posts: useSearch(q, 'posts') }
+  const popular = useTrending().data?.terms ?? []
+  const results = { postings: useSearch(q, 'postings', sort), people: useSearch(q, 'people', sort), posts: useSearch(q, 'posts', sort) }
   const active = results[tab]
   const items: (Posting | Profile | Post)[] = active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
   const totalOf = (k: SearchTab) => results[k].data?.pages[0]?.page.total
@@ -74,11 +79,13 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               ))}
             </>
           ) : null}
-          <Text v="h3" accessibilityRole="header" style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12 }}>
-            지금 많이 찾는 검색어
-          </Text>
+          {popular.length ? (
+            <Text v="h3" accessibilityRole="header" style={{ paddingHorizontal: 20, paddingTop: 22, paddingBottom: 12 }}>
+              지금 많이 찾는 검색어
+            </Text>
+          ) : null}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, columnGap: 12 }}>
-            {POPULAR_TERMS.map((t, i) => (
+            {popular.map(({ term: t }, i) => (
               <Pressable
                 key={t}
                 accessibilityRole="button"
@@ -116,17 +123,39 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 4 }}>
-                <Text v="c1" weight="600" color="t3" numberOfLines={1} style={{ flex: 1 }}>
-                  ‘{q}’ {TABS.find((t) => t.key === tab)!.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}개
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                  <Text v="c1" weight="600" color="t2">
-                    관련도순
-                  </Text>
-                  <Icon name="down" size={14} color="t2" />
+              {active.isPending ? (
+                <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 }}>
+                  <Skeleton width={120} height={12} />
                 </View>
-              </View>
+              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 4 }}>
+                  <Text v="c1" weight="600" color="t3" numberOfLines={1} style={{ flex: 1 }}>
+                    ‘{q}’ {TABS.find((t) => t.key === tab)!.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}{TABS.find((t) => t.key === tab)!.unit}
+                  </Text>
+                  {tab === 'postings' ? (
+                    SEARCH_SORTS.length > 1 ? (
+                      <Menu
+                        accessibilityLabel={`정렬, ${SEARCH_SORTS.find((s) => s.key === sort)?.label}`}
+                        actions={SEARCH_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, minHeight: 44 }}>
+                          <Text v="c1" weight="600" color="t2">
+                            {SEARCH_SORTS.find((s) => s.key === sort)?.label}
+                          </Text>
+                          <Icon name="down" size={14} color="t2" />
+                        </View>
+                      </Menu>
+                    ) : (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                        <Text v="c1" weight="600" color="t2">
+                          {SEARCH_SORTS[0]?.label}
+                        </Text>
+                        <Icon name="down" size={14} color="t2" />
+                      </View>
+                    )
+                  ) : null}
+                </View>
+              )}
             </>
           }
           renderItem={({ item }) =>
@@ -140,7 +169,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
           }
           ListEmptyComponent={
             active.isPending ? (
-              <LoadingNote style={{ marginTop: 40 }} />
+              <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
               <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ marginTop: 40 }} />
             ) : (

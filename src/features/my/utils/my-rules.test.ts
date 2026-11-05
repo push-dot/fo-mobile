@@ -16,7 +16,9 @@ import {
   SIZE_LIMIT,
   THEME_CHOICES,
   WITHDRAW_BODY,
+  careerDeleteBody,
   careerDeleteCopy,
+  commentedSee,
   deleteDocCopy,
   emptyCta,
   followMatches,
@@ -39,14 +41,14 @@ import {
 describe('my screen rules', () => {
   it('shows following, follower, and post counts', () => {
     expect(profileCountLabels({ followingCount: 18, followerCount: 12, postCount: 8 })).toEqual({
-      following: '18 팔로잉',
-      followers: '12 팔로워',
-      posts: '8 게시글',
+      following: { count: 18, label: '팔로잉' },
+      followers: { count: 12, label: '팔로워' },
+      posts: { count: 8, label: '게시글' },
     })
     expect(profileCountLabels({})).toEqual({
-      following: '0 팔로잉',
-      followers: '0 팔로워',
-      posts: '0 게시글',
+      following: { count: 0, label: '팔로잉' },
+      followers: { count: 0, label: '팔로워' },
+      posts: { count: 0, label: '게시글' },
     })
   })
 
@@ -69,11 +71,15 @@ describe('my screen rules', () => {
   it('confirms a career delete and offers undo', () => {
     expect(careerDeleteCopy).toEqual({
       title: '이 경력을 삭제할까요?',
-      body: '이 경력을 프로필에서 지워요.',
       confirm: '삭제',
       toast: '경력을 삭제했어요',
       undo: '되돌리기',
     })
+    expect(careerDeleteBody({ company: '모아페이', role: '백엔드 엔지니어' })).toBe(
+      '모아페이 · 백엔드 엔지니어 경력을 프로필에서 지워요.',
+    )
+    expect(careerDeleteBody({ company: ' 모아페이 ', role: '' })).toBe('모아페이 경력을 프로필에서 지워요.')
+    expect(careerDeleteBody({ company: '', role: '' })).toBe('이 경력을 프로필에서 지워요.')
   })
 
   it('keeps the known size-limit sentences', () => {
@@ -104,9 +110,10 @@ describe('my screen rules', () => {
   })
 
   it('names the follow and post see-all rows', () => {
-    expect(followSeeAll(18)).toBe('18명 전체 보기')
-    expect(followerSee(12)).toBe('팔로워 12명 보기')
-    expect(postsSeeAll(8)).toBe('8개 전체 보기')
+    expect(followSeeAll(18)).toBe('18명 전체 보기 ›')
+    expect(followerSee(12)).toBe('팔로워 12명 보기 ›')
+    expect(postsSeeAll(8)).toBe('8개 전체 보기 ›')
+    expect(commentedSee(9)).toBe('댓글 단 글 9개 보기 ›')
     expect(pushSeeAll(5)).toBe('전체 5개 보기')
   })
 
@@ -123,22 +130,22 @@ describe('my screen rules', () => {
 
   it('gives each empty activity list one action', () => {
     expect(emptyCta('applications')).toEqual({
-      title: '아직 지원한 공고가 없어요',
+      title: '아직 지원한 공고가 없어요.',
       action: '채용공고 보기',
       href: '/jobs',
     })
     expect(emptyCta('bookmarks')).toEqual({
-      title: '북마크한 공고가 없어요',
+      title: '북마크한 공고가 없어요.',
       action: '채용공고 보기',
       href: '/jobs',
     })
     expect(emptyCta('follows')).toEqual({
-      title: '아직 팔로우한 사람이 없어요',
+      title: '아직 팔로우한 사람이 없어요.',
       action: '허브 둘러보기',
       href: '/hub',
     })
     expect(emptyCta('posts')).toEqual({
-      title: '아직 쓴 글이 없어요',
+      title: '아직 쓴 글이 없어요.',
       action: '글쓰기',
       href: '/compose',
     })
@@ -184,11 +191,11 @@ describe('my screen rules', () => {
       '마감 임박 공고',
       '제안 받음',
       '댓글과 답글',
-      'AI 작업 완료',
+      '에이전트 작업 완료',
       '지원 상태 변경',
     ])
     expect(AGENT_TITLE).toBe('에이전트')
-    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 AI가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
+    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
     expect(REFERENCE_SUB).toBe('에이전트를 쓰려면 켜 두어야 해요')
   })
@@ -230,11 +237,12 @@ describe('my screen rules', () => {
         { title: '허브 프로필' },
         { company: '모아페이', title: '백엔드 엔지니어', fitScore: 86 },
       ),
-    ).toEqual({ title: '백엔드 엔지니어', company: '모아페이', score: '86' })
+    ).toEqual({ title: '백엔드 엔지니어', company: '모아페이', score: '8.6', doc: '허브 프로필' })
     expect(pushCardLines({ title: '허브 프로필' }, null)).toEqual({
       title: '허브 프로필',
       company: '',
       score: '',
+      doc: '',
     })
   })
 })

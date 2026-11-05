@@ -1,7 +1,7 @@
 import type { Posting, PostingFilters } from '@push/api-client'
 import { api } from '../../../shared/infrastructure'
 import { APPLY_DOC_LIMIT, POSTING_PAGE_LIMIT } from '../constants'
-import type { ApplyDoc } from '../types'
+import type { ApplyBody } from '../types'
 import { toQuery, type Filters } from '../utils'
 
 export const fetchPostingPages = (f: PostingFilters, cursor: string | undefined) =>
@@ -15,8 +15,7 @@ export const fetchMyProfile = api.me.profile
 
 export const fetchPostingLocations = (draft: Filters) => api.postings.locations(toQuery({ ...draft, location: [] }))
 
-export const applyToPosting = (postingId: string, doc: ApplyDoc | undefined) =>
-  api.postings.apply(postingId, doc?.ai ? [doc.id] : [], doc && !doc.ai ? [doc.id] : [])
+export const applyToPosting = (postingId: string, body: ApplyBody) => api.postings.apply(postingId, body.documentIds, body.sourceIds)
 
 export const fetchApplyDocs = () => api.sources.list({ limit: APPLY_DOC_LIMIT })
 

@@ -1,39 +1,29 @@
-import { useState } from 'react'
-import { ScrollView, View } from 'react-native'
-import { BottomSheet, Chip, Text, TextField } from '../../../shared/components'
-import { useOfferBookmarks, useSendOffer } from '../api/hooks'
+import { brandOf } from '@push/shared'
+import { View } from 'react-native'
+import { Chip, Text, TextField } from '../../../shared/components'
+import { useColors } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
+
+type Posting = { id: string; company: string; title: string }
 
 type Props = {
   userId: string
   name: string
   subtitle: string
-  visible: boolean
-  onClose: () => void
-  onSent?: () => void
+  message: string
+  postingId?: string
+  postings: Posting[]
+  error: string | null
+  onMessage: (message: string) => void
+  onPosting: (id: string | undefined) => void
+  onError: (message: string | null) => void
 }
 
-const ProposalSheet = ({ userId, name, subtitle, visible, onClose, onSent }: Props) => {
-  const [message, setMessage] = useState('')
-  const [postingId, setPostingId] = useState<string>()
-  const [error, setError] = useState<string | null>(null)
-  const bookmarks = useOfferBookmarks(visible)
-  const send = useSendOffer(userId, message, postingId, () => {
-    setMessage('')
-    setPostingId(undefined)
-    onSent?.()
-    onClose()
-  }, setError)
-  const postings = bookmarks.data?.data ?? []
-
+const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError }: Props) => {
+  const c = useColors()
   return (
-    <BottomSheet
-      visible={visible}
-      onClose={onClose}
-      title="제안하기"
-      action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}
-    >
+    <View style={{ gap: 14 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <Avatar userId={userId} name={name} size={44} />
         <View style={{ flex: 1 }}>
@@ -52,27 +42,33 @@ const ProposalSheet = ({ userId, name, subtitle, visible, onClose, onSent }: Pro
         max={PROPOSAL_MAX}
         value={message}
         onChangeText={(t) => {
-          setMessage(t)
-          setError(null)
+          onMessage(t)
+          onError(null)
         }}
         placeholder="어떤 이야기를 나누고 싶은지 적어 주세요"
       />
       {postings.length ? (
         <View style={{ gap: 8 }}>
-          <Text v="c1" color="t3" weight="700">
+          <Text v="b2" weight="700">
             함께 보낼 공고 (선택)
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {postings.map((p) => (
               <Chip
                 key={p.id}
                 label={`${p.company} · ${p.title}`}
-                check
+                lead={
+                  <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
+                    <Text weight="700" style={{ color: c.card, fontSize: 11, lineHeight: 14 }}>
+                      {[...p.company][0]}
+                    </Text>
+                  </View>
+                }
                 on={postingId === p.id}
-                onPress={() => setPostingId(postingId === p.id ? undefined : p.id)}
+                onPress={() => onPosting(postingId === p.id ? undefined : p.id)}
               />
             ))}
-          </ScrollView>
+          </View>
         </View>
       ) : null}
       <Text v="c1" color="t3">
@@ -83,7 +79,7 @@ const ProposalSheet = ({ userId, name, subtitle, visible, onClose, onSent }: Pro
           {error}
         </Text>
       ) : null}
-    </BottomSheet>
+    </View>
   )
 }
 

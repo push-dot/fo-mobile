@@ -15,7 +15,7 @@ const Text = ({ v = 'b2', color = 't1', weight, style, ...rest }: Props) => {
       {...rest}
       style={[
         { fontSize: t.fontSize, lineHeight: t.lineHeight, letterSpacing: t.letterSpacing, color: c[color] },
-        fontFor(weight ?? (t.fontWeight as '400')),
+        fontFor(weight ?? t.weight),
         style,
       ]}
     />

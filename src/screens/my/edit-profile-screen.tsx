@@ -21,12 +21,15 @@ import {
 } from '@push/api-client'
 import {
   Avatar,
+  careerDeleteBody,
   careerDeleteCopy,
   careerPeriod,
   FieldLabel,
   AVATAR_IMAGE_OPTIONS,
   skillOrderHint,
   parseYm,
+  dateToYm,
+  ymToDate,
   Toast,
   useToast,
   SheetHeader,
@@ -37,10 +40,12 @@ import {
   useSaveProfile,
   type ProfileSection,
 } from '@/features/my'
-import { BottomSheet, Button, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
+import { askConfirm, BottomSheet, Button, DatePicker, Icon, SegmentedControl, Switch, Text, TextField } from '@/shared/components'
 import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
 import { fontFor, radius, useColors } from '@/theme'
+
+const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
 const TITLES: Record<ProfileSection, string> = {
   basic: '기본 정보',
@@ -361,7 +366,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
         />
         {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
-          label="AI로 다듬기"
+          label="에이전트로 다듬기"
           icon="spark"
           variant="secondary"
           onPress={() => router.push('/(tabs)/(chat)/chat')}
@@ -410,6 +415,19 @@ const EditCareer = ({ p }: { p: Profile }) => {
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const parsed = items.map(toCareer)
+  const removeAt = (i: number, item: CareerDraft) => {
+    setItems((xs) => xs.filter((_, j) => j !== i))
+    setOpen(null)
+    toast.show(careerDeleteCopy.toast, {
+      action: careerDeleteCopy.undo,
+      onAction: () =>
+        setItems((xs) => {
+          const next = [...xs]
+          next.splice(i, 0, item)
+          return next
+        }),
+    })
+  }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
   // shortcut: no drag library installed, so the grip moves an item up one place; swap for drag-to-reorder if one is added.
@@ -438,6 +456,9 @@ const EditCareer = ({ p }: { p: Profile }) => {
         {items.map((it, i) => {
           const expanded = open === i
           const valid = parsed[i]
+          const start = parseYm(it.start)
+          const end = it.current ? null : parseYm(it.end)
+          const period = start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null
           return (
             <View key={i} style={{ padding: 16, borderRadius: 18, backgroundColor: c.bg2, gap: 6 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -469,9 +490,15 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Icon name={expanded ? 'up' : 'down'} size={18} color="t3" />
                 </Pressable>
               </View>
-              <Text v="c1" color={valid ? 't3' : 'red'} style={{ paddingLeft: 26 }}>
-                {valid ? careerPeriod(valid) : '회사, 직무, 기간을 채워 주세요'}
-              </Text>
+              {!valid && !expanded ? (
+                <Text v="c1" color="red" style={{ paddingLeft: 26 }}>
+                  {CAREER_MISSING}
+                </Text>
+              ) : period ? (
+                <Text v="c1" color="t3" style={{ paddingLeft: 26 }}>
+                  {period}
+                </Text>
+              ) : null}
               {expanded ? (
                 <View style={{ gap: 8, paddingTop: 8 }}>
                   <Input
@@ -480,14 +507,15 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     onChangeText={(t) => set(i, { company: t })}
                   />
                   <Input label="직무" value={it.role} onChangeText={(t) => set(i, { role: t })} />
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
-                      <Input
+                      <DatePicker
                         label="시작"
-                        placeholder="시작 (2022.03)"
-                        keyboardType="numbers-and-punctuation"
-                        value={it.start}
-                        onChangeText={(t) => set(i, { start: t })}
+                        mode="month"
+                        surface="bg"
+                        value={ymToDate(it.start)}
+                        max={new Date()}
+                        onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
                     <View
@@ -512,12 +540,14 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     </View>
                   </View>
                   {!it.current ? (
-                    <Input
+                    <DatePicker
                       label="종료"
-                      placeholder="종료 (2024.02)"
-                      keyboardType="numbers-and-punctuation"
-                      value={it.end}
-                      onChangeText={(t) => set(i, { end: t })}
+                      mode="month"
+                      surface="bg"
+                      value={ymToDate(it.end)}
+                      min={ymToDate(it.start) ?? undefined}
+                      max={new Date()}
+                      onChange={(d) => set(i, { end: dateToYm(d) })}
                     />
                   ) : null}
                   <Input
@@ -526,32 +556,26 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     value={it.description}
                     onChangeText={(t) => set(i, { description: t })}
                   />
+                  {valid ? null : (
+                    <Text v="c1" weight="600" color="red">
+                      {CAREER_MISSING}
+                    </Text>
+                  )}
                   <Pressable
                     accessibilityRole="button"
-                    onPress={() => {
-                      const removed = it
-                      Alert.alert(careerDeleteCopy.title, careerDeleteCopy.body, [
-                        { text: '취소', style: 'cancel' },
+                    onPress={() =>
+                      askConfirm(
                         {
-                          text: careerDeleteCopy.confirm,
-                          style: 'destructive',
-                          onPress: () => {
-                            setItems((xs) => xs.filter((_, j) => j !== i))
-                            setOpen(null)
-                            toast.show(careerDeleteCopy.toast, {
-                              action: careerDeleteCopy.undo,
-                              onAction: () =>
-                                setItems((xs) => {
-                                  const next = [...xs]
-                                  next.splice(i, 0, removed)
-                                  return next
-                                }),
-                            })
-                          },
+                          title: careerDeleteCopy.title,
+                          body: careerDeleteBody(it),
+                          confirm: careerDeleteCopy.confirm,
+                          danger: true,
+                          onConfirm: () => removeAt(i, it),
                         },
-                      ])
-                    }}
-                    style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}
+                        '/(tabs)/(my)/confirm',
+                      )
+                    }
+                    style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'center' }}
                   >
                     <Text v="b2" weight="600" color="red">
                       이 경력 삭제하기

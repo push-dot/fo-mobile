@@ -2,8 +2,8 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
-import { Band, PostCard, usePosts } from '@/features/social'
-import { Button, Chip, GlassButton, LoadingNote, Text, TopBar } from '@/shared/components'
+import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
+import { Button, Chip, GlassButton, Text, TopBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
 const SocialScreen = () => {
@@ -57,25 +57,27 @@ const SocialScreen = () => {
         refreshing={q.isRefetching && !q.isFetchingNextPage}
         onRefresh={() => q.refetch()}
         ListEmptyComponent={
-          <View style={{ padding: 40, alignItems: 'center', gap: 12 }}>
-            {q.isPending ? (
-              <LoadingNote />
-            ) : q.isError ? (
-              <>
-                <Text v="b2" color="t3">
-                  글을 불러오지 못했어요
-                </Text>
-                <Button label="다시 불러오기" variant="secondary" size="sm" onPress={() => q.refetch()} />
-              </>
-            ) : (
-              <>
-                <Text v="b2" color="t3">
-                  아직 올라온 글이 없어요
-                </Text>
-                <Button label="글쓰기" size="sm" onPress={() => router.push('/(tabs)/(social)/compose')} />
-              </>
-            )}
-          </View>
+          q.isPending ? (
+            <PostListSkeleton />
+          ) : (
+            <View style={{ padding: 40, alignItems: 'center', gap: 12 }}>
+              {q.isError ? (
+                <>
+                  <Text v="b2" color="t3">
+                    글을 불러오지 못했어요
+                  </Text>
+                  <Button label="다시 불러오기" variant="secondary" size="sm" onPress={() => q.refetch()} />
+                </>
+              ) : (
+                <>
+                  <Text v="b2" color="t3">
+                    아직 올라온 글이 없어요
+                  </Text>
+                  <Button label="글쓰기" variant="secondary" size="sm" onPress={() => router.push('/(tabs)/(social)/compose')} />
+                </>
+              )}
+            </View>
+          )
         }
         ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ padding: 20 }} /> : undefined}
       />

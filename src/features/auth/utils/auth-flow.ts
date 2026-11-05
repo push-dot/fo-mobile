@@ -111,8 +111,6 @@ export const emailFromPendingToken = (token: string) => {
 export const needsTerms = (consent: { terms?: { age14At: string | null; serviceTermsAt: string | null; privacyAt: string | null } | null }) =>
   !consent.terms?.age14At || !consent.terms.serviceTermsAt || !consent.terms.privacyAt
 
-export const otpSentLine = (display: string) => `${display}로 6자리 번호를 보냈어요.`
-
 export const phoneFailureLine = (failure: PhoneAuthFailure) => {
   if (failure.kind === 'unavailable') return PHONE_UNAVAILABLE
   if (failure.kind === 'taken') return PHONE_TAKEN

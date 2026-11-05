@@ -7,7 +7,7 @@ const Empty = ({ text, action, onAction }: { text: string; action?: string; onAc
       <Text v="b2" color="t3" style={{ textAlign: 'center', paddingTop: 48, paddingBottom: action ? 0 : 48 }}>
         {text}
       </Text>
-      {action && onAction ? <Button label={action} onPress={onAction} size="sm" /> : null}
+      {action && onAction ? <Button label={action} onPress={onAction} variant="secondary" size="sm" /> : null}
     </View>
   )
 }
