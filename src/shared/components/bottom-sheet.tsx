@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors } from '../../theme'
 import Button from './button'
 import Glass from './glass'
-import Icon from './icon'
 import Text from './text'
 
 type Props = {
@@ -25,25 +24,15 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
     <View style={{ paddingTop: 12, paddingHorizontal: 16, paddingBottom: ios ? 16 : 16 + insets.bottom, gap: 14, maxHeight: '100%', flexShrink: 1 }}>
       <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
       {title ? (
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text v="h2" accessibilityRole="header">
-              {title}
+        <View style={{ gap: 2 }}>
+          <Text v="h2" accessibilityRole="header">
+            {title}
+          </Text>
+          {description ? (
+            <Text v="b2" color="t3">
+              {description}
             </Text>
-            {description ? (
-              <Text v="b2" color="t3">
-                {description}
-              </Text>
-            ) : null}
-          </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="닫기"
-            onPress={onClose}
-            style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Icon name="x" size={18} />
-          </Pressable>
+          ) : null}
         </View>
       ) : null}
       <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} keyboardShouldPersistTaps="handled">
@@ -54,7 +43,7 @@ const BottomSheet = ({ visible, onClose, title, description, children, action, f
   )
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable accessibilityLabel="닫기" onPress={onClose} style={{ flex: 1, backgroundColor: c.scrim }} />
+      <Pressable accessibilityRole="button" accessibilityLabel="닫기" onPress={onClose} style={{ flex: 1, backgroundColor: c.scrim }} />
       <View
         style={{
           position: 'absolute',
