@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { brandOf } from '@push/shared'
-import { onAccent, spacing } from '@/theme'
+import { onAccent, spacing, tile } from '@/theme'
 import { Badge, Button, Chip, GlassButton, Icon, Menu, Text, askConfirm, showToast, type BadgeTone, type IconName } from '@/shared/components'
 import { copyText, openUrl } from '@/shared/infrastructure'
 import { LINK_DELETED_TOAST, LINK_EMPTY, LINK_UNDO, linkDeleteBody } from '../constants'
@@ -24,8 +24,9 @@ const GROUPS: { title: string; kinds: LinkKind[] }[] = [
   { title: '기타', kinds: ['other'] },
 ]
 const TILE_ICON: Record<LinkKind, IconName | undefined> = { job: 'brief', github: undefined, portfolio: 'folder', blog: 'doc', other: 'link' }
+const KIND_TILE: Record<Exclude<LinkKind, 'job'>, string> = { github: tile.github, portfolio: tile.violet, blog: tile.cyan, other: tile.slate }
 // Job tiles take the company's seed color (title is "회사 · 제목"); other kinds one color per kind.
-const tileColor = (l: UserLink) => brandOf(l.kind === 'job' ? l.title.split(' · ')[0]! : l.kind)
+const tileColor = (l: UserLink) => (l.kind === 'job' ? brandOf(l.title.split(' · ')[0]!) : KIND_TILE[l.kind])
 
 const bare = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
@@ -85,7 +86,7 @@ export const LinksModal = () => {
         <Empty onAdd={() => router.push(linkAddPath())} />
       ) : (
         <>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[1] }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[1] }}>
             <Chip label={`전체 ${all.length}`} on={!kind} onPress={() => setKind(null)} />
             {KINDS.map((k) => (
               <Chip key={k.key} label={k.label} on={kind === k.key} onPress={() => setKind(k.key)} />
@@ -134,20 +135,24 @@ const LinkRow = ({ link, onAct }: { link: UserLink; onAct: (what: 'open' | 'copy
           {bare(link.url)}
         </Text>
       </View>
-      <Badge label={s.label} tone={s.tone} />
-      <Menu
-        accessibilityLabel={`${link.title} 더 보기`}
-        actions={[
-          { key: 'open', label: '열기', systemImage: 'arrow.up.right.square', onPress: () => onAct('open') },
-          { key: 'copy', label: '링크 복사', systemImage: 'doc.on.doc', onPress: () => onAct('copy') },
-          { key: 'use', label: '에이전트에서 쓰기', systemImage: 'bubble.left', onPress: () => onAct('use') },
-          { key: 'delete', label: '삭제', systemImage: 'xmark', destructive: true, onPress: () => onAct('delete') },
-        ]}
-      >
-        <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginVertical: -6, marginRight: -spacing[3] }}>
-          <Icon name="more" size={20} color="t3" />
-        </View>
-      </Menu>
+      <View style={{ alignSelf: 'center' }}>
+        <Badge label={s.label} tone={s.tone} />
+      </View>
+      <View style={{ marginVertical: -6, marginRight: -spacing[3] }}>
+        <Menu
+          accessibilityLabel={`${link.title} 더 보기`}
+          actions={[
+            { key: 'open', label: '열기', systemImage: 'arrow.up.right.square', onPress: () => onAct('open') },
+            { key: 'copy', label: '링크 복사', systemImage: 'doc.on.doc', onPress: () => onAct('copy') },
+            { key: 'use', label: '에이전트에서 쓰기', systemImage: 'bubble.left', onPress: () => onAct('use') },
+            { key: 'delete', label: '삭제', systemImage: 'xmark', destructive: true, onPress: () => onAct('delete') },
+          ]}
+        >
+          <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="more" size={20} color="t3" />
+          </View>
+        </Menu>
+      </View>
     </View>
   )
 }

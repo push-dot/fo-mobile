@@ -15,7 +15,9 @@ tags:
     notVisible: "공고 링크로 맞추기"
     timeout: 10000
 - waitForAnimationToEnd
-- tapOn: "대화 목록 열기"
+# The open approval panel hides the header buttons from the accessibility tree, so tap the sidebar circle by position.
+- tapOn:
+    point: "9%,10%"
 - extendedWaitUntil:
     visible: "최근 대화"
     timeout: 10000
@@ -44,7 +46,8 @@ tags:
     when:
       notVisible: "내 서류"
     commands:
-      - tapOn: "대화 목록 열기"
+      - tapOn:
+          point: "9%,10%"
       - extendedWaitUntil:
           visible: "내 서류"
           timeout: 10000
@@ -60,7 +63,8 @@ tags:
     when:
       notVisible: "북마크한 공고"
     commands:
-      - tapOn: "대화 목록 열기"
+      - tapOn:
+          point: "9%,10%"
       - extendedWaitUntil:
           visible: "북마크한 공고"
           timeout: 10000

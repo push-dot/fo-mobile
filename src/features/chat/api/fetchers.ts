@@ -30,6 +30,7 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
 
 export const chatApi = {
   conversations: (q: { limit?: number; archived?: 'true' } = {}) => c.get<ListEnvelope<ConversationRow>>('conversations', { query: q }),
+  conversation: (id: string) => data(c.get<DataEnvelope<ConversationRow>>(`conversations/${id}`)),
   /** Mock-only: the scripted agent run for one message or approval answer. */
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
   // shortcut: push-be has no chat/docs; real mode reads 마이 › 서류 (myApi.sources) and uploads there.

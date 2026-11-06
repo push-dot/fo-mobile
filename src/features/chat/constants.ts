@@ -24,6 +24,8 @@ export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 export const PICK_HINT = '번호를 누르거나 바로 말해도 돼요'
 export const HINTLESS_GATES = ['validate_cap']
 
+export const COMPOSER_PLACEHOLDER = { first: '공고 링크를 붙여넣어 보세요', working: '작업 중에도 말할 수 있어요', followUp: '더 고칠 부분이 있으면 말해 주세요' } as const
+export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '선택을 기다리고 있어요' } as const
 
 export const FIT_ROWS = [

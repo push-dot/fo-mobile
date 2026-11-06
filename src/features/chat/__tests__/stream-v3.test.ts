@@ -2,14 +2,13 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream, mapEvent } from '../utils/stream'
-import { sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
+import { isVerdictPlan, planTone, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
 import type { Approval, ChatItem } from '../types'
 
 const profile = (): ChatItem => ({
   type: 'result',
   id: 'result-d1',
   source: 'profile',
-  taskLine: '프로필 수정',
   checklist: [],
   documentId: 'd1',
   actions: [{ id: 'view', label: '프로필 보기' }],
@@ -58,6 +57,13 @@ describe('stream v3', () => {
         { tag: '기타', tone: 'grey', label: '소개' },
       ],
     })
+  })
+
+  it('tells a blueprint list (verdict tags only) from a tagged plan', () => {
+    expect(isVerdictPlan([{ tag: '통과' }, { tag: '조건부' }])).toBe(true)
+    expect(isVerdictPlan([{ tag: '통과' }, { tag: '강화' }])).toBe(false)
+    expect(isVerdictPlan([])).toBe(false)
+    expect([planTone('통과'), planTone('조건부')]).toEqual(['green', 'orange'])
   })
 
   it('maps paper', () => {

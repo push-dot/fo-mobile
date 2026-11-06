@@ -42,7 +42,6 @@ export type ChatItem =
       type: 'result'
       id: string
       source: 'external'
-      taskLine: string
       checklist: string[]
       documentId: string
       company?: string
@@ -56,7 +55,6 @@ export type ChatItem =
       type: 'result'
       id: string
       source: 'profile'
-      taskLine: string
       checklist: string[]
       documentId: string
       company?: string
@@ -70,6 +68,7 @@ export type ChatItem =
     }
   | { type: 'worked'; id: string; seconds: number }
   | { type: 'error'; id: string; text: string; code?: string }
+  | { type: 'stale'; id: string; text: string }
 
 export type Choice = { label: string; desc?: string; hint?: string; badge?: { label: string; tone: BadgeTone } }
 

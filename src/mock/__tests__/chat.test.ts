@@ -18,6 +18,11 @@ describe('chat mock', () => {
     expect(kept).toHaveLength(3)
   })
 
+  it('serves one conversation by id, also when it is archived', async () => {
+    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ id: 'c-moa', revision: 1 })
+    expect((await call('GET', 'conversations/a-toss')).data).toMatchObject({ title: '토스 백엔드 이력서' })
+  })
+
   it('runs a tour token instead of the generic reply', async () => {
     const events = await run('t-free', { text: 'ph1-free' })
     const fit = events.find((e) => e.type === 'fit')
@@ -50,8 +55,8 @@ describe('chat mock', () => {
     expect(gate).toMatchObject({ approval: { id: 'ph2x-level', sections: [{ selected: [1] }] } })
   })
 
-  it('serves the stopped draft for 도토리증권 without a first user bubble', async () => {
+  it('serves the stopped draft and its expired gate for 도토리증권 without a first user bubble', async () => {
     const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { userMessageId: string | null; events: { type: string }[] }[]
-    expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }] })
+    expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }, { type: 'choice', resolution: { status: 'EXPIRED' } }] })
   })
 })

@@ -37,7 +37,6 @@ describe('scripted runs (mock)', () => {
     ])
     expect(s.items.find((i) => i.type === 'result')).toMatchObject({
       source: 'profile',
-      taskLine: '',
       checklist: ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장'],
       name: '김서준',
       title: '김서준 · 백엔드 엔지니어',
@@ -45,7 +44,7 @@ describe('scripted runs (mock)', () => {
       documentId: 'd1',
     })
     expect(s.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
-    expect(s.items.some((i) => i.type === 'worked')).toBe(false)
+    expect(s.items.some((i) => i.type === 'worked')).toBe(true)
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
   }, 10_000)
 
@@ -55,7 +54,6 @@ describe('scripted runs (mock)', () => {
     expect(todo && todo.type === 'todo' ? todo.items.at(-1)?.label : '').toBe('PDF로 만들기')
     expect(s.items.find((i) => i.type === 'result')).toMatchObject({
       source: 'external',
-      taskLine: '',
       fileName: '김서준_모아페이_백엔드.pdf',
       pageLine: 'A4 1쪽 · 186KB',
       cardMeta: 'A4 1쪽 · 186KB · 내 서류에 자동 저장됨',

@@ -85,14 +85,14 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
         const title = s.title && s.title !== approval.question ? s.title : undefined
         const stop = sectioned ? approval.secondary : undefined
         if (s.multi) {
-          const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare onPress={cancel} /> : null
+          const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare center onPress={cancel} /> : null
           const inGrid = s.options.length % 2 === 1
           return (
             <View key={si}>
               {title ? <Question label={title} /> : null}
               <MultiGrid stop={stopRow && !inGrid ? <View style={{ marginTop: 2 }}>{stopRow}</View> : undefined}>
                 {s.options.map((o, i) => (
-                  <ChoiceRow key={o} choice={{ label: o }} on={sel[si]!.includes(i)} square onPress={() => toggle(si, i, true)} />
+                  <ChoiceRow key={o} choice={{ label: o }} on={sel[si]!.includes(i)} square center onPress={() => toggle(si, i, true)} />
                 ))}
                 {stopRow && inGrid ? stopRow : null}
               </MultiGrid>
@@ -129,7 +129,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
               <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
                 {r.tag === 'link' ? (
                   <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="link" size={16} color="t2" />
+                    <Icon name="at" size={16} color="t2" />
                   </View>
                 ) : r.tag.length === 1 ? (
                   <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.ac, alignItems: 'center', justifyContent: 'center' }}>
@@ -251,9 +251,10 @@ const Sub = ({ label }: { label: string }) => (
   </Text>
 )
 
-const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; onPress: () => void }) => {
+const ChoiceRow = ({ n, choice, on, square, bare, center, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; onPress: () => void }) => {
   const c = useColors()
   const two = !!choice.desc
+  const paleNumber = Platform.OS === 'ios' && !square
   return (
     <Pressable
       accessibilityRole={square ? 'checkbox' : 'button'}
@@ -263,9 +264,10 @@ const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choic
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: two ? 'flex-start' : 'center',
-        gap: spacing[3],
+        justifyContent: center ? 'center' : undefined,
+        gap: center ? spacing[2] : spacing[3],
         minHeight: two ? 64 : 52,
-        paddingHorizontal: 14,
+        paddingHorizontal: center ? spacing[2] : 14,
         paddingVertical: two ? spacing[3] : 0,
         borderRadius: 14,
         ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
@@ -279,7 +281,7 @@ const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choic
             height: 24,
             borderRadius: square ? 7 : 8,
             marginTop: two ? 1 : 0,
-            backgroundColor: on ? c.ac : c.fill,
+            backgroundColor: on && !paleNumber ? c.ac : c.fill,
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -293,7 +295,7 @@ const ChoiceRow = ({ n, choice, on, square, bare, onPress }: { n?: number; choic
           ) : null}
         </View>
       )}
-      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+      <View style={{ flex: center ? undefined : 1, flexShrink: 1, minWidth: 0, gap: 2 }}>
         <Text v="b1" weight="600" color={on ? 'acText' : 't1'} style={{ lineHeight: type.b2.lineHeight }}>
           {choice.label}
         </Text>

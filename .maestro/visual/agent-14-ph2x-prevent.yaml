@@ -19,4 +19,7 @@ tags:
     visible: "어떤 문제를 예방할까요?"
     timeout: 20000
 - waitForAnimationToEnd
+- tapOn: "안정성"
+- tapOn: "데이터 무결성"
+- waitForAnimationToEnd
 - takeScreenshot: ChatPh2XPrevent

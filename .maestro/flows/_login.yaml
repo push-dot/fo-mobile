@@ -10,9 +10,13 @@ tags:
 - extendedWaitUntil:
     visible: "개발 토큰으로 들어가기"
     timeout: 60000
-- runFlow: _dismiss_logbox.yaml
-- tapOn: "개발 토큰으로 들어가기"
-- extendedWaitUntil:
-    visible: "새로 올라온 공고"
-    timeout: 20000
+# A LogBox toast that appears after the dismiss covers the link and takes the tap (it opens DevTools), so dismiss and tap again.
+- retry:
+    maxRetries: 1
+    commands:
+      - runFlow: _dismiss_logbox.yaml
+      - tapOn: "개발 토큰으로 들어가기"
+      - extendedWaitUntil:
+          visible: "새로 올라온 공고"
+          timeout: 20000
 - runFlow: _dismiss_logbox.yaml

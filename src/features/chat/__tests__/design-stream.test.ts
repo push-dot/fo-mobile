@@ -79,7 +79,7 @@ describe('agent stream for the new design', () => {
     expect(s.items).toEqual([{ type: 'fit', id: 'fit-3', score: 8.3, from: 6.9, delta: '+1.4', note: '적합도 6.9 → 8.3 (+1.4)', caption: '높음 · 잘 맞아요' }])
   })
 
-  it('puts the done summary with the score change in bold and its bullets above the result card', async () => {
+  it('puts the task line, then the done summary with the score change in bold and its bullets, above the result card', async () => {
     const s = play(
       await map({
         type: 'result', source: 'profile', taskLine: '프로필 수정 · Push 프로필 · 경력', checklist: [], documentId: 'd1', company: '모아페이',
@@ -88,6 +88,7 @@ describe('agent stream for the new design', () => {
       }),
     )
     expect(s.items).toMatchObject([
+      { type: 'tool', action: '프로필 수정' },
       { type: 'agentText', text: '다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.', bullets: ['Kafka를 기술 스택 맨 앞으로 옮겼어요'] },
       { type: 'result', source: 'profile', documentId: 'd1' },
     ])

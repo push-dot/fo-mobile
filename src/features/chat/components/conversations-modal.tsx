@@ -19,7 +19,11 @@ import PageModal from './page-modal'
 
 
 export const statusBadge = (s: ConversationRow['status']) =>
-  s === 'NEEDS_APPROVAL' ? <Badge label="확인 필요" tone="orange" /> : s === 'RUNNING' ? <Badge label="작업 중" tone="ac" /> : null
+  s === 'NEEDS_APPROVAL' || s === 'RUNNING' ? (
+    <View style={{ alignSelf: 'center' }}>
+      <Badge label={s === 'RUNNING' ? '작업 중' : '확인 필요'} tone={s === 'RUNNING' ? 'ac' : 'orange'} />
+    </View>
+  ) : null
 
 const dayStart = () => new Date(new Date().setHours(0, 0, 0, 0)).getTime()
 
@@ -137,7 +141,7 @@ export const ConversationList = ({
   return (
     <PageModal title="대화" onClose={onClose} right={<GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: () => startNew(onClose) }]} />}>
       <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: spacing[2] }}>
-        <TextField icon="search" placeholder="대화 검색" value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="대화 검색" />
+        <TextField variant="search" placeholder="대화 검색" value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="대화 검색" />
       </View>
       <View style={{ height: 6 }} />
       {grouped.map((g) => (
@@ -154,7 +158,7 @@ export const ConversationList = ({
               actions={menu(r)}
               onPress={() => router.push(`/chat/${r.id}`)}
               preview={
-                <View style={{ ...ROW, width: width - 24, borderRadius: 18, backgroundColor: c.card }}>
+                <View style={{ ...ROW, paddingHorizontal: spacing[4], width: width - 24, borderRadius: 18, backgroundColor: c.card }}>
                   <RowBody row={r} />
                 </View>
               }

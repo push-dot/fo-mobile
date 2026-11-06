@@ -1,9 +1,9 @@
 import type { LinkKind } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { radius, spacing, useColors } from '@/theme'
-import { Chip, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
+import { Button, Chip, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { useAddLink } from '@/features/my'
 import { LINK_ADD_NOTE } from '../constants'
 import { LINK_KIND_LABEL, kindOf } from '../utils/links'
@@ -19,11 +19,25 @@ export const LinkAddSheet = () => {
   const valid = /^https?:\/\/[^\s@/]+\.[^\s@]+$/.test(full)
   const add = useAddLink(() => router.back())
   return (
-    <Sheet
-      title="링크 추가"
-      description="링크를 붙여넣으면 종류를 알아서 골라요."
-      action={{ label: '추가하기', onPress: () => add.mutate({ url: full, kind: kind ?? undefined, aiRead }), disabled: !valid || add.isPending }}
-    >
+    <Sheet gap={spacing[4]}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
+        <View style={{ flex: 1, gap: spacing[1] }}>
+          <Text v="h2" accessibilityRole="header">
+            링크 추가
+          </Text>
+          <Text v="b2" color="t3">
+            링크를 붙여넣으면 종류를 알아서 골라요.
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="닫기"
+          onPress={() => router.back()}
+          style={{ width: 44, height: 44, margin: -spacing[1], borderRadius: 22, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Icon name="x" size={20} color="t1" />
+        </Pressable>
+      </View>
       <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="링크 주소" />
       <View style={{ gap: spacing[2] }}>
         <Text v="c1" weight="700" color="t3">
@@ -42,6 +56,7 @@ export const LinkAddSheet = () => {
         </Text>
         <Switch value={aiRead} onValueChange={setAiRead} label={LINK_ADD_NOTE} />
       </View>
+      <Button label="추가하기" onPress={() => add.mutate({ url: full, kind: kind ?? undefined, aiRead })} disabled={!valid || add.isPending} style={{ marginTop: spacing[1] }} />
     </Sheet>
   )
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterMentions, insertMention, mentionQuery, type MentionGroup } from '../utils/mentions'
+import { filterMentions, insertMention, mentionMaxHeight, mentionQuery, type MentionGroup } from '../utils/mentions'
 
 const groups: MentionGroup[] = [
   { title: '북마크 공고', items: [{ id: 'p', kind: 'job', title: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 · 서울 강남구' }] },
@@ -37,5 +37,11 @@ describe('mentions', () => {
 
   it('inserts the picked title', () => {
     expect(insertMention('이거 봐 @모아', '경력기술서_모아페이.docx')).toBe('이거 봐 @경력기술서_모아페이.docx ')
+  })
+
+  it('fills the space above the composer and shrinks for the keyboard', () => {
+    expect(mentionMaxHeight(874, 62, 100)).toBe(510)
+    expect(mentionMaxHeight(874, 62, 336)).toBe(274)
+    expect(mentionMaxHeight(400, 62, 336)).toBe(160)
   })
 })

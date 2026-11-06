@@ -4,7 +4,7 @@ import Text from './text'
 
 export type BadgeTone = 'ac' | 'grey' | 'red' | 'green' | 'orange'
 
-const Badge = ({ label, tone = 'grey' }: { label: string; tone?: BadgeTone }) => {
+const Badge = ({ label, tone = 'grey', minWidth }: { label: string; tone?: BadgeTone; minWidth?: number }) => {
   const c = useColors()
   const map = {
     ac: [c.acSoft, c.acText],
@@ -15,7 +15,7 @@ const Badge = ({ label, tone = 'grey' }: { label: string; tone?: BadgeTone }) =>
   } as const
   const [bg, fg] = map[tone]
   return (
-    <View style={{ minHeight: 22, paddingHorizontal: 7, borderRadius: radius.xs, backgroundColor: bg, justifyContent: 'center', alignSelf: 'flex-start' }}>
+    <View style={{ minWidth, minHeight: 22, paddingHorizontal: 7, borderRadius: radius.xs, backgroundColor: bg, alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start' }}>
       <Text v="c2" weight="700" style={{ color: fg }} numberOfLines={1}>
         {label}
       </Text>

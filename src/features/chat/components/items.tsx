@@ -7,9 +7,10 @@ import { useOpenArtifact } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
 import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
-import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTask, resultTitle, type ResultActionId } from '../utils/result-card'
+import { isVerdictPlan } from '../utils/stream-v3'
+import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_PCT, fitProjected } from '../constants'
+import { FIT_LOCKED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../constants'
 import { Appear } from './motion'
 import Mark from './mark'
 import { UsageExhausted } from './usage-exhausted'
@@ -224,8 +225,23 @@ const TodoList = ({ item }: { item: Of<'todo'> }) => {
   )
 }
 
+const StaleGate = ({ item }: { item: Of<'stale'> }) => (
+  <Card gap={8}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Text v="c1" weight="700" color="t3">
+        {STALE_GATE.title}
+      </Text>
+      <Badge label={STALE_GATE.badge} />
+    </View>
+    <Text v="b2" weight="600" color="t2">
+      {item.text}
+    </Text>
+  </Card>
+)
+
 const Plan = ({ item }: { item: Of<'plan'> }) => {
   const titled = !!item.title
+  const verdict = isVerdictPlan(item.rows)
   const card = (
     <Card gap={titled ? spacing[3] : 14} padding={spacing[4]}>
       {titled ? (
@@ -238,12 +254,10 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
           </Text>
         </View>
       ) : null}
-      {item.rows.map((r) => (
+      {item.rows.map((r, i) => (
         <View key={r.label} style={{ flexDirection: 'row', gap: spacing[3], alignItems: 'flex-start' }}>
-          <View style={{ width: titled ? 38 : 44, alignItems: 'center' }}>
-            <Badge label={r.tag} tone={r.tone} />
-          </View>
-          <View style={{ flex: 1 }}>
+          {verdict ? <Badge label={String(i + 1)} minWidth={24} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 38 : 44} />}
+          <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="b2" weight="700">
               {r.label}
             </Text>
@@ -251,6 +265,7 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
               {r.note}
             </Text>
           </View>
+          {verdict ? <Badge label={r.tag} tone={r.tone} /> : null}
         </View>
       ))}
       {titled && item.keywords.length ? (
@@ -558,7 +573,6 @@ const ResultCard = ({
   const actions = resultActionsFor(item, awaiting)
   return (
     <Appear style={{ gap: 18 }}>
-      {item.taskLine ? <ToolLine item={{ type: 'tool', id: `${item.id}-task`, state: 'ok', ...resultTask(item.taskLine) }} /> : null}
       <Surface>
         {chrome.initials ? <Mark text={chrome.initials} color={tile.indigo} size={40} round /> : null}
         <View style={{ flex: 1, minWidth: 0 }}>
@@ -673,6 +687,8 @@ export const Item = ({
       return <ToolLine item={item} />
     case 'todo':
       return <TodoList item={item} />
+    case 'stale':
+      return <StaleGate item={item} />
     case 'plan':
       return <Plan item={item} />
     case 'diff':

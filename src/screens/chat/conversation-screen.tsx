@@ -14,6 +14,7 @@ import {
   AWAITING_TEXT,
   AwaitingRow,
   ComposerArea,
+  composerPlaceholder,
   ConsentSheet,
   OPEN_DRAWER,
   DELETE_CONFIRM,
@@ -34,6 +35,7 @@ import {
   useConversationList,
   useArchiveConversation,
   useDeleteConversation,
+  useKeyboardHeight,
   usePinConversation,
   useReduceMotion,
 } from '@/features/chat'
@@ -90,7 +92,9 @@ const ConversationScreen = ({ id }: { id: string }) => {
   }))
 
   const company = chat.items.findLast((i) => i.type === 'result')?.company
-  const placeholder = chat.working ? '작업 중에도 말할 수 있어요' : chat.items.length ? '더 고칠 부분이 있으면 말해 주세요' : '공고 링크를 붙여넣어 보세요'
+  const placeholder = composerPlaceholder(chat)
+  // Android pads the keyboard height itself; the nav-bar inset on top of it would leave a gap.
+  const keyboard = useKeyboardHeight()
   const showPanel = chat.approval && !saying
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
 
@@ -128,7 +132,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
 
       <Header onDrawer={() => navigation.dispatch(OPEN_DRAWER)} title={company} menu={menu} />
 
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
+      <KeyboardAvoidingView behavior="padding" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         {fresh ? (
           <Appear kind="fade" style={{ alignItems: 'center', paddingBottom: spacing[2] }}>
             <Pressable
@@ -154,7 +158,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
               onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialsPath()))}
             />
           ) : (
-            <View style={{ paddingHorizontal: spacing[3], paddingBottom: Math.max(insets.bottom, 6) }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: Platform.OS === 'android' && keyboard ? 6 : Math.max(insets.bottom, 6) }}>
               <ComposerArea
                 inputRef={input}
                 placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}

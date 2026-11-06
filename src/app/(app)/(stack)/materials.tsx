@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Platform, Pressable, ScrollView, useWindowDimensions, View } from 'react-native'
-import { docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs } from '@/features/chat'
+import { Platform, Pressable, View } from 'react-native'
+import { SheetScroll, docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs, useSheetScrollMax } from '@/features/chat'
 import { useBookmarkList } from '@/features/my'
 import { Button, Chip, GlassButton, Icon, Sheet, Text, TextField, type IconName } from '@/shared/components'
 import { onAccent, selectedRing, spacing, useColors } from '@/theme'
@@ -10,7 +10,7 @@ type Row = { id: string; title: string; meta: string }
 
 const MaterialsScreen = () => {
   const c = useColors()
-  const { height } = useWindowDimensions()
+  const bound = useSheetScrollMax(0.6)
   const [kind, setKind] = useState<'github' | 'posting' | null>(null)
   const [text, setText] = useState('')
   const [picks, setPicks] = useState<string[]>([])
@@ -28,13 +28,13 @@ const MaterialsScreen = () => {
   const add = () => done(sections.flatMap((s) => s.rows).filter((r) => picks.includes(r.id)).map((r) => r.title).join(', '))
   const submit = () => text.trim() && done(text.trim())
   const others: [string, IconName, () => void][] = [
-    ['파일', 'doc', () => (requestMaterialFile(), router.back())],
-    ['GitHub 링크', 'github', () => setKind('github')],
-    ['공고 붙여넣기', 'paper', () => setKind('posting')],
+    ['파일', 'pdf', () => (requestMaterialFile(), router.back())],
+    ['GitHub 링크', 'at', () => setKind('github')],
+    ['공고 붙여넣기', 'doc', () => setKind('posting')],
   ]
   return (
-    <Sheet action={kind ? { label: '넣기', onPress: submit, disabled: !text.trim() } : undefined}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+    <Sheet gap={spacing[2]} onLayout={bound.onSheetLayout} action={kind ? { label: '넣기', onPress: submit, disabled: !text.trim() } : undefined}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
         {Platform.OS === 'ios' ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} /> : null}
         <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
           자료 고르기
@@ -54,7 +54,7 @@ const MaterialsScreen = () => {
           accessibilityLabel={kind === 'github' ? 'GitHub 링크' : '공고 링크'}
         />
       ) : (
-        <ScrollView style={{ maxHeight: height * 0.6 }} contentContainerStyle={{ gap: spacing[2] }}>
+        <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[2] }}>
           {sections.map((s) =>
             s.rows.length ? (
               <View key={s.title} style={{ gap: spacing[1] }}>
@@ -105,7 +105,7 @@ const MaterialsScreen = () => {
               <Chip key={label} label={label} lead={<Icon name={icon} size={16} color="t2" />} onPress={onPress} />
             ))}
           </View>
-        </ScrollView>
+        </SheetScroll>
       )}
     </Sheet>
   )

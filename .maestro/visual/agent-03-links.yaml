@@ -20,9 +20,10 @@ tags:
     visible: "추가하기"
     timeout: 5000
 - inputText: "github.com/seojun-kim/payment-gateway"
+- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: MyLinkAdd
-# Dismiss the add sheet through its scrim; with the keyboard up it reaches y=11% on iOS, so 15-25% is inside it and _close_sheet taps higher.
+# Dismiss the add sheet through its scrim (the keyboard is down, so the sheet top is below 25%); _close_sheet taps higher.
 - tapOn:
     point: "50%,25%"
 - waitForAnimationToEnd

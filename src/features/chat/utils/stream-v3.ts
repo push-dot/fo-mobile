@@ -11,7 +11,13 @@ export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
   축소: 'orange',
   키워드: 'orange',
   도메인: 'orange',
+  통과: 'green',
+  조건부: 'orange',
 }
+
+const VERDICT_TAGS = ['통과', '조건부']
+
+export const isVerdictPlan = (rows: { tag: string }[]) => rows.length > 0 && rows.every((r) => VERDICT_TAGS.includes(r.tag))
 
 export const planTone = (tag: string): BadgeTone => PLAN_TAG_TONE[tag] ?? 'grey'
 

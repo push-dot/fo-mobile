@@ -14,3 +14,8 @@ export const accessMenu = (current: AccessMode, onPick: (mode: AccessMode) => vo
 
 export const usagePercent = (credits: Account['credits'] | undefined) =>
   credits && credits.total > 0 ? Math.min(100, Math.max(0, Math.round((credits.used / credits.total) * 100))) : null
+
+export const toneLabel = (tone?: { key: Tone; label: string }) => (tone && tone.key !== 'as_is' ? `${tone.label} 말투` : '그대로')
+
+export const currentRole = (profile?: { headline: string; careers: { role: string; endedOn?: string | null }[] }) =>
+  profile?.careers.find((c) => !c.endedOn)?.role ?? profile?.headline

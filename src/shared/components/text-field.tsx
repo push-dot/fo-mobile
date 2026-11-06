@@ -12,11 +12,11 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
   return (
     <View
       style={{
-        borderRadius: search ? radius.card : radius.md,
+        borderRadius: search ? radius.pill : radius.md,
         backgroundColor: c.fill,
         paddingHorizontal: spacing[4],
         paddingVertical: multiline || label ? spacing[4] : 0,
-        minHeight: search ? 44 : 56,
+        minHeight: search ? 48 : 56,
         justifyContent: 'center',
         gap: spacing[2],
       }}
@@ -27,7 +27,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
         </Text>
       ) : null}
       <View style={{ flexDirection: 'row', alignItems: multiline ? 'flex-start' : 'center', gap: spacing[2] }}>
-        {(search ? 'search' : icon) ? <Icon name={search ? 'search' : icon!} size={18} color="t3" /> : null}
+        {(search ? 'search' : icon) ? <Icon name={search ? 'search' : icon!} size={search ? 20 : 18} color="t3" /> : null}
         <TextInput
           value={value}
           multiline={multiline}

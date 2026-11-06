@@ -34,7 +34,11 @@ export const restoreTurns = (turns: ConversationTurn[], messages: Message[]): Ch
       if (ev.type === 'approval' || ev.type === 'choice') {
         cards.set(ev.id, ev)
         const answered = ev.resolution && ev.resolution.status !== 'PENDING'
-        if (answered && !(ev.type === 'choice' && ev.auto)) continue
+        if (answered && !(ev.type === 'choice' && ev.auto)) {
+          const question = ev.resolution?.status === 'EXPIRED' ? mapEvent(ev).find((e) => e.type === 'approval') : undefined
+          if (question?.type === 'approval') put({ type: 'stale', id: `stale-${ev.id}`, text: question.approval.question })
+          continue
+        }
       }
       if (ev.type === 'token') {
         spoke = true

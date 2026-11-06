@@ -11,6 +11,7 @@ import {
   queueBusyText,
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
+import { resultTask } from './result-card'
 import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
 export const errorText = (code?: string, retryAfterSec?: number) =>
@@ -84,8 +85,12 @@ const doneLine = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] => {
   return [{ type: 'agentText', id: `done-${ev.documentId}`, text, ...(ev.bullets?.length ? { bullets: ev.bullets } : {}) }]
 }
 
+/** 이력서 수정 · 올린 파일 · 경력 → a finished tool line above the summary, as the done artboards draw it. */
+const taskOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] =>
+  ev.taskLine ? [{ type: 'tool', id: `task-${ev.documentId}`, state: 'ok', ...resultTask(ev.taskLine) }] : []
+
 const resultOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem => {
-  const base = { type: 'result' as const, id: `result-${ev.documentId}`, taskLine: ev.taskLine, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
+  const base = { type: 'result' as const, id: `result-${ev.documentId}`, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
   return ev.source === 'external'
     ? { ...base, source: ev.source, fileName: ev.fileName, pageLine: ev.pageLine, savedLine: ev.savedLine, cardMeta: ev.cardMeta }
     : { ...base, source: ev.source, name: ev.name, headline: ev.headline, title: ev.title, subtitle: ev.subtitle }
@@ -139,7 +144,7 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
     case 'file':
       return [{ type: 'file', id: `file-${ev.fileId}`, name: ev.name, url: ev.downloadUrl, preview: true }]
     case 'result':
-      return [...doneLine(ev), resultOf(ev)]
+      return [...taskOf(ev), ...doneLine(ev), resultOf(ev)]
     case 'todo':
       return [{ type: 'todo', id: ev.id ? `todo-${ev.id}` : 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state, ...(i.added ? { added: true } : {}) })) }]
     case 'diff':

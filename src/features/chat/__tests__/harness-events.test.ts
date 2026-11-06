@@ -66,11 +66,36 @@ describe('harness events', () => {
       actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }, { id: 'view', label: '프로필 보기' }],
     })
     expect(play(file).items).toMatchObject([
-      { type: 'result', source: 'external', taskLine: '이력서 수정 · 올린 파일 · 경력', fileName: '김서준_모아페이_백엔드.pdf', documentId: 'src-1' },
+      { type: 'tool', state: 'ok', action: '이력서 수정', target: '올린 파일 · 경력' },
+      { type: 'result', source: 'external', fileName: '김서준_모아페이_백엔드.pdf', documentId: 'src-1' },
     ])
     expect(play(profile).items).toMatchObject([
-      { type: 'result', source: 'profile', taskLine: '프로필 수정 · Push 프로필 · 경력', title: '김서준 · 백엔드 엔지니어', subtitle: 'Push 프로필 · 방금 수정' },
+      { type: 'tool', state: 'ok', action: '프로필 수정', target: 'Push 프로필 · 경력' },
+      { type: 'result', source: 'profile', title: '김서준 · 백엔드 엔지니어', subtitle: 'Push 프로필 · 방금 수정' },
     ])
+  })
+
+  it('ends a profile run the way push-be sends it: task line, summary, card, then the worked row and the open gate', async () => {
+    const s = play(
+      await map(
+        { type: 'todo', items: [{ id: '1', text: '프로필 읽기', state: 'done' }, { id: '2', text: '프로필에 저장', state: 'done' }], seq: 1 },
+        {
+          type: 'result', source: 'profile', taskLine: '프로필 수정 · Push 프로필 · 경력', checklist: ['프로필 읽기', '프로필에 저장'], company: '모아페이',
+          name: '김서준', headline: '백엔드 엔지니어', title: '김서준 · 백엔드 엔지니어', subtitle: 'Push 프로필 · 방금 수정', documentId: 'd1',
+          actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }, { id: 'view', label: '프로필 보기' }],
+          summary: '다 됐어요! 적합도를 6.9 → 8.1로 올렸어요.', fitFrom: 6.9, fitTo: 8.1, bullets: ['Kafka를 기술 스택 맨 앞으로 옮겼어요'], seq: 2,
+        },
+        { type: 'token', text: '결과를 정리했어요.', seq: 3 },
+        { type: 'choice', id: 'present', title: 'Push 프로필에 저장했어요. 결과를 확인할까요?', options: [{ id: 'done', label: '확인했어요' }], recommended: 'done', seq: 4 },
+        { type: 'done', operation: null, awaiting: 'approval', seq: 5 },
+      ),
+      { ...emptyChat, runStartedAt: 0 },
+    )
+    expect(s.items.map((i) => i.type)).toEqual(['todo', 'tool', 'agentText', 'result', 'agentText', 'worked'])
+    expect(s.items[1]).toMatchObject({ action: '프로필 수정', target: 'Push 프로필 · 경력', state: 'ok' })
+    expect(s.items[2]).toMatchObject({ text: '다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.' })
+    expect(s.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
+    expect(s.awaiting).toBe('approval')
   })
 
   it('updates a running tool in place across two streams, keyed by tool name', async () => {

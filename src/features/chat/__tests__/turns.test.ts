@@ -45,6 +45,12 @@ describe('restoreTurns', () => {
     expect(s.working).toBeNull()
   })
 
+  it('keeps an expired gate as a stale card instead of reopening it', () => {
+    const s = restoreTurns([turn('j1', [{ ...GATE, resolution: { status: 'EXPIRED', optionId: null } }])], [])
+    expect(s.items).toEqual([{ type: 'stale', id: 'stale-g1', text: '이 공고에 맞춰 이력서를 고칠까요?' }])
+    expect(s.approval).toBeNull()
+  })
+
   it('reopens a card that is still waiting for an answer', () => {
     const s = restoreTurns(
       [

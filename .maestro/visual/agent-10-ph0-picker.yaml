@@ -13,6 +13,7 @@ tags:
 - extendedWaitUntil:
     visible: "어떤 방식으로 진행할까요?"
     timeout: 30000
+- waitForAnimationToEnd
 - tapOn: ".*이력서부터 쓸게요"
 - extendedWaitUntil:
     visible: "어떤 산출물을 만들까요?"
@@ -25,4 +26,6 @@ tags:
     visible: "자료 고르기"
     timeout: 10000
 - waitForAnimationToEnd
+- tapOn: ".*PDF · 2\\.4MB.*"
+- tapOn: ".*모아페이 · 백엔드 엔지니어.*"
 - takeScreenshot: ChatPh0Picker
