@@ -24,5 +24,10 @@ tags:
 - extendedWaitUntil:
     visible: "지원하기"
     timeout: 15000
+# The body is the fo-web page; wait for it to paint (optional, so a slow page still leaves a shot).
+- extendedWaitUntil:
+    visible: ".*자격 요건.*"
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd
 - takeScreenshot: MyBookmarkJob

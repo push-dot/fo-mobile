@@ -18,6 +18,15 @@ tags:
           start: "1%,50%"
           end: "80%,50%"
           duration: 300
+# hideKeyboard presses back on Android when no keyboard is up, so the pair can leave the tab for 홈; return to it.
+- runFlow:
+    when:
+      platform: Android
+      notVisible: "공고 링크로 맞추기"
+    commands:
+      - tapOn:
+          text: "에이전트"
+          optional: true
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

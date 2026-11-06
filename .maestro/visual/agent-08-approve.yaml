@@ -20,12 +20,17 @@ tags:
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 60000
-- waitForAnimationToEnd
+- runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh6Result
 - tapOn: ".*확인했어요"
-- extendedWaitUntil:
-    visible: ".* 동안 작업했어요"
-    timeout: 20000
+# The closing summary streams in below the fold and can stop the follow-the-end scroll (새 내용 pill).
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow: _chat_bottom.yaml
+      - extendedWaitUntil:
+          visible: ".* 동안 작업했어요"
+          timeout: 8000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneProfile
 - tapOn: "모아페이에 바로 지원하기"

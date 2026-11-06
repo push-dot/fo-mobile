@@ -79,5 +79,9 @@ tags:
 - extendedWaitUntil:
     visible: "아직 모아 둔 링크가 없어요."
     timeout: 10000
+# The board has no undo toast; wait for the last delete's toast to time out.
+- extendedWaitUntil:
+    notVisible: "되돌리기"
+    timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: MyLinksEmpty

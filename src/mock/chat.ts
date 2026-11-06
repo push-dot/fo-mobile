@@ -587,20 +587,22 @@ const TOKENS: Record<string, Step[]> = {
 }
 
 const pick = (text: string, interrupted: boolean, attachment?: string, intent?: string): { steps: Step[]; labels?: string[] } | null => {
-  const token = TOKENS[text.trim()]
+  // The Android keyboard capitalizes the first letter of a tour's typed English alias.
+  const t = text.trim().toLowerCase()
+  const token = TOKENS[t]
   if (token) return { steps: token }
   if (attachment) return { steps: fileRun() }
   if (intent === 'fit') return { steps: ph1 }
   if (intent === 'boost') return { steps: ph3Boost }
   if (intent === 'experience') return { steps: ph2xApproach }
-  if (/지원해|^apply$/.test(text)) return { steps: applyRun }
-  if (/저장해/.test(text)) return { steps: [s(300, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 마이 › 서류')), done] }
-  if (/실패|채용 페이지|^fail$/.test(text)) return { steps: failRun, labels: TODO }
-  if (/만들어 주세요|^make resume$/.test(text)) return { steps: ph0 }
-  if (/PDF로 만들어 줘/.test(text)) return { steps: autoPick }
-  if (/경력 섹션을 공고에 맞게/.test(text)) return { steps: awaitReply }
+  if (/지원해|^apply$/.test(t)) return { steps: applyRun }
+  if (/저장해/.test(t)) return { steps: [s(300, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 마이 › 서류')), done] }
+  if (/실패|채용 페이지|^fail$/.test(t)) return { steps: failRun, labels: TODO }
+  if (/만들어 주세요|^make resume$/.test(t)) return { steps: ph0 }
+  if (/pdf로 만들어 줘/.test(t)) return { steps: autoPick }
+  if (/경력 섹션을 공고에 맞게/.test(t)) return { steps: awaitReply }
   if (interrupted) return null
-  if (/맞춰|고쳐|^tailor/.test(text)) return { steps: [...tailorRead, ...tailorFit(TODO)], labels: TODO }
+  if (/맞춰|고쳐|^tailor/.test(t)) return { steps: [...tailorRead, ...tailorFit(TODO)], labels: TODO }
   return { steps: generic(text) }
 }
 

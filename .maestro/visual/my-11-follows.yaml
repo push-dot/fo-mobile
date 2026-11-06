@@ -32,5 +32,10 @@ tags:
 - extendedWaitUntil:
     visible: "제안하기"
     timeout: 20000
+# The body is the fo-web page; wait for it to paint (optional, so a slow page still leaves a shot).
+- extendedWaitUntil:
+    visible: ".*기술 스택.*"
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd
 - takeScreenshot: MyFollowingProfile

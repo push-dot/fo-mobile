@@ -10,10 +10,16 @@ tags:
 - extendedWaitUntil:
     visible: "휴대폰 번호로 시작하기"
     timeout: 60000
-- tapOn: "휴대폰 번호로 시작하기"
-- extendedWaitUntil:
-    visible: "인증번호 받기"
-    timeout: 10000
+# The cleared launch shows the LogBox toast over 휴대폰 번호로 시작하기, sometimes only after the first check;
+# a tap on the toast opens the debugger, so close it and tap again until the form shows.
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow: ../flows/_dismiss_logbox.yaml
+      - tapOn: "휴대폰 번호로 시작하기"
+      - extendedWaitUntil:
+          visible: "인증번호 받기"
+          timeout: 6000
 - tapOn: "휴대폰 번호"
 - inputText: "01012345678"
 - runFlow: _hide_kbd.yaml
