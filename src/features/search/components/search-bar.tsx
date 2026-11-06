@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Icon, Text } from '../../../shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors } from '../../../theme'
 
 const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v: string) => void; onSubmit: () => void }) => {
@@ -21,7 +22,7 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
         autoCorrect={false}
         autoCapitalize="none"
         accessibilityLabel="검색어"
-        style={[{ flex: 1, fontSize: type.b1.fontSize, color: c.t1, paddingVertical: 0 }, fontFor('400')]}
+        style={[{ flex: 1, fontSize: type.b1.fontSize, color: c.t1, ...inputReset }, fontFor('400')]}
       />
       {value ? (
         <Pressable accessibilityRole="button" accessibilityLabel="검색어 지우기" onPress={() => onChange('')} hitSlop={12}>

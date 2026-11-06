@@ -36,10 +36,10 @@ const AddEventSheetScreen = () => {
     >
       <View style={{ flexDirection: 'row', gap: spacing[2] }}>
         <View style={{ flex: 1 }}>
-          <DatePicker label="날짜" mode="date" value={date} onChange={setDate} />
+          <DatePicker label="날짜" mode="date" value={date} onChange={setDate} minHeight={52} />
         </View>
         <View style={{ flex: 1 }}>
-          <DatePicker label="시간" mode="time" value={time} onChange={setTime} />
+          <DatePicker label="시간" mode="time" value={time} onChange={setTime} minHeight={52} />
         </View>
       </View>
       <TextField accessibilityLabel="일정 이름" value={title} onChangeText={setTitle} placeholder="일정 이름" />

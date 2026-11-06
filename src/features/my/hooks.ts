@@ -1,6 +1,6 @@
 import { useIsFocused } from 'expo-router'
 import { useEffect, useEffectEvent } from 'react'
-import { showToast, type ConfirmRequest } from '@/shared/components'
+import { TOAST_ABOVE, showToast, type ConfirmRequest } from '@/shared/components'
 import { pickDocument } from '@/shared/infrastructure'
 import { MAX_BYTES, RESUME_DOCUMENT_OPTIONS, SHEET_SWAP_MS } from './constants'
 import type { PickedFile } from './types'
@@ -48,7 +48,7 @@ export const pickResume = async (): Promise<PickedFile | null> => {
   const file = res.canceled ? null : res.assets[0]
   if (!file) return null
   if ((file.size ?? 0) > MAX_BYTES) {
-    showToast({ message: SIZE_LIMIT.title, tone: 'error' })
+    showToast({ message: SIZE_LIMIT.title, tone: 'error', bottom: TOAST_ABOVE.docsError })
     return null
   }
   return file

@@ -17,12 +17,13 @@ export type DatePickerProps = {
   max?: Date
   /** Field background: 'fill' on sheets, 'bg' inside bg2 cards. */
   surface?: 'fill' | 'bg'
+  minHeight?: number
 }
 
 const FORMAT = { date: formatDay, time: formatTime, month: formatMonth }
 
 /** Android: a field that opens the Material 3 date or time dialog. Month mode keeps year and month of the picked day. */
-const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface = 'fill' }: DatePickerProps) => {
+const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface = 'fill', minHeight = 48 }: DatePickerProps) => {
   const c = useColors()
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
@@ -32,7 +33,7 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={() => setOpen(true)}
-        style={{ minHeight: 56, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+        style={{ minHeight, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
       >
         <Text v="b1" color={value ? 't1' : 't4'} style={{ flex: 1 }}>
           {value ? FORMAT[mode](value) : label}

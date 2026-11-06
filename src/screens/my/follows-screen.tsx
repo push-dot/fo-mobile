@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
 import { Icon, Text, TopBar } from '@/shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
 
 
@@ -40,7 +41,7 @@ const FollowsScreen = () => {
             onChangeText={setQ}
             placeholder="이름이나 직무로 찾기"
             placeholderTextColor={c.t4}
-            style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1 }, fontFor('400')]}
+            style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1, ...inputReset }, fontFor('400')]}
           />
         </View>
       ) : null}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TextInput, View } from 'react-native'
 import { Icon, Text } from '../../../shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, spacing, useColors } from '../../../theme'
 import { COUNTRY_CODE, COUNTRY_CODE_LABEL, FIELD_RADIUS } from '../constants'
 
@@ -33,7 +34,7 @@ const PhoneField = ({ value, onChange }: { value: string; onChange: (next: strin
           placeholderTextColor={c.t4}
           maxLength={13}
           selectionColor={c.ac}
-          style={[{ fontSize: 19, letterSpacing: 0.4, color: c.t1, fontVariant: ['tabular-nums'] }, fontFor('700')]}
+          style={[{ ...inputReset, fontSize: 19, letterSpacing: 0.4, color: c.t1, fontVariant: ['tabular-nums'] }, fontFor('700')]}
         />
       </View>
     </View>

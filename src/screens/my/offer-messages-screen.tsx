@@ -21,6 +21,7 @@ import {
   useOfferMessages,
 } from '@/features/my'
 import { Glass, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
@@ -233,13 +234,15 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
             style={[
               {
                 flex: 1,
+                ...inputReset,
                 minHeight: 40,
                 maxHeight: 120,
-                paddingTop: 10,
-                paddingBottom: 10,
+                paddingVertical: spacing[2],
                 paddingHorizontal: spacing[1],
                 fontSize: type.b1.fontSize,
+                lineHeight: type.b1.lineHeight,
                 color: c.t1,
+                textAlignVertical: 'center',
               },
               fontFor('400'),
             ]}

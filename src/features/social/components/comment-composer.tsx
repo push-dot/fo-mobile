@@ -2,6 +2,7 @@ import { useState, type ComponentRef, type RefObject } from 'react'
 import { ActivityIndicator, Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Glass, GlassPressable, Icon, Text } from '../../../shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { useCreateComment } from '../api/hooks'
 import { MAX_COMMENT } from '../constants'
@@ -38,7 +39,7 @@ const CommentComposer = ({
         accessibilityLabel="댓글"
         placeholder={replyTo ? '답글을 남겨 주세요' : '댓글을 남겨 주세요'}
         placeholderTextColor={c.t4}
-        style={[{ flex: 1, fontSize: type.b1.fontSize, color: c.t1, paddingHorizontal: spacing[1], paddingVertical: 9, minHeight: 40, maxHeight: 120 }, fontFor('400')]}
+        style={[{ flex: 1, fontSize: type.b1.fontSize, lineHeight: type.b1.lineHeight, color: c.t1, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, maxHeight: 120, textAlignVertical: 'center' }, fontFor('400')]}
       />
       <GlassPressable
         accessibilityRole="button"

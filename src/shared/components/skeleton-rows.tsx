@@ -1,6 +1,6 @@
 import { View, type DimensionValue } from 'react-native'
 import { spacing } from '../../theme'
-import { LOADING_LABEL } from './loading-note'
+import { LOADING_LABEL } from './constants'
 import Skeleton from './skeleton'
 
 export type SkeletonRowsShape = {

@@ -5,7 +5,7 @@ import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
-import { showToast } from '@/shared/components'
+import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, MENTION_SHORTCUT_KEYS, QUICK_STARTS, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
 import { LINK_KIND_LABEL } from '../utils/links'
@@ -175,7 +175,7 @@ export const useShareFile = () =>
         const pdf = await fetchDocumentPdf(f.documentId)
         return shareAs(pdfName(f.name ?? pdf.title), pdf.bytes, 'application/pdf')
       }),
-    onError: (e) => showToast({ message: shareErrorText(e) }),
+    onError: (e) => showToast({ message: shareErrorText(e), bottom: TOAST_ABOVE.tabs }),
   })
 
 export const useAccessMode = () => {

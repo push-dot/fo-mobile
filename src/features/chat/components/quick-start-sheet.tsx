@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { hitSlopTo, radius, selectedRing, spacing, useColors } from '@/theme'
 import { Badge, Chip, GlassButton, Icon, SegmentedControl, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { readClipboard } from '@/shared/infrastructure'
@@ -83,11 +83,9 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             {qs.description}
           </Text>
         </View>
-        {Platform.OS === 'ios' ? (
-          <View style={{ margin: -spacing[1] }}>
-            <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />
-          </View>
-        ) : null}
+        <View style={{ margin: -spacing[1] }}>
+          <GlassButton filled actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />
+        </View>
       </View>
       <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled">
         {!d ? (

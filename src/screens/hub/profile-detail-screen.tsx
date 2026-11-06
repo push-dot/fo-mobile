@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
 import { DetailWebView, Glass, Text, TopBar } from '@/shared/components'
@@ -9,7 +8,6 @@ import { spacing, useColors } from '@/theme'
 const ProfileDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const me = useViewerId()
-  const [title, setTitle] = useState<string>()
   const { data: p } = useProfile(id)
   const follow = useFollow(id)
   const following = follow.isPending ? follow.variables : !!p?.following
@@ -38,11 +36,10 @@ const ProfileDetailScreen = ({ id }: { id: string }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
-        title={title}
         onBack={() => router.back()}
         right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
       />
-      <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} onTitle={setTitle} />
+      <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} />
     </View>
   )
 }

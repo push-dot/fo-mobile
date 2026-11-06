@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
 import { Button, GlassButton, Icon, Menu, Text } from '@/shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
@@ -77,7 +78,7 @@ const ComposeScreen = () => {
             accessibilityLabel={TITLE_LABEL}
             placeholder="제목을 입력해 주세요"
             placeholderTextColor={c.t4}
-            style={[{ fontSize: 22, letterSpacing: -0.66, color: c.t1, paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[1], borderBottomWidth: 1, borderBottomColor: c.line }, fontFor('800')]}
+            style={[{ ...inputReset, fontSize: 22, letterSpacing: -0.66, color: c.t1, paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[1], borderBottomWidth: 1, borderBottomColor: c.line }, fontFor('800')]}
           />
         </View>
         <View style={{ gap: 6 }}>
@@ -96,7 +97,7 @@ const ComposeScreen = () => {
             accessibilityLabel={BODY_LABEL}
             placeholder="나누고 싶은 이야기를 적어 주세요"
             placeholderTextColor={c.t4}
-            style={[{ fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: 200, textAlignVertical: 'top' }, fontFor('400')]}
+            style={[{ ...inputReset, fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: 200, textAlignVertical: 'top' }, fontFor('400')]}
           />
         </View>
         <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>

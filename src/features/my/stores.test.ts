@@ -6,7 +6,7 @@ const invalidateQueries = vi.hoisted(() => vi.fn())
 const showToast = vi.hoisted(() => vi.fn())
 vi.mock('./api', () => ({ myApi: { remove } }))
 vi.mock('@/providers/query-client', () => ({ queryClient: { invalidateQueries } }))
-vi.mock('@/shared/components', () => ({ showToast }))
+vi.mock('@/shared/components', () => ({ showToast, TOAST_ABOVE: { docsCta: 160 } }))
 
 const { deleteWithUndo, usePendingDelete } = await import('./stores')
 

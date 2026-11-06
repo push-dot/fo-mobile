@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
 import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
@@ -10,7 +9,6 @@ import { spacing, useColors } from '@/theme'
 const PostingDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
-  const [title, setTitle] = useState<string>()
   const { data: p } = usePosting(id)
   const toggleBookmark = useToggleBookmark()
   const android = Platform.OS === 'android'
@@ -19,7 +17,6 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
-        title={title}
         onBack={() => router.back()}
         right={
           <GlassButton
@@ -34,7 +31,7 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
           />
         }
       />
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} onTitle={setTitle} />
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} />
       <View
         style={{
           flexDirection: 'row',

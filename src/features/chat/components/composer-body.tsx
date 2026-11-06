@@ -3,6 +3,7 @@ import type { Ref } from 'react'
 import { Pressable, TextInput, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { Icon, Text, hitSlopTo } from '@/shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import ModePicker from './mode-picker'
 
 
@@ -56,7 +57,7 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
         placeholderTextColor={c.t4}
         multiline
         accessibilityLabel="메시지"
-        style={[{ fontSize: type.h3.fontSize, lineHeight: type.h3.lineHeight, color: c.t1, maxHeight: 140, padding: 0 }, fontFor(hasText ? '600' : '400')]}
+        style={[{ fontSize: type.h3.fontSize, lineHeight: type.h3.lineHeight, color: c.t1, maxHeight: 140, ...inputReset }, fontFor(hasText ? '600' : '400')]}
       />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>

@@ -1,6 +1,6 @@
 import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect'
 import { useEffect, useState, type ReactNode } from 'react'
-import { AccessibilityInfo, Platform, View, type StyleProp, type ViewStyle } from 'react-native'
+import { AccessibilityInfo, Platform, View, type ColorValue, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, useShadow } from '../../theme'
 import { toBoxShadow } from '../utility'
 
@@ -26,9 +26,10 @@ type Props = {
   style?: StyleProp<ViewStyle>
   surface?: 'glass' | 'sheet'
   interactive?: boolean
+  tint?: ColorValue
 }
 
-const Glass = ({ children, style, surface = 'glass', interactive }: Props) => {
+const Glass = ({ children, style, surface = 'glass', interactive, tint }: Props) => {
   const c = useColors()
   const boxShadow = toBoxShadow(useShadow().glass)
   const glass = useGlassSurface()
@@ -36,7 +37,7 @@ const Glass = ({ children, style, surface = 'glass', interactive }: Props) => {
   if (glass) {
     // An RN boxShadow stays at rest size while interactive glass grows on press, leaving a fixed disc inside it.
     return (
-      <GlassView style={[interactive ? null : { boxShadow }, style]} glassEffectStyle="regular" isInteractive={interactive}>
+      <GlassView style={[interactive ? null : { boxShadow }, style]} glassEffectStyle="regular" tintColor={tint} isInteractive={interactive}>
         {children}
       </GlassView>
     )

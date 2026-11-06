@@ -3,26 +3,25 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { spacing, useColors, useThemeMode } from '../../theme'
-import { detailUrl } from './detail-url'
+import { detailUrl, textSizeScript } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import Text from './text'
 
 type Props = {
   path: string
-  onTitle?: (title: string) => void
   onBridge?: (message: Record<string, unknown>) => void
 }
 
-const DetailWebView = ({ path, onTitle, onBridge }: Props) => {
+const DetailWebView = ({ path, onBridge }: Props) => {
   const c = useColors()
   const mode = useThemeMode()
   const ref = useRef<WebView<object>>(null)
   const token = useSession((s) => s.session?.accessToken ?? null)
   const [failed, setFailed] = useState(false)
   const zoom = Math.round(useWindowDimensions().fontScale * 100)
-  const applyZoom = Platform.OS === 'ios' ? `document.documentElement.style.webkitTextSizeAdjust='${zoom}%';true;` : undefined
-  const [boot] = useState(() => `window.__PUSH__=${JSON.stringify({ token, apiBaseUrl: API_BASE_URL, mock: API_MOCK, theme: mode })};true;`)
+  const applyZoom = Platform.OS === 'ios' ? textSizeScript(zoom) : undefined
+  const [boot] = useState(() => `window.__PUSH__=${JSON.stringify({ token, apiBaseUrl: API_BASE_URL, mock: API_MOCK, theme: mode })};${applyZoom ?? ''}true;`)
 
   useEffect(() => {
     ref.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('push:token',{detail:{token:${JSON.stringify(token)}}}));true;`)
@@ -37,14 +36,15 @@ const DetailWebView = ({ path, onTitle, onBridge }: Props) => {
   }, [applyZoom])
 
   const onMessage = (e: WebViewMessageEvent) => {
-    let m: { type?: string; title?: unknown; path?: unknown; url?: unknown; status?: unknown } & Record<string, unknown>
+    let m: { type?: string; path?: unknown; url?: unknown; status?: unknown } & Record<string, unknown>
     try {
       m = JSON.parse(e.nativeEvent.data)
     } catch {
       return
     }
-    if (m.type === 'title' && typeof m.title === 'string') onTitle?.(m.title)
-    else if (m.type === 'open' && typeof m.path === 'string' && m.path.startsWith('/')) router.push(m.path as Href)
+    // fo-web still posts its page title; the design draws no native header title, so it is dropped here.
+    if (m.type === 'title') return
+    if (m.type === 'open' && typeof m.path === 'string' && m.path.startsWith('/')) router.push(m.path as Href)
     else if (m.type === 'external' && typeof m.url === 'string' && /^https?:\/\//.test(m.url)) void openBrowser(m.url)
     else if (m.type === 'error') setFailed(true)
     else onBridge?.(m)

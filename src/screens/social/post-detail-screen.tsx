@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
 import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, threadComments, useComments, usePost } from '@/features/social'
-import { Glass, Icon, Menu, Text, TopBar, showToast } from '@/shared/components'
+import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors } from '@/theme'
 
@@ -29,7 +29,7 @@ const PostDetailScreen = ({ id }: { id: string }) => {
                 key: 'copy',
                 label: '링크 복사',
                 systemImage: 'link',
-                onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요' })),
+                onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요', bottom: TOAST_ABOVE.cta })),
               },
             ]}
           >

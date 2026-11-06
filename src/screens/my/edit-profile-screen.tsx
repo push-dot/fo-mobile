@@ -54,6 +54,7 @@ import {
   ToastHost,
   type MenuAction,
 } from '@/shared/components'
+import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
@@ -109,6 +110,7 @@ const Input = ({
       keyboardType={keyboardType}
       style={[
         {
+          ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
           backgroundColor: c.bg,

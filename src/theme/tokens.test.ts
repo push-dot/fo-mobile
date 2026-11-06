@@ -48,7 +48,7 @@ describe('handoff extras', () => {
 
   it('pick button corners and canvas insets per platform', () => {
     expect(platformTokens('ios')).toEqual({ safeTop: 54, safeBottom: 34, tabBarHeight: 94, buttonRadius: 28, buttonSmRadius: 20 })
-    expect(platformTokens('android')).toEqual({ safeTop: 40, safeBottom: 20, tabBarHeight: 78, buttonRadius: 16, buttonSmRadius: 12 })
+    expect(platformTokens('android')).toEqual({ safeTop: 40, safeBottom: 20, tabBarHeight: 100, buttonRadius: 16, buttonSmRadius: 12 })
     expect(spacing[5]).toBe(20)
   })
 })

@@ -158,7 +158,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
               onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialsPath()))}
             />
           ) : (
-            <View style={{ paddingHorizontal: spacing[3], paddingBottom: Platform.OS === 'android' && keyboard ? 6 : Math.max(insets.bottom, 6) }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: Platform.OS === 'android' ? (keyboard ? spacing[2] : insets.bottom + spacing[2]) : Math.max(insets.bottom, 6) }}>
               <ComposerArea
                 inputRef={input}
                 placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}

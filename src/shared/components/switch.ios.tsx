@@ -13,6 +13,7 @@ const Switch = ({
   const c = useColors()
   return (
     <RNSwitch
+      style={{ alignSelf: 'center' }} // RN Switch hard-codes alignSelf: flex-start on iOS, which beats the row's alignItems
       accessibilityLabel={label}
       value={value}
       onValueChange={onValueChange}

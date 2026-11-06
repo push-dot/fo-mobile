@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { queryClient } from '@/providers/query-client'
-import { showToast } from '@/shared/components'
+import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { myApi } from './api'
 import { UNDO_MS } from './constants'
 import type { MySource } from './types'
@@ -28,6 +28,7 @@ export const deleteWithUndo = (doc: Pick<MySource, 'id' | 'fileName'>) => {
   pending.start(doc.id)
   usePendingDelete.setState((s) => ({ hidden: [...s.hidden, doc.id] }))
   showToast({
+    bottom: TOAST_ABOVE.docsCta,
     message: copy.toast,
     action: {
       label: copy.undo,

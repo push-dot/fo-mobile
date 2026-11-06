@@ -18,6 +18,7 @@ const DatePicker = ({
   min,
   max,
   surface = 'fill',
+  minHeight = 48,
 }: DatePickerProps) => {
   const c = useColors()
   if (mode !== 'month')
@@ -34,7 +35,7 @@ const DatePicker = ({
     )
   const pick = (year: number, month: number) =>
     onChange(clampMonth(new Date(year, month - 1, 1), min, max))
-  const field = { minHeight: 48, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[1] } as const
+  const field = { minHeight, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[1] } as const
   const year = value?.getFullYear()
   const month = value ? value.getMonth() + 1 : new Date().getMonth() + 1
   return (

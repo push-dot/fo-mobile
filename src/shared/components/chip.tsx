@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Platform } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { hitSlopTo, radius, spacing, useColors } from '../../theme'
+import { hitSlopTo, radius, spacing, useColors, useThemeMode } from '../../theme'
 import GlassPressable from './glass-pressable'
 import Icon from './icon'
 import Text from './text'
@@ -23,6 +23,7 @@ const CHIP_HEIGHT = 34
 
 const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, icon, chevron }: Props) => {
   const c = useColors()
+  const dark = useThemeMode() === 'dark'
   const fg = on ? c.bg : Platform.OS === 'ios' ? c.t1 : c.t2
   return (
     <GlassPressable
@@ -32,8 +33,9 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, i
       onLongPress={onLongPress}
       hitSlop={hitSlopTo(CHIP_HEIGHT)}
       glass={!on}
+      tint={dark ? c.glass : undefined}
       fill={on ? 't1' : 'fill'}
-      style={{ flexGrow: 0, minHeight: CHIP_HEIGHT, borderRadius: radius.chip, maxWidth: '100%' }}
+      style={{ minHeight: CHIP_HEIGHT, borderRadius: radius.chip, maxWidth: '100%' }}
       contentStyle={{ paddingLeft: lead ? 5 : 14, paddingRight: 14, gap: lead || removable ? spacing[2] : spacing[1] }}
     >
       {lead}

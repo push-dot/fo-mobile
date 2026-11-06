@@ -26,7 +26,8 @@ const ToastHost = () => {
   return (
     <NativeHost
       matchContents={{ vertical: true }}
-      style={{ position: 'absolute', left: spacing[4], right: spacing[4], bottom: insets.bottom + (toast?.bottom ?? TOAST_BOTTOM_GAP) }}
+      pointerEvents={toast ? 'auto' : 'none'}
+      style={{ position: 'absolute', left: spacing[4], right: spacing[4], bottom: insets.bottom + (toast?.bottom ?? TOAST_BOTTOM_GAP.android) }}
     >
       <SnackbarHost ref={ref}>
         <Snackbar containerColor={c.t1} contentColor={c.bg} actionContentColor={inverse.acText} modifiers={[clip(Shapes.RoundedCorner(radius.md))]} />

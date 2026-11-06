@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
-import { Sheet, showToast } from '@/shared/components'
+import { Sheet, TOAST_ABOVE, showToast } from '@/shared/components'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
 
@@ -17,7 +17,7 @@ const ApplySheetScreen = () => {
   const chosen = extras.filter((d) => extraIds.includes(d.id))
   const apply = useApplyPosting(postingId ?? '', () => {
     router.back()
-    showToast({ message: '지원했어요. 내 활동에서 진행 상황을 볼 수 있어요' })
+    showToast({ message: '지원했어요. 내 활동에서 진행 상황을 볼 수 있어요', bottom: TOAST_ABOVE.cta })
   })
 
   useEffect(() => {
