@@ -23,6 +23,11 @@ describe('chat mock', () => {
     expect((await call('GET', 'conversations/a-toss')).data).toMatchObject({ title: '토스 백엔드 이력서' })
   })
 
+  it('names the posting company on the 모아페이 conversations for the header pill', async () => {
+    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ company: '모아페이' })
+    expect((await call('GET', 'conversations/c-dotori')).data).toMatchObject({ company: '모아페이' })
+  })
+
   it('runs a tour token instead of the generic reply', async () => {
     const events = await run('t-free', { text: 'ph1-free' })
     const fit = events.find((e) => e.type === 'fit')

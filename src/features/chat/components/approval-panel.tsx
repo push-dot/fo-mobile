@@ -18,6 +18,9 @@ type Props = {
   onMaterials: () => void
 }
 
+// `.panel { gap: 6px }`: between the panel's blocks and inside each section.
+const PANEL_GAP = 6
+
 const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 const isStop = (c: Choice) => c.label === '그만하기' || c.label === '그만할게요'
 
@@ -88,7 +91,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
           const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare center onPress={cancel} /> : null
           const inGrid = s.options.length % 2 === 1
           return (
-            <View key={si}>
+            <View key={si} style={{ gap: PANEL_GAP }}>
               {title ? <Question label={title} /> : null}
               <MultiGrid stop={stopRow && !inGrid ? <View style={{ marginTop: 2 }}>{stopRow}</View> : undefined}>
                 {s.options.map((o, i) => (
@@ -100,9 +103,9 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
           )
         }
         return (
-          <View key={si}>
+          <View key={si} style={{ gap: PANEL_GAP }}>
             {title ? <Question label={title} /> : null}
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1], paddingVertical: spacing[1] }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1], paddingBottom: spacing[1] }}>
               {s.options.map((o, i) => (
                 <MiniChip
                   key={o}
@@ -123,7 +126,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
       }
       case 'rows':
         return (
-          <View key={si}>
+          <View key={si} style={{ gap: PANEL_GAP }}>
             <Sub label={s.title} />
             {s.items.map((r) => (
               <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
@@ -165,7 +168,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   }
 
   const body = (
-    <View style={{ gap: 6, paddingTop: ios ? 22 : spacing[5], paddingHorizontal: ios ? 14 : spacing[4], paddingBottom: ios ? 18 : insets.bottom + spacing[3] }}>
+    <View style={{ gap: PANEL_GAP, paddingTop: ios ? 22 : spacing[5], paddingHorizontal: ios ? 14 : spacing[4], paddingBottom: ios ? 18 : insets.bottom + spacing[3] }}>
       <Text v="h3" accessibilityRole="header" style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
         {approval.question}
       </Text>

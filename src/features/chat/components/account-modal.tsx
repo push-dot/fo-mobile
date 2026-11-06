@@ -63,10 +63,13 @@ const AccountRow = ({ label, value, bold, onPress }: { label: string; value?: st
   )
 }
 
+// The board's row is min-height 56 content-box plus 16 padding top and bottom, so the bar sits high with room below.
+const USAGE_ROW_HEIGHT = 88
+
 const UsageRow = ({ percent }: { percent: number }) => {
   const c = useColors()
   return (
-    <View style={{ paddingVertical: spacing[4], gap: spacing[2] }}>
+    <View style={{ minHeight: USAGE_ROW_HEIGHT, paddingVertical: spacing[4], gap: spacing[2] }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <Text v="b1">사용량</Text>
         <Text v="b2" color="t2">
@@ -100,7 +103,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
           {me.name}
         </Text>
       </View>
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: 14, gap: 22 }}>
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: 14, gap: 26 }}>
         <SettingsGroup>
           <AccountRow label={account?.plan ?? ' '} bold onPress={onPlan} />
           {usage == null ? null : <UsageRow percent={usage} />}

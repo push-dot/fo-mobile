@@ -207,8 +207,8 @@ export const QUICK_STARTS: QuickStart[] = [
 ]
 
 export const CALENDAR_TASKS = [
-  { label: '이번 주 정리하기', sub: '일정마다 준비할 일까지', icon: 'check' },
-  { label: '마감일 넣기', sub: '북마크·지원한 공고 마감일', icon: 'clock' },
+  { label: '이번 주 정리하기', sub: '일정마다 준비할 일까지', icon: 'clock' },
+  { label: '마감일 넣기', sub: '북마크·지원한 공고 마감일', icon: 'flame' },
   { label: '면접·커피챗 잡기', sub: '시간 골라 일정 등록', icon: 'people' },
   { label: '준비 알림 만들기', sub: '면접 전날, 마감 3일 전', icon: 'bell' },
 ] as const

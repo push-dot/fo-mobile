@@ -157,11 +157,11 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                         </View>
                       ) : null}
                       <View style={{ flex: 1, minWidth: 0 }}>
-                        <Text v="b2" weight="600" numberOfLines={1}>
+                        <Text v="b2" weight="600" numberOfLines={1} style={{ lineHeight: 21 }}>
                           {m.title}
                         </Text>
                         {m.sub ? (
-                          <Text v="c2" color="t3" numberOfLines={1}>
+                          <Text v="c2" color="t3" numberOfLines={1} style={{ lineHeight: 21 }}>
                             {m.sub}
                           </Text>
                         ) : null}

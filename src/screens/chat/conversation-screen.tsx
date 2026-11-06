@@ -90,7 +90,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
     },
   }))
 
-  const company = chat.items.findLast((i) => i.type === 'result')?.company
+  const company = chat.items.findLast((i) => i.type === 'result')?.company ?? conv?.company ?? undefined
   const placeholder = composerPlaceholder(chat)
   // Android pads the keyboard height itself; the nav-bar inset on top of it would leave a gap.
   const keyboard = useKeyboardHeight()

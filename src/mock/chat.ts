@@ -23,8 +23,9 @@ const conv = (id: string, title: string, min: number, lastLine: string, status: 
 })
 
 const conversations: ConversationRow[] = [
-  conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'),
-  conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'),
+  { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'), company: '모아페이' },
+  // ChatResume opens this one and draws 모아페이 in the header pill.
+  { ...conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'), company: '모아페이' },
   // ChatListPress draws this row pinned.
   { ...conv('c-career', '경력기술서 다듬기', 60 * 30, 'PDF로 저장했어요 · 적합도 8.2'), pinned: true },
   // The design lists these two under 이번 주, so keep them inside the last six days whatever day the tour runs.
@@ -46,7 +47,8 @@ mock('GET', 'conversations', ({ query }) =>
 mock('POST', 'conversations', ({ body }) => {
   if (!referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
   const b = body as { title: string }
-  const c = conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, '')
+  // Every scenario targets the 모아페이 posting except the upload without one (ChatDoneNoJob).
+  const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^ext-nojob$/i.test(b.title.trim()) ? null : '모아페이' }
   conversations.push(c)
   return { status: 201, body: { data: c } }
 })
@@ -145,8 +147,7 @@ const tailorFit = (labels: string[], added = -1): Step[] => [
   s(200, todo('todo', labels, 2, added)),
   s(100, status(added < 0 ? '맞춰보는 중…' : '다시 맞춰보는 중…', '견주어 보는 중…', '따져 보는 중…')),
   s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
-  s(DWELL, tool('fit', '적합도 계산', '5개 항목', 'run', '경험 연관성을 비교하는 중')),
-  s(1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
+  s(DWELL + 1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
   s(300, {
     type: 'fit', id: 'fitcard', score: 8.1, from: 6.9, delta: '+1.2 예상',
     rows: [{ label: '기술 스택', score: 7.5 }, { label: '경험 연관성', score: 8.2 }, { label: '키워드', score: 4.5 }],
@@ -424,7 +425,12 @@ const ph4Quality: Step[] = [
     zeroSubmit: '그대로 디자인으로',
   }),
 ]
-const TEMPLATES = ['클래식', '모던', '컴팩트', 'ATS']
+const TEMPLATES = [
+  { label: '클래식', layout: 'classic' },
+  { label: '모던', layout: 'modern' },
+  { label: '컴팩트', layout: 'compact' },
+  { label: 'ATS', layout: 'ats' },
+] as const
 const ph4Design: Step[] = [
   s(300, tool('applied', '추천 수정 반영', '2개', 'ok', '쉼표 정리 · 현재형 문장 고침')),
   s(400, agent('tpl', '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
@@ -432,7 +438,7 @@ const ph4Design: Step[] = [
     id: 'ph4-design',
     question: '검증을 마쳤어요. 어떤 디자인을 적용할까요?',
     sections: [
-      { kind: 'templates', items: TEMPLATES.map((label, i) => ({ id: `t${i}`, label, ...(i === 0 ? { recommended: true } : {}) })), selected: [0] },
+      { kind: 'templates', items: TEMPLATES.map((tpl, i) => ({ id: `t${i}`, ...tpl, ...(i === 0 ? { recommended: true } : {}) })), selected: [0] },
       { kind: 'toggle', items: [{ label: '프로필 사진 넣기', desc: '마이 › 프로필 사진을 써요 · 모든 템플릿' }], selected: [], ids: ['photo'] },
     ],
     submit: '클래식으로 만들기',
@@ -545,7 +551,7 @@ const verifyFail: Step[] = [
   ask({ ...numbered('ph2x-verify', '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', ['다시 고르기', '그만하기']), foot: undefined }),
 ]
 const autoPick: Step[] = [
-  s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
+  s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개')),
   s(400, agent('auto1', '자동으로 골랐어요: 모던 템플릿')),
   s(400, agent('auto2', '자동으로 골랐어요: 경력 섹션부터 고치기')),
   s(300, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
@@ -798,14 +804,13 @@ const quick: Record<string, QsData> = {
   match: { items: [], chips: ['개발 · 백엔드', '경력 4–6년', '서울', 'Kotlin', 'Spring Boot'] },
   gap: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
   fit: { segments: ['북마크 4', '최근 본 공고'], items: [JOBS[0]!, { ...JOBS[1]!, selected: true }, JOBS[2]!, ...RECENT], doc: RESUME },
-  // The design draws the job as one "company · title" line, so it has no overline.
-  boost: { items: [{ ...JOBS[0]!, over: '', title: '모아페이 · 백엔드 엔지니어 (Kotlin·Spring)', sub: '', selected: true }], doc: RESUME },
+  boost: { items: [{ ...JOBS[0]!, selected: true }], doc: RESUME },
   deadline: {
     items: [
       job('d-pado', '파도AI', '데이터 분석가', '', '파', '#862E9C', { badge: { label: 'D-2', tone: 'red' }, note: { label: '서류 없음' } }),
-      job('d-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: 'D-4', tone: 'red' }, note: { label: '서류 준비됨', ac: true } }),
-      job('d-green', '그린티켓', '그로스 마케터', '', '그', '#E67700', { badge: { label: 'D-6', tone: 'orange' }, note: { label: '서류 없음' } }),
-      job('d-saebyuk', '새벽마켓', 'ML 엔지니어', '', '새', '#C2255C', { badge: { label: 'D-7', tone: 'orange' }, note: { label: '초안 있음' } }),
+      job('d-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: 'D-4', tone: 'grey' }, note: { label: '서류 준비됨', ac: true } }),
+      job('d-green', '그린티켓', '그로스 마케터', '', '그', '#E67700', { badge: { label: 'D-6', tone: 'grey' }, note: { label: '서류 없음' } }),
+      job('d-saebyuk', '새벽마켓', 'ML 엔지니어', '', '새', '#C2255C', { badge: { label: 'D-7', tone: 'grey' }, note: { label: '초안 있음' } }),
     ],
   },
   status: {

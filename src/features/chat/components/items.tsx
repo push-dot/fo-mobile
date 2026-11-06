@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Animated, Easing, Platform, Pressable, View } from 'react-native'
+import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
 import { onAccent, radius, spacing, tile, useColors, useShadow, type Colors } from '../../../theme'
 import { Badge, Button, Icon, Text } from '@/shared/components'
+import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
 import { useOpenArtifact, useShareFile } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
@@ -41,10 +42,14 @@ const Dot = ({ color, size = 8, top = 8 }: { color: string; size?: number; top?:
   <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, marginTop: top }} />
 )
 
+// The design's max-width: 82% sizes the content box, so the bubble's padding and border come on top of it.
+const useBubbleMax = (chrome: number) => (useWindowDimensions().width - spacing[5] * 2) * 0.82 + chrome
+
 const UserBubble = ({ item }: { item: Of<'user'> }) => {
   const c = useColors()
+  const maxWidth = useBubbleMax(30)
   return (
-    <Appear kind="bubble" style={{ alignSelf: 'flex-end', maxWidth: '82%' }}>
+    <Appear kind="bubble" style={{ alignSelf: 'flex-end', maxWidth }}>
       <View style={{ paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomRightRadius: radius.xs, backgroundColor: c.fill }}>
         <Text v="b1" style={{ lineHeight: 23 }}>
           {item.text}
@@ -256,7 +261,7 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
       ) : null}
       {item.rows.map((r, i) => (
         <View key={r.label} style={{ flexDirection: 'row', gap: spacing[3], alignItems: 'flex-start' }}>
-          {verdict ? <Badge label={String(i + 1)} minWidth={24} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 38 : 44} />}
+          {verdict ? <Badge label={String(i + 1)} minWidth={24} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 52 : 58} />}
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="b2" weight="700">
               {r.label}
@@ -338,14 +343,14 @@ const Bar = ({ pct, low, height = 8, delay = 150 }: { pct: number; low?: boolean
   )
 }
 
-const FitRow = ({ label, score, index }: { label: string; score?: number; index: number }) => (
+const FitRow = ({ label, score, index }: { label: string; score: number; index: number }) => (
   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
     <Text v="c1" color="t2" style={{ width: 76 }}>
       {label}
     </Text>
-    <Bar pct={score === undefined ? FIT_LOCKED_PCT[index % FIT_LOCKED_PCT.length]! : score * 10} low={score !== undefined && score < 6} delay={150 + index * 80} />
+    <Bar pct={score * 10} low={score < 6} delay={150 + index * 80} />
     <Text v="c1" weight="700" style={{ width: 28, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
-      {score === undefined ? '' : score.toFixed(1)}
+      {score.toFixed(1)}
     </Text>
   </View>
 )
@@ -355,17 +360,18 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
   const shadow = useShadow().pop
   return (
     <View>
-      <View style={{ gap: spacing[3], opacity: 0.55 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <View style={{ gap: spacing[3], opacity: 0.55, ...(Platform.OS === 'android' ? { filter: [{ blur: 5 }] } : {}) }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {rows.map((r, i) => (
-          <FitRow key={r.label} label={r.label} index={i} />
+          <FitRow key={r.label} label={r.label} score={FIT_LOCKED_PCT[i % FIT_LOCKED_PCT.length]! / 10} index={i} />
         ))}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
-          {LOCKED_KEYWORDS.map((k, i) => (
-            <View key={i} style={{ width: k.width, height: 22, borderRadius: radius.xs, backgroundColor: k.ok ? c.greenSoft : c.orangeSoft }} />
+          {LOCKED_KEYWORDS.map((k) => (
+            <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
           ))}
         </View>
       </View>
-      <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing[4] }}>
+      <Blur intensity={20} style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }} />
+      <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing[2] }}>
         <Pressable
           accessibilityRole="button"
           onPress={onPlan}
@@ -419,7 +425,7 @@ const FitNum = ({ size, color, children }: { size: 'mid' | 'big'; color: keyof C
 const FitCard = ({ item, onPlan }: { item: Of<'fit'>; onPlan?: () => void }) => {
   const c = useColors()
   const view = fitChrome(item)
-  const compact = !view.locked && !item.note
+  const compact = !view.locked && !item.note && item.from === undefined
   const head = item.note ? (
     // 점수 올리기: before → after, one bar, the note.
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
@@ -739,10 +745,11 @@ export const Item = ({
 /** Dashed "대기 중" chip for messages sent while the agent works. */
 export const Queued = ({ text }: { text: string }) => {
   const c = useColors()
+  const maxWidth = useBubbleMax(27)
   return (
     <Appear
       kind="bubble"
-      style={{ alignSelf: 'flex-end', maxWidth: '82%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.deco }}
+      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.deco }}
     >
       <Icon name="clock" size={14} color="t2" />
       <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>

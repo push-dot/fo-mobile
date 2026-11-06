@@ -12,9 +12,9 @@ export const fitChrome = (item: Fit) => ({
 })
 
 export const LOCKED_KEYWORDS = [
-  { ok: true, width: 48 },
-  { ok: true, width: 84 },
-  { ok: true, width: 36 },
-  { ok: false, width: 48 },
-  { ok: false, width: 84 },
+  { ok: true, label: 'Kotlin' },
+  { ok: true, label: 'Spring Boot' },
+  { ok: true, label: 'JPA' },
+  { ok: false, label: 'Kafka' },
+  { ok: false, label: '정산 도메인' },
 ] as const

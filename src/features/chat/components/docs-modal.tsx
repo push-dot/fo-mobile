@@ -39,7 +39,7 @@ export const DocsModal = () => {
         </View>
       ) : null}
       {docs.data?.map((d) => (
-        <View key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing[3], paddingHorizontal: spacing[5] }}>
+        <View key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing[5] }}>
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="b1" weight="700" numberOfLines={1}>
               {d.fileName}

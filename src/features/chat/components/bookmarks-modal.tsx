@@ -40,7 +40,7 @@ export const BookmarksModal = () => {
         </View>
       ) : (
         <>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: 2, paddingBottom: 6 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
             <Chip label={`전체 ${lists.all.length}`} on={filter === 'all'} onPress={() => setFilter('all')} />
             <Chip label={`마감 임박 ${lists.soon.length}`} on={filter === 'soon'} onPress={() => setFilter('soon')} />
             <Chip label={`지원 안 함 ${lists.notApplied.length}`} on={filter === 'notApplied'} onPress={() => setFilter('notApplied')} />
@@ -60,7 +60,7 @@ export const BookmarksModal = () => {
                 { key: 'open', label: '공고 보기', systemImage: 'doc.text', onPress: () => leave(() => router.push(`/postings/${p.id}`)) },
               ]}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing[3], paddingHorizontal: spacing[5] }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], paddingVertical: spacing[3], paddingHorizontal: spacing[5] }}>
                 <Mark text={p.company.slice(0, 1)} color={logoColor(p.company)} size={56} />
                 <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
                   <Text v="c1" weight="600" color="t3">

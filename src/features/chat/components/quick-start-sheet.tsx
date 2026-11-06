@@ -100,7 +100,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                   {chips.map((ch) => (
                     <Chip key={ch} label={ch} on removable onPress={() => setChips((cur) => cur.filter((x) => x !== ch))} />
                   ))}
-                  <Chip label="조건 추가" lead={<Icon name="plus" size={16} color="t2" />} onPress={() => setAdding('')} />
+                  <Chip label="조건 추가" icon="plus" onPress={() => setAdding('')} />
                 </View>
                 {adding !== null ? (
                   <TextField
@@ -116,7 +116,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                   />
                 ) : null}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-                  <Icon name="filter" size={20} color="acText" />
+                  <Icon name="spark" size={18} color="acText" filled />
                   <Text v="b2" style={{ flex: 1 }}>
                     적합도 7점 이상인 공고만 보여 드려요
                   </Text>
@@ -144,7 +144,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             ) : null}
 
             {qs.layout === 'cards' ? (
-              <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: spacing[2] }}>
+              <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: spacing[3] }}>
                 {visible.map((it) => (
                   <OptionCard key={it.id} item={it} on={custom === null && sel.includes(it.id)} grid={qs.grid} onPress={() => (setCustom(null), toggle(it.id))} />
                 ))}
@@ -169,15 +169,17 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
 
             {qs.listLabel ? (
               <>
-                {docField}
-                {job ? (
-                  <PickerRow
-                    label={qs.listLabel}
-                    value={`${job.over} · ${job.title}`}
-                    lead={job.logo ? <Mark text={job.logo.text} color={job.logo.color} size={34} /> : undefined}
-                    onPress={() => setPickingJob((v) => !v)}
-                  />
-                ) : null}
+                <View style={{ gap: spacing[2] }}>
+                  {docField}
+                  {job ? (
+                    <PickerRow
+                      label={qs.listLabel}
+                      value={[job.over, job.title].filter(Boolean).join(' · ')}
+                      lead={job.logo ? <Mark text={job.logo.text} color={job.logo.color} size={34} /> : undefined}
+                      onPress={() => setPickingJob((v) => !v)}
+                    />
+                  ) : null}
+                </View>
               </>
             ) : null}
 
@@ -318,21 +320,21 @@ const DocField = ({
 const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; on: boolean; onPress?: () => void }) => {
   const status = layout === 'status'
   const content = (
-    <View style={{ flexDirection: 'row', alignItems: item.body ? 'flex-start' : 'center', gap: spacing[3], minHeight: status ? 56 : layout === 'pick' && item.logo ? 60 : 58, paddingVertical: item.body ? 10 : 0 }}>
+    <View style={{ flexDirection: 'row', alignItems: item.body ? 'flex-start' : 'center', gap: spacing[3], minHeight: status ? 56 : layout === 'pick' && item.logo ? 60 : 58, paddingVertical: item.body ? spacing[3] : 0 }}>
       {status ? <Pick on={on} square /> : null}
       {item.logo ? <Mark text={item.logo.text} color={item.logo.color} size={status ? 40 : 44} /> : null}
       {item.avatar ? <Mark text={item.avatar.text} color={item.avatar.color} round /> : null}
-      <View style={{ flex: 1, minWidth: 0, gap: item.body ? 2 : 0 }}>
+      <View style={{ flex: 1, minWidth: 0, gap: item.body ? spacing[1] : 0 }}>
         {item.over ? (
           <Text v="c1" weight="600" color="t3">
             {item.over}
           </Text>
         ) : null}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
           <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
             {item.title}
           </Text>
-          {layout === 'reply' && item.badge ? <Badge label={item.badge.label} tone={item.badge.tone} /> : null}
+          {layout === 'reply' && item.badge ? <Badge {...item.badge} /> : null}
           {layout === 'reply' && item.meta ? (
             <Text v="c2" color="t3" style={{ marginLeft: 'auto' }}>
               {item.meta}
@@ -352,7 +354,7 @@ const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; 
       </View>
       {layout === 'deadline' ? (
         <View style={{ alignItems: 'flex-end', gap: spacing[1] }}>
-          {item.badge ? <Badge label={item.badge.label} tone={item.badge.tone} /> : null}
+          {item.badge ? <Badge {...item.badge} /> : null}
           {item.note ? (
             <Text v="c2" weight="600" color={item.note.ac ? 'acText' : 't3'}>
               {item.note.label}
@@ -360,7 +362,7 @@ const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; 
           ) : null}
         </View>
       ) : null}
-      {status && item.badge ? <Badge label={item.badge.label} tone={item.badge.tone} /> : null}
+      {status && item.badge ? <Badge {...item.badge} /> : null}
       {layout === 'pick' ? <Pick on={on} /> : null}
     </View>
   )
@@ -427,7 +429,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               <Text v="c2" weight="600" color="t3">
                 {e.date?.dow}
               </Text>
-              <Text v="b1" weight="800">
+              <Text v="b1">
                 {e.date?.day}
               </Text>
             </View>
@@ -440,7 +442,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
                 {e.sub}
               </Text>
             </View>
-            {e.badge ? <Badge label={e.badge.label} tone={e.badge.tone} /> : null}
+            {e.badge ? <Badge {...e.badge} /> : null}
           </View>
         ))}
       </View>
@@ -453,7 +455,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               onPress={() => setTask(i)}
-              style={{ width: '48.5%', gap: 6, padding: spacing[4], borderRadius: radius.md, ...(on ? selectedRing(c) : { backgroundColor: c.bg2, borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
+              style={{ width: '48.5%', gap: spacing[2], padding: spacing[4], borderRadius: radius.md, ...(on ? selectedRing(c) : { backgroundColor: c.bg2, borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
             >
               <Icon name={t.icon} size={20} color={on ? 'acText' : 't2'} />
               <Text v="b2" weight="700">

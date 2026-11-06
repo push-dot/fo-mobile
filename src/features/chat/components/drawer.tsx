@@ -87,8 +87,8 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
       </View>
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: 6,
-          paddingTop: spacing[3],
+          paddingHorizontal: spacing[2],
+          paddingTop: spacing[4],
           paddingBottom: insets.bottom + 10,
         }}
       >
@@ -101,9 +101,9 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
               style={({ pressed }) => ({
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 7,
+                gap: spacing[2],
                 height: 44,
-                paddingHorizontal: 14,
+                paddingHorizontal: spacing[4],
                 borderRadius: radius.sm,
                 backgroundColor: pressed ? c.fill : 'transparent',
               })}
@@ -126,7 +126,7 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
               v="c1"
               weight="700"
               color="t3"
-              style={{ paddingTop: 10, paddingHorizontal: 14, paddingBottom: 6 }}
+              style={{ paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}
             >
               최근 대화
             </Text>
@@ -138,15 +138,15 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
                 style={({ pressed }) => ({
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 10,
+                  gap: spacing[3],
                   paddingVertical: spacing[3],
-                  paddingHorizontal: 14,
+                  paddingHorizontal: spacing[4],
                   borderRadius: radius.md,
                   backgroundColor: pressed || cv.id === currentId ? c.fill : 'transparent',
                 })}
               >
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                     <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
                       {cv.title}
                     </Text>
@@ -170,9 +170,9 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 2,
+                gap: spacing[1],
                 paddingVertical: spacing[3],
-                paddingHorizontal: 14,
+                paddingHorizontal: spacing[4],
                 minHeight: 44,
               }}
             >
