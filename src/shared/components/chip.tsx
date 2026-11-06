@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Platform } from 'react-native'
+import type { IconName } from '@push/design-system'
 import { hitSlopTo, radius, spacing, useColors } from '../../theme'
 import GlassPressable from './glass-pressable'
 import Icon from './icon'
@@ -14,11 +15,13 @@ type Props = {
   check?: boolean
   removable?: boolean
   lead?: ReactNode
+  icon?: IconName
+  chevron?: boolean
 }
 
 const CHIP_HEIGHT = 34
 
-const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead }: Props) => {
+const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, icon, chevron }: Props) => {
   const c = useColors()
   const fg = on ? c.bg : Platform.OS === 'ios' ? c.t1 : c.t2
   return (
@@ -34,10 +37,12 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead }:
       contentStyle={{ paddingLeft: lead ? 5 : 14, paddingRight: 14, gap: lead || removable ? spacing[2] : spacing[1] }}
     >
       {lead}
+      {icon ? <Icon name={icon} size={16} color={fg} /> : null}
       {check && on ? <Icon name="check" size={14} color={fg} /> : null}
       <Text v="c1" weight="600" style={{ fontSize: 14, color: fg, flexShrink: 1 }} numberOfLines={1}>
         {label}
       </Text>
+      {chevron ? <Icon name="chev" size={14} color={fg} /> : null}
       {menu ? <Icon name="down" size={14} color={fg} /> : null}
       {removable ? <Icon name="x" size={12} color={fg} /> : null}
     </GlassPressable>

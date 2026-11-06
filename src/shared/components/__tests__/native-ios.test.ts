@@ -103,12 +103,13 @@ describe('DatePicker (iOS)', () => {
   it('picks a month with year and month menus', () => {
     const onChange = vi.fn()
     const tree = DatePicker({ value: new Date(2022, 2, 1), onChange, label: '시작', mode: 'month', min: new Date(2020, 0, 1), max: new Date(2023, 5, 10) })
-    const [year, month] = findAll(tree, 'Picker')
-    expect(year!.props.selection).toBe(2022)
-    expect(month!.props.selection).toBe(3)
-    expect(year!.props.modifiers).toContainEqual({ name: 'pickerStyle', arg: 'menu' })
-    expect(findAll(year, 'SText').map((t) => t.props.children)).toEqual(['2023년', '2022년', '2021년', '2020년'])
-    ;(year!.props.onSelectionChange as (y: number) => void)(2020)
+    const [year, month] = findAll(tree, Menu)
+    expect(JSON.stringify(year!.props.children)).toContain('2022년')
+    expect(JSON.stringify(month!.props.children)).toContain('3월')
+    const years = year!.props.actions as { label: string; selected?: boolean; onPress: () => void }[]
+    expect(years.map((y) => y.label)).toEqual(['2023년', '2022년', '2021년', '2020년'])
+    expect(years.find((y) => y.selected)?.label).toBe('2022년')
+    years[3]!.onPress()
     expect(onChange).toHaveBeenLastCalledWith(new Date(2020, 2, 1))
   })
 
@@ -127,7 +128,8 @@ describe('DatePicker (iOS)', () => {
   it('keeps a picked month inside the allowed range', () => {
     const onChange = vi.fn()
     const tree = DatePicker({ value: new Date(2023, 2, 1), onChange, label: '종료', mode: 'month', max: new Date(2023, 5, 10) })
-    ;(findAll(tree, 'Picker')[1]!.props.onSelectionChange as (m: number) => void)(12)
+    const months = findAll(tree, Menu)[1]!.props.actions as { label: string; onPress: () => void }[]
+    months.find((m) => m.label === '12월')!.onPress()
     expect(onChange).toHaveBeenLastCalledWith(new Date(2023, 5, 1))
   })
 })

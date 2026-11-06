@@ -17,7 +17,10 @@ const base = (p: Partial<Posting> & Pick<Posting, 'id' | 'company' | 'title' | '
 
 const DAY = 86_400_000
 // Deadlines keep their distance from the day the sample was written (2026-10-19), counted from today.
-const inDays = (n: number) => new Date(Date.now() + n * DAY).toISOString().slice(0, 10)
+const inDays = (n: number) => {
+  const d = new Date(Date.now() + n * DAY)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
 
 // Sample data from the Claude Design boards (홈, 채용공고, 채용공고 상세).
 export const postings: Posting[] = [
@@ -162,7 +165,7 @@ mock('DELETE', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, 
 const SHEET_TITLES: Record<string, string> = { p1: '백엔드 엔지니어' }
 mock('GET', 'me/bookmarks', ({ query }) => {
   const sheet = query.get('limit') === '10'
-  const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, title: (sheet && SHEET_TITLES[p.id]) || p.title }))
+  const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, title: (sheet && SHEET_TITLES[p.id]) || p.title, location: p.id === 'p8' ? '성남 판교' : p.location }))
   return page(list, query)
 })
 mock('POST', 'postings/:id/apply', ({ params }) => {

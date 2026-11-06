@@ -87,7 +87,7 @@ const Bookmarks = () => {
           onAction={() => router.push(emptyCta('bookmarks').href)}
         />
       ) : (
-        <ListTitle title="북마크한 공고" count={list.length} />
+        <ListTitle title="북마크한 공고" count={data?.page.total ?? list.length} />
       )}
       {list.map((p) => (
         <Pressable
@@ -248,6 +248,7 @@ const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub)
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={{ flexGrow: 0 }}
         contentContainerStyle={{ gap: spacing[2], paddingTop: spacing[5], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}
       >
         {SUBS.map((s) => (

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Platform, View, type ViewProps } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
 import GlassButton from './glass-button'
@@ -20,9 +20,9 @@ type Props = {
 
 const GRAB = { width: 36, height: 5, radius: 3 }
 const SHEET_GAP = 14
+const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 
-/** Body of a native form sheet route (see sheetOptions). iOS draws the grabber; Android gets the Material 3 drag handle. */
-const Sheet = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, onLayout }: Props) => {
+const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, onLayout }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -63,5 +63,15 @@ const Sheet = ({ title, description, children, action, secondary, onClose, gap =
     </View>
   )
 }
+
+// iOS 26 floats partial sheets clear of the home indicator and attaches large ones; a provider inside the sheet reads which.
+const IosSheet = (props: Props) => (
+  <SafeAreaProvider initialMetrics={{ frame: useSafeAreaFrame(), insets: NO_INSETS }} style={{ flex: 0 }}>
+    <Body {...props} />
+  </SafeAreaProvider>
+)
+
+/** Body of a native form sheet route (see sheetOptions). iOS draws the grabber; Android gets the Material 3 drag handle. */
+const Sheet = Platform.OS === 'android' ? Body : IosSheet
 
 export default Sheet

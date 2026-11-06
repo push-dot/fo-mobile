@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { ScrollView, View } from 'react-native'
+import { ScrollView, useWindowDimensions, View } from 'react-native'
 import { useStartChat } from '@/features/chat'
 import {
   FIX_DOC,
@@ -13,9 +13,21 @@ import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/sh
 import { shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors, useShadow } from '@/theme'
 
+const PAGE_PAD = 36
+const CAREER_BARS = [92, 70]
+const PROJECT_BARS = [88, 76, 82, 60]
+
+const Bars = ({ widths }: { widths: readonly number[] }) => {
+  const c = useColors()
+  return widths.map((w) => (
+    <View key={w} style={{ width: `${w}%`, height: 5, borderRadius: 3, backgroundColor: c.deco, opacity: 0.55 }} />
+  ))
+}
+
 const Paper = ({ d }: { d: ResumeDraft }) => {
   const c = useColors()
   const sh = useShadow()
+  const { width } = useWindowDimensions()
   const p = d.profile
   const head = (t: string) => (
     <Text
@@ -32,7 +44,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       accessibilityLabel={`${p.displayName} 서류 미리보기`}
       style={{
         width: '100%',
-        aspectRatio: 1 / 1.414,
+        minHeight: (width - PAGE_PAD * 2) * 1.414,
         backgroundColor: c.paper,
         borderRadius: radius.xs,
         borderWidth: 1,
@@ -40,7 +52,6 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         paddingVertical: spacing[6],
         paddingHorizontal: spacing[5],
         gap: spacing[2],
-        overflow: 'hidden',
         ...sh.pop,
       }}
     >
@@ -55,7 +66,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       </Text>
       {head(PREVIEW_HEADINGS[0])}
       {p.careers.map((cr) => (
-        <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: 2 }}>
+        <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: spacing[2] }}>
           <Text v="c2" weight="700">
             {cr.company} · {cr.role}{' '}
             <Text v="c2" weight="500" color="t3">
@@ -64,17 +75,27 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
           </Text>
           {cr.description ? (
             <Text v="tab" weight="400" color="t2">
-              {cr.description}
+              {cr.description
+                .split('\n')
+                .filter(Boolean)
+                .map((line) => `· ${line}`)
+                .join('\n')}
             </Text>
-          ) : null}
+          ) : (
+            <Bars widths={CAREER_BARS} />
+          )}
         </View>
       ))}
       {head(PREVIEW_HEADINGS[1])}
-      {(d.projects ?? []).map((project) => (
-        <Text key={project} v="tab" weight="400" color="t2">
-          {project}
-        </Text>
-      ))}
+      {d.projects?.length ? (
+        d.projects.map((project) => (
+          <Text key={project} v="tab" weight="400" color="t2">
+            {project}
+          </Text>
+        ))
+      ) : (
+        <Bars widths={PROJECT_BARS} />
+      )}
       {head(PREVIEW_HEADINGS[2])}
       <Text v="tab" weight="400" color="t2">
         {p.skills.join(' · ')}
@@ -111,7 +132,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingVertical: spacing[1], paddingHorizontal: spacing[5] }}>
           {d?.pageCount ? <Badge label={`1 / ${d.pageCount}`} tone="grey" /> : null}
         </View>
-        <View style={{ paddingTop: spacing[1], paddingHorizontal: 36 }}>
+        <View style={{ paddingTop: spacing[1], paddingHorizontal: PAGE_PAD }}>
           {d ? (
             <Paper d={d} />
           ) : draft.isPending ? (

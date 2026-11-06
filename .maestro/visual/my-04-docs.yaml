@@ -25,9 +25,12 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: UploadPick
-# Tap the scrim above the sheet.
-- tapOn:
-    point: "50%,5%"
+- swipe:
+    start: "50%,72%"
+    end: "50%,99%"
+- extendedWaitUntil:
+    notVisible: "서류 가져오기"
+    timeout: 10000
 - waitForAnimationToEnd:
     timeout: 3000
 

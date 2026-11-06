@@ -33,7 +33,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
           multiline={multiline}
           maxLength={max}
           placeholderTextColor={c.t4}
-          style={[{ flex: 1, fontSize: type.b1.fontSize, lineHeight: type.b1.lineHeight, color: c.t1, minHeight: multiline ? 96 : 24, textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), style]}
+          style={[{ flex: 1, fontSize: type.b1.fontSize, lineHeight: type.b1.lineHeight, letterSpacing: type.b1.letterSpacing, color: c.t1, minHeight: multiline ? 96 : 24, textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), style]}
           {...rest}
         />
       </View>

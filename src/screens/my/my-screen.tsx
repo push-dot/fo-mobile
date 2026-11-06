@@ -45,7 +45,7 @@ const MyScreen = () => {
         <SegmentedControl items={TABS} value={tab} onChange={pick} />
       </View>
       {tab === 'profile' ? (
-        <ScrollView>
+        <ScrollView contentInsetAdjustmentBehavior="automatic">
           <ProfileTab />
         </ScrollView>
       ) : null}

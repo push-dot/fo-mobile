@@ -23,7 +23,7 @@ const SheetHeader = ({
         alignItems: 'center',
         gap: spacing[2],
         paddingHorizontal: spacing[5],
-        paddingVertical: spacing[3],
+        paddingVertical: spacing[4],
       }}
     >
       <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />

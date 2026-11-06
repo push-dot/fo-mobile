@@ -24,15 +24,14 @@ tags:
     when:
       platform: iOS
     commands:
-      # The Switch is the second "재직 중" match, after its label text.
       - tapOn:
           text: "재직 중"
-          index: 1
+          index: 0
       - waitForAnimationToEnd
       - takeScreenshot: EditCareerStates.1
       - tapOn:
           text: "재직 중"
-          index: 1
+          index: 0
       - tapOn: "직무.*"
       - eraseText
       - runFlow: _hide_kbd.yaml

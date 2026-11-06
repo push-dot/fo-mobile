@@ -31,19 +31,8 @@ tags:
 - takeScreenshot: EditIntro
 - tapOn: "닫기"
 
-# The skills section ends under the tab bar even at the bottom of the scroll, so on iOS tap the strip of its pencil above the bar.
 - scroll
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - tapOn:
-          point: "91%,90%"
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - tapOn: "기술 스택 편집"
+- tapOn: "기술 스택 편집"
 - extendedWaitUntil:
     visible: ".*내 기술 .*개.*"
     timeout: 10000

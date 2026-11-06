@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
 import { useStartChat } from '@/features/chat'
 import { usePosting } from '@/features/jobs'
@@ -12,6 +12,7 @@ import {
   ListSkeleton,
   FIX_DOC,
   hubProfile,
+  type ProfileSection,
   pushCardLines,
   SET_BASE_COPY,
   tenureLabel,
@@ -22,21 +23,43 @@ import {
   useMyProfile,
   useSetBaseProfile,
 } from '@/features/my'
-import { CtaBar, askConfirm, Badge, Button, showToast, Text, TopBar } from '@/shared/components'
+import { CtaBar, askConfirm, Badge, Button, Icon, showToast, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 const HUB_BADGE = '지원 서류용 프로필(허브형)'
 
-const Section = ({ title, gap = spacing[2], children }: { title: string; gap?: number; children: ReactNode }) => (
+const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
+
+const Section = ({
+  title,
+  onEdit,
+  gap = spacing[2],
+  children,
+}: {
+  title: string
+  onEdit: () => void
+  gap?: number
+  children: ReactNode
+}) => (
   <View style={{ paddingHorizontal: spacing[5], gap }}>
-    <Text v="h3" accessibilityRole="header">
-      {title}
-    </Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Text v="h3" accessibilityRole="header">
+        {title}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${title} 편집`}
+        onPress={onEdit}
+        style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Icon name="edit" size={18} color="t3" />
+      </Pressable>
+    </View>
     {children}
   </View>
 )
 
-const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
+const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet?: boolean }) => {
   const c = useColors()
   const doc = useDocument(id)
   const versions = useDocumentVersions(id)
@@ -67,7 +90,11 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={application ? undefined : '지원 서류용 프로필'} onBack={() => router.back()} />
+      <TopBar
+        title={application ? undefined : '지원 서류용 프로필'}
+        onBack={() => router.back()}
+        safeTop={!(sheet && Platform.OS === 'ios')}
+      />
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />
       ) : (
@@ -123,6 +150,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
               {jobLine ? <Badge label={jobLine} tone="grey" /> : null}
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
+            <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: 10 }} />
             {application || based ? null : (
               <Button
                 label={SET_BASE_COPY.action}
@@ -152,7 +180,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           ) : null}
 
           {intro && !making ? (
-            <Section title="소개">
+            <Section title="소개" onEdit={() => edit('intro')}>
               <Text v="b2" color="t2">
                 {intro}
               </Text>
@@ -160,7 +188,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           ) : null}
 
           {profile.careers.length ? (
-            <Section title="경력" gap={spacing[3]}>
+            <Section title="경력" onEdit={() => edit('career')} gap={spacing[3]}>
               {profile.careers.map((cr, i) => {
                 const last = i === profile.careers.length - 1
                 return (
@@ -191,7 +219,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           ) : null}
 
           {profile.skills.length ? (
-            <Section title="기술 스택" gap={spacing[3]}>
+            <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[3]}>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
                 {profile.skills.map((s) => (
                   <Badge key={s} label={s} tone="grey" />
@@ -211,6 +239,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           />
           <Button
             label={applied ? '지원 완료' : '이 공고에 지원'}
+            icon={applied ? undefined : 'chevron-right-2'}
             disabled={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}

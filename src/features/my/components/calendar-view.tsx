@@ -139,7 +139,7 @@ const CalendarView = () => {
         })}
       </View>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: spacing[3], rowGap: spacing[1], paddingBottom: spacing[3], paddingHorizontal: spacing[5] }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: spacing[2], rowGap: spacing[1], paddingBottom: spacing[3], paddingHorizontal: spacing[5] }}>
         {[...EVENT_TYPES.map((t) => ({ label: t.label, color: EVENT_COLOR[t.key](c) })), { label: 'Google 캘린더', color: c.green }].map((l) => (
           <View key={l.label} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
             <View style={{ width: 6, height: 6, borderRadius: radius.pill, backgroundColor: l.color }} />

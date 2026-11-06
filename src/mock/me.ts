@@ -154,7 +154,7 @@ const draft: ResumeDraft = {
   links: ['github.com/seojun'],
   profile: {
     displayName: '김서준',
-    headline: '결제 시스템을 만드는 4년차 백엔드 개발자',
+    headline: '결제 시스템을 만드는 백엔드 개발자',
     jobCategory: 'dev',
     tenureYears: 4,
     intro:
@@ -205,7 +205,7 @@ const applications: Application[] = [
   app('a3', 'p8', '별빛게임즈', 'DevOps 엔지니어', 'APPLIED', on(10, 16)),
   app('a4', 'p7', '라온헬스', '백엔드 개발자 (Java)', 'ACCEPTED', on(9, 22)),
   app('a5', 'p6', '새벽마켓', '결제 플랫폼 엔지니어', 'REJECTED', on(9, 8)),
-  // Applications behind the Push 서류 cards; the 지원활동 header counts only the first five.
+  // Applications behind the Push 서류 cards; not applied yet, so the list (like push-be's 지원활동) leaves them out.
   ...(
     [
       ['a6', '다온뱅크', '서버 개발자', 76],
@@ -220,7 +220,7 @@ const applications: Application[] = [
     fitScore,
   })),
 ]
-mock('GET', 'applications', ({ query }) => withTotal(applications, query, 5))
+mock('GET', 'applications', ({ query }) => page(applications.filter((a) => a.appliedAt), query))
 
 const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
   id,
@@ -480,15 +480,15 @@ mock('GET', 'me/posts', ({ query }) => page(myPosts, query))
 mock('GET', 'posts/mp[0-9]+', ({ path }) => {
   const p = myPosts.find((x) => x.id === path.split('/').pop())
   return p
-    ? { data: { ...p, body: '연봉 협상 전에 정리해 두면 좋은 것들을 적어 봤어요. 시장 시세, 내가 만든 성과, 포기할 수 있는 조건 순서로 정리하면 대화가 훨씬 편해져요.' } }
+    ? { data: { ...p, body: '이직하면서 연봉 협상을 세 번 해 봤는데, 매번 준비한 만큼 결과가 달랐어요. 지금 연봉과 성과 숫자, 원하는 범위와 그 근거, 연봉 말고 협상할 수 있는 것들까지 미리 적어 두면 훨씬 덜 흔들려요.\n\n특히 "지금 얼마 받으세요?"라는 질문에 바로 숫자로 답하지 않는 연습이 제일 도움이 됐어요.' } }
     : { status: 404, body: { error: { code: 'NOT_FOUND', message: '게시물을 찾을 수 없어요' } } }
 })
 mock('GET', 'posts/mp[0-9]+/comments', ({ path, query }) =>
   page(
     path.includes('mp1/')
       ? [
-          { id: 'mc-1', author: { id: 'u-subin', displayName: '이수빈', avatarUrl: null }, body: '시세는 어디서 확인하세요? 저도 협상 전에 정리해 보고 싶어요.', parentId: null, createdAt: ago(D) },
-          { id: 'mc-2', author: ME, body: '지인 두세 분께 여쭤보고 공고 연봉 범위를 같이 봤어요.', parentId: 'mc-1', createdAt: ago(D - H) },
+          { id: 'mc-1', author: { id: 'u-haeun', displayName: '이하은', avatarUrl: null }, body: '숫자로 바로 답하지 않기, 다음 협상 때 꼭 써 볼게요.', parentId: null, createdAt: ago(20 * H) },
+          { id: 'mc-2', author: { id: 'u3', displayName: '박도윤', avatarUrl: null }, body: '연봉 말고 협상할 수 있는 것들 예시도 더 궁금해요!', parentId: null, createdAt: ago(18 * H) },
         ]
       : [],
     query,

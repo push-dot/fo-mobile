@@ -51,11 +51,12 @@ import {
   Switch,
   Text,
   TextField,
+  ToastHost,
   type MenuAction,
 } from '@/shared/components'
 import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
-import { fontFor, radius, spacing, type, useColors } from '@/theme'
+import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
@@ -96,6 +97,7 @@ const Input = ({
   invalid?: boolean
 }) => {
   const c = useColors()
+  const font = multiline ? type.b2 : type.b1
   return (
     <TextInput
       accessibilityLabel={label}
@@ -114,7 +116,9 @@ const Input = ({
           borderColor: invalid ? c.red : 'transparent',
           paddingHorizontal: spacing[4],
           paddingTop: multiline ? spacing[3] : 0,
-          fontSize: type.b1.fontSize,
+          fontSize: font.fontSize,
+          lineHeight: font.lineHeight,
+          letterSpacing: font.letterSpacing,
           color: c.t1,
           textAlignVertical: multiline ? 'top' : 'center',
         },
@@ -425,8 +429,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
       <SheetHeader
         title={TITLES.career}
         saving={save.isPending}
-        canSave={parsed.every(Boolean)}
-        onSave={() => save.mutate({ careers: parsed as Career[] })}
+        onSave={() => parsed.every(Boolean) && save.mutate({ careers: parsed as Career[] })}
       />
       <ScrollView
         contentContainerStyle={FORM}
@@ -459,8 +462,9 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: spacing[2],
-                    minHeight: 32,
+                    minHeight: 24,
                   }}
+                  hitSlop={hitSlopTo(24)}
                 >
                   <Text v="b1" weight="700" numberOfLines={1} style={{ flex: 1 }}>
                     {it.company || '새 경력'}
@@ -715,6 +719,7 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
       }}
     >
       {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
+      {Platform.OS === 'ios' ? <ToastHost /> : null}
     </KeyboardAvoidingView>
   )
 }

@@ -1,5 +1,6 @@
 import type { Settings } from '@push/api-client'
 import { router, useLocalSearchParams } from 'expo-router'
+import { useEffect } from 'react'
 import { View } from 'react-native'
 import { RadioRow, SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
 import { Sheet } from '@/shared/components'
@@ -8,6 +9,9 @@ const SettingsPickSheetScreen = () => {
   const { kind } = useLocalSearchParams<{ kind: SettingsPickKind }>()
   const { s, set } = useSettings()
   const pick = SETTINGS_PICKS[kind]
+  useEffect(() => {
+    if (!pick) router.back()
+  }, [pick])
   if (!pick) return null
   const current = s?.[pick.field]
   return (

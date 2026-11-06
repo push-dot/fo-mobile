@@ -1,11 +1,13 @@
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import {
+  ListSkeleton,
   overwriteWarning,
   profilePatch,
   profileSections,
   replacedLabels,
+  RETRY_LABEL,
   useApplyResumeProfile,
   useMyProfile,
   useResumeDraft,
@@ -56,12 +58,22 @@ const CheckRow = ({ label, sub, on, onPress }: { label: string; sub: string; on:
 const DocToProfileSheetScreen = () => {
   const c = useColors()
   const { id } = useLocalSearchParams<{ id: string }>()
-  const draft = useResumeDraft(id).data?.profile
+  const query = useResumeDraft(id)
+  const draft = query.data?.profile
   const { data: me } = useMyProfile()
   const apply = useApplyResumeProfile(() => undefined)
   const sections = draft ? profileSections(draft) : []
   const [picked, setPicked] = useState<ProfileSectionKey[] | null>(null)
-  if (!draft) return null
+  if (!draft)
+    return (
+      <Sheet
+        title="이 이력서로 프로필을 채울까요?"
+        onClose={() => router.back()}
+        action={query.isPending ? undefined : { label: RETRY_LABEL, onPress: () => void query.refetch() }}
+      >
+        {query.isPending ? <ListSkeleton count={3} /> : null}
+      </Sheet>
+    )
   const chosen = picked ?? sections.filter((s) => s.on).map((s) => s.key)
   const toggle = (key: ProfileSectionKey) => setPicked(chosen.includes(key) ? chosen.filter((k) => k !== key) : [...chosen, key])
   const warning = overwriteWarning(replacedLabels(draft, me, chosen))

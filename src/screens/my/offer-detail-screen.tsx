@@ -67,7 +67,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
           </View>
         </View>
         <View style={{ alignSelf: 'flex-start' }}>
-          <Chip label="허브 프로필 보기" onPress={() => router.push(`/profiles/${who.id}`)} />
+          <Chip label="허브 프로필 보기" icon="user" chevron onPress={() => router.push(`/profiles/${who.id}`)} />
         </View>
         <View
           style={{

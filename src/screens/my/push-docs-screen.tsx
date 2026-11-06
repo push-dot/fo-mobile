@@ -1,6 +1,6 @@
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, useDocuments, useMyApplications } from '@/features/my'
 import { GlassButton, Text } from '@/shared/components'
@@ -17,7 +17,7 @@ const Line = ({ doc }: { doc: HubDocument }) => {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, monthDay(doc.updatedAt)].filter(Boolean).join(', ')}
-      onPress={() => router.push(`/docs/push/${doc.id}`)}
+      onPress={() => router.push({ pathname: '/docs/push/[id]', params: { id: doc.id, sheet: '1' } })}
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], borderRadius: radius.card, borderWidth: 1, borderColor: c.line, paddingVertical: spacing[4], paddingLeft: spacing[5], paddingRight: spacing[4] }}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -48,7 +48,7 @@ const PushDocsScreen = () => {
   const { data, isLoading } = useDocuments()
   const docs = data?.data ?? []
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: insets.top }}>
+    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: Platform.OS === 'ios' ? 0 : insets.top }}>
       <View style={{ height: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[2] }}>
         <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>

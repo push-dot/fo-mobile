@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { Pressable, View } from 'react-native'
-import { SHEET_SWAP_MS, useDocDelete, useSource } from '@/features/my'
-import { Icon, Sheet, Text, type IconName } from '@/shared/components'
+import { deleteConfirm, useDocDelete, useSource } from '@/features/my'
+import { Icon, Sheet, Text, useConfirmStore, type IconName } from '@/shared/components'
 import { spacing } from '@/theme'
 
 const ICON_BOX = 24
@@ -30,8 +30,8 @@ const DocMoreSheetScreen = () => {
   }
   const remove = () => {
     if (!doc) return
-    router.back()
-    setTimeout(() => useDocDelete.setState({ doc }), SHEET_SWAP_MS)
+    useConfirmStore.getState().set(deleteConfirm(doc, () => useDocDelete.setState({ doc })))
+    router.replace('/confirm')
   }
   return (
     <Sheet gap={spacing[3]}>

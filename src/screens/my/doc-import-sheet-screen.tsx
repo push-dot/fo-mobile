@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
-import { PickRow, pickResume, SHEET_SWAP_MS, useDocImport } from '@/features/my'
+import { PickRow, useDocImport } from '@/features/my'
 import { Sheet } from '@/shared/components'
 
 const DocImportSheetScreen = () => (
@@ -12,8 +12,8 @@ const DocImportSheetScreen = () => (
         title="파일에서 고르기"
         sub="PDF, DOCX · 20MB까지"
         onPress={() => {
+          useDocImport.setState({ requested: true })
           router.back()
-          setTimeout(() => void pickResume().then((file) => file && useDocImport.setState({ file })), SHEET_SWAP_MS)
         }}
       />
       <PickRow

@@ -273,7 +273,7 @@ export const useApplyResumeProfile = (onDone: () => void) => {
     onSuccess: (p) => {
       qc.setQueryData(['me', 'profile'], p)
       onDone()
-      router.navigate({ pathname: '/my', params: { tab: 'profile' } })
+      router.dismissTo({ pathname: '/my', params: { tab: 'profile' } })
     },
     onError: () => Alert.alert('프로필에 반영하지 못했어요', '잠시 뒤에 다시 반영해 주세요.'),
   })

@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useEffect } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -8,8 +7,7 @@ import { Button, Icon, Text, showToast } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
-import { pickResume, useUndoRemove } from '../hooks'
-import { useDocImport } from '../stores'
+import { pickResume, useImportRequest, useUndoRemove } from '../hooks'
 import type { HubDocument, MySource } from '../types'
 import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
 import FitRing from './fit-ring'
@@ -111,18 +109,13 @@ const DocsTab = () => {
   const c = useColors()
   const { data, isLoading } = useSources()
   const push = useDocuments()
-  const undo = useUndoRemove()
+  const hidden = useUndoRemove()
   const { upload, start, cancel } = useUpload(() => showToast({ message: '이력서 파일을 올렸어요', tone: 'success' }))
-  const imported = useDocImport((st) => st.file)
-  useEffect(() => {
-    if (!imported) return
-    useDocImport.setState({ file: null })
-    void start(imported)
-  }, [imported, start])
   const pickFile = () => void pickResume().then((file) => file && start(file))
+  useImportRequest(pickFile)
 
   if (isLoading) return <ActivityIndicator style={{ marginTop: 60 }} />
-  const docs = (data?.data ?? []).filter((d) => d.id !== undo.hiddenId)
+  const docs = (data?.data ?? []).filter((d) => !hidden.includes(d.id))
   const pushDocs = push.data?.data ?? []
   const preview = pushDocs.slice(0, 3)
   if (docs.length === 0 && preview.length === 0 && !upload && !push.isLoading) {
@@ -166,7 +159,7 @@ const DocsTab = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: spacing[6] }}>
         {preview.length > 0 ? (
           <>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: spacing[6], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
