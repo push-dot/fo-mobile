@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { ScrollView, useWindowDimensions, View } from 'react-native'
-import { useStartChat } from '@/features/chat'
+import { useShareFile, useStartChat } from '@/features/chat'
 import {
   FIX_DOC,
   PREVIEW_HEADINGS,
@@ -10,7 +10,6 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
-import { shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors, useShadow } from '@/theme'
 
 const PAGE_PAD = 36
@@ -108,6 +107,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const start = useStartChat()
   const doc = useSource(id)
+  const share = useShareFile()
   const draft = useResumeDraft(id)
   useUndoRemove(() => router.back())
   const s = doc.data
@@ -121,8 +121,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         right={
           <GlassButton
             actions={[
-              // shortcut: Source has no download URL yet, so 공유 shares the file name; share the file once push-be returns a URL.
-              { icon: 'share', label: '공유', onPress: () => s && void shareMessage({ message: s.fileName }) },
+              { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
               { icon: 'menu', label: '더 보기', onPress: () => router.push({ pathname: '/docs/[id]/more', params: { id, viewing: '1' } }) },
             ]}
           />

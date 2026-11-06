@@ -3,7 +3,7 @@ import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { onAccent, radius, spacing, tile, useColors, useShadow, type Colors } from '../../../theme'
 import { Badge, Button, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { useOpenArtifact } from '../api/hooks'
+import { useOpenArtifact, useShareFile } from '../api/hooks'
 import { usePop, usePulse, useReduceMotion } from '../hooks'
 import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
@@ -567,6 +567,7 @@ const ResultCard = ({
   awaiting?: boolean
 }) => {
   const chrome = resultChrome(item)
+  const share = useShareFile()
   const save = profileSaveCopy(item)
   const title = save?.title ?? resultTitle(item)
   const press = (id: ResultActionId) => (id === 'apply' ? onApply() : id === 'convert' ? onConvert() : onView())
@@ -584,7 +585,7 @@ const ResultCard = ({
           </Text>
         </View>
         {save ? <Button label={save.buttons[0]} variant={RESULT_VARIANT.view} size="sm" onPress={onView} /> : null}
-        {chrome.share ? <ShareButton onPress={() => void shareMessage({ message: title, title })} /> : null}
+        {chrome.share ? <ShareButton onPress={() => share.mutate({ documentId: item.documentId, name: item.source === 'external' ? item.fileName : undefined })} /> : null}
       </Surface>
       {actions.length ? (
         <View style={{ gap: spacing[2] }}>

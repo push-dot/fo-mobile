@@ -9,7 +9,7 @@ import { copyText, openUrl } from '@/shared/infrastructure'
 import { LINK_DELETED_TOAST, LINK_EMPTY, LINK_UNDO, linkDeleteBody } from '../constants'
 import { LINK_KIND_LABEL } from '../utils/links'
 import { linkAddPath } from '../utils/sheet-routes'
-import { useAddLink, useDeleteLink, useMyLinks } from '@/features/my'
+import { useDeleteLink, useMyLinks, useRestoreLink } from '@/features/my'
 import { useStartChat } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import GroupTitle from './group-title'
@@ -50,7 +50,7 @@ export const LinksModal = () => {
   const all = q.data?.data ?? []
   const shown = kind ? all.filter((l) => l.kind === kind) : all
   const remove = useDeleteLink()
-  const restore = useAddLink(() => {})
+  const restore = useRestoreLink()
 
   const act = (l: UserLink, what: 'open' | 'copy' | 'use' | 'delete') => {
     if (what === 'open') void openUrl(l.url)
@@ -75,7 +75,7 @@ export const LinksModal = () => {
         danger: true,
         onConfirm: () =>
           remove.mutate(l.id, {
-            onSuccess: () => showToast({ message: LINK_DELETED_TOAST, action: { label: LINK_UNDO, onPress: () => restore.mutate({ url: l.url, kind: l.kind, aiRead: true }) } }),
+            onSuccess: () => showToast({ message: LINK_DELETED_TOAST, action: { label: LINK_UNDO, onPress: () => restore.mutate(l.id) } }),
           }),
       })
   }

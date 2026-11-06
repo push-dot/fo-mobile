@@ -6,5 +6,7 @@ describe('cacheName', () => {
     expect(cacheName('../05_최종 이력서.pdf')).toBe('.._05_최종_이력서.pdf')
     expect(cacheName('')).toBe('artifact')
     expect(cacheName('05_final_resume.pdf')).toBe('05_final_resume.pdf')
+    for (const dots of ['.', '..', '...', '/', '..%2F']) expect(cacheName(dots)).not.toMatch(/^\.*$|\//)
+    expect(cacheName('..')).toBe('artifact')
   })
 })

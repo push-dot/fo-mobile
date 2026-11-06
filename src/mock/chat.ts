@@ -721,9 +721,13 @@ const links: UserLink[] = [
   { id: 'l7', kind: 'blog', url: 'https://velog.io/@seojun/p95', title: '결제 승인 API p95 절반 아래로 줄이기', status: null, fitCount: 0, aiRead: false, createdAt: ago(30000) },
 ]
 
+const deletedLinks = new Set<string>()
+const linkNotFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'link' } } }
+
 mock('GET', 'me/links', ({ query }) => {
   const kind = query.get('kind')
-  return page(kind ? links.filter((l) => l.kind === kind) : links, query)
+  const live = links.filter((l) => !deletedLinks.has(l.id))
+  return page(kind ? live.filter((l) => l.kind === kind) : live, query)
 })
 mock('POST', 'me/links', ({ body }) => {
   const b = body as { url: string; kind?: LinkKind; title?: string; aiRead?: boolean }
@@ -737,8 +741,14 @@ mock('POST', 'me/links', ({ body }) => {
   return { status: 201, body: { data: link } }
 })
 mock('DELETE', 'me/links/:id', ({ params }) => {
-  const i = links.findIndex((l) => l.id === params.id)
-  if (i >= 0) links.splice(i, 1)
+  if (!links.some((l) => l.id === params.id) || deletedLinks.has(params.id!)) return linkNotFound
+  deletedLinks.add(params.id!)
+})
+mock('POST', 'me/links/:id/restore', ({ params }) => {
+  const link = links.find((l) => l.id === params.id)
+  if (!link) return linkNotFound
+  deletedLinks.delete(link.id)
+  return { data: link }
 })
 
 // ---------- 내 서류 · 계정 ----------

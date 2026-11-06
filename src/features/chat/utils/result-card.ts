@@ -13,6 +13,7 @@ type ResultFields = {
   name?: string
   title?: string
   subtitle?: string
+  documentId?: string
 }
 
 export const resultActions = (card: Pick<ResultFields, 'actions'>) =>
@@ -43,8 +44,9 @@ export const resultMeta = (card: Pick<ResultFields, 'source' | 'pageLine' | 'car
 
 const given = (name: string) => (/^[가-힣]{3}$/.test(name) ? name.slice(1) : name.slice(0, 2))
 
-export const resultChrome = (card: Pick<ResultFields, 'source' | 'name'>) =>
-  card.source === 'external' ? { share: true as const, initials: null } : { share: false as const, initials: given(card.name ?? '') }
+/** 공유 sends the saved document's PDF export, so a card whose document was not saved has nothing to share. */
+export const resultChrome = (card: Pick<ResultFields, 'source' | 'name' | 'documentId'>) =>
+  card.source === 'external' ? { share: !!card.documentId, initials: null } : { share: false, initials: given(card.name ?? '') }
 
 /** 프로필 수정 · Push 프로필 · 경력 → the tool line above the card. */
 export const resultTask = (taskLine: string) => {

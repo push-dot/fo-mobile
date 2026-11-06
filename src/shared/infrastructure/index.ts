@@ -13,10 +13,9 @@ export {
   pickImage,
   hapticImpactLight,
   hapticNotify,
-  saveToCache,
-  shareFile,
   readClipboard,
   copyText,
 } from './platform'
 export { shareMessage } from './platform'
+export { shareBytes } from './share-file'
 export { readNotificationPermission } from './notification-permission'

@@ -1,1 +1,4 @@
-export const cacheName = (name: string) => name.replace(/[^\w.가-힣-]/g, '_') || 'artifact'
+export const cacheName = (name: string) => {
+  const safe = name.replace(/[^\w.가-힣-]/g, '_')
+  return /^\.*$/.test(safe) ? 'artifact' : safe
+}

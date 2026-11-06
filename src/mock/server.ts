@@ -16,6 +16,16 @@ export const mock = (method: string, pattern: string, handler: Handler) => {
   routes.push({ method, re, keys, handler })
 }
 
+const PDF = `%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]>>endobj
+trailer<</Root 1 0 R>>
+%%EOF
+`
+export const pdfResponse = () =>
+  new Response(Uint8Array.from(PDF, (ch) => ch.charCodeAt(0)), { headers: { 'Content-Type': 'application/pdf' } })
+
 /** Cursor page like push-be. Only GET postings reports `total`, so other lists leave it out too. */
 export const page = <T>(items: T[], query: URLSearchParams, withTotal = false) => {
   const limit = Number(query.get('limit') ?? 20)
@@ -54,11 +64,11 @@ export const mockFetch: typeof fetch = async (input, init) => {
     if (!m) continue
     const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(m[i + 1]!)]))
     const out = await r.handler({ method, path, query: url.searchParams, body, params })
+    if (out instanceof Response) return out
     if (out && typeof out === 'object' && 'status' in out && 'body' in out) {
       const o = out as { status: number; body: unknown }
       return json(o.status, o.body)
     }
-    if (out instanceof Response) return out
     return out === undefined ? json(204, null) : json(200, out)
   }
   return json(404, { error: { code: 'NOT_FOUND', message: `mock: ${method} ${path}` } })

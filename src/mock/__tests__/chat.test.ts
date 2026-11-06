@@ -59,4 +59,14 @@ describe('chat mock', () => {
     const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { userMessageId: string | null; events: { type: string }[] }[]
     expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }, { type: 'choice', resolution: { status: 'EXPIRED' } }] })
   })
+
+  it('restores a deleted link with its fit count and date, and restores a live link as is', async () => {
+    const ids = async () => ((await call('GET', 'me/links')).data as { id: string }[]).map((l) => l.id)
+    const before = ((await call('GET', 'me/links')).data as { id: string }[]).find((l) => l.id === 'l1')
+    expect((await mockFetch(new Request('http://x/api/v1/me/links/l1', { method: 'DELETE' }))).status).toBe(204)
+    expect(await ids()).not.toContain('l1')
+    expect((await call('POST', 'me/links/l1/restore')).data).toEqual(before)
+    expect(await ids()).toContain('l1')
+    expect((await call('POST', 'me/links/l1/restore')).data).toEqual(before)
+  })
 })

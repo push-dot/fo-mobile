@@ -67,6 +67,8 @@ export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크�
 export const LINK_EMPTY = '아직 모아 둔 링크가 없어요.'
 export const LINK_ADD_NOTE = '추가하면 에이전트가 README와 커밋을 읽어 둬요'
 export const LINK_DELETED_TOAST = '링크를 삭제했어요'
+export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 뒤에 다시 해 주세요.'
+export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
 export const LINK_UNDO = '되돌리기'
 export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
 export const CONSENT_MORE = '자세히 보기'

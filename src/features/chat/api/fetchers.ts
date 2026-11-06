@@ -73,8 +73,19 @@ export const fetchMyProfile = api.me.profile
 
 export const fetchMentionBookmarks = () => api.me.bookmarks({ limit: 20 })
 
-export const fetchArtifactBytes = async (downloadUrl: string) =>
-  new Uint8Array(await (await c.raw('GET', downloadUrl)).arrayBuffer())
+const bytesOf = async (res: Promise<Response>) => new Uint8Array(await (await res).arrayBuffer())
+
+export const fetchArtifactBytes = (downloadUrl: string) => bytesOf(c.raw('GET', downloadUrl))
+
+export const fetchSourceBytes = (id: string) => bytesOf(api.sources.content(id))
+
+export const fetchDocumentPdf = async (id: string) => {
+  if (!id) throw new Error('no document to export')
+  const doc = await api.documents.get(id)
+  const version = doc.finalizedVersionId ?? doc.latestVersionId
+  if (!version) throw new Error(`document ${id} has no version`)
+  return { title: doc.title, bytes: await bytesOf(api.documents.exportFile(id, version)) }
+}
 
 export const updateAiAccessMode = (mode: AccessMode) => api.me.updateSettings({ aiAccessMode: mode })
 

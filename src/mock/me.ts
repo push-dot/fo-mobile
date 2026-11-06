@@ -13,7 +13,7 @@ import type {
 } from '@push/api-client'
 import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { removeChatDoc } from './chat'
-import { mock, page } from './server'
+import { mock, page, pdfResponse } from './server'
 
 const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
 const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, headline: '' }
@@ -124,6 +124,9 @@ mock('GET', 'sources/:id', ({ params }) => {
     ? { data: s }
     : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
 })
+mock('GET', 'sources/:id/content', ({ params }) =>
+  sources.some((x) => x.id === params.id) ? pdfResponse() : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } },
+)
 mock('DELETE', 'sources/:id', ({ params }) => {
   sources = sources.filter((x) => x.id !== params.id)
   removeChatDoc(params.id!)
@@ -240,13 +243,25 @@ let documents: HubDocument[] = [
   pushDoc('d5', 'a10', '서버 엔지니어 이력서', on(9, 11)),
 ]
 
+// The document the agent saved for the chat upload result card (its documentId), and a tailored draft never finalized; both outside 마이's list.
+const agentDoc: HubDocument = { ...pushDoc('src-upload', '', '김서준_모아페이_백엔드', on(10, 20)), applicationId: null }
+const draftDoc: HubDocument = { ...pushDoc('d-draft', '', '모아페이 맞춤 이력서', on(10, 21)), applicationId: null, kind: 'TAILORED' }
+const findDoc = (id?: string) => [...documents, agentDoc, draftDoc].find((d) => d.id === id)
+// push-be exports a HUB_PROFILE's latest version before finalize; no mock document is finalized.
+const exportable = (d: HubDocument | undefined, versionId?: string) => d?.kind === 'HUB_PROFILE' && d.latestVersionId === versionId
+
 mock('GET', 'documents', ({ query }) => page(documents, query))
 mock('GET', 'documents/:id', ({ params }) => {
-  const doc = documents.find((d) => d.id === params.id)
+  const doc = findDoc(params.id)
   return doc
     ? { data: doc }
     : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
 })
+mock('GET', 'documents/:id/versions/:versionId/export', ({ params }) =>
+  exportable(findDoc(params.id), params.versionId)
+    ? pdfResponse()
+    : { status: 422, body: { error: { code: 'DOCUMENT_NOT_FINALIZED', message: 'only the finalized version can be exported' } } },
+)
 const docText = (type: 'heading' | 'paragraph', text: string) => ({ type, content: [{ type: 'text', text }] })
 const hubContent = {
   type: 'doc',

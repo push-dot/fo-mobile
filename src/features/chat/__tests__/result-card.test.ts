@@ -36,6 +36,7 @@ describe('agent result cards', () => {
     expect(resultButtons(file)).toEqual(['모아페이에 바로 지원하기', '프로필로 전환'])
     expect(resultButtons(file).join(' ')).not.toMatch(/PDF|DOCX|v1/)
     expect(resultChrome(file)).toEqual({ share: true, initials: null })
+    expect(resultChrome({ ...file, documentId: '' })).toEqual({ share: false, initials: null })
   })
 
   it('shows the profile card and the view button', () => {
