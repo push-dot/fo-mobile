@@ -17,7 +17,7 @@ const StatusNote = ({ lines, action, style }: Props) => {
       </Text>
       {action ? (
         <View style={{ marginTop: spacing[3] }}>
-          <Button label={action.label} variant="secondary" size="sm" onPress={action.onPress} />
+          <Button label={action.label} variant="secondary" size="pill" onPress={action.onPress} />
         </View>
       ) : null}
     </View>

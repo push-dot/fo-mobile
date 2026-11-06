@@ -12,7 +12,7 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, Icon, SkeletonRows, StatusNote, Text, TopBar } from '@/shared/components'
+import { Badge, Button, Chip, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 const HubScreen = () => {
@@ -90,7 +90,7 @@ const HubScreen = () => {
             <StatusNote
               lines={['조건에 맞는 프로필이 없어요.']}
               action={{ label: '필터 초기화', onPress: reset }}
-              style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 40, paddingBottom: 140 }}
+              style={emptyNoteStyle(140, false)}
             />
           )
         }

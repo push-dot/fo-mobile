@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import { SheetScroll, docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs, useSheetScrollMax } from '@/features/chat'
+import { docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs } from '@/features/chat'
 import { useBookmarkList } from '@/features/my'
-import { Button, Chip, GlassButton, Icon, Sheet, Text, TextField, type IconName } from '@/shared/components'
+import { Button, Chip, GlassButton, Icon, Sheet, SheetScroll, Text, TextField, useSheetScrollMax, type IconName } from '@/shared/components'
 import { onAccent, selectedRing, spacing, useColors } from '@/theme'
 
 type Row = { id: string; title: string; meta: string }

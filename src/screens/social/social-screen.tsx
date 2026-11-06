@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
-import { Chip, GlassButton, StatusNote, Text, TopBar } from '@/shared/components'
+import { Chip, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const SocialScreen = () => {
@@ -31,7 +31,7 @@ const SocialScreen = () => {
                 },
               ]}
             />
-            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/(tabs)/(social)/compose') }]} />
+            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
           </>
         }
       />
@@ -61,16 +61,15 @@ const SocialScreen = () => {
           q.isPending ? (
             <PostListSkeleton />
           ) : (
-            <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 40, paddingBottom: 140 }}>
-              <StatusNote
-                lines={[q.isError ? '글을 불러오지 못했어요' : '아직 올라온 글이 없어요']}
-                action={
-                  q.isError
-                    ? { label: '다시 불러오기', onPress: () => q.refetch() }
-                    : { label: '글쓰기', onPress: () => router.push('/(app)/(stack)/(tabs)/(social)/compose') }
-                }
-              />
-            </View>
+            <StatusNote
+              lines={[q.isError ? '글을 불러오지 못했어요' : '아직 올라온 글이 없어요']}
+              action={
+                q.isError
+                  ? { label: '다시 불러오기', onPress: () => q.refetch() }
+                  : { label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }
+              }
+              style={emptyNoteStyle(140, false)}
+            />
           )
         }
         ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ padding: spacing[5] }} /> : undefined}

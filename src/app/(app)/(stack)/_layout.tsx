@@ -2,6 +2,9 @@ import { Stack } from 'expo-router'
 import { sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
+// A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
+export const unstable_settings = { initialRouteName: '(tabs)' }
+
 const SignedInStack = () => {
   const c = useColors()
   return (
@@ -11,6 +14,7 @@ const SignedInStack = () => {
       <Stack.Screen name="postings/[id]" />
       <Stack.Screen name="profiles/[id]" />
       <Stack.Screen name="posts/[id]" />
+      <Stack.Screen name="compose" options={{ presentation: 'modal' }} />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="search" />
       <Stack.Screen name="offers/index" />

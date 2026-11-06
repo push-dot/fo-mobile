@@ -3,6 +3,8 @@ import { Platform, View, type ViewProps } from 'react-native'
 import { SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
+import { floatingSheet } from './sheet-scale'
+import { useKeyboardHeight } from './use-keyboard-height'
 import GlassButton from './glass-button'
 import Text from './text'
 
@@ -69,9 +71,12 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
 const IosSheet = (props: Props) => {
   const frame = useSafeAreaFrame()
   const { bottom } = useSafeAreaInsets()
+  const float = floatingSheet(frame.width, Platform.Version, bottom, useKeyboardHeight() > 0)
   return (
     <SafeAreaProvider initialMetrics={{ frame, insets: NO_INSETS }} style={{ flex: 0 }}>
-      <Body {...props} homeInset={bottom} />
+      <View style={float ? { width: float.width, alignSelf: 'center', transform: [{ scale: float.scale }] } : null}>
+        <Body {...props} homeInset={bottom} />
+      </View>
     </SafeAreaProvider>
   )
 }

@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, spacing, useColors } from '@/theme'
-import { Glass, GlassButton, Icon3D, Text } from '@/shared/components'
-import { ComposerArea, ConsentSheet, OPEN_DRAWER, QUICK_STARTS, quickStartPath, useKeyboardHeight, useStartChat, type QuickStart } from '@/features/chat'
+import { Glass, GlassButton, Icon3D, Text, useKeyboardHeight } from '@/shared/components'
+import { ComposerArea, ConsentSheet, OPEN_DRAWER, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
 
 
 const ChatHomeScreen = () => {

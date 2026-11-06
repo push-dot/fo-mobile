@@ -1,9 +1,7 @@
 import { router, useNavigation } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AccessibilityInfo, Animated, Easing, Keyboard, Platform, useWindowDimensions, type LayoutChangeEvent } from 'react-native'
-import { initialWindowMetrics } from 'react-native-safe-area-context'
+import { AccessibilityInfo, Animated, Easing } from 'react-native'
 import { CLOSE_DRAWER } from './constants'
-import { sheetScrollMax } from './utils/sheet-height'
 
 /** Leaves a sidebar page for another screen: iOS shows the page over the open drawer, so close both first and back returns to the chat. */
 export const useLeaveSidebar = () => {
@@ -26,30 +24,6 @@ export const useReduceMotion = () => {
     return () => sub.remove()
   }, [])
   return on
-}
-
-export const useKeyboardHeight = () => {
-  const [height, setHeight] = useState(0)
-  useEffect(() => {
-    const ios = Platform.OS === 'ios'
-    const show = Keyboard.addListener(ios ? 'keyboardWillShow' : 'keyboardDidShow', (e) => setHeight(e.endCoordinates.height))
-    const hide = Keyboard.addListener(ios ? 'keyboardWillHide' : 'keyboardDidHide', () => setHeight(0))
-    return () => (show.remove(), hide.remove())
-  }, [])
-  return height
-}
-
-/** Bounds a SheetScroll by the room left on screen: pass `onSheetLayout` to the Sheet and `onScrollLayout` to the SheetScroll. */
-export const useSheetScrollMax = (cap: number) => {
-  const { height } = useWindowDimensions()
-  const keyboard = useKeyboardHeight()
-  const [sheet, setSheet] = useState(0)
-  const [scroll, setScroll] = useState(0)
-  return {
-    maxHeight: sheetScrollMax(height, initialWindowMetrics?.insets.top ?? 0, keyboard, sheet - scroll, cap),
-    onSheetLayout: (e: LayoutChangeEvent) => setSheet(e.nativeEvent.layout.height),
-    onScrollLayout: (e: LayoutChangeEvent) => setScroll(e.nativeEvent.layout.height),
-  }
 }
 
 export const usePulse = (active: boolean, period = 1000, low = 0.25) => {

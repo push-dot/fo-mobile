@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sheetScrollMax } from '../utils/sheet-height'
+import { sheetScrollMax } from './sheet-height'
 
 describe('sheetScrollMax', () => {
   it('keeps the design share of the window when there is room', () => {
