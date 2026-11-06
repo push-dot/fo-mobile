@@ -29,7 +29,14 @@ name: 홈 → 채용공고 필터 → 상세 → 지원
     visible: "지원하기"
     timeout: 20000
 - takeScreenshot: 01_home_jobs_apply-04
-- tapOn: "지원하기"
+# The first tap on the CTA is sometimes dropped right after the detail screen settles (seen on iOS in PR #160, screen still on the detail); tap until the sheet shows.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn: "지원하기"
+      - extendedWaitUntil:
+          visible: "이 서류로 지원하기"
+          timeout: 6000
 - tapOn: "이 서류로 지원하기"
 - extendedWaitUntil:
     visible: "지원 완료"
