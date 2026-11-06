@@ -32,15 +32,16 @@ const ComposeScreen = () => {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior="padding">
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: ios ? 14 : insets.top + 14, paddingBottom: 14 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: ios ? spacing[4] : insets.top + spacing[4], paddingBottom: spacing[4] }}>
         <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           새 글
         </Text>
-        <Button label="게시" size="sm" disabled={!ready} onPress={() => submit.mutate({ category: category!, title, body, images })} />
+        <Button label="게시" size="pill" style={{ flexGrow: 0 }} disabled={!ready} onPress={() => submit.mutate({ category: category!, title, body, images })} />
       </View>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], gap: 14, paddingBottom: spacing[4] }} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], gap: spacing[4], paddingBottom: insets.bottom + spacing[4] }} keyboardShouldPersistTaps="handled">
         <Menu
+          stretch
           accessibilityLabel={`카테고리, ${category ? categoryLabel(category) : '고르지 않음'}`}
           actions={POST_CATEGORIES.flatMap((x) =>
             x.key ? [{ key: x.key, label: x.label, selected: x.key === category, onPress: () => setCategory(x.key) }] : [],
@@ -50,7 +51,7 @@ const ComposeScreen = () => {
             <Text v="b2" color="t3">
               카테고리
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
               <Text v="b1" weight="700" color={category ? 'acText' : 't4'}>
                 {category ? categoryLabel(category) : '골라 주세요'}
               </Text>
@@ -98,33 +99,33 @@ const ComposeScreen = () => {
             style={[{ fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: 200, textAlignVertical: 'top' }, fontFor('400')]}
           />
         </View>
-      </ScrollView>
-      <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center', paddingHorizontal: spacing[5], paddingTop: spacing[2], paddingBottom: insets.bottom + spacing[3] }}>
-        {images.map((a, i) => (
-          <View key={a.uri}>
-            <Image source={a.uri} contentFit="cover" style={{ width: 80, height: 80, borderRadius: 14, backgroundColor: c.fill2 }} accessibilityIgnoresInvertColors />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`사진 ${i + 1} 빼기`}
-              onPress={() => setImages((prev) => prev.filter((x) => x.uri !== a.uri))}
-              hitSlop={11}
-              style={{ position: 'absolute', top: 5, right: 5, width: 22, height: 22, borderRadius: 11, backgroundColor: c.scrim, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Icon name="x" size={12} color={onAccent} />
-            </Pressable>
-          </View>
-        ))}
-        {images.length < MAX_IMAGES ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
-            <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.bg2, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-              <Icon name="plus" size={22} color="acText" />
-              <Text v="c2" weight="700" color="acText">
-                {images.length}/{MAX_IMAGES}
-              </Text>
+        <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
+          {images.map((a, i) => (
+            <View key={a.uri}>
+              <Image source={a.uri} contentFit="cover" style={{ width: 80, height: 80, borderRadius: 14, backgroundColor: c.fill2 }} accessibilityIgnoresInvertColors />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`사진 ${i + 1} 빼기`}
+                onPress={() => setImages((prev) => prev.filter((x) => x.uri !== a.uri))}
+                hitSlop={11}
+                style={{ position: 'absolute', top: 5, right: 5, width: 22, height: 22, borderRadius: 11, backgroundColor: c.scrim, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Icon name="x" size={12} color={onAccent} />
+              </Pressable>
             </View>
-          </Pressable>
-        ) : null}
-      </View>
+          ))}
+          {images.length < MAX_IMAGES ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
+              <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.bg2, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                <Icon name="plus" size={22} color="acText" />
+                <Text v="c2" weight="700" color="acText">
+                  {images.length}/{MAX_IMAGES}
+                </Text>
+              </View>
+            </Pressable>
+          ) : null}
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }

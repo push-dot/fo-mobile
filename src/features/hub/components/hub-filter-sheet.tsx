@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native'
 import { CAREER_STATUSES, TENURES } from '@push/api-client'
 import { Chip, Text } from '../../../shared/components'
+import { hitSlopTo, type } from '../../../theme'
 import { EMPTY_SHEET, toggle, type Explore, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
 
@@ -20,7 +21,7 @@ const HubFilterSheet = ({ draft, sent, onChange }: Props) => (
       <Text v="h2" accessibilityRole="header">
         필터
       </Text>
-      <Pressable accessibilityRole="button" onPress={() => onChange(EMPTY_SHEET)} hitSlop={12} style={{ minHeight: 44, justifyContent: 'center' }}>
+      <Pressable accessibilityRole="button" onPress={() => onChange(EMPTY_SHEET)} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }}>
         <Text v="c1" weight="700" color="ac">
           초기화
         </Text>

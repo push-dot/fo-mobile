@@ -15,13 +15,11 @@ import {
   toE164,
   usePhoneAuth,
 } from '@/features/auth'
-import { Button, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const PhoneScreen = () => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const email = usePhoneAuth((state) => state.email)
   const provider = usePhoneAuth((state) => state.provider)
   const digits = usePhoneAuth((state) => state.digits)
@@ -86,9 +84,9 @@ const PhoneScreen = () => {
           </Text>
         ) : null}
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
-        <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} />
-      </View>
+      <CtaBar>
+        <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} style={{ flex: 1 }} />
+      </CtaBar>
     </View>
   )
 }

@@ -3,6 +3,7 @@ name: 인증번호 틀림 · 만료 · 5번 초과
 tags:
   - visual
 ---
+# The boards draw each error over a code cut back to 3 digits, so the tour erases after the error shows.
 # The mock reads the code's tail: 482111 wrong, 482222 expired, 482333 too many tries (mock/home.ts).
 - runFlow: _phone_code.yaml
 - inputText: "482111"
@@ -16,6 +17,9 @@ tags:
     when:
       platform: iOS
     commands:
+      - tapOn: "인증번호"
+      - eraseText: 3
+      - runFlow: _hide_kbd.yaml
       - takeScreenshot: SignInErrors.1
 - tapOn: "번호 바꾸기"
 - tapOn: "인증번호 받기"
@@ -33,6 +37,9 @@ tags:
     when:
       platform: iOS
     commands:
+      - tapOn: "인증번호"
+      - eraseText: 3
+      - runFlow: _hide_kbd.yaml
       - takeScreenshot: SignInErrors.2
 - tapOn: "번호 바꾸기"
 - tapOn: "인증번호 받기"

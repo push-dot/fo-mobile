@@ -26,7 +26,7 @@ tags:
 - tapOn: "유성구(.*28)?"
 - waitForAnimationToEnd
 - runFlow:
-    file: _apply_region.yaml
+    file: ../flows/_tap_sheet_button.yaml
     env:
       TEXT: "공고 0개 보기"
 - extendedWaitUntil:

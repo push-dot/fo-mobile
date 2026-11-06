@@ -40,8 +40,12 @@ describe('mock data drawn on the design boards', () => {
   it('searches ‘백엔드’ with the board totals and row order', async () => {
     const found = await fetchJson<Listed>('search?q=백엔드&type=postings')
     expect(found.page.total).toBe(24)
-    expect(found.data.slice(0, 6).map((p) => p.id)).toEqual(['p1', 'p9', 'p10', 'p3', 'p11', 'p12'])
-    expect((await fetchJson<Listed>('search?q=백엔드&type=people')).page.total).toBe(8)
+    expect(found.data.map((p) => p.id)).toEqual(['p1', 'p9', 'p10', 'p3', 'p11', 'p12'])
+    expect(found.data[3]?.title).toBe('서버·백엔드 개발자 (Go)')
+    const people = await fetchJson<Listed>('search?q=백엔드&type=people')
+    expect(people.page.total).toBe(8)
+    expect(people.data).toHaveLength(4)
+    expect((await fetchJson<Listed>('search?q=백엔드&type=posts')).data).toHaveLength(4)
     expect((await fetchJson<Listed>('search?q=데브옵스 인턴&type=postings')).page.total).toBe(0)
   })
 

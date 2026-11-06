@@ -19,10 +19,10 @@ const person = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenure
   ...p,
 })
 const people: Profile[] = [
-  person({ userId: 'u-taeyun', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
+  person({ userId: 'u1', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
   person({ userId: 'u-subin', displayName: '이수빈', headline: '3년차 백엔드 · Node.js', tenureYears: 3, skills: ['Node.js'] }),
   person({ userId: 'u-hyunwoo', displayName: '윤현우', headline: '백엔드 · 대용량 트래픽 경험', tenureYears: 7 }),
-  person({ userId: 'u-jiwoo', displayName: '최지우', headline: '데이터 파이프라인 · 백엔드 협업', tenureYears: 5, skills: ['Spark'] }),
+  person({ userId: 'u4', displayName: '최지우', headline: '데이터 파이프라인 · 백엔드 협업', tenureYears: 5, skills: ['Spark'] }),
   person({ userId: 'u-jihyun', displayName: '오지현', headline: '모아페이 결제 플랫폼팀 백엔드 리드', tenureYears: 9, skills: ['Kotlin', 'Spring Boot'] }),
   person({ userId: 'u-doyun', displayName: '박도윤', headline: '백엔드 개발자 · Go, gRPC', tenureYears: 5, skills: ['Go'] }),
   person({ userId: 'u-seoyeon', displayName: '이서연', headline: '데이터 엔지니어 · 추천 시스템', jobCategory: 'data', tenureYears: 4 }),
@@ -50,20 +50,17 @@ const posts: Post[] = [
 ]
 
 // shortcut: the design's search boards show 공고 24 · 사람 8 · 게시글 13 for ‘백엔드’ in a fixed order; the fixtures are fewer,
-// so this query reports those totals and pins the drawn rows first.
+// so this query reports those totals and returns only the drawn rows.
 const BOARD_QUERY = '백엔드'
 const BOARD_TOTALS = { postings: 24, people: 8, posts: 13 }
 const BOARD_ORDER = {
   postings: ['p1', 'p9', 'p10', 'p3', 'p11', 'p12'],
-  people: ['u-taeyun', 'u-subin', 'u-hyunwoo', 'u-jiwoo'],
+  people: ['u1', 'u-subin', 'u-hyunwoo', 'u4'],
   posts: ['post-1', 's2', 's3', 's4'],
 }
-const pinFirst = <T,>(items: T[], idOf: (t: T) => string, order: string[]) => [
-  ...order.flatMap((id) => items.filter((t) => idOf(t) === id)),
-  ...items.filter((t) => !order.includes(idOf(t))),
-]
-// 도토리증권 shows up under ‘백엔드’ on the board although its title says 서버.
-const POSTING_TAGS: Record<string, string[]> = { p3: ['백엔드'] }
+const onlyOrdered = <T,>(items: T[], idOf: (t: T) => string, order: string[]) => order.flatMap((id) => items.filter((t) => idOf(t) === id))
+// The board draws 도토리증권 as 서버·백엔드 under ‘백엔드’; the other boards show the plain title.
+const BOARD_TITLES: Record<string, string> = { p3: '서버·백엔드 개발자 (Go)' }
 
 mock('GET', 'search', ({ query }) => {
   const q = query.get('q') ?? ''
@@ -71,14 +68,14 @@ mock('GET', 'search', ({ query }) => {
   const board = q.trim() === BOARD_QUERY
   const rank = <T,>(items: T[], fields: (t: T) => string[], idOf: (t: T) => string) => {
     const found = searchHangul(items, q, fields).map((h) => h.item)
-    return board ? pinFirst(found, idOf, BOARD_ORDER[type]) : found
+    return board ? onlyOrdered(found, idOf, BOARD_ORDER[type]) : found
   }
   const hits =
     type === 'people'
       ? rank(people, (p) => [p.displayName, p.headline, ...p.skills], (p) => p.userId)
       : type === 'posts'
         ? rank(posts, (p) => [p.title, p.body], (p) => p.id)
-        : rank(postings, (p) => [p.title, p.company, ...(POSTING_TAGS[p.id] ?? [])], (p) => p.id)
+        : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
   const out = page<Posting | Profile | Post>(hits, query, true)
   return { ...out, page: { ...out.page, total: board ? BOARD_TOTALS[type] : hits.length } }
 })

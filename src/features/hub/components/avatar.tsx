@@ -6,7 +6,7 @@ import { onAccent } from '../../../theme'
 import { FILLS } from '../constants'
 import { givenName } from '../utils'
 
-const fillFor = (id: string) => FILLS[[...id].reduce((n, ch) => n + ch.charCodeAt(0), 0) % FILLS.length]!
+const fillFor = (id: string) => FILLS[[...id].reduce((n, ch) => (n * 33 + ch.charCodeAt(0)) >>> 0, 0) % FILLS.length]!
 
 const Avatar = ({ userId, name, url, size }: { userId: string; name: string; url?: string | null; size: number }) => {
   const box = { width: size, height: size, borderRadius: size / 2 }

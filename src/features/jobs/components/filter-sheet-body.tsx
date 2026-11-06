@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native'
 import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
 import { Text } from '../../../shared/components'
+import { hitSlopTo, type } from '../../../theme'
 import { FILTER_TITLES } from '../constants'
 import { EMPTY, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
 import FilterOptions from './filter-options'
@@ -22,7 +23,7 @@ const FilterSheetBody = ({ kind, draft, trending, onChange }: Props) => {
         <Text v="h2" accessibilityRole="header">
           {FILTER_TITLES[kind]}
         </Text>
-        <Pressable accessibilityRole="button" onPress={() => set(EMPTY[kind])} hitSlop={12} style={{ minHeight: 44, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" onPress={() => set(EMPTY[kind])} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }}>
           <Text v="c1" weight="700" color="acText">
             초기화
           </Text>

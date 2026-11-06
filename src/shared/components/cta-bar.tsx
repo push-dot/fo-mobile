@@ -29,7 +29,7 @@ const CtaBar = ({ children }: { children: ReactNode }) => {
     >
       {ios ? (
         <LinearGradient
-          colors={[c.bg, c.bg, 'transparent']}
+          colors={[c.bg, c.bg, `${c.bg}00`]}
           locations={[0, 0.72, 1]}
           start={{ x: 0, y: 1 }}
           end={{ x: 0, y: 0 }}

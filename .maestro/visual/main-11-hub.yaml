@@ -35,7 +35,6 @@ tags:
     visible: "프로필 46개 보기"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: HubFilter
 - runFlow:
     file: ../flows/_tap_sheet_button.yaml
     env:
@@ -45,18 +44,24 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: Hub
-# 개발·데이터 with 10년+ has no one in the fixtures.
+# The board draws the sheet over the applied filter (badge 2), so reopen it; its draft starts from the store.
 - tapOn: "필터.*"
 - extendedWaitUntil:
-    visible: "재직 기간"
+    visible: "프로필 46개 보기"
     timeout: 10000
-- tapOn: "3.5년"
-- tapOn: "10년\\+"
 - waitForAnimationToEnd
+- takeScreenshot: HubFilter
 - runFlow:
     file: ../flows/_tap_sheet_button.yaml
     env:
-      TEXT: "프로필 .*개 보기"
+      TEXT: "프로필 46개 보기"
+- extendedWaitUntil:
+    visible: ".*김태윤.*"
+    timeout: 10000
+# The empty board repeats the Hub board's filters, which list 46 people; 기획 in place of 개발·데이터 keeps the badge and has no one.
+- tapOn: "개발"
+- tapOn: "데이터"
+- tapOn: "기획"
 - extendedWaitUntil:
     visible: "조건에 맞는 프로필이 없어요."
     timeout: 10000

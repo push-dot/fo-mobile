@@ -42,8 +42,14 @@ let seq = 0
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: '게시물을 찾을 수 없어요' } } }
 
+let feedEmpty = false
+export const emptyFeed = () => {
+  feedEmpty = true
+}
+
 mock('GET', 'posts', ({ query }) => {
   const category = query.get('category') as PostCategory | null
+  if (feedEmpty) return page([], query)
   return page(category ? posts.filter((p) => p.category === category) : posts, query)
 })
 

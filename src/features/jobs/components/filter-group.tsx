@@ -4,7 +4,7 @@ import { spacing } from '../../../theme'
 import { Text } from '../../../shared/components'
 
 const FilterGroup = ({ title, children }: { title: string; children: ReactNode }) => (
-  <View style={{ gap: 10 }}>
+  <View style={{ gap: spacing[3] }}>
     <Text v="b2" weight="700">
       {title}
     </Text>

@@ -50,9 +50,9 @@ const CommentComposer = ({
         glass={false}
         fill={ok ? 'ac' : 'fill2'}
         pressedFill="acPress"
-        style={{ width: 40, height: 40, borderRadius: radius.pill }}
+        style={{ flexGrow: 0, width: 40, height: 40, borderRadius: radius.pill }}
       >
-        {send.isPending ? <ActivityIndicator color={c.t4} /> : <Icon name="up" size={20} color={ok ? onAccent : c.t4} />}
+        {send.isPending ? <ActivityIndicator color={c.t3} /> : <Icon name="up" size={20} color={ok ? onAccent : c.t3} />}
       </GlassPressable>
     </View>
   )

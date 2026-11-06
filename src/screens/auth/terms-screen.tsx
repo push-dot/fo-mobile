@@ -15,15 +15,13 @@ import {
   usePhoneAuth,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
-import { Button, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const blank = () => Object.fromEntries(TERM_ROWS.map((row) => [row.id, false]))
 
 const TermsScreen = () => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const held = usePhoneAuth((state) => state.held)
   const clear = usePhoneAuth((state) => state.clear)
   const [checked, setChecked] = useState<Record<string, boolean>>(blank)
@@ -85,9 +83,9 @@ const TermsScreen = () => {
           </Text>
         ) : null}
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
-        <Button label={TERMS_START} disabled={!requiredOk || busy} onPress={submit} />
-      </View>
+      <CtaBar>
+        <Button label={TERMS_START} disabled={!requiredOk || busy} onPress={submit} style={{ flex: 1 }} />
+      </CtaBar>
     </View>
   )
 }

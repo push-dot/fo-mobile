@@ -2,8 +2,11 @@ import { createApi, createClient } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
 import { mockFetch } from '../../mock'
+import { listenMockLinks } from '../../mock/links'
 import { API_BASE_URL, API_MOCK } from './config'
 import { useSession } from './session-store'
+
+if (API_MOCK) listenMockLinks()
 
 let refreshing: Promise<boolean> | null = null
 

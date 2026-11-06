@@ -14,7 +14,10 @@ const OtpCells = ({ value, onChange, error }: { value: string; onChange: (next: 
       autoComplete="sms-otp"
       maxLength={OTP_LENGTH}
       autoFocus
-      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, opacity: 0 }}
+      caretHidden
+      contextMenuHidden
+      // Not opacity 0: iOS skips views under 0.01 alpha when hit-testing, so tapping the boxes could not refocus the code.
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, color: 'transparent' }}
     />
   </View>
 )

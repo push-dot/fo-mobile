@@ -10,6 +10,7 @@ import {
   loginFailureCopy,
   loginTarget,
   mapPhoneAuthError,
+  otpErrorAfterInput,
   registeredBody,
   registeredButton,
   remainingSeconds,
@@ -106,5 +107,20 @@ describe('phone number', () => {
     expect(emailFromPendingToken(pending('seojun.kim@gmail.com'))).toBe('seojun.kim@gmail.com')
     expect(emailFromPendingToken(pending(null))).toBeNull()
     expect(emailFromPendingToken('not-a-token')).toBeNull()
+  })
+})
+
+describe('otpErrorAfterInput', () => {
+  it('keeps the error while the code is trimmed or retyped short', () => {
+    expect(otpErrorAfterInput('expired', '482222', '482')).toBe('expired')
+    expect(otpErrorAfterInput('invalid', '482', '4821')).toBe('invalid')
+  })
+
+  it('clears the error once a new full code is typed', () => {
+    expect(otpErrorAfterInput('expired', '48222', '482223')).toBeNull()
+  })
+
+  it('keeps the error when the same full code comes back unchanged', () => {
+    expect(otpErrorAfterInput('invalid', '482111', '482111')).toBe('invalid')
   })
 })

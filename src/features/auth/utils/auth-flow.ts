@@ -1,5 +1,5 @@
 import { ApiError } from '@push/api-client'
-import { FAILURE_BODY, PENDING_EXPIRED, PHONE_TAKEN, PHONE_UNAVAILABLE, PROVIDER_LABEL, PROVIDER_ORDER, TRY_AGAIN } from '../constants'
+import { FAILURE_BODY, OTP_LENGTH, PENDING_EXPIRED, PHONE_TAKEN, PHONE_UNAVAILABLE, PROVIDER_LABEL, PROVIDER_ORDER, TRY_AGAIN } from '../constants'
 
 export const formatCountdown = (totalSeconds: number) => {
   const seconds = Math.max(0, Math.floor(totalSeconds))
@@ -9,6 +9,9 @@ export const formatCountdown = (totalSeconds: number) => {
 }
 
 export const countdownLabel = (totalSeconds: number) => `${formatCountdown(totalSeconds)} 후에 다시 받을 수 있어요`
+
+// The boards keep a code error up while the code is edited; a newly completed code is a fresh attempt.
+export const otpErrorAfterInput = <E>(error: E | null, prev: string, next: string) => (next.length === OTP_LENGTH && next !== prev ? null : error)
 
 export const remainingSeconds = (endsAtMs: number, nowMs: number) => Math.max(0, Math.ceil((endsAtMs - nowMs) / 1000))
 

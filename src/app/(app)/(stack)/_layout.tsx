@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router'
-import { LONG_FILTER_KINDS, type FilterKey } from '@/features/jobs'
 import { sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
@@ -36,17 +35,7 @@ const SignedInStack = () => {
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
       <Stack.Screen name="materials" options={sheetOptions(c)} />
-      <Stack.Screen
-        name="job-filter"
-        options={({ route }) =>
-          sheetOptions(
-            c,
-            LONG_FILTER_KINDS.includes((route.params as { kind?: FilterKey })?.kind as FilterKey)
-              ? [0.5, 1]
-              : 'fitToContents',
-          )
-        }
-      />
+      <Stack.Screen name="job-filter" options={sheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />

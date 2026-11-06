@@ -13,7 +13,7 @@ const PostCard = ({ post }: { post: Post }) => {
     <Pressable
       accessibilityRole="button"
       onPress={() => openPost(post.id)}
-      style={({ pressed }) => ({ gap: 10, paddingVertical: 18, paddingHorizontal: spacing[5], opacity: pressed ? 0.7 : 1 })}
+      style={({ pressed }) => ({ gap: spacing[3], paddingVertical: spacing[5], paddingHorizontal: spacing[5], opacity: pressed ? 0.7 : 1 })}
     >
       <AuthorRow post={post} size={36} />
       <View style={{ gap: spacing[1] }}>

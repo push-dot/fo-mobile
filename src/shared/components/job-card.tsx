@@ -8,6 +8,9 @@ import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
 
+// CSS color-mix(in srgb, brand 55%, #000), the cover gradient's end stop.
+const shade = (hex: string) => `#${[1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * 0.55).toString(16).padStart(2, '0')).join('')}`
+
 type Props = {
   posting: Posting
   width?: number
@@ -24,7 +27,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           <Image source={{ uri: assetUrl(p.imageUrl) }} style={{ position: 'absolute', inset: 0 }} contentFit="cover" />
         ) : (
           <>
-            <LinearGradient colors={[brand, `${brand}B3`]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', inset: 0 }} />
+            <LinearGradient colors={[brand, shade(brand)]} start={{ x: 0.13, y: -0.16 }} end={{ x: 0.87, y: 1.16 }} style={{ position: 'absolute', inset: 0 }} />
             <Text v="h1" style={{ fontSize: 52, lineHeight: 60, color: photo.ink, letterSpacing: -2 }}>
               {[...p.company][0]}
             </Text>

@@ -16,6 +16,7 @@ import {
   countdownLabel,
   formatNational,
   mapPhoneAuthError,
+  otpErrorAfterInput,
   needsTerms,
   phoneFailureLine,
   readConsents,
@@ -26,13 +27,11 @@ import {
   verifyPhoneCode,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
-import { Button, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const OtpScreen = () => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const digits = usePhoneAuth((state) => state.digits)
   const pendingToken = usePhoneAuth((state) => state.pendingToken)
   const cooldownEndsAt = usePhoneAuth((state) => state.cooldownEndsAt)
@@ -57,14 +56,16 @@ const OtpScreen = () => {
     if (!e164) return
     setBusy(true)
     setError(null)
+    const before = otpError
+    setOtpError(null)
     sendPhoneCode(e164)
       .then((sent) => {
         setCooldown(Date.now() + sent.cooldownSeconds * 1000)
         setBlocked(false)
-        setOtpError(null)
         setCode('')
       })
       .catch((caught: unknown) => {
+        setOtpError(before)
         const mapped = mapPhoneAuthError(caught)
         if (mapped.kind === 'cooldown') {
           setCooldown(Date.now() + mapped.retryAfterSec * 1000)
@@ -79,6 +80,7 @@ const OtpScreen = () => {
     if (!e164 || code.length !== 6) return
     setBusy(true)
     setError(null)
+    setOtpError(null)
     verifyPhoneCode({ phone: e164, code, pendingToken: pendingToken ?? undefined })
       .then(async (session) => {
         const consent = await readConsents(session.accessToken)
@@ -142,9 +144,9 @@ const OtpScreen = () => {
             <OtpBoxes value="" active={null} />
           </View>
         </View>
-        <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
-          <Button label={RESEND_CODE} disabled={busy} onPress={resend} />
-        </View>
+        <CtaBar>
+          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
+        </CtaBar>
       </View>
     )
   }
@@ -167,8 +169,8 @@ const OtpScreen = () => {
             value={code}
             error={otpError === 'invalid'}
             onChange={(next) => {
+              setOtpError((e) => otpErrorAfterInput(e, code, next))
               setCode(next)
-              setOtpError(null)
             }}
           />
         </View>
@@ -181,13 +183,13 @@ const OtpScreen = () => {
           </Pressable>
         </View>
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16 }}>
+      <CtaBar>
         {otpError === 'expired' ? (
-          <Button label={RESEND_CODE} disabled={busy} onPress={resend} />
+          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
         ) : (
-          <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} />
+          <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} style={{ flex: 1 }} />
         )}
-      </View>
+      </CtaBar>
     </View>
   )
 }

@@ -8,7 +8,7 @@ import ImageGrid from './image-grid'
 
 const PostHeader = ({ post }: { post: Post }) => {
   return (
-    <View style={{ gap: 14, paddingTop: spacing[1], paddingBottom: 14 }}>
+    <View style={{ gap: spacing[4], paddingTop: spacing[1], paddingBottom: spacing[4] }}>
       <AuthorRow post={post} size={40} showViews />
       <Text v="h1">
         {post.title}
@@ -17,7 +17,7 @@ const PostHeader = ({ post }: { post: Post }) => {
         {post.body}
       </Text>
       <ImageGrid urls={post.imageUrls} row={96} />
-      <Band style={{ marginHorizontal: -spacing[5] }} />
+      <Band style={{ marginHorizontal: -spacing[5], marginVertical: 6 }} />
       <Text v="h3">댓글 {post.commentCount}</Text>
     </View>
   )

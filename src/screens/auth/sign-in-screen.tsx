@@ -95,7 +95,7 @@ const SignInScreen = () => {
         {devToken ? (
           <Pressable
             accessibilityRole="button"
-            style={{ minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+            style={{ position: 'absolute', top: '100%', left: 0, right: 0, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => signInWithDevToken(devToken)}
           >
             <Text v="c1" weight="700" color="acText">

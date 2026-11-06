@@ -35,11 +35,11 @@ const PostDetailScreen = ({ id }: { id: string }) => {
           >
             {Platform.OS === 'ios' ? (
               <Glass interactive style={moreButton}>
-                <Icon name="more" size={22} color="t1" />
+                <Icon name="menu" size={22} color="t1" />
               </Glass>
             ) : (
               <View style={moreButton}>
-                <Icon name="more" size={22} color="t1" />
+                <Icon name="menu" size={22} color="t1" />
               </View>
             )}
           </Menu>

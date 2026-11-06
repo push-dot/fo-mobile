@@ -14,9 +14,8 @@ import {
   type LoginProvider,
 } from '@/features/auth'
 import { signIn, signInWithApple, type SignInOutcome } from '@/shared/infrastructure'
-import { Button, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   if (outcome.kind !== 'phone') return
@@ -26,7 +25,6 @@ const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
 
 const PhoneRegisteredScreen = () => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const apple = useAppleSignIn()
   const providers = usePhoneAuth((state) => state.providers)
   const [busy, setBusy] = useState(false)
@@ -84,18 +82,20 @@ const PhoneRegisteredScreen = () => {
           </View>
         ) : null}
       </View>
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 16, gap: spacing[2] }}>
-        <Button label={list} disabled={busy || target == null} onPress={press} />
-        <Button
-          label={OTHER_NUMBER}
-          variant="secondary"
-          disabled={busy}
-          onPress={() => {
-            usePhoneAuth.getState().setDigits('')
-            router.dismissTo('/phone')
-          }}
-        />
-      </View>
+      <CtaBar>
+        <View style={{ flex: 1, gap: spacing[2] }}>
+          <Button label={list} disabled={busy || target == null} onPress={press} />
+          <Button
+            label={OTHER_NUMBER}
+            variant="secondary"
+            disabled={busy}
+            onPress={() => {
+              usePhoneAuth.getState().setDigits('')
+              router.dismissTo('/phone')
+            }}
+          />
+        </View>
+      </CtaBar>
     </View>
   )
 }

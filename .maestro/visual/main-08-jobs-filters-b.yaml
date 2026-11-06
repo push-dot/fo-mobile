@@ -18,7 +18,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: FilterSkill
 - runFlow:
-    file: _apply_region.yaml
+    file: ../flows/_tap_sheet_button.yaml
     env:
       TEXT: "공고 214개 보기"
 - tapOn: "전체"
@@ -34,7 +34,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: FilterRegion
 - runFlow:
-    file: _apply_region.yaml
+    file: ../flows/_tap_sheet_button.yaml
     env:
       TEXT: "공고 398개 보기"
 - tapOn: "전체"

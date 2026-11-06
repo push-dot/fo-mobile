@@ -31,7 +31,8 @@ const JobListScreen = () => {
           <Skeleton width={80} height={12} />
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[5], paddingBottom: spacing[3] }}>
+        // The 44pt sort target overhangs the design's 20 / 18 / 12 count row.
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: 7, marginBottom: -1 }}>
           <Text v="c1" weight="600" color="t3">
             {total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
           </Text>
