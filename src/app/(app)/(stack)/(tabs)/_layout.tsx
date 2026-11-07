@@ -1,6 +1,6 @@
 import { NativeTabs } from 'expo-router/native-tabs'
 import { Platform } from 'react-native'
-import { tabColor, useColors, useThemeMode } from '@/theme'
+import { fontFor, tabColor, type, useColors, useThemeMode } from '@/theme'
 
 // Tab bar icons rendered from the Claude Design line icons and the mascot (assets/tabs, @2x/@3x).
 const ICONS = {
@@ -18,6 +18,8 @@ const TabsLayout = () => {
   const idle = tabColor(platform, false, c)
   const selected = tabColor(platform, true, c)
   const android = platform === 'android'
+  // The iOS floating tab bar draws 10px labels, Android 11px (design .ios .tabbar a).
+  const label = { ...fontFor(type.tab.weight), fontSize: android ? type.tab.fontSize : 10 }
   return (
     // Android: label every tab like the design boards (Material hides unselected labels by default).
     <NativeTabs
@@ -25,7 +27,7 @@ const TabsLayout = () => {
       labelVisibilityMode="labeled"
       tintColor={selected}
       iconColor={{ default: idle, selected }}
-      labelStyle={{ default: { color: idle }, selected: { color: selected } }}
+      labelStyle={{ default: { ...label, color: idle }, selected: { ...label, color: selected } }}
       backgroundColor={android ? c.bg : undefined}
       rippleColor={c.fill}
       disableIndicator

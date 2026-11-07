@@ -1,6 +1,6 @@
 import { SegmentedButton, SingleChoiceSegmentedButtonRow, Text } from '@expo/ui/jetpack-compose'
 import { fillMaxWidth, weight } from '@expo/ui/jetpack-compose/modifiers'
-import { useColors, useThemeMode } from '../../theme'
+import { fontFor, type, useColors, useThemeMode } from '../../theme'
 import NativeHost from './native-host'
 
 export type SegmentedControlProps<K extends string> = {
@@ -32,7 +32,7 @@ const SegmentedControl = <K extends string,>({ items, value, onChange }: Segment
             modifiers={[weight(1)]}
           >
             <SegmentedButton.Label>
-              <Text>{it.label}</Text>
+              <Text style={{ ...fontFor(type.segLabel.weight), fontSize: type.segLabel.fontSize }}>{it.label}</Text>
             </SegmentedButton.Label>
           </SegmentedButton>
         ))}
