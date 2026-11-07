@@ -14,7 +14,7 @@ export type ToastInput = {
 export type Toast = ToastInput & { id: number }
 
 /** Artboard toast bottoms above the safe inset, given the tab bar's height above it. */
-export const toastOffsets = (tabBar: number) => ({ tabs: tabBar + 14, docsCta: tabBar + 100, docsError: tabBar + 150, cta: 92 }) as const
+export const toastOffsets = (tabBar: number) => ({ tabs: tabBar + 14, docsError: tabBar + 150, cta: 92 }) as const
 
 type OpenSheet = { id: string; height: number }
 type State = { current: Toast | null; hosts: string[]; sheets: OpenSheet[] }

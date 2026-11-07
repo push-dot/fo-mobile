@@ -45,8 +45,7 @@ const CommentComposer = ({
         accessibilityRole="button"
         accessibilityLabel="보내기"
         accessibilityState={{ disabled: !ok }}
-        disabled={!ok}
-        onPress={() => send.mutate({ text, parentId: replyTo?.id })}
+        onPress={() => ok && send.mutate({ text, parentId: replyTo?.id })}
         hitSlop={4}
         glass={false}
         fill={ok ? 'ac' : 'fill2'}

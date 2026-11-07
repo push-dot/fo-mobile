@@ -5,10 +5,16 @@ import { Alert } from 'react-native'
 import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
-import { nextEventFor, restoreLinkFailure } from '../utils'
+import { showToast } from '@/shared/components'
+import { useSession } from '@/shared/infrastructure'
+import { nextEventFor, offerMenu, restoreLinkFailure } from '../utils'
 import {
   acceptOffer,
   addLink,
+  archiveOffer,
+  blockUser,
+  reportOffer,
+  unarchiveOffer,
   declineOffer,
   deleteLink,
   restoreLink,
@@ -340,6 +346,15 @@ export const useOfferDecision = (id: string, reply: string, onAccepted: () => vo
   })
   const decline = useMutation({ mutationFn: () => declineOffer(id), onSuccess: done })
   return { accept, decline }
+}
+
+export const useOfferMenu = (offer: Offer | undefined) => {
+  const qc = useQueryClient()
+  const viewerId = useSession((s) => s.session?.user.id) ?? ''
+  if (!offer) return null
+  const refresh = () =>
+    Promise.all([qc.invalidateQueries({ queryKey: ['me', 'offers'] }), qc.invalidateQueries({ queryKey: ['me', 'offer', offer.id] })])
+  return offerMenu(offer, viewerId, { archive: archiveOffer, unarchive: unarchiveOffer, report: reportOffer, block: blockUser, refresh, back: router.back, toast: showToast })
 }
 
 export const usePostingDetail = (postingId: string | undefined) =>

@@ -53,14 +53,13 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
           {o.message}
         </Text>
       </View>
-      {unread ? (
-        <View
-          style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac, marginTop: spacing[2] }}
-        />
-      ) : null}
+      {unread ? <View style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac }} /> : null}
     </Row>
   )
 }
+
+// The board ends the list and lifts its empty state by the same 40pt.
+const LIST_END = 40
 
 const OffersScreen = () => {
   const c = useColors()
@@ -83,11 +82,12 @@ const OffersScreen = () => {
           onChange={setBox}
         />
       </View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {q.isLoading ? <SkeletonRows {...OFFER_SKELETON} /> : null}
         {q.data?.data.length === 0 ? (
           <Empty
             text={box === 'received' ? '아직 받은 제안이 없어요.' : '아직 보낸 제안이 없어요.'}
+            lift={LIST_END}
             action={box === 'received' ? OFFER_EMPTY_ACTION : undefined}
             onAction={box === 'received' ? () => router.push('/edit-profile/basic') : undefined}
           />
@@ -96,7 +96,7 @@ const OffersScreen = () => {
           <OfferRow key={o.id} o={o} box={box} />
         ))}
         {q.data?.data.length ? (
-          <Text v="c2" color="t3" style={{ paddingTop: spacing[5], paddingHorizontal: spacing[6] }}>
+          <Text v="c2" color="t3" style={{ paddingTop: spacing[5], paddingBottom: LIST_END, paddingHorizontal: spacing[6] }}>
             {box === 'received'
               ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
               : '상대가 읽으면 ‘읽음’으로 바뀌고, 수락하면 대화를 시작할 수 있어요.'}

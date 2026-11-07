@@ -108,6 +108,13 @@ export const OFFER_DECLINE = '거절'
 export const OFFER_FAIL = '잠시 뒤에 다시 보내 주세요.'
 export const OFFER_FAIL_TITLE = '메시지를 보내지 못했어요'
 export const OFFER_FAIL_LINE = `${OFFER_FAIL_TITLE}. ${OFFER_FAIL}`
+// shortcut: placeholder toast copy; the menu items stay hidden until Claude Design draws the toasts (design-gaps request 2026-11-07c).
+export const OFFER_MENU_COPY = {
+  archived: '제안을 보관했어요',
+  undo: '되돌리기',
+  reported: '신고했어요',
+  failed: '잠시 뒤에 다시 시도해 주세요.',
+}
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
 export const PUSH_DOCS_TITLE = 'Push 서류'

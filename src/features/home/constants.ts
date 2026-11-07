@@ -6,6 +6,7 @@ export const HOME_POSTING_LIMIT = 10
 export const SECTION_ERROR_LINES = ['공고를 불러오지 못했어요.', '잠시 후 다시 열어 주세요.'] as const
 export const SECTION_RETRY_LABEL = '다시 시도'
 export const SECTION_SKELETON_CARDS = 2
+export const HOME_SKELETON_SECTIONS = 2
 export const SECTION_SKELETON_CARD_WIDTH = 200
 
 export const SHORTCUTS: { label: string; icon: Icon3DName; glow: string; opacity: number; href: Href }[] = [

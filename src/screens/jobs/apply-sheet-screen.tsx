@@ -17,7 +17,7 @@ const ApplySheetScreen = () => {
   const chosen = extras.filter((d) => extraIds.includes(d.id))
   const apply = useApplyPosting(postingId ?? '', () => {
     router.back()
-    showToast({ message: '지원했어요. 내 활동에서 진행 상황을 볼 수 있어요', bottom: TOAST_ABOVE.cta })
+    showToast({ message: '지원했어요. 내 활동에서 진행 상황을 볼 수 있어요', tone: 'success', bottom: TOAST_ABOVE.cta })
   })
 
   useEffect(() => {

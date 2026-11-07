@@ -21,6 +21,10 @@ export const useOfferBookmarks = (visible: boolean) =>
     enabled: visible,
   })
 
+// BLOCKED: the other person blocked the viewer, so retrying cannot help and the retry advice is dropped.
+const sendOfferError = (e: unknown) =>
+  e instanceof ApiError && e.code === 'CONFLICT' ? '이미 제안을 보냈어요.' : e instanceof ApiError && e.code === 'BLOCKED' ? '제안을 보내지 못했어요.' : '제안을 보내지 못했어요. 잠시 후 다시 시도해 주세요.'
+
 export const useSendOffer = (userId: string, message: string, postingId: string | undefined, onDone: () => void, onFail: (message: string) => void) => {
   const qc = useQueryClient()
   return useMutation({
@@ -30,7 +34,7 @@ export const useSendOffer = (userId: string, message: string, postingId: string 
       onDone()
     },
     onError: (e) =>
-      onFail(e instanceof ApiError && e.code === 'CONFLICT' ? '이미 제안을 보냈어요.' : '제안을 보내지 못했어요. 잠시 후 다시 시도해 주세요.'),
+      onFail(sendOfferError(e)),
   })
 }
 

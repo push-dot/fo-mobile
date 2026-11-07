@@ -6,7 +6,7 @@ tags:
 # The rules must be set before 내 활동 first loads each list (the queries cache for 30s); the link lands on the social tab, which asks for none of them.
 - runFlow: ../flows/_login.yaml
 - runFlow: ../flows/_dismiss_logbox.yaml
-- openLink: push://social?mock=empty:GET:applications$,empty:GET:me/bookmarks,empty:GET:me/follows$,empty:GET:me/posts$
+- openLink: push://social?mock=empty:GET:applications$,empty:GET:me/bookmarks,empty:GET:me/follows$,empty:GET:me/followers$,empty:GET:me/posts$,empty:GET:me/commented-posts$
 - extendedWaitUntil:
     visible: "직장 생활"
     timeout: 10000

@@ -70,7 +70,6 @@ const NotificationsScreen = () => {
               <EmptyBell />
               <StatusNote
                 lines={[NOTIFICATION_EMPTY]}
-                style={{ gap: spacing[3] }}
                 action={settingsVisible ? { label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings } : undefined}
               />
             </View>

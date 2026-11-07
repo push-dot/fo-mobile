@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { initialWindowMetrics, SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   CAREER_STATUSES,
   JOB_CATEGORIES,
@@ -506,25 +506,25 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        minHeight: 48,
-                        borderRadius: radius.md,
-                        backgroundColor: c.bg,
-                        paddingLeft: spacing[4],
-                        paddingRight: spacing[2],
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Text v="b1">재직 중</Text>
-                      <Switch
-                        label="재직 중"
-                        value={it.current}
-                        onValueChange={(v) => set(i, { current: v })}
-                      />
+                    {/* padding on a flex:1 item widens it past the 50/50 split, so it lives on the inner row */}
+                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: c.bg }}>
+                      <View
+                        style={{
+                          minHeight: 48,
+                          paddingLeft: spacing[4],
+                          paddingRight: spacing[2],
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Text v="b1">재직 중</Text>
+                        <Switch
+                          label="재직 중"
+                          value={it.current}
+                          onValueChange={(v) => set(i, { current: v })}
+                        />
+                      </View>
                     </View>
                   </View>
                   {!it.current ? (
@@ -635,6 +635,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
           placeholder="기술 검색"
           value={q}
           onChangeText={setQ}
+          style={q ? fontFor('600') : undefined}
           onSubmitEditing={() => add(hits[0]?.item ?? q)}
           returnKeyType="done"
           autoCapitalize="none"
@@ -650,7 +651,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
               paddingHorizontal: spacing[2],
             }}
           >
-            {hits.map(({ item, match }) => {
+            {hits.map(({ item, match }, n) => {
               const [a, b] = match ? [match.start, match.end] : [0, 0]
               return (
                 <Pressable
@@ -667,8 +668,8 @@ const EditSkills = ({ p }: { p: Profile }) => {
                     borderRadius: radius.sm,
                   }}
                 >
-                  <Icon name="plus" size={16} color="t3" />
-                  <Text v="b1">
+                  <Icon name="plus" size={16} />
+                  <Text v="b1" weight={n === 0 ? '700' : undefined}>
                     {item.slice(0, a)}
                     <Text v="b1" weight="700" color="acText">
                       {item.slice(a, b)}
@@ -706,24 +707,32 @@ const EditSkills = ({ p }: { p: Profile }) => {
 
 const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
+  const raw = useSafeAreaInsets()
+  // A modal over the tab bar reports the tab bar as part of the bottom inset (home indicator + bar); the modal only has the window's home inset.
+  const insets = { ...raw, bottom: Platform.OS === 'ios' ? (initialWindowMetrics?.insets.bottom ?? 0) : raw.bottom }
   const { data: p } = useMyProfile()
   const Form =
     { basic: EditBasic, intro: EditIntro, career: EditCareer, skills: EditSkills }[section] ??
     EditBasic
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{
-        flex: 1,
-        backgroundColor: c.bg,
-        paddingTop: Platform.OS === 'android' ? insets.top : 0,
-        paddingBottom: insets.bottom,
-      }}
-    >
-      {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
-      {Platform.OS === 'ios' ? <ToastHost /> : null}
-    </KeyboardAvoidingView>
+    <View style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{
+          flex: 1,
+          backgroundColor: c.bg,
+          paddingTop: Platform.OS === 'android' ? insets.top : 0,
+          paddingBottom: insets.bottom,
+        }}
+      >
+        {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
+      </KeyboardAvoidingView>
+      {Platform.OS === 'ios' ? (
+        <SafeAreaInsetsContext.Provider value={insets}>
+          <ToastHost />
+        </SafeAreaInsetsContext.Provider>
+      ) : null}
+    </View>
   )
 }
 

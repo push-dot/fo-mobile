@@ -5,6 +5,7 @@ import {
   Avatar,
   clock,
   counterpart,
+  Logo,
   OFFER_DECLINE,
   OfferPostingCard,
   offerBadge,
@@ -66,7 +67,11 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
         keyboardShouldPersistTaps="handled"
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
-          <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
+          {who.kind === 'COMPANY' ? (
+            <Logo name={who.companyName ?? who.displayName} size={56} />
+          ) : (
+            <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
+          )}
           <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
               <Text v="h3" accessibilityRole="header" numberOfLines={1} style={{ flexShrink: 1 }}>

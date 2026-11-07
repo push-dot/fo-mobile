@@ -7,6 +7,7 @@ import { Badge, Button, Icon, SkeletonRows, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
+import { PROFILE_ACTIONS_TOP, PROFILE_NAME_TOP } from '../constants'
 import type { ProfileSection } from '../types'
 import { careerPeriod, profileCountLabels, tenureLabel } from '../utils'
 import Avatar from './avatar'
@@ -65,7 +66,7 @@ const ProfileTab = () => {
     <View style={{ gap: spacing[6], paddingTop: spacing[6], paddingBottom: spacing[6] }}>
       <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
         <Avatar name={p.displayName} url={p.avatarUrl} size={84} />
-        <Text v="h1">
+        <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
           {p.displayName}
         </Text>
         {p.headline ? (
@@ -73,7 +74,7 @@ const ProfileTab = () => {
             {p.headline}
           </Text>
         ) : null}
-        <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] }}>
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
           {status ? <Badge label={status} tone={p.careerStatus === 'seeking' ? 'ac' : 'grey'} /> : null}
         </View>
@@ -99,7 +100,7 @@ const ProfileTab = () => {
             </Pressable>
           ))}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: spacing[2] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
           <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />
           <Button
             label="공유"

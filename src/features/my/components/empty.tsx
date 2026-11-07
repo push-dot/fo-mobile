@@ -1,18 +1,20 @@
-import { View } from 'react-native'
-import { Button, Text } from '@/shared/components'
-import { spacing } from '../../../theme'
+import { Platform } from 'react-native'
+import { StatusNote, emptyNoteStyle } from '@/shared/components'
+import { platformTheme } from '../../../theme'
 
-const Empty = ({ text, action, onAction }: { text: string; action?: string; onAction?: () => void }) => {
-  return (
-    <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 40, paddingBottom: 140 }}>
-      <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
-        {text}
-      </Text>
-      {action && onAction ? (
-        <Button label={action} onPress={onAction} variant="secondary" size="pill" style={{ marginTop: spacing[3] }} />
-      ) : null}
-    </View>
-  )
-}
+// The boards centre 마이 empties over the whole screen; Android's tab bar is a real inset (iOS floats over the list).
+const EMPTY_LIFT = 140
+
+export const TAB_EMPTY_LIFT = EMPTY_LIFT - (Platform.OS === 'android' ? platformTheme.tabBarHeight : 0)
+
+type Props = { text: string; action?: string; onAction?: () => void; lift?: number }
+
+const Empty = ({ text, action, onAction, lift = EMPTY_LIFT }: Props) => (
+  <StatusNote
+    lines={[text]}
+    action={action && onAction ? { label: action, onPress: onAction } : undefined}
+    style={emptyNoteStyle(lift, false)}
+  />
+)
 
 export default Empty

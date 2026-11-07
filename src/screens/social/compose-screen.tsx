@@ -10,6 +10,9 @@ import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
+// The artboard textarea is content-box: height 200 plus 4pt padding on each side.
+const BODY_HEIGHT = 200 + spacing[1] * 2
+
 const ComposeScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
@@ -97,7 +100,7 @@ const ComposeScreen = () => {
             accessibilityLabel={BODY_LABEL}
             placeholder="나누고 싶은 이야기를 적어 주세요"
             placeholderTextColor={c.t4}
-            style={[{ ...inputReset, fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: 200, textAlignVertical: 'top' }, fontFor('400')]}
+            style={[{ ...inputReset, fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: BODY_HEIGHT, textAlignVertical: 'top' }, fontFor('400')]}
           />
         </View>
         <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>

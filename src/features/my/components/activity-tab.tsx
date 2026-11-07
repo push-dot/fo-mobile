@@ -16,7 +16,7 @@ import { FOLLOW_PREVIEW, POST_PREVIEW } from '../constants'
 import type { ActivitySub } from '../types'
 import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
 import CalendarView from './calendar-view'
-import Empty from './empty'
+import Empty, { TAB_EMPTY_LIFT } from './empty'
 import ListSkeleton from './list-skeleton'
 import ListTitle from './list-title'
 import Logo from './logo'
@@ -24,6 +24,8 @@ import PersonRow from './person-row'
 import Row from './row'
 import SectionHead from './section-head'
 
+const LIST_PAD = 40
+const EMPTY_LIFT = TAB_EMPTY_LIFT - LIST_PAD
 
 const SUBS: { key: ActivitySub; label: string }[] = [
   { key: 'applications', label: '지원활동' },
@@ -42,6 +44,7 @@ const Applications = () => {
       {list.length === 0 ? (
         <Empty
           text={emptyCta('applications').title}
+          lift={EMPTY_LIFT}
           action={emptyCta('applications').action}
           onAction={() => router.push(emptyCta('applications').href)}
         />
@@ -83,6 +86,7 @@ const Bookmarks = () => {
       {list.length === 0 ? (
         <Empty
           text={emptyCta('bookmarks').title}
+          lift={EMPTY_LIFT}
           action={emptyCta('bookmarks').action}
           onAction={() => router.push(emptyCta('bookmarks').href)}
         />
@@ -131,13 +135,18 @@ const Bookmarks = () => {
   )
 }
 
-const SeeAll = ({ label, onPress }: { label: string; onPress: () => void }) => {
+// divided: the rows above have no bottom border, so the link draws the one divider; post rows already do.
+const SeeAll = ({ label, onPress, divided }: { label: string; onPress: () => void; divided?: boolean }) => {
   const c = useColors()
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={{ marginTop: spacing[1], borderTopWidth: 1, borderTopColor: c.line, paddingVertical: spacing[4], paddingHorizontal: spacing[5] }}
+      style={{
+        ...(divided ? { marginTop: spacing[1], borderTopWidth: 1, borderTopColor: c.line } : null),
+        paddingVertical: spacing[4],
+        paddingHorizontal: spacing[5],
+      }}
     >
       <Text v="b2" weight="600" color="t2">
         {label}
@@ -158,6 +167,7 @@ const Follows = () => {
       {people.length === 0 && !following.isLoading ? (
         <Empty
           text={emptyCta('follows').title}
+          lift={EMPTY_LIFT}
           action={emptyCta('follows').action}
           onAction={() => router.push(emptyCta('follows').href)}
         />
@@ -171,10 +181,13 @@ const Follows = () => {
       {people.slice(0, FOLLOW_PREVIEW).map((p) => (
         <PersonRow key={p.userId} p={p} known />
       ))}
-      <SeeAll
-        label={followerSee(followerCount)}
-        onPress={() => router.push({ pathname: '/activity/follows', params: { box: 'followers' } })}
-      />
+      {people.length || followerCount ? (
+        <SeeAll
+          divided
+          label={followerSee(followerCount)}
+          onPress={() => router.push({ pathname: '/activity/follows', params: { box: 'followers' } })}
+        />
+      ) : null}
     </>
   )
 }
@@ -192,6 +205,7 @@ const Posts = () => {
       {posts.length === 0 && !mine.isLoading ? (
         <Empty
           text={emptyCta('posts').title}
+          lift={EMPTY_LIFT}
           action={emptyCta('posts').action}
           onAction={() => router.push(emptyCta('posts').href)}
         />
@@ -235,17 +249,19 @@ const Posts = () => {
           </View>
         </Pressable>
       ))}
-      <SeeAll
-        label={commentedSee(commentCount)}
-        onPress={() => router.push({ pathname: '/activity/posts', params: { box: 'commented' } })}
-      />
+      {posts.length || commentCount ? (
+        <SeeAll
+          label={commentedSee(commentCount)}
+          onPress={() => router.push({ pathname: '/activity/posts', params: { box: 'commented' } })}
+        />
+      ) : null}
     </>
   )
 }
 
 const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub) => void }) => {
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: LIST_PAD }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

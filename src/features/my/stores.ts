@@ -28,7 +28,7 @@ export const deleteWithUndo = (doc: Pick<MySource, 'id' | 'fileName'>) => {
   pending.start(doc.id)
   usePendingDelete.setState((s) => ({ hidden: [...s.hidden, doc.id] }))
   showToast({
-    bottom: TOAST_ABOVE.docsCta,
+    bottom: TOAST_ABOVE.tabs,
     message: copy.toast,
     action: {
       label: copy.undo,

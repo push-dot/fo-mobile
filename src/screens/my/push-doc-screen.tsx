@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
-import { useStartChat } from '@/features/chat'
+import { useShareFile, useStartChat } from '@/features/chat'
 import { usePosting } from '@/features/jobs'
 import {
   Avatar,
@@ -13,6 +13,8 @@ import {
   FIX_DOC,
   hubProfile,
   type ProfileSection,
+  PROFILE_ACTIONS_TOP,
+  PROFILE_NAME_TOP,
   pushCardLines,
   SET_BASE_COPY,
   tenureLabel,
@@ -23,7 +25,7 @@ import {
   useMyProfile,
   useSetBaseProfile,
 } from '@/features/my'
-import { CtaBar, askConfirm, Badge, Button, Icon, showToast, Text, TopBar } from '@/shared/components'
+import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 const HUB_BADGE = '지원 서류용 프로필(허브형)'
@@ -74,6 +76,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   const apps = useMyApplications()
   const me = useMyProfile().data
   const start = useStartChat()
+  const share = useShareFile()
   const [based, setBased] = useState(false)
   const setBase = useSetBaseProfile(() => {
     setBased(true)
@@ -96,6 +99,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
       <TopBar
         title={application ? undefined : '지원 서류용 프로필'}
         onBack={() => router.back()}
+        right={<GlassButton actions={[{ icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) }]} />}
         safeTop={!(sheet && Platform.OS === 'ios')}
       />
       {doc.isLoading || !item || !lines ? (
@@ -109,7 +113,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               onPress={() => router.push(`/postings/${application.jobId}`)}
               style={{
                 marginHorizontal: spacing[5],
-                marginTop: spacing[1],
+                marginTop: spacing[2],
                 borderRadius: radius.card,
                 borderWidth: 1,
                 borderColor: c.line,
@@ -139,9 +143,9 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
             </Pressable>
           ) : null}
 
-          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
+          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: application ? 0 : spacing[1] }}>
             <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl ?? null} size={84} />
-            <Text v="h1" style={{ marginTop: 6 }}>
+            <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
               {me?.displayName}
             </Text>
             {profile.headline || me?.headline ? (
@@ -154,7 +158,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: 10 }} />
+              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
             ) : null}
             {application || based ? null : (
               <Button
@@ -170,7 +174,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
                     onConfirm: () => setBase.mutate(id),
                   })
                 }
-                style={{ marginTop: 10 }}
+                style={{ marginTop: PROFILE_ACTIONS_TOP }}
               />
             )}
           </View>

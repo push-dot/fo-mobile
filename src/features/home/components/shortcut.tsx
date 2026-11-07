@@ -14,7 +14,8 @@ const Shortcut = ({ label, icon, glow, opacity, href }: (typeof SHORTCUTS)[numbe
       onPress={() => router.push(href)}
       style={({ pressed }) => ({ flex: 1, minHeight: 100, padding: 14, borderRadius: 22, overflow: 'hidden', backgroundColor: c.bg2, transform: [{ scale: pressed ? 0.97 : 1 }] })}
     >
-      <Svg style={{ position: 'absolute', inset: 0 }} width="100%" height="100%">
+      {/* No width/height props: 100% there resolves against the padded content box and clips the glow to a rectangle. */}
+      <Svg style={{ position: 'absolute', inset: 0 }}>
         <Defs>
           <RadialGradient id={`glow-${icon}`} cx="85%" cy="115%" rx="130%" ry="90%" fx="85%" fy="115%">
             <Stop offset="0" stopColor={glow} stopOpacity={opacity} />

@@ -137,3 +137,7 @@ export const LOGIN_LABEL: Record<string, string> = {
 }
 
 export const INGEST_TEXT = { reading: '읽는 중', failed: '읽지 못했어요' } as const
+
+/** Profile header spacing from the 마이 / 지원 서류용 프로필 boards: name margin-top 6, action buttons margin-top 10. */
+export const PROFILE_NAME_TOP = 6
+export const PROFILE_ACTIONS_TOP = 10

@@ -1,36 +1,20 @@
 import { router } from 'expo-router'
 import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
-import { Button, DetailWebView, GlassButton, TopBar } from '@/shared/components'
-import { shareMessage } from '@/shared/infrastructure'
+import { usePosting } from '@/features/jobs'
+import { Button, DetailWebView, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const PostingDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { data: p } = usePosting(id)
-  const toggleBookmark = useToggleBookmark()
   const android = Platform.OS === 'android'
   const barBottom = insets.bottom + (android ? 10 : 6)
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar
-        onBack={() => router.back()}
-        right={
-          <GlassButton
-            actions={[
-              { icon: 'bookmark', label: p?.bookmarked ? '북마크 해제' : '북마크', active: p?.bookmarked, onPress: () => p && toggleBookmark(p) },
-              {
-                icon: 'share',
-                label: '공유',
-                onPress: () => void shareMessage({ message: postingShareMessage(id, p) }),
-              },
-            ]}
-          />
-        }
-      />
+      <TopBar onBack={() => router.back()} />
       <DetailWebView path={`/postings/${encodeURIComponent(id)}`} />
       <View
         style={{

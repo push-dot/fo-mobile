@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import { Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
+import { HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
 import { SECTIONS, useToggleBookmark, type SectionKind } from '@/features/jobs'
 import { useUnreadCount } from '@/features/notifications'
 import { GlassButton, TopBar, Wordmark } from '@/shared/components'
@@ -37,8 +37,8 @@ const HomeScreen = () => {
             <Shortcut key={s.label} {...s} />
           ))}
         </View>
-        {kinds.map((kind) => (
-          <Section key={kind} kind={kind} title={SECTIONS[kind].title} onBookmark={toggleBookmark} />
+        {kinds.map((kind, index) => (
+          <Section key={kind} kind={kind} title={SECTIONS[kind].title} skeleton={index < HOME_SKELETON_SECTIONS} onBookmark={toggleBookmark} />
         ))}
       </ScrollView>
     </View>

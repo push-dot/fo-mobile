@@ -34,7 +34,8 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
   const popular = useTrending().data?.terms ?? []
   const results = { postings: useSearch(q, 'postings', sort), people: useSearch(q, 'people', sort), posts: useSearch(q, 'posts', sort) }
   const active = results[tab]
-  const items: (Posting | Profile | Post)[] = active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
+  const loading = active.isPending || active.isPlaceholderData
+  const items: (Posting | Profile | Post)[] = loading ? [] : active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
   const totalOf = (k: SearchTab) => results[k].data?.pages[0]?.page.total
   const remember = () => q && recent.add(q)
 
@@ -123,7 +124,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>
-              {active.isPending ? (
+              {loading ? (
                 <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: spacing[1] }}>
                   <Skeleton width={120} height={12} />
                 </View>
@@ -168,7 +169,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             )
           }
           ListEmptyComponent={
-            active.isPending ? (
+            loading ? (
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
               <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ flex: 1, justifyContent: 'center' }} />

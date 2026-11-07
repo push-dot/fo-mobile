@@ -114,6 +114,14 @@ export const acceptOffer = (id: string, reply: string | undefined) => api.me.acc
 
 export const declineOffer = (id: string) => api.me.declineOffer(id)
 
+export const archiveOffer = (id: string) => api.me.archiveOffer(id)
+
+export const unarchiveOffer = (id: string) => api.me.unarchiveOffer(id)
+
+export const reportOffer = (id: string, reason?: string) => api.me.reportOffer(id, reason)
+
+export const blockUser = (userId: string) => api.me.blockUser(userId)
+
 export const fetchPosting = (id: string) => api.postings.get(id)
 
 export const fetchEvents = (from: string, to: string) =>

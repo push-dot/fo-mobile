@@ -13,9 +13,11 @@ const PostHeader = ({ post }: { post: Post }) => {
       <Text v="h1">
         {post.title}
       </Text>
-      <Text v="b1" color="t2">
-        {post.body}
-      </Text>
+      {post.body.split(/\n{2,}/).map((paragraph, i) => (
+        <Text key={i} v="b1" color="t2">
+          {paragraph}
+        </Text>
+      ))}
       <ImageGrid urls={post.imageUrls} row={96} />
       <Band style={{ marginHorizontal: -spacing[5], marginVertical: 6 }} />
       <Text v="h3">댓글 {post.commentCount}</Text>

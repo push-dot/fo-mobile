@@ -208,8 +208,8 @@ const PlanPage = ({ account, purchase }: { account: Account; purchase: ReturnTyp
           </Text>
         ))}
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing[6] }}>
-        {paid ? <PlanLink label="요금제 낮추기" onPress={() => purchase.manage(paid)} /> : <View />}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[5], paddingHorizontal: spacing[6] }}>
+        {paid ? <PlanLink label="요금제 낮추기" onPress={() => purchase.manage(paid)} /> : null}
         <PlanLink label="구매 복원" onPress={() => !purchase.pending && purchase.restore()} />
       </View>
     </Appear>

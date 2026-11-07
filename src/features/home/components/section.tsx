@@ -8,12 +8,12 @@ import { useHomePostings } from '../api/hooks'
 import { SECTION_ERROR_LINES, SECTION_RETRY_LABEL } from '../constants'
 import SectionSkeleton from './section-skeleton'
 
-const Section = ({ kind, title, onBookmark }: { kind: SectionKind; title: string; onBookmark: (posting: Posting) => void }) => {
+const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; title: string; skeleton: boolean; onBookmark: (posting: Posting) => void }) => {
   const c = useColors()
   const q = useHomePostings(kind)
   const items = q.data?.data ?? []
   if (q.isSuccess && !items.length) return null
-  if (q.isPending) return <SectionSkeleton />
+  if (q.isPending) return skeleton ? <SectionSkeleton /> : null
   return (
     <View>
       <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[3] }}>
@@ -42,7 +42,7 @@ const Section = ({ kind, title, onBookmark }: { kind: SectionKind; title: string
               </Text>
             ))}
           </View>
-          <Button label={SECTION_RETRY_LABEL} variant="secondary" size="sm" onPress={() => q.refetch()} />
+          <Button label={SECTION_RETRY_LABEL} variant="secondary" size="pill" onPress={() => q.refetch()} />
         </View>
       ) : (
         <FlatList
