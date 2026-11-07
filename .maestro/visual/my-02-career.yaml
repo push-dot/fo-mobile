@@ -35,6 +35,7 @@ tags:
       - tapOn: "직무.*"
       - eraseText
       - runFlow: _hide_kbd.yaml
+      - tapOn: "저장"
       - extendedWaitUntil:
           visible: "회사, 직무, 기간을 채워 주세요"
           timeout: 5000

@@ -18,6 +18,7 @@ import {
   fetchFollowers,
   fetchFollows,
   fetchLinks,
+  fetchAppliedApplications,
   fetchMyApplications,
   fetchMyBookmarks,
   fetchMyPosts,
@@ -187,6 +188,12 @@ export const useMyApplications = () =>
   useQuery({
     queryKey: ['applications', 'my-list'],
     queryFn: fetchMyApplications,
+  })
+
+export const useAppliedApplications = () =>
+  useQuery({
+    queryKey: ['applications', 'applied-list'],
+    queryFn: fetchAppliedApplications,
   })
 
 export const useMyBookmarks = () => {

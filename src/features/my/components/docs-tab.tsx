@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
-import { Button, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { Button, GlassPressable, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
@@ -15,6 +15,7 @@ import ListTitle from './list-title'
 import Row from './row'
 
 const HIT = 44
+const RETRY_H = 32
 const PROGRESS_H = 6
 const EMPTY_ART = 76
 const EMPTY_INSET = 40
@@ -52,7 +53,19 @@ const DocRow = ({ doc }: { doc: MySource }) => {
           ) : null}
         </View>
       </View>
-      {failed ? <Button label={RETRY_LABEL} icon="retry" variant="secondary" size="sm" onPress={retry} /> : null}
+      {failed ? (
+        <GlassPressable
+          accessibilityRole="button"
+          onPress={retry}
+          style={{ height: RETRY_H, borderRadius: RETRY_H / 2 }}
+          contentStyle={{ paddingHorizontal: spacing[3], gap: spacing[1] }}
+        >
+          <Icon name="retry" size={14} color="t1" />
+          <Text v="c1" weight="700">
+            {RETRY_LABEL}
+          </Text>
+        </GlassPressable>
+      ) : null}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${doc.fileName} 더 보기`}

@@ -10,6 +10,7 @@ import type { CalendarEvent, CalendarEventType } from '../types'
 import { clock, dayTitle, dday, monthGrid, sameDay, toDayParam } from '../utils'
 
 
+const DAY_SIZE = 30
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 const EVENT_COLOR: Record<CalendarEventType, (c: Colors) => string> = {
   INTERVIEW: (c) => c.ac,
@@ -56,13 +57,15 @@ const CalendarView = () => {
         <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
           {month.getFullYear()}년 {month.getMonth() + 1}월
         </Text>
-        <GlassButton actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
-        <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
-        <GlassButton
-          actions={[
-            { icon: 'plus', label: '일정 추가', active: true, onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) },
-          ]}
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], marginVertical: -spacing[1] }}>
+          <GlassButton actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
+          <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
+          <GlassButton
+            actions={[
+              { icon: 'plus', label: '일정 추가', active: true, onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) },
+            ]}
+          />
+        </View>
       </View>
 
       <View style={{ flexDirection: 'row', paddingHorizontal: spacing[3] }}>
@@ -103,14 +106,15 @@ const CalendarView = () => {
             >
               <View
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: radius.pill,
+                  width: DAY_SIZE,
+                  height: DAY_SIZE,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: isSel ? c.t1 : 'transparent',
                 }}
               >
+                {isSel ? (
+                  <View style={{ position: 'absolute', inset: 0, borderRadius: DAY_SIZE / 2, backgroundColor: c.t1 }} />
+                ) : null}
                 <Text
                   v="b2"
                   weight={isSel || isToday ? '800' : '600'}

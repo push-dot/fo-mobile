@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import type { Offer } from '@push/api-client'
-import { Avatar, counterpart, Empty, OFFER_EMPTY_ACTION, offerBadge, personLine, Row, timeAgo, useOffers } from '@/features/my'
+import { Avatar, counterpart, Empty, Logo, OFFER_EMPTY_ACTION, offerBadge, personLine, Row, timeAgo, useOffers } from '@/features/my'
 import { Badge, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
@@ -29,7 +29,11 @@ const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
       label={`${who.displayName}, ${badge.label}${unread ? ', 안 읽음' : ''}`}
       onPress={() => router.push(`/offers/${o.id}${o.status === 'ACCEPTED' ? '/messages' : ''}?box=${box}`)}
     >
-      <Avatar name={who.displayName} url={who.avatarUrl} />
+      {who.kind === 'COMPANY' ? (
+        <Logo name={who.companyName ?? who.displayName} />
+      ) : (
+        <Avatar name={who.displayName} url={who.avatarUrl} />
+      )}
       <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
           <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>

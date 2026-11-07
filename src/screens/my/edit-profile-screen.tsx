@@ -302,7 +302,6 @@ const EditBasic = ({ p }: { p: Profile }) => {
             borderRadius: radius.md,
             backgroundColor: c.fill,
             paddingHorizontal: spacing[4],
-            paddingVertical: spacing[3],
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing[3],
@@ -367,6 +366,7 @@ type CareerDraft = {
   end: string
   current: boolean
   description: string
+  saved?: { head: string; period: string }
 }
 const toDraft = (c: Career): CareerDraft => ({
   company: c.company,
@@ -375,6 +375,7 @@ const toDraft = (c: Career): CareerDraft => ({
   end: c.endedOn?.replace('-', '.') ?? '',
   current: !c.endedOn,
   description: c.description,
+  saved: { head: `${c.company} · ${c.role}`, period: careerPeriod(c) },
 })
 const toCareer = (d: CareerDraft): Career | null => {
   const startedOn = parseYm(d.start)
@@ -394,6 +395,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
   const save = useSaveProfile()
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
+  const [tried, setTried] = useState(false)
   const parsed = items.map(toCareer)
   const removeAt = (i: number, item: CareerDraft) => {
     setItems((xs) => xs.filter((_, j) => j !== i))
@@ -431,7 +433,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
       <SheetHeader
         title={TITLES.career}
         saving={save.isPending}
-        onSave={() => parsed.every(Boolean) && save.mutate({ careers: parsed as Career[] })}
+        onSave={() => (parsed.every(Boolean) ? save.mutate({ careers: parsed as Career[] }) : setTried(true))}
       />
       <ScrollView
         contentContainerStyle={FORM}
@@ -442,7 +444,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
           const valid = parsed[i]
           const start = parseYm(it.start)
           const end = it.current ? null : parseYm(it.end)
-          const period = start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null
+          const period = it.saved?.period ?? (start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null)
           return (
             <View key={i} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
@@ -469,8 +471,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   hitSlop={hitSlopTo(24)}
                 >
                   <Text v="b1" weight="700" numberOfLines={1} style={{ flex: 1 }}>
-                    {it.company || '새 경력'}
-                    {it.role ? ` · ${it.role}` : ''}
+                    {it.saved?.head ?? `${it.company || '새 경력'}${it.role ? ` · ${it.role}` : ''}`}
                   </Text>
                   <Icon name={expanded ? 'up' : 'down'} size={18} color="t3" />
                 </Pressable>
@@ -543,11 +544,11 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     value={it.description}
                     onChangeText={(t) => set(i, { description: t })}
                   />
-                  {valid ? null : (
+                  {!valid && tried ? (
                     <Text v="c1" weight="600" color="red">
                       {CAREER_MISSING}
                     </Text>
-                  )}
+                  ) : null}
                   <Pressable
                     accessibilityRole="button"
                     onPress={() =>

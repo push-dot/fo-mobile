@@ -37,7 +37,7 @@ const Section = ({
   children,
 }: {
   title: string
-  onEdit: () => void
+  onEdit?: () => void
   gap?: number
   children: ReactNode
 }) => (
@@ -46,14 +46,16 @@ const Section = ({
       <Text v="h3" accessibilityRole="header">
         {title}
       </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${title} 편집`}
-        onPress={onEdit}
-        style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
-      >
-        <Icon name="edit" size={18} color="t3" />
-      </Pressable>
+      {onEdit ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${title} 편집`}
+          onPress={onEdit}
+          style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Icon name="edit" size={18} color="t3" />
+        </Pressable>
+      ) : null}
     </View>
     {children}
   </View>
@@ -81,6 +83,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   const application = apps.data?.data.find((a) => a.id === item?.applicationId) ?? null
   const posting = usePosting(application?.jobId ?? '')
   const applied = !!application?.appliedAt || !!posting.data?.applied
+  const editable = (s: ProfileSection) => (application ? () => edit(s) : undefined)
   const lines = item ? pushCardLines(item, application) : null
   const version = versions.data?.data[0]
   const profile = hubProfile(version?.content)
@@ -150,7 +153,9 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               {jobLine ? <Badge label={jobLine} tone="grey" /> : null}
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
-            <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: 10 }} />
+            {application ? (
+              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: 10 }} />
+            ) : null}
             {application || based ? null : (
               <Button
                 label={SET_BASE_COPY.action}
@@ -180,7 +185,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
           ) : null}
 
           {intro && !making ? (
-            <Section title="소개" onEdit={() => edit('intro')}>
+            <Section title="소개" onEdit={editable('intro')}>
               <Text v="b2" color="t2">
                 {intro}
               </Text>
@@ -188,7 +193,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
           ) : null}
 
           {profile.careers.length ? (
-            <Section title="경력" onEdit={() => edit('career')} gap={spacing[3]}>
+            <Section title="경력" onEdit={editable('career')} gap={spacing[3]}>
               {profile.careers.map((cr, i) => {
                 const last = i === profile.careers.length - 1
                 return (
@@ -219,7 +224,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
           ) : null}
 
           {profile.skills.length ? (
-            <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[3]}>
+            <Section title="기술 스택" onEdit={editable('skills')} gap={spacing[3]}>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
                 {profile.skills.map((s) => (
                   <Badge key={s} label={s} tone="grey" />

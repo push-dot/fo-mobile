@@ -86,6 +86,8 @@ export const addLink = api.me.addLink
 
 export const fetchMyApplications = () => api.applications.list(FIRST)
 
+export const fetchAppliedApplications = () => api.applications.list({ ...FIRST, applied: true })
+
 export const fetchMyBookmarks = () => api.me.bookmarks(FIRST)
 
 export const unbookmarkPosting = (p: Posting) => api.postings.unbookmark(p.id)

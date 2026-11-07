@@ -12,6 +12,7 @@ import type {
   UserRef,
 } from '@push/api-client'
 import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
+import { appliedOnly } from '@/features/my/utils/applied-only'
 import { removeChatDoc } from './chat'
 import { mock, page, pdfResponse } from './server'
 
@@ -223,7 +224,10 @@ const applications: Application[] = [
     fitScore,
   })),
 ]
-mock('GET', 'applications', ({ query }) => page(applications, query))
+mock('GET', 'applications', ({ query }) => {
+  const applied = query.get('applied') === 'true'
+  return page(applied ? appliedOnly(applications) : applications, query, applied)
+})
 
 const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
   id,
@@ -560,7 +564,7 @@ const received: Offer[] = [
   }),
   offer({
     id: 'o4',
-    sender: user('u-greenticket', '그린티켓 채용팀', '그린티켓', '서버 개발자 포지션'),
+    sender: { ...user('u-greenticket', '그린티켓 채용팀', '그린티켓', '서버 개발자 포지션'), kind: 'COMPANY' as const },
     recipient: ME_SENDER,
     message: '서버 개발자 포지션에 관심 있으시면 이야기 나눠 보고 싶어요.',
     status: 'DECLINED',

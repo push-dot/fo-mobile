@@ -10,30 +10,29 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
-import { radius, spacing, useColors, useShadow } from '@/theme'
+import { palette, radius, shadow, spacing, useColors } from '@/theme'
 
 const PAGE_PAD = 36
+const TITLE_MAX_WIDTH = 168
 const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
 
-const Bars = ({ widths }: { widths: readonly number[] }) => {
-  const c = useColors()
-  return widths.map((w) => (
-    <View key={w} style={{ width: `${w}%`, height: 5, borderRadius: 3, backgroundColor: c.deco, opacity: 0.55 }} />
+const sheet = palette.light
+
+const Bars = ({ widths }: { widths: readonly number[] }) =>
+  widths.map((w) => (
+    <View key={w} style={{ width: `${w}%`, height: 5, borderRadius: 3, backgroundColor: sheet.deco, opacity: 0.55 }} />
   ))
-}
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
-  const c = useColors()
-  const sh = useShadow()
+  const sh = shadow.light
   const { width } = useWindowDimensions()
   const p = d.profile
   const head = (t: string) => (
     <Text
       v="tab"
       weight="800"
-      color="acText"
-      style={{ borderBottomWidth: 1, borderBottomColor: c.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
+      style={{ color: sheet.acText, borderBottomWidth: 1, borderBottomColor: sheet.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
     >
       {t}
     </Text>
@@ -44,36 +43,36 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       style={{
         width: '100%',
         minHeight: (width - PAGE_PAD * 2) * 1.414,
-        backgroundColor: c.paper,
+        backgroundColor: sheet.paper,
         borderRadius: radius.xs,
         borderWidth: 1,
-        borderColor: c.line,
+        borderColor: sheet.line,
         paddingVertical: spacing[6],
         paddingHorizontal: spacing[5],
         gap: spacing[2],
         ...sh.pop,
       }}
     >
-      <Text v="h3" weight="800">
+      <Text v="h3" weight="800" style={{ color: sheet.t1 }}>
         {p.displayName}
       </Text>
-      <Text v="tab" weight="400" color="t3">
+      <Text v="tab" weight="400" style={{ color: sheet.t3 }}>
         {[d.email, ...d.links].filter(Boolean).join(' · ')}
       </Text>
-      <Text v="c2" color="t2">
+      <Text v="c2" style={{ color: sheet.t2 }}>
         {p.intro}
       </Text>
       {head(PREVIEW_HEADINGS[0])}
       {p.careers.map((cr) => (
         <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: spacing[2] }}>
-          <Text v="c2" weight="700">
+          <Text v="c2" weight="700" style={{ color: sheet.t1 }}>
             {cr.company} · {cr.role}{' '}
-            <Text v="c2" weight="500" color="t3">
+            <Text v="c2" weight="500" style={{ color: sheet.t3 }}>
               {cr.startedOn.replace('-', '.')} – {cr.endedOn?.replace('-', '.') ?? '현재'}
             </Text>
           </Text>
           {cr.description ? (
-            <Text v="tab" weight="400" color="t2">
+            <Text v="tab" weight="400" style={{ color: sheet.t2 }}>
               {cr.description
                 .split('\n')
                 .filter(Boolean)
@@ -88,7 +87,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       {head(PREVIEW_HEADINGS[1])}
       {d.projects?.length ? (
         d.projects.map((project) => (
-          <Text key={project} v="tab" weight="400" color="t2">
+          <Text key={project} v="tab" weight="400" style={{ color: sheet.t2 }}>
             {project}
           </Text>
         ))
@@ -96,7 +95,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         <Bars widths={PROJECT_BARS} />
       )}
       {head(PREVIEW_HEADINGS[2])}
-      <Text v="tab" weight="400" color="t2">
+      <Text v="tab" weight="400" style={{ color: sheet.t2 }}>
         {p.skills.join(' · ')}
       </Text>
     </View>
@@ -116,7 +115,11 @@ const DocViewerScreen = ({ id }: { id: string }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg2 }}>
       <TopBar
-        title={s?.fileName ?? '서류 보기'}
+        left={
+          <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ alignSelf: 'center', maxWidth: TITLE_MAX_WIDTH }}>
+            {s?.fileName ?? '서류 보기'}
+          </Text>
+        }
         onBack={() => router.back()}
         right={
           <GlassButton

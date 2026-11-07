@@ -49,7 +49,7 @@ const FollowsScreen = () => {
         <ListSkeleton />
       ) : (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? people.length}명
           </Text>
           {people.length === 0 && following ? (

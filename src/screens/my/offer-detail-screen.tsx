@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router'
-import { Alert, Pressable, ScrollView, View } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, View } from 'react-native'
 import { monthDay } from '@push/shared'
 import {
   Avatar,
@@ -12,10 +12,12 @@ import {
   useOffer,
   useOfferDecision,
 } from '@/features/my'
-import { CtaBar, Badge, Button, Chip, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
+
+const DECLINE_INSET = Platform.OS === 'ios' ? spacing[1] : 0
 
 const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) => {
   const c = useColors()
@@ -45,7 +47,20 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar
+        onBack={() => router.back()}
+        right={
+          <GlassButton
+            actions={[
+              {
+                icon: 'menu',
+                label: '더 보기',
+                menu: [{ key: 'profile', label: '허브 프로필 보기', systemImage: 'person', icon: 'user', onPress: () => router.push(`/profiles/${who.id}`) }],
+              },
+            ]}
+          />
+        }
+      />
       <ScrollView
         contentContainerStyle={{ gap: spacing[5], paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120 }}
         keyboardShouldPersistTaps="handled"
@@ -121,7 +136,7 @@ const OfferDetailScreen = ({ id, box = 'received' }: { id: string; box?: Box }) 
             label="거절"
             variant="secondary"
             disabled={decline.isPending}
-            style={{ paddingHorizontal: spacing[6] }}
+            style={{ paddingHorizontal: DECLINE_INSET }}
             onPress={() =>
               Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
                 { text: '취소', style: 'cancel' },

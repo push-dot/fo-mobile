@@ -3,9 +3,9 @@ import { Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, stageBadge } from '@push/api-client'
 import { careerLabel, monthDay } from '@push/shared'
 import { Badge, Chip, Icon, Text } from '@/shared/components'
-import { spacing, useColors } from '../../../theme'
+import { hitSlopTo, spacing, useColors } from '../../../theme'
 import {
-  useMyApplications,
+  useAppliedApplications,
   useMyBookmarks,
   useMyCommentedPosts,
   useMyFollowers,
@@ -14,7 +14,7 @@ import {
 } from '../api/hooks'
 import { FOLLOW_PREVIEW, POST_PREVIEW } from '../constants'
 import type { ActivitySub } from '../types'
-import { commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
+import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
 import CalendarView from './calendar-view'
 import Empty from './empty'
 import ListSkeleton from './list-skeleton'
@@ -34,9 +34,9 @@ const SUBS: { key: ActivitySub; label: string }[] = [
 ]
 
 const Applications = () => {
-  const { data, isLoading } = useMyApplications()
+  const { data, isLoading } = useAppliedApplications()
   if (isLoading) return <ListSkeleton />
-  const list = data?.data ?? []
+  const list = appliedOnly(data?.data ?? [])
   return (
     <>
       {list.length === 0 ? (
@@ -120,7 +120,8 @@ const Bookmarks = () => {
             accessibilityLabel="북마크 해제"
             accessibilityState={{ selected: true }}
             onPress={() => unbookmark.mutate(p)}
-            style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
+            hitSlop={hitSlopTo(20)}
+            style={{ width: 20, height: 20 }}
           >
             <Icon name="bookmark" size={20} color={c.acText} filled />
           </Pressable>
