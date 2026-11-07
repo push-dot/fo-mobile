@@ -1,0 +1,50 @@
+appId: app.push.mobile
+name: 허브 → 개발·데이터 필터 · 빈 상태
+tags:
+  - visual
+---
+# The board keeps 개발·데이터 selected and still lists nobody, which the fixtures can't hold (46 people match), so the profiles list is served empty from the first fetch.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=empty:GET:profiles$"
+      READY: "새로 올라온 공고"
+- tapOn: "허브"
+- extendedWaitUntil:
+    visible: "추천 프로필"
+    timeout: 10000
+- tapOn: "필터"
+- extendedWaitUntil:
+    visible: "재직 기간"
+    timeout: 10000
+- tapOn: "3.5년"
+# Android keeps the list's 이직/구직중 badges behind the sheet (a tap on one hits the scrim and closes it), so anchor under the group title.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "이직/구직중"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          text: "이직/구직중"
+          below: "커리어 상태"
+- extendedWaitUntil:
+    visible: "프로필 .*개 보기"
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    file: ../flows/_tap_sheet_button.yaml
+    env:
+      TEXT: "프로필 .*개 보기"
+- tapOn: "개발"
+- tapOn: "데이터"
+- extendedWaitUntil:
+    visible: "조건에 맞는 프로필이 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: HubEmpty.1
+- takeScreenshot: HubEmpty.2
+- openLink: push://?mock=reset

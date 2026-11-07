@@ -1,0 +1,25 @@
+appId: app.push.mobile
+name: 홈 → 마감 임박 공고 섹션 불러오기 실패
+tags:
+  - visual
+---
+# All three sections ask GET postings and differ only in the query, so the rule matches the path with its query string (sort=deadline).
+# The failed query is retried by the app for several seconds before the error card shows.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=fail:GET:postings.*sort=deadline"
+      READY: "새로 올라온 공고"
+- extendedWaitUntil:
+    visible: "공고를 불러오지 못했어요.*"
+    timeout: 40000
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: HomeStates.1
+- openLink: push://?mock=reset

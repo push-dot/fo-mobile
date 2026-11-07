@@ -1,0 +1,23 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# ../flows/_login.yaml with a mock rule link (MOCK) opened on the signed-out screen, so the rule is set before any screen fetches.
+# READY is a text the home shows even while the rule holds its data back.
+---
+- clearKeychain
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- extendedWaitUntil:
+    visible: "개발 토큰으로 들어가기"
+    timeout: 60000
+- openLink: ${MOCK}
+- retry:
+    maxRetries: 1
+    commands:
+      - runFlow: ../flows/_dismiss_logbox.yaml
+      - tapOn: "개발 토큰으로 들어가기"
+      - extendedWaitUntil:
+          visible: ${READY}
+          timeout: 20000
+- runFlow: ../flows/_dismiss_logbox.yaml

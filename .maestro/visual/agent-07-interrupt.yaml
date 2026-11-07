@@ -9,11 +9,13 @@ tags:
     file: _say.yaml
     env:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
-      EN: "tailor resume"
+      EN: "tailor hold"
 - extendedWaitUntil:
     visible: ".*기술 스택을 비교하는 중.*"
     timeout: 40000
 - tapOn: "중지"
+# The stop line lands below the fold on Android; bring the thread to its end first.
+- runFlow: _chat_bottom.yaml
 - extendedWaitUntil:
     visible: ".*중단됨.*"
     timeout: 5000

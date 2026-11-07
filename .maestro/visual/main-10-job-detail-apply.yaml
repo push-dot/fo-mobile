@@ -38,14 +38,24 @@ tags:
 - extendedWaitUntil:
     visible: ".*김서준_백엔드_이력서_2026.*"
     timeout: 10000
-    optional: true
 - waitForAnimationToEnd
 - takeScreenshot: ApplySheet
+# The toast hides after 2.5s, so shoot as soon as it shows (the CTA flips to 지원 완료 in the same render).
 - runFlow:
-    file: ../flows/_tap_sheet_button.yaml
-    env:
-      TEXT: "이 서류로 지원하기"
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "이 서류로 지원하기"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow:
+          file: ../flows/_tap_sheet_button.yaml
+          env:
+            TEXT: "이 서류로 지원하기"
 - extendedWaitUntil:
-    visible: "지원 완료"
+    visible: "지원했어요. 내 활동에서.*"
     timeout: 10000
+    optional: true
 - takeScreenshot: Applied

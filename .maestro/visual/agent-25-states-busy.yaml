@@ -1,0 +1,48 @@
+appId: app.push.mobile
+name: 에이전트 · 결과 파일 → 지원 기록 → 혼잡 오류 (한 대화, iOS 전용 패널)
+tags:
+  - visual
+---
+# One conversation: the file card, the apply record, then a second request that the queue refuses with a 12 second wait (mock tokens).
+- runFlow: ../flows/_login.yaml
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - runFlow: _agent_tab.yaml
+      - runFlow:
+          file: _say.yaml
+          env:
+            KO: "states-file"
+            EN: "states-file"
+      - extendedWaitUntil:
+          visible: ".* 동안 작업했어요"
+          timeout: 30000
+      - waitForAnimationToEnd
+      - runFlow:
+          file: _say.yaml
+          env:
+            KO: "states-apply"
+            EN: "states-apply"
+      - extendedWaitUntil:
+          visible: ".*지원했어요 · 마이 › 내 활동에 기록했어요.*"
+          timeout: 20000
+      - waitForAnimationToEnd
+      - runFlow:
+          file: _say.yaml
+          env:
+            KO: "도토리증권 공고도 맞춰 줘"
+            EN: "queue-busy"
+      - runFlow:
+          file: _chat_kbd_down.yaml
+          env:
+            TEXT: "states-file"
+      - retry:
+          maxRetries: 3
+          commands:
+            - runFlow: _chat_bottom.yaml
+            - extendedWaitUntil:
+                visible: "지금 요청이 많아요. 12초 뒤에 다시 보내 주세요."
+                timeout: 8000
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatStates.4

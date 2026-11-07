@@ -51,6 +51,12 @@ export const postings: Posting[] = [
   base({ id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', location: '서울 강남구', careerMin: 5, deadline: inDays(21), createdAt: '2026-10-02T09:00:00Z' }),
 ]
 
+// Tour switch (links.ts): the 마감 임박 공고 board lists 모아페이 백엔드 as its sixth tile, so it closes in 7 days there (D-13 everywhere else).
+export const closeMoapay = () => {
+  const p = postings.find((x) => x.id === 'p1')
+  if (p) p.deadline = inDays(7)
+}
+
 // The home 새로 올라온 공고 cards show the long title the board drew; lists and detail use the short one.
 const HOME_LATEST_TITLES: Record<string, string> = {
   p1: '백엔드 엔지니어 (Kotlin·Spring) · 결제 플랫폼팀',
@@ -158,6 +164,10 @@ const setBookmark = (id: string, on: boolean) => {
   p.bookmarked = on
   const rest = bookmarkOrder.filter((x) => x !== id)
   bookmarkOrder.splice(0, bookmarkOrder.length, ...(on ? [id, ...rest] : rest))
+}
+// Tour switch (links.ts): ChatMention draws an account with only 모아페이 and 라온헬스 bookmarked.
+export const fewBookmarks = () => {
+  bookmarkOrder.splice(2)
 }
 mock('POST', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, true))
 mock('DELETE', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, false))

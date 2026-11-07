@@ -28,8 +28,7 @@ tags:
       - waitForAnimationToEnd
       - takeScreenshot: DeleteCareer.1
       - tapOn: "삭제"
-      # The iOS toast lives in the root host, under this modal; close the sheet inside its 5s to see it over the profile.
-      - tapOn: "닫기"
+      # The editor sheet hosts its own toast on iOS, so it stays open behind it like the board.
       - extendedWaitUntil:
           visible: "경력을 삭제했어요"
           timeout: 5000

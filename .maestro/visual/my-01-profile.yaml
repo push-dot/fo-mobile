@@ -36,5 +36,15 @@ tags:
 - extendedWaitUntil:
     visible: ".*내 기술 .*개.*"
     timeout: 10000
+# The board has AWS added (6 skills) and "Re" typed; a tap on the static heading lowers the keyboard (taps no child handles dismiss it).
+- tapOn: "기술 검색.*"
+- inputText: "AWS"
+- tapOn: "AWS 추가"
+- tapOn: "기술 검색.*"
+- inputText: "Re"
+- extendedWaitUntil:
+    visible: "Redis 추가"
+    timeout: 5000
+- tapOn: "내 기술 .*개"
 - waitForAnimationToEnd
 - takeScreenshot: EditSkills

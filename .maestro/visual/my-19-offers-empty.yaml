@@ -1,0 +1,47 @@
+appId: app.push.mobile
+name: 마이 제안함 → 빈 받은 제안 → 답장 없이 수락 → 빈 대화
+tags:
+  - visual
+---
+# Only the received box is emptied (the box query), so 보낸 제안 keeps its 3.
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- openLink: push://social?mock=empty:GET:me/offers.*box=received
+- extendedWaitUntil:
+    visible: "직장 생활"
+    timeout: 10000
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+# The header reads 받은 제안 N개 while the unread count it cached before the rule is fresh, else 제안함.
+- tapOn: "받은 제안 .*개|제안함"
+- extendedWaitUntil:
+    visible: "아직 받은 제안이 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: ProposalStates.1
+
+# The offer detail is a plain GET me/offers/o1, so after the reset it opens straight from the link; accepting o1 without a reply leaves its thread empty.
+- openLink: push://offers/o1?mock=reset
+- extendedWaitUntil:
+    visible: "수락하고 답장하기"
+    timeout: 10000
+- tapOn: "수락하고 답장하기"
+- extendedWaitUntil:
+    visible: "어떻게 답장할까요?"
+    timeout: 10000
+- tapOn: "수락하고 보내기"
+- extendedWaitUntil:
+    visible: "첫 메시지를 보내 대화를 시작해 보세요."
+    timeout: 20000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: ProposalStates.5

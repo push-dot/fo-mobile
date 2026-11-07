@@ -27,10 +27,10 @@ tags:
           timeout: 6000
 - tapOn: "휴대폰 번호"
 - inputText: "01012345678"
-- waitForAnimationToEnd
-# Shot while the field still has focus (purple border, caret); the pad is dismissed after.
-- takeScreenshot: PhoneInputDirect
+# The board draws the field filled with the pad already down and 인증번호 받기 in view.
 - runFlow: _hide_kbd.yaml
+- waitForAnimationToEnd
+- takeScreenshot: PhoneInputDirect
 - tapOn: "인증번호 받기"
 - extendedWaitUntil:
     visible: "인증번호를 입력해 주세요"

@@ -1,0 +1,34 @@
+appId: app.push.mobile
+name: 알림함 → 빈 상태
+tags:
+  - visual
+---
+# GET me/notifications serves no rows. The 알림 설정 button shows only while the OS notification permission is off (the simulator starts undetermined),
+# so the shot name follows it: with the button it is the permission-off board, without it the permission-on one.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=empty:GET:me/notifications"
+      READY: "새로 올라온 공고"
+- tapOn: "알림.*"
+- extendedWaitUntil:
+    visible: "아직 받은 알림이 없어요."
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "알림 설정"
+    timeout: 3000
+    optional: true
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+      visible: "알림 설정"
+    commands:
+      - takeScreenshot: NotificationsStates.2
+- runFlow:
+    when:
+      platform: iOS
+      notVisible: "알림 설정"
+    commands:
+      - takeScreenshot: NotificationsStates.3
+- openLink: push://?mock=reset

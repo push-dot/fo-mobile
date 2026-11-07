@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 소셜 → 빈 피드
+name: 소셜 → 빈 피드 · 불러오기 실패
 tags:
   - visual
 ---
@@ -22,3 +22,21 @@ tags:
       platform: iOS
     commands:
       - takeScreenshot: SocialStates.1
+# The feed is empty now, so a failed refresh leaves no rows and the error note replaces the empty one (the app retries for several seconds first).
+- openLink: push://social?mock=fail:GET:posts
+- extendedWaitUntil:
+    visible: "직장 생활"
+    timeout: 10000
+- swipe:
+    start: "50%,35%"
+    end: "50%,80%"
+- extendedWaitUntil:
+    visible: "글을 불러오지 못했어요"
+    timeout: 40000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: SocialStates.2
+- openLink: push://social?mock=reset

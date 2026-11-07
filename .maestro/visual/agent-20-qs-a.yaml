@@ -5,6 +5,30 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
+# QsLink draws the 복사한 링크 row, which the sheet shows for a link on the clipboard: copy the first one from 내 링크 (a row action, as a user would).
+- tapOn: "대화 목록 열기"
+- extendedWaitUntil:
+    visible: "최근 대화"
+    timeout: 10000
+- tapOn: "내 링크"
+- extendedWaitUntil:
+    visible: "에이전트에서 @언급으로 불러오거나.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- tapOn:
+    text: ".*더 보기"
+    index: 0
+- extendedWaitUntil:
+    visible: "링크 복사"
+    timeout: 5000
+- tapOn: "링크 복사"
+- waitForAnimationToEnd
+# Closing a page sheet also closes the sidebar.
+- tapOn: "닫기"
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- waitForAnimationToEnd
 - runFlow:
     file: _qs.yaml
     env:
@@ -29,7 +53,7 @@ tags:
       LABEL: "점수 올리기"
       WAIT: ".*올릴 서류.*"
       SHOT: QsBoost
-# The link sheet autofocuses its field, so it goes last and is left open.
+# The link sheet autofocuses its field, so it goes last and is left open (QsLink).
 - runFlow:
     file: _pill.yaml
     env:
@@ -39,6 +63,11 @@ tags:
 - extendedWaitUntil:
     visible: "맞추기 시작"
     timeout: 15000
-- inputText: "https://careers.moapay.kr/jobs/1182"
+- extendedWaitUntil:
+    visible: "붙여넣기"
+    timeout: 10000
+- waitForAnimationToEnd
+# The field autofocuses; the board draws it empty with the keyboard down.
+- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: QsLink

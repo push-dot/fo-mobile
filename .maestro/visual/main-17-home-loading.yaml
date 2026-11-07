@@ -1,0 +1,47 @@
+appId: app.push.mobile
+name: 홈 · 검색 결과 · 알림함 불러오는 중
+tags:
+  - visual
+---
+# The rules are set on the signed-out screen: GET postings feeds the home sections and the 채용공고 list,
+# GET search the results (it also holds the trending terms back, which the board does not need), GET me/notifications the inbox and the bell badge.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:search,hang:GET:me/notifications"
+      READY: "채용공고"
+- assertNotVisible: "마감 임박 공고"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: HomeLoading.1
+# Android inputText is ASCII only, so the search board is iOS only.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "검색"
+      - extendedWaitUntil:
+          visible: "취소"
+          timeout: 10000
+      - tapOn: "검색어|회사, 직무, 기술 검색"
+      - inputText: "백엔드"
+      - runFlow: _hide_kbd.yaml
+      - assertNotVisible: "‘백엔드’ 공고.*"
+      - waitForAnimationToEnd
+      - takeScreenshot: HomeLoading.2
+      - tapOn: "취소"
+- tapOn: "알림.*"
+- extendedWaitUntil:
+    visible: "모두 읽음"
+    timeout: 10000
+- assertNotVisible: ".*지원 상태가 바뀌었어요.*"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: HomeLoading.3
+- openLink: push://?mock=reset

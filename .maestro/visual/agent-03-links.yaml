@@ -33,14 +33,20 @@ tags:
     file: _close_sheet.yaml
     env:
       TITLE: "추가하기"
+# MyLinkMenu draws the menu on the 6th row (김서준 포트폴리오); DeleteLink names the first link, so the menu is reopened on it after the shot.
+- tapOn: "김서준 포트폴리오 더 보기"
+- extendedWaitUntil:
+    visible: "에이전트에서 쓰기"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: MyLinkMenu
+- runFlow: _dismiss_menu.yaml
 - tapOn:
     text: ".*더 보기"
     index: 0
 - extendedWaitUntil:
     visible: "에이전트에서 쓰기"
     timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: MyLinkMenu
 - tapOn: "삭제"
 - extendedWaitUntil:
     visible: "이 링크를 삭제할까요?"

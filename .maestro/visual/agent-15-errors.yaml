@@ -5,10 +5,12 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
+# The boards draw the user's own request above each error; run:<token> makes the mock answer it with that error (Android types the ASCII alias).
+- openLink: push://chat?mock=run:err-unavailable
 - runFlow:
     file: _say.yaml
     env:
-      KO: "err-unavailable"
+      KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "err-unavailable"
 - extendedWaitUntil:
     visible: "지금은 에이전트를 쓸 수 없어요.*"
@@ -16,10 +18,11 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
 - runFlow: _back_home.yaml
+- openLink: push://chat?mock=run:err-other
 - runFlow:
     file: _say.yaml
     env:
-      KO: "err-other"
+      KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "err-other"
 - extendedWaitUntil:
     visible: "작업을 이어가지 못했어요.*"
@@ -27,10 +30,11 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrOther
 - runFlow: _back_home.yaml
+- openLink: push://chat?mock=run:err-credit
 - runFlow:
     file: _say.yaml
     env:
-      KO: "err-credit"
+      KO: "모아페이 공고에 맞춰 경력기술서도 써 줘"
       EN: "err-credit"
 - extendedWaitUntil:
     visible: "이번 달 사용량을 다 썼어요.*"
@@ -38,6 +42,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatNoCredit
 - runFlow: _back_home.yaml
+- openLink: push://chat?mock=reset
 - runFlow:
     file: _say.yaml
     env:

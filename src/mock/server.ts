@@ -35,6 +35,17 @@ export const page = <T>(items: T[], query: URLSearchParams, withTotal = false) =
   return { data: slice, page: { nextCursor: next, hasMore: next !== null, ...(withTotal ? { total: items.length } : {}) } }
 }
 
+/**
+ * Tour switches (links.ts). A rule matches `method` + a regex on the path (or path + query string, to tell `GET postings` sorts apart) and makes the route misbehave: `hang` never answers in time
+ * (loading skeletons), `fail` answers 500 (error states), `empty` serves the handler's list with no rows (empty states).
+ */
+export type Rule = { kind: 'hang' | 'fail' | 'empty'; method: string; re: RegExp }
+let rules: Rule[] = []
+export const setRules = (next: Rule[]) => {
+  rules = next
+}
+const HANG_MS = 10 * 60_000
+
 const json = (status: number, body: unknown) =>
   new Response(status === 204 ? null : JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 
@@ -58,12 +69,19 @@ export const mockFetch: typeof fetch = async (input, init) => {
   }
   const body: unknown = form ?? (text ? parse(text) : undefined)
   await delay(250)
+  const rule = rules.find((x) => x.method === method && (x.re.test(path) || x.re.test(path + url.search)))
+  if (rule?.kind === 'hang') await delay(HANG_MS)
+  if (rule?.kind === 'fail') return json(500, { error: { code: 'INTERNAL', message: 'mock: injected failure' } })
   for (const r of routes) {
     if (r.method !== method) continue
     const m = path.match(r.re)
     if (!m) continue
     const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(m[i + 1]!)]))
     const out = await r.handler({ method, path, query: url.searchParams, body, params })
+    if (rule?.kind === 'empty' && out && typeof out === 'object' && 'data' in out && Array.isArray(out.data)) {
+      const pg = (out as { page?: Record<string, unknown> }).page
+      return json(200, { ...out, data: [], page: pg && { ...pg, nextCursor: null, hasMore: false, ...('total' in pg ? { total: 0 } : {}) } })
+    }
     if (out instanceof Response) return out
     if (out && typeof out === 'object' && 'status' in out && 'body' in out) {
       const o = out as { status: number; body: unknown }

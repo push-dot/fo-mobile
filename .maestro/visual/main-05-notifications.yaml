@@ -3,7 +3,12 @@ name: 홈 → 알림함 → 모두 읽음
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
+# The board draws the 마감 임박 row unread (4 unread, the home bell reads 3), so that row arrives unread before the first fetch.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=unread-deadline"
+      READY: "새로 올라온 공고"
 - tapOn: "알림.*"
 - extendedWaitUntil:
     visible: "모두 읽음"

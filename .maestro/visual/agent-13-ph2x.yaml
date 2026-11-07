@@ -15,27 +15,46 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XApproach
-- tapOn: ".*병목을 만들게요"
-- extendedWaitUntil:
-    visible: "병목 강도를 어느 정도로 할까요?"
-    timeout: 20000
+- runFlow:
+    file: _pick.yaml
+    env:
+      ASK: "어떤 접근 방식으로 진행할까요?"
+      PICK: ".*병목을 만들게요"
+      NEXT: "병목 강도를 어느 정도로 할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XLevel
 # The first pick fails verification in the mock; picking again passes.
-- tapOn: ".*중간 제약으로"
+- runFlow:
+    file: _pick.yaml
+    env:
+      ASK: "병목 강도를 어느 정도로 할까요?"
+      PICK: ".*중간 제약으로"
+      NEXT: "검증을 통과하지 못했어요.*"
+- waitForAnimationToEnd
+- runFlow:
+    file: _pick.yaml
+    env:
+      ASK: "검증을 통과하지 못했어요.*"
+      PICK: ".*다시 고르기"
+      NEXT: "병목 강도를 어느 정도로 할까요?"
+- waitForAnimationToEnd
+- runFlow:
+    file: _pick.yaml
+    env:
+      ASK: "병목 강도를 어느 정도로 할까요?"
+      PICK: ".*중간 제약으로"
+      NEXT: "어떤 프로젝트를 구현할까요?"
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh2XBlueprints
+# ChatVerifyFail draws the failed check under the 중간 제약으로 line alone, so it jumps there in a fresh conversation (mock token).
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "중간 제약으로"
+      EN: "verify-fail"
 - extendedWaitUntil:
     visible: "검증을 통과하지 못했어요.*"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatVerifyFail
-- tapOn: ".*다시 고르기"
-- extendedWaitUntil:
-    visible: "병목 강도를 어느 정도로 할까요?"
-    timeout: 20000
-- waitForAnimationToEnd
-- tapOn: ".*중간 제약으로"
-- extendedWaitUntil:
-    visible: "어떤 프로젝트를 구현할까요?"
-    timeout: 30000
-- waitForAnimationToEnd
-- takeScreenshot: ChatPh2XBlueprints

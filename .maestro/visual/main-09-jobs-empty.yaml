@@ -32,6 +32,15 @@ tags:
 - extendedWaitUntil:
     visible: ".*조건에 맞는 공고가 없어요.*"
     timeout: 10000
+# The board's bar sits at its start (전체 first); picking 지역 left it scrolled right.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: "10%,17%"
+          end: "90%,17%"
+          duration: 300
 - waitForAnimationToEnd
 - takeScreenshot: JobListEmpty.1
 - takeScreenshot: JobListEmpty.2

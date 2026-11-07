@@ -23,7 +23,13 @@ tags:
 - waitForAnimationToEnd
 - tapOn: "프로필 사진 넣기"
 - takeScreenshot: ChatPh4Design
-- tapOn: "클래식으로 만들기"
+# ChatPh5 draws the running save under the 클래식으로 만들기 line alone, so it jumps there in a fresh conversation (the run holds for a minute).
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "클래식으로 만들기"
+      EN: "ph5"
 - extendedWaitUntil:
     visible: ".*Push 프로필에 저장하는 중.*"
     timeout: 30000

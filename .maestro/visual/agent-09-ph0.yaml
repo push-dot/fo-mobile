@@ -15,20 +15,36 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0
-- tapOn: ".*이력서부터 쓸게요"
+# Each board below draws one thread under its own user line, not the answers that led to it, so each takes a fresh run (mock tokens;
+# Android types the ASCII alias).
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "1번, 지금 이력서로 할게요"
+      EN: "ph0-input"
 - extendedWaitUntil:
     visible: "어떤 산출물을 만들까요?"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0Input
-# The closing 말투 chip sends the card.
-- tapOn: "원래 말투로"
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "이력서만 · 자료 3개 · 말투 그대로"
+      EN: "ph0-start"
 - extendedWaitUntil:
     visible: "이대로 분석을 시작할까요?"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0Start
-- tapOn: ".*네, 시작해 주세요"
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "네, 시작해 주세요"
+      EN: "analyze"
 # The list stops following the stream (a 새 내용 pill shows), so the running line sits below the fold until it is scrolled to.
 - scrollUntilVisible:
     element: ".*필수·우대 스택을 뽑는 중.*"

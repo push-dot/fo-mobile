@@ -1,0 +1,19 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Taps ${PICK} in the approval panel that asks ${ASK} until ${NEXT} shows. A tap during the panel's 420ms rise is dropped, and an earlier
+# pick leaves the same text as a user bubble, so the tap is scoped below the question.
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when:
+            visible: ${ASK}
+          commands:
+            - tapOn:
+                text: ${PICK}
+                below: ${ASK}
+      - extendedWaitUntil:
+          visible: ${NEXT}
+          timeout: 8000

@@ -101,7 +101,12 @@ let sources: (Source & { jobId?: string })[] = [
   { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
-mock('GET', 'sources', ({ query }) => page(sources, query))
+// The 지원 서류 sheet lists with no kind filter and reads origin/kind: today's AI résumé first, the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
+const applySources = () => [
+  { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, new Date().toISOString()), origin: 'AI' },
+  ...sources.filter((s) => s.id !== 's2').map((s) => ({ ...s, origin: 'UPLOAD', ...(s.id === 's3' ? { kind: 'PORTFOLIO' } : {}) })),
+]
+mock('GET', 'sources', ({ query }) => page(query.get('kind') ? sources : applySources(), query))
 // s2 stays 읽는 중: its ingest job never settles.
 mock('GET', 'ai/jobs/:id', ({ params }) =>
   params.id === 'j-read'
@@ -386,10 +391,11 @@ const events: CalendarEvent[] = [
   }),
   ev('e11', 'CUSTOM', '부하 테스트 스터디', on(10, 29, 20)),
   ev('e12', 'FOLLOW_UP', '모아페이 면접 후기 보내기', on(10, 30, 10)),
-  ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
+  // The calendar draws a day's dots in response order and the board lists 커피챗 before 후속 연락 there, so e15 precedes e14 (the day list sorts by time itself).
   ev('e15', 'COFFEE_CHAT', '오지현 님과 커피챗', on(10, 21, 18, 30), {
     notes: '받은 제안을 수락해서 잡힌 일정이에요',
   }),
+  ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
 ]
 // The board lists the 면접 once on the calendar and once on the application, so this one is only
 // served to the application's next-event query. shortcut: told apart by `from`, which is the
@@ -643,6 +649,16 @@ const o1Row = (o: Offer): Offer =>
     ? { ...o, message: '결제 플랫폼팀 시니어 포지션으로 가볍게 커피챗 어떠세요? 승인 API 개선하신 경험이 딱 저희 팀 고민이에요.', createdAt: ago(2 * H + 10 * 60_000) }
     : o
 mock('GET', 'me/offers', ({ query }) => page(query.get('box') === 'sent' ? sent : received.map(o1Row), query))
+// The boards draw o1 twice: the detail (two paragraphs; its date line slices the UTC day but shows the local clock, so shift the instant until
+// both read 10월 20일 오전 1:42) and, once accepted, the thread's opening bubble (one paragraph, local day).
+const o1Opening =
+  '서준 님, 안녕하세요! 허브에서 프로필 보고 연락드려요. 결제 승인 API를 다시 설계하신 경험이 저희 팀 고민과 딱 맞아서요. 30분 정도 커피챗 어떠세요?'
+const o1DetailAt = () => {
+  const d = new Date(2026, 9, 20, 1, 42)
+  return new Date(d.getUTCDate() < 20 ? d.getTime() + D : d.getTime()).toISOString()
+}
+const o1View = (o: Offer): Offer =>
+  o.id !== 'o1' ? o : o.status === 'ACCEPTED' ? { ...o, message: o1Opening } : { ...o, createdAt: o1DetailAt() }
 mock('GET', 'me/offers/:id', ({ params }) => {
   const o = findOffer(params.id!)
   if (!o) return notFound
@@ -652,16 +668,18 @@ mock('GET', 'me/offers/:id', ({ params }) => {
       readAt: new Date().toISOString(),
       status: o.status === 'SENT' ? 'READ' : o.status,
     })
-  return { data: o }
+  return { data: o1View(o) }
 })
-// Accepting o1 lands in the thread the 제안함 board draws, opened by the typed reply; the 3s wait
-// keeps the 보내는 중 button on screen.
-const o1Thread = (reply?: string): OfferMessage[] => [
+// Android types ASCII only, so the tour's "Thank you" stands for the board's Korean reply (case-insensitive, like chat.ts aliases).
+const REPLY_ALIAS: Record<string, string> = { 'thank you': '제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요.' }
+// Accepting o1 lands in the thread the 제안함 board draws, opened by the typed reply (no reply leaves the 메시지 · 빈 상태 thread);
+// the 3s wait keeps the 보내는 중 button on screen.
+const o1Thread = (typed: string): OfferMessage[] => [
   {
     id: 'm-o1-1',
     offerId: 'o1',
     sender: ME,
-    body: reply || '제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요.',
+    body: REPLY_ALIAS[typed.trim().toLowerCase()] ?? typed,
     createdAt: on(10, 20, 9, 10),
   },
   {
@@ -675,7 +693,7 @@ const o1Thread = (reply?: string): OfferMessage[] => [
 mock('POST', 'me/offers/:id/accept', async ({ params, body }) => {
   await new Promise((r) => setTimeout(r, 3000))
   const reply = (body as { reply?: string } | undefined)?.reply
-  if (params.id === 'o1') messages.o1 = o1Thread(reply)
+  if (params.id === 'o1') messages.o1 = reply ? o1Thread(reply) : []
   else if (reply)
     (messages[params.id!] ??= []).push({
       id: `m${Date.now()}`,

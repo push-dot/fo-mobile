@@ -109,6 +109,12 @@ const notifications: AppNotification[] = [
   { id: 'n8', type: 'OFFER', title: '제안 받음', body: '한지민 님이 정산팀 채용 제안을 보냈어요.', target: { kind: 'offer', id: 'o2' }, readAt: READ, createdAt: daysAgo(12, 11) },
 ]
 
+// Tour switch (links.ts): the Notifications board draws the 마감 임박 row unread while the home bell still reads 3, so only that tour asks for it.
+export const unreadDeadline = () => {
+  const n = notifications.find((x) => x.id === 'n4')
+  if (n) n.readAt = null
+}
+
 mock('GET', 'me/notifications', ({ query }) => page(notifications, query))
 mock('POST', 'me/notifications/read', ({ body }) => {
   const b = (body ?? {}) as { all?: boolean; ids?: string[] }

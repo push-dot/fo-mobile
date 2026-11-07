@@ -1,0 +1,47 @@
+appId: app.push.mobile
+name: 공고 상세 → 지원 서류 → 지원하는 중
+tags:
+  - visual
+---
+# POST apply never answers, so the sheet stays on 지원하는 중….
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=hang:POST:postings/.*/apply"
+      READY: "새로 올라온 공고"
+- runFlow: _open_jobs.yaml
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 15000
+- tapOn:
+    text: ".*모아페이.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "지원하기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: ".*조금만 고치면 8점대예요.*"
+    timeout: 30000
+    optional: true
+- tapOn: "지원하기"
+- extendedWaitUntil:
+    visible: "어떤 서류로 지원할까요?"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*김서준_백엔드_이력서_2026.*"
+    timeout: 10000
+    optional: true
+- runFlow:
+    file: ../flows/_tap_sheet_button.yaml
+    env:
+      TEXT: "이 서류로 지원하기"
+- extendedWaitUntil:
+    visible: "지원하는 중.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: JobDetailStates.2
+- openLink: push://?mock=reset

@@ -18,10 +18,12 @@ tags:
       - extendedWaitUntil:
           visible: ".*Google 계정으로 로그인.*"
           timeout: 10000
-      # 연락처 sits under the first screen.
-      - scrollUntilVisible:
-          element: "연락처.*"
-          direction: DOWN
+      # The boards show the list scrolled to its end, backed off ~30pt (허브 공개 header under the title).
+      - runFlow: _settings_end.yaml
+      # The boards have 참고 데이터 제공 on (the mock starts it off, so the chat asks first); turn the switch (at 84%,60%) on like a user would.
+      - tapOn:
+          point: "84%,60%"
+      - waitForAnimationToEnd
       - tapOn: "연락처.*"
       - extendedWaitUntil:
           visible: "누구에게 연락처를 보여 줄까요?"
@@ -36,10 +38,7 @@ tags:
       - extendedWaitUntil:
           notVisible: "누구에게 연락처를 보여 줄까요?"
           timeout: 5000
-      # 기본 말투 is below the first screen.
-      - scrollUntilVisible:
-          element: "기본 말투.*"
-          direction: DOWN
+      - runFlow: _settings_end.yaml
       - tapOn: "기본 말투.*"
       - extendedWaitUntil:
           visible: "에이전트가 어떤 말투로 쓸까요?"
@@ -53,9 +52,7 @@ tags:
       - extendedWaitUntil:
           notVisible: "에이전트가 어떤 말투로 쓸까요?"
           timeout: 5000
-      - scrollUntilVisible:
-          element: "로그아웃"
-          direction: DOWN
+      - runFlow: _settings_end.yaml
       - tapOn: "로그아웃"
       # Retap if the alert did not open (dropped first tap, see flows/05_my_settings_logout.yaml).
       - runFlow:

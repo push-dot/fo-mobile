@@ -1,0 +1,40 @@
+appId: app.push.mobile
+name: 에이전트 · 사이드바 · 북마크 없음 · 내 서류 없음
+tags:
+  - visual
+---
+# The rules are set on the signed-out screen, before the sidebar lists load: no bookmarks, and no 내 서류 rows.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=empty:GET:me/bookmarks,empty:GET:chat/docs"
+      READY: "새로 올라온 공고"
+- runFlow: _agent_tab.yaml
+- tapOn: "대화 목록 열기"
+- extendedWaitUntil:
+    visible: "최근 대화"
+    timeout: 10000
+- tapOn: "북마크한 공고"
+- extendedWaitUntil:
+    visible: "북마크한 공고가 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBookmarksEmpty
+- tapOn: "닫기"
+- waitForAnimationToEnd
+# Closing a page sheet also closes the sidebar, so reopen it for the next row.
+- runFlow:
+    when:
+      notVisible: "내 서류"
+    commands:
+      - tapOn: "대화 목록 열기"
+      - extendedWaitUntil:
+          visible: "내 서류"
+          timeout: 10000
+- tapOn: "내 서류"
+- extendedWaitUntil:
+    visible: "아직 등록한 서류가 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatDocsEmpty
+- openLink: push://?mock=reset

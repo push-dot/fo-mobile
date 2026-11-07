@@ -20,9 +20,13 @@ tags:
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 60000
-- runFlow: _chat_bottom.yaml
-- takeScreenshot: ChatPh6Result
-- tapOn: ".*확인했어요"
+# ChatDoneProfile draws the finished run alone (one elapsed line, no 적용 / 확인했어요 bubbles), so it takes its own run (mock token).
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "profile-done"
+      EN: "profile-done"
 # The closing summary streams in below the fold and can stop the follow-the-end scroll (새 내용 pill).
 - retry:
     maxRetries: 3
@@ -39,3 +43,15 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply
+# ChatPh6Result draws only the closing line and the card under the open gate, so it jumps there in a fresh conversation (mock token).
+- runFlow: _back_home.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "profile-gate"
+      EN: "profile-gate"
+- extendedWaitUntil:
+    visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh6Result

@@ -9,7 +9,7 @@ tags:
     file: ../_say.yaml
     env:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
-      EN: "tailor resume"
+      EN: "tailor hold"
 - extendedWaitUntil:
     visible: ".*기술 스택을 비교하는 중.*"
     timeout: 40000
@@ -21,6 +21,10 @@ tags:
 - extendedWaitUntil:
     visible: ".*대기 중.*"
     timeout: 10000
+- runFlow:
+    file: ../_chat_kbd_down.yaml
+    env:
+      TEXT: ".*맞춤 초안을 만들어 볼게요.*"
 - waitForAnimationToEnd
 - runFlow:
     when:

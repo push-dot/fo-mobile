@@ -3,7 +3,12 @@ name: 홈 → 스크롤 → 마감 임박 전체보기
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
+# 마감 임박 공고 전체보기 draws 모아페이 백엔드 as its sixth tile, so that posting closes within a week for this tour.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=close-moapay"
+      READY: "새로 올라온 공고"
 - extendedWaitUntil:
     visible: ".*모아페이.*"
     timeout: 20000

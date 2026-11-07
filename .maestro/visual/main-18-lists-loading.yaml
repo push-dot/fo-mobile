@@ -1,0 +1,51 @@
+appId: app.push.mobile
+name: 채용공고 · 허브 · 소셜 불러오는 중
+tags:
+  - visual
+---
+# One login with the three lists held back (GET postings, profiles, posts); each list is opened for the first time under its rule.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:profiles,hang:GET:posts"
+      READY: "채용공고"
+- tapOn:
+    text: "채용공고"
+    index: 0
+- extendedWaitUntil:
+    visible: "뒤로"
+    timeout: 10000
+- assertNotVisible: "공고 .*개"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: JobListLoading.1
+      - takeScreenshot: JobListLoading.2
+- tapOn: "뒤로"
+- tapOn: "허브"
+- extendedWaitUntil:
+    visible: "추천 프로필"
+    timeout: 10000
+- assertNotVisible: ".*김태윤.*"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: HubLoading.1
+      - takeScreenshot: HubLoading.2
+- tapOn: "소셜"
+- extendedWaitUntil:
+    visible: "직장 생활"
+    timeout: 10000
+- assertNotVisible: ".*3년차 백엔드.*"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: SocialLoading.1
+      - takeScreenshot: SocialLoading.2
+- openLink: push://?mock=reset

@@ -3,7 +3,12 @@ name: 에이전트 · 동의 → 첫 화면 → 실행 방식 → @언급
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
+# few-materials: the @언급 board draws two bookmarks, two documents and one link, so the popover fits above the composer.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=few-materials"
+      READY: "새로 올라온 공고"
 - tapOn: "에이전트"
 - extendedWaitUntil:
     visible: "동의하고 시작하기"
@@ -35,6 +40,16 @@ tags:
 - extendedWaitUntil:
     visible: "북마크 공고"
     timeout: 10000
+# The board draws the keyboard down with the tab bar back; the popover then grows to its full height.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard:
+          optional: true
+      - extendedWaitUntil:
+          visible: "바로가기"
+          timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: ChatMention
 # Android's inputText cannot type Hangul, so the filtered list (ChatEmpty) is iOS only.
@@ -43,9 +58,9 @@ tags:
       platform: iOS
     commands:
       - inputText: "모아"
-      # 파도AI's bookmark does not contain "모아", so its row leaves the list.
+      # 라온헬스's bookmark does not contain "모아", so its row leaves the list.
       - extendedWaitUntil:
-          notVisible: "북마크 공고, 데이터 분석가"
+          notVisible: "북마크 공고, 안드로이드 개발자"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: ChatEmpty
