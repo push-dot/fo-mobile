@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors } from '@/theme'
-import { askConfirm, Glass, GlassButton, Icon, Mascot, Menu, Text, useKeyboardHeight, type MenuAction } from '@/shared/components'
+import { askConfirm, Glass, GlassButton, Icon, Mascot, Menu, Text, useKeyboardHeight, useReduceMotion, type MenuAction } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { usePersonalPurchase } from '@/features/billing'
 import { useConvertDocument } from '@/features/my'
@@ -36,7 +36,6 @@ import {
   useArchiveConversation,
   useDeleteConversation,
   usePinConversation,
-  useReduceMotion,
 } from '@/features/chat'
 
 

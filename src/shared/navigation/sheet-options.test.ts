@@ -5,7 +5,7 @@ const platform = vi.hoisted(() => ({ OS: 'ios' }))
 vi.mock('react-native', () => ({ Platform: platform }))
 vi.mock('expo-secure-store', () => ({}))
 
-const { sheetOptions } = await import('./sheet-options')
+const { fullSheetOptions, sheetOptions } = await import('./sheet-options')
 const c = palette.light
 
 beforeEach(() => {
@@ -33,5 +33,9 @@ describe('sheetOptions', () => {
     const o = sheetOptions(c)
     expect(o.sheetCornerRadius).toBe(radius.sheetTop)
     expect(o.contentStyle).toEqual({ backgroundColor: c.bg })
+  })
+
+  it('draws a full-height sheet opaque on both platforms', () => {
+    expect(fullSheetOptions(c)).toMatchObject({ sheetAllowedDetents: [1], contentStyle: { backgroundColor: c.bg } })
   })
 })

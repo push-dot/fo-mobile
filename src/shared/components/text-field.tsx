@@ -5,9 +5,10 @@ import Icon from './icon'
 import { inputMetrics } from './text-field-metrics'
 import Text from './text'
 
-type Props = TextInputProps & { icon?: IconName; label?: string; max?: number; variant?: 'field' | 'search' }
+/** `compact`: the 48pt `.field` some boards draw (FilterSkill search) instead of the 56pt default. */
+type Props = TextInputProps & { icon?: IconName; label?: string; max?: number; variant?: 'field' | 'search'; compact?: boolean }
 
-const TextField = ({ icon, label, max, multiline, value, style, variant = 'field', ...rest }: Props) => {
+const TextField = ({ icon, label, max, multiline, value, style, variant = 'field', compact, ...rest }: Props) => {
   const c = useColors()
   const { fontScale } = useWindowDimensions()
   const search = variant === 'search'
@@ -18,7 +19,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
         backgroundColor: c.fill,
         paddingHorizontal: spacing[4],
         paddingVertical: multiline || label ? spacing[4] : 0,
-        minHeight: search ? 48 : 56,
+        minHeight: search || compact ? 48 : 56,
         justifyContent: 'center',
         gap: spacing[2],
       }}

@@ -5,7 +5,8 @@ import { toPickerUtc } from '@/shared/utility/picker-date'
 import { find, findAll, stubs } from './native-stubs'
 
 const state = vi.hoisted(() => ({ value: undefined as unknown, set: (() => {}) as (v: unknown) => void }))
-vi.mock('react', async (orig) => ({ ...(await orig<typeof import('react')>()), useState: (init: unknown) => [state.value ?? init, state.set] }))
+vi.mock('react', async (orig) => ({ ...(await orig<typeof import('react')>()), useState: (init: unknown) => [state.value ?? init, state.set], useEffect: () => {}, useId: () => 'id', useRef: (v: unknown) => ({ current: v }) }))
+vi.mock('expo-router', () => ({ useNavigation: () => ({ addListener: () => () => {} }) }))
 vi.mock('react-native', async () => ({ ...(await import('./native-stubs')).stubs.reactNative, Platform: { OS: 'android' } }))
 vi.mock('@expo/ui', () => ({ Host: 'Host' }))
 vi.mock('@expo/ui/jetpack-compose', async () => (await import('./native-stubs')).stubs.compose)
@@ -13,7 +14,7 @@ vi.mock('@expo/ui/jetpack-compose/modifiers', async () => (await import('./nativ
 vi.mock('@/theme', async () => (await import('./native-stubs')).stubs.theme)
 vi.mock('@/shared/utility/asset-url', () => ({}))
 vi.mock('@/shared/components/icon', () => ({ default: 'Icon' }))
-vi.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }))
+vi.mock('react-native-safe-area-context', () => ({ initialWindowMetrics: null, useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }))
 vi.mock('../button', () => ({ default: 'Button' }))
 vi.mock('../text', () => ({ default: 'Text' }))
 

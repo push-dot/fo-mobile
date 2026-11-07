@@ -13,7 +13,7 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
   const found = q.trim() ? searchHangul(SKILL_CATALOG, q, (s) => [s]).map((r) => r.item) : []
   return (
     <>
-      <TextField icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
+      <TextField compact icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
       {q.trim() ? (
         <FilterGroup title="검색 결과">
           {found.length ? (

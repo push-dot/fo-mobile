@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router'
-import { sheetOptions } from '@/shared/navigation'
+import { FULL_SHEET_KIND } from '@/features/jobs'
+import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
@@ -39,7 +40,10 @@ const SignedInStack = () => {
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
       <Stack.Screen name="materials" options={sheetOptions(c)} />
-      <Stack.Screen name="job-filter" options={sheetOptions(c)} />
+      <Stack.Screen
+        name="job-filter"
+        options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}
+      />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />

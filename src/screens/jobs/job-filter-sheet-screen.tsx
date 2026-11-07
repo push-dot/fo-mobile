@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { FILTER_KEYS, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
+import { FILTER_KEYS, FULL_SHEET_KIND, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
 import { Sheet, useSheetScrollMax } from '@/shared/components'
 
@@ -24,9 +24,11 @@ const JobFilterSheetScreen = () => {
   }, [kind])
 
   if (!kind) return null
+  const full = kind === FULL_SHEET_KIND
 
   return (
     <Sheet
+      full={full}
       onLayout={bound.onSheetLayout}
       action={{
         label: total === undefined ? '공고 보기' : `공고 ${formatCount(total)}개 보기`,
@@ -41,7 +43,7 @@ const JobFilterSheetScreen = () => {
         draft={draft}
         trending={trending}
         onChange={setDraft}
-        scroll={LONG_FILTER_KINDS.includes(kind) ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
+        scroll={LONG_FILTER_KINDS.includes(kind) && !full ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
       />
     </Sheet>
   )

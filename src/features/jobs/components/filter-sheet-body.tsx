@@ -31,7 +31,7 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, scroll }: Props) => 
       <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} />
     )
   return (
-    <View style={{ gap: 14 }}>
+    <View style={{ gap: 14, flexGrow: 1 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text v="h2" accessibilityRole="header">
           {FILTER_TITLES[kind]}

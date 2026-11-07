@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Pressable, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
+import { Pressable, View, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, type Colors } from '../../theme'
 import { DISABLED_OPACITY, PRESS_SCALE } from './constants'
 import Glass, { useGlassSurface } from './glass'
@@ -36,18 +36,16 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
-        CONTENT,
         {
           overflow: 'hidden',
           backgroundColor: fill ? c[pressed && pressedFill ? pressedFill : fill] : undefined,
           transform: [{ scale: pressed ? PRESS_SCALE : 1 }],
         },
         style,
-        contentStyle,
         dim,
       ]}
     >
-      {children}
+      <View style={[CONTENT, { flexGrow: 1 }, contentStyle]}>{children}</View>
     </Pressable>
   )
 }

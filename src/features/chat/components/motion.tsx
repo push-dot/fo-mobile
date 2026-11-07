@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, type StyleProp, type ViewStyle } from 'react-native'
 import { BUBBLE } from '../constants'
-import { useReduceMotion } from '../hooks'
+import { useReduceMotion } from '@/shared/components'
 
 type AppearProps = {
   children: ReactNode

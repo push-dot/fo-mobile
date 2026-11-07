@@ -1,6 +1,7 @@
 import { router, useNavigation } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AccessibilityInfo, Animated, Easing } from 'react-native'
+import { Animated, Easing } from 'react-native'
+import { useReduceMotion } from '@/shared/components'
 import { CLOSE_DRAWER } from './constants'
 
 /** Leaves a sidebar page for another screen: iOS shows the page over the open drawer, so close both first and back returns to the chat. */
@@ -14,16 +15,6 @@ export const useLeaveSidebar = () => {
     },
     [navigation],
   )
-}
-
-export const useReduceMotion = () => {
-  const [on, setOn] = useState(false)
-  useEffect(() => {
-    void AccessibilityInfo.isReduceMotionEnabled().then(setOn)
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setOn)
-    return () => sub.remove()
-  }, [])
-  return on
 }
 
 export const usePulse = (active: boolean, period = 1000, low = 0.25) => {

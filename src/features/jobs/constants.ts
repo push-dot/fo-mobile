@@ -10,6 +10,8 @@ export const RESET_FILTERS_LABEL = '필터 초기화'
 export const FILTER_KEYS: FilterKey[] = ['category', 'skills', 'careerYears', 'location', 'employmentType']
 
 export const LONG_FILTER_KINDS: FilterKey[] = ['skills', 'location']
+/** The region picker is drawn as a full-height sheet (FilterRegion). */
+export const FULL_SHEET_KIND: FilterKey = 'location'
 
 export const POSTING_SORTS: { key: PostingSort; label: string }[] = [
   { key: 'latest', label: '최신순' },

@@ -16,3 +16,6 @@ export const sheetOptions = (c: Colors, detents: SheetDetents = 'fitToContents')
     contentStyle: { backgroundColor: android ? c.bg : 'transparent' },
   }
 }
+
+/** A sheet drawn to the top of the screen: iOS attaches it 10pt under the status bar, opaque; Android right under it. */
+export const fullSheetOptions = (c: Colors): NativeStackNavigationOptions => ({ ...sheetOptions(c, [1]), contentStyle: { backgroundColor: c.bg } })
