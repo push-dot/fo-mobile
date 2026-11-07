@@ -10,6 +10,7 @@ type Row = { id: string; title: string; meta: string }
 
 const MaterialsScreen = () => {
   const c = useColors()
+  const ring = selectedRing(c)
   const bound = useSheetScrollMax(0.6)
   const [kind, setKind] = useState<'github' | 'posting' | null>(null)
   const [text, setText] = useState('')
@@ -74,10 +75,10 @@ const MaterialsScreen = () => {
                         alignItems: 'flex-start',
                         gap: spacing[3],
                         minHeight: 64,
-                        paddingVertical: spacing[3],
-                        paddingHorizontal: 14,
+                        paddingVertical: spacing[3] - ring.borderWidth,
+                        paddingHorizontal: 14 - ring.borderWidth,
                         borderRadius: 14,
-                        ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
+                        ...(on ? ring : { borderWidth: ring.borderWidth, borderColor: 'transparent' }),
                       }}
                     >
                       <View style={{ width: 24, height: 24, marginTop: 1, borderRadius: 7, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.ac : c.fill }}>

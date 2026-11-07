@@ -122,7 +122,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
   const groups = filterMentions(useMentionGroups(), query)
   const firstId = query ? groups.find((g) => g.items[0]?.kind !== 'shortcut')?.items[0]?.id : undefined
   return (
-    <Appear duration={250}>
+    <Appear duration={250} style={{ marginBottom: spacing[2] }}>
       <View style={[shadow.pop, { borderRadius: ios ? 26 : radius.lg, backgroundColor: ios ? c.bg : c.card, borderWidth: 1, borderColor: c.line, elevation: 8, overflow: 'hidden' }]}>
         <ScrollView style={{ maxHeight }} contentContainerStyle={{ padding: spacing[2] }} keyboardShouldPersistTaps="always">
           {groups.length === 0 ? (
@@ -136,7 +136,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                   {g.title}
                 </Text>
                 {g.items[0]?.kind === 'shortcut' ? (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[1] }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[1], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
                     {g.items.map((m) => (
                       <Chip key={m.id} label={m.title} onPress={() => onPick(m)} lead={<Icon name={SHORTCUT_ICON[m.id as keyof typeof SHORTCUT_ICON] ?? 'spark'} size={15} color="t2" />} />
                     ))}

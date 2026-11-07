@@ -22,7 +22,9 @@ export const UsageExhausted = ({ onPlan, onCredits }: { onPlan: () => void; onCr
       </View>
       <View style={{ flexDirection: 'row', gap: spacing[2] }}>
         {u.actions.map((a) => (
-          <Button key={a.id} style={{ flex: 1 }} variant={a.variant} label={a.label} onPress={a.id === 'plan' ? onPlan : onCredits} />
+          <View key={a.id} style={{ flex: 1 }}>
+            <Button variant={a.variant} label={a.label} onPress={a.id === 'plan' ? onPlan : onCredits} />
+          </View>
         ))}
       </View>
     </Appear>

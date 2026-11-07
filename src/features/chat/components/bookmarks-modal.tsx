@@ -11,7 +11,7 @@ import { useLeaveSidebar } from '../hooks'
 import { BOOKMARK_EMPTY } from '../constants'
 import Mark from './mark'
 import Note from './note'
-import PageModal from './page-modal'
+import PageModal, { PageEmpty } from './page-modal'
 
 
 // Same company colour as JobCard so a company looks the same across screens.
@@ -32,12 +32,14 @@ export const BookmarksModal = () => {
   return (
     <PageModal title="북마크한 공고">
       {empty ? (
-        <View style={{ alignItems: 'center', gap: spacing[4], paddingTop: 120, paddingHorizontal: spacing[6] }}>
+        <PageEmpty>
           <Text v="b1" weight="700" color="t2">
             {BOOKMARK_EMPTY}
           </Text>
-          <Button label="채용공고 보기" size="pill" variant="secondary" onPress={() => leave(() => router.push('/jobs'))} />
-        </View>
+          <View style={{ marginTop: spacing[3] }}>
+            <Button label="채용공고 보기" size="pill" variant="secondary" onPress={() => leave(() => router.push('/jobs'))} />
+          </View>
+        </PageEmpty>
       ) : (
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[2] }}>

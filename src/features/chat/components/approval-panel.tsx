@@ -5,6 +5,7 @@ import { onAccent, radius, selectedRing, spacing, type, useColors, useShadow } f
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../constants'
 import type { Approval, ApprovalSection, Choice, TemplateLayout } from '../types'
+import { isStop, multiPick } from '../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../utils/stream-v3'
 
 type Props = {
@@ -19,10 +20,12 @@ type Props = {
 
 // `.panel { gap: 6px }`: between the panel's blocks and inside each section.
 const PANEL_GAP = 6
+// The foot sits 14pt under the grid: panel gap 6 + 6 + 2.
+const FOOT_TOP = 6
+// The board pads 그만하기 22pt per side; the Button gives 20.
+const STOP_PAD = { paddingHorizontal: 2 }
 
 const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
-const isStop = (c: Choice) => c.label === '그만하기' || c.label === '그만할게요'
-
 /** Replaces the composer until answered (design_system ApprovalPanel). */
 export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props) => {
   const c = useColors()
@@ -41,6 +44,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   const cancel = () => onAnswer(approval.secondary!, approval.optionIds?.indexOf('cancel') ?? -1)
   const sendSections = (picks: number[][]) => onAnswer(sectionLabel(approval, picks), sectionPicks(approval, picks))
   const sectionSubmit = sectioned && approval.submit && !chipSends ? sectionLabel(approval, sel) : undefined
+  const multi = multiPick(approval, sel)
+  const submitRow = !sectioned && !!approval.submit
 
   useEffect(() => {
     Animated.timing(rise, { toValue: 1, duration: 420, easing: Easing.bezier(...SPRING), useNativeDriver: true }).start()
@@ -77,7 +82,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
         if (!s.multi) return rows
         const stops = s.items.flatMap((ch, i) => (isStop(ch) ? [i] : []))
         return (
-          <MultiGrid key={si} stop={stops.length ? <View style={{ marginTop: 2 }}>{rows[stops[0]!]}</View> : undefined}>
+          <MultiGrid key={si} stop={stops.length && !submitRow ? <View style={{ marginTop: 2 }}>{rows[stops[0]!]}</View> : undefined}>
             {rows.filter((_, i) => !stops.includes(i))}
           </MultiGrid>
         )
@@ -178,33 +183,45 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
           {approval.secondary && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
         </View>
       ) : approval.submit ? (
-        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[2] }}>
-          {approval.secondary ? (
-            <Button style={{ flex: 1 }} variant="secondary" label={approval.secondary} onPress={() => onAnswer(approval.secondary!, 1)} />
+        <>
+          {multi.at >= 0 && approval.foot ? (
+            <Text v="c2" color="t3" style={{ textAlign: 'center', paddingTop: FOOT_TOP, marginTop: 2 }}>
+              {approval.foot}
+            </Text>
           ) : null}
-          <Button
-            style={{ flex: 1 }}
-            label={approval.submit}
-            disabled={approval.sections.some((s, i) => s.kind === 'choices' && s.multi && !(sel[i]?.length))}
-            onPress={() => {
-              const si = approval.sections.findIndex((s) => s.kind === 'choices' && s.multi)
-              const section = si >= 0 ? approval.sections[si] : undefined
-              if (section?.kind === 'choices') {
-                const picks = sel[si] ?? []
-                if (!picks.length) return
-                onAnswer(picks.map((i) => section.items[i]!.label).join(', '), picks)
-                return
-              }
-              onAnswer(approval.answer ?? approval.submit!, 0)
-            }}
-          />
-        </View>
+          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: multi.at >= 0 ? spacing[1] : 2 }}>
+            {multi.stopLabel ? (
+              <View style={multi.at >= 0 ? STOP_PAD : { flex: 1 }}>
+                <Button
+                  variant="secondary"
+                  label={multi.stopLabel}
+                  onPress={() => (approval.secondary ? onAnswer(approval.secondary, 1) : onAnswer(multi.stopLabel!, multi.stopAt))}
+                />
+              </View>
+            ) : null}
+            <View style={{ flex: 1 }}>
+              <Button
+                label={multi.submitLabel!}
+                disabled={multi.disabled}
+                onPress={() => {
+                  if (multi.at >= 0) {
+                    const picks = sel[multi.at] ?? []
+                    if (!picks.length) return
+                    onAnswer(picks.map((i) => multi.items[i]!.label).join(', '), picks)
+                    return
+                  }
+                  onAnswer(approval.answer ?? approval.submit!, 0)
+                }}
+              />
+            </View>
+          </View>
+        </>
       ) : null}
       {approval.warning ? (
         <Text v="c1" weight="600" color="t2" style={{ textAlign: 'center', paddingTop: 6 }}>
           {approval.warning}
         </Text>
-      ) : approval.foot ? (
+      ) : approval.foot && !(submitRow && multi.at >= 0) ? (
         <Text v="c2" color="t3" style={{ textAlign: 'center', paddingTop: 6 }}>
           {approval.foot}
         </Text>
@@ -255,6 +272,7 @@ const Sub = ({ label }: { label: string }) => (
 
 const ChoiceRow = ({ n, choice, on, square, bare, center, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; onPress: () => void }) => {
   const c = useColors()
+  const ring = selectedRing(c)
   const two = !!choice.desc
   const paleNumber = Platform.OS === 'ios' && !square
   return (
@@ -269,10 +287,10 @@ const ChoiceRow = ({ n, choice, on, square, bare, center, onPress }: { n?: numbe
         justifyContent: center ? 'center' : undefined,
         gap: center ? spacing[2] : spacing[3],
         minHeight: two ? 64 : 52,
-        paddingHorizontal: center ? spacing[2] : 14,
-        paddingVertical: two ? spacing[3] : 0,
+        paddingHorizontal: (center ? spacing[2] : 14) - ring.borderWidth,
+        paddingVertical: two ? spacing[3] - ring.borderWidth : 0,
         borderRadius: 14,
-        ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }),
+        ...(on ? ring : { borderWidth: ring.borderWidth, borderColor: 'transparent' }),
         transform: [{ scale: pressed ? 0.98 : 1 }],
       })}
     >
@@ -338,6 +356,7 @@ const THUMB_LINES = ['90%', '72%', '84%', '56%']
 
 const Template = ({ label, recommended, on, layout, onPress }: { label: string; recommended?: boolean; on: boolean; layout: TemplateLayout; onPress: () => void }) => {
   const c = useColors()
+  const ring = selectedRing(c)
   const line = (w: string, key: string | number, extra?: object) => <View key={key} style={{ height: 7, width: w as `${number}%`, borderRadius: 4, backgroundColor: c.fill2, ...extra }} />
   const heading = (w: string, h: number, color: string) => line(w, 'h', { height: h, backgroundColor: color })
   const page = {
@@ -358,14 +377,14 @@ const Template = ({ label, recommended, on, layout, onPress }: { label: string; 
       accessibilityState={{ selected: on }}
       accessibilityLabel={recommended ? `${label}, 추천` : label}
       onPress={onPress}
-      style={{ flex: 1, gap: spacing[2], padding: spacing[2], borderRadius: radius.md, ...(on ? selectedRing(c) : { borderWidth: selectedRing(c).borderWidth, borderColor: 'transparent' }) }}
+      style={{ flex: 1, gap: spacing[2], padding: spacing[2] - ring.borderWidth, borderRadius: radius.md, ...(on ? ring : { borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
     >
       {recommended ? (
         <View pointerEvents="none" style={{ position: 'absolute', top: -9, left: 0, right: 0, alignItems: 'center', zIndex: 1 }}>
           <Badge label="추천" tone="ac" />
         </View>
       ) : null}
-      <View style={{ height: 96, borderRadius: 10, backgroundColor: c.paper, borderWidth: 1, borderColor: c.line, padding: 9, gap: layout === 'compact' ? 3 : 5 }}>{page}</View>
+      <View style={{ height: 96, borderRadius: 10, backgroundColor: c.paper, boxShadow: `0 0 0 1px ${c.line}`, padding: 9, gap: layout === 'compact' ? 3 : 5 }}>{page}</View>
       <Text v="c1" weight="700" style={{ textAlign: 'center' }}>
         {label}
       </Text>

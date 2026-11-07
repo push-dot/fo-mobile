@@ -19,6 +19,7 @@ import {
   OPEN_DRAWER,
   DELETE_CONFIRM,
   headerMenu,
+  headerCompany,
   hydrate,
   Item,
   Queued,
@@ -31,6 +32,7 @@ import {
   send,
   StatusRow,
   stop,
+  threadInset,
   useChat,
   useConversationList,
   useArchiveConversation,
@@ -89,9 +91,9 @@ const ConversationScreen = ({ id }: { id: string }) => {
     },
   }))
 
-  const company = chat.items.findLast((i) => i.type === 'result')?.company ?? conv?.company ?? undefined
+  const company = headerCompany(chat.items, conv?.company)
   const placeholder = composerPlaceholder(chat)
-  // Android pads the keyboard height itself; the nav-bar inset on top of it would leave a gap.
+  // The keyboard lifts the composer on Android, so the nav-bar inset below it would leave a gap.
   const keyboard = useKeyboardHeight()
   const showPanel = chat.approval && !saying
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
@@ -100,7 +102,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScrollView
         ref={scroll}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: insets.top + 64, paddingBottom: bottomH + spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: insets.top + 64, paddingBottom: threadInset({ bottomH, keyboard, navBar: insets.bottom, approval: !!showPanel, android: Platform.OS === 'android' }) }}
         onScroll={(e) => {
           const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent
           atBottom.current = contentOffset.y + layoutMeasurement.height >= contentSize.height - 48

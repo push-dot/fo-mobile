@@ -138,13 +138,14 @@ const PLANS = [
 
 const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[number]; current: boolean; disabled: boolean; onPress: () => void }) => {
   const c = useColors()
+  const ring = selectedRing(c)
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: current, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[{ borderRadius: radius.card, padding: spacing[4] - 1.5, gap: spacing[2], backgroundColor: c.bg2, borderWidth: 1.5, borderColor: 'transparent' }, current && selectedRing(c)]}
+      style={[{ borderRadius: radius.card, padding: spacing[4] - ring.borderWidth, gap: spacing[2], backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }, current && ring]}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         <Text v="h3" weight="800">

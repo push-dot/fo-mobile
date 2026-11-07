@@ -43,4 +43,17 @@ const PageModal = ({
   )
 }
 
+// The boards keep 140pt under the centred block; the header height differs per platform, so the lift is calibrated on the device.
+const EMPTY_LIFT = Platform.OS === 'ios' ? 158 : 100
+const EMPTY_INSET = 40
+
+export const PageEmpty = ({ children }: { children: ReactNode }) => {
+  const insets = useSafeAreaInsets()
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: EMPTY_INSET, paddingBottom: Math.max(EMPTY_LIFT - spacing[6] - insets.bottom, 0) }}>
+      {children}
+    </View>
+  )
+}
+
 export default PageModal

@@ -1,0 +1,20 @@
+appId: app.push.mobile
+name: 에이전트 · 공고를 아직 모를 때 헤더는 로고만
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "no-posting"
+      EN: "no-posting"
+- extendedWaitUntil:
+    visible: ".*공고 링크를 보내 주시면.*"
+    timeout: 30000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*공고 링크를 보내 주시면.*"
+- takeScreenshot: ChatHeaderNoCompany

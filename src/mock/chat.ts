@@ -48,7 +48,7 @@ mock('POST', 'conversations', ({ body }) => {
   if (!referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
   const b = body as { title: string }
   // Every scenario targets the 모아페이 posting except the upload without one (ChatDoneNoJob) and the read failure (ChatErrors).
-  const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^(ext-nojob|fail|이 서류를 고쳐 줘)$/i.test(b.title.trim()) ? null : '모아페이' }
+  const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^(ext-nojob|fail|no-posting|이 서류를 고쳐 줘)$/i.test(b.title.trim()) ? null : '모아페이' }
   conversations.push(c)
   return { status: 201, body: { data: c } }
 })
@@ -491,6 +491,10 @@ const ph2xApproach: Step[] = [
 const ph2xLevel: Step[] = [
   ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약으로', '중간 제약으로', '강한 제약으로', '그만하기'], PICK_HINT, [1])),
 ]
+const noPosting: Step[] = [
+  s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')),
+  ...say('np', '어떤 공고에 지원하실 건가요? 공고 링크를 보내 주시면 그 회사에 맞춰 고칠게요. 공고 없이 다듬기만 해도 돼요.'),
+]
 const PREVENT = ['성능', '보안', '확장성', '안정성', '유지보수', '데이터 무결성', '그만하기']
 const ph2xPrevent: Step[] = [
   ask({
@@ -640,6 +644,8 @@ const TOKENS: Record<string, Step[]> = {
   'ph1-ultra-open': ph1Plan('ULTRA', DWELL + 4000),
   'auto-pick': autoPick,
   // The long-held working line: a second message or 중지 must land while it still runs (ChatWorking, ChatInterrupt on Android).
+  // ChatHeaderNoCompany: no posting yet, so the conversation has no company and the header pill shows the logo only.
+  'no-posting': noPosting,
   'tailor hold': [...tailorRead, ...tailorFit(TODO, -1, HOLD)],
   // ChatStates.4 in one conversation: the file card, then the apply record, then (busy below) the 혼잡 error.
   'states-file': statesFile,

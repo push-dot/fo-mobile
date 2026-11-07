@@ -5,13 +5,14 @@ import GlassActionButton, { type GlassAction } from './glass-action'
 
 export type { GlassAction }
 
-/** `filled`: the design's solid `fill` icon chip with a 16pt glyph (sheet close buttons), on both platforms. */
-const GlassButton = ({ actions, filled }: { actions: GlassAction[]; filled?: boolean }) => {
+/** `iconSize` overrides the glyph size (22, or 16 when `filled`).
+ * `filled`: the design's solid `fill` icon chip with a 16pt glyph (sheet close buttons), on both platforms. */
+const GlassButton = ({ actions, filled, iconSize }: { actions: GlassAction[]; filled?: boolean; iconSize?: number }) => {
   const single = actions.length === 1
   const row = (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: single ? 0 : spacing[1] }}>
       {actions.map((a) => (
-        <GlassActionButton key={a.label} a={a} width={single ? 44 : 40} iconSize={filled ? 16 : 22} filled={filled} />
+        <GlassActionButton key={a.label} a={a} width={single ? 44 : 40} iconSize={iconSize ?? (filled ? 16 : 22)} filled={filled} />
       ))}
     </View>
   )

@@ -7,7 +7,7 @@ import { type ChatDoc } from '../api/schemas'
 import { useChatDocs, useUploadChatDoc } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import Note from './note'
-import PageModal from './page-modal'
+import PageModal, { PageEmpty } from './page-modal'
 import { docAiSub } from '../constants'
 import { ago } from '../utils'
 
@@ -28,15 +28,15 @@ export const DocsModal = () => {
   return (
     <PageModal title="내 서류" right={<GlassButton actions={[{ icon: 'plus', label: '서류 올리기', onPress: () => upload.mutate() }]} />}>
       {empty ? (
-        <View style={{ alignItems: 'center', gap: spacing[4], paddingTop: 120, paddingHorizontal: spacing[6] }}>
+        <PageEmpty>
           <Text v="b1" weight="700" color="t2">
             아직 등록한 서류가 없어요.
           </Text>
-          <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
             <Button label="파일 등록" size="pill" variant="secondary" onPress={() => upload.mutate()} />
             <Button label="에이전트로 만들기" size="pill" variant="secondary" onPress={() => leave(() => router.dismissTo('/chat'))} />
           </View>
-        </View>
+        </PageEmpty>
       ) : null}
       {docs.data?.map((d) => (
         <View key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing[5] }}>

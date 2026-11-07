@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
 import { onAccent, radius, spacing, tile, useColors, useShadow, type Colors } from '../../../theme'
-import { Badge, Button, Icon, Text, useReduceMotion } from '@/shared/components'
+import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
 import { useOpenArtifact, useShareFile } from '../api/hooks'
@@ -171,6 +171,26 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   )
 }
 
+// The board's index chip is width 24 plus 2x7 padding.
+const INDEX_CHIP = 38
+
+// shortcut: Android does not draw the decoration on a label that turns done (probed: native-driver pop off strikes one of two rows, constant weight none), so it draws the board's rule itself: 1.5pt at 55% of each line box. Retry the native line on an RN upgrade.
+const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<typeof Text>) => {
+  const c = useColors()
+  const [lines, setLines] = useState<{ x: number; y: number; width: number; height: number }[]>([])
+  if (Platform.OS === 'ios') return <Text {...props} style={[props.style, on ? { textDecorationLine: 'line-through' } : null]} />
+  return (
+    <View>
+      <Text {...props} onTextLayout={(e) => setLines(e.nativeEvent.lines)} />
+      {on
+        ? lines.map((l, i) => (
+            <View key={i} pointerEvents="none" style={{ position: 'absolute', left: l.x, top: l.y + l.height * 0.55 - 0.75, width: l.width, height: 1.5, backgroundColor: c.t3 }} />
+          ))
+        : null}
+    </View>
+  )
+}
+
 const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
   const c = useColors()
   const done = item.state === 'done'
@@ -194,9 +214,9 @@ const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
         {done ? <Icon name="check" size={12} color={onAccent} /> : null}
         {now ? <View style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: c.ac }} /> : null}
       </Animated.View>
-      <Text v="b2" color={done ? 't3' : 't1'} weight={now ? '700' : '400'} style={done ? { textDecorationLine: 'line-through' } : undefined}>
+      <StruckLabel on={done} v="b2" color={done ? 't3' : 't1'} weight={now ? '700' : '400'}>
         {item.label}
-      </Text>
+      </StruckLabel>
       {item.added ? <Badge label="새로 추가" tone="ac" /> : null}
     </View>
   )
@@ -261,7 +281,7 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
       ) : null}
       {item.rows.map((r, i) => (
         <View key={r.label} style={{ flexDirection: 'row', gap: spacing[3], alignItems: 'flex-start' }}>
-          {verdict ? <Badge label={String(i + 1)} minWidth={24} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 52 : 58} />}
+          {verdict ? <Badge label={String(i + 1)} minWidth={INDEX_CHIP} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 52 : 58} />}
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="b2" weight="700">
               {r.label}
@@ -305,7 +325,7 @@ const Diff = ({ item }: { item: Of<'diff'> }) => {
               {l.n ?? ''}
             </Text>
             <Text v="c1" weight="700" style={{ width: 10, lineHeight: 20, color: add ? c.green : del ? c.red : c.t3 }}>
-              {l.sign === '-' ? '−' : l.sign}
+              {l.sign === '-' ? '−' : l.sign || '\u00A0'}
             </Text>
             <Text
               v="c1"
@@ -411,16 +431,23 @@ const Projected = ({ label, bullets }: { label: string; bullets: string[] }) => 
   )
 }
 
-const FitNum = ({ size, color, children }: { size: 'mid' | 'big'; color: keyof Colors; children: string }) => (
-  <Text
-    v={size === 'big' ? 'h1' : 'h2'}
-    weight="800"
-    color={color}
-    style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
-  >
-    {children}
-  </Text>
-)
+// iOS draws the 40pt numeral ~6pt higher in its 44pt line box than the board (card top to numeral 15.6 vs 21, '/ 10' 8pt low); the shift grows with the text size.
+const FIT_DROP = 6
+
+const FitNum = ({ size, color, children }: { size: 'mid' | 'big'; color: keyof Colors; children: string }) => {
+  const { fontScale } = useWindowDimensions()
+  const drop = size === 'big' && Platform.OS === 'ios' ? Math.round(FIT_DROP * fontScale) : 0
+  return (
+    <Text
+      v={size === 'big' ? 'h1' : 'h2'}
+      weight="800"
+      color={color}
+      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
+    >
+      {children}
+    </Text>
+  )
+}
 
 const FitCard = ({ item, onPlan }: { item: Of<'fit'>; onPlan?: () => void }) => {
   const c = useColors()
@@ -522,11 +549,14 @@ const Surface = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-const ShareButton = ({ onPress }: { onPress: () => void }) => (
-  <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-    <Icon name="share" size={22} color="t2" />
-  </Pressable>
-)
+const ShareButton = ({ onPress }: { onPress: () => void }) =>
+  Platform.OS === 'ios' ? (
+    <GlassButton iconSize={20} actions={[{ icon: 'share', label: '공유', color: 't2', onPress }]} />
+  ) : (
+    <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="share" size={20} color="t2" />
+    </Pressable>
+  )
 
 const FileCard = ({ item }: { item: Of<'file'> }) => {
   const c = useColors()

@@ -50,7 +50,7 @@ export const LinkAddSheet = () => {
         </View>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-        <Icon name="spark" size={20} color="acText" />
+        <Icon name="spark" size={18} color="acText" filled />
         <Text v="b2" style={{ flex: 1 }}>
           {LINK_ADD_NOTE}
         </Text>
