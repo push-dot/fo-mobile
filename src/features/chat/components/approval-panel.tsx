@@ -239,7 +239,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
       accessibilityLabel="확인 요청"
       style={[
         ios
-          ? { marginHorizontal: spacing[2], marginBottom: Math.max(insets.bottom - 18, spacing[2]), backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
+          ? { marginHorizontal: spacing[2], marginBottom: spacing[2], backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
           : { backgroundColor: c.bg, borderTopLeftRadius: radius.confirmPanelTop, borderTopRightRadius: radius.confirmPanelTop, ...shadow.pop, shadowOffset: { width: 0, height: -10 }, elevation: 12 },
         motion,
       ]}

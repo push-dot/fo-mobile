@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { inputMetrics, inputReset } from '../text-field-metrics'
+import { inputMetrics, inputReset, iosLineBox } from '../text-field-metrics'
 
 vi.mock('react-native', () => ({ Platform: { OS: 'android' } }))
 
@@ -18,5 +18,13 @@ describe('text field input height', () => {
     expect(inputReset).toEqual({ padding: 0, includeFontPadding: false })
     expect(inputMetrics(false, 1)).toMatchObject(inputReset)
     expect(inputMetrics(true, 1)).toMatchObject(inputReset)
+  })
+
+  it('drops the iOS multiline top inset and lifts by the half-leading TextKit puts above the line', () => {
+    expect(iosLineBox(24, 16, 1, 'ios')).toEqual({ paddingTop: 0, marginTop: expect.closeTo(-0.416), marginBottom: expect.closeTo(0.416) })
+    expect(iosLineBox(25, 16, 1, 'ios')?.marginTop).toBeCloseTo(-0.916)
+    expect(iosLineBox(24, 16, 1.5, 'ios')?.marginTop).toBeCloseTo(-0.624)
+    expect(iosLineBox(20, 16, 1, 'ios')?.marginTop).toBe(-0)
+    expect(iosLineBox(24, 16, 1, 'android')).toBeUndefined()
   })
 })

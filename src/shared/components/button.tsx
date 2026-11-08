@@ -18,11 +18,11 @@ type Props = {
   style?: StyleProp<ViewStyle>
 }
 
-const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHorizontal: number; text: TypeName; fontSize: number }> = {
-  lg: { minHeight: 56, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'button', fontSize: type.button.fontSize },
-  md: { minHeight: 48, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'b2', fontSize: type.b2.fontSize },
-  pill: { minHeight: 44, borderRadius: 22, paddingHorizontal: spacing[5], text: 'c1', fontSize: 14 },
-  sm: { minHeight: 40, borderRadius: platformTheme.buttonSmRadius, paddingHorizontal: 14, text: 'c1', fontSize: 14 },
+const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHorizontal: number; text: TypeName; fontSize: number; icon: number }> = {
+  lg: { minHeight: 56, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'button', fontSize: type.button.fontSize, icon: 18 },
+  md: { minHeight: 48, borderRadius: platformTheme.buttonRadius, paddingHorizontal: spacing[5], text: 'b2', fontSize: type.b2.fontSize, icon: 16 },
+  pill: { minHeight: 44, borderRadius: 22, paddingHorizontal: spacing[5], text: 'c1', fontSize: 14, icon: 16 },
+  sm: { minHeight: 40, borderRadius: platformTheme.buttonSmRadius, paddingHorizontal: 14, text: 'c1', fontSize: 14, icon: 16 },
 }
 
 const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
@@ -48,7 +48,7 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabl
       style={[{ minHeight: s.minHeight, borderRadius: s.borderRadius }, style]}
       contentStyle={{ paddingHorizontal: s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
     >
-      {icon ? <Icon name={icon} size={16} color={fg} /> : null}
+      {icon ? <Icon name={icon} size={s.icon} color={fg} /> : null}
       <Text v={s.text} weight="700" style={{ color: fg, fontSize: s.fontSize }}>
         {label}
       </Text>

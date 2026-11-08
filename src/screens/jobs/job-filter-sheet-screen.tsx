@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { FILTER_KEYS, FULL_SHEET_KIND, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
-import { Sheet, useSheetScrollMax } from '@/shared/components'
+import { Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
 
 const kindOf = (value: string | string[] | undefined) => {
   const kind = Array.isArray(value) ? value[0] : value
@@ -29,6 +29,7 @@ const JobFilterSheetScreen = () => {
   return (
     <Sheet
       full={full}
+      actionGap={SHEET_ACTION_GAP.filter}
       onLayout={bound.onSheetLayout}
       action={{
         label: total === undefined ? '공고 보기' : `공고 ${formatCount(total)}개 보기`,

@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandOf, cardCareerLabel } from '@push/shared'
-import { hitSlopTo, palette, photo, radius } from '../../theme'
+import { hitSlopTo, palette, photo, radius, useColors } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
@@ -19,6 +19,7 @@ type Props = {
 }
 
 const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
+  const c = useColors()
   const brand = brandOf(p.company)
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} style={{ width, gap: 10 }}>
@@ -42,7 +43,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           hitSlop={hitSlopTo(30)}
           style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: radius.pill, backgroundColor: photo.button, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Icon name="bookmark" size={16} color={p.bookmarked ? palette.light.acText : palette.light.t1} filled={p.bookmarked} />
+          <Icon name="bookmark" size={16} color={p.bookmarked ? c.acText : palette.light.t1} filled={p.bookmarked} />
         </Pressable>
       </View>
       <View style={{ gap: 2 }}>

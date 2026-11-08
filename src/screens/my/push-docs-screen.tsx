@@ -2,8 +2,9 @@ import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, useDocuments, useMyApplications } from '@/features/my'
+import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, SHEET_PARAM, useDocuments, useMyApplications } from '@/features/my'
 import { GlassButton, Text } from '@/shared/components'
+import { sheetHeaderTop } from '@/shared/navigation'
 import { radius, spacing, useColors } from '@/theme'
 import type { HubDocument } from '@/features/my'
 
@@ -17,7 +18,7 @@ const Line = ({ doc }: { doc: HubDocument }) => {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, monthDay(doc.updatedAt)].filter(Boolean).join(', ')}
-      onPress={() => router.push({ pathname: '/docs/push/[id]', params: { id: doc.id, sheet: '1' } })}
+      onPress={() => router.push({ pathname: '/docs/push/[id]', params: { id: doc.id, sheet: SHEET_PARAM } })}
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], borderRadius: radius.card, borderWidth: 1, borderColor: c.line, paddingVertical: spacing[4], paddingLeft: spacing[5], paddingRight: spacing[4] }}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -42,14 +43,16 @@ const Line = ({ doc }: { doc: HubDocument }) => {
   )
 }
 
+const HEADER_ROW = 56
+
 const PushDocsScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { data, isLoading } = useDocuments()
   const docs = data?.data ?? []
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: Platform.OS === 'ios' ? 0 : insets.top }}>
-      <View style={{ height: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[2] }}>
+    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: Platform.OS === 'ios' ? 0 : sheetHeaderTop(Platform.OS, true, insets.top, HEADER_ROW) }}>
+      <View style={{ height: HEADER_ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[2] }}>
         <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {PUSH_DOCS_TITLE}

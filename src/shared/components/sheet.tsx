@@ -4,6 +4,7 @@ import { Platform, View, type ViewProps } from 'react-native'
 import { initialWindowMetrics, SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
+import { SheetSurface } from './glass'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
 import GlassButton from './glass-button'
@@ -19,6 +20,8 @@ type Props = {
   /** iOS only: a glass close button left of the title. Android closes by drag or back. */
   onClose?: () => void
   gap?: number
+  /** Extra space above the action: the boards add 6 (filters) or 4 (quick starts) to the sheet gap. */
+  actionGap?: number
   onLayout?: ViewProps['onLayout']
   /** Drawn to the top of the screen (route with fullSheetOptions): fills the sheet and keeps the CTA at the bottom. */
   full?: boolean
@@ -30,7 +33,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, actionGap, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -83,7 +86,7 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
         </View>
       ) : null}
       {children}
-      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} style={full ? { marginTop: 'auto' } : undefined} /> : null}
+      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} style={full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : undefined} /> : null}
       {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} /> : null}
     </View>
   )
@@ -112,7 +115,9 @@ const IosSheet = (props: Props) => {
             : { flex: props.full ? 1 : undefined }
         }
       >
-        <Body {...props} homeInset={HOME_INSET} />
+        <SheetSurface.Provider value={!props.full}>
+          <Body {...props} homeInset={HOME_INSET} />
+        </SheetSurface.Provider>
       </View>
     </SafeAreaProvider>
   )

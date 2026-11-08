@@ -1,5 +1,7 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import { NATIVE_FONTS } from '@/theme/fonts'
+import { type } from '@/theme/tokens'
 import { find, findAll } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
@@ -8,6 +10,8 @@ vi.mock('@expo/ui/swift-ui', async () => (await import('./native-stubs')).stubs.
 vi.mock('@expo/ui/swift-ui/modifiers', async () => (await import('./native-stubs')).stubs.swiftUIModifiers)
 vi.mock('@/theme', async () => (await import('./native-stubs')).stubs.theme)
 vi.mock('@/shared/utility/asset-url', () => ({}))
+const setSegmentedTitleFont = vi.hoisted(() => vi.fn())
+vi.mock('../../../../modules/segmented-appearance', () => ({ setSegmentedTitleFont }))
 
 const { default: SegmentedControl } = await import('../segmented-control.ios')
 const { default: MenuButtons } = await import('../menu-buttons')
@@ -22,6 +26,10 @@ const actions = [
 ]
 
 describe('SegmentedControl (iOS)', () => {
+  it('sets the 600 label face on every UISegmentedControl', () => {
+    expect(setSegmentedTitleFont).toHaveBeenCalledWith(NATIVE_FONTS[type.segLabel.weight], type.segLabel.fontSize)
+  })
+
   it('renders a SwiftUI segmented picker tagged by item key', () => {
     const onChange = vi.fn()
     const tree = SegmentedControl({ items: [{ key: 'a', label: '받은' }, { key: 'b', label: '보낸' }], value: 'a', onChange })

@@ -101,6 +101,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
         onBack={() => router.back()}
         right={<GlassButton actions={[{ icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) }]} />}
         safeTop={!(sheet && Platform.OS === 'ios')}
+        sheet={sheet}
       />
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />

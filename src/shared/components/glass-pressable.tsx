@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import { Pressable, View, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
-import { useColors, type Colors } from '../../theme'
+import { useColors, useShadow, type Colors } from '../../theme'
+import { toBoxShadow } from '../utility'
 import { DISABLED_OPACITY, PRESS_SCALE } from './constants'
-import Glass, { useGlassSurface } from './glass'
+import Glass, { useGlassSurface, useSheetGlassFill } from './glass'
 
 type Props = Omit<PressableProps, 'style' | 'children'> & {
   children: ReactNode
@@ -20,6 +21,9 @@ const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justify
 const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fill = 'fill', pressedFill, disabled, ...press }: Props) => {
   const c = useColors()
   const native = useGlassSurface() && glass
+  const sheetFill = useSheetGlassFill()
+  const sheetGlass = glass ? sheetFill : null
+  const boxShadow = toBoxShadow(useShadow().glass)
   const dim = disabled ? { opacity: DISABLED_OPACITY } : null
   if (native) {
     return (
@@ -38,7 +42,8 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
       style={({ pressed }) => [
         {
           overflow: 'hidden',
-          backgroundColor: fill ? c[pressed && pressedFill ? pressedFill : fill] : undefined,
+          backgroundColor: sheetGlass ?? (fill ? c[pressed && pressedFill ? pressedFill : fill] : undefined),
+          boxShadow: sheetGlass ? boxShadow : undefined,
           transform: [{ scale: pressed ? PRESS_SCALE : 1 }],
         },
         style,

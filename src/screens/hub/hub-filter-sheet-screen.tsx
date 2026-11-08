@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { HubFilterSheet, profileQuery, useHubFilterStore, useProfileCount } from '@/features/hub'
-import { Sheet } from '@/shared/components'
+import { Sheet, SHEET_ACTION_GAP } from '@/shared/components'
 
 const HubFilterSheetScreen = () => {
   const category = useHubFilterStore((s) => s.category)
@@ -11,6 +11,7 @@ const HubFilterSheetScreen = () => {
   const sent = useProfileCount(['offers'], { explore: 'offers' }, true)
   return (
     <Sheet
+      actionGap={SHEET_ACTION_GAP.filter}
       action={{
         label: total === undefined ? '프로필 보기' : `프로필 ${total}개 보기`,
         onPress: () => {

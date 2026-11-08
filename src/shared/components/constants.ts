@@ -6,3 +6,4 @@ export const TOAST_SHEET_GAP = 29
 export const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1)
 export const PRESS_SCALE = 0.97
 export const DISABLED_OPACITY = 0.4
+export const SHEET_ACTION_GAP = { filter: 6, quickStart: 4 } as const
