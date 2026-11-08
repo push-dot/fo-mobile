@@ -3,8 +3,12 @@ name: 마이 설정 → 연락처·말투 시트 → 로그아웃·탈퇴 확인
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
-- runFlow: ../flows/_dismiss_logbox.yaml
+# The boards have 참고 데이터 제공 on; the mock starts it off (so the chat asks first), so the link switches it on before the settings load.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
 - tapOn: "마이"
 - extendedWaitUntil:
     visible: "김서준"
@@ -20,10 +24,6 @@ tags:
           timeout: 10000
       # The boards show the list scrolled to its end, backed off ~30pt (허브 공개 header under the title).
       - runFlow: _settings_end.yaml
-      # The boards have 참고 데이터 제공 on (the mock starts it off, so the chat asks first); turn the switch (at 84%,60%) on like a user would.
-      - tapOn:
-          point: "84%,60%"
-      - waitForAnimationToEnd
       - tapOn: "연락처.*"
       - extendedWaitUntil:
           visible: "누구에게 연락처를 보여 줄까요?"

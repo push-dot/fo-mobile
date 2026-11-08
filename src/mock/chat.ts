@@ -37,6 +37,10 @@ const conversations: ConversationRow[] = [
 ]
 const archived = new Set(['a-toss', 'a-line', 'a-baemin'])
 let referenceData = false
+// Tour switch (links.ts): the 설정 boards draw 참고 데이터 제공 on; the mock starts it off so the chat asks first.
+export const grantReference = () => {
+  referenceData = true
+}
 const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)

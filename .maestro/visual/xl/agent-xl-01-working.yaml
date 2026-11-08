@@ -21,10 +21,11 @@ tags:
 - extendedWaitUntil:
     visible: ".*대기 중.*"
     timeout: 10000
+# At the large text size the first agent line has scrolled off; the queued pill (static text) is always on screen.
 - runFlow:
     file: ../_chat_kbd_down.yaml
     env:
-      TEXT: ".*맞춤 초안을 만들어 볼게요.*"
+      TEXT: ".*대기 중 · .*"
 - waitForAnimationToEnd
 - runFlow:
     when:

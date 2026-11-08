@@ -27,4 +27,11 @@ describe('mock postings long after the sample was written', () => {
     const list = await get('sort=deadline')
     expect(list.data.length).toBeGreaterThan(0)
   })
+
+  it('lists 모아페이 백엔드 as the sixth closing-soon tile once close-moapay is on', async () => {
+    const { closeMoapay } = await import('../postings')
+    closeMoapay()
+    const list = await get('sort=deadline&deadlineWithin=7')
+    expect(list.data.map((p) => p.id)).toEqual(['p2', 'p3', 'p5', 'p6', 'p7', 'p1'])
+  })
 })

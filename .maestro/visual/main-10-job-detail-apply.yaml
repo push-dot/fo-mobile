@@ -20,6 +20,9 @@ tags:
     timeout: 30000
     optional: true
 - waitForAnimationToEnd
+# The score bars grow for ~1.4s after the card shows (CSS in the WebView), so let them settle before the shot.
+- waitForAnimationToEnd:
+    timeout: 5000
 - runFlow:
     when:
       platform: iOS

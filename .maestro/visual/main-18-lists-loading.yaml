@@ -30,12 +30,7 @@ tags:
     timeout: 10000
 - assertNotVisible: ".*김태윤.*"
 - waitForAnimationToEnd
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - takeScreenshot: HubLoading.1
-      - takeScreenshot: HubLoading.2
+- takeScreenshot: HubLoading
 - tapOn: "소셜"
 - extendedWaitUntil:
     visible: "직장 생활"

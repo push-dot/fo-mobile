@@ -60,3 +60,38 @@ tags:
       - waitForAnimationToEnd:
           timeout: 3000
       - takeScreenshot: DeleteDoc.2
+# ToastSheetAndroid: the delete toast, then a confirm sheet opened while it shows (the toast must go).
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      # The first file's ⋯ sits at 90%,52% of the Android screen.
+      - tapOn:
+          point: "90%,52%"
+      - extendedWaitUntil:
+          visible: "서류 삭제하기"
+          timeout: 5000
+      - tapOn: "서류 삭제하기"
+      - extendedWaitUntil:
+          visible: "이 서류를 삭제할까요?"
+          timeout: 10000
+      - tapOn: "삭제"
+      - extendedWaitUntil:
+          visible: "서류를 삭제했어요"
+          timeout: 10000
+      - waitForAnimationToEnd:
+          timeout: 2000
+      - takeScreenshot: ToastSheetAndroid.1
+      - tapOn:
+          point: "90%,52%"
+      - extendedWaitUntil:
+          visible: "서류 삭제하기"
+          timeout: 5000
+      - tapOn: "서류 삭제하기"
+      - extendedWaitUntil:
+          visible: "이 서류를 삭제할까요?"
+          timeout: 10000
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - takeScreenshot: ToastSheetAndroid.2
+      - tapOn: "취소"

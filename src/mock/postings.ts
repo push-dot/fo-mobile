@@ -39,7 +39,7 @@ export const postings: Posting[] = [
   base({ id: 'p13', company: '모아페이', title: '프로덕트 디자이너', jobCategory: 'design', location: '서울 강남구', careerMin: 3, careerMax: 5, skills: ['Figma'], deadline: null, createdAt: '2026-10-14T09:00:00Z' }),
   base({ id: 'p14', company: '파도AI', title: 'AI 엔지니어 (LLM)', location: '원격', careerMin: 4, careerMax: 6, skills: ['Python', 'PyTorch'], employmentType: 'contract', deadline: inDays(20), createdAt: '2026-10-13T09:00:00Z' }),
   base({ id: 'p15', company: '바다물류', title: '데이터 엔지니어', jobCategory: 'data', location: '부산 해운대구', careerMin: 1, careerMax: 3, skills: ['Kafka', 'Python', 'AWS'], deadline: inDays(30), createdAt: '2026-10-12T09:00:00Z' }),
-  base({ id: 'p16', company: '하늘항공', title: '서비스 기획자', jobCategory: 'plan', location: '인천 중구', careerMin: 0, deadline: inDays(7), createdAt: '2026-10-11T09:00:00Z' }),
+  base({ id: 'p16', company: '하늘항공', title: '서비스 기획자', jobCategory: 'plan', location: '인천 중구', careerMin: 0, deadline: inDays(9), createdAt: '2026-10-11T09:00:00Z' }),
   base({ id: 'p17', company: '한빛연구소', title: '연구 데이터 분석 인턴', jobCategory: 'data', location: '대전 유성구', careerMin: 0, skills: ['Python', 'SQL'], employmentType: 'intern', deadline: inDays(13), createdAt: '2026-10-10T09:00:00Z' }),
   base({ id: 'p18', company: '새벽마켓', title: 'B2B 영업 매니저', jobCategory: 'sales', location: '서울 송파구', careerMin: 4, careerMax: 6, deadline: inDays(34), createdAt: '2026-10-09T09:00:00Z' }),
   base({ id: 'p19', company: '도토리증권', title: 'HR 비즈니스 파트너', jobCategory: 'hr', location: '서울 영등포구', careerMin: 7, careerMax: 9, deadline: null, createdAt: '2026-10-08T09:00:00Z' }),
@@ -125,8 +125,9 @@ mock('GET', 'postings', ({ query }) => {
   let list = filter(query)
   const sort = query.get('sort')
   // Home sections reuse the list: ?sort=deadline → 마감 7일 이내 (feature-spec 3.3).
-  if (query.get('deadlineWithin') === '7' || sort === 'deadline') list = list.filter((p) => days(p.deadline) <= 7)
-  if (sort === 'deadline') list = list.sort((a, b) => days(a.deadline) - days(b.deadline))
+  // Compared as calendar dates: the millisecond distance to a date string jumps a day with the device's UTC offset.
+  if (query.get('deadlineWithin') === '7' || sort === 'deadline') list = list.filter((p) => p.deadline !== null && p.deadline <= inDays(7))
+  if (sort === 'deadline') list = list.sort((a, b) => a.deadline!.localeCompare(b.deadline!))
   else if (sort === 'popular') list = list.filter((p) => views[p.id]).sort((a, b) => views[b.id]! - views[a.id]!)
   else list = [...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   if (query.get('limit') === '10' && (sort ?? 'latest') === 'latest') list = list.map((p) => ({ ...p, title: HOME_LATEST_TITLES[p.id] ?? p.title }))
