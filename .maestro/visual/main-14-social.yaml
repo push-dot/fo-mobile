@@ -5,10 +5,24 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: ../flows/_dismiss_logbox.yaml
+# 소셜 mounts on its first visit, so its photos start downloading then; a round trip to 홈 lets them land before the shot.
 - tapOn: "소셜"
 - extendedWaitUntil:
     visible: "직장 생활"
     timeout: 10000
+- extendedWaitUntil:
+    visible: ".*3년차 백엔드.*"
+    timeout: 10000
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "홈"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "소셜"
+      READY: "직장 생활"
 - extendedWaitUntil:
     visible: ".*3년차 백엔드.*"
     timeout: 10000

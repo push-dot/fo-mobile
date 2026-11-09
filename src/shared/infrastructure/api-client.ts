@@ -1,12 +1,15 @@
 import { createApi, createClient } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
-import { mockFetch } from '../../mock'
-import { listenMockLinks } from '../../mock/links'
-import { API_BASE_URL, API_MOCK } from './config'
+import { API_BASE_URL } from './config'
 import { useSession } from './session-store'
 
-if (API_MOCK) listenMockLinks()
+// The flag is read inline, not from config, so Metro folds it and production bundles leave the mock out.
+const MOCK = process.env.EXPO_PUBLIC_API_MOCK === '1'
+/* eslint-disable @typescript-eslint/no-require-imports */
+const mockFetch: typeof fetch | undefined = MOCK ? require('../../mock').mockFetch : undefined
+if (MOCK) require('../../mock/links').listenMockLinks()
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 let refreshing: Promise<boolean> | null = null
 
@@ -31,7 +34,7 @@ export const http = createClient({
   baseUrl: API_BASE_URL,
   getToken: () => useSession.getState().session?.accessToken,
   refresh,
-  fetch: API_MOCK ? mockFetch : (expoFetch as unknown as typeof fetch),
+  fetch: mockFetch ?? (expoFetch as unknown as typeof fetch),
   uuid: () => Crypto.randomUUID(),
 })
 

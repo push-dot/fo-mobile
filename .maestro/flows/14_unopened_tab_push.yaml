@@ -1,0 +1,45 @@
+appId: app.push.mobile
+name: 에이전트로 시작 → 홈을 열기 전에 그 탭으로 이동 → 탭 첫 화면 유지
+---
+# A launch into 에이전트 leaves 홈 unopened; a push into 홈 from there must keep the feed under it.
+- runFlow: _login.yaml
+- stopApp
+- openLink: push://chat
+- extendedWaitUntil:
+    visible: "(동의하고 시작하기|공고 링크로 맞추기)"
+    timeout: 60000
+- runFlow: _dismiss_logbox.yaml
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- openLink: push://chat?mock=empty:GET:me/bookmarks
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- tapOn: "대화 목록 열기"
+- extendedWaitUntil:
+    visible: "북마크한 공고"
+    timeout: 5000
+- tapOn: "북마크한 공고"
+- extendedWaitUntil:
+    visible: "북마크한 공고가 없어요."
+    timeout: 10000
+- tapOn: "채용공고 보기"
+- extendedWaitUntil:
+    visible: "공고 .*개"
+    timeout: 20000
+- takeScreenshot: 14_unopened_tab_push-01
+# 뒤로 lands on the feed under 채용공고; with 홈's stack missing it went back to 에이전트 and 홈 showed 채용공고 again.
+- tapOn: "뒤로"
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "홈"
+      READY: "새로 올라온 공고"
+- assertNotVisible: "공고 .*개"
+- takeScreenshot: 14_unopened_tab_push-02

@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
-import type { ReactElement } from 'react'
+import { memo, useCallback, useMemo, type ReactElement } from 'react'
 import { ActivityIndicator, FlatList, useWindowDimensions, View } from 'react-native'
-import type { PostingFilters } from '@push/api-client'
+import type { Posting, PostingFilters } from '@push/api-client'
 import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
 import { JOBS_EMPTY_LINES, RESET_FILTERS_LABEL } from '../constants'
@@ -16,12 +16,18 @@ type Props = {
 
 const Gap = () => <View style={{ height: 22 }} />
 
+const GridCard = ({ posting, width, onBookmark }: { posting: Posting; width: number; onBookmark: (p: Posting) => void }) => (
+  <JobCard posting={posting} width={width} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
+)
+const MemoGridCard = memo(GridCard)
+
 const PostingGrid = ({ filters, header, onReset }: Props) => {
   const { width } = useWindowDimensions()
   const cardWidth = Math.floor((width - spacing[5] * 2 - spacing[3]) / 2)
   const q = usePostingPages(filters)
   const toggleBookmark = useToggleBookmark()
-  const items = q.data?.pages.flatMap((p) => p.data) ?? []
+  const items = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
+  const renderItem = useCallback(({ item }: { item: Posting }) => <MemoGridCard posting={item} width={cardWidth} onBookmark={toggleBookmark} />, [cardWidth, toggleBookmark])
   return (
     <FlatList
       data={items}
@@ -32,9 +38,7 @@ const PostingGrid = ({ filters, header, onReset }: Props) => {
       columnWrapperStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}
       contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
       ItemSeparatorComponent={Gap}
-      renderItem={({ item }) => (
-        <JobCard posting={item} width={cardWidth} onPress={() => router.push(`/postings/${item.id}`)} onBookmark={() => toggleBookmark(item)} />
-      )}
+      renderItem={renderItem}
       onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
       onEndReachedThreshold={0.5}
       ListEmptyComponent={

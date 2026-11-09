@@ -10,7 +10,7 @@ const fillFor = (id: string) => FILLS[[...id].reduce((n, ch) => (n * 33 + ch.cha
 
 const Avatar = ({ userId, name, url, size }: { userId: string; name: string; url?: string | null; size: number }) => {
   const box = { width: size, height: size, borderRadius: size / 2 }
-  if (url) return <Image source={assetUrl(url)} style={box} accessibilityIgnoresInvertColors />
+  if (url) return <Image source={assetUrl(url)} style={box} cachePolicy="memory-disk" accessibilityIgnoresInvertColors />
   return (
     <View style={[box, { backgroundColor: fillFor(userId), alignItems: 'center', justifyContent: 'center' }]}>
       <Text weight="700" style={{ color: onAccent, fontSize: size / 3, lineHeight: size / 2.2 }}>

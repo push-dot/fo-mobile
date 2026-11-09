@@ -25,7 +25,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
     <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} style={{ width, gap: 10 }}>
       <View style={{ height: Math.round((width * 136) / 200), borderRadius: radius.md, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
         {p.imageUrl ? (
-          <Image source={{ uri: assetUrl(p.imageUrl) }} style={{ position: 'absolute', inset: 0 }} contentFit="cover" />
+          <Image source={{ uri: assetUrl(p.imageUrl) }} style={{ position: 'absolute', inset: 0 }} contentFit="cover" cachePolicy="memory-disk" />
         ) : (
           <>
             <LinearGradient colors={[brand, shade(brand)]} start={{ x: 0.13, y: -0.16 }} end={{ x: 0.87, y: 1.16 }} style={{ position: 'absolute', inset: 0 }} />
