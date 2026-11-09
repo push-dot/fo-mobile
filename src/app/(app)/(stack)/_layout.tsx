@@ -26,6 +26,7 @@ const SignedInStack = () => {
       <Stack.Screen name="settings/index" />
       <Stack.Screen name="settings/visibility" />
       <Stack.Screen name="settings/blocked" />
+      <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
       <Stack.Screen name="docs/push/index" options={{ presentation: 'modal' }} />
       <Stack.Screen name="docs/push/[id]" />

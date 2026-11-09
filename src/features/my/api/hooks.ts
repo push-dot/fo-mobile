@@ -7,7 +7,7 @@ import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
 import { useSession } from '@/shared/infrastructure'
-import { nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
+import { marketingResult, nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
 import {
   acceptOffer,
   addLink,
@@ -55,6 +55,7 @@ import {
   unfollowProfile,
   unbookmarkPosting,
   updateProfile,
+  updateMarketingConsent,
   updateReferenceConsent,
   updateSettings,
 } from './fetchers'
@@ -77,6 +78,20 @@ export const useReferenceConsent = () => {
     onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
   return { data: q.data, save: m.mutate, saving: m.isPending }
+}
+
+export const useMarketingConsent = () => {
+  const qc = useQueryClient()
+  const q = useQuery({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
+  const m = useMutation({
+    mutationFn: updateMarketingConsent,
+    onSuccess: (data) => {
+      qc.setQueryData(['me', 'consents'], data)
+      showToast({ message: marketingResult(data.terms?.marketing ?? false, data.terms?.marketingAt ?? null) })
+    },
+    onError: () => Alert.alert('알림 수신 설정을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+  return { on: !!q.data?.terms?.marketing, save: m.mutate }
 }
 
 export const useAuthMe = () => useQuery({ queryKey: ['auth', 'me'], queryFn: fetchAuthMe })

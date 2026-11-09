@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import {
   TERM_ROWS,
   TERMS_BODY,
   TERMS_OPTIONAL,
+  TERMS_PRIVACY_POLICY,
   TERMS_REQUIRED,
   TERMS_START,
   TERMS_TITLE,
@@ -17,7 +18,8 @@ import {
   usePhoneAuth,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
-import { Button, CtaBar, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar, showToast } from '@/shared/components'
+import { marketingResult } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
 const TermsScreen = () => {
@@ -54,8 +56,10 @@ const TermsScreen = () => {
     if (!held || !requiredOk) return
     setBusy(true)
     setError(null)
-    saveTerms(held.accessToken, Boolean(checked.marketing))
-      .then(async () => {
+    const marketing = Boolean(checked.marketing)
+    saveTerms(held.accessToken, marketing)
+      .then(async (consent) => {
+        if (marketing) showToast({ message: marketingResult(true, consent.terms?.marketingAt ?? null) })
         await useSession.getState().set(held)
         clear()
       })
@@ -89,6 +93,15 @@ const TermsScreen = () => {
             />
           ))}
         </View>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => openTerm('privacyPolicy')}
+          style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}
+        >
+          <Text v="c1" color="t2" style={{ textDecorationLine: 'underline' }}>
+            {TERMS_PRIVACY_POLICY}
+          </Text>
+        </Pressable>
         {error ? (
           <Text v="c1" color="red" accessibilityRole="alert">
             {error}

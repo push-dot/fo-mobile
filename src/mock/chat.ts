@@ -80,10 +80,16 @@ mock('DELETE', 'conversations/:id', ({ params }) => {
   if (i >= 0) conversations.splice(i, 1)
   archived.delete(params.id!)
 })
-mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null } }))
+const terms = { version: '1.0', age14At: null, serviceTermsAt: null, privacyAt: null, marketing: false, marketingAt: null as string | null }
+mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null, terms } }))
 mock('PUT', 'me/consents', ({ body }) => {
   referenceData = (body as { referenceData?: boolean }).referenceData === true
-  return { data: { referenceData, updatedAt: new Date().toISOString() } }
+  return { data: { referenceData, updatedAt: new Date().toISOString(), terms } }
+})
+mock('PUT', 'me/consents/terms', ({ body }) => {
+  const marketing = (body as { marketing?: boolean }).marketing
+  if (typeof marketing === 'boolean') Object.assign(terms, { marketing, marketingAt: new Date().toISOString() })
+  return { data: { referenceData, updatedAt: null, terms } }
 })
 mock('GET', 'conversations/:id/messages', ({ params, query }) => {
   const c = find(params.id!)

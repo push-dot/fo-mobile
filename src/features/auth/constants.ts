@@ -1,3 +1,4 @@
+import { LEGAL_DOCUMENTS, LEGAL_VERSION } from '@push/shared'
 export const GOOGLE = `<svg viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3Z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2Z" fill="#FBBC05"/><path d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1Z" fill="#EA4335"/></svg>`
 export const GITHUB = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"/></svg>`
 export const APPLE = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.8-3.5.8s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7 2-.1 2.9-2.3c.7-1 1-2 1-2.1-.1 0-1.9-.7-1.9-2.9zM14.5 6.2c.6-.8 1.1-1.9.9-3-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.8-.9 2.9 1 .1 2-.5 2.6-1.3z"/></svg>`
@@ -47,7 +48,7 @@ export const TERMS_ALL = '전체 동의'
 export const TERMS_REQUIRED = '필수'
 export const TERMS_OPTIONAL = '선택'
 export const TERMS_START = '동의하고 시작하기'
-export const TERMS_VERSION = '2026-10-29'
+export const TERMS_VERSION = LEGAL_VERSION
 export const PHONE_UNAVAILABLE = '지금은 인증번호를 보낼 수 없어요. 잠시 후 다시 시도해 주세요.'
 export const PHONE_TAKEN = '이 번호로 로그인할 수 없어요. 다른 번호로 시도해 주세요.'
 export const PENDING_EXPIRED = '로그인 시간이 지났어요. 다시 로그인해 주세요.'
@@ -63,27 +64,24 @@ export const TERM_ROWS = [
 export const TERMS_AGREE = '동의하기'
 export const TERMS_DETAIL_SUFFIX = '자세히 보기'
 
-const termsPlaceholder = (title: string) => ({
-  title,
-  effective: '시행일 [2026년 00월 00일] · 버전 [1.0]',
-  notice: '원문이 확정되면 이 자리에 들어가요. 지금은 조항 제목과 자리 표시 문단만 있어요.',
-  sections: [
-    { heading: '제1조 (목적)', body: '[본문 자리 표시] 이 약관이 Push 서비스 이용에서 회사와 회원의 권리·의무를 정한다는 내용이 들어가요.' },
-    { heading: '제2조 (정의)', body: '[본문 자리 표시] 서비스, 회원, 허브 프로필, 에이전트, 서류 같은 용어의 뜻이 들어가요.' },
-    { heading: '제3조 (약관의 효력과 변경)', body: '[본문 자리 표시] 약관을 바꿀 때 언제, 어떻게 알리는지가 들어가요.' },
-    { heading: '제4조 (서비스의 제공)', body: '[본문 자리 표시] 채용공고, 허브, 소셜, 에이전트 기능과 유료 요금제 안내가 들어가요.' },
-    { heading: '제5조 (회원의 의무)', body: '[본문 자리 표시] 회원이 지켜야 할 사항과 금지 행위가 들어가요.' },
-    { heading: '제6조 (유료 서비스와 환불)', body: '[본문 자리 표시] 요금제 결제, 구매 복원, 해지와 환불 기준이 들어가요.' },
-  ],
-})
-
-// owner content: replace with the final terms text
-export const TERMS_TEXT = {
-  serviceTerms: termsPlaceholder('서비스 이용약관'),
-  privacy: termsPlaceholder('개인정보 수집·이용'),
-  marketing: termsPlaceholder('혜택·이벤트 알림 받기'),
+export const TERM_DOCUMENTS = {
+  serviceTerms: LEGAL_DOCUMENTS.termsOfService,
+  privacy: LEGAL_DOCUMENTS.privacyConsent,
+  marketing: LEGAL_DOCUMENTS.marketingConsent,
+  privacyPolicy: LEGAL_DOCUMENTS.privacyPolicy,
 }
 
-export type TermKey = keyof typeof TERMS_TEXT
+export const TERMS_PRIVACY_POLICY = '개인정보 처리방침 보기'
 
-export const isTermKey = (key: unknown): key is TermKey => typeof key === 'string' && Object.hasOwn(TERMS_TEXT, key)
+export type TermKey = keyof typeof TERM_DOCUMENTS
+
+export type LegalTab = 'termsOfService' | 'privacyPolicy'
+
+export const LEGAL_TABS: { key: LegalTab; label: string }[] = [
+  { key: 'termsOfService', label: '서비스 이용약관' },
+  { key: 'privacyPolicy', label: '개인정보 처리방침' },
+]
+
+export const LEGAL_TITLE = '약관 및 정책'
+
+export const isTermKey = (key: unknown): key is TermKey => typeof key === 'string' && Object.hasOwn(TERM_DOCUMENTS, key)

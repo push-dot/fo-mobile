@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { TERMS_TEXT, TERM_ROWS, isTermKey, type TermKey } from './constants'
+import { TERM_DOCUMENTS, TERM_ROWS, isTermKey, type TermKey } from './constants'
 import { useTermsConsent, usePhoneAuth } from './stores'
 
 describe('usePhoneAuth', () => {
@@ -30,7 +30,7 @@ describe('useTermsConsent', () => {
 
   it('opens a text only for the rows that have one', () => {
     expect(TERM_ROWS.filter((row) => isTermKey(row.id)).map((row) => row.id)).toEqual(['serviceTerms', 'privacy', 'marketing'])
-    expect(TERM_ROWS.filter((row) => isTermKey(row.id)).every((row) => TERMS_TEXT[row.id as TermKey].sections.length > 0)).toBe(true)
+    expect(TERM_ROWS.filter((row) => isTermKey(row.id)).every((row) => TERM_DOCUMENTS[row.id as TermKey].articles.length > 0)).toBe(true)
   })
 
   it('accepts only own term keys, not inherited object properties or other values', () => {

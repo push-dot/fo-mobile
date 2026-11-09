@@ -13,6 +13,7 @@ import {
   LANGS,
   NOTIFY_SUB,
   LOGIN_LABEL,
+  MARKETING_COPY,
   NOTIFICATION_ROWS,
   REFERENCE_LABEL,
   REFERENCE_SUB,
@@ -20,6 +21,7 @@ import {
   TONES,
   useAuthMe,
   useBlocked,
+  useMarketingConsent,
   useMyProfile,
   useReferenceConsent,
   useSettings,
@@ -86,6 +88,7 @@ const SettingsScreen = () => {
   const theme = useThemePreference((state) => state.choice)
   const setTheme = useThemePreference((state) => state.setChoice)
   const consent = useReferenceConsent()
+  const marketing = useMarketingConsent()
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const blocked = useBlocked()
@@ -162,6 +165,11 @@ const SettingsScreen = () => {
             right={sw(row.key, row.label)}
           />
         ))}
+        <SettingsRow
+          label={MARKETING_COPY.label}
+          sub={MARKETING_COPY.sub}
+          right={<Switch label={MARKETING_COPY.label} value={marketing.on} onValueChange={(v) => marketing.save(v)} />}
+        />
       </SettingsGroup>
 
       <SettingsGroup title="허브 공개">
@@ -207,9 +215,9 @@ const SettingsScreen = () => {
       </SettingsGroup>
 
       <SettingsGroup title="기타">
-        {/* shortcut: support/terms URLs aren't decided yet; wire these rows when they are. */}
+        {/* shortcut: the support URL isn't decided yet; wire this row when it is. */}
         <SettingsRow label="고객센터" right={<Icon name="chev" size={18} color="t4" />} />
-        <SettingsRow label="약관 및 정책" right={<Icon name="chev" size={18} color="t4" />} />
+        <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} right={<Icon name="chev" size={18} color="t4" />} />
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>
