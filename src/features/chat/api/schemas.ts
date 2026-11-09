@@ -9,6 +9,8 @@ export type Account = {
   email: string | null
   plan: 'FREE' | 'PRO' | 'ULTRA'
   credits: { used: number; total: number } | null
+  /** GET billing paymentsEnabled; false hides every buy button. */
+  paymentsEnabled?: boolean
 }
 
 export type QsItem = {

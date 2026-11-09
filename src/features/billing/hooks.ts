@@ -17,7 +17,7 @@ import { queryClient } from '@/providers/query-client'
 import { verifyPurchase } from './api/fetchers'
 import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
 import type { StorePurchase, SubscriptionProduct } from './types'
-import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored } from './utils/settle'
+import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored, verifyFailedMessage } from './utils/settle'
 
 let pending = false
 const listeners = new Set<() => void>()
@@ -65,9 +65,9 @@ const accept = async (purchase: Purchase) => {
   try {
     await settlePurchase(purchase, deps)
     refreshAccount()
-  } catch {
+  } catch (error) {
     release(purchase)
-    Alert.alert(IAP_FAILED_MESSAGE)
+    Alert.alert(verifyFailedMessage(error))
   } finally {
     setPending(false)
   }
@@ -153,9 +153,9 @@ export const usePersonalPurchase = () => {
           // shortcut: a mid-batch failure releases every token in the batch, upgrade when finishTransaction is idempotent
           await settleRestored(fresh, deps)
           refreshAccount()
-        } catch {
+        } catch (error) {
           fresh.forEach(release)
-          Alert.alert(IAP_FAILED_MESSAGE)
+          Alert.alert(verifyFailedMessage(error))
         } finally {
           setPending(false)
         }

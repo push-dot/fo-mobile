@@ -1,6 +1,7 @@
+import { ApiError } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from '../constants'
-import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored, verifyBody } from './settle'
+import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA, PAYMENTS_CLOSED_MESSAGE } from '../constants'
+import { androidOfferToken, outcomeFromCode, paymentsOpen, settlePurchase, settleRestored, verifyBody, verifyFailedMessage } from './settle'
 
 const purchase = (productId: string, purchaseToken: string | null) => ({ productId, purchaseToken })
 
@@ -76,5 +77,32 @@ describe('androidOfferToken', () => {
   it('reads the play offer token for the selected plan', () => {
     expect(androidOfferToken([{ id: IAP_PRODUCT_ULTRA, subscriptionOffers: [{ offerTokenAndroid: 'offer-1' }] }], IAP_PRODUCT_ULTRA)).toBe('offer-1')
     expect(androidOfferToken([{ id: IAP_PRODUCT_PRO, subscriptionOffers: [] }], IAP_PRODUCT_PRO)).toBeNull()
+  })
+})
+
+describe('paymentsOpen', () => {
+  it('closes buying when billing reports payments off', () => {
+    expect(paymentsOpen({ paymentsEnabled: false })).toBe(false)
+  })
+
+  it('keeps buying open when billing allows it or predates the flag', () => {
+    expect(paymentsOpen({ paymentsEnabled: true })).toBe(true)
+    expect(paymentsOpen({})).toBe(true)
+  })
+
+  it('keeps buying closed until the account loads', () => {
+    expect(paymentsOpen(undefined)).toBe(false)
+  })
+})
+
+describe('verifyFailedMessage', () => {
+  it('says payments are not open yet for 503 PAYMENTS_DISABLED', () => {
+    expect(verifyFailedMessage(new ApiError('closed', 'PAYMENTS_DISABLED', 503))).toBe(PAYMENTS_CLOSED_MESSAGE)
+    expect(PAYMENTS_CLOSED_MESSAGE).toBe('결제는 아직 준비 중이에요')
+  })
+
+  it('keeps the generic failure for anything else', () => {
+    expect(verifyFailedMessage(new ApiError('boom', 'INTERNAL', 500))).toBe(IAP_FAILED_MESSAGE)
+    expect(verifyFailedMessage(new Error('offline'))).toBe(IAP_FAILED_MESSAGE)
   })
 })

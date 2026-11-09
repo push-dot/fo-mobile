@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { LANGS, MAX_BYTES } from '../constants'
 import {
@@ -195,7 +197,7 @@ describe('my screen rules', () => {
       '지원 상태 변경',
     ])
     expect(AGENT_TITLE).toBe('에이전트')
-    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
+    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
     expect(REFERENCE_SUB).toBe('에이전트를 쓰려면 켜 두어야 해요')
   })
@@ -244,5 +246,14 @@ describe('my screen rules', () => {
       score: '',
       doc: '',
     })
+  })
+})
+
+describe('settings screen', () => {
+  // push-be never reads allowAiReadMyFiles, so the switch would be a dead control (D19).
+  it('hides the 내 자료 읽기 허용 switch until the server enforces it', () => {
+    const screen = readFileSync(join(__dirname, '../../../screens/my/settings-screen.tsx'), 'utf8')
+    expect(screen).not.toContain('allowAiReadMyFiles')
+    expect(screen).not.toContain('내 자료 읽기 허용')
   })
 })

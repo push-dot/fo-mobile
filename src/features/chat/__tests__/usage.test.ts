@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { paymentsOpen } from '../../billing/utils/settle'
 import { ERROR_TEXT } from '../constants'
 import { composerPlaceholder, isUsageExhausted, usageExhausted } from '../utils/usage'
 import type { ChatItem } from '../types'
@@ -21,6 +22,21 @@ describe('usage exhausted copy', () => {
 
   it('gives ULTRA only a credit purchase', () => {
     expect(usageExhausted('ULTRA')).toEqual({ body: ULTRA_BODY, actions: [{ id: 'credits', label: '크레딧 구매', variant: 'primary' }] })
+  })
+
+  it('offers no buy button while payments are closed', () => {
+    for (const plan of ['FREE', 'PRO', 'ULTRA'] as const) {
+      expect(usageExhausted(plan, false)).toEqual({ body: '이번 달 사용량을 다 썼어요. 결제는 아직 준비 중이에요.', actions: [] })
+    }
+  })
+
+  it('offers no buy button before the account loads', () => {
+    expect(usageExhausted(undefined, false)).toEqual({ body: '이번 달 사용량을 다 썼어요.', actions: [] })
+    expect(usageExhausted(undefined)).toEqual({ body: '이번 달 사용량을 다 썼어요.', actions: [] })
+  })
+
+  it('keeps the buy buttons for an older server that sends no flag', () => {
+    expect(usageExhausted('FREE', paymentsOpen({}))).toEqual(usageExhausted('FREE'))
   })
 
   it('drops 충전, an AI key, and a yearly discount', () => {

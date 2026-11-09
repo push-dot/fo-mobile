@@ -44,7 +44,7 @@ export const chatApi = {
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
     const total = Math.round(b.monthlyMicroCredits / MICRO_CREDITS_PER_CREDIT)
     const used = Math.round(b.spentMicroCredits / MICRO_CREDITS_PER_CREDIT)
-    return { email: me.email || null, plan: b.plan ?? 'FREE', credits: total > 0 ? { used, total } : null }
+    return { email: me.email || null, plan: b.plan ?? 'FREE', credits: total > 0 ? { used, total } : null, paymentsEnabled: b.paymentsEnabled }
   },
   // shortcut: push-be has no chat/quick-starts; real mode assembles each sheet from existing lists (quickStartFrom).
   quickStart: async (key: string): Promise<QsData> => {

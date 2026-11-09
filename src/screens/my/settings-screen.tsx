@@ -181,10 +181,6 @@ const SettingsScreen = () => {
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
         />
         <SettingsRow
-          label="내 자료 읽기 허용"
-          right={sw('allowAiReadMyFiles', '내 자료 읽기 허용')}
-        />
-        <SettingsRow
           label={REFERENCE_LABEL}
           sub={REFERENCE_SUB}
           right={

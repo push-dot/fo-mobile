@@ -36,6 +36,7 @@ export const FIT_ROWS = [
   { key: 'domain', label: '도메인' },
 ] as const
 export const FIT_LOCKED = 'PRO로 올리면 항목별 점수와 약점을 볼 수 있어요'
+export const FIT_LOCKED_CLOSED = '항목별 점수와 약점은 PRO에서 볼 수 있어요'
 export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
 /** Decorative bar widths behind the FREE lock, from the design. */
 export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]

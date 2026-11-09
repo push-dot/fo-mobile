@@ -4,14 +4,15 @@ import { onAccent, radius, spacing, tile, useColors, useShadow, type Colors } fr
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
-import { useOpenArtifact, useShareFile } from '../api/hooks'
+import { paymentsOpen } from '@/features/billing'
+import { useChatAccount, useOpenArtifact, useShareFile } from '../api/hooks'
 import { usePop, usePulse } from '../hooks'
 import { isUsageExhausted } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
 import { isVerdictPlan } from '../utils/stream-v3'
 import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../constants'
+import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../constants'
 import { Appear } from './motion'
 import Mark from './mark'
 import { UsageExhausted } from './usage-exhausted'
@@ -393,13 +394,14 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
       <Blur intensity={20} style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }} />
       <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing[2] }}>
         <Pressable
-          accessibilityRole="button"
+          accessibilityRole={onPlan ? 'button' : 'text'}
+          disabled={!onPlan}
           onPress={onPlan}
           style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.bg, elevation: 3, ...shadow }}
         >
           <Icon name="lock" size={14} color="t1" />
           <Text v="c1" weight="700" style={{ flexShrink: 1, textAlign: 'center' }}>
-            {FIT_LOCKED}
+            {onPlan ? FIT_LOCKED : FIT_LOCKED_CLOSED}
           </Text>
         </Pressable>
       </View>
@@ -453,9 +455,12 @@ const FitNum = ({ size, color, children, rowDrop }: { size: 'mid' | 'big'; color
   )
 }
 
-const FitCard = ({ item, onPlan }: { item: Of<'fit'>; onPlan?: () => void }) => {
+const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => void }) => {
   const c = useColors()
-  const view = fitChrome(item)
+  // No upgrade entry while payments are closed or the account has not loaded.
+  const open = paymentsOpen(useChatAccount(true).data)
+  const onPlan = open ? planEntry : undefined
+  const view = fitChrome(item, open)
   const compact = !view.locked && !item.note && item.from === undefined
   const drop = useFitDrop()
   const head = item.note ? (

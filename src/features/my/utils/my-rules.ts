@@ -129,7 +129,7 @@ export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | '
 ]
 
 export const AGENT_TITLE = '에이전트'
-export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
+export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요.'
 export const REFERENCE_LABEL = '참고 데이터 제공'
 export const REFERENCE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
 

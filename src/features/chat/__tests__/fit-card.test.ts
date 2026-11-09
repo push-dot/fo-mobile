@@ -14,6 +14,10 @@ describe('fit card by plan', () => {
     expect(fitChrome({ ...card, plan: 'PRO' })).toEqual({ locked: false, summary: card.summary, teaser: FIT_TEASER, projected: undefined })
   })
 
+  it('drops the ULTRA teaser while payments are closed', () => {
+    expect(fitChrome({ ...card, plan: 'PRO' }, false)).toEqual({ locked: false, summary: card.summary, teaser: undefined, projected: undefined })
+  })
+
   it('shows the projection on ULTRA', () => {
     expect(fitChrome({ ...card, plan: 'ULTRA' })).toEqual({ locked: false, summary: card.summary, teaser: undefined, projected: card.projected })
   })
