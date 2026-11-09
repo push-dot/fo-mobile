@@ -2,15 +2,16 @@ import { router, useNavigation } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, Easing } from 'react-native'
 import { useReduceMotion } from '@/shared/components'
-import { CLOSE_DRAWER } from './constants'
+import { sidebarDepth } from './utils'
 
-/** Leaves a sidebar page for another screen: iOS shows the page over the open drawer, so close both first and back returns to the chat. */
+/** Leaves a sidebar page for another screen: the page sits over the sidebar, so pop both first and back returns to the chat. */
 export const useLeaveSidebar = () => {
   const navigation = useNavigation()
   return useCallback(
     (go: () => void) => {
-      navigation.dispatch(CLOSE_DRAWER)
-      router.back()
+      const routes = navigation.getState()?.routes ?? []
+      const depth = Math.min(sidebarDepth(routes.map((r) => r.name)), routes.length - 1)
+      if (depth > 0) router.dismiss(depth)
       go()
     },
     [navigation],

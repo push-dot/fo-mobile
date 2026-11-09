@@ -23,8 +23,8 @@ tags:
     timeout: 5000
 - tapOn: "링크 복사"
 - waitForAnimationToEnd
-# Closing a page sheet also closes the sidebar.
 - tapOn: "닫기"
+- tapOn: "사이드바 닫기"
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

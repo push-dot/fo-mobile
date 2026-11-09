@@ -29,6 +29,7 @@ tags:
 - takeScreenshot: PlanUltra
 - tapOn: "뒤로"
 - tapOn: "닫기"
+- tapOn: "사이드바 닫기"
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

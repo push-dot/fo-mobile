@@ -213,7 +213,3 @@ export const CALENDAR_TASKS = [
   { label: '면접·커피챗 잡기', sub: '시간 골라 일정 등록', icon: 'people' },
   { label: '준비 알림 만들기', sub: '면접 전날, 마감 3일 전', icon: 'bell' },
 ] as const
-
-// DrawerActions.openDrawer(); bubbles up to the app drawer in app/(app)/_layout.tsx.
-export const OPEN_DRAWER = { type: 'OPEN_DRAWER' } as const
-export const CLOSE_DRAWER = { type: 'CLOSE_DRAWER' } as const

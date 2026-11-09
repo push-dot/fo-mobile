@@ -41,16 +41,9 @@ tags:
 - tapOn: "뒤로"
 - tapOn: "닫기"
 - waitForAnimationToEnd
-# Closing a page sheet also closes the sidebar, so reopen it before each menu row.
-- runFlow:
-    when:
-      notVisible: "내 서류"
-    commands:
-      - tapOn:
-          point: "9%,10%"
-      - extendedWaitUntil:
-          visible: "내 서류"
-          timeout: 10000
+- extendedWaitUntil:
+    visible: "내 서류"
+    timeout: 10000
 - tapOn: "내 서류"
 - extendedWaitUntil:
     visible: "PDF, DOCX 파일을 20MB까지.*"
@@ -59,15 +52,9 @@ tags:
 - takeScreenshot: ChatDocs
 - tapOn: "닫기"
 - waitForAnimationToEnd
-- runFlow:
-    when:
-      notVisible: "북마크한 공고"
-    commands:
-      - tapOn:
-          point: "9%,10%"
-      - extendedWaitUntil:
-          visible: "북마크한 공고"
-          timeout: 10000
+- extendedWaitUntil:
+    visible: "북마크한 공고"
+    timeout: 10000
 - tapOn: "북마크한 공고"
 - extendedWaitUntil:
     visible: "공고를 누르면 상세를 보거나.*"

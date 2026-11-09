@@ -22,15 +22,9 @@ tags:
 - takeScreenshot: ChatBookmarksEmpty
 - tapOn: "닫기"
 - waitForAnimationToEnd
-# Closing a page sheet also closes the sidebar, so reopen it for the next row.
-- runFlow:
-    when:
-      notVisible: "내 서류"
-    commands:
-      - tapOn: "대화 목록 열기"
-      - extendedWaitUntil:
-          visible: "내 서류"
-          timeout: 10000
+- extendedWaitUntil:
+    visible: "내 서류"
+    timeout: 10000
 - tapOn: "내 서류"
 - extendedWaitUntil:
     visible: "아직 등록한 서류가 없어요."

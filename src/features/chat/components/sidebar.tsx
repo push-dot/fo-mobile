@@ -1,5 +1,4 @@
-import { router, usePathname } from 'expo-router'
-import { useDrawerStatus } from 'expo-router/drawer'
+import { router } from 'expo-router'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { tintOf } from '@/features/my'
@@ -8,44 +7,35 @@ import { GlassButton, Icon, Text, type IconName } from '@/shared/components'
 import { useChatAccount, useMe, useRecentConversations } from '../api/hooks'
 import { statusBadge } from './conversations-modal'
 import Mark from './mark'
+import { useLeaveSidebar } from '../hooks'
 import { accountPath, ago, bookmarksPath, conversationsPath, docsPath, linksPath } from '../utils'
 
 
 // Android draws the collapse button as a 48pt white disc with a 1pt ring outside it.
 const CLOSE_DISC = 48
 
-/** Content of the app drawer (see app/(app)/_layout.tsx): full-width chat sidebar over the tab bar. */
-export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
+/** Full-screen chat sidebar, a stack route that slides in from the left (app/(app)/(stack)/sidebar/index.tsx). */
+export const ChatSidebar = ({ currentId }: { currentId?: string }) => {
   const c = useColors()
   const shadow = useShadow()
   const insets = useSafeAreaInsets()
-  const visible = useDrawerStatus() === 'open'
-  const currentId = usePathname().match(/^\/chat\/([^/]+)$/)?.[1]
+  const leave = useLeaveSidebar()
   const me = useMe()
-  const account = useChatAccount(visible)
-  const recent = useRecentConversations(visible)
+  const account = useChatAccount(true)
+  const recent = useRecentConversations(true)
 
+  const onClose = () => router.back()
   const open = (id: string) => {
-    onClose()
-    if (id === currentId) return
-    if (currentId) router.replace(`/chat/${id}`)
-    else router.push(`/chat/${id}`)
+    if (id === currentId) return onClose()
+    leave(() => (currentId ? router.replace(`/chat/${id}`) : router.push(`/chat/${id}`)))
   }
-  // iOS presents the page sheet over the open sidebar; on Android the drawer would cover the stack's modal.
-  const page = (href: Parameters<typeof router.push>[0]) => {
-    if (Platform.OS === 'android') onClose()
-    router.push(href)
-  }
-  const newChat = () => {
-    onClose()
-    if (currentId) router.dismissTo('/chat')
-  }
+  const newChat = () => (currentId ? router.dismissTo('/chat') : onClose())
 
   const menu: { icon: IconName; label: string; onPress: () => void }[] = [
     { icon: 'edit', label: '새 대화', onPress: newChat },
-    { icon: 'doc', label: '내 서류', onPress: () => page(docsPath()) },
-    { icon: 'link', label: '내 링크', onPress: () => page(linksPath()) },
-    { icon: 'bookmark', label: '북마크한 공고', onPress: () => page(bookmarksPath()) },
+    { icon: 'doc', label: '내 서류', onPress: () => router.push(docsPath()) },
+    { icon: 'link', label: '내 링크', onPress: () => router.push(linksPath()) },
+    { icon: 'bookmark', label: '북마크한 공고', onPress: () => router.push(bookmarksPath()) },
   ]
 
   return (
@@ -63,7 +53,7 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${me.name}, 계정 열기`}
-          onPress={() => page(accountPath())}
+          onPress={() => router.push(accountPath())}
           style={({ pressed }) => ({
             flex: 1,
             marginRight: spacing[2],
@@ -174,7 +164,7 @@ export const ChatSidebar = ({ onClose }: { onClose: () => void }) => {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="최근 대화 모두 보기"
-              onPress={() => (onClose(), router.push(conversationsPath(currentId)))}
+              onPress={() => router.push(conversationsPath(currentId))}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',

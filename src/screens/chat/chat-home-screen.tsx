@@ -1,10 +1,10 @@
-import { router, useNavigation } from 'expo-router'
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, spacing, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text, useKeyboardHeight } from '@/shared/components'
-import { ComposerArea, ConsentSheet, OPEN_DRAWER, QUICK_STARTS, quickStartPath, useStartChat, type QuickStart } from '@/features/chat'
+import { ComposerArea, ConsentSheet, QUICK_STARTS, quickStartPath, sidebarPath, useStartChat, type QuickStart } from '@/features/chat'
 
 
 // iOS draws the 56pt glyph 9pt above the centre of its line box (measured on the simulator); the board centres the ink.
@@ -15,16 +15,15 @@ const ChatHomeScreen = () => {
   const insets = useSafeAreaInsets()
   const start = useStartChat()
   const [typing, setTyping] = useState(false)
-  const navigation = useNavigation()
   // The floating iOS tab bar is inside the inset; the design keeps the composer a step above it.
   const lift = Platform.OS === 'ios' && insets.bottom > 0 ? spacing[5] : 0
-  // Android pads the keyboard height itself; the nav-bar inset on top of it would leave a gap.
+  // The keyboard covers the inset below the composer, so it is dropped while the keyboard is up.
   const keyboard = useKeyboardHeight()
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior="padding">
       <View style={{ paddingTop: insets.top, height: insets.top + 56, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: spacing[3] }}>
-        <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: () => navigation.dispatch(OPEN_DRAWER) }]} />
+        <GlassButton actions={[{ icon: 'side', label: '대화 목록 열기', onPress: () => router.push(sidebarPath()) }]} />
       </View>
       {/* The board centres the mark between the status bar and 6pt above the chips: up under the 56pt header, down 10pt into the chip row's top padding. */}
       <View style={{ flex: 1, marginTop: -56, marginBottom: -10, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none" accessibilityElementsHidden>
@@ -39,7 +38,7 @@ const ChatHomeScreen = () => {
           ))}
         </ScrollView>
       ) : null}
-      <View style={{ paddingHorizontal: spacing[3], paddingBottom: Platform.OS === 'android' && keyboard ? 10 : Math.max(insets.bottom + lift, 10) }}>
+      <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? (Platform.OS === 'android' ? 10 : spacing[2]) : Math.max(insets.bottom + lift, 10) }}>
         <ComposerArea
           placeholder="공고 링크를 붙여넣어 보세요"
           roomy
