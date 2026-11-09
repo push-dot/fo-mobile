@@ -29,7 +29,6 @@ const ProposalSheetScreen = () => {
         action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}
       >
         <ProposalSheet
-          userId={userId}
           name={p?.displayName ?? ''}
           subtitle={p ? proposalSubtitle(p) : ''}
           message={message}

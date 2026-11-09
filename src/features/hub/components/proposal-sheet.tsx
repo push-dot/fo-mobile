@@ -8,7 +8,6 @@ import Avatar from './avatar'
 type Posting = { id: string; company: string; title: string }
 
 type Props = {
-  userId: string
   name: string
   subtitle: string
   message: string
@@ -23,7 +22,7 @@ type Props = {
 
 const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
 
-const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError, onClose }: Props) => {
+const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError, onClose }: Props) => {
   const c = useColors()
   return (
     <View style={{ gap: 14 }}>
@@ -34,7 +33,7 @@ const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, e
         </Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Avatar userId={userId} name={name} size={44} />
+        <Avatar name={name} size={44} />
         <View style={{ flex: 1 }}>
           <Text v="b1" weight="700">
             {name} 님에게

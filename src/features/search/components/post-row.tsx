@@ -21,7 +21,7 @@ const PostRow = ({ p, q, onOpen }: { p: Post; q: string; onOpen: () => void }) =
         {postInfo(p)}
       </Text>
       <Text v="b1" weight="700" numberOfLines={1}>
-        <Highlight text={p.title} q={q} />
+        <Highlight text={p.title} q={q} weight="700" />
       </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
         <Icon name="chat" size={14} color="t3" />

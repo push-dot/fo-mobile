@@ -1,10 +1,8 @@
 import type { CareerStatus } from '@push/api-client'
-import { tile } from '@/theme/tokens'
 import type { BadgeTone, SkeletonRowsShape } from '../../shared/components'
 
 export const STATUS_TONE: Record<CareerStatus, BadgeTone> = { seeking: 'ac', feedback: 'orange', satisfied: 'green' }
 
-export const FILLS = [tile.indigo, tile.cyan, tile.orange, tile.violet, tile.green]
 
 export const PROPOSAL_MAX = 500
 

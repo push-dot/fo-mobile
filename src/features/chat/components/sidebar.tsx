@@ -1,7 +1,7 @@
+import { brandColor } from '@push/shared'
 import { router } from 'expo-router'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { avatarTint } from '@/features/my'
 import { radius, spacing, useColors, useShadow } from '@/theme'
 import { GlassButton, Icon, Text, type IconName } from '@/shared/components'
 import { useChatAccount, useMe, useRecentConversations } from '../api/hooks'
@@ -67,7 +67,7 @@ export const ChatSidebar = ({ currentId }: { currentId?: string }) => {
             backgroundColor: pressed ? c.fill : 'transparent',
           })}
         >
-          <Mark text={me.given} color={avatarTint(me.name)} size={40} round />
+          <Mark text={me.given} color={brandColor(me.name)} size={40} round />
           <View>
             <Text v="b1" weight="700">
               {me.name}

@@ -1,11 +1,12 @@
 import type { Application, Offer, Posting, Profile } from '@push/api-client'
 import { brandColor } from '@push/shared'
+import { registerMockBrandColors } from '@push/shared/mock-brand'
 import { describe, expect, it, vi } from 'vitest'
 import { docMeta, initialPicks, postingMeta, quickStartFrom } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')
-  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, avatarTint: utils.avatarTint }
+  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo }
 })
 
 const now = new Date('2026-10-21T09:00:00')
@@ -31,6 +32,9 @@ describe('quickStartFrom (real mode)', () => {
       ({ id: status, status, sender: { id: 's', displayName: '오지현' }, message: '커피챗 어떠세요?', posting: null, createdAt: '2026-10-21T08:00:00' }) as unknown as Offer
     const reply = quickStartFrom('reply', { offers: [offer('SENT'), offer('ACCEPTED')] }, now)
     expect(reply.items).toMatchObject([{ id: 'SENT', title: '오지현', body: '커피챗 어떠세요?', badge: { label: '새 제안' } }])
+    // People take the board palette and overrides like company tiles (ProposalDetailMenu 지현 #E8590C).
+    registerMockBrandColors()
+    expect(quickStartFrom('reply', { offers: [offer('SENT')] }, now).items[0]!.avatar!.color).toBe('#E8590C')
   })
 
   it('leaves AI-suggested sheets empty', () => {

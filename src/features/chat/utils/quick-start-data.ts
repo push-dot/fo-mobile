@@ -1,6 +1,6 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
 import { brandColor, careerLabel, cardCareerLabel } from '@push/shared'
-import { dday, givenName, stageTone, timeAgo, avatarTint } from '@/features/my'
+import { dday, givenName, stageTone, timeAgo } from '@/features/my'
 import type { ChatDoc, QsData, QsItem } from '../api/schemas'
 import type { QuickStart } from '../constants'
 
@@ -33,7 +33,7 @@ const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem
 const person = (id: string, name: string, extra: Partial<QsItem> = {}): QsItem => ({
   id,
   title: name,
-  avatar: { text: givenName(name), color: avatarTint(name) },
+  avatar: { text: givenName(name), color: brandColor(name) },
   ...extra,
 })
 

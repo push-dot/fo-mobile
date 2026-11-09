@@ -15,7 +15,7 @@ const ProfileRow = ({ p }: { p: Profile }) => {
       onPress={() => router.push(`/profiles/${p.userId}` as Href)}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: spacing[5], paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
     >
-      <Avatar userId={p.userId} name={p.displayName} url={p.avatarUrl} size={52} />
+      <Avatar name={p.displayName} url={p.avatarUrl} size={52} />
       <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
           <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>

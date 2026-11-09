@@ -1,3 +1,5 @@
+import { brandColor } from '@push/shared'
+
 const KNOWN = ['apply', 'convert', 'view'] as const
 
 export type ResultActionId = (typeof KNOWN)[number]
@@ -46,7 +48,9 @@ const given = (name: string) => (/^[가-힣]{3}$/.test(name) ? name.slice(1) : n
 
 /** 공유 sends the saved document's PDF export, so a card whose document was not saved has nothing to share. */
 export const resultChrome = (card: Pick<ResultFields, 'source' | 'name' | 'documentId'>) =>
-  card.source === 'external' ? { share: !!card.documentId, initials: null } : { share: false, initials: given(card.name ?? '') }
+  card.source === 'external'
+    ? { share: !!card.documentId, initials: null, color: null }
+    : { share: false, initials: given(card.name ?? ''), color: brandColor(card.name ?? '') }
 
 /** 프로필 수정 · Push 프로필 · 경력 → the tool line above the card. */
 export const resultTask = (taskLine: string) => {

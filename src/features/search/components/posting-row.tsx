@@ -29,7 +29,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
           {p.company}
         </Text>
         <Text v="b1" weight="700" numberOfLines={1}>
-          <Highlight text={p.title} q={q} />
+          <Highlight text={p.title} q={q} weight="700" />
         </Text>
         <Text v="c1" color="t3" numberOfLines={1}>
           {p.location} · {careerLabel(p)}

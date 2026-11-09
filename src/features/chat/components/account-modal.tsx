@@ -1,3 +1,4 @@
+import { brandColor } from '@push/shared'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
@@ -5,7 +6,7 @@ import { radius, selectedRing, spacing, useColors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { type Account } from '../api/schemas'
-import { TONES, avatarTint, useMySettings, useUpdateSettings } from '@/features/my'
+import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
@@ -108,7 +109,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
   return (
     <>
       <View style={{ alignItems: 'center', gap: spacing[2], paddingTop: spacing[2], paddingHorizontal: spacing[5], paddingBottom: spacing[1] }}>
-        <Mark text={me.given} color={avatarTint(me.name)} size={76} round />
+        <Mark text={me.given} color={brandColor(me.name)} size={76} round />
         <Text v="h2" style={{ marginTop: 6 }}>
           {me.name}
         </Text>

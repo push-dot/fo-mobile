@@ -1,3 +1,4 @@
+import { brandColor } from '@push/shared'
 import { describe, expect, it } from 'vitest'
 import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
 
@@ -35,15 +36,16 @@ describe('agent result cards', () => {
     expect(resultMeta(file)).toBe('A4 1쪽 · 186KB · 내 서류에 자동 저장됨')
     expect(resultButtons(file)).toEqual(['모아페이에 바로 지원하기', '프로필로 전환'])
     expect(resultButtons(file).join(' ')).not.toMatch(/PDF|DOCX|v1/)
-    expect(resultChrome(file)).toEqual({ share: true, initials: null })
-    expect(resultChrome({ ...file, documentId: '' })).toEqual({ share: false, initials: null })
+    expect(resultChrome(file)).toEqual({ share: true, initials: null, color: null })
+    expect(resultChrome({ ...file, documentId: '' })).toEqual({ share: false, initials: null, color: null })
   })
 
   it('shows the profile card and the view button', () => {
     expect(resultTitle(profile)).toBe('김서준 · 백엔드 엔지니어')
     expect(resultMeta(profile)).toBe('Push 프로필 · 방금 수정')
     expect(resultButtons(profile)).toEqual(['모아페이에 바로 지원하기', '프로필 보기'])
-    expect(resultChrome(profile)).toEqual({ share: false, initials: '서준' })
+    expect(resultChrome(profile)).toEqual({ share: false, initials: '서준', color: brandColor('김서준') })
+    expect(resultChrome({ ...profile, name: '박도윤' }).color).toBe(brandColor('박도윤'))
   })
 
   it('renders one button when apply is missing', () => {

@@ -5,7 +5,7 @@ import { quickStartFrom } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')
-  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, avatarTint: utils.avatarTint }
+  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo }
 })
 
 const input = { url: '', chips: [] as string[], option: false, task: '', custom: '' }

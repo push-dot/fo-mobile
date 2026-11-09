@@ -1,5 +1,4 @@
 import type { Settings, Tone } from '@push/api-client'
-import { tile } from '@push/design-system'
 import { TOAST_MS } from '@/shared/components/constants'
 import type { CalendarEventType } from './types'
 
@@ -13,6 +12,9 @@ export const NEXT_EVENT_DAYS = 90
 export const FOLLOW_PREVIEW = 5
 export const POST_PREVIEW = 4
 
+// Person avatar size -> initials font size on the boards; not a ratio (36/13 but 48/15).
+export const AVATAR_TEXT: Record<number, number> = { 36: 13, 44: 14, 48: 15, 56: 18, 64: 20, 84: 26 }
+
 export const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 
 export const EVENT_TYPES: { key: CalendarEventType; label: string }[] = [
@@ -22,9 +24,6 @@ export const EVENT_TYPES: { key: CalendarEventType; label: string }[] = [
   { key: 'COFFEE_CHAT', label: '커피챗' },
   { key: 'CUSTOM', label: '직접 추가' },
 ]
-
-// Person avatars only (avatarTint).
-export const TINTS = [tile.indigo, tile.cyan, tile.violet, tile.orange, tile.green, tile.navy, tile.rose, tile.blueDeep]
 
 // shortcut: static list; replace with a skills endpoint if push-be adds one.
 export const SKILL_CATALOG = [

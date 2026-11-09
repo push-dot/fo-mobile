@@ -4,7 +4,8 @@ import { useColors } from '../../theme'
 import { menuSections, type MenuAction, type MenuSection } from './menu-action'
 
 // Item icons take the host tint; Menu and ContextMenu set it to t1 so they read like the boards' black/gray icons, not accent.
-// A destructive item's icon would take t1 too, so it gets red back like its label (boards: red ✕ 삭제).
+// A destructive item's icon would take t1 too, so it gets the board red. The label stays the system red: UIMenu ignores
+// foregroundStyle, tint and font on titles (probes 2b8babb7 light, 05764ffd dark; push-e2e visual/README.md).
 const buttons = (actions: MenuAction[], red: string) =>
   actions.map((a) => (
     <Button

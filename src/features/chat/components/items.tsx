@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import { onAccent, radius, spacing, tile, useColors, useShadow, type Colors } from '../../../theme'
+import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
@@ -621,7 +621,7 @@ const ResultCard = ({
   return (
     <Appear style={{ gap: 18 }}>
       <Surface>
-        {chrome.initials ? <Mark text={chrome.initials} color={tile.indigo} size={40} round /> : null}
+        {chrome.initials && chrome.color ? <Mark text={chrome.initials} color={chrome.color} size={40} round /> : null}
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text v="b2" weight="700" numberOfLines={1}>
             {title}
