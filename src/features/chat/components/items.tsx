@@ -268,7 +268,7 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
   const titled = !!item.title
   const verdict = isVerdictPlan(item.rows)
   const card = (
-    <Card gap={titled ? spacing[3] : 14} padding={spacing[4]}>
+    <Card gap={titled ? spacing[3] : 14} padding={titled ? undefined : spacing[4]}>
       {titled ? (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text v="c1" weight="700" color="t3">
@@ -322,7 +322,7 @@ const Diff = ({ item }: { item: Of<'diff'> }) => {
             style={{ flexDirection: 'row', gap: 10, paddingVertical: 5, paddingHorizontal: spacing[3], backgroundColor: add ? c.greenSoft : del ? c.redSoft : 'transparent' }}
           >
             <Text v="c2" color="t3" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, fontVariant: ['tabular-nums'] }}>
-              {l.n ?? ''}
+              {l.n ?? ' '}
             </Text>
             <Text v="c1" weight="700" style={{ width: 10, lineHeight: 20, color: add ? c.green : del ? c.red : c.t3 }}>
               {l.sign === '-' ? '−' : l.sign || '\u00A0'}
@@ -434,15 +434,19 @@ const Projected = ({ label, bullets }: { label: string; bullets: string[] }) => 
 // iOS draws the 40pt numeral ~6pt higher in its 44pt line box than the board (card top to numeral 15.6 vs 21, '/ 10' 8pt low); the shift grows with the text size.
 const FIT_DROP = 6
 
-const FitNum = ({ size, color, children }: { size: 'mid' | 'big'; color: keyof Colors; children: string }) => {
+const useFitDrop = () => {
   const { fontScale } = useWindowDimensions()
-  const drop = size === 'big' && Platform.OS === 'ios' ? Math.round(FIT_DROP * fontScale) : 0
+  return Platform.OS === 'ios' ? Math.round(FIT_DROP * fontScale) : 0
+}
+
+const FitNum = ({ size, color, children, rowDrop }: { size: 'mid' | 'big'; color: keyof Colors; children: string; rowDrop?: boolean }) => {
+  const drop = useFitDrop()
   return (
     <Text
       v={size === 'big' ? 'h1' : 'h2'}
       weight="800"
       color={color}
-      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
+      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: rowDrop ? 0 : drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
     >
       {children}
     </Text>
@@ -453,20 +457,21 @@ const FitCard = ({ item, onPlan }: { item: Of<'fit'>; onPlan?: () => void }) => 
   const c = useColors()
   const view = fitChrome(item)
   const compact = !view.locked && !item.note && item.from === undefined
+  const drop = useFitDrop()
   const head = item.note ? (
-    // 점수 올리기: before → after, one bar, the note.
-    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
+    // 점수 올리기: before → after, one bar, the note. The row drops as one so the baselines stay shared.
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2], transform: [{ translateY: drop }] }}>
       {item.from !== undefined ? (
         <>
           <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>
           <Text color="t3">→</Text>
         </>
       ) : null}
-      <FitNum size="big" color="acText">{item.score.toFixed(1)}</FitNum>
+      <FitNum size="big" color="acText" rowDrop>{item.score.toFixed(1)}</FitNum>
     </View>
   ) : item.from !== undefined ? (
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
-      <Text v="b2" weight="800" color="t3" style={{ lineHeight: 20 }}>
+      <Text v="c1" weight="700" color="t3">
         적합도
       </Text>
       <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>

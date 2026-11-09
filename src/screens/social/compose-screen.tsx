@@ -1,12 +1,12 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
 import { Button, GlassButton, Icon, Menu, Text } from '@/shared/components'
-import { inputReset } from '@/shared/components/text-field-metrics'
+import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
@@ -16,6 +16,7 @@ const BODY_HEIGHT = 200 + spacing[1] * 2
 const ComposeScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const { fontScale } = useWindowDimensions()
   const ios = Platform.OS === 'ios'
   const [category, setCategory] = useState<PostCategory | null>(null)
   const [title, setTitle] = useState('')
@@ -100,7 +101,7 @@ const ComposeScreen = () => {
             accessibilityLabel={BODY_LABEL}
             placeholder="나누고 싶은 이야기를 적어 주세요"
             placeholderTextColor={c.t4}
-            style={[{ ...inputReset, fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], minHeight: BODY_HEIGHT, textAlignVertical: 'top' }, fontFor('400')]}
+            style={[{ ...inputReset, fontSize: type.b1.fontSize, lineHeight: 26, color: c.t2, padding: spacing[1], ...iosLineBox(26, type.b1.fontSize, fontScale), paddingTop: spacing[1], minHeight: BODY_HEIGHT, textAlignVertical: 'top' }, fontFor('400')]}
           />
         </View>
         <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>

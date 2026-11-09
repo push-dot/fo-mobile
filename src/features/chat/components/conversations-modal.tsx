@@ -15,7 +15,8 @@ import {
 import type { ConversationRow } from '../api/schemas'
 import { ago, renamePath } from '../utils'
 import { ARCHIVED_NOTE, ARCHIVED_TITLE, DELETE_CONFIRM, UNARCHIVE_LABEL, conversationRowMenu } from '../utils/conversation-menu'
-import PageModal from './page-modal'
+import Note from './note'
+import PageModal, { PageEmpty } from './page-modal'
 
 
 export const statusBadge = (s: ConversationRow['status']) =>
@@ -63,6 +64,9 @@ const RowBody = ({ row: r, archived }: { row: ConversationRow; archived?: boolea
     ) : null}
   </View>
 )
+
+// Under the search field the boards keep 160pt clear below the note, 20 more than a page.
+const LIST_EMPTY_RESERVE = 160
 
 const ROW = { paddingVertical: spacing[4], paddingHorizontal: spacing[5] } as const
 
@@ -122,75 +126,78 @@ export const ConversationList = ({
   if (archivedView)
     return (
       <PageModal title={ARCHIVED_TITLE} onClose={() => setArchivedView(false)}>
-        {rows.map((r) => (
-          <View key={r.id} style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-            <Pressable accessibilityRole="button" onPress={() => router.push(`/chat/${r.id}`)} style={{ flex: 1, minWidth: 0 }}>
-              <RowBody row={r} archived />
-            </Pressable>
-            <Button label={UNARCHIVE_LABEL} variant="secondary" size="sm" onPress={() => unarchive.mutate(r)} />
-          </View>
-        ))}
-        <Text v="c1" color="t3" style={{ paddingTop: spacing[4], paddingHorizontal: spacing[6] }}>
-          {ARCHIVED_NOTE}
-        </Text>
+        <View>
+          {rows.map((r) => (
+            <View key={r.id} style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+              <Pressable accessibilityRole="button" onPress={() => router.push(`/chat/${r.id}`)} style={{ flex: 1, minWidth: 0 }}>
+                <RowBody row={r} archived />
+              </Pressable>
+              <Button label={UNARCHIVE_LABEL} variant="secondary" size="sm" onPress={() => unarchive.mutate(r)} />
+            </View>
+          ))}
+          <Note>{ARCHIVED_NOTE}</Note>
+        </View>
       </PageModal>
     )
 
   const grouped = groups(rows)
   const firstTitled = grouped.find((g) => g.title)
+  const empty = !!source.data && rows.length === 0
   return (
     <PageModal title="대화" onClose={onClose} right={<GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: () => startNew(onClose) }]} />}>
-      <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: spacing[2] }}>
-        <TextField variant="search" placeholder="대화 검색" value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="대화 검색" />
-      </View>
-      <View style={{ height: 6 }} />
-      {grouped.map((g) => (
-        <View key={g.title ?? 'pinned'}>
-          {g.title ? (
-            <Text v="c1" weight="700" color="t3" style={{ paddingTop: g === firstTitled ? spacing[4] : 22, paddingHorizontal: spacing[6], paddingBottom: spacing[2] }}>
-              {g.title}
-            </Text>
-          ) : null}
-          {g.rows.map((r) => (
-            <ContextMenu
-              key={r.id}
-              accessibilityLabel={r.title}
-              actions={menu(r)}
-              onPress={() => router.push(`/chat/${r.id}`)}
-              preview={
-                <View style={{ ...ROW, paddingHorizontal: spacing[4], width: width - 24, borderRadius: 18, backgroundColor: c.card }}>
+      <View style={{ flex: 1 }}>
+        <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: spacing[2] }}>
+          <TextField variant="search" placeholder="대화 검색" value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="대화 검색" />
+        </View>
+        {empty ? null : <View style={{ height: 6 }} />}
+        {grouped.map((g) => (
+          <View key={g.title ?? 'pinned'}>
+            {g.title ? (
+              <Text v="c1" weight="700" color="t3" style={{ paddingTop: g === firstTitled ? spacing[4] : 22, paddingHorizontal: spacing[6], paddingBottom: spacing[2] }}>
+                {g.title}
+              </Text>
+            ) : null}
+            {g.rows.map((r) => (
+              <ContextMenu
+                key={r.id}
+                accessibilityLabel={r.title}
+                actions={menu(r)}
+                onPress={() => router.push(`/chat/${r.id}`)}
+                preview={
+                  <View style={{ ...ROW, paddingHorizontal: spacing[4], width: width - 24, borderRadius: 18, backgroundColor: c.card }}>
+                    <RowBody row={r} />
+                  </View>
+                }
+              >
+                <View style={ROW}>
                   <RowBody row={r} />
                 </View>
-              }
-            >
-              <View style={ROW}>
-                <RowBody row={r} />
-              </View>
-            </ContextMenu>
-          ))}
-        </View>
-      ))}
-      {source.data && rows.length === 0 ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 40, paddingBottom: 140 }}>
-          <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
-            {q ? `“${q}”에 맞는 대화가 없어요` : '아직 대화가 없어요'}
-          </Text>
-          {!q ? <Button label="새 대화 시작" variant="secondary" size="pill" onPress={() => startNew(onClose)} style={{ marginTop: spacing[3] }} /> : null}
-        </View>
-      ) : null}
-      {!q && rows.length > 0 ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => setArchivedView(true)}
-          style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
-        >
-          <Icon name="archive" size={18} color="t2" />
-          <Text v="b2" weight="600" color="t2" style={{ flex: 1 }}>
-            {ARCHIVED_TITLE}
-          </Text>
-          <Icon name="chev" size={16} color="t2" />
-        </Pressable>
-      ) : null}
+              </ContextMenu>
+            ))}
+          </View>
+        ))}
+        {empty ? (
+          <PageEmpty reserve={LIST_EMPTY_RESERVE}>
+            <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
+              {q ? `“${q}”에 맞는 대화가 없어요` : '아직 대화가 없어요'}
+            </Text>
+            {!q ? <Button label="새 대화 시작" variant="secondary" size="pill" onPress={() => startNew(onClose)} style={{ marginTop: spacing[3] }} /> : null}
+          </PageEmpty>
+        ) : null}
+        {!q && rows.length > 0 ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setArchivedView(true)}
+            style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+          >
+            <Icon name="archive" size={18} color="t2" />
+            <Text v="b2" weight="600" color="t2" style={{ flex: 1 }}>
+              {ARCHIVED_TITLE}
+            </Text>
+            <Icon name="chev" size={16} color="t2" />
+          </Pressable>
+        ) : null}
+      </View>
     </PageModal>
   )
 }

@@ -11,7 +11,9 @@ import { useLeaveSidebar } from '../hooks'
 import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
 import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import { Appear } from './motion'
+import GroupTitle from './group-title'
 import Mark from './mark'
+import Note from './note'
 import PageModal from './page-modal'
 
 
@@ -83,6 +85,10 @@ const UsageRow = ({ percent }: { percent: number }) => {
   )
 }
 
+// The boards pad a group title 22 above and 8 below, and the page stacks its blocks 4 apart.
+const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
+const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
+
 const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => void }) => {
   const me = useMe()
   const settings = useMySettings(true)
@@ -103,17 +109,24 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
           {me.name}
         </Text>
       </View>
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: 14, gap: 26 }}>
+      <View style={GROUP}>
         <SettingsGroup>
           <AccountRow label={account?.plan ?? ' '} bold onPress={onPlan} />
           {usage == null ? null : <UsageRow percent={usage} />}
         </SettingsGroup>
-        <SettingsGroup title={ACCOUNT_REFERENCE_TITLE} note={ACCOUNT_REFERENCE_NOTE}>
+      </View>
+      <GroupTitle style={TITLE}>{ACCOUNT_REFERENCE_TITLE}</GroupTitle>
+      <View style={{ paddingHorizontal: spacing[5] }}>
+        <SettingsGroup>
           <AccountRow label={currentRole(me.profile) || '희망 직무'} onPress={toMy} />
           <AccountRow label={me.profile?.tenureYears != null ? `${me.profile.tenureYears}년차` : '연차'} onPress={toMy} />
           <AccountRow label={docs.data?.find((d) => !d.aiMade)?.fileName ?? '기본 서류'} onPress={toMy} />
         </SettingsGroup>
-        <SettingsGroup title="대화">
+      </View>
+      <Note style={{ paddingTop: spacing[2] }}>{ACCOUNT_REFERENCE_NOTE}</Note>
+      <GroupTitle style={TITLE}>대화</GroupTitle>
+      <View style={{ paddingHorizontal: spacing[5] }}>
+        <SettingsGroup>
           <Menu stretch accessibilityLabel="말투" actions={toneMenu(tone?.key, (defaultTone) => save.mutate({ defaultTone }))}>
             <View>
               <AccountRow label={toneLabel(tone)} />

@@ -37,22 +37,22 @@ const PageModal = ({
         </Text>
         <View style={{ minWidth: 44, alignItems: 'flex-end' }}>{right}</View>
       </View>
-      <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: spacing[1] }} contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
-      {footer ? <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + 10, backgroundColor: c.bg }}>{footer}</View> : null}
+      <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: spacing[1] }} contentContainerStyle={{ flexGrow: 1, gap: spacing[1], paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
+      {footer ? <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10), backgroundColor: c.bg }}>{footer}</View> : null}
       {/* iOS: the root ToastHost sits under this sheet; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
     </View>
   )
 }
 
-// The boards keep 140pt under the centred block; the header height differs per platform, so the lift is calibrated on the device.
-const EMPTY_LIFT = Platform.OS === 'ios' ? 158 : 100
 const EMPTY_INSET = 40
+// The boards centre the note in the body and keep this much clear under it (140 on pages, 160 under the search of a list).
+export const EMPTY_RESERVE = 140
 
-export const PageEmpty = ({ children }: { children: ReactNode }) => {
+export const PageEmpty = ({ children, reserve = EMPTY_RESERVE }: { children: ReactNode; reserve?: number }) => {
   const insets = useSafeAreaInsets()
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: EMPTY_INSET, paddingBottom: Math.max(EMPTY_LIFT - spacing[6] - insets.bottom, 0) }}>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: EMPTY_INSET, paddingBottom: Math.max(reserve - spacing[6] - insets.bottom, 0) }}>
       {children}
     </View>
   )

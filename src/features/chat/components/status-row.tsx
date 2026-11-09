@@ -36,10 +36,10 @@ export const StatusRow = ({ verbs, startedAt, onStop }: Props) => {
   return (
     <Shell end={spacing[1]}>
       <Glyph />
-      <Text v="b2" weight="600" color="acText" accessibilityLiveRegion="polite">
+      <Text v="b1" color="acText" accessibilityLiveRegion="polite">
         {verb}
       </Text>
-      <Text v="c1" weight="500" color="t3" style={{ fontVariant: ['tabular-nums'] }}>
+      <Text v="c1" color="t3" style={{ fontVariant: ['tabular-nums'] }}>
         {elapsed}
       </Text>
       <View style={Platform.OS === 'ios' ? undefined : { flex: 1 }} />

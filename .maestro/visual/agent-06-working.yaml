@@ -24,7 +24,7 @@ tags:
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
-      TEXT: ".*맞춤 초안을 만들어 볼게요.*"
+      TEXT: ".*대기 중.*"
 - takeScreenshot: ChatWorking
 - runFlow:
     when:

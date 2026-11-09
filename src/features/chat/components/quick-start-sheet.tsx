@@ -1,8 +1,9 @@
 import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
-import { Pressable, View } from 'react-native'
-import { hitSlopTo, radius, selectedRing, spacing, useColors } from '@/theme'
-import { Badge, Chip, GlassButton, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
+import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
+import { Badge, Chip, GlassButton, GlassPressable, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
 import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
@@ -100,7 +101,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                   {chips.map((ch) => (
                     <Chip key={ch} label={ch} on removable onPress={() => setChips((cur) => cur.filter((x) => x !== ch))} />
                   ))}
-                  <Chip label="조건 추가" icon="plus" onPress={() => setAdding('')} />
+                  <AddChip onPress={() => setAdding('')} />
                 </View>
                 {adding !== null ? (
                   <TextField
@@ -155,7 +156,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                       onPress={() => setCustom('')}
                       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}
                     >
-                      <Icon name="plus" size={20} color="t3" />
+                      <Icon name="plus" size={18} color="t3" />
                       <Text v="b1" weight="600">
                         {qs.custom}
                       </Text>
@@ -218,7 +219,7 @@ const LinkInput = ({ url, setUrl }: { url: string; setUrl: (v: string) => void }
   }, [])
   return (
     <>
-      <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="공고 링크" />
+      <LinkField value={url} onChangeText={setUrl} />
       {clip && url !== clip ? (
         <Pressable
           accessibilityRole="button"
@@ -226,13 +227,13 @@ const LinkInput = ({ url, setUrl }: { url: string; setUrl: (v: string) => void }
           onPress={() => setUrl(clip)}
           style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.acSoft }}
         >
-          <Icon name="link" size={20} color="acText" />
+          <Icon name="copy" size={18} color="acText" />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text v="c2" weight="700" color="acText">
               복사한 링크
             </Text>
             <Text v="b2" numberOfLines={1}>
-              {clip}
+              {clip.replace(/^https?:\/\//, '')}
             </Text>
           </View>
           <Text v="b2" weight="700" color="acText">
@@ -241,6 +242,42 @@ const LinkInput = ({ url, setUrl }: { url: string; setUrl: (v: string) => void }
         </Pressable>
       ) : null}
     </>
+  )
+}
+
+const LinkField = ({ value, onChangeText }: { value: string; onChangeText: (v: string) => void }) => {
+  const c = useColors()
+  const { fontScale } = useWindowDimensions()
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: 54, paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.fill }}>
+      <Icon name="link" size={18} color="t1" />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder="https://"
+        placeholderTextColor={c.t4}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="url"
+        autoFocus
+        accessibilityLabel="공고 링크"
+        style={[{ flex: 1, fontSize: type.b1.fontSize, letterSpacing: type.b1.letterSpacing, color: c.t1, ...inputMetrics(false, fontScale) }, fontFor('400')]}
+      />
+    </View>
+  )
+}
+
+// The board's glass chip: the shared Chip leaves light glass untinted, which reads flat grey on the sheet.
+const AddChip = ({ onPress }: { onPress: () => void }) => {
+  const c = useColors()
+  const fg = Platform.OS === 'ios' ? c.t1 : c.t2
+  return (
+    <GlassPressable accessibilityRole="button" onPress={onPress} hitSlop={hitSlopTo(34)} tint={c.glass} style={{ minHeight: 34, borderRadius: radius.chip }} contentStyle={{ paddingHorizontal: 14, gap: spacing[1] }}>
+      <Icon name="plus" size={14} color={fg} />
+      <Text v="c1" weight="600" style={{ fontSize: 14, color: fg }}>
+        조건 추가
+      </Text>
+    </GlassPressable>
   )
 }
 
@@ -392,12 +429,12 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
         gap: spacing[3],
         padding: spacing[4] - ring.borderWidth,
         borderRadius: on ? radius.md : radius.card,
-        width: grid ? '48.5%' : undefined,
+        ...(grid ? { flexGrow: 1, flexBasis: '48%' } : null),
         ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }),
       }}
     >
       <Pick on={on} square />
-      <View style={{ flex: 1, gap: spacing[1] }}>
+      <View style={{ flex: 1, gap: spacing[1], paddingBottom: item.meta ? 0 : spacing[1] }}>
         <Text v="b1" weight="700">
           {item.title}
         </Text>
@@ -457,7 +494,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               onPress={() => setTask(i)}
-              style={{ width: '48.5%', gap: spacing[2], padding: spacing[4] - ring.borderWidth, borderRadius: radius.md, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
+              style={{ flexGrow: 1, flexBasis: '48%', gap: spacing[2], padding: spacing[4] - ring.borderWidth, borderRadius: radius.md, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
             >
               <Icon name={t.icon} size={20} color={on ? 'acText' : 't2'} />
               <Text v="b2" weight="700">

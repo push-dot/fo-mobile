@@ -149,7 +149,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
                   <Text v="b2" weight="700" numberOfLines={1}>
                     {r.title}
                   </Text>
-                  <Text v="c2" weight="700" color={r.ac ? 'acText' : 't3'}>
+                  <Text v="c2" weight={r.ac ? '700' : '400'} color={r.ac ? 'acText' : 't3'}>
                     {r.sub}
                   </Text>
                 </View>
@@ -189,7 +189,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
               {approval.foot}
             </Text>
           ) : null}
-          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: multi.at >= 0 ? spacing[1] : 2 }}>
+          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: multi.at >= 0 ? spacing[1] : 2, paddingHorizontal: multi.at >= 0 ? 0 : spacing[1] }}>
             {multi.stopLabel ? (
               <View style={multi.at >= 0 ? STOP_PAD : { flex: 1 }}>
                 <Button

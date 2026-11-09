@@ -4,7 +4,7 @@ import { brandOf } from '@push/shared'
 import { Alert, Platform, Pressable, ScrollView, View, useWindowDimensions, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MAX_BYTES, SIZE_LIMIT, type PickedFile } from '@/features/my'
-import { onAccent, radius, spacing, useColors, useShadow } from '../../../theme'
+import { onAccent, radius, spacing, useColors, useShadow, useThemeMode } from '../../../theme'
 import { Chip, Icon, Text, useKeyboardHeight, type IconName } from '@/shared/components'
 import { pickDocument } from '../../../shared/infrastructure'
 import { useAccessMode, useMentionGroups } from '../api/hooks'
@@ -28,10 +28,12 @@ type Props = {
   /** Floats above the box (StatusRow). */
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
+  /** First screen only (see ComposerProps.roomy). */
+  roomy?: boolean
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, above, inputRef }: Props) => {
+export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy }: Props) => {
   const [text, setText] = useState('')
   const [file, setFile] = useState<PickedFile>()
   const own = useRef<TextInputInstance>(null)
@@ -90,6 +92,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, a
       {query !== null ? <MentionPopover query={query} onPick={pick} /> : above}
       <Composer
         inputRef={ref}
+        roomy={roomy}
         value={text}
         onChangeText={change}
         onSend={submit}
@@ -115,6 +118,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
   const c = useColors()
   const shadow = useShadow()
   const ios = Platform.OS === 'ios'
+  const dark = useThemeMode() === 'dark'
   const { height } = useWindowDimensions()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
@@ -138,7 +142,10 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                 {g.items[0]?.kind === 'shortcut' ? (
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[1], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
                     {g.items.map((m) => (
-                      <Chip key={m.id} label={m.title} onPress={() => onPick(m)} lead={<Icon name={SHORTCUT_ICON[m.id as keyof typeof SHORTCUT_ICON] ?? 'spark'} size={15} color="t2" />} />
+                      // iOS dark: the glass chip over the opaque panel has no visible fill; the design draws a filled pill.
+                      <View key={m.id} style={{ borderRadius: radius.chip, backgroundColor: ios && dark ? c.fill : undefined }}>
+                        <Chip label={m.title} onPress={() => onPick(m)} lead={<Icon name={SHORTCUT_ICON[m.id as keyof typeof SHORTCUT_ICON] ?? 'spark'} size={15} color="t2" />} />
+                      </View>
                     ))}
                   </ScrollView>
                 ) : (

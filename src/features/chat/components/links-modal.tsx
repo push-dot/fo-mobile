@@ -14,7 +14,7 @@ import { useStartChat } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import GroupTitle from './group-title'
 import Note from './note'
-import PageModal from './page-modal'
+import PageModal, { PageEmpty } from './page-modal'
 
 const KINDS = (Object.keys(LINK_KIND_LABEL) as LinkKind[]).map((key) => ({ key, label: LINK_KIND_LABEL[key] }))
 const GROUPS: { title: string; kinds: LinkKind[] }[] = [
@@ -157,13 +157,11 @@ const LinkRow = ({ link, onAct }: { link: UserLink; onAct: (what: 'open' | 'copy
   )
 }
 
-const Empty = ({ onAdd }: { onAdd: () => void }) => {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 40, paddingBottom: 140 }}>
-      <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
-        {LINK_EMPTY}
-      </Text>
-      <Button label="링크 추가" variant="secondary" size="pill" onPress={onAdd} style={{ marginTop: spacing[3] }} />
-    </View>
-  )
-}
+const Empty = ({ onAdd }: { onAdd: () => void }) => (
+  <PageEmpty>
+    <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
+      {LINK_EMPTY}
+    </Text>
+    <Button label="링크 추가" variant="secondary" size="pill" onPress={onAdd} style={{ marginTop: spacing[3] }} />
+  </PageEmpty>
+)

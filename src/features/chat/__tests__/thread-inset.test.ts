@@ -20,6 +20,12 @@ describe('threadInset', () => {
 
   it('leaves the design gap above an approval sheet per platform', () => {
     expect(threadInset({ ...base, bottomH: 260, approval: true })).toBe(306)
-    expect(threadInset({ ...base, bottomH: 260, approval: true, android: true })).toBe(290)
+    expect(threadInset({ ...base, bottomH: 260, approval: true, android: true })).toBe(285)
+  })
+
+  it('gives the status row the design lift: 14 on iOS, 22 on Android, the keyboard step when typing', () => {
+    expect(threadInset({ ...base, status: true })).toBe(174)
+    expect(threadInset({ ...base, status: true, android: true })).toBe(182)
+    expect(threadInset({ ...base, status: true, keyboard: 336 })).toBe(504)
   })
 })

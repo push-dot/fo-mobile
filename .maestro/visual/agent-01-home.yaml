@@ -9,10 +9,14 @@ tags:
     env:
       MOCK: "push://sign-in?mock=few-materials"
       READY: "새로 올라온 공고"
-- tapOn: "에이전트"
-- extendedWaitUntil:
-    visible: "동의하고 시작하기"
-    timeout: 10000
+# The first tab tap after login is sometimes dropped (screen stays on 홈); tap until the consent shows.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn: "에이전트"
+      - extendedWaitUntil:
+          visible: "동의하고 시작하기"
+          timeout: 6000
 - waitForAnimationToEnd
 - takeScreenshot: ChatConsent
 - tapOn: "동의하고 시작하기"
