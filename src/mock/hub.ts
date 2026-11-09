@@ -2,8 +2,8 @@
 import type { Offer, Profile } from '@push/api-client'
 import { tenureOf } from '../features/hub/utils/filters'
 import { searchHangul } from '@push/shared'
-import { following, myProfile } from './me'
-import { mock, page } from './server'
+import { blockedViewer, following, myProfile } from './me'
+import { MOCK_USER_ID, mock, page } from './server'
 
 const base = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYears' | 'careerStatus'> & Partial<Profile>): Profile => ({
   avatarUrl: null,
@@ -52,7 +52,7 @@ export const profiles: Profile[] = [
 const offers = new Map<string, Offer>()
 const sentOffer = (to: Profile): Offer => ({
   id: `o-${to.userId}`,
-  sender: { id: 'me', displayName: '김서준', avatarUrl: null, companyName: null, headline: '' },
+  sender: { id: MOCK_USER_ID, displayName: '김서준', avatarUrl: null, companyName: null, headline: '' },
   recipient: { id: to.userId, displayName: to.displayName, avatarUrl: to.avatarUrl, companyName: null, headline: to.headline },
   message: '가볍게 커피챗 나눠 보고 싶어요.',
   posting: null,
@@ -86,7 +86,7 @@ mock('GET', 'profiles', ({ query }) => {
 })
 
 mock('GET', 'profiles/:userId', ({ params }) => {
-  if (params.userId === 'me') return { data: { ...myProfile(), following: false, offered: false } }
+  if (params.userId === 'me' || params.userId === MOCK_USER_ID) return { data: { ...myProfile(), following: false, offered: false } }
   const p = profiles.find((x) => x.userId === params.userId)
   if (!p) return notFound
   return { data: { ...p, following: following.has(p.userId), offered: offers.has(p.userId) } }
@@ -98,10 +98,12 @@ mock('POST', 'profiles/:userId/offer', ({ params, body }) => {
   const { message, postingId } = (body ?? {}) as { message?: string; postingId?: string }
   if (!message?.trim() || message.length > 500)
     return { status: 400, body: { error: { code: 'VALIDATION_FAILED', message: '메시지는 1–500자로 써 주세요.' } } }
+  if (blockedViewer(p.userId))
+    return { status: 403, body: { error: { code: 'BLOCKED', message: 'this user is not accepting offers from you' } } }
   if (offers.has(p.userId)) return { status: 409, body: { error: { code: 'CONFLICT', message: '이미 제안을 보냈어요.' } } }
   const offer: Offer = {
     id: `o-${p.userId}`,
-    sender: { id: 'me', displayName: '나', avatarUrl: null, companyName: null, headline: '' },
+    sender: { id: MOCK_USER_ID, displayName: '나', avatarUrl: null, companyName: null, headline: '' },
     recipient: { id: p.userId, displayName: p.displayName, avatarUrl: p.avatarUrl, companyName: null, headline: p.headline },
     message,
     // shortcut: posting is not resolved in the mock; postings mock owns that data.

@@ -7,6 +7,8 @@ type Route = { method: string; re: RegExp; keys: string[]; handler: Handler }
 
 const routes: Route[] = []
 
+export const MOCK_USER_ID = 'dev'
+
 /** Registers `GET postings/:id` style routes. Return `{ status, body }` to control the response. */
 export const mock = (method: string, pattern: string, handler: Handler) => {
   const keys: string[] = []

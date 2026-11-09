@@ -61,4 +61,16 @@ describe('deleteWithUndo', () => {
     await vi.runAllTimersAsync()
     expect(usePendingDelete.getState().hidden).toEqual([])
   })
+
+  it('shows the failure toast whose 다시 시도 deletes again', async () => {
+    remove.mockRejectedValueOnce(new Error('offline'))
+    deleteWithUndo(doc)
+    await vi.runAllTimersAsync()
+    const toast = showToast.mock.lastCall?.[0]
+    expect(toast).toMatchObject({ message: '서류를 삭제하지 못했어요', alert: true, opaque: true, bottom: 74 })
+    toast.action.onPress()
+    await vi.runAllTimersAsync()
+    expect(remove).toHaveBeenCalledTimes(2)
+    expect(invalidateQueries).toHaveBeenCalledOnce()
+  })
 })

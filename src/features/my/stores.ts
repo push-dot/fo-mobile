@@ -4,7 +4,7 @@ import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { myApi } from './api'
 import { UNDO_MS } from './constants'
 import type { MySource } from './types'
-import { createUndo, deleteDocCopy } from './utils'
+import { createUndo, deleteDocCopy, RETRY_LABEL } from './utils'
 
 export const useDocImport = create<{ requested: boolean }>(() => ({ requested: false }))
 
@@ -15,13 +15,23 @@ export const usePendingDelete = create<{ hidden: string[] }>(() => ({ hidden: []
 
 const unhide = (id: string) => usePendingDelete.setState((s) => ({ hidden: s.hidden.filter((h) => h !== id) }))
 
-const pending = createUndo((id) => {
+const remove = (id: string) => {
   void myApi
     .remove(id)
     .then(() => queryClient.invalidateQueries({ queryKey: ['me', 'sources'] }))
-    .catch(() => undefined)
+    .catch(() =>
+      showToast({
+        message: deleteDocCopy('').failed,
+        alert: true,
+        opaque: true,
+        bottom: TOAST_ABOVE.tabs,
+        action: { label: RETRY_LABEL, onPress: () => remove(id) },
+      }),
+    )
     .finally(() => unhide(id))
-}, UNDO_MS)
+}
+
+const pending = createUndo(remove, UNDO_MS)
 
 export const deleteWithUndo = (doc: Pick<MySource, 'id' | 'fileName'>) => {
   const copy = deleteDocCopy(doc.fileName)

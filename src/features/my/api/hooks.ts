@@ -5,14 +5,16 @@ import { Alert } from 'react-native'
 import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
-import { showToast } from '@/shared/components'
+import { askConfirm, showToast } from '@/shared/components'
 import { useSession } from '@/shared/infrastructure'
-import { nextEventFor, offerMenu, restoreLinkFailure } from '../utils'
+import { nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
 import {
   acceptOffer,
   addLink,
   archiveOffer,
   blockUser,
+  fetchBlocked,
+  unblockUser,
   reportOffer,
   unarchiveOffer,
   declineOffer,
@@ -31,12 +33,15 @@ import {
   fetchMyProfile,
   fetchOffer,
   fetchOfferMessages,
+  fetchArchivedOffers,
   fetchOffers,
   fetchPosting,
   convertDocumentProfile,
   fetchConsents,
   fetchDocument,
   fetchDocuments,
+  renameDocument,
+  archiveDocument,
   fetchDocumentVersions,
   fetchEvents,
   fetchSettings,
@@ -116,12 +121,33 @@ export const useSetBaseProfile = (onDone: () => void) => {
   })
 }
 
+// The refetch is returned, so a caller's onSuccess runs once the new revision is loaded.
+const useDocumentWrite = <V,>(write: (v: V) => Promise<unknown>) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: write,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['documents'] }),
+    onError: () => {
+      void qc.invalidateQueries({ queryKey: ['documents'] })
+    },
+  })
+}
+
+export const useRenameDocument = (doc: { id: string; revision: number } | undefined) =>
+  useDocumentWrite((title: string) => renameDocument(doc!.id, doc!.revision, title))
+
+export const useArchiveDocument = (doc: { id: string; revision: number } | undefined) =>
+  useDocumentWrite(() => archiveDocument(doc!.id, doc!.revision))
+
 export const useIngestJob = (jobId: string | undefined) => useQuery(ingestJobQuery(jobId))
 
 type Box = 'received' | 'sent'
 
 export const useOffers = (box: Box) =>
   useQuery({ queryKey: ['me', 'offers', box], queryFn: () => fetchOffers(box) })
+
+export const useArchivedOffers = (box: Box) =>
+  useQuery({ queryKey: ['me', 'offers', box, 'archived'], queryFn: () => fetchArchivedOffers(box) })
 
 export const useSettings = () => {
   const qc = useQueryClient()
@@ -142,6 +168,23 @@ export const useSettings = () => {
     onSuccess: (s) => qc.setQueryData(key, s),
   })
   return { s: q.data, set: m.mutate }
+}
+
+export const useBlocked = () => useQuery({ queryKey: ['me', 'blocks'], queryFn: fetchBlocked, refetchOnMount: 'always' })
+
+// push-be lists offers without the people you block, so unblocking brings their offers back into the lists.
+export const useUnblock = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: unblockUser,
+    onSettled: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: ['me', 'blocks'] }),
+        qc.invalidateQueries({ queryKey: ['me', 'offers'] }),
+        qc.invalidateQueries({ queryKey: ['chat', 'quick-start'] }),
+      ]),
+    onError: () => showToast({ message: OFFER_MENU_COPY.failed, tone: 'error' }),
+  })
 }
 
 export const useMySettings = (enabled: boolean) =>
@@ -348,13 +391,32 @@ export const useOfferDecision = (id: string, reply: string, onAccepted: () => vo
   return { accept, decline }
 }
 
-export const useOfferMenu = (offer: Offer | undefined) => {
+export const useViewerBox = (offer: Offer | undefined, hint: Box): Box => {
+  const viewerId = useSession((s) => s.session?.user.id)
+  return offer ? viewerBox(offer, viewerId, hint) : hint
+}
+
+export const useOfferMenu = (offer: Offer | undefined, box: Box) => {
   const qc = useQueryClient()
-  const viewerId = useSession((s) => s.session?.user.id) ?? ''
   if (!offer) return null
   const refresh = () =>
-    Promise.all([qc.invalidateQueries({ queryKey: ['me', 'offers'] }), qc.invalidateQueries({ queryKey: ['me', 'offer', offer.id] })])
-  return offerMenu(offer, viewerId, { archive: archiveOffer, unarchive: unarchiveOffer, report: reportOffer, block: blockUser, refresh, back: router.back, toast: showToast })
+    Promise.all([
+      qc.invalidateQueries({ queryKey: ['me', 'offers'] }),
+      qc.invalidateQueries({ queryKey: ['me', 'offer', offer.id] }),
+      qc.invalidateQueries({ queryKey: ['me', 'blocks'] }),
+      qc.invalidateQueries({ queryKey: ['chat', 'quick-start'] }),
+    ])
+  return offerMenuSections(offer, box, {
+    archive: archiveOffer,
+    unarchive: unarchiveOffer,
+    report: reportOffer,
+    block: blockUser,
+    refresh,
+    back: router.back,
+    toast: showToast,
+    profile: (userId) => router.push(`/profiles/${userId}`),
+    confirm: askConfirm,
+  })
 }
 
 export const usePostingDetail = (postingId: string | undefined) =>

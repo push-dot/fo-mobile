@@ -8,6 +8,8 @@ import {
   deleteAccountSession,
   AGENT_NOTE,
   AGENT_TITLE,
+  BLOCKED_COPY,
+  blockedCount,
   LANGS,
   NOTIFY_SUB,
   LOGIN_LABEL,
@@ -17,6 +19,7 @@ import {
   signOutSession,
   TONES,
   useAuthMe,
+  useBlocked,
   useMyProfile,
   useReferenceConsent,
   useSettings,
@@ -85,6 +88,7 @@ const SettingsScreen = () => {
   const consent = useReferenceConsent()
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
+  const blocked = useBlocked()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   if (!s) {
     return (
@@ -171,6 +175,11 @@ const SettingsScreen = () => {
           label="연락처"
           value={CONTACT.find((v) => v.key === s.contactVisibility)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })}
+        />
+        <SettingsRow
+          label={BLOCKED_COPY.title}
+          value={blockedCount(blocked.data?.page.total)}
+          onPress={() => router.push('/settings/blocked')}
         />
       </SettingsGroup>
 

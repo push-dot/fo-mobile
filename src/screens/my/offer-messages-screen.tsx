@@ -12,21 +12,25 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   Avatar,
   clock,
+  composerClosed,
   counterpart,
   dayBreaks,
-  OFFER_FAIL_TITLE,
+  failedLine,
+  failedSend,
+  OFFER_BLOCKED_COMPOSER,
   OfferPostingCard,
   personLine,
   useOffer,
+  useOfferMenu,
+  useViewerBox,
   useOfferMessages,
+  type FailedSend,
 } from '@/features/my'
-import { ApiError } from '@push/api-client'
-import { Glass, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { Glass, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
-type Failed = { key: string; body: string; blocked: boolean }
 
 const Bubble = ({
   body,
@@ -69,15 +73,19 @@ const Bubble = ({
 
 // The board centres the empty line over the whole screen (composer overlaid) with a 120pt lift; here the composer takes its own height.
 const EMPTY_LIFT = 120
+const COMPOSER_HEIGHT = 52
+const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
 
-const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
+const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const [text, setText] = useState('')
   const [composerH, setComposerH] = useState(0)
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
-  const [failed, setFailed] = useState<Failed[]>([])
+  const [failed, setFailed] = useState<FailedSend[]>([])
   const { data: o } = useOffer(id)
+  const box = useViewerBox(o, hint)
+  const menu = useOfferMenu(o, box)
   const { data, send } = useOfferMessages(id)
 
   if (!o) {
@@ -108,16 +116,13 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
   )
   const post = (body: string) =>
     send.mutate(body, {
-      onError: (e) =>
-        setFailed((f) => [
-          ...f,
-          { key: `${Date.now()}`, body, blocked: e instanceof ApiError && e.code === 'BLOCKED' },
-        ]),
+      onError: (e) => setFailed((f) => [...f, failedSend(body, e)]),
     })
   const canSend = !!text.trim()
   const ios = Platform.OS === 'ios'
   const Composer = ios ? Glass : View
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
+  const closed = composerClosed(failed)
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: c.bg }}>
@@ -147,6 +152,9 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
               ) : null}
             </View>
           </Pressable>
+        }
+        right={
+          menu ? <GlassButton actions={[{ icon: 'menu', label: '더 보기', menu }]} /> : undefined
         }
       />
       <ScrollView
@@ -206,9 +214,9 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
                 !
               </Text>
               <Text v="c2" color="red">
-                {OFFER_FAIL_TITLE}
+                {failedLine(f).title}
               </Text>
-              {f.blocked ? null : (
+              {failedLine(f).retry ? (
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="다시 보내기"
@@ -220,7 +228,7 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
                 >
                   <Icon name="retry" size={16} color="t2" />
                 </Pressable>
-              )}
+              ) : null}
             </View>
           </View>
         ))}
@@ -234,60 +242,78 @@ const OfferMessagesScreen = ({ id, box }: { id: string; box: Box }) => {
           backgroundColor: ios ? undefined : c.bg,
         }}
       >
-        <Composer
-          style={{
-            borderRadius: 26,
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-            padding: 6,
-            gap: spacing[2],
-            backgroundColor: ios ? undefined : c.fill,
-          }}
-        >
-          <TextInput
-            accessibilityLabel="메시지"
-            value={text}
-            onChangeText={setText}
-            placeholder="메시지를 입력해 주세요"
-            placeholderTextColor={c.t4}
-            multiline
-            style={[
-              {
-                flex: 1,
-                ...inputReset,
-                minHeight: 40,
-                maxHeight: 120,
-                paddingVertical: spacing[2],
-                paddingHorizontal: spacing[1],
-                fontSize: type.b1.fontSize,
-                lineHeight: type.b1.lineHeight,
-                color: c.t1,
-                textAlignVertical: 'center',
-              },
-              fontFor('400'),
-            ]}
-          />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="보내기"
-            accessibilityState={{ disabled: !canSend }}
-            disabled={!canSend}
-            onPress={() => {
-              post(text.trim())
-              setText('')
-            }}
+        {closed ? (
+          <View
+            accessibilityRole="alert"
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: radius.pill,
-              backgroundColor: canSend ? c.ac : ios ? c.fill : c.fill2,
+              minHeight: COMPOSER_HEIGHT,
+              borderRadius: COMPOSER_RADIUS,
+              paddingHorizontal: spacing[4],
               alignItems: 'center',
               justifyContent: 'center',
+              backgroundColor: c.fill,
             }}
           >
-            <Icon name="up" size={20} color={canSend ? onAccent : c.t3} />
-          </Pressable>
-        </Composer>
+            <Text v="c1" color="t2" style={{ textAlign: 'center' }}>
+              {OFFER_BLOCKED_COMPOSER}
+            </Text>
+          </View>
+        ) : (
+          <Composer
+            style={{
+              borderRadius: COMPOSER_RADIUS,
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              padding: 6,
+              gap: spacing[2],
+              backgroundColor: ios ? undefined : c.fill,
+            }}
+          >
+            <TextInput
+              accessibilityLabel="메시지"
+              value={text}
+              onChangeText={setText}
+              placeholder="메시지를 입력해 주세요"
+              placeholderTextColor={c.t4}
+              multiline
+              style={[
+                {
+                  flex: 1,
+                  ...inputReset,
+                  minHeight: 40,
+                  maxHeight: 120,
+                  paddingVertical: spacing[2],
+                  paddingHorizontal: spacing[1],
+                  fontSize: type.b1.fontSize,
+                  lineHeight: type.b1.lineHeight,
+                  color: c.t1,
+                  textAlignVertical: 'center',
+                },
+                fontFor('400'),
+              ]}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="보내기"
+              accessibilityState={{ disabled: !canSend }}
+              disabled={!canSend}
+              onPress={() => {
+                post(text.trim())
+                setText('')
+              }}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: radius.pill,
+                backgroundColor: canSend ? c.ac : ios ? c.fill : c.fill2,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon name="up" size={20} color={canSend ? onAccent : c.t3} />
+            </Pressable>
+          </Composer>
+        )}
       </View>
     </KeyboardAvoidingView>
   )

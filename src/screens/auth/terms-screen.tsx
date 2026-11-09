@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import {
   TERM_ROWS,
   TERMS_BODY,
@@ -11,20 +11,22 @@ import {
   TRY_AGAIN,
   TermRow,
   TermsAllRow,
+  isTermKey,
   saveTerms,
+  useTermsConsent,
   usePhoneAuth,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
 import { Button, CtaBar, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
-const blank = () => Object.fromEntries(TERM_ROWS.map((row) => [row.id, false]))
-
 const TermsScreen = () => {
   const c = useColors()
   const held = usePhoneAuth((state) => state.held)
   const clear = usePhoneAuth((state) => state.clear)
-  const [checked, setChecked] = useState<Record<string, boolean>>(blank)
+  const checked = useTermsConsent((state) => state.checked)
+  const toggle = useTermsConsent((state) => state.toggle)
+  const toggleAll = useTermsConsent((state) => state.toggleAll)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const all = TERM_ROWS.every((row) => checked[row.id])
@@ -34,9 +36,18 @@ const TermsScreen = () => {
     if (!held) router.replace('/sign-in')
   }, [held])
 
-  const toggleAll = () => {
-    const next = !all
-    setChecked(Object.fromEntries(TERM_ROWS.map((row) => [row.id, next])))
+  useEffect(() => () => useTermsConsent.getState().reset(), [])
+
+  const opening = useRef(false)
+  useFocusEffect(
+    useCallback(() => {
+      opening.current = false
+    }, []),
+  )
+  const openTerm = (term: string) => {
+    if (opening.current) return
+    opening.current = true
+    router.push({ pathname: '/terms-view', params: { term } })
   }
 
   const submit = () => {
@@ -73,7 +84,8 @@ const TermsScreen = () => {
               badge={row.required ? TERMS_REQUIRED : TERMS_OPTIONAL}
               required={row.required}
               checked={Boolean(checked[row.id])}
-              onPress={() => setChecked((current) => ({ ...current, [row.id]: !current[row.id] }))}
+              onPress={() => toggle(row.id)}
+              onOpen={isTermKey(row.id) ? () => openTerm(row.id) : undefined}
             />
           ))}
         </View>

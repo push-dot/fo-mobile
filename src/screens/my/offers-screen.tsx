@@ -1,9 +1,8 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import type { Offer } from '@push/api-client'
-import { Avatar, counterpart, Empty, Logo, OFFER_EMPTY_ACTION, offerBadge, personLine, Row, timeAgo, useOffers } from '@/features/my'
-import { Badge, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
+import { Empty, OFFER_ARCHIVED_ROW, OFFER_EMPTY_ACTION, OfferRow, Row, useArchivedOffers, useOffers } from '@/features/my'
+import { Icon, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
@@ -18,43 +17,23 @@ const OFFER_SKELETON: SkeletonRowsShape = {
 
 type Box = 'received' | 'sent'
 
-const OfferRow = ({ o, box }: { o: Offer; box: Box }) => {
+const ArchivedRow = ({ count }: { count: number }) => {
   const c = useColors()
-  const who = counterpart(o, box)
-  const unread = box === 'received' && !o.readAt
-  const badge = offerBadge(o, box)
   return (
-    <Row
-      top
-      label={`${who.displayName}, ${badge.label}${unread ? ', 안 읽음' : ''}`}
-      onPress={() => router.push(`/offers/${o.id}${o.status === 'ACCEPTED' ? '/messages' : ''}?box=${box}`)}
-    >
-      {who.kind === 'COMPANY' ? (
-        <Logo name={who.companyName ?? who.displayName} />
-      ) : (
-        <Avatar name={who.displayName} url={who.avatarUrl} />
-      )}
-      <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-          <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
-            {who.displayName}
-          </Text>
-          <Badge label={badge.label} tone={badge.tone} />
-          <Text v="c2" color="t3" style={{ marginLeft: 'auto' }}>
-            {timeAgo(o.createdAt)}
-          </Text>
+    <View style={{ marginTop: spacing[1] }}>
+      <Row label={`${OFFER_ARCHIVED_ROW} ${count}개`} onPress={() => router.push('/offers/archived')}>
+        <View style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="archive" size={20} color="t2" />
         </View>
-        {personLine(who) ? (
-          <Text v="c1" color="t3" numberOfLines={1}>
-            {personLine(who)}
-          </Text>
-        ) : null}
-        <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} numberOfLines={2}>
-          {o.message}
+        <Text v="b1" weight="600" style={{ flex: 1 }}>
+          {OFFER_ARCHIVED_ROW}
         </Text>
-      </View>
-      {unread ? <View style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac }} /> : null}
-    </Row>
+        <Text v="c1" color="t3">
+          {count}개
+        </Text>
+        <Icon name="chev" size={18} color="t3" />
+      </Row>
+    </View>
   )
 }
 
@@ -66,6 +45,7 @@ const OffersScreen = () => {
   const [box, setBox] = useState<Box>('received')
   const received = useOffers('received')
   const sent = useOffers('sent')
+  const archived = useArchivedOffers('received').data?.page.total ?? 0
   const q = box === 'received' ? received : sent
   const n = (r: typeof received) => r.data?.page.total ?? r.data?.data.length ?? 0
 
@@ -95,6 +75,7 @@ const OffersScreen = () => {
         {q.data?.data.map((o) => (
           <OfferRow key={o.id} o={o} box={box} />
         ))}
+        {box === 'received' && archived > 0 ? <ArchivedRow count={archived} /> : null}
         {q.data?.data.length ? (
           <Text v="c2" color="t3" style={{ paddingTop: spacing[5], paddingBottom: LIST_END, paddingHorizontal: spacing[6] }}>
             {box === 'received'

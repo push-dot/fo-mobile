@@ -8,6 +8,8 @@ import { usePosting } from '@/features/jobs'
 import {
   Avatar,
   careerPeriod,
+  deleteConfirm,
+  deleteDocCopy,
   FitRing,
   ListSkeleton,
   FIX_DOC,
@@ -15,9 +17,13 @@ import {
   type ProfileSection,
   PROFILE_ACTIONS_TOP,
   PROFILE_NAME_TOP,
+  RETRY_LABEL,
+  SHEET_SWAP_MS,
   pushCardLines,
+  pushDocMenu,
   SET_BASE_COPY,
   tenureLabel,
+  useArchiveDocument,
   useDocument,
   useDocumentVersions,
   useIngestJob,
@@ -25,7 +31,7 @@ import {
   useMyProfile,
   useSetBaseProfile,
 } from '@/features/my'
-import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, Text, TopBar } from '@/shared/components'
+import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 const HUB_BADGE = '지원 서류용 프로필(허브형)'
@@ -77,6 +83,8 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   const me = useMyProfile().data
   const start = useStartChat()
   const share = useShareFile()
+  const deleteCopy = deleteDocCopy(doc.data?.data.title ?? '')
+  const archive = useArchiveDocument(doc.data?.data)
   const [based, setBased] = useState(false)
   const setBase = useSetBaseProfile(() => {
     setBased(true)
@@ -86,6 +94,32 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   const application = apps.data?.data.find((a) => a.id === item?.applicationId) ?? null
   const posting = usePosting(application?.jobId ?? '')
   const applied = !!application?.appliedAt || !!posting.data?.applied
+  const removeDoc = () => {
+    if (archive.isPending) return
+    archive.mutate(undefined, {
+      onSuccess: () => {
+        showToast({ message: deleteCopy.toast })
+        router.back()
+      },
+      onError: () =>
+        showToast({
+          message: deleteCopy.failed,
+          alert: true,
+          opaque: true,
+          bottom: TOAST_ABOVE.tabs,
+          action: { label: RETRY_LABEL, onPress: removeDoc },
+        }),
+    })
+  }
+  const menu = pushDocMenu(
+    { hasPosting: !!application },
+    {
+      posting: () => router.push(`/postings/${application?.jobId}`),
+      export: () => share.mutate({ documentId: id }),
+      rename: () => router.push(`/docs/push/${id}/rename`),
+      delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, () => setTimeout(removeDoc, SHEET_SWAP_MS))),
+    },
+  )
   const editable = (s: ProfileSection) => (application ? () => edit(s) : undefined)
   const lines = item ? pushCardLines(item, application) : null
   const version = versions.data?.data[0]
@@ -99,7 +133,14 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
       <TopBar
         title={application ? undefined : '지원 서류용 프로필'}
         onBack={() => router.back()}
-        right={<GlassButton actions={[{ icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) }]} />}
+        right={
+          <GlassButton
+            actions={[
+              { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
+              { icon: 'menu', label: '더 보기', menu },
+            ]}
+          />
+        }
         safeTop={!(sheet && Platform.OS === 'ios')}
         sheet={sheet}
       />

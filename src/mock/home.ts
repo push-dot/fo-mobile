@@ -2,7 +2,7 @@
 import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
 import { postings } from './postings'
-import { mock, page } from './server'
+import { MOCK_USER_ID, mock, page } from './server'
 
 // Search-only samples; hub/social own their full fixtures.
 const person = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYears'> & Partial<Profile>): Profile => ({
@@ -133,5 +133,5 @@ mock('POST', 'auth/phone/verify', ({ body }) => {
   if (code === '482111') return authError(400, 'PHONE_CODE_INVALID', 'invalid code')
   if (code === '482222') return authError(400, 'PHONE_CODE_EXPIRED', 'expired code')
   if (code === '482333') return authError(429, 'RATE_LIMITED', 'too many attempts')
-  return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: 'me', displayName: '김서준', locale: 'ko' }, created: true } }
+  return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: true } }
 })

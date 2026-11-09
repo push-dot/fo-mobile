@@ -59,6 +59,14 @@ describe('menu items (iOS)', () => {
   })
 })
 
+describe('menu sections (iOS)', () => {
+  it('wraps each section in a titled UIMenu section', () => {
+    const tree = MenuButtons({ actions: [{ key: 'view', title: '보기', actions: [actions[2]!] }, { key: 'more', actions: [actions[0]!] }] })
+    expect(findAll(tree, 'SSection').map((s) => s.props.title)).toEqual(['보기', undefined])
+    expect(findAll(tree, 'SButton').map((b) => b.props.label)).toEqual(['최신순', '공유하기'])
+  })
+})
+
 describe('Menu (iOS)', () => {
   it('opens a pull-down menu from the React Native trigger', () => {
     const trigger = createElement('View')

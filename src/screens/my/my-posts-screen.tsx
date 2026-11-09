@@ -1,21 +1,26 @@
 import { router, useLocalSearchParams } from 'expo-router'
+import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES } from '@push/api-client'
-import { Icon, Text, TopBar } from '@/shared/components'
-import { Empty, emptyCta, ListSkeleton, postedAt, useMyCommentedPosts, useMyPosts } from '@/features/my'
+import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, useMyCommentedPosts, useMyPosts, type PostsView } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
-  const commented = box === 'commented'
+  const [view, setView] = useState<PostsView>(box === 'commented' ? 'commented' : 'mine')
   const mine = useMyPosts()
   const replies = useMyCommentedPosts()
-  const query = commented ? replies : mine
+  const query = view === 'commented' ? replies : mine
   const posts = query.data?.data ?? []
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={commented ? '댓글 단 글' : '내가 쓴 글'} onBack={() => router.back()} />
+      <TopBar
+        title={postsTitle(view)}
+        onBack={() => router.back()}
+        right={<GlassButton actions={[{ icon: 'menu', label: '더 보기', menu: postsMenu(view, setView) }]} />}
+      />
       {query.isLoading ? (
         <ListSkeleton />
       ) : (
@@ -24,7 +29,7 @@ const MyPostsScreen = () => {
           <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? posts.length}개
           </Text>
-          {posts.length === 0 && !commented ? (
+          {posts.length === 0 && view === 'mine' ? (
             <Empty
               text={emptyCta('posts').title}
               action={emptyCta('posts').action}

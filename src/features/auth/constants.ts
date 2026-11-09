@@ -59,3 +59,31 @@ export const TERM_ROWS = [
   { id: 'privacy', label: '개인정보 수집·이용', required: true },
   { id: 'marketing', label: '혜택·이벤트 알림 받기', required: false },
 ] as const
+
+export const TERMS_AGREE = '동의하기'
+export const TERMS_DETAIL_SUFFIX = '자세히 보기'
+
+const termsPlaceholder = (title: string) => ({
+  title,
+  effective: '시행일 [2026년 00월 00일] · 버전 [1.0]',
+  notice: '원문이 확정되면 이 자리에 들어가요. 지금은 조항 제목과 자리 표시 문단만 있어요.',
+  sections: [
+    { heading: '제1조 (목적)', body: '[본문 자리 표시] 이 약관이 Push 서비스 이용에서 회사와 회원의 권리·의무를 정한다는 내용이 들어가요.' },
+    { heading: '제2조 (정의)', body: '[본문 자리 표시] 서비스, 회원, 허브 프로필, 에이전트, 서류 같은 용어의 뜻이 들어가요.' },
+    { heading: '제3조 (약관의 효력과 변경)', body: '[본문 자리 표시] 약관을 바꿀 때 언제, 어떻게 알리는지가 들어가요.' },
+    { heading: '제4조 (서비스의 제공)', body: '[본문 자리 표시] 채용공고, 허브, 소셜, 에이전트 기능과 유료 요금제 안내가 들어가요.' },
+    { heading: '제5조 (회원의 의무)', body: '[본문 자리 표시] 회원이 지켜야 할 사항과 금지 행위가 들어가요.' },
+    { heading: '제6조 (유료 서비스와 환불)', body: '[본문 자리 표시] 요금제 결제, 구매 복원, 해지와 환불 기준이 들어가요.' },
+  ],
+})
+
+// owner content: replace with the final terms text
+export const TERMS_TEXT = {
+  serviceTerms: termsPlaceholder('서비스 이용약관'),
+  privacy: termsPlaceholder('개인정보 수집·이용'),
+  marketing: termsPlaceholder('혜택·이벤트 알림 받기'),
+}
+
+export type TermKey = keyof typeof TERMS_TEXT
+
+export const isTermKey = (key: unknown): key is TermKey => typeof key === 'string' && Object.hasOwn(TERMS_TEXT, key)

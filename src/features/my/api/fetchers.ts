@@ -62,6 +62,8 @@ export const fetchUnreadOffers = () => api.me.offers('received', { limit: 50 })
 
 export const fetchOffers = (box: 'received' | 'sent') => api.me.offers(box, { limit: 50 })
 
+export const fetchArchivedOffers = (box: 'received' | 'sent') => api.me.offers(box, { limit: 50, archived: 1 })
+
 export const fetchMyProfile = api.me.profile
 
 export const fetchAuthMe = api.auth.me
@@ -122,6 +124,11 @@ export const reportOffer = (id: string, reason?: string) => api.me.reportOffer(i
 
 export const blockUser = (userId: string) => api.me.blockUser(userId)
 
+// shortcut: first 100 blocked people only; page once anyone blocks more.
+export const fetchBlocked = () => api.me.blocks({ limit: 100 })
+
+export const unblockUser = (userId: string) => api.me.unblockUser(userId)
+
 export const fetchPosting = (id: string) => api.postings.get(id)
 
 export const fetchEvents = (from: string, to: string) =>
@@ -131,9 +138,19 @@ export const fetchOfferMessages = (offerId: string) => api.me.offerMessages(offe
 
 export const sendOfferMessage = (offerId: string, body: string) => api.me.sendOfferMessage(offerId, body)
 
-export const fetchDocuments = () => c.get<ListEnvelope<HubDocument>>('documents', { query: { limit: 50 } })
+// push-be lists archived documents too (the archive route is how a document is deleted), so the list hides them here.
+export const fetchDocuments = async () => {
+  const r = await c.get<ListEnvelope<HubDocument>>('documents', { query: { limit: 50 } })
+  return { ...r, data: r.data.filter((d) => d.status !== 'ARCHIVED') }
+}
 
 export const fetchDocument = (id: string) => c.get<DataEnvelope<HubDocument>>(`documents/${id}`)
+
+export const renameDocument = async (id: string, expectedRevision: number, title: string) =>
+  (await c.patch<DataEnvelope<HubDocument>>(`documents/${id}`, { body: { expectedRevision, title } })).data
+
+export const archiveDocument = async (id: string, expectedRevision: number) =>
+  (await c.post<DataEnvelope<HubDocument>>(`documents/${id}/archive`, { body: { expectedRevision } })).data
 
 export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })

@@ -1,0 +1,50 @@
+appId: app.push.mobile
+name: 마이 설정 → 차단한 사람 → 빈 차단 목록
+tags:
+  - visual
+---
+# The mock starts with 2 blocked people. It has no company (push-be GET me/blocks sends none), so the rows read "{date} 차단" only.
+- runFlow: ../flows/_login.yaml
+- runFlow: ../flows/_dismiss_logbox.yaml
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: ".*Google 계정으로 로그인.*"
+    timeout: 10000
+# The board shows the 허브 공개 group with the 차단한 사람 row in the middle of the screen.
+- scrollUntilVisible:
+    element: "차단한 사람.*"
+    centerElement: true
+- waitForAnimationToEnd
+- takeScreenshot: SettingsBlockedEntry
+- tapOn: "차단한 사람.*"
+- extendedWaitUntil:
+    visible: "차단한 사람은 나에게 제안이나 메시지를 보낼 수 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: SettingsBlocked
+
+# Only GET me/blocks is emptied; the screens read it fresh on mount.
+- openLink: push://social?mock=empty:GET:me/blocks
+- extendedWaitUntil:
+    visible: "직장 생활"
+    timeout: 10000
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: ".*Google 계정으로 로그인.*"
+    timeout: 10000
+- runFlow: _settings_end.yaml
+- tapOn: "차단한 사람.*"
+- extendedWaitUntil:
+    visible: "차단한 사람이 없어요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: SettingsBlockedEmpty
+- openLink: push://?mock=reset

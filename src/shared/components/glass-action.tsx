@@ -4,14 +4,14 @@ import { onAccent, radius, useColors, type Colors } from '../../theme'
 import { PRESS_SCALE } from './constants'
 import Icon from './icon'
 import Menu from './menu'
-import type { MenuAction } from './menu-action'
+import type { MenuProps } from './menu-action'
 import Text from './text'
 
 export type GlassAction = {
   icon: IconName
   label: string
   onPress?: () => void
-  menu?: MenuAction[]
+  menu?: MenuProps['actions']
   active?: boolean
   /** Glyph colour when not active (default t1). */
   color?: keyof Colors

@@ -20,13 +20,16 @@ const SignedInStack = () => {
       <Stack.Screen name="notifications" />
       <Stack.Screen name="search" />
       <Stack.Screen name="offers/index" />
+      <Stack.Screen name="offers/archived" />
       <Stack.Screen name="offers/[id]" />
       <Stack.Screen name="offers/[id]/messages" />
       <Stack.Screen name="settings/index" />
       <Stack.Screen name="settings/visibility" />
+      <Stack.Screen name="settings/blocked" />
       <Stack.Screen name="docs/[id]" />
       <Stack.Screen name="docs/push/index" options={{ presentation: 'modal' }} />
       <Stack.Screen name="docs/push/[id]" />
+      <Stack.Screen name="docs/push/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="activity/follows" />
       <Stack.Screen name="activity/posts" />
       <Stack.Screen name="activity/applications/[id]" />

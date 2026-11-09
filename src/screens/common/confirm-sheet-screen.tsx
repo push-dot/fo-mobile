@@ -24,6 +24,11 @@ const ConfirmSheetScreen = () => {
         <Text v="b2" color="t2">
           {request.body}
         </Text>
+        {request.note ? (
+          <Text v="c1" color="t3" style={{ marginTop: spacing[1] }}>
+            {request.note}
+          </Text>
+        ) : null}
       </View>
       <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
         <Button label={request.cancel ?? '취소'} variant="secondary" onPress={() => router.back()} style={{ flex: 1 }} />

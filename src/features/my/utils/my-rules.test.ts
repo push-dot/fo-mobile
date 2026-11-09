@@ -66,6 +66,7 @@ describe('my screen rules', () => {
       cancel: '취소',
       toast: '서류를 삭제했어요',
       undo: '되돌리기',
+      failed: '서류를 삭제하지 못했어요',
     })
     expect(deleteDocCopy('포트폴리오집').body.startsWith('포트폴리오집을 ')).toBe(true)
   })

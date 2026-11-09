@@ -78,13 +78,42 @@ describe('MenuAnchor (Android)', () => {
     expect(menu.props).toMatchObject({ expanded: true, onDismissRequest: onClose })
   })
 
-  it('closes and runs the action when an item is picked, coloring delete and the current pick', () => {
+  it('closes and runs the action when an item is picked, coloring delete', () => {
     const onClose = vi.fn()
     const items = findAll(MenuAnchor({ actions, open: true, onClose, children: createElement('View') }), stubs.compose.DropdownMenuItem)
-    expect(items.map((i) => (i.props.elementColors as { textColor: string }).textColor)).toEqual([c.t1, c.red, c.acText])
+    expect(items.map((i) => (i.props.elementColors as { textColor: string }).textColor)).toEqual([c.t1, c.red, c.t1])
     ;(items[1]!.props.onClick as () => void)()
     expect(onClose).toHaveBeenCalled()
     expect(actions[1]!.onPress).toHaveBeenCalled()
+  })
+
+  it('marks the current pick with a leading check in t1 and leaves an empty slot on the others', () => {
+    const choices = [
+      { key: 'latest', label: '최신순', selected: true, onPress: vi.fn() },
+      { key: 'old', label: '오래된순', selected: false, onPress: vi.fn() },
+    ]
+    const items = findAll(MenuAnchor({ actions: choices, open: true, onClose: vi.fn(), children: createElement('View') }), stubs.compose.DropdownMenuItem)
+    const slots = items.map((i) => findAll(i, stubs.compose.DropdownMenuItem.LeadingIcon))
+    expect(slots.map((s) => s.length)).toEqual([1, 1])
+    expect(findAll(slots[0]!, 'Icon').map((i) => [i.props.name, i.props.color])).toEqual([['check', 't1']])
+    expect(findAll(slots[1]!, 'Icon')).toHaveLength(0)
+    expect(findAll(items[0]!, stubs.compose.DropdownMenuItem.TrailingIcon)).toHaveLength(0)
+    expect(findAll(items[0]!, stubs.compose.Text).map((t) => t.props.style)).toEqual([undefined])
+    expect(items.map((i) => (i.props.modifiers as { arg: unknown }[])[0]!.arg)).toEqual([true, false])
+  })
+
+  it('draws a trailing acText check and a bold label when the section asks for it', () => {
+    const section = [{ key: 'view', title: '보기', check: 'trailing' as const, actions: [{ key: 'a', label: '내가 쓴 글', selected: true, onPress: vi.fn() }, { key: 'b', label: '댓글 단 글', selected: false, onPress: vi.fn() }] }]
+    const items = findAll(MenuAnchor({ actions: section, open: true, onClose: vi.fn(), children: createElement('View') }), stubs.compose.DropdownMenuItem)
+    expect(items.map((i) => findAll(i, stubs.compose.DropdownMenuItem.TrailingIcon).length)).toEqual([1, 0])
+    expect(findAll(items[0]!, 'Icon').map((i) => [i.props.name, i.props.color])).toEqual([['check', 'acText']])
+    expect(items.flatMap((i) => findAll(i, stubs.compose.DropdownMenuItem.LeadingIcon))).toHaveLength(0)
+    expect(findAll(items[0]!, stubs.compose.Text).map((t) => t.props.style)).toEqual([{ fontWeight: 'bold' }])
+  })
+
+  it('draws no leading slot in a menu with nothing to choose', () => {
+    const items = findAll(MenuAnchor({ actions: [actions[0]!, actions[1]!], open: true, onClose: vi.fn(), children: createElement('View') }), stubs.compose.DropdownMenuItem)
+    expect(items.flatMap((i) => findAll(i, stubs.compose.DropdownMenuItem.LeadingIcon))).toHaveLength(0)
   })
 
   it('separates the destructive item and draws a design icon as the leading icon', () => {
@@ -96,6 +125,26 @@ describe('MenuAnchor (Android)', () => {
 })
 
 describe('Menu and ContextMenu (Android)', () => {
+  it('draws sections with a divider between them and the title as a heading outside the items', () => {
+    const sections = [
+      { key: 'view', title: '보기', actions: [actions[2]!] },
+      { key: 'sort', title: '정렬', actions: [actions[0]!] },
+    ]
+    const tree = MenuAnchor({ actions: sections, open: true, onClose: vi.fn(), children: createElement('View') })
+    expect(findAll(tree, stubs.compose.HorizontalDivider)).toHaveLength(1)
+    expect(findAll(tree, stubs.compose.DropdownMenuItem)).toHaveLength(2)
+    expect(findAll(tree, 'Text').filter((t) => t.props.accessibilityRole === 'header').map((t) => t.props.children)).toEqual(['보기', '정렬'])
+  })
+
+  it('draws a divider only between two sections when the second holds the destructive item', () => {
+    const sections = [
+      { key: 'doc', actions: [actions[0]!] },
+      { key: 'danger', actions: [actions[1]!] },
+    ]
+    const tree = MenuAnchor({ actions: sections, open: true, onClose: vi.fn(), children: createElement('View') })
+    expect(findAll(tree, stubs.compose.HorizontalDivider)).toHaveLength(1)
+  })
+
   it('Menu opens on tap', () => {
     const anchor = Menu({ actions, accessibilityLabel: '정렬', children: createElement('View') })
     const trigger = find(anchor, 'Pressable')

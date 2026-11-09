@@ -15,8 +15,13 @@ export type MenuAction = {
   selected?: boolean
 }
 
+export type MenuSection = { key: string; title?: string; actions: MenuAction[]; /** Android: the pick reads as a bold label with a trailing check (MyPostsAllMenu) instead of the leading check. */ check?: 'trailing' }
+
+export const menuSections = (items: MenuAction[] | MenuSection[]): MenuSection[] =>
+  items.length && 'actions' in items[0]! ? (items as MenuSection[]) : [{ key: 'actions', actions: items as MenuAction[] }]
+
 export type MenuProps = {
-  actions: MenuAction[]
+  actions: MenuAction[] | MenuSection[]
   accessibilityLabel: string
   children: ReactElement
   /** iOS: the trigger takes the parent's width (a full settings row) instead of its own. */

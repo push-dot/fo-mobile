@@ -4,6 +4,8 @@ import { create } from 'zustand'
 export type ConfirmRequest = {
   title: string
   body: string
+  /** A quieter line under the body (caption, t3). */
+  note?: string
   confirm: string
   cancel?: string
   danger?: boolean

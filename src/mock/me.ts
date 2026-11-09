@@ -14,9 +14,9 @@ import type {
 import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
 import { removeChatDoc } from './chat'
-import { mock, page, pdfResponse } from './server'
+import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
 
-const ME: UserRef = { id: 'me', displayName: '김서준', avatarUrl: null }
+const ME: UserRef = { id: MOCK_USER_ID, displayName: '김서준', avatarUrl: null }
 const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, headline: '' }
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 const H = 3_600_000
@@ -34,7 +34,7 @@ const tomorrowAt = (h: number) => {
 }
 
 let profile: Profile = {
-  userId: 'me',
+  userId: MOCK_USER_ID,
   displayName: '김서준',
   avatarUrl: null,
   headline: '결제 시스템을 만드는 백엔드 개발자',
@@ -271,6 +271,43 @@ mock('GET', 'documents/:id/versions/:versionId/export', ({ params }) =>
     ? pdfResponse()
     : { status: 422, body: { error: { code: 'DOCUMENT_NOT_FINALIZED', message: 'only the finalized version can be exported' } } },
 )
+// documents PATCH / archive like push-be: strict body, 404, archived documents take no writes, 409 REVISION_CONFLICT on a stale expectedRevision.
+const docFail = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({
+  status,
+  body: { error: { code, message, ...(details ? { details } : {}) } },
+})
+const docInvalid = (field?: string) => docFail(400, 'VALIDATION_ERROR', field ? `${field} is invalid` : 'invalid request body', field ? { field } : undefined)
+const docTarget = (id: string | undefined, expected: unknown) => {
+  const doc = findDoc(id)
+  if (!doc) return { fail: docFail(404, 'NOT_FOUND', 'resource not found') }
+  if (doc.revision !== expected) return { fail: docFail(409, 'REVISION_CONFLICT', 'resource was modified', { currentRevision: doc.revision }) }
+  return { doc }
+}
+mock('PATCH', 'documents/:id', ({ params, body }) => {
+  const b = body as Record<string, unknown> | undefined
+  if (!b || typeof b !== 'object' || Object.keys(b).some((k) => !['expectedRevision', 'title', 'template', 'language'].includes(k))) return docInvalid()
+  if (!Number.isInteger(b.expectedRevision)) return docInvalid('expectedRevision')
+  if (b.title != null && typeof b.title !== 'string') return docInvalid('title')
+  const doc = findDoc(params.id)
+  if (doc?.status === 'ARCHIVED') return docFail(409, 'INVALID_TRANSITION', 'document is archived')
+  const { fail } = docTarget(params.id, b.expectedRevision)
+  if (fail) return fail
+  if (typeof b.title === 'string') {
+    const length = Array.from(b.title).length
+    if (length < 1 || length > 300) return docFail(400, 'VALIDATION_ERROR', 'title must be 1-300 characters', { field: 'title' })
+    doc!.title = b.title
+  }
+  Object.assign(doc!, { revision: doc!.revision + 1, updatedAt: new Date().toISOString() })
+  return { data: doc }
+})
+mock('POST', 'documents/:id/archive', ({ params, body }) => {
+  const b = body as Record<string, unknown> | undefined
+  if (!b || typeof b !== 'object' || Object.keys(b).some((k) => k !== 'expectedRevision') || !Number.isInteger(b.expectedRevision)) return docInvalid()
+  const { doc, fail } = docTarget(params.id, b.expectedRevision)
+  if (fail) return fail
+  if (doc.status !== 'ARCHIVED') Object.assign(doc, { revision: doc.revision + 1, status: 'ARCHIVED', updatedAt: new Date().toISOString() })
+  return { data: doc }
+})
 const docText = (type: 'heading' | 'paragraph', text: string) => ({ type, content: [{ type: 'text', text }] })
 const hubContent = {
   type: 'doc',
@@ -329,7 +366,7 @@ mock('POST', 'documents/:id/base-profile', ({ params }) => {
   const doc = documents.find((d) => d.id === params.id)
   if (!doc) return { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
   profile = { ...profile, headline: doc.title.slice(0, 120), updatedAt: new Date().toISOString() }
-  return { data: { documentId: doc.id, profileUserId: 'me' } }
+  return { data: { documentId: doc.id, profileUserId: MOCK_USER_ID } }
 })
 mock('POST', 'documents/:id/profile', ({ params, body }) => {
   if (body && typeof body === 'object' && 'target' in body) {
@@ -499,7 +536,7 @@ const commented = [
     displayName: '김태윤',
   }),
 ]
-mock('GET', 'me/posts', ({ query }) => page(myPosts, query))
+mock('GET', 'me/posts', ({ query }) => page(myPosts, query, true))
 // social.ts owns `posts/:id` and 404s my ids, so index.ts loads this file first and these patterns
 // (regex, not :params) catch the mp* ids only. shortcut: only mp1 has a body and comments.
 mock('GET', 'posts/mp[0-9]+', ({ path }) => {
@@ -576,6 +613,14 @@ const received: Offer[] = [
     status: 'DECLINED',
     createdAt: on(10, 2, 15),
   }),
+  offer({
+    id: 'o8',
+    sender: { ...user('u-nuri', '누리클라우드 채용팀', '누리클라우드', '프론트엔드 포지션'), kind: 'COMPANY' as const },
+    recipient: ME_SENDER,
+    message: '프론트엔드 포지션도 열려 있어요. 백엔드와 같이 보실 생각 있으시면 이야기 나눠요.',
+    status: 'READ',
+    createdAt: on(9, 18, 10),
+  }),
 ]
 const sent: Offer[] = [
   offer({
@@ -648,14 +693,33 @@ const o1Row = (o: Offer): Offer =>
   o.id === 'o1'
     ? { ...o, message: '결제 플랫폼팀 시니어 포지션으로 가볍게 커피챗 어떠세요? 승인 API 개선하신 경험이 딱 저희 팀 고민이에요.', createdAt: ago(2 * H + 10 * 60_000) }
     : o
-const archivedAt = new Map<string, string>()
-const blockedUsers = new Map<string, string>()
+const archivedAt = new Map<string, string>([['o8', on(9, 20, 9)]])
+// People who blocked the viewer (tours switch it on with `mock=blocked-by-them`); push-be answers their messages and offers 403 BLOCKED.
+const blockedMe = new Set<string>()
+export const setBlockedByThem = (enabled: boolean) => {
+  blockedMe.clear()
+  if (enabled) ['u-jihyun', 'u4'].forEach((id) => blockedMe.add(id))
+}
+export const blockedViewer = (userId: string) => blockedMe.has(userId)
+const blockedBody = (what: string) => ({ status: 403, body: { error: { code: 'BLOCKED', message: `this user is not accepting ${what} from you` } } })
+const badRequest = (field: string, message: string) => ({
+  status: 400,
+  body: { error: { code: 'VALIDATION_ERROR', message, details: { field } } },
+})
+const blockedUsers = new Map<string, { displayName: string; createdAt: string }>([
+  ['u-blocked-jihyun', { displayName: '오지현', createdAt: on(11, 7, 9) }],
+  ['u-blocked-minjae', { displayName: '한민재', createdAt: on(10, 3, 9) }],
+])
 const otherParty = (o: Offer) => (o.sender.id === ME.id ? o.recipient.id : o.sender.id)
 mock('GET', 'me/offers', ({ query }) => {
-  const rows = (query.get('box') === 'sent' ? sent : received.map(o1Row))
-    .filter((o) => archivedAt.has(o.id) === (query.get('archived') === '1') && !blockedUsers.has(otherParty(o)))
+  const box = query.get('box')
+  if (box !== 'received' && box !== 'sent') return badRequest('box', 'must be received or sent')
+  const archived = query.get('archived')
+  if (archived !== null && archived !== '0' && archived !== '1') return badRequest('archived', 'must be 0 or 1')
+  const rows = (box === 'sent' ? sent : received.map(o1Row))
+    .filter((o) => archivedAt.has(o.id) === (archived === '1') && !blockedUsers.has(otherParty(o)))
     .map((o) => ({ ...o, archivedAt: archivedAt.get(o.id) ?? null }))
-  return page(rows, query)
+  return withTotal(rows, query, rows.length)
 })
 mock('POST', 'me/offers/:id/archive', ({ params }) => {
   const o = findOffer(params.id!)
@@ -670,17 +734,31 @@ mock('POST', 'me/offers/:id/unarchive', ({ params }) => {
   return { data: { ...o, archivedAt: null } }
 })
 mock('POST', 'me/offers/:id/report', ({ params }) => (findOffer(params.id!) ? undefined : notFound))
+const partyName = (id: string) =>
+  [...received, ...sent].flatMap((o) => [o.sender, o.recipient]).find((p) => p.id === id)?.displayName
 mock('POST', 'me/blocks', ({ body }) => {
-  blockedUsers.set((body as { userId: string }).userId, new Date().toISOString())
+  const userId = (body as { userId?: unknown } | undefined)?.userId
+  if (typeof userId !== 'string')
+    return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'userId must be a UUID', details: { field: 'userId' } } } }
+  if (userId === ME.id)
+    return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'cannot block yourself', details: { field: 'userId' } } } }
+  const displayName = partyName(userId)
+  if (!displayName) return notFound
+  // Like ON CONFLICT DO NOTHING: blocking twice keeps the first date.
+  if (!blockedUsers.has(userId)) blockedUsers.set(userId, { displayName, createdAt: new Date().toISOString() })
 })
 mock('DELETE', 'me/blocks/:userId', ({ params }) => {
   blockedUsers.delete(params.userId!)
 })
-const partyName = (id: string) =>
-  [...received, ...sent].flatMap((o) => [o.sender, o.recipient]).find((p) => p.id === id)?.displayName ?? id
-mock('GET', 'me/blocks', ({ query }) =>
-  page([...blockedUsers].map(([id, createdAt]) => ({ user: { id, displayName: partyName(id) }, createdAt })), query),
-)
+mock('GET', 'me/blocks', ({ query }) => {
+  const limit = query.get('limit')
+  if (limit && !/^[1-9]\d*$/.test(limit))
+    return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'must be a positive integer', details: { field: 'limit' } } } }
+  const rows = [...blockedUsers]
+    .sort(([ai, a], [bi, b]) => b.createdAt.localeCompare(a.createdAt) || bi.localeCompare(ai))
+    .map(([id, b]) => ({ user: { id, displayName: b.displayName }, createdAt: b.createdAt }))
+  return page(rows, new URLSearchParams({ limit: String(Math.min(Number(limit ?? 50), 100)), cursor: query.get('cursor') ?? '' }), true)
+})
 // The boards draw o1 twice: the detail (two paragraphs; its date line slices the UTC day but shows the local clock, so shift the instant until
 // both read 10월 20일 오전 1:42) and, once accepted, the thread's opening bubble (one paragraph, local day).
 const o1Opening =
@@ -695,12 +773,12 @@ mock('GET', 'me/offers/:id', ({ params }) => {
   const o = findOffer(params.id!)
   if (!o) return notFound
   // Opening a received offer marks it read (보낸 사람에게 '읽음').
-  if (o.recipient.id === 'me' && !o.readAt)
+  if (o.recipient.id === ME.id && !o.readAt)
     Object.assign(o, {
       readAt: new Date().toISOString(),
       status: o.status === 'SENT' ? 'READ' : o.status,
     })
-  return { data: o1View(o) }
+  return { data: { ...o1View(o), archivedAt: archivedAt.get(o.id) ?? null } }
 })
 // Android types ASCII only, so the tour's "Thank you" stands for the board's Korean reply (case-insensitive, like chat.ts aliases).
 const REPLY_ALIAS: Record<string, string> = { 'thank you': '제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요.' }
@@ -743,6 +821,10 @@ mock('GET', 'me/offers/:id/messages', ({ params, query }) =>
 // The 보내지 못했어요 board needs a send that fails; the tour types one of these.
 const FAILING_BODIES = ['좋아요. 그때 뵐게요!', 'fail']
 mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
+  const o = findOffer(params.id!)
+  if (!o) return notFound
+  if (o.status !== 'ACCEPTED') return { status: 409, body: { error: { code: 'CONFLICT', message: 'offer is not accepted' } } }
+  if (blockedMe.has(otherParty(o))) return blockedBody('messages')
   if (FAILING_BODIES.includes((body as { body: string }).body))
     return { status: 500, body: { error: { code: 'INTERNAL', message: '메시지를 보내지 못했어요' } } }
   const m: OfferMessage = {
@@ -753,7 +835,7 @@ mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
     createdAt: new Date().toISOString(),
   }
   ;(messages[params.id!] ??= []).push(m)
-  return { data: m }
+  return { status: 201, body: { data: m } }
 })
 
 // 설정
@@ -778,7 +860,7 @@ let settings: Settings = {
 mock('DELETE', 'me', () => null)
 mock('GET', 'auth/me', () => ({
   data: {
-    id: 'me',
+    id: MOCK_USER_ID,
     displayName: '김서준',
     locale: 'ko',
     createdAt: on(1, 5),

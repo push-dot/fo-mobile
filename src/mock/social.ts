@@ -1,13 +1,13 @@
 // Mock routes for the social area. Owned by that area's screens.
 import type { Comment, Post, PostCategory, UserRef } from '@push/api-client'
-import { mock, page } from './server'
+import { MOCK_USER_ID, mock, page } from './server'
 
 const H = 3600_000
 const at = (hoursAgo: number) => new Date(Date.now() - hoursAgo * H).toISOString()
 const img = (seed: string) => `https://picsum.photos/seed/${seed}/800/600`
 
 const user = (id: string, displayName: string): UserRef => ({ id, displayName, avatarUrl: null })
-const ME = user('me', '김서준')
+const ME = user(MOCK_USER_ID, '김서준')
 const subin = user('u-subin', '이수빈')
 const haerin = user('u-haerin', '정해린')
 const minho = user('u-minho', '강민호')

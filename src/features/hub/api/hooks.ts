@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ApiError, type JobCategory, type ProfileFilters } from '@push/api-client'
-import type { SheetFilters } from '../utils'
+import type { JobCategory, ProfileFilters } from '@push/api-client'
+import { sendOfferError, type SheetFilters } from '../utils'
 import { fetchOfferBookmarks, fetchProfile, fetchProfileCount, fetchProfileList, followProfile, sendProfileOffer, unfollowProfile } from './fetchers'
 
 export const useProfileList = (category: JobCategory[], sheet: SheetFilters) =>
@@ -20,10 +20,6 @@ export const useOfferBookmarks = (visible: boolean) =>
     queryFn: fetchOfferBookmarks,
     enabled: visible,
   })
-
-// BLOCKED: the other person blocked the viewer, so retrying cannot help and the retry advice is dropped.
-const sendOfferError = (e: unknown) =>
-  e instanceof ApiError && e.code === 'CONFLICT' ? '이미 제안을 보냈어요.' : e instanceof ApiError && e.code === 'BLOCKED' ? '제안을 보내지 못했어요.' : '제안을 보내지 못했어요. 잠시 후 다시 시도해 주세요.'
 
 export const useSendOffer = (userId: string, message: string, postingId: string | undefined, onDone: () => void, onFail: (message: string) => void) => {
   const qc = useQueryClient()
