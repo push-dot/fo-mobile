@@ -1,5 +1,5 @@
 export * from './given-name'
-export * from './tint'
+export * from './avatar-tint'
 export * from './ym-label'
 export * from './career-period'
 export * from './parse-ym'

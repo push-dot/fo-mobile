@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native'
 import { Button, Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
 import { hitSlopTo, spacing, useColors } from '@/theme'
 import { useDocument, useRenameDocument } from '../api/hooks'
-import { clipTitle, DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, titleLength } from '../utils'
+import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, typedTitle } from '../utils'
 
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 14
@@ -15,8 +15,9 @@ const DocRenameSheet = ({ id }: { id: string }) => {
   const [typed, setTyped] = useState<string>()
   const value = typed ?? doc?.title ?? ''
   const rename = useRenameDocument(doc)
+  const over = titleOver(value)
   const save = () => {
-    if (!doc || rename.isPending) return
+    if (!doc || rename.isPending || over) return
     const next = renamedTitle(doc.title, value)
     if (!next) return router.back()
     rename.mutate(next, {
@@ -35,7 +36,7 @@ const DocRenameSheet = ({ id }: { id: string }) => {
       <View style={{ marginTop: spacing[2] }}>
         <TextField
           value={value}
-          onChangeText={(t) => setTyped(clipTitle(t))}
+          onChangeText={(t) => setTyped(typedTitle(value, t))}
           placeholder={DOC_RENAME_COPY.placeholder}
           autoFocus
           focusRing
@@ -57,12 +58,12 @@ const DocRenameSheet = ({ id }: { id: string }) => {
           }
         />
       </View>
-      <Text v="c1" color="t3" style={{ alignSelf: 'flex-end', paddingRight: spacing[1] }}>
-        {titleLength(value)}/{DOC_TITLE_MAX}
+      <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingRight: spacing[1] }}>
+        {savedLength(value)}/{DOC_TITLE_MAX}
       </Text>
       <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[2] }}>
         <Button label={DOC_RENAME_COPY.cancel} variant="secondary" onPress={() => router.back()} style={{ flex: 1 }} />
-        <Button label={DOC_RENAME_COPY.save} disabled={!doc || !value.trim() || rename.isPending} onPress={save} style={{ flex: 1 }} />
+        <Button label={DOC_RENAME_COPY.save} disabled={!doc || !value.trim() || over || rename.isPending} onPress={save} style={{ flex: 1 }} />
       </View>
     </Sheet>
   )

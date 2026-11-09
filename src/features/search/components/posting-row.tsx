@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
-import { brandOf, careerLabel } from '@push/shared'
+import { brandColor, careerLabel } from '@push/shared'
 import { useToggleBookmark } from '@/features/jobs'
 import { Icon, Text } from '../../../shared/components'
 import { onAccent, radius, spacing } from '../../../theme'
@@ -19,7 +19,7 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
       }}
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], paddingHorizontal: spacing[5], paddingVertical: spacing[3] }}
     >
-      <View style={{ width: 56, height: 56, borderRadius: radius.md, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 56, height: 56, borderRadius: radius.md, backgroundColor: brandColor(p.company), alignItems: 'center', justifyContent: 'center' }}>
         <Text v="h3" weight="800" style={{ color: onAccent, fontSize: 21, lineHeight: 26 }}>
           {[...p.company][0]}
         </Text>

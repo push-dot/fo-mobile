@@ -13,5 +13,5 @@ export const createUndo = (commit: (id: string) => void, ms: number) => {
     flush()
     pending = { id, timer: setTimeout(flush, ms) }
   }
-  return { start, cancel, flush }
+  return { start, cancel, flush, busy: () => pending !== null }
 }

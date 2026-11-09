@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { onAccent } from '../../../theme'
 import { assetUrl } from '@/shared/utility'
-import { givenName, tintOf } from '../utils'
+import { givenName, avatarTint } from '../utils'
 
 const Avatar = ({
   name,
@@ -26,7 +26,7 @@ const Avatar = ({
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: tintOf(name),
+        backgroundColor: avatarTint(name),
         alignItems: 'center',
         justifyContent: 'center',
       }}

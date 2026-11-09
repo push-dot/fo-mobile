@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { fontFor, spacing, useColors } from '@/theme'
 import { Glass, GlassButton, Icon3D, Text, useKeyboardHeight } from '@/shared/components'
@@ -8,14 +8,17 @@ import { ComposerArea, ConsentSheet, QUICK_STARTS, quickStartPath, sidebarPath, 
 
 
 // iOS draws the 56pt glyph 9pt above the centre of its line box (measured on the simulator); the board centres the ink.
+// The glyph grows with the system text size, so the drop is scaled by fontScale.
 const MARK_INK_DROP = 18
 
 const ChatHomeScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const start = useStartChat()
+  const { fontScale } = useWindowDimensions()
   const [typing, setTyping] = useState(false)
-  // The floating iOS tab bar is inside the inset; the design keeps the composer a step above it.
+  // The board seats the composer at tabH + 10 from the bottom (iOS tabH 94). Inside NativeTabs the iOS bottom inset
+  // already covers the floating tab bar and ends 20pt short of that (84 on the gate iPhone), so 20 more lands on tabH + 10.
   const lift = Platform.OS === 'ios' && insets.bottom > 0 ? spacing[5] : 0
   // The keyboard covers the inset below the composer, so it is dropped while the keyboard is up.
   const keyboard = useKeyboardHeight()
@@ -27,7 +30,7 @@ const ChatHomeScreen = () => {
       </View>
       {/* The board centres the mark between the status bar and 6pt above the chips: up under the 56pt header, down 10pt into the chip row's top padding. */}
       <View style={{ flex: 1, marginTop: -56, marginBottom: -10, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none" accessibilityElementsHidden>
-        <Text style={{ fontSize: 56, lineHeight: 60, letterSpacing: -2.8, ...fontFor('800'), color: c.t1, opacity: typing ? 0 : 0.12, paddingTop: Platform.OS === 'ios' ? MARK_INK_DROP : 0 }}>
+        <Text style={{ fontSize: 56, lineHeight: 60, letterSpacing: -2.8, ...fontFor('800'), color: c.t1, opacity: typing ? 0 : 0.12, paddingTop: Platform.OS === 'ios' ? MARK_INK_DROP * fontScale : 0 }}>
           Push<Text style={{ fontSize: 56, lineHeight: 60, ...fontFor('800'), color: c.ac }}>.</Text>
         </Text>
       </View>

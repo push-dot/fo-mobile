@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
-import { brandOf, cardCareerLabel } from '@push/shared'
+import { brandColor, cardCareerLabel } from '@push/shared'
 import { hitSlopTo, palette, photo, radius, useColors } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
@@ -20,7 +20,7 @@ type Props = {
 
 const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
   const c = useColors()
-  const brand = brandOf(p.company)
+  const brand = brandColor(p.company)
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} style={{ width, gap: 10 }}>
       <View style={{ height: Math.round((width * 136) / 200), borderRadius: radius.md, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>

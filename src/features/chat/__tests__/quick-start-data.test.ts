@@ -1,10 +1,11 @@
 import type { Application, Offer, Posting, Profile } from '@push/api-client'
+import { brandColor } from '@push/shared'
 import { describe, expect, it, vi } from 'vitest'
 import { docMeta, initialPicks, postingMeta, quickStartFrom } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')
-  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, tintOf: utils.tintOf }
+  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo, avatarTint: utils.avatarTint }
 })
 
 const now = new Date('2026-10-21T09:00:00')
@@ -17,6 +18,8 @@ describe('quickStartFrom (real mode)', () => {
     const bookmarks = [posting('a', '2026-10-30'), posting('b', '2026-10-23'), posting('c', '2026-10-20'), posting('d', null)]
     const fit = quickStartFrom('fit', { bookmarks, doc: '이력서.pdf' }, now)
     expect(fit.doc).toBe('이력서.pdf')
+    // Same company colour as the job cards and the WebView, not the person-avatar tint.
+    expect(fit.items[0]!.logo!.color).toBe(brandColor('모아페이'))
     expect(fit.items.map((i) => [i.id, i.over, !!i.selected])).toEqual([['a', '모아페이', true], ['b', '모아페이', false], ['c', '모아페이', false], ['d', '모아페이', false]])
     expect(quickStartFrom('deadline', { bookmarks }, now).items.map((i) => [i.id, i.badge])).toEqual([['b', { label: 'D-2', tone: 'red' }]])
   })

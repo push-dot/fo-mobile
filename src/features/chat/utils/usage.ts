@@ -13,6 +13,13 @@ const CREDITS = { id: 'credits', label: '크레딧 구매', variant: 'primary' }
 export const usageExhausted = (plan: string | undefined, paymentsOpen = true) =>
   plan === undefined ? { body: BARE_BODY, actions: [] } : !paymentsOpen ? { body: CLOSED_BODY, actions: [] } : plan === 'ULTRA' ? { body: ULTRA_BODY, actions: [CREDITS] } : { body: FREE_BODY, actions: [PLAN, CREDITS] }
 
+const PLAN_OPEN = '요금제를 올리면 쓸 수 있어요.'
+const PLAN_CLOSED = '지금 요금제에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.'
+const PLAN_BARE = '지금 요금제에서는 쓸 수 없어요.'
+
+/** PLAN_REQUIRED line, in the same three states as usageExhausted. */
+export const planRequired = (plan: string | undefined, paymentsOpen = true) => (plan === undefined ? PLAN_BARE : !paymentsOpen ? PLAN_CLOSED : PLAN_OPEN)
+
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)

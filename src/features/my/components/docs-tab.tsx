@@ -47,7 +47,7 @@ const DocRow = ({ doc }: { doc: MySource }) => {
           </Text>
           {reading && !failed ? <Spinner /> : null}
           {reading || failed ? (
-            <Text v="c1" weight="600" color={failed ? 'red' : 'acText'}>
+            <Text v="c1" weight="700" color={failed ? 'red' : 'acText'}>
               {failed ? INGEST_TEXT.failed : INGEST_TEXT.reading}
             </Text>
           ) : null}

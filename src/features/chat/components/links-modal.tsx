@@ -2,7 +2,7 @@ import type { LinkKind, UserLink } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
-import { brandOf } from '@push/shared'
+import { brandColor } from '@push/shared'
 import { onAccent, spacing, tile } from '@/theme'
 import { Badge, Button, Chip, GlassButton, Icon, Menu, Text, askConfirm, showToast, type BadgeTone, type IconName } from '@/shared/components'
 import { copyText, openUrl } from '@/shared/infrastructure'
@@ -26,7 +26,7 @@ const GROUPS: { title: string; kinds: LinkKind[] }[] = [
 const TILE_ICON: Record<LinkKind, IconName | undefined> = { job: 'brief', github: undefined, portfolio: 'folder', blog: 'doc', other: 'link' }
 const KIND_TILE: Record<Exclude<LinkKind, 'job'>, string> = { github: tile.github, portfolio: tile.violet, blog: tile.cyan, other: tile.slate }
 // Job tiles take the company's seed color (title is "회사 · 제목"); other kinds one color per kind.
-const tileColor = (l: UserLink) => (l.kind === 'job' ? brandOf(l.title.split(' · ')[0]!) : KIND_TILE[l.kind])
+const tileColor = (l: UserLink) => (l.kind === 'job' ? brandColor(l.title.split(' · ')[0]!) : KIND_TILE[l.kind])
 
 const bare = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 

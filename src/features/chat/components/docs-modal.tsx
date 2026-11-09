@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
-import { deleteDocCopy, useRemoveSource } from '@/features/my'
+import { deleteDocCopy, deleteWithUndo, usePendingDelete } from '@/features/my'
 import { Button, GlassButton, Icon, Menu, Text, askConfirm } from '@/shared/components'
 import { spacing } from '../../../theme'
 import { type ChatDoc } from '../api/schemas'
@@ -18,13 +18,14 @@ const meta = (d: ChatDoc) => (d.aiMade ? docAiSub(ago(d.createdAt)) : `${size(d.
 export const DocsModal = () => {
   const docs = useChatDocs()
   const upload = useUploadChatDoc()
-  const remove = useRemoveSource(() => {})
+  const hidden = usePendingDelete((st) => st.hidden)
   const leave = useLeaveSidebar()
   const ask = (d: ChatDoc) => {
     const copy = deleteDocCopy(d.fileName)
-    askConfirm({ ...copy, danger: true, onConfirm: () => remove.mutate(d.id) })
+    askConfirm({ ...copy, danger: true, onConfirm: () => deleteWithUndo(d) })
   }
-  const empty = !!docs.data && docs.data.length === 0
+  const list = docs.data?.filter((d) => !hidden.includes(d.id))
+  const empty = !!list && list.length === 0
   return (
     <PageModal title="내 서류" right={<GlassButton actions={[{ icon: 'plus', label: '서류 올리기', onPress: () => upload.mutate() }]} />}>
       {empty ? (
@@ -38,9 +39,9 @@ export const DocsModal = () => {
           </View>
         </PageEmpty>
       ) : null}
-      {docs.data?.length ? (
+      {list?.length ? (
         <View>
-          {docs.data.map((d) => (
+          {list.map((d) => (
             <View key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing[5] }}>
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text v="b1" weight="700" numberOfLines={1}>

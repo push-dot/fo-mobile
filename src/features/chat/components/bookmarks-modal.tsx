@@ -1,5 +1,5 @@
 import type { Posting } from '@push/api-client'
-import { brandOf, careerLabel } from '@push/shared'
+import { brandColor, careerLabel } from '@push/shared'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -13,9 +13,6 @@ import Mark from './mark'
 import Note from './note'
 import PageModal, { PageEmpty } from './page-modal'
 
-
-// Same company colour as JobCard so a company looks the same across screens.
-export const logoColor = brandOf
 
 const soon = (p: Posting) => !!p.deadline && new Date(p.deadline).getTime() - Date.now() < 7 * 86_400_000
 
@@ -63,7 +60,7 @@ export const BookmarksModal = () => {
               ]}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], paddingVertical: spacing[3], paddingHorizontal: spacing[5] }}>
-                <Mark text={p.company.slice(0, 1)} color={logoColor(p.company)} size={56} />
+                <Mark text={p.company.slice(0, 1)} color={brandColor(p.company)} size={56} />
                 <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
                   <Text v="c1" weight="600" color="t3">
                     {p.company}

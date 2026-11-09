@@ -1,7 +1,7 @@
 import type { AccessMode, ChatIntent } from '@push/api-client'
 import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
-import { usageExhausted } from './utils/usage'
+import { planRequired, usageExhausted } from './utils/usage'
 
 // Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.
 export const SPRING = [0.2, 0.9, 0.25, 1] as const
@@ -46,7 +46,7 @@ const USAGE_BODY = usageExhausted('FREE').body
 export const ERROR_TEXT: Record<string, string> = {
   FEATURE_DISABLED: USAGE_BODY,
   INSUFFICIENT_CREDITS: USAGE_BODY,
-  PLAN_REQUIRED: '요금제를 올리면 쓸 수 있어요.',
+  PLAN_REQUIRED: planRequired('FREE'),
   QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
   APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',

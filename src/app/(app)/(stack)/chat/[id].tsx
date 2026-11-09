@@ -3,7 +3,7 @@ import ConversationScreen from '@/screens/chat/conversation-screen'
 
 const Conversation = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
-  // key: switching conversations from the drawer resets screen state.
+  // key: switching conversations from the sidebar resets screen state.
   return <ConversationScreen key={id} id={id} />
 }
 

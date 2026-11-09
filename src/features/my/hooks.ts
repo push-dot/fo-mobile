@@ -36,7 +36,7 @@ export const deleteConfirm = (doc: { fileName: string }, onConfirm: () => void):
 export const useUndoRemove = (onStart?: () => void) => {
   const hidden = usePendingDelete((st) => st.hidden)
   const confirm = (doc: { id: string; fileName: string }) => {
-    deleteWithUndo(doc)
+    deleteWithUndo(doc, TOAST_ABOVE.tabs)
     onStart?.()
   }
   useSheetHandoff(useDocDelete((st) => st.doc), () => useDocDelete.setState({ doc: null }), confirm, 0)

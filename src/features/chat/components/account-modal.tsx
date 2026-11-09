@@ -5,7 +5,7 @@ import { radius, selectedRing, spacing, useColors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { type Account } from '../api/schemas'
-import { TONES, tintOf, useMySettings, useUpdateSettings } from '@/features/my'
+import { TONES, avatarTint, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
 import { useLeaveSidebar } from '../hooks'
 import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
@@ -108,7 +108,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
   return (
     <>
       <View style={{ alignItems: 'center', gap: spacing[2], paddingTop: spacing[2], paddingHorizontal: spacing[5], paddingBottom: spacing[1] }}>
-        <Mark text={me.given} color={tintOf(me.name)} size={76} round />
+        <Mark text={me.given} color={avatarTint(me.name)} size={76} round />
         <Text v="h2" style={{ marginTop: 6 }}>
           {me.name}
         </Text>
@@ -165,7 +165,7 @@ const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[n
       style={[{ borderRadius: radius.card, padding: spacing[4] - ring.borderWidth, gap: spacing[2], backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }, current && ring]}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-        <Text v="h3" weight="800">
+        <Text v="h3">
           {plan.key}
         </Text>
         {current ? <Badge label="지금 쓰는 중" tone="ac" /> : plan.key === 'ULTRA' ? <Badge label="추천" /> : null}

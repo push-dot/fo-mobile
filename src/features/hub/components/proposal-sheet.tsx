@@ -1,4 +1,4 @@
-import { brandOf } from '@push/shared'
+import { brandColor } from '@push/shared'
 import { Platform, ScrollView, View } from 'react-native'
 import { Chip, GlassButton, Text, TextField } from '../../../shared/components'
 import { spacing, useColors } from '../../../theme'
@@ -68,7 +68,7 @@ const ProposalSheet = ({ userId, name, subtitle, message, postingId, postings, e
                 check
                 label={`${p.company} · ${p.title}`}
                 lead={
-                  <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandOf(p.company), alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandColor(p.company), alignItems: 'center', justifyContent: 'center' }}>
                     <Text weight="700" style={{ color: c.card }}>
                       {[...p.company][0]}
                     </Text>

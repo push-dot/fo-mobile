@@ -7,7 +7,7 @@ import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../api/hooks'
 import { usePop, usePulse } from '../hooks'
-import { isUsageExhausted } from '../utils/usage'
+import { isUsageExhausted, planRequired } from '../utils/usage'
 import { formatElapsed } from '../utils/reducer'
 import { isVerdictPlan } from '../utils/stream-v3'
 import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
@@ -769,17 +769,29 @@ export const Item = ({
     case 'error':
       return isUsageExhausted(item.code) && onUsage ? (
         <UsageExhausted onPlan={() => onUsage('plan')} onCredits={() => onUsage('credits')} />
+      ) : item.code === 'PLAN_REQUIRED' ? (
+        <PlanRequired />
       ) : (
-        <Appear style={{ flexDirection: 'row', gap: spacing[2] }}>
-          <Text v="c1" weight="800" color="red">
-            !
-          </Text>
-          <Text v="c1" color="red" style={{ flex: 1 }}>
-            {item.text}
-          </Text>
-        </Appear>
+        <ErrorLine text={item.text} />
       )
   }
+}
+
+const ErrorLine = ({ text }: { text: string }) => (
+  <Appear style={{ flexDirection: 'row', gap: spacing[2] }}>
+    <Text v="c1" weight="800" color="red">
+      !
+    </Text>
+    <Text v="c1" color="red" style={{ flex: 1 }}>
+      {text}
+    </Text>
+  </Appear>
+)
+
+// Read at render: payments can close or the account can load after the error arrived.
+const PlanRequired = () => {
+  const account = useChatAccount(true).data
+  return <ErrorLine text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
 /** Dashed "대기 중" chip for messages sent while the agent works. */

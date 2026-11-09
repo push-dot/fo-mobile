@@ -23,6 +23,7 @@ export const EVENT_TYPES: { key: CalendarEventType; label: string }[] = [
   { key: 'CUSTOM', label: '직접 추가' },
 ]
 
+// Person avatars only (avatarTint).
 export const TINTS = [tile.indigo, tile.cyan, tile.violet, tile.orange, tile.green, tile.navy, tile.rose, tile.blueDeep]
 
 // shortcut: static list; replace with a skills endpoint if push-be adds one.

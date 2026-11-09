@@ -336,17 +336,6 @@ export const useResumeDraft = (id: string) =>
     queryFn: () => myApi.resumeDraft(id),
   })
 
-export const useRemoveSource = (onRemoved: () => void) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => myApi.remove(id),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
-      onRemoved()
-    },
-  })
-}
-
 export const useApplyResumeProfile = (onDone: () => void) => {
   const qc = useQueryClient()
   return useMutation({

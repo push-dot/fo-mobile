@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { brandOf } from '@push/shared'
+import { brandColor } from '@push/shared'
 import { Alert, Platform, Pressable, ScrollView, View, useWindowDimensions, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MAX_BYTES, SIZE_LIMIT, type PickedFile } from '@/features/my'
@@ -157,9 +157,9 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                       onPress={() => onPick(m)}
                       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 10, borderRadius: radius.sm, backgroundColor: m.id === firstId || pressed ? c.fill : 'transparent' })}
                     >
-                      {m.kind === 'job' ? <Mark text={m.tag ?? ''} color={brandOf(m.tag ?? '')} size={36} /> : null}
+                      {m.kind === 'job' ? <Mark text={m.tag ?? ''} color={brandColor(m.tag ?? '')} size={36} /> : null}
                       {m.kind === 'link' ? (
-                        <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: brandOf(m.title), alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: brandColor(m.title), alignItems: 'center', justifyContent: 'center' }}>
                           <Icon name="brief" size={18} color={onAccent} />
                         </View>
                       ) : null}

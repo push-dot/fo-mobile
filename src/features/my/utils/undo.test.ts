@@ -57,4 +57,13 @@ describe('createUndo', () => {
     expect(commit).toHaveBeenLastCalledWith('b')
     expect(commit).toHaveBeenCalledTimes(2)
   })
+
+  it('is busy only while a window is open', () => {
+    const undo = createUndo(vi.fn(), 5000)
+    expect(undo.busy()).toBe(false)
+    undo.start('a')
+    expect(undo.busy()).toBe(true)
+    vi.advanceTimersByTime(5000)
+    expect(undo.busy()).toBe(false)
+  })
 })

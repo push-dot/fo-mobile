@@ -1,7 +1,7 @@
+import { brandColor } from '@push/shared'
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { onAccent, radius } from '../../../theme'
-import { tintOf } from '../utils'
 
 const LOGO_RADIUS: Record<number, number> = { 44: 14, 48: 15, 56: 16 }
 
@@ -12,7 +12,7 @@ const Logo = ({ name, size = 48 }: { name: string; size?: number }) => {
         width: size,
         height: size,
         borderRadius: LOGO_RADIUS[size] ?? radius.sm,
-        backgroundColor: tintOf(name),
+        backgroundColor: brandColor(name),
         alignItems: 'center',
         justifyContent: 'center',
       }}

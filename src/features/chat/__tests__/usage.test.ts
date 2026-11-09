@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { paymentsOpen } from '../../billing/utils/settle'
 import { ERROR_TEXT } from '../constants'
-import { composerPlaceholder, isUsageExhausted, usageExhausted } from '../utils/usage'
+import { composerPlaceholder, isUsageExhausted, planRequired, usageExhausted } from '../utils/usage'
 import type { ChatItem } from '../types'
 
 const FREE_BODY = '이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.'
@@ -80,5 +80,11 @@ describe('composerPlaceholder', () => {
 
   it('lets the person talk while the agent works', () => {
     expect(run([user], true)).toBe('작업 중에도 말할 수 있어요')
+  })
+
+  it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
+    expect(planRequired('FREE', true)).toBe('요금제를 올리면 쓸 수 있어요.')
+    expect(planRequired('FREE', false)).toBe('지금 요금제에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')
+    expect(planRequired(undefined, false)).toBe('지금 요금제에서는 쓸 수 없어요.')
   })
 })

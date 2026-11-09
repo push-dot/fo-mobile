@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { NATIVE_FONTS } from '@/theme/fonts'
-import { type } from '@/theme/tokens'
+import { palette, type } from '@/theme/tokens'
 import { find, findAll } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
@@ -54,6 +54,8 @@ describe('menu items (iOS)', () => {
       ['삭제하기', undefined, 'destructive'],
       ['최신순', 'checkmark', undefined],
     ])
+    // The host tint (t1) would paint the destructive icon too; the boards draw it red like the label.
+    expect(buttons.map((b) => b.props.modifiers)).toEqual([undefined, [{ name: 'tint', arg: palette.light.red }], undefined])
     ;(buttons[1]!.props.onPress as () => void)()
     expect(actions[1]!.onPress).toHaveBeenCalled()
   })

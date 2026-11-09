@@ -6,11 +6,13 @@ const invalidateQueries = vi.hoisted(() => vi.fn())
 const showToast = vi.hoisted(() => vi.fn())
 vi.mock('./api', () => ({ myApi: { remove } }))
 vi.mock('@/providers/query-client', () => ({ queryClient: { invalidateQueries } }))
-vi.mock('@/shared/components', () => ({ showToast, TOAST_ABOVE: { tabs: 74 } }))
+vi.mock('@/shared/components', () => ({ showToast }))
 
 const { deleteWithUndo, usePendingDelete } = await import('./stores')
 
 const doc = { id: 's1', fileName: '이력서.pdf' }
+const other = { id: 's2', fileName: '경력기술서.docx' }
+const lastToast = () => showToast.mock.lastCall?.[0]
 const tapUndo = () => showToast.mock.lastCall?.[0].action.onPress()
 
 beforeEach(() => {
@@ -64,7 +66,7 @@ describe('deleteWithUndo', () => {
 
   it('shows the failure toast whose 다시 시도 deletes again', async () => {
     remove.mockRejectedValueOnce(new Error('offline'))
-    deleteWithUndo(doc)
+    deleteWithUndo(doc, 74)
     await vi.runAllTimersAsync()
     const toast = showToast.mock.lastCall?.[0]
     expect(toast).toMatchObject({ message: '서류를 삭제하지 못했어요', alert: true, opaque: true, bottom: 74 })
@@ -72,5 +74,32 @@ describe('deleteWithUndo', () => {
     await vi.runAllTimersAsync()
     expect(remove).toHaveBeenCalledTimes(2)
     expect(invalidateQueries).toHaveBeenCalledOnce()
+  })
+
+  it("keeps the next doc's 되돌리기 on screen when the earlier delete fails, then shows the failure", async () => {
+    remove.mockRejectedValueOnce(new Error('offline'))
+    deleteWithUndo(doc)
+    deleteWithUndo(other)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(remove).toHaveBeenCalledExactlyOnceWith('s1')
+    expect(lastToast()).toMatchObject({ message: '서류를 삭제했어요', action: { label: '되돌리기' } })
+    lastToast().action.onPress()
+    expect(lastToast()).toMatchObject({ message: '서류를 삭제하지 못했어요', alert: true })
+    expect(usePendingDelete.getState().hidden).toEqual([])
+    lastToast().action.onPress()
+    await vi.runAllTimersAsync()
+    expect(remove).toHaveBeenLastCalledWith('s1')
+    expect(remove).toHaveBeenCalledTimes(2)
+  })
+
+  it('shows a held failure once the next undo window ends', async () => {
+    remove.mockRejectedValueOnce(new Error('offline'))
+    deleteWithUndo(doc)
+    deleteWithUndo(other)
+    await vi.advanceTimersByTimeAsync(UNDO_MS - 1)
+    expect(lastToast().action.label).toBe('되돌리기')
+    await vi.advanceTimersByTimeAsync(1)
+    expect(lastToast()).toMatchObject({ message: '서류를 삭제하지 못했어요' })
+    expect(remove).toHaveBeenCalledTimes(2)
   })
 })
