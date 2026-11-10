@@ -38,7 +38,13 @@ const TermsScreen = () => {
     if (!held) router.replace('/sign-in')
   }, [held])
 
-  useEffect(() => () => useTermsConsent.getState().reset(), [])
+  useEffect(
+    () => () => {
+      useTermsConsent.getState().reset()
+      if (usePhoneAuth.getState().held) clear()
+    },
+    [clear],
+  )
 
   const opening = useRef(false)
   useFocusEffect(
@@ -46,6 +52,11 @@ const TermsScreen = () => {
       opening.current = false
     }, []),
   )
+  const leave = () => {
+    if (held) clear()
+    router.back()
+  }
+
   const openTerm = (term: string) => {
     if (opening.current) return
     opening.current = true
@@ -69,7 +80,7 @@ const TermsScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar onBack={leave} />
       <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
         <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
           {TERMS_TITLE}

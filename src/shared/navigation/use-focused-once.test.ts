@@ -16,6 +16,7 @@ vi.mock('@/screens/home/home-screen', () => ({ default: 'HomeScreen' }))
 vi.mock('@/screens/hub/hub-screen', () => ({ default: 'HubScreen' }))
 vi.mock('@/screens/social/social-screen', () => ({ default: 'SocialScreen' }))
 vi.mock('@/screens/my/my-screen', () => ({ default: 'MyScreen' }))
+vi.mock('@/screens/chat/chat-home-screen', () => ({ default: 'ChatHomeScreen' }))
 
 const { Stack } = await import('expo-router')
 const { useFocusedOnce } = await import('./use-focused-once')
@@ -25,6 +26,7 @@ const tabs = await Promise.all(
     ['(hub)', 'hub', 'HubScreen'],
     ['(social)', 'social', 'SocialScreen'],
     ['(my)', 'my', 'MyScreen'],
+    ['(chat)', 'chat', 'ChatHomeScreen'],
   ].map(async ([group, root, screen]) => ({
     group,
     screen,

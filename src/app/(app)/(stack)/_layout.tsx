@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router'
-import { Platform } from 'react-native'
+import { Platform, View } from 'react-native'
+import { ConsentPromptListener } from '@/features/chat'
 import { FULL_SHEET_KIND } from '@/features/jobs'
 import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
@@ -10,7 +11,9 @@ export const unstable_settings = { initialRouteName: '(tabs)' }
 const SignedInStack = () => {
   const c = useColors()
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <View style={{ flex: 1 }}>
+      <ConsentPromptListener />
+      <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="chat/[id]" />
       <Stack.Screen name="postings/[id]" />
@@ -63,6 +66,7 @@ const SignedInStack = () => {
       <Stack.Screen name="docs/[id]/more" options={sheetOptions(c)} />
       <Stack.Screen name="offers/[id]/reply" options={sheetOptions(c)} />
     </Stack>
+    </View>
   )
 }
 

@@ -2,6 +2,7 @@ import { createApi, createClient } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
 import { API_BASE_URL } from './config'
+import { isRefreshAuthFailure } from './refresh-auth-failure'
 import { useSession } from './session-store'
 
 // The flag is read inline, not from config, so Metro folds it and production bundles leave the mock out.
@@ -11,17 +12,27 @@ const mockFetch: typeof fetch | undefined = MOCK ? require('../../mock').mockFet
 if (MOCK) require('../../mock/links').listenMockLinks()
 /* eslint-enable @typescript-eslint/no-require-imports */
 
+const clientFetch = mockFetch ?? (expoFetch as unknown as typeof fetch)
+const clientConfig = {
+  baseUrl: API_BASE_URL,
+  getToken: () => useSession.getState().session?.accessToken,
+  fetch: clientFetch,
+  uuid: () => Crypto.randomUUID(),
+}
+
 let refreshing: Promise<boolean> | null = null
 
-const refresh = () => {
+const refreshApi = createApi(createClient(clientConfig))
+
+export const refreshSession = () => {
   refreshing ??= (async () => {
     const { session, set } = useSession.getState()
     if (!session?.refreshToken) return false
     try {
-      await set(await api.auth.refresh(session.refreshToken))
+      await set(await refreshApi.auth.refresh(session.refreshToken))
       return true
-    } catch {
-      await set(null)
+    } catch (error) {
+      if (isRefreshAuthFailure(error)) await set(null)
       return false
     } finally {
       refreshing = null
@@ -30,12 +41,6 @@ const refresh = () => {
   return refreshing
 }
 
-export const http = createClient({
-  baseUrl: API_BASE_URL,
-  getToken: () => useSession.getState().session?.accessToken,
-  refresh,
-  fetch: mockFetch ?? (expoFetch as unknown as typeof fetch),
-  uuid: () => Crypto.randomUUID(),
-})
+export const http = createClient({ ...clientConfig, refresh: refreshSession })
 
 export const api = createApi(http)
