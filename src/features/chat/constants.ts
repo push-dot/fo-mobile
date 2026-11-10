@@ -52,6 +52,15 @@ export const ERROR_TEXT: Record<string, string> = {
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
   NOT_CONFIGURED: '지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
 }
+export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
+// push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
+export const billingLockedText = (sec: number) => `결제 정보를 정리하고 있어요. ${sec}초 뒤에 다시 보내 주세요.`
+/** QUEUE_BUSY copy. reason BILLING_LOCKED uses the web billing line when a retry delay is known. */
+export const queueBusyMessage = (retryAfterSec?: number, reason?: unknown) => {
+  if (retryAfterSec && reason === 'BILLING_LOCKED') return billingLockedText(retryAfterSec)
+  if (retryAfterSec) return queueBusyText(retryAfterSec)
+  return ERROR_TEXT.QUEUE_BUSY
+}
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
 
@@ -80,7 +89,6 @@ export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요
 export const CONSENT_TOGGLE = '참고 데이터 제공'
 export const CONSENT_TOGGLE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
 export const CONSENT_TOGGLE_NOTE = '끄면 에이전트를 쓸 수 없어요.'
-export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 

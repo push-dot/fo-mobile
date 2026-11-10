@@ -21,22 +21,39 @@ export type Toast = ToastInput & { id: number }
 export const toastOffsets = (tabBar: number) => ({ tabs: tabBar + 14, docsError: tabBar + 150, cta: 92 }) as const
 
 type OpenSheet = { id: string; height: number }
-type State = { current: Toast | null; hosts: string[]; sheets: OpenSheet[] }
+type State = { current: Toast | null; queued: Toast[]; hosts: string[]; sheets: OpenSheet[] }
 
-export const useToastStore = create<State>(() => ({ current: null, hosts: [], sheets: [] }))
+export const useToastStore = create<State>(() => ({ current: null, queued: [], hosts: [], sheets: [] }))
 
 let seq = 0
 
-export const showToast = (toast: ToastInput) => useToastStore.setState({ current: { ...toast, id: ++seq } })
+/** A live 되돌리기 toast: it has an action and is not itself a failure. */
+const keepsUndo = (toast: ToastInput) => !!toast.action && toast.tone !== 'error' && !toast.alert
 
-export const hideToast = (id: number) => useToastStore.setState((s) => (s.current?.id === id ? { current: null } : s))
+const failureToast = (toast: ToastInput) => toast.tone === 'error' || !!toast.alert
+
+export const showToast = (toast: ToastInput) => {
+  const next = { ...toast, id: ++seq }
+  useToastStore.setState((s) => {
+    // A failure must not take the place of a live 되돌리기 toast: the undo would be lost. It waits, then shows.
+    if (s.current && keepsUndo(s.current) && failureToast(toast)) return { queued: [...s.queued, next] }
+    return { current: next }
+  })
+}
+
+export const hideToast = (id: number) =>
+  useToastStore.setState((s) => {
+    if (s.current?.id !== id) return s
+    const [next, ...queued] = s.queued
+    return { current: next ?? null, queued }
+  })
 
 const putSheet = (sheets: OpenSheet[], id: string, height?: number) =>
   sheets.some((x) => x.id === id) ? sheets.map((x) => (x.id === id && height !== undefined ? { id, height } : x)) : [...sheets, { id, height: height ?? 0 }]
 
 /** Android (ToastSheetAndroid): an opening sheet clears the toast, and a toast shown while it is open floats above its top. */
 export const mountSheet = (id: string) => {
-  useToastStore.setState((s) => ({ current: null, sheets: putSheet(s.sheets, id) }))
+  useToastStore.setState((s) => ({ current: null, queued: [], sheets: putSheet(s.sheets, id) }))
   return () => useToastStore.setState((s) => ({ sheets: s.sheets.filter((x) => x.id !== id) }))
 }
 

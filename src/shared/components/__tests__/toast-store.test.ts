@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { activeToastHost, hideToast, mountSheet, mountToastHost, showToast, sizeSheet, topSheet, toastDuration, toastOffsets, useToastStore } from '../toast-store'
 
-beforeEach(() => useToastStore.setState({ current: null, hosts: [], sheets: [] }))
+beforeEach(() => useToastStore.setState({ current: null, queued: [], hosts: [], sheets: [] }))
 
 describe('toast store', () => {
   it('shows the newest toast in place of the current one', () => {
@@ -34,6 +34,15 @@ describe('toast store', () => {
     expect(topSheet(useToastStore.getState())).toBe(240)
     closeLower()
     expect(topSheet(useToastStore.getState())).toBe(0)
+  })
+
+  it('keeps a live 되돌리기 toast when a failure toast arrives', () => {
+    showToast({ message: '서류를 삭제했어요', action: { label: '되돌리기', onPress: vi.fn() } })
+    const undo = useToastStore.getState().current!
+    showToast({ message: '서류를 삭제하지 못했어요', tone: 'error', alert: true })
+    expect(useToastStore.getState().current).toMatchObject({ id: undo.id, message: '서류를 삭제했어요', action: { label: '되돌리기' } })
+    hideToast(undo.id)
+    expect(useToastStore.getState().current).toMatchObject({ message: '서류를 삭제하지 못했어요', tone: 'error' })
   })
 
   it('keeps an undo toast up longer than a plain one', () => {

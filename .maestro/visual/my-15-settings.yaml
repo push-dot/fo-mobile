@@ -27,6 +27,11 @@ tags:
     point: "10%,50%"
 - waitForAnimationToEnd
 
+# 혜택·이벤트 알림 stays in the list (the consent row is legally required) and pushes 커리어 상태 below the fold.
+- scrollUntilVisible:
+    element: "커리어 상태.*"
+    direction: DOWN
+    centerElement: true
 - tapOn: "커리어 상태.*"
 - extendedWaitUntil:
     visible: ".*커리어 상태를 누가 볼 수 있는지.*"

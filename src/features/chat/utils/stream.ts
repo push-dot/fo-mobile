@@ -8,14 +8,17 @@ import {
   MULTI_PICK_FOOT,
   MULTI_PICK_SUBMIT,
   PICK_HINT,
-  queueBusyText,
+  queueBusyMessage,
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
 import { resultTask } from './result-card'
 import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
-export const errorText = (code?: string, retryAfterSec?: number) =>
-  code === 'QUEUE_BUSY' && retryAfterSec ? queueBusyText(retryAfterSec) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
+const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
+  value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
+
+export const errorText = (code?: string, retryAfterSec?: number, reason?: unknown) =>
+  code === 'QUEUE_BUSY' ? queueBusyMessage(retryAfterSec, reason) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
 type Ask = { id: string; question: string; options: StreamOption[]; multiple?: boolean; warning?: string; hint?: boolean; recommended?: string }
 
@@ -160,8 +163,12 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
       return [{ type: 'diff', id: `diff-${ev.revisionId}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }]
     case 'fit':
       return [fitOf(ev)]
-    case 'error':
-      return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code), code: ev.error.code }]
+    case 'error': {
+      const details = detailRecord(ev.error.details)
+      const retry = details?.retryAfterSec
+      const sec = typeof retry === 'number' ? retry : undefined
+      return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code, sec, details?.reason), code: ev.error.code }]
+    }
     case 'cancelled':
       return [{ type: 'stop' }]
     case 'done':

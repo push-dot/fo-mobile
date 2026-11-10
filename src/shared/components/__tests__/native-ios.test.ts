@@ -26,8 +26,8 @@ const actions = [
 ]
 
 describe('SegmentedControl (iOS)', () => {
-  it('sets the 600 label face on every UISegmentedControl', () => {
-    expect(setSegmentedTitleFont).toHaveBeenCalledWith(NATIVE_FONTS[type.segLabel.weight], type.segLabel.fontSize)
+  it('sets the 600 label face and the normal-state t3 grey on every UISegmentedControl', () => {
+    expect(setSegmentedTitleFont).toHaveBeenCalledWith(NATIVE_FONTS[type.segLabel.weight], type.segLabel.fontSize, palette.light.t3, palette.dark.t3)
   })
 
   it('renders a SwiftUI segmented picker tagged by item key', () => {

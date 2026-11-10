@@ -189,6 +189,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label={BLOCKED_COPY.title}
           value={blockedCount(blocked.data?.page.total)}
+          accent
           onPress={() => router.push('/settings/blocked')}
         />
       </SettingsGroup>

@@ -11,13 +11,15 @@ type RowProps = {
   onPress?: () => void
   right?: ReactNode
   danger?: boolean
+  /** Accent label (acText, 700). Used for 차단한 사람. */
+  accent?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger }: RowProps) => {
+const SettingsRow = ({ label, sub, value, onPress, right, danger, accent }: RowProps) => {
   const body = (
     <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2] }}>
       <View style={{ flex: 1 }}>
-        <Text v="b1" color={danger ? 'red' : 't1'} style={{ lineHeight: type.b2.lineHeight }}>
+        <Text v="b1" color={danger ? 'red' : accent ? 'acText' : 't1'} weight={accent ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
           {label}
         </Text>
         {sub ? (
