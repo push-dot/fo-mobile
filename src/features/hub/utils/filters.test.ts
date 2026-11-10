@@ -3,7 +3,7 @@ import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profil
 
 describe('hub filters', () => {
   it('buckets tenure years', () => {
-    expect([0, 2, 3, 5, 6, 9, 10, 15].map(tenureOf)).toEqual(['0-2', '0-2', '3-5', '3-5', '6-9', '6-9', '10+', '10+'])
+    expect([0, 1, 2, 3, 5, 6, 9, 10, 15].map(tenureOf)).toEqual(['0', '1-2', '1-2', '3-5', '3-5', '6-9', '6-9', '10+', '10+'])
   })
 
   it('summarises and counts applied filters', () => {
@@ -39,11 +39,11 @@ describe('hub filters', () => {
   })
 
   it('sends every picked tenure and status to push-be', () => {
-    const many = { ...EMPTY_SHEET, tenure: ['0-2' as const, '10+' as const], status: ['seeking' as const] }
+    const many = { ...EMPTY_SHEET, tenure: ['0' as const, '1-2' as const, '10+' as const], status: ['seeking' as const] }
     expect(profileQuery(['dev'], many)).toEqual({
       category: ['dev'],
       explore: 'recommended',
-      tenure: ['0-2', '10+'],
+      tenure: ['0', '1-2', '10+'],
       status: ['seeking'],
     })
   })

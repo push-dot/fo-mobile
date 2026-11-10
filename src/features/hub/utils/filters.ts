@@ -5,7 +5,8 @@ export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: 
 
 export const EMPTY_SHEET: SheetFilters = { tenure: [], status: [], explore: 'recommended' }
 
-export const tenureOf = (years: number): Tenure => (years <= 2 ? '0-2' : years <= 5 ? '3-5' : years <= 9 ? '6-9' : '10+')
+export const tenureOf = (years: number): Tenure =>
+  years <= 0 ? '0' : years <= 2 ? '1-2' : years <= 5 ? '3-5' : years <= 9 ? '6-9' : '10+'
 
 export const appliedCount = (f: SheetFilters) => f.tenure.length + f.status.length + (f.explore === 'recommended' ? 0 : 1)
 
