@@ -43,7 +43,7 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
   // Leaves the toast stack when the close starts, so a toast shown on confirm lands where it stays.
   useEffect(() => {
     if (!android) return
-    const close = mountSheet(id)
+    const close = mountSheet(id, Platform.OS)
     const sub = navigation.addListener('beforeRemove', () => {
       closing.current = true
       close()

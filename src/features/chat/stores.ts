@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode, type ChatIntent } from '@push/api-client'
 import { myApi, type PickedFile } from '@/features/my'
 import { queryClient } from '@/providers/query-client'
-import { API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
+import { showToast } from '@/shared/components/toast-store'
+import { api, API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
 import {
   chatApi,
   fetchConversationMessages,
@@ -13,7 +14,7 @@ import {
   updateAiAccessMode,
 } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream } from './utils/stream'
@@ -237,10 +238,40 @@ export const answer = (id: string, text: string, choice: number | number[]) => {
   )
 }
 
-export const stop = (id: string) => {
+const halting = new Set<string>()
+
+const finishStop = (id: string) => {
+  halting.delete(id)
   runs.get(id)?.abort()
   dispatch(id, { type: 'stop' })
+}
+
+const reportCancel = (id: string) => {
+  // A scripted mock run has no server job. Cancelling it only raises the failure toast.
+  if (API_MOCK) {
+    finishStop(id)
+    return
+  }
+  if (halting.has(id)) return
+  halting.add(id)
+  void api.conversations.cancel(id).then(
+    () => finishStop(id),
+    (error: unknown) => {
+      // 409: the job already ended, which is what stop asked for.
+      if (error instanceof ApiError && error.status === 409) {
+        finishStop(id)
+        return
+      }
+      halting.delete(id)
+      // Leave the run on screen so a retryable failure can be pressed again. 403 cannot succeed on retry.
+      showToast({ message: error instanceof ApiError && error.status === 403 ? CHAT_STOP_FORBIDDEN : CHAT_STOP_FAILED })
+    },
+  )
+}
+
+export const stop = (id: string) => {
   void hapticNotify('warning')
+  reportCancel(id)
 }
 
 const busy = (id: string) => get(id).items.length > 0 || runs.has(id)

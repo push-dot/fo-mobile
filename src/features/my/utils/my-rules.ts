@@ -33,6 +33,10 @@ export const deleteDocCopy = (fileName: string) => ({
   failed: '서류를 삭제하지 못했어요',
 })
 
+/** DELETE /sources/:id answers 409 when a career row still cites the upload. */
+export const DELETE_REFERENCED = '경력 기록에서 쓰고 있어 지울 수 없어요'
+export const RESTORE_FAILED = '되돌리지 못했어요'
+
 export const careerDeleteCopy = {
   title: '이 경력을 삭제할까요?',
   confirm: '삭제',

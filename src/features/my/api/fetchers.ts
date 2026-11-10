@@ -34,6 +34,7 @@ export const myApi = {
   },
   // push-be deletes a Push document (origin AI) by archiving it; DELETE sources/:id answers 404 for it.
   archive: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.archive(id, revision)),
+  restore: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.restore(id, revision)),
   resumeDraft: async (sourceId: string): Promise<ResumeDraft> =>
     API_MOCK
       ? (await c.get<DataEnvelope<ResumeDraft>>(`sources/${sourceId}/profile-draft`)).data

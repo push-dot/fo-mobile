@@ -1,11 +1,14 @@
+import { ApiError } from '@push/api-client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { DELETE_REFERENCED, RESTORE_FAILED } from './utils'
 import { UNDO_MS } from './constants'
 
 const remove = vi.hoisted(() => vi.fn())
 const archive = vi.hoisted(() => vi.fn())
+const restore = vi.hoisted(() => vi.fn())
 const invalidateQueries = vi.hoisted(() => vi.fn())
 const showToast = vi.hoisted(() => vi.fn())
-vi.mock('./api', () => ({ myApi: { remove, archive } }))
+vi.mock('./api', () => ({ myApi: { remove, archive, restore } }))
 vi.mock('@/providers/query-client', () => ({ queryClient: { invalidateQueries } }))
 vi.mock('@/shared/components', () => ({ showToast }))
 
@@ -21,6 +24,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   remove.mockResolvedValue(undefined)
   archive.mockResolvedValue(undefined)
+  restore.mockResolvedValue(undefined)
   invalidateQueries.mockResolvedValue(undefined)
   usePendingDelete.setState({ hidden: [] })
 })
@@ -43,6 +47,52 @@ describe('deleteWithUndo', () => {
     expect(usePendingDelete.getState().hidden).toEqual(['s1'])
     expect(showToast.mock.lastCall?.[0].action.label).toBe('되돌리기')
     expect(remove).not.toHaveBeenCalled()
+  })
+
+  it('calls documents.restore when 되돌리기 is tapped after a Push document commits', async () => {
+    deleteWithUndo({ id: 'doc-ai', fileName: '모아페이_맞춤_이력서_v2.pdf', aiMade: true })
+    await vi.advanceTimersByTimeAsync(UNDO_MS)
+    expect(archive).toHaveBeenCalledExactlyOnceWith('doc-ai')
+    tapUndo()
+    await Promise.resolve()
+    expect(restore).toHaveBeenCalledExactlyOnceWith('doc-ai')
+  })
+
+  it('says the undo failed when documents.restore rejects', async () => {
+    restore.mockRejectedValueOnce(new Error('offline'))
+    deleteWithUndo({ id: 'doc-restore', fileName: '모아페이_맞춤_이력서_v2.pdf', aiMade: true })
+    await vi.advanceTimersByTimeAsync(UNDO_MS)
+    tapUndo()
+    for (let i = 0; i < 4; i++) await Promise.resolve()
+    expect(restore).toHaveBeenCalledOnce()
+    expect(lastToast()).toMatchObject({ message: RESTORE_FAILED, alert: true })
+  })
+
+  it('does not restore a Push document when 되돌리기 lands before the archive', async () => {
+    deleteWithUndo({ id: 'doc-ai', fileName: '모아페이_맞춤_이력서_v2.pdf', aiMade: true })
+    tapUndo()
+    await vi.runAllTimersAsync()
+    expect(archive).not.toHaveBeenCalled()
+    expect(restore).not.toHaveBeenCalled()
+    expect(usePendingDelete.getState().hidden).toEqual([])
+  })
+
+  it('does not restore an uploaded file after its delete commits', async () => {
+    deleteWithUndo(doc)
+    await vi.advanceTimersByTimeAsync(UNDO_MS)
+    tapUndo()
+    await vi.runAllTimersAsync()
+    expect(remove).toHaveBeenCalledOnce()
+    expect(restore).not.toHaveBeenCalled()
+  })
+
+  it('says the upload is still used by a career record when delete answers 409 REFERENCED_BY_EVIDENCE', async () => {
+    remove.mockRejectedValueOnce(new ApiError('conflict', 'INVALID_TRANSITION', 409, { reason: 'REFERENCED_BY_EVIDENCE', evidenceCount: 1 }))
+    deleteWithUndo(doc, 74)
+    await vi.runAllTimersAsync()
+    expect(lastToast()).toMatchObject({ message: DELETE_REFERENCED, alert: true, opaque: true, bottom: 74 })
+    expect(lastToast().action).toBeUndefined()
+    expect(usePendingDelete.getState().hidden).toEqual([])
   })
 
   it('restores the doc when 되돌리기 is tapped after the screen is gone', async () => {

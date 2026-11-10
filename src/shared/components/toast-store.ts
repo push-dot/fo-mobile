@@ -37,23 +37,29 @@ export const showToast = (toast: ToastInput) => {
   useToastStore.setState((s) => {
     // A failure must not take the place of a live 되돌리기 toast: the undo would be lost. It waits, then shows.
     if (s.current && keepsUndo(s.current) && failureToast(toast)) return { queued: [...s.queued, next] }
-    return { current: next }
+    // A plain toast may replace that undo. Anything already waiting stays in order and shows after this one.
+    return { current: next, queued: s.queued }
   })
 }
 
 export const hideToast = (id: number) =>
   useToastStore.setState((s) => {
-    if (s.current?.id !== id) return s
-    const [next, ...queued] = s.queued
-    return { current: next ?? null, queued }
+    if (s.current?.id === id) {
+      const [next, ...queued] = s.queued
+      return { current: next ?? null, queued }
+    }
+    if (!s.queued.some((item) => item.id === id)) return s
+    return { queued: s.queued.filter((item) => item.id !== id) }
   })
 
 const putSheet = (sheets: OpenSheet[], id: string, height?: number) =>
   sheets.some((x) => x.id === id) ? sheets.map((x) => (x.id === id && height !== undefined ? { id, height } : x)) : [...sheets, { id, height: height ?? 0 }]
 
-/** Android (ToastSheetAndroid): an opening sheet clears the toast, and a toast shown while it is open floats above its top. */
-export const mountSheet = (id: string) => {
-  useToastStore.setState((s) => ({ current: null, queued: [], sheets: putSheet(s.sheets, id) }))
+/** Android (ToastSheetAndroid): an opening sheet clears the toast and its queue. iOS keeps both. A toast shown while a sheet is open floats above its top. */
+export const mountSheet = (id: string, os: string) => {
+  useToastStore.setState((s) =>
+    os === 'android' ? { current: null, queued: [], sheets: putSheet(s.sheets, id) } : { sheets: putSheet(s.sheets, id) },
+  )
   return () => useToastStore.setState((s) => ({ sheets: s.sheets.filter((x) => x.id !== id) }))
 }
 

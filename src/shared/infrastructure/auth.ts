@@ -1,6 +1,8 @@
-import type { AuthResult } from '@push/api-client'
+import { needsTerms, type AuthResult } from '@push/api-client'
 import * as Crypto from 'expo-crypto'
+import { router } from 'expo-router'
 import { Platform } from 'react-native'
+import { usePhoneAuth } from '../../features/auth/stores'
 import { isAppleCancel } from '../../features/auth/utils/auth-flow'
 import { api } from './api-client'
 import { AUTH_REDIRECT_URI } from './constants'
@@ -10,12 +12,20 @@ import { useSession } from './session-store'
 
 export type SignInOutcome =
   | { kind: 'session' }
+  | { kind: 'terms' }
   | { kind: 'phone'; pendingToken: string }
   | { kind: 'cancelled' }
   | { kind: 'failed' }
 
 const applyAuthResult = async (result: AuthResult): Promise<SignInOutcome> => {
   if (!('accessToken' in result)) return { kind: 'phone', pendingToken: result.pendingToken }
+  // Same gate as the phone code screen: a stale or missing terms version stays signed out until consent.
+  const consent = await api.me.consents(result.accessToken)
+  if (needsTerms(consent)) {
+    usePhoneAuth.getState().hold(result)
+    router.push('/signup-terms')
+    return { kind: 'terms' }
+  }
   await useSession.getState().set(result)
   return { kind: 'session' }
 }
