@@ -18,4 +18,10 @@ describe('a message that fails to send', () => {
     expect(failedLine(f)).toEqual({ title: '메시지를 보낼 수 없어요', retry: false })
     expect(composerClosed([failedSend('a', server), f])).toBe(true)
   })
+
+  it('closes the composer before any send when push-be says the offer takes no messages', () => {
+    expect(composerClosed([], false)).toBe(true)
+    expect(composerClosed([], true)).toBe(false)
+    expect(composerClosed([])).toBe(false)
+  })
 })

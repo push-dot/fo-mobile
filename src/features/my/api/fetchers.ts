@@ -1,4 +1,4 @@
-import { jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
+import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
 import type { CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
 import { profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
@@ -32,6 +32,8 @@ export const myApi = {
     await api.sources.remove(id)
     uploaded.delete(id)
   },
+  // push-be deletes a Push document (origin AI) by archiving it; DELETE sources/:id answers 404 for it.
+  archive: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.archive(id, revision)),
   resumeDraft: async (sourceId: string): Promise<ResumeDraft> =>
     API_MOCK
       ? (await c.get<DataEnvelope<ResumeDraft>>(`sources/${sourceId}/profile-draft`)).data
@@ -148,11 +150,11 @@ export const fetchDocuments = async () => {
 
 export const fetchDocument = (id: string) => c.get<DataEnvelope<HubDocument>>(`documents/${id}`)
 
-export const renameDocument = async (id: string, expectedRevision: number, title: string) =>
-  (await c.patch<DataEnvelope<HubDocument>>(`documents/${id}`, { body: { expectedRevision, title } })).data
+export const renameDocument = (id: string, expectedRevision: number, title: string) =>
+  atDocumentRevision(api.documents, id, (revision) => api.documents.rename(id, revision, title), expectedRevision)
 
-export const archiveDocument = async (id: string, expectedRevision: number) =>
-  (await c.post<DataEnvelope<HubDocument>>(`documents/${id}/archive`, { body: { expectedRevision } })).data
+export const archiveDocument = (id: string, expectedRevision: number) =>
+  atDocumentRevision(api.documents, id, (revision) => api.documents.archive(id, revision), expectedRevision)
 
 export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })

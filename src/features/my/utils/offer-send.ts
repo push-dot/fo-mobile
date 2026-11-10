@@ -16,5 +16,5 @@ export const failedLine = (f: FailedSend) => ({
   retry: !f.blocked,
 })
 
-/** Once any send was rejected as BLOCKED the composer is replaced by a note. */
-export const composerClosed = (failed: FailedSend[]) => failed.some((f) => f.blocked)
+/** The composer is replaced by a note when push-be says the offer takes no messages (canSend false) or a send came back BLOCKED. */
+export const composerClosed = (failed: FailedSend[], canSend?: boolean) => canSend === false || failed.some((f) => f.blocked)

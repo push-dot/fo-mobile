@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UNDO_MS } from './constants'
 
 const remove = vi.hoisted(() => vi.fn())
+const archive = vi.hoisted(() => vi.fn())
 const invalidateQueries = vi.hoisted(() => vi.fn())
 const showToast = vi.hoisted(() => vi.fn())
-vi.mock('./api', () => ({ myApi: { remove } }))
+vi.mock('./api', () => ({ myApi: { remove, archive } }))
 vi.mock('@/providers/query-client', () => ({ queryClient: { invalidateQueries } }))
 vi.mock('@/shared/components', () => ({ showToast }))
 
@@ -19,6 +20,7 @@ beforeEach(() => {
   vi.useFakeTimers()
   vi.clearAllMocks()
   remove.mockResolvedValue(undefined)
+  archive.mockResolvedValue(undefined)
   invalidateQueries.mockResolvedValue(undefined)
   usePendingDelete.setState({ hidden: [] })
 })
@@ -28,6 +30,14 @@ afterEach(async () => {
 })
 
 describe('deleteWithUndo', () => {
+  it('archives a Push document (origin AI) instead of DELETE sources/:id, which push-be answers 404', async () => {
+    deleteWithUndo({ id: 'doc-ai', fileName: '모아페이_맞춤_이력서_v2.pdf', aiMade: true })
+    await vi.advanceTimersByTimeAsync(UNDO_MS)
+    expect(archive).toHaveBeenCalledExactlyOnceWith('doc-ai')
+    expect(remove).not.toHaveBeenCalled()
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['documents'] })
+  })
+
   it('hides the doc and offers 되돌리기 without deleting yet', () => {
     deleteWithUndo(doc)
     expect(usePendingDelete.getState().hidden).toEqual(['s1'])

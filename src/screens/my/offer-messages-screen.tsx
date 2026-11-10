@@ -122,7 +122,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const ios = Platform.OS === 'ios'
   const Composer = ios ? Glass : View
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
-  const closed = composerClosed(failed)
+  const closed = composerClosed(failed, o.canSend)
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: c.bg }}>

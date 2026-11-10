@@ -31,10 +31,17 @@ const showFailed = () => {
   })
 }
 
+// Push documents (origin AI) pending delete; they archive instead of DELETE sources/:id.
+const pushDocs = new Set<string>()
+
 const remove = (id: string, bottom?: number) => {
-  void myApi
-    .remove(id)
-    .then(() => queryClient.invalidateQueries({ queryKey: ['me', 'sources'] }))
+  const push = pushDocs.has(id)
+  void (push ? myApi.archive(id) : myApi.remove(id))
+    .then(() => {
+      pushDocs.delete(id)
+      if (push) void queryClient.invalidateQueries({ queryKey: ['documents'] })
+      return queryClient.invalidateQueries({ queryKey: ['me', 'sources'] })
+    })
     .catch(() => {
       failed = { ids: [...failed.ids, id], bottom }
       showFailed()
@@ -52,8 +59,9 @@ const pending = createUndo((id) => {
 }, UNDO_MS)
 
 /** Hides the doc and offers 되돌리기 for UNDO_MS, then deletes it. `bottom` places the toasts (TOAST_ABOVE). */
-export const deleteWithUndo = (doc: Pick<MySource, 'id' | 'fileName'>, bottom?: number) => {
+export const deleteWithUndo = (doc: Pick<MySource, 'id' | 'fileName'> & { aiMade?: boolean }, bottom?: number) => {
   const copy = deleteDocCopy(doc.fileName)
+  if (doc.aiMade) pushDocs.add(doc.id)
   pending.start(doc.id)
   undoBottom = bottom
   usePendingDelete.setState((s) => ({ hidden: [...s.hidden, doc.id] }))

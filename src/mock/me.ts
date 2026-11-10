@@ -255,7 +255,9 @@ let documents: HubDocument[] = [
 // The document the agent saved for the chat upload result card (its documentId), and a tailored draft never finalized; both outside 마이's list.
 const agentDoc: HubDocument = { ...pushDoc('src-upload', '', '김서준_모아페이_백엔드', on(10, 20)), applicationId: null }
 const draftDoc: HubDocument = { ...pushDoc('d-draft', '', '모아페이 맞춤 이력서', on(10, 21)), applicationId: null, kind: 'TAILORED' }
-const findDoc = (id?: string) => [...documents, agentDoc, draftDoc].find((d) => d.id === id)
+// 내 서류's AI-made row (chat.ts d4) is a Push document too: deleting it archives it.
+const chatAiDoc: HubDocument = { ...pushDoc('d4', '', '모아페이_맞춤_이력서_v2', on(10, 22)), applicationId: null, kind: 'TAILORED' }
+const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc].find((d) => d.id === id)
 // push-be exports a HUB_PROFILE's latest version before finalize; no mock document is finalized.
 const exportable = (d: HubDocument | undefined, versionId?: string) => d?.kind === 'HUB_PROFILE' && d.latestVersionId === versionId
 
@@ -306,6 +308,7 @@ mock('POST', 'documents/:id/archive', ({ params, body }) => {
   const { doc, fail } = docTarget(params.id, b.expectedRevision)
   if (fail) return fail
   if (doc.status !== 'ARCHIVED') Object.assign(doc, { revision: doc.revision + 1, status: 'ARCHIVED', updatedAt: new Date().toISOString() })
+  removeChatDoc(doc.id)
   return { data: doc }
 })
 const docText = (type: 'heading' | 'paragraph', text: string) => ({ type, content: [{ type: 'text', text }] })

@@ -1,92 +1,48 @@
+import { offerMenu, offerMenuKeys, OFFER_MENU_COPY, offerBlockConfirm, otherParty, type OfferBox, type OfferMenuDeps as SharedDeps, type OfferMenuToast } from '@push/shared'
 import type { Offer } from '@push/api-client'
 import type { ConfirmRequest } from '@/shared/components/confirm-store'
 import type { MenuSection } from '@/shared/components/menu-action'
 import { toastOffsets, type ToastInput } from '@/shared/components/toast-store'
-import { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from './my-rules'
 
-type Box = 'received' | 'sent'
+export { offerMenu, otherParty, viewerBox } from '@push/shared'
 
-export const viewerBox = (o: Offer, viewerId: string | undefined, hint: Box): Box => {
-  if (viewerId === o.sender.id) return 'sent'
-  if (viewerId === o.recipient.id) return 'received'
-  return hint
-}
+const hasBottomBar = (o: Offer, box: OfferBox) => o.status === 'ACCEPTED' || (box === 'received' && (o.status === 'SENT' || o.status === 'READ'))
 
-export const otherParty = (o: Offer, box: Box) => (box === 'sent' ? o.recipient : o.sender)
+/** The app toast for a shared offer-menu toast; the report toast sits above the offer's bottom bar when it has one. */
+export const offerToast = (offer: Offer, box: OfferBox, { kind, message, undo }: OfferMenuToast): ToastInput => ({
+  message,
+  ...(kind === 'failed' ? { tone: 'error' as const } : {}),
+  ...(undo ? { action: { label: OFFER_MENU_COPY.undo, onPress: undo } } : {}),
+  ...(kind === 'reported' && hasBottomBar(offer, box) ? { bottom: toastOffsets(0).cta } : {}),
+})
 
-const hasBottomBar = (o: Offer, box: Box) => o.status === 'ACCEPTED' || (box === 'received' && (o.status === 'SENT' || o.status === 'READ'))
-
-export type OfferMenuDeps = {
-  archive: (id: string) => Promise<unknown>
-  unarchive: (id: string) => Promise<unknown>
-  report: (id: string) => Promise<unknown>
-  block: (userId: string) => Promise<unknown>
-  refresh: () => Promise<unknown>
-  back: () => void
-  toast: (t: ToastInput) => void
-}
-
-/** The offer ⋯ menu actions; every failure shows the error toast and re-reads the offer so the screen never shows a stale state. */
-export const offerMenu = (offer: Offer, box: Box, d: OfferMenuDeps) => {
-  const who = otherParty(offer, box)
-  const failed = () => {
-    d.toast({ message: OFFER_MENU_COPY.failed, tone: 'error' })
-    void d.refresh()
-  }
-  const run = (task: Promise<unknown>, done: () => void) => task.then(done, failed)
-  return {
-    archive: () =>
-      run(d.archive(offer.id), () => {
-        d.back()
-        void d.refresh()
-        d.toast({
-          message: OFFER_MENU_COPY.archived,
-          action: { label: OFFER_MENU_COPY.undo, onPress: () => void d.unarchive(offer.id).then(d.refresh, failed) },
-        })
-      }),
-    unarchive: () => run(d.unarchive(offer.id), () => void d.refresh()),
-    report: () =>
-      run(d.report(offer.id), () =>
-        d.toast({ message: OFFER_MENU_COPY.reported, bottom: hasBottomBar(offer, box) ? toastOffsets(0).cta : undefined }),
-      ),
-    block: () =>
-      run(d.block(who.id), () => {
-        d.back()
-        void d.refresh()
-        d.toast({ message: offerBlocked(who.displayName) })
-      }),
-  }
-}
+export type OfferMenuDeps = Omit<SharedDeps, 'toast'> & { toast: (t: ToastInput) => void }
 
 export type OfferMenuSectionDeps = OfferMenuDeps & {
   profile: (userId: string) => void
   confirm: (r: ConfirmRequest) => void
 }
 
-export const offerMenuSections = (offer: Offer, box: Box, d: OfferMenuSectionDeps): MenuSection[] => {
-  const run = offerMenu(offer, box, d)
+const ACTIONS = {
+  profile: { label: OFFER_MENU_COPY.profile, systemImage: 'person', icon: 'user' },
+  archive: { label: OFFER_MENU_COPY.archive, systemImage: 'archivebox', icon: 'archive' },
+  unarchive: { label: OFFER_MENU_COPY.unarchive, systemImage: 'tray.and.arrow.up', icon: 'archive' },
+  report: { label: OFFER_MENU_COPY.report, systemImage: 'flag', icon: 'flag' },
+  block: { label: OFFER_MENU_COPY.block, systemImage: 'nosign', icon: 'block', destructive: true },
+} as const
+
+export const offerMenuSections = (offer: Offer, box: OfferBox, d: OfferMenuSectionDeps): MenuSection[] => {
+  const run = offerMenu(offer, box, { ...d, toast: (t) => d.toast(offerToast(offer, box, t)) })
   const who = otherParty(offer, box)
-  const archived = !!offer.archivedAt
-  const keep: MenuSection['actions'] = [
-    { key: 'profile', label: OFFER_MENU_COPY.profile, systemImage: 'person', icon: 'user', onPress: () => d.profile(who.id) },
-  ]
-  if (archived)
-    keep.push({ key: 'unarchive', label: OFFER_MENU_COPY.unarchive, systemImage: 'tray.and.arrow.up', icon: 'archive', onPress: () => void run.unarchive() })
-  else if (box === 'received')
-    keep.push({ key: 'archive', label: OFFER_MENU_COPY.archive, systemImage: 'archivebox', icon: 'archive', onPress: () => void run.archive() })
-  const harm: MenuSection['actions'] = [
-    { key: 'report', label: OFFER_MENU_COPY.report, systemImage: 'flag', icon: 'flag', onPress: () => void run.report() },
-    {
-      key: 'block',
-      label: OFFER_MENU_COPY.block,
-      systemImage: 'nosign',
-      icon: 'block',
-      destructive: true,
-      onPress: () => d.confirm({ ...offerBlockConfirm(who.displayName), danger: true, onConfirm: () => void run.block() }),
-    },
-  ]
-  return [
-    { key: 'keep', actions: keep },
-    { key: 'harm', actions: harm },
-  ]
+  const press = {
+    profile: () => d.profile(who.id),
+    archive: () => void run.archive(),
+    unarchive: () => void run.unarchive(),
+    report: () => void run.report(),
+    block: () => d.confirm({ ...offerBlockConfirm(who.displayName), danger: true, onConfirm: () => void run.block() }),
+  }
+  return offerMenuKeys(offer, box).map((keys, i) => ({
+    key: i ? 'harm' : 'keep',
+    actions: keys.map((key) => ({ key, ...ACTIONS[key], onPress: press[key] })),
+  }))
 }

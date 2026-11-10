@@ -114,24 +114,7 @@ export const OFFER_BLOCKED_COMPOSER = '이 대화에는 더 이상 메시지를 
 export const OFFER_ARCHIVED_NOTE = '보관한 제안은 받은 제안 목록과 알림에서 빠져요. 열어서 보관을 풀 수 있어요.'
 export const OFFER_ARCHIVED_ROW = '보관한 제안'
 export const OFFER_ARCHIVED_BADGE = '보관함'
-export const OFFER_MENU_COPY = {
-  profile: '허브 프로필 보기',
-  archive: '제안 보관하기',
-  unarchive: '보관 풀기',
-  report: '신고하기',
-  block: '차단하기',
-  archived: '제안을 보관했어요',
-  undo: '되돌리기',
-  reported: '신고가 접수됐어요',
-  failed: '잠시 뒤에 다시 시도해 주세요.',
-}
-export const offerBlocked = (name: string) => `${name} 님을 차단했어요`
-export const offerBlockConfirm = (name: string) => ({
-  title: `${name} 님을 차단할까요?`,
-  body: `${name} 님의 제안이 목록에서 사라지고, 앞으로 제안과 메시지를 받지 않아요. 상대에게는 차단했다고 알리지 않아요.`,
-  note: '설정 › 차단한 사람에서 언제든 풀 수 있어요.',
-  confirm: '차단',
-})
+export { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from '@push/shared'
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
 export const PUSH_DOCS_TITLE = 'Push 서류'
