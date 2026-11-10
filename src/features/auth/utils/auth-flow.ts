@@ -111,8 +111,7 @@ export const emailFromPendingToken = (token: string) => {
   }
 }
 
-export const needsTerms = (consent: { terms?: { age14At: string | null; serviceTermsAt: string | null; privacyAt: string | null } | null }) =>
-  !consent.terms?.age14At || !consent.terms.serviceTermsAt || !consent.terms.privacyAt
+export { needsTerms } from '@push/api-client'
 
 export const phoneFailureLine = (failure: PhoneAuthFailure) => {
   if (failure.kind === 'unavailable') return PHONE_UNAVAILABLE
