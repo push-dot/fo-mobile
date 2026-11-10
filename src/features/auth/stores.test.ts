@@ -33,6 +33,13 @@ describe('useTermsConsent', () => {
     expect(TERM_ROWS.filter((row) => isTermKey(row.id)).every((row) => TERM_DOCUMENTS[row.id as TermKey].articles.length > 0)).toBe(true)
   })
 
+  it('opens the collection consent that lists employer email sign-up items', () => {
+    const rows = TERM_DOCUMENTS.privacy.articles
+      .flatMap((article) => article.blocks)
+      .flatMap((block) => (block.kind === 'table' ? block.rows : []))
+    expect(rows.some((row) => row.join(' ').includes('이메일 주소, 비밀번호(되돌릴 수 없게 암호화해 저장), 이름, 약관 동의 기록'))).toBe(true)
+  })
+
   it('accepts only own term keys, not inherited object properties or other values', () => {
     expect(['toString', 'constructor', '__proto__', 'age14', '', undefined, 1].map(isTermKey)).toEqual(Array(7).fill(false))
     expect(isTermKey('privacy')).toBe(true)
