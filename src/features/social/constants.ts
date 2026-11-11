@@ -12,6 +12,3 @@ export const POST_IMAGE_OPTIONS = {
   allowsMultipleSelection: true,
   quality: 0.85,
 }
-export const MIN = 60_000
-export const HOUR = 60 * MIN
-export const DAY = 24 * HOUR
