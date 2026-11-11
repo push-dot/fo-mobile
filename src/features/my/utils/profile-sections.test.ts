@@ -32,6 +32,15 @@ describe('profile sections from a resume', () => {
     expect(profilePatch(draft, ['intro', 'career'])).toEqual({ intro: draft.intro, careers: draft.careers })
   })
 
+  it('does not patch jobCategory from the basic section', () => {
+    const withJob = { ...draft, jobCategory: 'dev' as const }
+    expect(profilePatch(withJob, ['basic'])).toEqual({
+      displayName: withJob.displayName,
+      headline: withJob.headline,
+      tenureYears: withJob.tenureYears,
+    })
+  })
+
   it('warns only about picked sections that would replace different existing content', () => {
     const current = { ...draft, intro: '예전 소개', careers: [], skills: ['Go'] }
     const labels = replacedLabels(draft, current, ['basic', 'intro', 'career'])

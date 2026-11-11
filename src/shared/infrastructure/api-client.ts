@@ -25,9 +25,9 @@ let refreshing: Promise<boolean> | null = null
 const refreshApi = createApi(createClient(clientConfig))
 
 export const refreshSession = () => {
+  const { session, set } = useSession.getState()
+  if (!session?.refreshToken) return Promise.resolve(false)
   refreshing ??= (async () => {
-    const { session, set } = useSession.getState()
-    if (!session?.refreshToken) return false
     try {
       await set(await refreshApi.auth.refresh(session.refreshToken))
       return true
