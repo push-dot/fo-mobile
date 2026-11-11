@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Post } from '@push/api-client'
 import { Icon, Text } from '../../../shared/components'
@@ -33,4 +34,4 @@ const PostCard = ({ post }: { post: Post }) => {
   )
 }
 
-export default PostCard
+export default memo(PostCard)

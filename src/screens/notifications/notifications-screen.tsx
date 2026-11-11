@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { useCallback, useMemo } from 'react'
 import { SectionList, View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
 import {
@@ -23,16 +24,26 @@ const NotificationsScreen = () => {
   const read = useReadNotifications()
   const settingsVisible = useNotificationSettingsVisible()
   const items = q.data?.data ?? []
-  const sections = ['오늘', '이번 주', '이전']
-    .map((title) => ({ title, data: items.filter((n) => groupLabel(n.createdAt) === title) }))
-    .filter((s) => s.data.length)
+  const sections = useMemo(() => {
+    const rows = q.data?.data ?? []
+    return ['오늘', '이번 주', '이전']
+      .map((title) => ({ title, data: rows.filter((n) => groupLabel(n.createdAt) === title) }))
+      .filter((s) => s.data.length)
+  }, [q.data])
   const unread = items.some((n) => !n.readAt)
 
-  const open = (n: AppNotification) => {
-    if (!n.readAt) read.mutate([n.id])
-    const href = notificationHref(n)
-    if (href) router.push(href)
-  }
+  const open = useCallback(
+    (n: AppNotification) => {
+      if (!n.readAt) read.mutate([n.id])
+      const href = notificationHref(n)
+      if (href) router.push(href)
+    },
+    [read],
+  )
+  const renderItem = useCallback(
+    ({ item }: { item: AppNotification }) => <NotificationRow n={item} onPress={open} />,
+    [open],
+  )
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -52,7 +63,7 @@ const NotificationsScreen = () => {
             {section.title}
           </Text>
         )}
-        renderItem={({ item }) => <NotificationRow n={item} onPress={() => open(item)} />}
+        renderItem={renderItem}
         ListEmptyComponent={
           q.isPending ? (
             <View>

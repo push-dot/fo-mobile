@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { AppNotification, NotificationType } from '@push/api-client'
 import { Icon, Text, type IconName } from '../../../shared/components'
@@ -12,7 +13,7 @@ const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: key
   APPLICATION_STAGE: { icon: 'job-check', fg: 'green', bg: 'greenSoft' },
 }
 
-const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => void }) => {
+const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: (item: AppNotification) => void }) => {
   const c = useColors()
   const k = KIND[n.type]
   const unread = !n.readAt
@@ -20,7 +21,7 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${unread ? '안 읽음, ' : ''}${notificationTitle(n)}, ${n.body}, ${timeLabel(n.createdAt)}`}
-      onPress={onPress}
+      onPress={() => onPress(n)}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: spacing[5], paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
     >
       <View style={{ width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: c[k.bg] }}>
@@ -44,4 +45,4 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: () => vo
   )
 }
 
-export default NotificationRow
+export default memo(NotificationRow)

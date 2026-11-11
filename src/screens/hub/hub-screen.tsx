@@ -1,5 +1,6 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
+import { useCallback, useMemo } from 'react'
 import { ActivityIndicator, FlatList, Pressable, ScrollView, View } from 'react-native'
 import {
   FilterButton,
@@ -24,10 +25,11 @@ const HubScreen = () => {
 
   const viewerId = useViewerId()
   const list = useProfileList(category, sheet)
-  const items = list.data?.pages.flatMap((p) => p.data) ?? []
+  const items = useMemo(() => list.data?.pages.flatMap((p) => p.data) ?? [], [list.data])
   const summary = filterSummary(sheet)
 
-  const header = (
+  const header = useMemo(
+    () => (
     <View>
       <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
         <Pressable
@@ -55,7 +57,11 @@ const HubScreen = () => {
         {summary ? <Badge label={summary} tone="ac" /> : null}
       </View>
     </View>
+    ),
+    [c.fill, category, setCategory, summary, viewerId],
   )
+
+  const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -77,7 +83,7 @@ const HubScreen = () => {
       <FlatList
         data={items}
         keyExtractor={(p) => p.userId}
-        renderItem={({ item }) => <ProfileRow p={item} />}
+        renderItem={renderItem}
         ListHeaderComponent={header}
         ListEmptyComponent={
           list.isPending ? (

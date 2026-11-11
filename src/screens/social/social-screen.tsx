@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
@@ -10,7 +10,8 @@ const SocialScreen = () => {
   const c = useColors()
   const [category, setCategory] = useState<PostCategory | null>(null)
   const q = usePosts(category)
-  const posts = q.data?.pages.flatMap((p) => p.data) ?? []
+  const posts = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
+  const renderItem = useCallback(({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />, [])
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -49,7 +50,7 @@ const SocialScreen = () => {
       <FlatList
         data={posts}
         keyExtractor={(p) => p.id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        renderItem={renderItem}
         ItemSeparatorComponent={Band}
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
