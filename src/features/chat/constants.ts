@@ -1,7 +1,10 @@
 import type { AccessMode, ChatIntent } from '@push/api-client'
 import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
-import { planRequired, usageExhausted } from './utils/usage'
+import { ERROR_TEXT } from './error-text'
+
+export { COMPOSER_PLACEHOLDER } from './composer-placeholder'
+export { ERROR_TEXT } from './error-text'
 
 // Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.
 export const SPRING = [0.2, 0.9, 0.25, 1] as const
@@ -24,7 +27,6 @@ export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 export const PICK_HINT = '번호를 누르거나 바로 말해도 돼요'
 export const HINTLESS_GATES = ['validate_cap']
 
-export const COMPOSER_PLACEHOLDER = { first: '공고 링크를 붙여넣어 보세요', working: '작업 중에도 말할 수 있어요', followUp: '더 고칠 부분이 있으면 말해 주세요' } as const
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '선택을 기다리고 있어요' } as const
 
@@ -42,16 +44,6 @@ export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
 export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]
 export const fitProjected = (label: string) => `이렇게 고치면 ${label}`
 
-const USAGE_BODY = usageExhausted('FREE').body
-export const ERROR_TEXT: Record<string, string> = {
-  FEATURE_DISABLED: USAGE_BODY,
-  INSUFFICIENT_CREDITS: USAGE_BODY,
-  PLAN_REQUIRED: planRequired('FREE'),
-  QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
-  APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
-  APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
-  NOT_CONFIGURED: '지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
-}
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
 export const billingLockedText = (sec: number) => `결제 정보를 정리하고 있어요. ${sec}초 뒤에 다시 보내 주세요.`

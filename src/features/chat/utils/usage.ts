@@ -1,4 +1,4 @@
-import { COMPOSER_PLACEHOLDER } from '../constants'
+import { COMPOSER_PLACEHOLDER } from '../composer-placeholder'
 import type { ChatItem, ChatState } from '../types'
 
 const FREE_BODY = '이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.'
