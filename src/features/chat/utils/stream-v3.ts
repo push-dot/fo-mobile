@@ -1,7 +1,7 @@
 import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
 import { MULTI_PICK_FOOT } from '../constants'
-import type { Approval, ApprovalSection, ChatEvent, ChatItem, Choice, TemplateLayout } from '../types'
+import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
 /** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
 export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
