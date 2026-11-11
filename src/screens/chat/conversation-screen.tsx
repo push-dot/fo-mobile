@@ -1,10 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors } from '@/theme'
-import { askConfirm, Glass, GlassButton, Icon, Mascot, Menu, Text, useKeyboardHeight, useReduceMotion, type MenuAction } from '@/shared/components'
+import { askConfirm, Button, Glass, GlassButton, Icon, Mascot, Menu, Text, useKeyboardHeight, useReduceMotion, type MenuAction } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { usePersonalPurchase } from '@/features/billing'
 import { useConvertDocument } from '@/features/my'
@@ -34,11 +34,13 @@ import {
   stop,
   threadInset,
   useChat,
-  useConversationList,
+  useConversation,
   useArchiveConversation,
   useDeleteConversation,
   usePinConversation,
 } from '@/features/chat'
+import { followScroll } from '@/features/chat/utils/follow-scroll'
+import type { ChatItem } from '@/features/chat/types'
 
 
 // The boards seat the composer box 6pt above the home-indicator inset (`bottom: calc(var(--bot) + 6px)`).
@@ -53,17 +55,26 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const convert = useConvertDocument((documentId) => {
     router.push(`/docs/push/${documentId}`)
   })
-  const list = useConversationList()
-  const conv = list.data?.data.find((x) => x.id === id)
+  const one = useConversation(id)
+  const conv = one.data
   const [sayingFor, setSayingFor] = useState<string>()
   const [bottomH, setBottomH] = useState(160)
   const [fresh, setFresh] = useState(false)
+  const [failedHydrateId, setFailedHydrateId] = useState<string | null>(null)
+  const historyError = failedHydrateId === id
   const scroll = useRef<ScrollViewInstance>(null)
   const atBottom = useRef(true)
   const input = useRef<TextInputInstance>(null)
 
+  const idRef = useRef(id)
   useEffect(() => {
-    hydrate(id).catch(() => undefined)
+    idRef.current = id
+  }, [id])
+
+  useEffect(() => {
+    void hydrate(id)
+      .then(() => setFailedHydrateId((failed) => (failed === id ? null : failed)))
+      .catch(() => setFailedHydrateId(id))
   }, [id])
   const saying = !!chat.approval && sayingFor === chat.approval.id
 
@@ -100,6 +111,34 @@ const ConversationScreen = ({ id }: { id: string }) => {
   const showPanel = chat.approval && !saying
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
 
+  const onAction = useCallback((text: string) => send(idRef.current, text), [])
+
+  const convertRef = useRef(convert.mutate)
+  const buyCredits = useRef(purchase.buyCredits)
+  useEffect(() => {
+    convertRef.current = convert.mutate
+    buyCredits.current = purchase.buyCredits
+  }, [convert.mutate, purchase.buyCredits])
+
+  const onConvert = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
+    convertRef.current(card.documentId)
+  }, [])
+
+  const onView = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
+    router.push(`/docs/push/${card.documentId}`)
+  }, [])
+
+  const onUsage = useCallback((action: 'plan' | 'credits') => {
+    if (action === 'plan') router.push(accountPath('plan'))
+    else buyCredits.current()
+  }, [])
+
+  const retryHistory = useCallback(() => {
+    void hydrate(id)
+      .then(() => setFailedHydrateId((failed) => (failed === id ? null : failed)))
+      .catch(() => setFailedHydrateId(id))
+  }, [id])
+
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScrollView
@@ -112,19 +151,31 @@ const ConversationScreen = ({ id }: { id: string }) => {
         }}
         scrollEventThrottle={64}
         // Follow new lines; stop following once the person scrolls up (feature-spec 15.4).
-        onContentSizeChange={() => (atBottom.current ? scroll.current?.scrollToEnd({ animated: !reduce }) : setFresh(true))}
+        onContentSizeChange={() => {
+          const mode = followScroll(atBottom.current, !!chat.working, reduce)
+          if (mode === 'fresh') setFresh(true)
+          else scroll.current?.scrollToEnd({ animated: mode === 'animated' })
+        }}
         keyboardDismissMode="interactive"
       >
+        {historyError ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingVertical: spacing[2] }}>
+            <Text v="c1" color="t2" style={{ flex: 1 }}>
+              대화를 불러오지 못했어요
+            </Text>
+            <Button label="다시 불러오기" size="sm" variant="secondary" onPress={retryHistory} />
+          </View>
+        ) : null}
         {chat.items.map((it) => (
           <Item
             key={it.id}
             item={it}
-            onAction={(text) => send(id, text)}
-            onConvert={(card) => convert.mutate(card.documentId)}
-            onView={(card) => router.push(`/docs/push/${card.documentId}`)}
-            resultPending={convert.isPending}
-            resultAwaiting={!!chat.approval && it.id === lastResultId}
-            onUsage={(action) => (action === 'plan' ? router.push(accountPath('plan')) : purchase.buyCredits())}
+            onAction={onAction}
+            onConvert={onConvert}
+            onView={onView}
+            resultPending={it.type === 'result' && it.id === lastResultId && convert.isPending}
+            resultAwaiting={it.type === 'result' && it.id === lastResultId && !!chat.approval}
+            onUsage={onUsage}
           />
         ))}
         {chat.queue.map((item, i) => (

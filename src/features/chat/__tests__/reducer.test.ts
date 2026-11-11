@@ -36,6 +36,18 @@ describe('applyEvent', () => {
     expect(s.items.filter((i) => i.type === 'agentText').map((i) => (i as { text: string }).text)).toEqual(['좋아요.', '다음'])
   })
 
+  it('keeps earlier item references stable when appending tokens', () => {
+    let s = run([{ type: 'user', id: 'u1', text: 'hi' }])
+    const userRef = s.items[0]
+    s = applyEvent(s, { type: 'token', text: '안' })
+    expect(s.items[0]).toBe(userRef)
+    const midRef = s.items[1]
+    s = applyEvent(s, { type: 'token', text: '녕' })
+    expect(s.items[0]).toBe(userRef)
+    expect(s.items[1]).not.toBe(midRef)
+    expect(s.items[1]).toMatchObject({ type: 'agentText', text: '안녕' })
+  })
+
   it('stop marks running tools interrupted and remembers it for the next message', () => {
     const s = run([
       { type: 'start', at: 0 },

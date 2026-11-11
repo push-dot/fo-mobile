@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
@@ -698,7 +698,7 @@ export const Glyph = ({ still, size = 17, color }: { still?: boolean; size?: num
 }
 
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
-export const Item = ({
+const ItemComponent = ({
   item,
   onAction,
   onUsage,
@@ -776,6 +776,8 @@ export const Item = ({
       )
   }
 }
+
+export const Item = memo(ItemComponent)
 
 const ErrorLine = ({ text }: { text: string }) => (
   <Appear style={{ flexDirection: 'row', gap: spacing[2] }}>
