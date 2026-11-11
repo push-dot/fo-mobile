@@ -1,41 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { invalidateAfterPostingBookmarkToggle } from './bookmark-invalidation'
 
-const invalidateQueries = vi.hoisted(() => vi.fn(async () => undefined))
-let capturedOnSettled: (() => Promise<unknown>) | undefined
+const invalidateQueries = vi.fn(async () => undefined)
 
-vi.mock('@tanstack/react-query', () => ({
-  useQueryClient: () => ({ invalidateQueries }),
-  useMutation: (opts: { onSettled?: () => Promise<unknown> }) => {
-    capturedOnSettled = opts.onSettled
-    return { mutate: vi.fn() }
-  },
-  useQuery: () => ({}),
-  useInfiniteQuery: () => ({}),
-  keepPreviousData: 'keep',
-}))
-
-vi.mock('./fetchers', () => ({
-  togglePostingBookmark: vi.fn(),
-  fetchPostingPages: vi.fn(),
-  fetchPostingCount: vi.fn(),
-  fetchMyProfile: vi.fn(),
-  fetchPostingLocations: vi.fn(),
-  applyToPosting: vi.fn(),
-  fetchApplyDocs: vi.fn(),
-  fetchPosting: vi.fn(),
-}))
-
-describe('useToggleBookmark', () => {
+describe('invalidateAfterPostingBookmarkToggle', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    capturedOnSettled = undefined
   })
 
-  it('invalidates postings, search, and me bookmarks after settle', async () => {
-    const { useToggleBookmark } = await import('./hooks')
-    useToggleBookmark()
-    expect(capturedOnSettled).toBeTypeOf('function')
-    await capturedOnSettled!()
+  it('invalidates postings, search, and me bookmarks', async () => {
+    await invalidateAfterPostingBookmarkToggle({ invalidateQueries })
     expect(invalidateQueries).toHaveBeenCalledTimes(3)
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['postings'] })
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['search'] })

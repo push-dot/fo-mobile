@@ -2,17 +2,20 @@ import type { Session } from '@push/api-client'
 import { ApiError } from '@push/api-client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const set = vi.hoisted(() => vi.fn(async () => undefined))
-const authRefresh = vi.hoisted(() => vi.fn())
-
-const session = {
-  accessToken: 'at',
-  refreshToken: 'rt',
-  expiresIn: 3600,
-  user: { id: 'u1', displayName: '김서준', locale: 'ko' },
-} satisfies Session
-
-const sessionRef = vi.hoisted(() => ({ current: session as Session | null }))
+const { set, authRefresh, session, sessionRef } = vi.hoisted(() => {
+  const session = {
+    accessToken: 'at',
+    refreshToken: 'rt',
+    expiresIn: 3600,
+    user: { id: 'u1', displayName: '김서준', locale: 'ko' },
+  } satisfies Session
+  return {
+    set: vi.fn(async () => undefined),
+    authRefresh: vi.fn(),
+    session,
+    sessionRef: { current: session as Session | null },
+  }
+})
 
 vi.hoisted(() => {
   vi.stubEnv('EXPO_PUBLIC_API_MOCK', '0')
