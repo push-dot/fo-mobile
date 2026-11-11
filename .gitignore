@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# env files (same rules as push-fe root)
+.env
+.env.*
+!.env.example
