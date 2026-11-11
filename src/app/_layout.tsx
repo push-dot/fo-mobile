@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Appearance } from 'react-native'
 import { queryClient } from '@/providers'
-import { ToastHost } from '@/shared/components'
+import { RootErrorBoundary, ToastHost } from '@/shared/components'
 import SplashGate from '@/shared/infrastructure/splash-gate'
 import { useSession } from '@/shared/infrastructure'
 import { useThemeMode, useThemePreference } from '@/theme'
@@ -36,21 +36,23 @@ const RootLayout = () => {
   return (
     <DesignThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <SplashGate sessionReady={ready} themeReady={themeReady} />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={!!session} redirectTo="/sign-in">
-            <Stack.Screen name="(app)" />
-          </Stack.Protected>
-          <Stack.Protected guard={!session}>
-            <Stack.Screen name="sign-in" />
-            <Stack.Screen name="phone" />
-            <Stack.Screen name="verify-phone" />
-            <Stack.Screen name="signup-terms" />
-            <Stack.Screen name="terms-view" />
-            <Stack.Screen name="phone-registered" />
-          </Stack.Protected>
-        </Stack>
-        <ToastHost />
+        <RootErrorBoundary>
+          <SplashGate sessionReady={ready} themeReady={themeReady} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={!!session} redirectTo="/sign-in">
+              <Stack.Screen name="(app)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!session}>
+              <Stack.Screen name="sign-in" />
+              <Stack.Screen name="phone" />
+              <Stack.Screen name="verify-phone" />
+              <Stack.Screen name="signup-terms" />
+              <Stack.Screen name="terms-view" />
+              <Stack.Screen name="phone-registered" />
+            </Stack.Protected>
+          </Stack>
+          <ToastHost />
+        </RootErrorBoundary>
         <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       </QueryClientProvider>
     </DesignThemeProvider>
