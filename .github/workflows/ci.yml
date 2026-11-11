@@ -1,0 +1,131 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+    inputs:
+      push-fe-ref:
+        description: "push-fe branch, tag, or SHA. Empty uses the PR body marker, then develop."
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+# Matches push-fe .github/workflows/ci.yml.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Resolve push-fe ref
+        id: fe
+        env:
+          INPUT_REF: ${{ inputs.push-fe-ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          ref=$(printf '%s' "${INPUT_REF:-}" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          if [ -z "$ref" ] && [ -n "${PR_BODY:-}" ]; then
+            ref=$(printf '%s\n' "$PR_BODY" | awk 'sub(/^push-fe-ref:[[:space:]]*/, "") { sub(/\r$/, ""); sub(/[[:space:]]+$/, ""); print; exit }')
+          fi
+          if [ -z "$ref" ]; then
+            ref=develop
+          fi
+          if [ "${#ref}" -gt 200 ]; then
+            printf 'push-fe-ref is too long\n' >&2
+            exit 1
+          fi
+          case "$ref" in
+            *[!A-Za-z0-9._/-]*|-*|*/-*|*..*|*/|*/*/)
+              printf 'invalid push-fe-ref\n' >&2
+              exit 1
+              ;;
+          esac
+          printf 'ref=%s\n' "$ref" >> "$GITHUB_OUTPUT"
+          printf 'push-fe ref: %s\n' "$ref"
+
+      - name: Checkout push-fe
+        uses: actions/checkout@v4
+        with:
+          repository: push-dot/push-fe
+          ref: ${{ steps.fe.outputs.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: false
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Initialize fo-web and clear fo-mobile
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          set -euo pipefail
+          if ! git config -f .gitmodules --get submodule.apps/fo-web.url >/dev/null 2>&1; then
+            printf 'This push-fe ref has no apps/fo-web submodule. Use develop (9911f12 or later).\n' >&2
+            exit 1
+          fi
+          git submodule update --init --depth 1 apps/fo-web
+          test "$(git -C apps/fo-web rev-parse HEAD)" = "$(git rev-parse HEAD:apps/fo-web)"
+          test -f pnpm-lock.yaml
+          test -f pnpm-workspace.yaml
+          rm -rf apps/fo-mobile
+
+      - name: Checkout the commit under test
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && format('refs/pull/{0}/head', github.event.pull_request.number) || github.sha }}
+          path: apps/fo-mobile
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Record commits
+        env:
+          APP_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          FE_REF: ${{ steps.fe.outputs.ref }}
+        run: |
+          set -euo pipefail
+          printf 'push-fe ref: %s\n' "$FE_REF"
+          printf 'push-fe sha: %s\n' "$(git rev-parse HEAD)"
+          printf 'app sha: %s\n' "$(git -C apps/fo-mobile rev-parse HEAD)"
+          test "$(git -C apps/fo-mobile rev-parse HEAD)" = "$APP_SHA"
+          test -f apps/fo-mobile/package.json
+          test -f apps/fo-web/package.json
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        id: install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lockfile hint
+        if: failure() && steps.install.outcome == 'failure'
+        run: |
+          cat <<'EOF'
+          pnpm install --frozen-lockfile failed.
+          This workflow does not update pnpm-lock.yaml.
+          If this PR changes dependencies or the expo-router patch, update the
+          lockfile on a push-fe branch with pnpm 11.0.4 at the push-fe root and
+          put this on its own line in the PR body:
+
+          push-fe-ref: <branch-or-sha>
+
+          The workflow_dispatch input push-fe-ref overrides the PR body.
+          The default ref is develop.
+          EOF
+
+      - name: Typecheck, lint, test
+        run: pnpm exec turbo run typecheck lint test --filter=@push/fo-mobile...
