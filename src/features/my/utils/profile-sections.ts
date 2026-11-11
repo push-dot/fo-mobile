@@ -10,7 +10,7 @@ const SECTIONS = [
     key: 'basic',
     label: '기본 정보',
     on: true,
-    fields: ['displayName', 'headline', 'jobCategory', 'tenureYears'],
+    fields: ['displayName', 'headline', 'tenureYears'],
     sub: (d: Draft) =>
       ['이름', '헤드라인', [JOB_CATEGORIES.find((j) => j.key === d.jobCategory)?.label, tenureLabel(d.tenureYears)].filter(Boolean).join(' ')]
         .filter(Boolean)
