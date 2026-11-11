@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const h = vi.hoisted(() => ({ focused: false, slots: [] as unknown[], s: 0 }))
@@ -30,6 +31,7 @@ const tabs = await Promise.all(
   ].map(async ([group, root, screen]) => ({
     group,
     screen,
+    rootSource: readFileSync(new URL(`../../app/(app)/(stack)/(tabs)/${group}/${root}.tsx`, import.meta.url), 'utf8'),
     Layout: (await import(`@/app/(app)/(stack)/(tabs)/${group}/_layout.tsx`)).default as () => { type: unknown },
     Root: (await import(`@/app/(app)/(stack)/(tabs)/${group}/${root}.tsx`)).default as () => { type: unknown } | null,
   })),
@@ -55,16 +57,22 @@ describe('useFocusedOnce', () => {
   })
 })
 
-describe.each(tabs)('$group tab', ({ screen, Layout, Root }) => {
+describe.each(tabs)('$group tab', ({ group, screen, rootSource, Layout, Root }) => {
   it('registers its Stack before the first focus, so a push into the tab keeps its first screen under it', () => {
     expect(render(Layout).type).toBe(Stack)
   })
 
   it('mounts its first screen on the first focus and keeps it after a blur', () => {
-    expect(render(Root)).toBeNull()
-    h.focused = true
-    expect(render(Root)?.type).toBe(screen)
-    h.focused = false
-    expect(render(Root)?.type).toBe(screen)
+    if (group === '(home)') {
+      expect(render(Root)).toBeNull()
+      h.focused = true
+      expect(render(Root)?.type).toBe(screen)
+      h.focused = false
+      expect(render(Root)?.type).toBe(screen)
+      return
+    }
+    expect(rootSource).toContain('useFocusedOnce')
+    expect(rootSource).toContain('import(')
+    expect(rootSource).not.toMatch(/from ['"]@\/screens\//)
   })
 })

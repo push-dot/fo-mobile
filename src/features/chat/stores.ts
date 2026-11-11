@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode, type ChatIntent } from '@push/api-client'
-import { myApi, type PickedFile } from '@/features/my'
+import { myApi } from '@/features/my/api/fetchers'
+import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
 import { api, API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'

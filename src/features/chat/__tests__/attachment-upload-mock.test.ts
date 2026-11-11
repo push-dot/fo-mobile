@@ -9,7 +9,21 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my', () => ({ myApi: { upload, sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload, sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('../api/fetchers', () => ({
+  chatApi: {
+    run: async (body: unknown) => {
+      const r = await post('chat/runs', { body })
+      return r.data
+    },
+  },
+  fetchConversationMessages: () => Promise.resolve({ data: [] }),
+  fetchConversationTurns: () => Promise.resolve({ data: [] }),
+  followConversation: () => (async function* () {})(),
+  resolveConversationApproval: vi.fn(),
+  streamConversation: () => (async function* () {})(),
+  updateAiAccessMode: vi.fn(),
+}))
 
 const { send, useChatStore, usePrefs } = await import('../stores')
 

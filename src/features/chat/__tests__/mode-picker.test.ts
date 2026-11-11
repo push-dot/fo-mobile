@@ -2,7 +2,7 @@ import { ApiError, type StreamEvent } from '@push/api-client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const api = vi.hoisted(() => ({
-  conversations: { stream: vi.fn(), follow: vi.fn(), resolveApproval: vi.fn() },
+  conversations: { stream: vi.fn(), follow: vi.fn(), resolveApproval: vi.fn(), messages: vi.fn(), turns: vi.fn() },
   me: { updateSettings: vi.fn() },
 }))
 vi.mock('@/shared/infrastructure', () => ({
@@ -12,7 +12,16 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/features/my/api/fetchers', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('../api/fetchers', () => ({
+  chatApi: {},
+  fetchConversationMessages: (id: string) => api.conversations.messages(id, { limit: 50 }),
+  fetchConversationTurns: (id: string) => api.conversations.turns(id, { limit: 50 }),
+  followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
+  resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string, string?])),
+  streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
+  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
+}))
 
 const { answer, pickAccessMode, send, useChatStore, usePrefs } = await import('../stores')
 const { emptyChat } = await import('../utils/reducer')

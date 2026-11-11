@@ -14,7 +14,7 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my', () => ({ myApi: { upload: vi.fn() } }))
+vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {},
   createConversation: vi.fn(),
@@ -33,6 +33,12 @@ const chatTabSource = readFileSync(
   new URL('../../../app/(app)/(stack)/(tabs)/(chat)/chat.tsx', import.meta.url),
   'utf8',
 )
+const stackLayoutSource = readFileSync(
+  new URL('../../../app/(app)/(stack)/_layout.tsx', import.meta.url),
+  'utf8',
+)
+const storesSource = readFileSync(new URL('../stores.ts', import.meta.url), 'utf8')
+const fetchersSource = readFileSync(new URL('../api/fetchers.ts', import.meta.url), 'utf8')
 const listenerSource = readFileSync(new URL('../components/consent-prompt-listener.tsx', import.meta.url), 'utf8')
 
 beforeEach(() => {
@@ -48,9 +54,18 @@ describe('ConsentPromptListener', () => {
   })
 
   it('does not read consents or settings on cold start', () => {
-    expect(chatTabSource).toContain('useFocusedOnce() ? <ChatHomeScreen /> : null')
+    expect(chatTabSource).not.toContain("from '@/screens/chat/chat-home-screen'")
+    expect(chatTabSource).toContain('import(')
     expect(listenerSource).not.toContain('useReferenceConsent')
     expect(listenerSource).not.toContain('useMySettings')
     expect(pushed).not.toHaveBeenCalled()
+  })
+
+  it('avoids heavy chat and my barrel imports on startup paths', () => {
+    expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat['"]/)
+    expect(storesSource).not.toMatch(/from ['"]@\/features\/my['"]/)
+    expect(fetchersSource).not.toMatch(/from ['"]@\/features\/my['"]/)
+    expect(storesSource).toContain("@/features/my/api/fetchers")
+    expect(fetchersSource).toContain("@/features/my/types")
   })
 })

@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
 import { Platform, View } from 'react-native'
-import { ConsentPromptListener } from '@/features/chat'
+import { ConsentPromptListener } from '@/features/chat/components/consent-prompt-listener'
 import { FULL_SHEET_KIND } from '@/features/jobs'
 import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'

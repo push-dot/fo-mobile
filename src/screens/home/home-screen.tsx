@@ -2,7 +2,9 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
-import { SECTIONS, useToggleBookmark, type SectionKind } from '@/features/jobs'
+import { useToggleBookmark } from '@/features/jobs/api/hooks'
+import { SECTIONS } from '@/features/jobs/constants'
+import type { SectionKind } from '@/features/jobs/types'
 import { useUnreadCount } from '@/features/notifications'
 import { GlassButton, TopBar, Wordmark } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
@@ -28,7 +30,7 @@ const HomeScreen = () => {
       />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        scrollEventThrottle={16}
+        scrollEventThrottle={64}
         onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
         contentContainerStyle={{ paddingBottom: 32 }}
       >

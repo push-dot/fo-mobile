@@ -9,7 +9,16 @@ const api = vi.hoisted(() => ({
   me: { updateSettings: vi.fn() },
 }))
 vi.mock('@/shared/infrastructure', () => ({ api, http: {}, API_MOCK: false, hapticImpactLight: vi.fn(), hapticNotify: vi.fn() }))
-vi.mock('@/features/my', () => ({ myApi: { upload: vi.fn(), sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload: vi.fn(), sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('../api/fetchers', () => ({
+  chatApi: {},
+  fetchConversationMessages: (id: string) => api.conversations.messages(id, { limit: 50 }),
+  fetchConversationTurns: (id: string) => api.conversations.turns(id, { limit: 50 }),
+  followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
+  resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string])),
+  streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
+  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
+}))
 vi.mock('@/shared/components/toast-store', () => ({ showToast }))
 
 const { stop, useChatStore } = await import('../stores')

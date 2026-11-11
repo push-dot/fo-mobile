@@ -1,6 +1,7 @@
 import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api-client'
 import { api, http, API_MOCK } from '@/shared/infrastructure'
-import { myApi, type PickedFile } from '@/features/my'
+import { myApi } from '@/features/my/api/fetchers'
+import type { PickedFile } from '@/features/my/types'
 import { MICRO_CREDITS_PER_CREDIT } from '../constants'
 import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
