@@ -31,6 +31,8 @@ import {
 } from './fetchers'
 import type { ConversationRow, RunInput } from './schemas'
 
+const RETRY_LATER = '잠시 뒤에 다시 해 주세요.'
+
 export const useStartChat = () => {
   const qc = useQueryClient()
   const run = useCallback(
@@ -47,7 +49,7 @@ export const useStartChat = () => {
           askConsent(true)
           return
         }
-        Alert.alert('대화를 시작하지 못했어요', '잠시 뒤에 다시 해 주세요.')
+        Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)
       }
     },
     [qc],
@@ -78,7 +80,7 @@ export const useRenameConversation = (id: string, revision: number | undefined) 
       return renameConversation(id, revision, title)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('이름을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('이름을 바꾸지 못했어요', RETRY_LATER),
   })
 }
 
@@ -87,7 +89,7 @@ export const usePinConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => pinConversation(row.id, row.revision, !row.pinned),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('고정을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('고정을 바꾸지 못했어요', RETRY_LATER),
   })
 }
 
@@ -96,7 +98,7 @@ export const useArchiveConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => archiveConversation(row.id, row.revision),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('보관하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -105,7 +107,7 @@ export const useUnarchiveConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => unarchiveConversation(row.id, row.revision),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관을 해제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('보관을 해제하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -117,7 +119,7 @@ export const useDeleteConversation = () => {
       forget(id)
       void qc.invalidateQueries({ queryKey: ['conversations'] })
     },
-    onError: () => Alert.alert('대화를 삭제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('대화를 삭제하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -145,7 +147,7 @@ export const useUploadChatDoc = () => {
       await chatApi.addDoc(f)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
-    onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : '잠시 뒤에 다시 해 주세요.'),
+    onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : RETRY_LATER),
   })
 }
 
@@ -161,7 +163,7 @@ const shareAs = (name: string, bytes: Uint8Array, mimeType?: string) => shareByt
 export const useOpenArtifact = () =>
   useMutation({
     mutationFn: ({ url, name }: { url: string; name: string }) => oneShare(async () => shareAs(name, await fetchArtifactBytes(url))),
-    onError: () => Alert.alert('파일을 열지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('파일을 열지 못했어요', RETRY_LATER),
   })
 
 export type SharedFile = { documentId: string; name?: string } | { sourceId: string; name: string; mimeType?: string }
@@ -188,7 +190,7 @@ export const useAccessMode = () => {
   const save = useMutation({
     mutationFn: pickAccessMode,
     onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
-    onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('바꾸지 못했어요', RETRY_LATER),
   })
   return { mode, pick: save.mutate }
 }
