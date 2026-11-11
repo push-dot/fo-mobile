@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FlatList, Pressable, ScrollView, View } from 'react-native'
 import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
@@ -32,12 +32,35 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
   const [sort, setSort] = useState<SearchSort>('relevance')
   const recent = useRecentSearches()
   const popular = useTrending().data?.terms ?? []
-  const results = { postings: useSearch(q, 'postings', sort), people: useSearch(q, 'people', sort), posts: useSearch(q, 'posts', sort) }
+  const results = {
+    postings: useSearch(q, 'postings', sort, tab === 'postings'),
+    people: useSearch(q, 'people', sort, tab === 'people'),
+    posts: useSearch(q, 'posts', sort, tab === 'posts'),
+  }
   const active = results[tab]
   const loading = active.isPending || active.isPlaceholderData
-  const items: (Posting | Profile | Post)[] = loading ? [] : active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
+  const pageItems = useMemo(
+    () => active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? [],
+    // React Query may update `data` in place; matches posting-grid memo deps.
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- active tab slice from useInfiniteQuery
+    [active.data],
+  )
+  const items = loading ? [] : pageItems
   const totalOf = (k: SearchTab) => results[k].data?.pages[0]?.page.total
-  const remember = () => q && recent.add(q)
+  const remember = useCallback(() => {
+    if (q) recent.add(q)
+  }, [q, recent])
+  const renderItem = useCallback(
+    ({ item }: { item: Posting | Profile | Post }) =>
+      'userId' in item ? (
+        <PersonRow p={item} q={q} onOpen={remember} />
+      ) : 'company' in item ? (
+        <PostingRow p={item} q={q} onOpen={remember} />
+      ) : (
+        <PostRow p={item} q={q} onOpen={remember} />
+      ),
+    [q, remember],
+  )
   const submit = () => {
     search(text)
     if (text.trim()) recent.add(text.trim())
@@ -163,15 +186,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               ) : null}
             </>
           }
-          renderItem={({ item }) =>
-            'userId' in item ? (
-              <PersonRow p={item} q={q} onOpen={remember} />
-            ) : 'company' in item ? (
-              <PostingRow p={item} q={q} onOpen={remember} />
-            ) : (
-              <PostRow p={item} q={q} onOpen={remember} />
-            )
-          }
+          renderItem={renderItem}
           ListEmptyComponent={
             loading ? (
               <SkeletonRows {...SEARCH_SKELETON} />
