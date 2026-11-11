@@ -1,7 +1,7 @@
 import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
 import { MULTI_PICK_FOOT } from '../constants'
-import type { Approval, ApprovalSection, ChatEvent, ChatItem, Choice, TemplateLayout } from '../types'
+import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
 /** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
 export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
@@ -209,6 +209,3 @@ export const attachPendingNote = (items: ChatItem[], note: string | undefined): 
 
 export const clearPendingNote = (items: ChatItem[]): ChatItem[] =>
   items.map((it) => (it.type === 'result' && it.source === 'profile' && it.pendingNote ? { ...it, pendingNote: undefined } : it))
-
-export const isSectionChoice = (ev: ChatEvent): ev is Extract<ChatEvent, { type: 'approval' }> =>
-  ev.type === 'approval' && ev.approval.sections.some((s) => s.kind !== 'choices')

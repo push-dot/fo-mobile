@@ -1,4 +1,5 @@
 import { brandColor } from '@push/shared'
+import { givenName } from '@/features/my/utils/given-name'
 
 const KNOWN = ['apply', 'convert', 'view'] as const
 
@@ -38,19 +39,20 @@ export const profileSaveCopy = (card: { pendingNote?: string; actions: ResultAct
     ? { title: PROFILE_SAVE_TITLE, body: card.pendingNote, buttons: ['프로필 보기'] as const }
     : null
 
-export const resultTitle = (card: Pick<ResultFields, 'source' | 'fileName' | 'title'> & { pendingNote?: string }) =>
-  card.pendingNote ? PROFILE_SAVE_TITLE : card.source === 'external' ? (card.fileName ?? '') : (card.title ?? '')
+export const resultTitle = (card: Pick<ResultFields, 'source' | 'fileName' | 'title'> & { pendingNote?: string }) => {
+  if (card.pendingNote) return PROFILE_SAVE_TITLE
+  if (card.source === 'external') return card.fileName ?? ''
+  return card.title ?? ''
+}
 
 export const resultMeta = (card: Pick<ResultFields, 'source' | 'pageLine' | 'cardMeta' | 'subtitle'>) =>
   card.source === 'external' ? (card.cardMeta ?? card.pageLine ?? '') : (card.subtitle ?? '')
-
-const given = (name: string) => (/^[가-힣]{3}$/.test(name) ? name.slice(1) : name.slice(0, 2))
 
 /** 공유 sends the saved document's PDF export, so a card whose document was not saved has nothing to share. */
 export const resultChrome = (card: Pick<ResultFields, 'source' | 'name' | 'documentId'>) =>
   card.source === 'external'
     ? { share: !!card.documentId, initials: null, color: null }
-    : { share: false, initials: given(card.name ?? ''), color: brandColor(card.name ?? '') }
+    : { share: false, initials: givenName(card.name ?? ''), color: brandColor(card.name ?? '') }
 
 /** 프로필 수정 · Push 프로필 · 경력 → the tool line above the card. */
 export const resultTask = (taskLine: string) => {

@@ -20,7 +20,6 @@ export const ACCESS_MODE_TITLE = '에이전트가 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
-export const SAY_LABEL = '직접 말하기'
 export const CHOICE_QUESTION = '어떻게 할까요?'
 export const MULTI_PICK_SUBMIT = '이대로 진행'
 export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
@@ -80,9 +79,6 @@ export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 �
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
 export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 에이전트를 쓸 수 없어요.'
-export const CONSENT_TOGGLE = '참고 데이터 제공'
-export const CONSENT_TOGGLE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
-export const CONSENT_TOGGLE_NOTE = '끄면 에이전트를 쓸 수 없어요.'
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 

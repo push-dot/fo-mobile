@@ -3,10 +3,12 @@ export const notificationTitle = (n: { type: string; title: string }) => (n.type
 const DAY = 86_400_000
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
 
+const daysAgo = (t: Date, now: Date) => Math.round((startOfDay(now) - startOfDay(t)) / DAY)
+
 export const timeLabel = (iso: string, now = new Date()) => {
   const t = new Date(iso)
   const min = Math.floor((now.getTime() - t.getTime()) / 60_000)
-  const days = Math.round((startOfDay(now) - startOfDay(t)) / DAY)
+  const days = daysAgo(t, now)
   if (days === 0) {
     if (min < 1) return '방금'
     if (min < 60) return `${min}분 전`
@@ -19,6 +21,6 @@ export const timeLabel = (iso: string, now = new Date()) => {
 }
 
 export const groupLabel = (iso: string, now = new Date()) => {
-  const days = Math.round((startOfDay(now) - startOfDay(new Date(iso))) / DAY)
+  const days = daysAgo(new Date(iso), now)
   return days === 0 ? '오늘' : days < 7 ? '이번 주' : '이전'
 }

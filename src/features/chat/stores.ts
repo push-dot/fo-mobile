@@ -203,7 +203,7 @@ const startRun = async (input: Outgoing) => {
     const apiError = err instanceof ApiError ? err : undefined
     const retryAfter = err instanceof QueueBusyError ? err.retryAfterSec : apiError?.details?.retryAfterSec
     const text = errorText(apiError?.code, typeof retryAfter === 'number' ? retryAfter : undefined, apiError?.details?.reason)
-    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: err instanceof ApiError ? err.code : undefined })
+    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: apiError?.code })
   } finally {
     if (runs.get(id) === ctrl) runs.delete(id)
   }
