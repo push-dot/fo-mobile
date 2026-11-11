@@ -43,8 +43,3 @@ export const useFollow = (id: string) => {
     onSettled: () => qc.invalidateQueries({ queryKey: ['profiles'] }),
   })
 }
-
-export const useInvalidateProfileDetail = (id: string) => {
-  const qc = useQueryClient()
-  return () => qc.invalidateQueries({ queryKey: ['profiles', 'detail', id] })
-}

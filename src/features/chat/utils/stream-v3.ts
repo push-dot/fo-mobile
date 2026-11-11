@@ -209,6 +209,3 @@ export const attachPendingNote = (items: ChatItem[], note: string | undefined): 
 
 export const clearPendingNote = (items: ChatItem[]): ChatItem[] =>
   items.map((it) => (it.type === 'result' && it.source === 'profile' && it.pendingNote ? { ...it, pendingNote: undefined } : it))
-
-export const isSectionChoice = (ev: ChatEvent): ev is Extract<ChatEvent, { type: 'approval' }> =>
-  ev.type === 'approval' && ev.approval.sections.some((s) => s.kind !== 'choices')

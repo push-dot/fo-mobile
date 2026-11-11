@@ -1,7 +1,6 @@
 export { default as Badge } from './badge'
 export type { BadgeTone } from './badge'
 export { default as Blur } from './blur'
-export { default as BottomSheet } from './bottom-sheet'
 export { default as Button } from './button'
 export { default as Chip } from './chip'
 export { default as CtaBar } from './cta-bar'
