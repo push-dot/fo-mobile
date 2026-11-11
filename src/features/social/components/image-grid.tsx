@@ -12,12 +12,14 @@ const ImageGrid = ({ urls, row }: { urls: string[]; row: number }) => {
       key={i}
       source={assetUrl(urls[i])}
       contentFit="cover"
+      cachePolicy="memory-disk"
+      recyclingKey={urls[i]}
       accessibilityIgnoresInvertColors
       style={[{ borderRadius: 14, backgroundColor: c.fill2 }, style]}
     />
   )
   const full = row * 2 + 4
-  if (n === 1) return img(0, { height: full })
+  if (n === 1) return img(0, { width: '100%', height: full })
   if (n === 2)
     return (
       <View style={{ flexDirection: 'row', gap: spacing[1], height: Math.round(row * 1.6) }}>

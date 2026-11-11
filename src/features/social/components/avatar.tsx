@@ -9,7 +9,14 @@ import { givenName } from '../utils'
 
 const Avatar = ({ user, size }: { user: UserRef; size: number }) => {
   if (user.avatarUrl) {
-    return <Image source={assetUrl(user.avatarUrl)} style={{ width: size, height: size, borderRadius: size / 2 }} accessibilityIgnoresInvertColors />
+    return (
+      <Image
+        source={assetUrl(user.avatarUrl)}
+        style={{ width: size, height: size, borderRadius: size / 2 }}
+        cachePolicy="memory-disk"
+        accessibilityIgnoresInvertColors
+      />
+    )
   }
   return (
     <View

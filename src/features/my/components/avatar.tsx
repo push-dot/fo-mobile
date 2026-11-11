@@ -19,6 +19,7 @@ const Avatar = ({
     <Image
       source={{ uri: assetUrl(url) }}
       style={{ width: size, height: size, borderRadius: size / 2 }}
+      cachePolicy="memory-disk"
       accessibilityIgnoresInvertColors
     />
   ) : (
