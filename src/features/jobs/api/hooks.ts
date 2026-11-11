@@ -16,7 +16,12 @@ export const useToggleBookmark = () => {
   const qc = useQueryClient()
   const { mutate } = useMutation({
     mutationFn: togglePostingBookmark,
-    onSettled: () => Promise.all(['postings', 'search', 'bookmarks'].map((k) => qc.invalidateQueries({ queryKey: [k] }))),
+    onSettled: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: ['postings'] }),
+        qc.invalidateQueries({ queryKey: ['search'] }),
+        qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
+      ]),
   })
   return mutate
 }
