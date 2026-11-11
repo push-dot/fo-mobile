@@ -159,7 +159,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       />
       <ScrollView
         ref={scroll}
-        onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: true })}
+        onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}
         contentContainerStyle={{
           flexGrow: 1,
           gap: spacing[4],
