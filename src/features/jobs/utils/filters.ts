@@ -26,16 +26,23 @@ const labelsOf = <K extends string>(list: { key: K; label: string }[], keys: K[]
   list.filter((x) => keys.includes(x.key)).map((x) => x.label)
 
 export const chipText = (key: FilterKey, f: Filters): string => {
-  const selected =
-    key === 'category'
-      ? labelsOf(JOB_CATEGORIES, f.category)
-      : key === 'skills'
-        ? f.skills
-        : key === 'careerYears'
-          ? labelsOf(CAREER_YEARS, f.careerYears)
-          : key === 'location'
-            ? f.location
-            : labelsOf(EMPLOYMENT_TYPES, f.employmentType)
+  let selected: string[]
+  switch (key) {
+    case 'category':
+      selected = labelsOf(JOB_CATEGORIES, f.category)
+      break
+    case 'skills':
+      selected = f.skills
+      break
+    case 'careerYears':
+      selected = labelsOf(CAREER_YEARS, f.careerYears)
+      break
+    case 'location':
+      selected = f.location
+      break
+    default:
+      selected = labelsOf(EMPLOYMENT_TYPES, f.employmentType)
+  }
   if (selected.length === 0) return FILTER_TITLES[key]
   if (selected.length === 1) return `${FILTER_TITLES[key]} · ${selected[0]}`
   return `${selected[0]} 외 ${selected.length - 1}`

@@ -10,15 +10,23 @@ const PLAN = { id: 'plan', label: '요금제 올리기', variant: 'secondary' } 
 const CREDITS = { id: 'credits', label: '크레딧 구매', variant: 'primary' } as const
 
 // plan is undefined until the account loads: say the fact and offer nothing to buy.
-export const usageExhausted = (plan: string | undefined, paymentsOpen = true) =>
-  plan === undefined ? { body: BARE_BODY, actions: [] } : !paymentsOpen ? { body: CLOSED_BODY, actions: [] } : plan === 'ULTRA' ? { body: ULTRA_BODY, actions: [CREDITS] } : { body: FREE_BODY, actions: [PLAN, CREDITS] }
+export const usageExhausted = (plan: string | undefined, paymentsOpen = true) => {
+  if (plan === undefined) return { body: BARE_BODY, actions: [] }
+  if (!paymentsOpen) return { body: CLOSED_BODY, actions: [] }
+  if (plan === 'ULTRA') return { body: ULTRA_BODY, actions: [CREDITS] }
+  return { body: FREE_BODY, actions: [PLAN, CREDITS] }
+}
 
 const PLAN_OPEN = '요금제를 올리면 쓸 수 있어요.'
 const PLAN_CLOSED = '지금 요금제에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.'
 const PLAN_BARE = '지금 요금제에서는 쓸 수 없어요.'
 
 /** PLAN_REQUIRED line, in the same three states as usageExhausted. */
-export const planRequired = (plan: string | undefined, paymentsOpen = true) => (plan === undefined ? PLAN_BARE : !paymentsOpen ? PLAN_CLOSED : PLAN_OPEN)
+export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
+  if (plan === undefined) return PLAN_BARE
+  if (!paymentsOpen) return PLAN_CLOSED
+  return PLAN_OPEN
+}
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 

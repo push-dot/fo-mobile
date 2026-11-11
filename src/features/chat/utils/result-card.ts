@@ -38,8 +38,11 @@ export const profileSaveCopy = (card: { pendingNote?: string; actions: ResultAct
     ? { title: PROFILE_SAVE_TITLE, body: card.pendingNote, buttons: ['프로필 보기'] as const }
     : null
 
-export const resultTitle = (card: Pick<ResultFields, 'source' | 'fileName' | 'title'> & { pendingNote?: string }) =>
-  card.pendingNote ? PROFILE_SAVE_TITLE : card.source === 'external' ? (card.fileName ?? '') : (card.title ?? '')
+export const resultTitle = (card: Pick<ResultFields, 'source' | 'fileName' | 'title'> & { pendingNote?: string }) => {
+  if (card.pendingNote) return PROFILE_SAVE_TITLE
+  if (card.source === 'external') return card.fileName ?? ''
+  return card.title ?? ''
+}
 
 export const resultMeta = (card: Pick<ResultFields, 'source' | 'pageLine' | 'cardMeta' | 'subtitle'>) =>
   card.source === 'external' ? (card.cardMeta ?? card.pageLine ?? '') : (card.subtitle ?? '')
