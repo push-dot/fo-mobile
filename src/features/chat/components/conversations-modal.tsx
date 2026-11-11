@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
-import { Pressable, View, useWindowDimensions } from 'react-native'
+import { memo, useCallback, useMemo, useState } from 'react'
+import { FlatList, Pressable, View, useWindowDimensions } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { searchHangul } from '@push/shared'
 import { spacing, useColors } from '@/theme'
-import { Badge, Button, ContextMenu, GlassButton, Icon, Text, TextField, askConfirm } from '@/shared/components'
+import { Badge, Button, ContextMenu, GlassButton, Icon, Text, TextField, askConfirm, type MenuAction } from '@/shared/components'
 import {
   useArchiveConversation,
   useArchivedConversations,
@@ -15,6 +16,7 @@ import {
 import type { ConversationRow } from '../api/schemas'
 import { ago, renamePath } from '../utils'
 import { ARCHIVED_NOTE, ARCHIVED_TITLE, DELETE_CONFIRM, UNARCHIVE_LABEL, conversationRowMenu } from '../utils/conversation-menu'
+import { flattenConversationGroups, type ConversationListRow as ListRow } from '../utils/conversation-list-rows'
 import Note from './note'
 import PageModal, { PageEmpty } from './page-modal'
 
@@ -75,6 +77,36 @@ const startNew = (onClose: () => void) => {
   router.dismissTo('/chat')
 }
 
+const ConversationItem = memo(
+  ({
+    row,
+    width,
+    menu,
+    cardBg,
+  }: {
+    row: ConversationRow
+    width: number
+    menu: (row: ConversationRow) => MenuAction[]
+    cardBg: string
+  }) => (
+    <ContextMenu
+      accessibilityLabel={row.title}
+      actions={menu(row)}
+      onPress={() => router.push(`/chat/${row.id}`)}
+      preview={
+        <View style={{ ...ROW, paddingHorizontal: spacing[4], width: width - 24, borderRadius: 18, backgroundColor: cardBg }}>
+          <RowBody row={row} />
+        </View>
+      }
+    >
+      <View style={ROW}>
+        <RowBody row={row} />
+      </View>
+    </ContextMenu>
+  ),
+)
+ConversationItem.displayName = 'ConversationItem'
+
 export const ConversationList = ({
   onClose,
   currentId,
@@ -97,31 +129,95 @@ export const ConversationList = ({
   const source = archivedView ? archived : list
   const rows = searchHangul(source.data?.data ?? [], archivedView ? '' : q, (r) => [r.title, r.lastLine ?? '']).map((x) => x.item)
 
-  const confirmDelete = (row: ConversationRow) =>
-    askConfirm({
-      ...DELETE_CONFIRM,
-      danger: true,
-      onConfirm: () =>
-        remove.mutate(row.id, {
-          onSuccess: () => {
-            if (row.id === currentId) onDeleted?.()
-          },
-        }),
-    })
+  const insets = useSafeAreaInsets()
 
-  const menu = (row: ConversationRow) =>
-    conversationRowMenu(row.pinned).map((a) => ({
-      key: a.id,
-      label: a.label,
-      systemImage: a.systemImage,
-      destructive: a.destructive,
-      onPress: () => {
-        if (a.id === 'pin') pin.mutate(row)
-        else if (a.id === 'archive') archive.mutate(row)
-        else if (a.id === 'delete') confirmDelete(row)
-        else router.push(renamePath(row.id))
-      },
-    }))
+  const confirmDelete = useCallback(
+    (row: ConversationRow) =>
+      askConfirm({
+        ...DELETE_CONFIRM,
+        danger: true,
+        onConfirm: () =>
+          remove.mutate(row.id, {
+            onSuccess: () => {
+              if (row.id === currentId) onDeleted?.()
+            },
+          }),
+      }),
+    [currentId, onDeleted, remove],
+  )
+
+  const menu = useCallback(
+    (row: ConversationRow) =>
+      conversationRowMenu(row.pinned).map((a) => ({
+        key: a.id,
+        label: a.label,
+        systemImage: a.systemImage,
+        destructive: a.destructive,
+        onPress: () => {
+          if (a.id === 'pin') pin.mutate(row)
+          else if (a.id === 'archive') archive.mutate(row)
+          else if (a.id === 'delete') confirmDelete(row)
+          else router.push(renamePath(row.id))
+        },
+      })),
+    [archive, confirmDelete, pin],
+  )
+
+  const grouped = useMemo(() => groups(rows), [rows])
+  const listRows = useMemo(() => flattenConversationGroups(grouped), [grouped])
+  const empty = !!source.data && rows.length === 0
+
+  const renderItem = useCallback(
+    ({ item }: { item: ListRow }) => {
+      if (item.kind === 'header') {
+        return (
+          <Text
+            v="c1"
+            weight="700"
+            color="t3"
+            style={{
+              paddingTop: item.firstTitled ? spacing[4] : 22,
+              paddingHorizontal: spacing[6],
+              paddingBottom: spacing[2],
+            }}
+          >
+            {item.title}
+          </Text>
+        )
+      }
+      return <ConversationItem row={item.row} width={width} menu={menu} cardBg={c.card} />
+    },
+    [c.card, menu, width],
+  )
+
+  const listEmpty = useMemo(
+    () => (
+      <PageEmpty reserve={LIST_EMPTY_RESERVE}>
+        <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
+          {q ? `“${q}”에 맞는 대화가 없어요` : '아직 대화가 없어요'}
+        </Text>
+        {!q ? <Button label="새 대화 시작" variant="secondary" size="pill" onPress={() => startNew(onClose)} style={{ marginTop: spacing[3] }} /> : null}
+      </PageEmpty>
+    ),
+    [onClose, q],
+  )
+
+  const listFooter = useMemo(
+    () => (
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setArchivedView(true)}
+        style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+      >
+        <Icon name="archive" size={18} color="t2" />
+        <Text v="b2" weight="600" color="t2" style={{ flex: 1 }}>
+          {ARCHIVED_TITLE}
+        </Text>
+        <Icon name="chev" size={16} color="t2" />
+      </Pressable>
+    ),
+    [],
+  )
 
   if (archivedView)
     return (
@@ -140,63 +236,27 @@ export const ConversationList = ({
       </PageModal>
     )
 
-  const grouped = groups(rows)
-  const firstTitled = grouped.find((g) => g.title)
-  const empty = !!source.data && rows.length === 0
   return (
-    <PageModal title="대화" onClose={onClose} right={<GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: () => startNew(onClose) }]} />}>
+    <PageModal
+      scroll={false}
+      title="대화"
+      onClose={onClose}
+      right={<GlassButton actions={[{ icon: 'edit', label: '새 대화', onPress: () => startNew(onClose) }]} />}
+    >
       <View style={{ flex: 1 }}>
         <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: spacing[2] }}>
           <TextField variant="search" placeholder="대화 검색" value={q} onChangeText={setQ} returnKeyType="search" accessibilityLabel="대화 검색" />
         </View>
         {empty ? null : <View style={{ height: 6 }} />}
-        {grouped.map((g) => (
-          <View key={g.title ?? 'pinned'}>
-            {g.title ? (
-              <Text v="c1" weight="700" color="t3" style={{ paddingTop: g === firstTitled ? spacing[4] : 22, paddingHorizontal: spacing[6], paddingBottom: spacing[2] }}>
-                {g.title}
-              </Text>
-            ) : null}
-            {g.rows.map((r) => (
-              <ContextMenu
-                key={r.id}
-                accessibilityLabel={r.title}
-                actions={menu(r)}
-                onPress={() => router.push(`/chat/${r.id}`)}
-                preview={
-                  <View style={{ ...ROW, paddingHorizontal: spacing[4], width: width - 24, borderRadius: 18, backgroundColor: c.card }}>
-                    <RowBody row={r} />
-                  </View>
-                }
-              >
-                <View style={ROW}>
-                  <RowBody row={r} />
-                </View>
-              </ContextMenu>
-            ))}
-          </View>
-        ))}
-        {empty ? (
-          <PageEmpty reserve={LIST_EMPTY_RESERVE}>
-            <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
-              {q ? `“${q}”에 맞는 대화가 없어요` : '아직 대화가 없어요'}
-            </Text>
-            {!q ? <Button label="새 대화 시작" variant="secondary" size="pill" onPress={() => startNew(onClose)} style={{ marginTop: spacing[3] }} /> : null}
-          </PageEmpty>
-        ) : null}
-        {!q && rows.length > 0 ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => setArchivedView(true)}
-            style={{ ...ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
-          >
-            <Icon name="archive" size={18} color="t2" />
-            <Text v="b2" weight="600" color="t2" style={{ flex: 1 }}>
-              {ARCHIVED_TITLE}
-            </Text>
-            <Icon name="chev" size={16} color="t2" />
-          </Pressable>
-        ) : null}
+        <FlatList
+          data={listRows}
+          keyExtractor={(item) => item.key}
+          renderItem={renderItem}
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + spacing[6] }}
+          ListEmptyComponent={empty ? listEmpty : undefined}
+          ListFooterComponent={!q && rows.length > 0 ? listFooter : undefined}
+        />
       </View>
     </PageModal>
   )

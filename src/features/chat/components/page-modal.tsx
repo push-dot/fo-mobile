@@ -16,6 +16,7 @@ const PageModal = ({
   children,
   footer,
   tight,
+  scroll = true,
 }: {
   onClose?: () => void
   title: string
@@ -24,6 +25,7 @@ const PageModal = ({
   children: ReactNode
   footer?: ReactNode
   tight?: boolean
+  scroll?: boolean
 }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
@@ -37,7 +39,11 @@ const PageModal = ({
         </Text>
         <View style={{ minWidth: 44, alignItems: 'flex-end' }}>{right}</View>
       </View>
-      <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: spacing[1] }} contentContainerStyle={{ flexGrow: 1, gap: spacing[1], paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
+      {scroll ? (
+        <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: spacing[1] }} contentContainerStyle={{ flexGrow: 1, gap: spacing[1], paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
+      ) : (
+        <View style={{ flex: 1, marginTop: spacing[1] }}>{children}</View>
+      )}
       {footer ? <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10), backgroundColor: c.bg }}>{footer}</View> : null}
       {/* iOS: the root ToastHost sits under this sheet; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
