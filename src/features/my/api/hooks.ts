@@ -59,6 +59,7 @@ import {
   updateReferenceConsent,
   updateSettings,
 } from './fetchers'
+import { ingestEnabled } from './ingest-enabled'
 
 export const useUnreadOffers = () =>
   useQuery({
@@ -154,7 +155,8 @@ export const useRenameDocument = (doc: { id: string; revision: number } | undefi
 export const useArchiveDocument = (doc: { id: string; revision: number } | undefined) =>
   useDocumentWrite(() => archiveDocument(doc!.id, doc!.revision))
 
-export const useIngestJob = (jobId: string | undefined) => useQuery(ingestJobQuery(jobId))
+export const useIngestJob = (jobId: string | undefined, enabled = true) =>
+  useQuery({ ...ingestJobQuery(jobId), enabled: ingestEnabled(jobId, enabled) })
 
 type Box = 'received' | 'sent'
 

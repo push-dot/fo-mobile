@@ -1,4 +1,4 @@
-import { router } from 'expo-router'
+import { router, useIsFocused } from 'expo-router'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -23,9 +23,9 @@ const EMPTY_INSET = 40
 
 const openChat = () => router.push('/(app)/(stack)/(tabs)/(chat)/chat')
 
-const DocRow = ({ doc }: { doc: MySource }) => {
+const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
   const qc = useQueryClient()
-  const job = useIngestJob(doc.jobId).data
+  const job = useIngestJob(doc.jobId, live).data
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
   const retry = () => {
@@ -78,10 +78,10 @@ const DocRow = ({ doc }: { doc: MySource }) => {
   )
 }
 
-const PushCard = ({ doc }: { doc: HubDocument }) => {
+type PushApplication = { company: string; title: string; fitScore?: number | null }
+
+const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApplication | null }) => {
   const c = useColors()
-  const apps = useMyApplications()
-  const application = apps.data?.data.find((a) => a.id === doc.applicationId) ?? null
   const lines = pushCardLines(doc, application)
   const date = monthDay(doc.updatedAt)
   return (
@@ -120,6 +120,8 @@ const PushCard = ({ doc }: { doc: HubDocument }) => {
 
 const DocsTab = () => {
   const c = useColors()
+  const focused = useIsFocused()
+  const apps = useMyApplications()
   const { data, isLoading } = useSources()
   const push = useDocuments()
   const hidden = useUndoRemove()
@@ -177,7 +179,11 @@ const DocsTab = () => {
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: spacing[2] }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
               {preview.map((d) => (
-                <PushCard key={d.id} doc={d} />
+                <PushCard
+                  key={d.id}
+                  doc={d}
+                  application={apps.data?.data.find((a) => a.id === d.applicationId) ?? null}
+                />
               ))}
             </ScrollView>
           </>
@@ -219,7 +225,7 @@ const DocsTab = () => {
           </Row>
         ) : null}
         {docs.map((d) => (
-          <DocRow key={d.id} doc={d} />
+          <DocRow key={d.id} doc={d} live={focused} />
         ))}
         <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <Button
