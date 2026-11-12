@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Platform, Pressable, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Glass, Icon, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
@@ -15,7 +15,7 @@ export const TOAST_ABOVE_SEARCH = FIELD + GAP_BELOW + spacing[2]
 /** The list's bottom padding, so its last row scrolls clear of the field. */
 export const useSearchClearance = () => FADE + FIELD + GAP_BELOW + useSafeAreaInsets().bottom
 
-/** `.msearch`: the search field floats at the bottom over a fade of the background, and rides up with the keyboard. */
+/** `.msearch`: the search field floats at the bottom over a fade of the background, and rides up with the keyboard as the chat composer does. */
 export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: (q: string) => void }) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
@@ -45,23 +45,25 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
     </View>
   )
   return (
-    <View style={{ position: 'absolute', left: 0, right: 0, bottom: keyboard, paddingTop: FADE, paddingHorizontal: spacing[4], paddingBottom: (keyboard ? 0 : insets.bottom) + GAP_BELOW }}>
-      <LinearGradient
-        pointerEvents="none"
-        colors={[c.bg, c.bg, `${c.bg}00`]}
-        locations={[0, 0.72, 1]}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 0, y: 0 }}
-        style={{ position: 'absolute', inset: 0 }}
-      />
-      {Platform.OS === 'ios' ? (
-        // Untinted native glass draws near-black on the dark background, the board draws its lighter --glass.
-        <Glass tint={dark ? c.glass : undefined} style={{ borderRadius: radius.pill }}>
-          {field}
-        </Glass>
-      ) : (
-        <View style={{ borderRadius: radius.pill, backgroundColor: c.fill }}>{field}</View>
-      )}
-    </View>
+    <KeyboardAvoidingView behavior="padding" pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <View style={{ paddingTop: FADE, paddingHorizontal: spacing[4], paddingBottom: (keyboard ? 0 : insets.bottom) + GAP_BELOW }}>
+        <LinearGradient
+          pointerEvents="none"
+          colors={[c.bg, c.bg, `${c.bg}00`]}
+          locations={[0, 0.72, 1]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 0, y: 0 }}
+          style={{ position: 'absolute', inset: 0 }}
+        />
+        {Platform.OS === 'ios' ? (
+          // Untinted native glass draws near-black on the dark background, the board draws its lighter --glass.
+          <Glass tint={dark ? c.glass : undefined} style={{ borderRadius: radius.pill }}>
+            {field}
+          </Glass>
+        ) : (
+          <View style={{ borderRadius: radius.pill, backgroundColor: c.fill }}>{field}</View>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   )
 }
