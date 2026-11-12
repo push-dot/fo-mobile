@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MASCOT_COLORS, mascotAccent, mascotPalette } from '../mascot'
 import { onAccent } from '../on-accent'
+import { palette } from '../tokens'
 
 // Body, dark fold, light fold, as drawn in the 2026-11-12 boards.
 const BOARD = {
@@ -44,5 +45,12 @@ describe('mascot accents', () => {
       unread: 'ac',
       ring: 'bg',
     })
+  })
+
+  it.each([
+    ['light', { thinkDot: '#646B75', helpBadge: '#AD4E00', helpMark: '#FFFFFF', doneSpark: '#087A3E', unread: '#5B4CF0', ring: '#FFFFFF' }],
+    ['dark', { thinkDot: '#8C939C', helpBadge: '#FF9A3D', helpMark: '#FFFFFF', doneSpark: '#3CCB7F', unread: '#6B5BFA', ring: '#0F1012' }],
+  ] as const)('are the colours the %s boards draw', (mode, board) => {
+    expect(mascotAccent(palette[mode])).toEqual(board)
   })
 })
