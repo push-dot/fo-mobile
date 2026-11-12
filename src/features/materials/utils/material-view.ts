@@ -3,11 +3,7 @@ import { fileSize } from '@push/shared'
 import type { BotId, BotRef } from '@/features/bots'
 import { formatTime } from '@/shared/utility/picker-date'
 import type { MadeBy, Material, MaterialKind, MaterialSection, MaterialsPage, MaterialTab, SendContext } from '../types'
-import { formatOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
-
-const DAY = 24 * 60 * 60_000
-const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
-const daysFrom = (now: Date, d: Date) => Math.round((startOfDay(d) - startOfDay(now)) / DAY)
+import { daysBetween, formatOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
 
 const hasBatchim = (word: string) => {
   const code = word.charCodeAt(word.length - 1) - 0xac00
@@ -53,7 +49,7 @@ const madeByFact = (madeBy: MadeBy): string | null => (madeBy.by === 'user' ? '�
 
 const deadlineFact = (m: Extract<Material, { kind: 'posting' }>, now: Date): string => {
   if (m.deadline === null) return '상시 채용'
-  const left = daysFrom(now, m.deadline)
+  const left = daysBetween(now, m.deadline)
   return m.closed || left < 0 ? `${monthDay(m.deadline)} (마감)` : `${monthDay(m.deadline)} (D-${left})`
 }
 
@@ -64,7 +60,7 @@ const careerOf = (min: number | null, max: number | null): string | null => {
 }
 
 const checkedFact = (check: { at: Date; ok: boolean }, now: Date) => {
-  const ago = daysFrom(check.at, now)
+  const ago = daysBetween(check.at, now)
   const day = ago === 0 ? '오늘' : ago === 1 ? '어제' : monthDay(check.at)
   return `${day} · ${check.ok ? '열림' : '열리지 않음'}`
 }

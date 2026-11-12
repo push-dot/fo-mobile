@@ -21,9 +21,12 @@ export const monthDay = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
 
+/** Calendar days from `from` to `to`, whatever the hours: 11월 9일 23시 to 11월 10일 1시 is one. */
+export const daysBetween = (from: Date, to: Date) => Math.round((startOfDay(to) - startOfDay(from)) / DAY)
+
 export const deadlineLabel = (deadline: Date | null, now: Date): string => {
   if (deadline === null) return '상시 채용'
-  const left = Math.round((startOfDay(deadline) - startOfDay(now)) / DAY)
+  const left = daysBetween(now, deadline)
   return left >= 0 && left <= SOON_DAYS ? `마감 ${monthDay(deadline)}(D-${left})` : `마감 ${monthDay(deadline)}`
 }
 

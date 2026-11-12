@@ -42,7 +42,7 @@ export const MaterialLinkAddSheet = () => {
           onPress={() => router.back()}
           style={{ width: 44, height: 44, margin: -spacing[1], borderRadius: 22, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Icon name="x" size={20} color="t1" />
+          <Icon name="x" size={16} color="t1" />
         </Pressable>
       </View>
       <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="링크 주소" />

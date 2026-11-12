@@ -84,8 +84,11 @@ tags:
 - runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLinkAdd
-- tapOn: "닫기"
-- waitForAnimationToEnd
+# The modal's own 닫기 sits behind the sheet, so the sheet closes the way the others do.
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "추가하기"
 - tapOn: "자료 검색"
 - inputText: "회고 발표"
 - runFlow: _hide_kbd.yaml

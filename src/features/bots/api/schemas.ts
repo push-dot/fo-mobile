@@ -2,7 +2,9 @@ import type { BotContract } from '@push/api-client'
 import type { Bot, BotActivity, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
 import { colorOf, dateOf, dayOf, toBotRef } from '../utils/wire'
 
-// The only place that reads bot wire field names. Wire types stop here.
+// With utils/wire, the only place that reads bot wire field names. Wire types stop here.
+
+export { dayOf }
 
 /** Null when a date does not parse. */
 const activityOf = (a: BotContract.BotActivity | null): BotActivity | null => {
