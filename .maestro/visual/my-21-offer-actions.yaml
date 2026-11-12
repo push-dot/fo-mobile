@@ -27,11 +27,13 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ProposalDetailMenu
 
-# Toasts disappear: shoot as soon as the text is up.
+# The toast's glass card draws only once its fade-in ends, so wait for that. The undo toast stays 5 s and a plain one 2.5 s.
 - tapOn: "제안 보관하기"
 - extendedWaitUntil:
     visible: "제안을 보관했어요"
     timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 3000
 - takeScreenshot: ProposalToastArchived
 - tapOn: "되돌리기"
 - extendedWaitUntil:
@@ -70,6 +72,8 @@ tags:
 - extendedWaitUntil:
     visible: "오지현 님을 차단했어요"
     timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 1000
 - takeScreenshot: ProposalToastBlocked
 
 # Blocking 오지현 leaves 3 received offers and the one archived offer.
