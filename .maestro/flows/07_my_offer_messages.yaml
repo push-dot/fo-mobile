@@ -34,6 +34,14 @@ name: 마이 → 제안함 → 제안 보관 토스트 → 제안 메시지 → 
     timeout: 10000
 - assertVisible: "되돌리기"
 - takeScreenshot: 07_my_offer_messages-toast
+# The toast outlives the screen and would cover the next screen's composer, so undo it, which also hides it.
+- tapOn: "되돌리기"
+- extendedWaitUntil:
+    notVisible: "제안을 보관했어요"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*오지현.*"
+    timeout: 10000
 - tapOn: ".*최지우.*"
 - extendedWaitUntil:
     visible: "좋아요. 강남역 근처에서 12시 반에 봬요."
