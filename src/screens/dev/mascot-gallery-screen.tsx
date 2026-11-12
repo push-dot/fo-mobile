@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
 import { router } from 'expo-router'
-import { Mascot, MASCOT_STATES, Text, TopBar, type MascotMotion, type MascotState } from '@/shared/components'
+import { Button, Mascot, MASCOT_STATES, Text, TopBar, type MascotMotion, type MascotState } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 import { MASCOT_COLORS, type MascotColor } from '@/theme/mascot'
 
@@ -13,6 +13,7 @@ const TILE_HEIGHT = 112
 const LIST_SIZE = 52
 const SIZES = [24, 32, 52, 96, 104, 120]
 const MOVING: MascotMotion = { mode: 'animate' }
+const HOLDING: MascotMotion = { mode: 'frame3' }
 
 const PROBE_MS = 3000
 const PROBE_WARMUP_MS = 300
@@ -24,13 +25,13 @@ type ProbeRow = { state: MascotState; moving: boolean; frames: number; late: num
 
 const stepOf = (step: number) => ({ state: MASCOT_STATES[Math.floor(step / 2) % MASCOT_STATES.length]!, moving: step % 2 === 1 })
 
-const Tile = ({ color }: { color: MascotColor }) => {
+const Tile = ({ color, motion }: { color: MascotColor; motion: MascotMotion }) => {
   const c = useColors()
   return (
     <View style={{ height: TILE_HEIGHT, flexDirection: 'row', alignItems: 'center', backgroundColor: c.bg2 }}>
       {MASCOT_STATES.map((state) => (
         <View key={state} style={{ flex: 1, alignItems: 'center' }}>
-          <Mascot size={FRAME} state={state} color={color} motion={MOVING} accessibilityLabel={`${color} ${STATE_LABEL[state]}`} />
+          <Mascot size={FRAME} state={state} color={color} motion={motion} accessibilityLabel={`${color} ${STATE_LABEL[state]}`} />
         </View>
       ))}
     </View>
@@ -99,9 +100,15 @@ const Probe = () => {
 
 const MascotGalleryScreen = ({ probe = false }: { probe?: boolean }) => {
   const c = useColors()
+  const [held, setHeld] = useState(false)
+  const motion = held ? HOLDING : MOVING
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title="마스코트" onBack={() => router.back()} />
+      <TopBar
+        title="마스코트"
+        onBack={() => router.back()}
+        right={probe ? null : <Button size="sm" variant="secondary" label={held ? '재생' : '멈춤'} onPress={() => setHeld(!held)} />}
+      />
       {probe ? (
         <Probe />
       ) : (
@@ -114,9 +121,13 @@ const MascotGalleryScreen = ({ probe = false }: { probe?: boolean }) => {
             ))}
           </View>
           <View style={{ gap: spacing[3] }}>
-            <Tile color="teal" />
-            <Tile color="push" />
+            <Tile color="teal" motion={motion} />
+            <Tile color="push" motion={motion} />
           </View>
+          <Section title="안 읽음 점">
+            <Mascot size={LIST_SIZE} state="done" color="teal" unread accessibilityLabel="teal 안 읽음" />
+            <Mascot size={LIST_SIZE} state="done" color="push" unread accessibilityLabel="push 안 읽음" />
+          </Section>
           <Section title="색">
             {[...MASCOT_COLORS, 'push' as const].map((color) => (
               <Mascot key={color} size={LIST_SIZE} color={color} accessibilityLabel={color} />
@@ -126,10 +137,6 @@ const MascotGalleryScreen = ({ probe = false }: { probe?: boolean }) => {
             {SIZES.map((size) => (
               <Mascot key={size} size={size} color="teal" accessibilityLabel={`${size}`} />
             ))}
-          </Section>
-          <Section title="안 읽음 점">
-            <Mascot size={LIST_SIZE} state="done" color="teal" unread accessibilityLabel="teal 안 읽음" />
-            <Mascot size={LIST_SIZE} state="done" color="push" unread accessibilityLabel="push 안 읽음" />
           </Section>
         </ScrollView>
       )}

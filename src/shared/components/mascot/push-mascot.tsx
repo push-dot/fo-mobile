@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Animated, Easing, View, type ViewStyle } from 'react-native'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Animated, Easing, PixelRatio, View, type ViewStyle } from 'react-native'
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg'
 import { useColors, useThemeMode } from '../../../theme'
 import { MASCOT_FACE, mascotAccent, mascotPalette, type MascotColor } from '../../../theme/mascot'
@@ -25,7 +25,7 @@ import {
   type MascotState,
   type Track,
 } from './motion'
-import { BADGE, BODY, DOTS, EYE, EYE_REACH, EYES_AT, FOLD_IN, FOLD_OUT, LOOK_UP, MOUTH, PAD, SMILE_WIDTH, SMILES, SPARKS, UNREAD } from './shapes'
+import { BADGE, BODY, DOTS, EYE, EYE_REACH, EYES_AT, FOLD_IN, FOLD_OUT, LOOK_UP, MOUTH, SMILE_WIDTH, SMILES, SPARKS, UNREAD } from './shapes'
 
 export type MascotProps = {
   size?: number
@@ -38,10 +38,9 @@ export type MascotProps = {
 }
 
 type AnimatedStyle = Animated.WithAnimatedValue<ViewStyle>
-type Drivers = { body: Animated.Value; blink: Animated.Value; marks: Animated.Value; look: Animated.Value }
+type Drivers = { body: Animated.Value; blink: Animated.Value; dots: Animated.Value; look: Animated.Value; spark: Animated.Value }
 
 const STILL: MascotMotion = { mode: 'still' }
-const BOX = 100 + PAD * 2
 
 const EASE: Record<CssEasing, (t: number) => number> = {
   ease: Easing.bezier(0.25, 0.1, 0.25, 1),
@@ -52,8 +51,9 @@ const EASE: Record<CssEasing, (t: number) => number> = {
 const newDrivers = (): Drivers => ({
   body: new Animated.Value(0),
   blink: new Animated.Value(0),
-  marks: new Animated.Value(0),
+  dots: new Animated.Value(0),
   look: new Animated.Value(0),
+  spark: new Animated.Value(0),
 })
 
 // Every run is one linear native timing, so a loop never returns to JS. The easing lives in the sampled interpolation.
@@ -69,16 +69,6 @@ const cycle = <T extends Record<string, number>>(driver: Animated.Value, track: 
   return (pick: (value: T) => number | string) => driver.interpolate({ inputRange, outputRange: points.map((p) => pick(p.value)) as number[] })
 }
 
-const square = (x: number, y: number, reach: number, unit: number): ViewStyle => ({
-  position: 'absolute',
-  left: (x - reach) * unit,
-  top: (y - reach) * unit,
-  width: reach * 2 * unit,
-  height: reach * 2 * unit,
-})
-
-const viewBoxAround = (x: number, y: number, reach: number) => `${x - reach} ${y - reach} ${reach * 2} ${reach * 2}`
-
 const layersOf = (state: MascotState, mode: MascotMotion['mode'], size: number, d: Drivers) => {
   const unit = size / 100
   const track = bodyTrackOf(state)
@@ -88,13 +78,14 @@ const layersOf = (state: MascotState, mode: MascotMotion['mode'], size: number, 
     return {
       body: { transformOrigin: track?.origin, transform: [{ rotate: `${t.rotate}deg` }, { translateY: t.translateY }, { scaleY: t.scaleY }, { scale: t.scale }] } as AnimatedStyle,
       eyes: { transform: [{ translateX: up ? LOOK_UP.x * unit : 0 }, { translateY: up ? LOOK_UP.y * unit : 0 }, { scaleY: HELD.lid }] } as AnimatedStyle,
-      dots: DOTS.xs.map(() => HELD.dot as number | Animated.AnimatedInterpolation<number>),
+      dots: DOTS.xs.map(() => ({ opacity: HELD.dot }) as AnimatedStyle),
       spark: null,
-      runs: [],
+      loops: [],
+      entry: [],
     }
   }
   const body = track && cycle(d.body, track)
-  const spark = MARK[state] === 'sparks' ? cycle(d.marks, SPARK, 0) : null
+  const spark = MARK[state] === 'sparks' ? cycle(d.spark, SPARK, 0) : null
   const lift = (to: number) => d.look.interpolate({ inputRange: [0, 1], outputRange: [0, to * unit] })
   return {
     body: (body
@@ -115,15 +106,17 @@ const layersOf = (state: MascotState, mode: MascotMotion['mode'], size: number, 
         { scaleY: state === 'idle' ? cycle(d.blink, BLINK)((v) => v.lid) : HELD.lid },
       ],
     } as AnimatedStyle,
-    dots: MARK[state] === 'dots' ? DOTS.xs.map((_, i) => cycle(d.marks, DOT, (1 - (i * DOT_STAGGER_MS) / DOT.duration) % 1)((v) => v.opacity)) : [],
+    dots:
+      MARK[state] === 'dots'
+        ? DOTS.xs.map((_, i) => ({ opacity: cycle(d.dots, DOT, (1 - (i * DOT_STAGGER_MS) / DOT.duration) % 1)((v) => v.opacity) }) as AnimatedStyle)
+        : [],
     spark: spark && ({ opacity: spark((v) => v.opacity), transform: [{ scale: spark((v) => v.scale) }] } as AnimatedStyle),
-    runs: [
+    loops: [
       ...(track ? [loop(d.body, track.duration)] : []),
       ...(state === 'idle' ? [loop(d.blink, BLINK.duration)] : []),
-      ...(up ? [once(d.look, LOOK_UP_MS, 0, EASE.ease)] : []),
-      ...(MARK[state] === 'dots' ? [loop(d.marks, DOT.duration)] : []),
-      ...(MARK[state] === 'sparks' ? [once(d.marks, SPARK.duration, SPARK_DELAY_MS)] : []),
+      ...(MARK[state] === 'dots' ? [loop(d.dots, DOT.duration)] : []),
     ],
+    entry: [...(up ? [once(d.look, LOOK_UP_MS, 0, EASE.ease)] : []), ...(spark ? [once(d.spark, SPARK.duration, SPARK_DELAY_MS)] : [])],
   }
 }
 
@@ -138,6 +131,26 @@ const useSettledState = (state: MascotState) => {
   return wait ? shown : state
 }
 
+type LayerProps = { x: number; y: number; reach: number; unit: number; style?: AnimatedStyle | null; children: ReactNode }
+
+// A part that moves on its own is drawn in its own small layer around (x, y). The layer's edges sit on device pixels and
+// its viewBox is those same edges in drawing units, so the part lands where one whole drawing would have put it.
+const Layer = ({ x, y, reach, unit, style, children }: LayerProps) => {
+  const ratio = PixelRatio.get()
+  const px = unit * ratio
+  const left = Math.floor((x - reach) * px)
+  const top = Math.floor((y - reach) * px)
+  const width = Math.ceil((x + reach) * px) - left
+  const height = Math.ceil((y + reach) * px) - top
+  return (
+    <Animated.View style={[{ position: 'absolute', left: left / ratio, top: top / ratio, width: width / ratio, height: height / ratio }, style]}>
+      <Svg width={width / ratio} height={height / ratio} viewBox={`${left / px} ${top / px} ${width / px} ${height / px}`}>
+        {children}
+      </Svg>
+    </Animated.View>
+  )
+}
+
 const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unread = false, accessibilityLabel }: MascotProps) => {
   const accent = mascotAccent(useColors())
   const pal = mascotPalette(color, useThemeMode())
@@ -147,15 +160,23 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
   const [drivers] = useState(newDrivers)
   const layers = useMemo(() => layersOf(shown, resolved.mode, size, drivers), [shown, resolved.mode, size, drivers])
 
+  // The eyes rise and the spark plays once when a state begins, not each time a hold ends.
+  const entered = useRef(false)
   useEffect(() => {
-    if (!layers.runs.length) return
-    Object.values(drivers).forEach((driver) => driver.setValue(0))
-    const timer = setTimeout(() => layers.runs.forEach((run) => run.start()), delayMs)
+    entered.current = false
+  }, [shown])
+  useEffect(() => {
+    if (resolved.mode !== 'animate') return
+    const runs = entered.current ? layers.loops : [...layers.loops, ...layers.entry]
+    ;[drivers.body, drivers.blink, drivers.dots].forEach((driver) => driver.setValue(0))
+    ;[drivers.look, drivers.spark].forEach((driver) => driver.setValue(entered.current ? 1 : 0))
+    entered.current = true
+    const timer = setTimeout(() => runs.forEach((run) => run.start()), delayMs)
     return () => {
       clearTimeout(timer)
-      layers.runs.forEach((run) => run.stop())
+      runs.forEach((run) => run.stop())
     }
-  }, [layers, drivers, delayMs])
+  }, [layers, drivers, delayMs, resolved.mode])
 
   const unit = size / 100
   const eyes = EYES[shown]
@@ -174,7 +195,7 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
       style={{ width: size, height: size, pointerEvents: 'none' }}
     >
       <Animated.View style={[{ width: size, height: size }, layers.body]}>
-        <Svg width={BOX * unit} height={BOX * unit} viewBox={`${-PAD} ${-PAD} ${BOX} ${BOX}`} style={{ position: 'absolute', left: -PAD * unit, top: -PAD * unit }}>
+        <Svg width={size} height={size} viewBox="0 0 100 100">
           <Path d={BODY} fill={pal.body} />
           <Path d={FOLD_OUT} fill={pal.foldDark} />
           <Path d={FOLD_IN} fill={pal.foldLight} />
@@ -182,46 +203,41 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
             ? SMILES.map((d) => <Path key={d} d={d} fill="none" stroke={MASCOT_FACE.eye} strokeWidth={SMILE_WIDTH} strokeLinecap="round" />)
             : null}
           <Path d={MOUTH.d} transform={MOUTH.transform} fill={MASCOT_FACE.mouth} />
-          {mark === 'badge' ? (
-            <>
-              <Circle cx={BADGE.x} cy={BADGE.y} r={BADGE.r} fill={accent.helpBadge} />
-              <Path d={BADGE.bar} stroke={accent.helpMark} strokeWidth={BADGE.barWidth} strokeLinecap="round" />
-              <Circle cx={BADGE.x} cy={BADGE.dotY} r={BADGE.dotR} fill={accent.helpMark} />
-            </>
-          ) : null}
         </Svg>
         {eyes === 'smile'
           ? null
           : EYES_AT.map((eye) => (
-              <Animated.View key={eye.x} style={[square(eye.x, eye.y, EYE_REACH, unit), layers.eyes]}>
-                <Svg width={EYE_REACH * 2 * unit} height={EYE_REACH * 2 * unit} viewBox={viewBoxAround(eye.x, eye.y, EYE_REACH)}>
-                  <Ellipse cx={eye.x} cy={eye.y} rx={EYE.rx} ry={EYE.ry} transform={`rotate(${EYE.tilt} ${eye.x} ${eye.y})`} fill={MASCOT_FACE.eye} />
-                  <Ellipse
-                    cx={eye[eyes].x}
-                    cy={eye[eyes].y}
-                    rx={EYE.pupilRx}
-                    ry={EYE.pupilRy}
-                    transform={`rotate(${EYE.tilt} ${eye[eyes].x} ${eye[eyes].y})`}
-                    fill={MASCOT_FACE.pupil}
-                  />
-                </Svg>
-              </Animated.View>
+              <Layer key={eye.x} x={eye.x} y={eye.y} reach={EYE_REACH} unit={unit} style={layers.eyes}>
+                <Ellipse cx={eye.x} cy={eye.y} rx={EYE.rx} ry={EYE.ry} transform={`rotate(${EYE.tilt} ${eye.x} ${eye.y})`} fill={MASCOT_FACE.eye} />
+                <Ellipse
+                  cx={eye[eyes].x}
+                  cy={eye[eyes].y}
+                  rx={EYE.pupilRx}
+                  ry={EYE.pupilRy}
+                  transform={`rotate(${EYE.tilt} ${eye[eyes].x} ${eye[eyes].y})`}
+                  fill={MASCOT_FACE.pupil}
+                />
+              </Layer>
             ))}
         {mark === 'dots'
           ? DOTS.xs.map((x, i) => (
-              <Animated.View
-                key={x}
-                style={[square(x, DOTS.y, DOTS.r, unit), { borderRadius: DOTS.r * unit, backgroundColor: accent.thinkDot, opacity: layers.dots[i] }]}
-              />
+              <Layer key={x} x={x} y={DOTS.y} reach={DOTS.r} unit={unit} style={layers.dots[i]}>
+                <Circle cx={x} cy={DOTS.y} r={DOTS.r} fill={accent.thinkDot} />
+              </Layer>
             ))
           : null}
+        {mark === 'badge' ? (
+          <Layer x={BADGE.x} y={BADGE.y} reach={BADGE.r} unit={unit}>
+            <Circle cx={BADGE.x} cy={BADGE.y} r={BADGE.r} fill={accent.helpBadge} />
+            <Path d={BADGE.bar} stroke={accent.helpMark} strokeWidth={BADGE.barWidth} strokeLinecap="round" />
+            <Circle cx={BADGE.x} cy={BADGE.dotY} r={BADGE.dotR} fill={accent.helpMark} />
+          </Layer>
+        ) : null}
         {mark === 'sparks' && layers.spark
           ? SPARKS.map((s) => (
-              <Animated.View key={s.d} style={[square(s.x, s.y, s.reach, unit), layers.spark]}>
-                <Svg width={s.reach * 2 * unit} height={s.reach * 2 * unit} viewBox={viewBoxAround(s.x, s.y, s.reach)}>
-                  <Path d={s.d} fill={accent.doneSpark} />
-                </Svg>
-              </Animated.View>
+              <Layer key={s.d} x={s.x} y={s.y} reach={s.reach} unit={unit} style={layers.spark}>
+                <Path d={s.d} fill={accent.doneSpark} />
+              </Layer>
             ))
           : null}
       </Animated.View>

@@ -25,7 +25,7 @@ export const MASCOT_PALETTES: Record<MascotColorName, MascotPalette> = {
   gray: { body: '#7A818B', foldDark: '#4C5056', foldLight: '#BCC0C5' },
 }
 
-export const PUSH_BOT_PALETTE: Record<'light' | 'dark', MascotPalette> = {
+const PUSH_BOT_PALETTE: Record<'light' | 'dark', MascotPalette> = {
   light: { body: '#16191D', foldDark: '#D9DDE2', foldLight: '#4B525C' },
   dark: { body: '#FFFFFF', foldDark: '#33373E', foldLight: '#C2C7CE' },
 }
