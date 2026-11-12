@@ -73,6 +73,14 @@ describe('my detail rules', () => {
     expect(stageSteps('APPLIED', null).map((s) => s.state)).toEqual(['now', 'todo', 'todo', 'todo'])
   })
 
+  it('dates each reached stage from when the server says it began', () => {
+    const at = (m: number, d: number) => new Date(2026, m - 1, d, 10).toISOString()
+    const entered = { APPLIED: at(10, 14), SCREENING: at(10, 17), INTERVIEW: at(10, 21) }
+    expect(stageSteps('INTERVIEW', at(10, 14), entered).map((s) => s.date)).toEqual(['10.14', '10.17', '10.21', null])
+    expect(stageSteps('SCREENING', at(10, 14), entered).map((s) => s.date)).toEqual(['10.14', '10.17', null, null])
+    expect(stageSteps('REJECTED', at(10, 14), { ...entered, REJECTED: at(11, 2) }).map((s) => s.date)).toEqual(['10.14', '10.17', '10.21', '11.02'])
+  })
+
   it('names when the next event starts', () => {
     const now = new Date(2026, 9, 20, 9)
     expect(eventWhen(new Date(2026, 9, 21, 15).toISOString(), now)).toBe('내일 오후 3:00')

@@ -5,8 +5,10 @@ import { useColors } from '../../../theme'
 
 const FitRing = ({ score, size = 44 }: { score: string; size?: number }) => {
   const c = useColors()
-  const stroke = Math.max(3, Math.round(size / 14))
-  const r = (size - stroke) / 2
+  // The boards' 64 pt card ring is r 27 with a 7 pt stroke and a 22 pt number.
+  const card = size >= 56
+  const stroke = card ? 7 : Math.max(3, Math.round(size / 14))
+  const r = card ? 27 : (size - stroke) / 2
   const length = 2 * Math.PI * r
   return (
     <View accessibilityLabel={`적합도 ${score}점`} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
@@ -23,7 +25,7 @@ const FitRing = ({ score, size = 44 }: { score: string; size?: number }) => {
           fill="none"
         />
       </Svg>
-      <Text v={size >= 56 ? 'h3' : 'b2'} weight="800">
+      <Text v={card ? 'h2' : 'b2'} weight="800" style={card ? { fontSize: 22, fontVariant: ['tabular-nums'] } : undefined}>
         {score}
       </Text>
     </View>

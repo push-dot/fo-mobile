@@ -11,7 +11,7 @@ import type {
   Source,
   UserRef,
 } from '@push/api-client'
-import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
+import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
 import { removeChatDoc } from './chat'
 import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
@@ -233,6 +233,27 @@ mock('GET', 'applications', ({ query }) => {
   const applied = query.get('applied') === 'true'
   return page(applied ? appliedOnly(applications) : applications, query, applied)
 })
+// MyAppliedJob draws the stage dates and the stored fit; its parts are the chat's p1 fit card's.
+const appliedDetail: Record<string, Omit<ApplicationDetail, keyof Application>> = {
+  a1: {
+    stageEnteredAt: { APPLIED: on(10, 14), SCREENING: on(10, 17), INTERVIEW: on(10, 21) },
+    fit: {
+      fitScore: 6.9,
+      parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },
+      topGap: 'Kafka 운영 경험과 부하 테스트 근거가 부족해요',
+      plan: 'PRO',
+      reachable: 8.2,
+      documentId: 'd-a1',
+      documentTitle: '김서준_백엔드_이력서_2026',
+    },
+  },
+}
+mock('GET', 'applications/:id', ({ params }) => {
+  const a = applications.find((x) => x.id === params.id)
+  return a
+    ? { data: { ...a, ...appliedDetail[a.id] } }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '지원 내역을 찾지 못했어요' } } }
+})
 
 const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
   id,
@@ -442,7 +463,7 @@ const events: CalendarEvent[] = [
 // current time there and a local midnight on the calendar grid; drop when /calendar is real.
 const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
   endsAt: tomorrowAt(16),
-  notes: 'Google Meet',
+  location: 'Google Meet',
   applicationId: 'a1',
 })
 mock('GET', 'calendar/events', ({ query }) => {

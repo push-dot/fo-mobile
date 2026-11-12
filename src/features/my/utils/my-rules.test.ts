@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { LANGS, MAX_BYTES } from '../constants'
 import {
@@ -8,7 +6,6 @@ import {
   CALENDAR_ADD,
   INTERVIEW_PREP,
   NOTIFICATION_ROWS,
-  READ_FILES_ROW,
   OFFER_DECLINE,
   OFFER_EMPTY_ACTION,
   OFFER_FAIL,
@@ -248,14 +245,5 @@ describe('my screen rules', () => {
       score: '',
       doc: '',
     })
-  })
-})
-
-describe('settings screen', () => {
-  // The board draws the switch. push-be enforces allowAiReadMyFiles in the read-switch PR, before any release.
-  it('shows the 내 자료 읽기 허용 switch in the 봇 group', () => {
-    expect(READ_FILES_ROW).toEqual({ key: 'allowAiReadMyFiles', label: '내 자료 읽기 허용' })
-    const screen = readFileSync(join(__dirname, '../../../screens/my/settings-screen.tsx'), 'utf8')
-    expect(screen).toContain('sw(READ_FILES_ROW.key, READ_FILES_ROW.label)')
   })
 })

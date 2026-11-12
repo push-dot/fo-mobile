@@ -2,7 +2,7 @@
 // Renames the app's 에이전트 copy to the boards' 봇 wording.
 //   node scripts/bot-copy.mjs           rewrite src and .maestro
 //   node scripts/bot-copy.mjs --check   exit 1 and list every line that still says 에이전트
-// The legal text keeps 에이전트. It lives in packages/shared, outside these roots.
+// The legal text lives in packages/shared, outside these roots. Its app rendering says 봇; only the web rendering keeps 에이전트.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
