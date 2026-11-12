@@ -22,10 +22,12 @@ import {
   focusSearch,
   initialForm,
   limitCopy,
+  linkFailed,
   linkFound,
   linkLabel,
   linkMissing,
   linkStatus,
+  markFinding,
   onPostingChosen,
   pickPosting,
   postingMeta,
@@ -51,7 +53,7 @@ import {
   ERROR_BODY,
   ERROR_TITLE,
   LINK_BAD,
-  LINK_CHIP,
+  LINK_FINDING_AFTER_MS,
   LINK_FOUND_SECTION,
   LINK_SECTION,
   NAME_PLACEHOLDER,
@@ -89,11 +91,23 @@ const isConsentRequired = (error: unknown) => error instanceof ApiError && error
 const pickedLine = (posting: PostingPick) => `${posting.company} · ${posting.title}`
 
 const searchPhase = (form: CreateForm) =>
-  form.phase.kind === 'searching' || form.phase.kind === 'linkChecking' || form.phase.kind === 'linkOk' || form.phase.kind === 'linkBad'
+  form.phase.kind === 'searching' ||
+  form.phase.kind === 'linkChecking' ||
+  form.phase.kind === 'linkFinding' ||
+  form.phase.kind === 'linkRetry' ||
+  form.phase.kind === 'linkOk' ||
+  form.phase.kind === 'linkBad'
 
 const fieldValue = (form: CreateForm) => {
   if (form.phase.kind === 'searching') return form.phase.query
-  if (form.phase.kind === 'linkChecking' || form.phase.kind === 'linkOk' || form.phase.kind === 'linkBad') return linkLabel(form.phase.url)
+  if (
+    form.phase.kind === 'linkChecking' ||
+    form.phase.kind === 'linkFinding' ||
+    form.phase.kind === 'linkRetry' ||
+    form.phase.kind === 'linkOk' ||
+    form.phase.kind === 'linkBad'
+  )
+    return linkLabel(form.phase.url)
   if ('posting' in form.phase) return pickedLine(form.phase.posting)
   return ''
 }
@@ -119,7 +133,7 @@ const Highlight = ({ text, query }: { text: string; query: string }) => {
   )
 }
 
-const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean }) => {
+const Cta = ({ label, onPress, busy, enabled, xl, icon }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean; icon?: 'retry' }) => {
   const c = useColors()
   return (
     <GlassPressable
@@ -129,9 +143,11 @@ const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: ()
       fill={enabled ? 'ac' : 'fill2'}
       pressedFill="acPress"
       onPress={!enabled || busy ? undefined : onPress}
+      contentStyle={icon ? { gap: spacing[2] } : undefined}
       style={{ minHeight: xl ? CTA_XL : CTA, borderRadius: platformTheme.buttonRadius }}
     >
       {busy ? <Spinner size={18} color="onFill" /> : null}
+      {!busy && icon ? <Icon name={icon} size={18} color={enabled ? 'onFill' : 't3'} /> : null}
       <Text weight="700" allowFontScaling={!xl} style={{ color: enabled ? onAccent : c.t3, fontSize: xl ? CTA_FONT_XL : type.button.fontSize, lineHeight: xl ? 30 : type.button.lineHeight }}>
         {label}
       </Text>
@@ -163,25 +179,33 @@ const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor)
   </View>
 )
 
+const LIMIT_MASCOTS = ['teal', 'amber', 'pink'] as const
+const PLAN_ROW = 56
+
 const LimitBody = ({ limit, onUpgrade, onClose }: { limit: BotLimit | undefined; onUpgrade: () => void; onClose: () => void }) => {
   const c = useColors()
   const copy = limit ? limitCopy(limit) : null
   return (
     <View style={{ gap: spacing[5] }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing[2] }}>
+        {LIMIT_MASCOTS.map((color) => (
+          <Mascot key={color} size={48} color={color} motion={{ mode: 'still' }} />
+        ))}
+      </View>
       {copy ? (
         <View style={{ gap: spacing[2] }}>
           <Text v="h2" accessibilityRole="header">
             {copy.title}
           </Text>
-          <Text v="b2" color="t2">
+          <Text v="b2" color="t3">
             {copy.body}
           </Text>
         </View>
       ) : null}
       {copy ? (
-        <View>
+        <View style={{ backgroundColor: c.fill, borderRadius: radius.lg, overflow: 'hidden' }}>
           {copy.rows.map((row) => (
-            <View key={row.plan} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: c.line }}>
+            <View key={row.plan} style={{ minHeight: PLAN_ROW, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[4], borderBottomWidth: 1, borderBottomColor: c.line }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                 <Text weight="700">{row.plan}</Text>
                 {row.current ? (
@@ -192,7 +216,7 @@ const LimitBody = ({ limit, onUpgrade, onClose }: { limit: BotLimit | undefined;
                   </View>
                 ) : null}
               </View>
-              <Text color="t2">{row.value}</Text>
+              <Text weight="700">{row.value}</Text>
             </View>
           ))}
         </View>
@@ -314,11 +338,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     return () => clearTimeout(timer)
   }, [phase])
 
+  const linkUrl = phase.kind === 'linkChecking' || phase.kind === 'linkFinding' ? phase.url : null
+
   useEffect(() => {
-    if (phase.kind !== 'linkChecking') return
-    const url = phase.url
+    if (!linkUrl) return
     let cancel = false
-    void checkLink(url)
+    void checkLink(linkUrl)
       .then((result) => {
         if (cancel) return
         if (result.status === 'not_a_posting') {
@@ -339,11 +364,17 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         )
       })
       .catch(() => {
-        if (!cancel) setForm((current) => linkMissing(current))
+        if (!cancel) setForm((current) => linkFailed(current))
       })
     return () => {
       cancel = true
     }
+  }, [linkUrl])
+
+  useEffect(() => {
+    if (phase.kind !== 'linkChecking') return
+    const timer = setTimeout(() => setForm((current) => markFinding(current)), LINK_FINDING_AFTER_MS)
+    return () => clearTimeout(timer)
   }, [phase])
 
   const run = async (base: CreateForm) => {
@@ -377,14 +408,18 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   }
 
   const name = posting?.company
-  const showLink = searching && (phase.kind !== 'searching' || asLink(query) !== null)
+  const linkWait = phase.kind === 'linkChecking' || phase.kind === 'linkFinding'
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + spacing[3], paddingBottom: insets.bottom + spacing[4], paddingHorizontal: spacing[4], gap: spacing[5] }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <GlassButton actions={[{ icon: 'x', label: searching ? SEARCH_CLOSE : CLOSE_LABEL, onPress: searching ? () => setForm(closeSearch) : onClose }]} />
+            {linkWait ? (
+              <View style={{ width: 44 }} />
+            ) : (
+              <GlassButton actions={[{ icon: 'x', label: searching ? SEARCH_CLOSE : CLOSE_LABEL, onPress: searching ? () => setForm(closeSearch) : onClose }]} />
+            )}
             <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
               {SHEET_TITLE}
             </Text>
@@ -418,7 +453,21 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                   </View>
                 </Pressable>
               ) : null}
-              {searching ? (
+              {linkWait ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                  <View style={{ flex: 1, minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                    <Icon name="link" size={18} color="t3" />
+                    <Text v="b1" numberOfLines={1} style={{ flex: 1, fontSize: xl ? 19 : undefined }}>
+                      {linkLabel(linkUrl ?? '')}
+                    </Text>
+                    <Spinner size={16} color="t3" />
+                  </View>
+                  <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_CLOSE} onPress={() => setForm(closeSearch)} hitSlop={8}>
+                    <Icon name="x" size={18} color="t1" />
+                  </Pressable>
+                </View>
+              ) : null}
+              {searching && !linkWait ? (
                 <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                   <Icon name="search" size={18} color="t3" />
                   <TextInput
@@ -428,19 +477,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                     placeholder={SEARCH_PLACEHOLDER}
                     placeholderTextColor={c.t4}
                     accessibilityLabel={SEARCH_PLACEHOLDER}
-                    editable={phase.kind !== 'linkChecking'}
                     autoCapitalize="none"
                     autoCorrect={false}
                     returnKeyType="search"
                     style={[{ flex: 1, color: c.t1, fontSize: xl ? 19 : type.b1.fontSize, paddingVertical: 0 }, fontFor('400')]}
                   />
-                  {showLink ? (
-                    <View style={{ backgroundColor: c.fill2, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
-                      <Text v="c2" weight="700">
-                        {LINK_CHIP}
-                      </Text>
-                    </View>
-                  ) : null}
                 </View>
               ) : null}
               {!searching && phase.kind !== 'idle' ? (
@@ -478,13 +519,13 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                     </Pressable>
                   ))
                 : null}
-              {phase.kind === 'linkChecking' ? (
+              {linkWait ? (
                 <View style={{ gap: spacing[2] }}>
                   <Text v="c1" weight="700" color="t3">
                     {LINK_SECTION}
                   </Text>
                   <Text v="b2" color="t2">
-                    {linkStatus()}
+                    {linkStatus(form)}
                   </Text>
                   <Skeleton width="70%" height={12} radius={6} />
                   <Skeleton width="45%" height={12} radius={6} />
@@ -493,6 +534,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               {phase.kind === 'linkBad' ? (
                 <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
                   {LINK_BAD}
+                </Text>
+              ) : null}
+              {phase.kind === 'linkRetry' ? (
+                <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
+                  {ERROR_BODY}
                 </Text>
               ) : null}
               {phase.kind === 'linkOk' ? (
@@ -514,13 +560,16 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                 </View>
               ) : null}
               {phase.kind === 'error' ? (
-                <View style={{ backgroundColor: c.redSoft, borderRadius: radius.md, paddingVertical: spacing[3], paddingHorizontal: 14, gap: spacing[1] }}>
-                  <Text weight="700" style={{ fontSize: 14, lineHeight: 20 }}>
-                    {ERROR_TITLE}
-                  </Text>
-                  <Text color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
-                    {ERROR_BODY}
-                  </Text>
+                <View style={{ backgroundColor: c.redSoft, borderRadius: radius.md, paddingVertical: spacing[3], paddingHorizontal: 14, flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
+                  <Icon name="alert" size={18} color="red" />
+                  <View style={{ flex: 1, gap: spacing[1] }}>
+                    <Text weight="700" color="red" style={{ fontSize: 14, lineHeight: 20 }}>
+                      {ERROR_TITLE}
+                    </Text>
+                    <Text color="red" style={{ fontSize: 14, lineHeight: 20 }}>
+                      {ERROR_BODY}
+                    </Text>
+                  </View>
                 </View>
               ) : null}
               {searching ? null : (
@@ -529,6 +578,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                     xl={xl}
                     enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
                     busy={phase.kind === 'creating'}
+                    icon={phase.kind === 'error' ? 'retry' : undefined}
                     label={phase.kind === 'creating' ? CREATING_LABEL : phase.kind === 'error' ? RETRY_LABEL : CREATE_LABEL}
                     onPress={phase.kind === 'error' ? () => void run(form) : onCreate}
                   />

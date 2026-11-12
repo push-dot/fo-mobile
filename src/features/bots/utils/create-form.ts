@@ -1,6 +1,7 @@
 import { BOT_COLORS } from '../constants'
 import type { BotColor, BotLimit } from '../types'
 
+const LINK_READING = '링크에서 공고를 읽고 있어요'
 const LINK_FINDING = 'Push에서 이 링크의 공고를 찾고 있어요'
 const LIMIT_NOTE = 'Push Bot은 개수에 들어가지 않아요.'
 const PLAN_ORDER = ['FREE', 'PRO', 'ULTRA'] as const
@@ -12,6 +13,8 @@ export type CreatePhase =
   | { kind: 'idle' }
   | { kind: 'searching'; query: string }
   | { kind: 'linkChecking'; url: string }
+  | { kind: 'linkFinding'; url: string }
+  | { kind: 'linkRetry'; url: string }
   | { kind: 'linkOk'; url: string; posting: PostingPick; host: string; meta: string }
   | { kind: 'linkBad'; url: string }
   | { kind: 'picked'; posting: PostingPick }
@@ -63,16 +66,32 @@ export const startLinkCheck = (form: CreateForm, url: string): CreateForm => ({
   phase: { kind: 'linkChecking', url },
 })
 
-export const linkStatus = (): string => LINK_FINDING
+const linkUrl = (form: CreateForm) =>
+  form.phase.kind === 'linkChecking' || form.phase.kind === 'linkFinding' ? form.phase.url : null
 
-export const linkFound = (form: CreateForm, found: PostingPick & { host: string; meta: string }): CreateForm => {
-  if (form.phase.kind !== 'linkChecking') return form
-  const { host, meta, ...posting } = found
-  return { ...form, phase: { kind: 'linkOk', url: form.phase.url, posting, host, meta } }
+export const linkStatus = (form: CreateForm): string => (form.phase.kind === 'linkFinding' ? LINK_FINDING : LINK_READING)
+
+export const markFinding = (form: CreateForm): CreateForm => {
+  const url = linkUrl(form)
+  return form.phase.kind === 'linkChecking' && url ? { ...form, phase: { kind: 'linkFinding', url } } : form
 }
 
-export const linkMissing = (form: CreateForm): CreateForm =>
-  form.phase.kind === 'linkChecking' ? { ...form, phase: { kind: 'linkBad', url: form.phase.url } } : form
+export const linkFound = (form: CreateForm, found: PostingPick & { host: string; meta: string }): CreateForm => {
+  const url = linkUrl(form)
+  if (!url) return form
+  const { host, meta, ...posting } = found
+  return { ...form, phase: { kind: 'linkOk', url, posting, host, meta } }
+}
+
+export const linkMissing = (form: CreateForm): CreateForm => {
+  const url = linkUrl(form)
+  return url ? { ...form, phase: { kind: 'linkBad', url } } : form
+}
+
+export const linkFailed = (form: CreateForm): CreateForm => {
+  const url = linkUrl(form)
+  return url ? { ...form, phase: { kind: 'linkRetry', url } } : form
+}
 
 export const pickPosting = (form: CreateForm, posting: PostingPick): CreateForm => ({
   ...form,

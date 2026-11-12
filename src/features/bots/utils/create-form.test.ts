@@ -10,9 +10,11 @@ import {
   initialForm,
   limitCopy,
   linkFound,
+  linkFailed,
   linkLabel,
   linkMissing,
   linkStatus,
+  markFinding,
   onPostingChosen,
   pickPosting,
   postingMeta,
@@ -35,8 +37,11 @@ describe('create form', () => {
     expect(searching.phase).toEqual({ kind: 'searching', query: '' })
     const checking = startLinkCheck(searching, 'https://careers.moapay.co.kr/jobs/1042')
     expect(checking.phase).toMatchObject({ kind: 'linkChecking', url: 'https://careers.moapay.co.kr/jobs/1042' })
-    expect(linkStatus()).toBe('Push에서 이 링크의 공고를 찾고 있어요')
-    const found = linkFound(checking, { ...posting, host: 'careers.moapay.co.kr', meta: '마감 11월 20일 · 경력 3년 이상 · 서울' })
+    expect(linkStatus(checking)).toBe('링크에서 공고를 읽고 있어요')
+    const finding = markFinding(checking)
+    expect(linkStatus(finding)).toBe('Push에서 이 링크의 공고를 찾고 있어요')
+    expect(markFinding(finding)).toBe(finding)
+    const found = linkFound(finding, { ...posting, host: 'careers.moapay.co.kr', meta: '마감 11월 20일 · 경력 3년 이상 · 서울' })
     expect(found.phase.kind).toBe('linkOk')
     expect(submitCreate(found).action).toBe('none')
   })
@@ -45,6 +50,14 @@ describe('create form', () => {
     const checking = startLinkCheck(focusSearch(initialForm()), 'https://moapay.co.kr/about')
     expect(linkMissing(checking).phase).toEqual({ kind: 'linkBad', url: 'https://moapay.co.kr/about' })
     expect(submitCreate(linkMissing(checking)).action).toBe('none')
+  })
+
+  it('keeps a network failure off the not-a-posting line', () => {
+    const checking = startLinkCheck(focusSearch(initialForm()), 'https://careers.moapay.co.kr/jobs/1042')
+    const failed = linkFailed(markFinding(checking))
+    expect(failed.phase).toEqual({ kind: 'linkRetry', url: 'https://careers.moapay.co.kr/jobs/1042' })
+    expect(linkMissing(failed)).toBe(failed)
+    expect(submitCreate(failed).action).toBe('none')
   })
 
   it('opens the company bot that already exists and does not create', () => {
