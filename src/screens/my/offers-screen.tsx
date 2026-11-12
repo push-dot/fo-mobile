@@ -17,25 +17,19 @@ const OFFER_SKELETON: SkeletonRowsShape = {
 
 type Box = 'received' | 'sent'
 
-const ArchivedRow = ({ count }: { count: number }) => {
-  const c = useColors()
-  return (
-    <View style={{ marginTop: spacing[1] }}>
-      <Row label={`${OFFER_ARCHIVED_ROW} ${count}개`} onPress={() => router.push('/offers/archived')}>
-        <View style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="archive" size={20} color="t2" />
-        </View>
-        <Text v="b1" weight="600" style={{ flex: 1 }}>
-          {OFFER_ARCHIVED_ROW}
-        </Text>
-        <Text v="c1" color="t3">
-          {count}개
-        </Text>
-        <Icon name="chev" size={18} color="t3" />
-      </Row>
-    </View>
-  )
-}
+const ArchivedRow = ({ count }: { count: number }) => (
+  <View style={{ marginTop: spacing[1] }}>
+    <Row label={`${OFFER_ARCHIVED_ROW} ${count}개`} onPress={() => router.push('/offers/archived')}>
+      <Text v="b1" weight="600" style={{ flex: 1 }}>
+        {OFFER_ARCHIVED_ROW}
+      </Text>
+      <Text v="c1" color="t3">
+        {count}개
+      </Text>
+      <Icon name="chev" size={18} color="t3" />
+    </Row>
+  </View>
+)
 
 // The board ends the list and lifts its empty state by the same 40pt.
 const LIST_END = 40
