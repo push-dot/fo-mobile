@@ -1,7 +1,8 @@
-// Mock of the /bots routes of push-be, with the same paths and bodies. Fixtures come from the board text of the
-// 2026-11-12 export: AgentHome, AgentHomeLong, AgentHomeSearch, BotProfile*, BotNewLinkOk, BotNewLimit.
+// Mock of the /bots routes of push-be, with the same paths and bodies. Fixtures come from the board text of design
+// version 396: AgentHome, AgentHomeLong, AgentHomeSearch, BotProfile*, BotNewLinkOk, BotNewLimit.
 import type { BotContract } from '@push/api-client'
 import { BOT_COLORS } from '../features/bots/constants'
+import { hasReferenceConsent } from './chat'
 import { postings } from './postings'
 import { mock } from './server'
 
@@ -39,6 +40,8 @@ export type MockJob = { turn: string; at: When; status: 'QUEUED' | 'RUNNING'; st
 export type BotFixture = {
   bot: Pick<BotContract.Bot, 'id' | 'kind' | 'displayName' | 'companyName' | 'color' | 'postingId' | 'notificationsMuted' | 'revision'> & { createdAt: When }
   /** `deadlineIn` counts days from today, so a D-day label holds in a capture. */
+  // shortcut: materialCount is the profile board's number, not counted from GET /materials?bot= as the server does. Only
+  // 모아페이 draws both and they agree; count it there once a board draws another bot's materials.
   detail: { posting: { id: string; title: string; deadlineIn: number | null; closed: boolean } | null; fit: { score: number } | null; materialCount?: number }
   readAt: When | null
   /** Oldest first. */
@@ -131,7 +134,7 @@ const said = (id: string, turn: string, text: string, at: When, role: MockMessag
 
 const MOA_POSTING = { id: 'p1', title: '백엔드 엔지니어', deadlineIn: 11, closed: false }
 
-/** AgentHome, row for row. Its times are not in last-activity order (DESIGN-GAPS G1), so the mock keeps the board's order. */
+/** AgentHome, row for row. GET /bots orders them by last activity, as the board does. */
 const home = (): BotFixture[] => [
   pushBot(),
   company(
@@ -200,7 +203,7 @@ const home = (): BotFixture[] => [
   ),
 ]
 
-/** AgentHomeLong, row for row, in the board's order (DESIGN-GAPS G1). Also the long names of BotProfileLong and ChatBotHeaderLong. */
+/** AgentHomeLong, row for row. Also the long names of BotProfileLong and ChatBotHeaderLong. */
 const homeLong = (): BotFixture[] => [
   pushBot(),
   company(
@@ -291,9 +294,18 @@ export const fixtureOf = (address: string) => fixtures.find((f) => (address === 
 
 const error = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 export const notFound = () => error(404, 'NOT_FOUND', 'resource not found')
+/** Creating a bot, sending to one, and answering its card all start AI work, which needs 참고 데이터 제공. */
+export const consentRequired = () => error(403, 'CONSENT_REQUIRED', 'reference data consent is required')
 const invalid = (field: string, message: string) => error(400, 'VALIDATION_ERROR', message, { field })
+const blankName = (b: Record<string, unknown>) => typeof b.displayName === 'string' && !b.displayName.trim()
 
 const dto = (f: BotFixture, now = new Date()) => botDtoOf(f, now, fixtures)
+
+/** push-be's list order: the Push Bot, then the company bots by last activity, newest first. */
+const inListOrder = (now: Date) => {
+  const rank = new Map(fixtures.map((f) => [f, f.bot.kind === 'push' ? Infinity : Date.parse(dto(f, now).lastActivityAt)]))
+  return [...fixtures].sort((a, b) => rank.get(b)! - rank.get(a)!)
+}
 
 const dayIn = (days: number, now: Date) => {
   const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days)
@@ -324,7 +336,7 @@ mock('GET', 'bots', ({ query }) => {
   }
   const now = new Date()
   const used = fixtures.filter((f) => f.bot.kind === 'company').length
-  const body: BotContract.BotList = { data: fixtures.map((f) => dto(f, now)), limit: { plan, max: LIMITS[plan], used, table: LIMITS } }
+  const body: BotContract.BotList = { data: inListOrder(now).map((f) => dto(f, now)), limit: { plan, max: LIMITS[plan], used, table: LIMITS } }
   return body
 })
 
@@ -334,22 +346,23 @@ mock('POST', 'bots', ({ body }) => {
   const b = (body ?? {}) as Record<string, unknown>
   const extra = Object.keys(b).find((k) => !CREATE_FIELDS.includes(k))
   if (extra) return invalid(extra, 'unknown field')
+  const color = b.color ?? 'teal'
+  if (!BOT_COLORS.some((c) => c === color)) return invalid('color', `must be one of ${BOT_COLORS.join(', ')}`)
+  if (blankName(b)) return invalid('displayName', 'must not be blank')
+  if (!hasReferenceConsent()) return consentRequired()
   const posting = postings.find((p) => p.id === b.postingId)
   if (!posting) return notFound()
   const existing = companyBotOf(posting.company)
   if (existing) return { status: 200, body: { data: dto(existing) } }
-  const color = b.color ?? 'teal'
-  if (!BOT_COLORS.some((c) => c === color)) return invalid('color', `must be one of ${BOT_COLORS.join(', ')}`)
   const max = LIMITS[plan]
   const used = fixtures.filter((f) => f.bot.kind === 'company').length
   if (max !== null && used >= max) return error(403, 'BOT_LIMIT', 'company bot limit reached for your plan', { limit: max, plan })
-  const name = typeof b.displayName === 'string' && b.displayName.trim() ? b.displayName.trim() : posting.company
+  const name = typeof b.displayName === 'string' ? b.displayName.trim() : posting.company
   const made = company(
     { id: nextId('b'), name, companyName: posting.company, color: color as BotContract.BotColor, postingId: posting.id, createdAt: new Date().toISOString() },
     { detail: { posting: { id: posting.id, title: posting.title, deadlineIn: null, closed: false }, fit: null, materialCount: 0 } },
   )
-  // The newest bot leads the company bots, as the server orders by last activity.
-  fixtures = [...fixtures.filter((f) => f.bot.kind === 'push'), made, ...fixtures.filter((f) => f.bot.kind === 'company')]
+  fixtures = [...fixtures, made]
   return { status: 201, body: { data: dto(made) } }
 })
 
@@ -401,7 +414,7 @@ mock('GET', 'bots/search', ({ query }) => {
   if (!q || [...q].length > 200) return invalid('q', 'q must be 1-200 characters')
   const has = (text: string) => text.toLowerCase().includes(q.toLowerCase())
   const now = new Date()
-  const bots = fixtures
+  const bots = inListOrder(now)
     .filter((f) => has(f.bot.displayName) || has(f.bot.companyName) || has(f.detail.posting?.title ?? ''))
     .map((f) => ({ ...dto(f, now), line: f.detail.posting ? `${f.bot.companyName} · ${f.detail.posting.title}` : f.bot.displayName }))
   const hits = fixtures
@@ -440,6 +453,7 @@ mock('PATCH', 'bots/:id', ({ params, body }) => {
   const extra = Object.keys(b).find((k) => !PATCH_FIELDS.includes(k) || (f.bot.kind === 'push' && k !== 'expectedRevision' && k !== 'notificationsMuted'))
   if (extra) return invalid(extra, 'unknown field')
   if (b.color !== undefined && !BOT_COLORS.some((c) => c === b.color)) return invalid('color', `must be one of ${BOT_COLORS.join(', ')}`)
+  if (blankName(b)) return invalid('displayName', 'must not be blank')
   if (b.expectedRevision !== f.bot.revision) return error(409, 'REVISION_CONFLICT', 'bot changed', { currentRevision: f.bot.revision })
   f.bot = {
     ...f.bot,

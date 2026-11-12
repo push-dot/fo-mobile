@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { createBotApi, createClient, type BotApi, type BotContract } from '@push/api-client'
 import { mockFetch } from '../index'
 import { expireCard, resetBots, setBotPlan, setBots } from '../bots'
+import { grantReference } from '../chat'
 import { setMaterials } from '../materials'
 
 const api = createBotApi(createClient({ baseUrl: 'http://x/api/v1', getToken: () => 't', fetch: mockFetch, uuid: () => 'k' }))
@@ -15,7 +16,10 @@ const frames = async (stream: AsyncGenerator<BotContract.StreamEvent>) => {
 beforeEach(() => {
   resetBots()
   setMaterials('default')
+  grantReference()
 })
+
+const withdrawConsent = () => mockFetch('http://x/api/v1/me/consents', { method: 'PUT', body: JSON.stringify({ referenceData: false }) })
 
 // A Record over the api-client's functions: a function added there without a call here fails `tsc`.
 const BOT_CALLS: Record<keyof BotApi['bots'], () => Promise<unknown>> = {
@@ -41,6 +45,7 @@ const MATERIAL_CALLS: Record<keyof BotApi['materials'], () => Promise<unknown>> 
   list: () => api.materials.list({ tab: 'all' }),
   get: () => api.materials.get('file', 'f1'),
   remove: () => api.materials.remove('link', 'l10'),
+  restore: () => api.materials.restore('link', 'l10'),
 }
 
 describe('the mock answers every call of the bot contract', () => {
@@ -57,6 +62,14 @@ describe('bots', () => {
     for (const bot of data) expect(Number.isNaN(Date.parse(bot.lastActivityAt))).toBe(false)
   })
 
+  it.each([
+    ['home', ['Push Bot', '파도AI', '모아페이', '도토리증권', '누리클라우드', '한빛모빌리티', '소담헬스']],
+    ['long', ['Push Bot', '파도AI', '한빛모빌리티 자율주행 데이터플랫폼팀', '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', '모아페이', '소담헬스케어 디지털헬스연구소']],
+  ] as const)('orders the %s bots by last activity, which is the row order of the board', async (set, names) => {
+    setBots(set)
+    expect((await api.bots.list()).data.map((b) => b.displayName)).toEqual(names)
+  })
+
   it('opens the existing bot of a company instead of making a second one', async () => {
     const found = await api.bots.list({ postingId: 'p13' })
     expect(found.data.map((b) => b.id)).toEqual(['b-moa'])
@@ -68,6 +81,16 @@ describe('bots', () => {
     setBotPlan('FREE')
     await expect(api.bots.create({ postingId: 'p6' })).rejects.toMatchObject({ code: 'BOT_LIMIT', status: 403, details: { limit: 3, plan: 'FREE' } })
     await expect(api.bots.create({ postingId: 'p6', companyName: 'x' } as BotContract.CreateBotBody)).rejects.toMatchObject({ status: 400 })
+    await expect(api.bots.create({ postingId: 'p6', displayName: '  ' })).rejects.toMatchObject({ status: 400 })
+  })
+
+  it('asks for 참고 데이터 제공 before it creates a bot, sends, or answers a card', async () => {
+    await withdrawConsent()
+    const refused = { status: 403, code: 'CONSENT_REQUIRED' }
+    await expect(api.bots.create({ postingId: 'p6' })).rejects.toMatchObject(refused)
+    await expect(frames(api.bots.send('push', { text: '안녕' }))).rejects.toMatchObject(refused)
+    await expect(api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'approve' })).rejects.toMatchObject(refused)
+    expect((await api.bots.list()).data).toHaveLength(7)
   })
 
   it('keeps the Push Bot, and checks the revision of an edit', async () => {
@@ -102,6 +125,14 @@ describe('bot chat', () => {
     await expect(frames(api.bots.send('push', { text: '봐 줘', attachments: [{ kind: 'file', id: 'nope' }] }))).rejects.toMatchObject({ code: 'ATTACHMENT_GONE' })
   })
 
+  it('takes a posting that is not bookmarked, and refuses more than 10 attachments or a key it does not take', async () => {
+    await frames(api.bots.send('push', { text: '이 공고 봐 줘', attachments: [{ kind: 'posting', id: 'p6' }] }))
+    expect((await api.bots.transcript('push')).data[0]?.user?.attachments.map((a) => a.id)).toEqual(['p6'])
+    const eleven = Array.from({ length: 11 }, () => ({ kind: 'posting' as const, id: 'p6' }))
+    await expect(frames(api.bots.send('push', { text: '봐 줘', attachments: eleven }))).rejects.toMatchObject({ status: 400 })
+    await expect(frames(api.bots.send('push', { text: '봐 줘', threadId: 'x' } as BotContract.SendBody))).rejects.toMatchObject({ status: 400 })
+  })
+
   it('reattaches to a run under way and ends at once when nothing runs', async () => {
     const stop = new AbortController()
     const live = api.bots.follow('b-dotori', 0, stop.signal)
@@ -122,12 +153,17 @@ describe('bot chat', () => {
     await expect(api.bots.answer('b-moa', 'card-moa-page', { optionId: 'approve' })).rejects.toMatchObject({ status: 410, code: 'APPROVAL_EXPIRED' })
     const retry = await api.bots.retryCard('b-moa', 'card-moa-page')
     expect(Date.parse(retry.expiresAt) - Date.parse(retry.openedAt)).toBe(10 * 60_000)
-    expect((await api.bots.answer('b-moa', 'card-moa-page', { optionId: 'approve_always' })).answer.status).toBe('APPROVED')
+    expect(await api.bots.answer('b-moa', 'card-moa-page', { optionId: 'approve_always' })).toMatchObject({ answer: { status: 'APPROVED' }, resumed: true })
+  })
+
+  it('resumes the run on an approval only, and keeps the waiting status of an answered card', async () => {
+    expect(await api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'reject' })).toMatchObject({ answer: { status: 'REJECTED' }, resumed: false })
+    const [turn] = (await api.bots.transcript('b-moa')).data
+    expect(turn?.events.filter((e) => e.type === 'status').map((e) => e.type === 'status' && e.phase)).toEqual(['waiting'])
   })
 })
 
 describe('server order', () => {
-  // The AgentHome and AgentHomeLong fixtures keep the boards' row order (DESIGN-GAPS G1). Everything else is in server order.
   const desc = (times: string[]) => expect([...times].sort().reverse()).toEqual(times)
 
   it('lists a new bot first among the company bots, as last activity orders them', async () => {
@@ -162,10 +198,44 @@ describe('materials', () => {
     expect((await api.materials.list({ q: '모아페이' })).counts).toEqual({ doc: 1, bookmark: 1, link: 0 })
   })
 
-  it('names the bots that used a material, and forgets a deleted one', async () => {
-    expect((await api.materials.get('file', 'f1')).usedBy.map((b) => b.displayName)).toEqual(['모아페이', '도토리증권'])
-    await api.materials.remove('posting', 'p3')
-    await expect(api.materials.get('posting', 'p3')).rejects.toMatchObject({ status: 404 })
-    expect((await api.materials.list()).counts.bookmark).toBe(5)
+  const names = (refs: BotContract.BotRef[]) => refs.map((b) => b.displayName)
+
+  it('names the maker first and then the chats it was attached in', async () => {
+    expect(names((await api.materials.get('file', 'f1')).usedBy)).toEqual(['모아페이', '도토리증권'])
+    expect(names((await api.materials.get('file', 'f3')).usedBy)).toEqual(['Push Bot'])
+  })
+
+  it("lists a bot's own materials, as many as its profile counts (MaterialsFromProfile)", async () => {
+    const page = await api.materials.list({ bot: 'b-moa' })
+    expect(page.counts).toEqual({ doc: 4, bookmark: 1, link: 3 })
+    expect(page.sections.map((s) => s.items.map((m) => m.id))).toEqual([['f1', 'f2', 'f4', 'f5'], ['p1'], ['l1', 'l2', 'l3']])
+    expect((await api.bots.get('b-moa')).materialCount).toBe(8)
+    expect((await api.materials.list({ bot: 'push' })).counts).toEqual({ doc: 1, bookmark: 0, link: 0 })
+    await expect(api.materials.list({ bot: 'b-gone' })).rejects.toMatchObject({ status: 404 })
+  })
+
+  it('sends the host of a link and one of the five kinds: LinkedIn is no kind', async () => {
+    const [links] = (await api.materials.list({ tab: 'link' })).sections
+    expect(links?.items.slice(0, 3).map((m) => m.kind === 'link' && [m.host, m.linkKind])).toEqual([['github.com', 'github'], ['seojun.dev', 'blog'], ['linkedin.com', 'other']])
+  })
+
+  it('keeps a deleted material out of every list until a restore brings it back', async () => {
+    await api.materials.remove('file', 'f2')
+    await api.materials.remove('file', 'f2')
+    await expect(api.materials.get('file', 'f2')).rejects.toMatchObject({ status: 404 })
+    expect((await api.materials.list()).counts.doc).toBe(7)
+    await expect(frames(api.bots.send('push', { text: '봐 줘', attachments: [{ kind: 'file', id: 'f2' }] }))).rejects.toMatchObject({ code: 'ATTACHMENT_GONE' })
+    expect(await api.materials.restore('file', 'f2')).toMatchObject({ kind: 'file', id: 'f2', title: '경력기술서_2026.pdf' })
+    expect((await api.materials.list({ tab: 'doc' })).sections[0]?.items.map((m) => m.id).slice(0, 3)).toEqual(['f1', 'f2', 'f3'])
+    await expect(api.materials.remove('file', 'nope')).rejects.toMatchObject({ status: 404 })
+    await expect(api.materials.restore('file', 'nope')).rejects.toMatchObject({ status: 404 })
+  })
+
+  it("forgets a deleted bot's chat, and reads what it made as made by no one known", async () => {
+    await api.bots.remove('b-dotori')
+    expect(names((await api.materials.get('file', 'f1')).usedBy)).toEqual(['모아페이'])
+    await api.bots.remove('b-moa')
+    expect(await api.materials.get('file', 'f1')).toMatchObject({ createdBy: null, usedBy: [] })
+    await expect(api.materials.list({ bot: 'b-moa' })).rejects.toMatchObject({ status: 404 })
   })
 })

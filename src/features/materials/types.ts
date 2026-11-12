@@ -5,10 +5,13 @@ export type MaterialTab = 'all' | 'doc' | 'bookmark' | 'link'
 export type MaterialSection = Exclude<MaterialTab, 'all'>
 export type MaterialKind = AttachmentKind
 
+/** What a materials list asks for. `bot` keeps the materials that bot made or that were attached in its chat (MaterialsFromProfile). */
+export type MaterialsFilter = { tab: MaterialTab; q: string; bot?: BotId }
+
 /** Who made a 서류. `bot: null` means a bot made it and that bot was deleted since. */
 export type MadeBy = { by: 'user' } | { by: 'bot'; bot: BotRef | null }
 
-/** The server's label kind of a link. `linkedin` is derived from the address: no one stores or picks it. */
+/** The label of a link: one of the five stored kinds, or `linkedin`, which the app derives from the link's host. */
 export type LinkLabel = 'job' | 'github' | 'portfolio' | 'blog' | 'linkedin' | 'other'
 
 type MaterialCommon = { id: string; title: string }

@@ -1,12 +1,15 @@
 // Mock of the /materials routes of push-be. Fixtures come from the board text of Materials, MaterialsDocs,
-// MaterialsBookmarks, MaterialsLinks, MaterialsLong, and MaterialDetail*. Each section is newest first, as the server
-// answers. A section's rows past what a board shows (the 8th 서류, links 7 to 10) are not drawn anywhere.
+// MaterialsBookmarks, MaterialsLinks, MaterialsLong, MaterialsFromProfile, and MaterialDetail* (design version 396). Each
+// section is newest first, as the server answers. A section's rows past what a board shows (the 8th 서류, links 7 to 10)
+// are not drawn anywhere.
 import type { BotContract } from '@push/api-client'
+import { fixtureOf } from './bots'
 import { mock } from './server'
 
 type Material = BotContract.Material
 type Section = BotContract.MaterialSection
 type Kind = BotContract.MaterialKind
+type LinkKind = Extract<Material, { kind: 'link' }>['linkKind']
 
 const MOA: BotContract.BotRef = { id: 'b-moa', kind: 'company', displayName: '모아페이', color: 'teal' }
 const DOTORI: BotContract.BotRef = { id: 'b-dotori', kind: 'company', displayName: '도토리증권', color: 'amber' }
@@ -32,8 +35,8 @@ const bookmark = (id: string, company: string, title: string, deadlineIn: number
   careerMin: null, careerMax: null, employmentType: null, location: null, bookmarkedAt, ...extra,
 } as Material)
 
-const link = (id: string, url: string, linkKind: Extract<Material, { kind: 'link' }>['linkKind'], addedAt: string, title = url, checked: string | null = null): Material => ({
-  kind: 'link', id, title, url, linkKind, addedAt, lastCheckedAt: checked, lastCheckOk: checked === null ? null : true,
+const link = (id: string, url: string, linkKind: LinkKind, addedAt: string, title = url, checked: string | null = null): Material => ({
+  kind: 'link', id, title, url, host: new URL(url).hostname, linkKind, addedAt, lastCheckedAt: checked, lastCheckOk: checked === null ? null : true,
 })
 
 const yesterday = () => new Date(Date.now() - DAY).toISOString()
@@ -61,7 +64,7 @@ const bookmarks = (): Material[] => [
 const links = (): Material[] => [
   link('l1', 'https://github.com/seojun-kim', 'github', '2026-10-03T02:00:00Z', '김서준 GitHub', yesterday()),
   link('l2', 'https://seojun.dev/blog/payment-retry', 'blog', '2026-09-21T02:00:00Z'),
-  link('l3', 'https://linkedin.com/in/seojun-kim', 'linkedin', '2026-09-02T02:00:00Z'),
+  link('l3', 'https://linkedin.com/in/seojun-kim', 'other', '2026-09-02T02:00:00Z'),
   link('l4', 'https://seojun.dev', 'portfolio', '2026-08-30T02:00:00Z'),
   link('l5', 'https://velog.io/@seojun/kafka-retry', 'blog', '2026-08-11T02:00:00Z'),
   link('l6', 'https://github.com/seojun-kim/pay-gw', 'github', '2026-07-20T02:00:00Z'),
@@ -83,34 +86,77 @@ const longSections = (): Record<Section, Material[]> => ({
 
 const defaults = (): Record<Section, Material[]> => ({ doc: docs(), bookmark: bookmarks(), link: links() })
 
-/** MaterialDetailDoc: 쓰인 대화 모아페이 봇, 도토리증권 봇. */
-const USED_BY: Record<string, BotContract.BotRef[]> = { 'file:f1': [MOA, DOTORI] }
+const keyOf = (m: { kind: Kind; id: string }) => `${m.kind}:${m.id}`
+
+/**
+ * The bot chats each material was attached in, most recent first. With the maker they are the material's 쓰인 대화
+ * (MaterialDetailDoc: 모아페이 봇, 도토리증권 봇) and the materials of a bot (MaterialsFromProfile: 모아페이 서류 4, 북마크 1, 링크 3).
+ */
+// shortcut: a send to a bot does not add to this table, so the bot's materials stay as drawn; add it when a flow checks them.
+const ATTACHED_IN: Record<string, BotContract.BotRef[]> = {
+  'file:f1': [DOTORI],
+  'file:f2': [MOA],
+  'file:f4': [MOA],
+  'posting:p1': [MOA],
+  'link:l1': [MOA],
+  'link:l2': [MOA],
+  'link:l3': [MOA],
+}
+
+/** A deleted bot's chat is gone with it, and what it made reads as made by no one known. */
+const live = (ref: BotContract.BotRef | null) => (ref && fixtureOf(ref.id) ? ref : null)
+
+const listed = (m: Material): Material => (m.kind === 'file' || m.kind === 'document' ? { ...m, createdBy: live(m.createdBy) } : m)
+
+/** The maker first, then the chats it was attached in. A bot's materials are the ones that name it here. */
+const usedBy = (m: Material): BotContract.BotRef[] => {
+  const maker = m.kind === 'file' || m.kind === 'document' ? live(m.createdBy) : null
+  const chats = (ATTACHED_IN[keyOf(m)] ?? []).filter((b) => live(b) && b.id !== maker?.id)
+  return maker ? [maker, ...chats] : chats
+}
 
 let sections = defaults()
+/** Deleted materials the server still keeps for 30 days: they leave every list until a restore. */
+let kept = new Set<string>()
 
 /** Tour switches (links.ts): `none` empties every section, a section name empties that one, `long` draws MaterialsLong. */
 export const setMaterials = (set: 'default' | 'none' | 'long' | Section) => {
   sections = set === 'long' ? longSections() : defaults()
+  kept = new Set()
   if (set === 'none') sections = { doc: [], bookmark: [], link: [] }
   else if (set !== 'default' && set !== 'long') sections[set] = []
 }
 
 export const SECTION_OF: Record<Kind, Section> = { file: 'doc', document: 'doc', posting: 'bookmark', link: 'link' }
 
-export const findMaterial = (kind: Kind, id: string) => sections[SECTION_OF[kind]].find((m) => m.kind === kind && m.id === id)
+const stored = (kind: Kind, id: string) => sections[SECTION_OF[kind]].find((m) => m.kind === kind && m.id === id)
+
+/** A material the caller can still use, or nothing once it was deleted. */
+export const findMaterial = (kind: Kind, id: string) => {
+  const m = stored(kind, id)
+  return m && !kept.has(keyOf(m)) ? m : undefined
+}
 
 const PREVIEW: Record<Section, number> = { doc: 4, bookmark: 3, link: 3 }
 const TABS = ['all', 'doc', 'bookmark', 'link'] as const
+const Q_MAX = 200
 
 const textOf = (m: Material) => [m.title, m.kind === 'posting' ? m.company : '', m.kind === 'link' ? m.url : ''].join(' ').toLowerCase()
 
 const notFound = () => ({ status: 404, body: { error: { code: 'NOT_FOUND', message: 'resource not found' } } })
+const invalid = (field: string, message: string) => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', message, details: { field } } } })
 
 mock('GET', 'materials', ({ query }) => {
   const tab = query.get('tab') ?? 'all'
-  if (!TABS.some((t) => t === tab)) return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'unknown tab', details: { field: 'tab' } } } }
-  const q = (query.get('q') ?? '').trim().toLowerCase()
-  const of = (s: Section) => sections[s].filter((m) => !q || textOf(m).includes(q))
+  if (!TABS.some((t) => t === tab)) return invalid('tab', 'unknown tab')
+  const raw = query.get('q') ?? ''
+  if ([...raw].length > Q_MAX) return invalid('q', `q must be at most ${Q_MAX} characters`)
+  const q = raw.trim().toLowerCase()
+  const address = query.get('bot')
+  const bot = address === null ? null : fixtureOf(address)?.bot.id
+  if (bot === undefined) return notFound()
+  const of = (s: Section) =>
+    sections[s].filter((m) => !kept.has(keyOf(m)) && (!q || textOf(m).includes(q)) && (!bot || usedBy(m).some((b) => b.id === bot))).map(listed)
   const counts = { doc: of('doc').length, bookmark: of('bookmark').length, link: of('link').length }
   if (tab === 'all') {
     const all: BotContract.MaterialsPage = { counts, sections: (['doc', 'bookmark', 'link'] as const).map((s) => ({ section: s, items: of(s).slice(0, PREVIEW[s]), nextCursor: null })) }
@@ -131,15 +177,24 @@ mock('GET', 'materials/:kind/:id', ({ params }) => {
   const kind = kindOf(params.kind)
   const m = kind && findMaterial(kind, params.id!)
   if (!m) return notFound()
-  const detail: BotContract.MaterialDetail = { ...m, usedBy: USED_BY[`${m.kind}:${m.id}`] ?? [] }
+  const detail: BotContract.MaterialDetail = { ...listed(m), usedBy: usedBy(m) }
   return { data: detail }
 })
 
+/** A second delete answers 204 again and changes nothing. */
 mock('DELETE', 'materials/:kind/:id', ({ params }) => {
   const kind = kindOf(params.kind)
-  const m = kind && findMaterial(kind, params.id!)
-  if (!kind || !m) return notFound()
-  const section = SECTION_OF[kind]
-  sections = { ...sections, [section]: sections[section].filter((x) => x !== m) }
+  const m = kind && stored(kind, params.id!)
+  if (!m) return notFound()
+  kept.add(keyOf(m))
   return undefined
+})
+
+/** Undoes a delete, and answers a material that was not deleted as it is. */
+mock('POST', 'materials/:kind/:id/restore', ({ params }) => {
+  const kind = kindOf(params.kind)
+  const m = kind && stored(kind, params.id!)
+  if (!m) return notFound()
+  kept.delete(keyOf(m))
+  return { data: listed(m) }
 })

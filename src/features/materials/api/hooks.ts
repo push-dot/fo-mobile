@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query'
-import type { MaterialKind, MaterialsPage, MaterialTab } from '../types'
+import type { MaterialKind, MaterialsFilter, MaterialsPage } from '../types'
 import { withoutMaterial } from '../utils/material-row'
-import { deleteMaterial, fetchMaterial, fetchMaterials } from './fetchers'
+import { deleteMaterial, fetchMaterial, fetchMaterials, restoreMaterial } from './fetchers'
 
 type Pages = InfiniteData<Awaited<ReturnType<typeof fetchMaterials>>, string | undefined>
 
@@ -22,10 +22,10 @@ const joined = (data: Pages): MaterialsPage => {
   }
 }
 
-export const useMaterials = ({ tab, q }: { tab: MaterialTab; q: string }) => {
+export const useMaterials = ({ tab, q, bot }: MaterialsFilter) => {
   const r = useInfiniteQuery({
-    queryKey: [...LISTS, tab, q.trim()],
-    queryFn: ({ pageParam }) => fetchMaterials(tab, q.trim(), pageParam),
+    queryKey: [...LISTS, tab, q.trim(), bot],
+    queryFn: ({ pageParam }) => fetchMaterials({ tab, q: q.trim(), bot }, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.next ?? undefined,
     select: joined,
@@ -56,6 +56,16 @@ export const useDeleteMaterial = () => {
       return before
     },
     onError: (_error, _vars, before) => before?.forEach(([key, data]) => qc.setQueryData(key, data)),
+    onSettled: () => qc.invalidateQueries({ queryKey: MATERIALS }),
+  })
+  return async (kind: MaterialKind, id: string) => void (await m.mutateAsync({ kind, id }))
+}
+
+/** 되돌리기 on the delete toast. The lists refetch, so the row comes back in its place. */
+export const useRestoreMaterial = () => {
+  const qc = useQueryClient()
+  const m = useMutation({
+    mutationFn: ({ kind, id }: { kind: MaterialKind; id: string }) => restoreMaterial(kind, id),
     onSettled: () => qc.invalidateQueries({ queryKey: MATERIALS }),
   })
   return async (kind: MaterialKind, id: string) => void (await m.mutateAsync({ kind, id }))

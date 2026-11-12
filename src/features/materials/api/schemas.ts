@@ -15,6 +15,9 @@ const dayOf = (value: string | null): Date | null => {
 
 const botRefOf = (ref: BotContract.BotRef): BotRef => ({ id: ref.id as BotId, kind: ref.kind, name: ref.displayName, color: ref.color })
 
+/** LinkedIn is not a stored link kind. The server sends the link's host, and the label comes from it. */
+const LINKEDIN_HOST = /(^|\.)linkedin\.com$/
+
 const madeByOf = (origin: 'UPLOAD' | 'AI', createdBy: BotContract.BotRef | null): MadeBy =>
   origin === 'UPLOAD' ? { by: 'user' } : { by: 'bot', bot: createdBy && botRefOf(createdBy) }
 
@@ -32,7 +35,7 @@ export const toMaterial = (m: BotContract.Material): Material => {
         id: m.id,
         title: m.title,
         url: m.url,
-        linkKind: m.linkKind,
+        linkKind: LINKEDIN_HOST.test(m.host) ? 'linkedin' : m.linkKind,
         addedAt: dateOf(m.addedAt),
         lastCheck: m.lastCheckedAt === null ? null : { at: dateOf(m.lastCheckedAt), ok: m.lastCheckOk ?? false },
       }

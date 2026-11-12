@@ -43,17 +43,27 @@ describe('materialRow', () => {
 })
 
 describe('reading the wire', () => {
-  it('reads who made a file, and the LinkedIn label the server derived', () => {
+  it('reads who made a file', () => {
     const made = toMaterial({ kind: 'file', id: 'f1', title: 'a.pdf', mimeType: 'application/pdf', size: 1, pageCount: null, origin: 'AI', createdBy: null, updatedAt: '2026-11-02T06:14:00Z' })
     expect(made).toMatchObject({ madeBy: { by: 'bot', bot: null } })
-    const wire: BotContract.MaterialDetail = {
-      kind: 'link', id: 'l1', title: 'in', url: 'https://linkedin.com/in/x', linkKind: 'linkedin', addedAt: '2026-09-02T00:00:00Z', lastCheckedAt: null, lastCheckOk: null,
-      usedBy: [{ id: 'b1', kind: 'company', displayName: '모아페이', color: 'teal' }],
-    }
-    const detail = toMaterialDetail(wire)
+  })
+
+  const wireLink = (host: string, linkKind: Extract<BotContract.Material, { kind: 'link' }>['linkKind']): BotContract.MaterialDetail => ({
+    kind: 'link', id: 'l1', title: 'in', url: `https://${host}/in/x`, host, linkKind, addedAt: '2026-09-02T00:00:00Z', lastCheckedAt: null, lastCheckOk: null,
+    usedBy: [{ id: 'b1', kind: 'company', displayName: '모아페이', color: 'teal' }],
+  })
+
+  it('labels a link LinkedIn from its host, whatever kind it is stored with', () => {
+    const detail = toMaterialDetail(wireLink('linkedin.com', 'other'))
     expect(detail.material).toMatchObject({ linkKind: 'linkedin', lastCheck: null })
+    expect(materialRow(detail.material, now).sub).toBe('링크 · LinkedIn · 9월 2일 추가')
     expect(detail.material).not.toHaveProperty('usedBy')
     expect(detail.usedBy).toEqual([moapay])
+    expect(toMaterialDetail(wireLink('kr.linkedin.com', 'portfolio')).material).toMatchObject({ linkKind: 'linkedin' })
+  })
+
+  it.each([['', 'other'], ['notlinkedin.com', 'blog'], ['linkedin.com.example.org', 'portfolio']] as const)('keeps the stored kind for host %j', (host, kind) => {
+    expect(toMaterialDetail(wireLink(host, kind)).material).toMatchObject({ linkKind: kind })
   })
 })
 

@@ -2,8 +2,10 @@
 // The thread is the bot fixture's messages, cards, and active job (bots.ts), so the list and the chat agree.
 // A send answers a short scripted run as a real event stream. Board scenarios replace it in the chat lane.
 import type { BotContract } from '@push/api-client'
-import { atOf, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
+import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
+import { hasReferenceConsent } from './chat'
 import { findMaterial } from './materials'
+import { postings } from './postings'
 import { mock } from './server'
 
 type TurnEvent = BotContract.TurnEvent
@@ -42,11 +44,10 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
       }
     }
     if (bot) events.push(stamp({ type: 'token', text: bot.text }, bot.at))
+    // A finished turn keeps its waiting statuses, so an answered card still has the one it asked with.
     for (const c of cards) {
-      if (c.status === 'PENDING') {
-        const text = c.for === 'answer' ? '답을 기다리고 있어요' : '확인을 기다리고 있어요'
-        events.push(stamp({ type: 'status', text, phase: 'waiting', since: atOf(c.at, now).toISOString(), for: c.for, cardId: c.id }, c.at))
-      }
+      const text = c.for === 'answer' ? '답을 기다리고 있어요' : '확인을 기다리고 있어요'
+      events.push(stamp({ type: 'status', text, phase: 'waiting', since: atOf(c.at, now).toISOString(), for: c.for, cardId: c.id }, c.at))
       events.push(stamp(cardEvent(c, now), c.at))
     }
     const first = Math.min(...[user, bot, ...cards, job].flatMap((x) => (x ? [time(x.at)] : [])))
@@ -103,15 +104,26 @@ mock('GET', 'bots/:id/transcript/matches', ({ params, query }) => {
   return { data }
 })
 
+const SEND_FIELDS = ['text', 'attachments', 'intent', 'accessMode', 'ai']
+const MAX_ATTACHMENTS = 10
+
+/** A material of the caller, or any posting: a posting needs no bookmark to be attached. */
+const attachable = (ref: BotContract.AttachmentRef) =>
+  findMaterial(ref.kind, ref.id) ?? (ref.kind === 'posting' ? postings.find((p) => p.id === ref.id) : undefined)
+
 mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
   const b = (body ?? {}) as Partial<BotContract.SendBody>
+  const extra = Object.keys(b).find((k) => !SEND_FIELDS.includes(k))
+  if (extra) return error(400, 'VALIDATION_ERROR', 'unknown field', { field: extra })
   const text = typeof b.text === 'string' ? b.text.trim() : ''
   if (!text || text.length > 20_000) return error(400, 'VALIDATION_ERROR', 'text must be 1-20000 characters', { field: 'text' })
+  if ((b.attachments ?? []).length > MAX_ATTACHMENTS) return error(400, 'VALIDATION_ERROR', `at most ${MAX_ATTACHMENTS} attachments`, { field: 'attachments' })
+  if (!hasReferenceConsent()) return consentRequired()
   const attachments: BotContract.Attachment[] = []
   for (const ref of b.attachments ?? []) {
-    const m = findMaterial(ref.kind, ref.id)
+    const m = attachable(ref)
     if (!m) return error(409, 'ATTACHMENT_GONE', 'an attached material is gone', { kind: ref.kind, id: ref.id })
     attachments.push({ kind: ref.kind, id: ref.id, title: m.title })
   }
@@ -154,7 +166,9 @@ mock('POST', 'bots/:id/stream/cancel', ({ params }) => {
 
 const cardOf = (f: BotFixture, id: string) => f.cards.find((c) => c.id === id)
 
+/** An approval resumes the run that asked (202, follow the stream). A rejection only closes the card. */
 mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
+  if (!hasReferenceConsent()) return consentRequired()
   const f = fixtureOf(params.id!)
   const card = f && cardOf(f, params.approvalId!)
   if (!card) return notFound()
@@ -166,7 +180,7 @@ mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
   if (expired && optionId !== 'reject') return error(410, 'APPROVAL_EXPIRED', 'the card expired')
   card.status = optionId === 'reject' ? 'REJECTED' : 'APPROVED'
   const data: BotContract.CardAnswer = { id: card.id, status: card.status, optionId }
-  return { data }
+  return { status: card.status === 'APPROVED' ? 202 : 200, body: { data } }
 })
 
 const DEFAULT_LIFETIME_MIN = 10
