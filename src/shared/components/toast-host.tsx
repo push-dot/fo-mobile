@@ -38,7 +38,13 @@ const ToneIcon = ({ tone }: { tone: ToastTone }) => {
 // Not the Material snackbar: @expo/ui's Snackbar has a fixed shape (no 16pt radius or 52pt height) and no dismiss API.
 const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow: string; opaque?: boolean; children: ReactNode }) => {
   const c = useColors()
-  if (Platform.OS === 'ios' && !opaque) return <Glass interactive style={shape}>{children}</Glass>
+  const dark = useThemeMode() === 'dark'
+  if (Platform.OS === 'ios' && !opaque)
+    return (
+      <Glass interactive tint={dark ? c.glass : undefined} style={shape}>
+        {children}
+      </Glass>
+    )
   return <View style={[shape, { backgroundColor: Platform.OS === 'ios' ? c.paper : c.t1, boxShadow: shadow }]}>{children}</View>
 }
 
@@ -82,7 +88,8 @@ const ToastHost = () => {
         left: shape.inset,
         right: shape.inset,
         bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP),
-        opacity: shown,
+        // UIKit drops a glass effect that installs under a nearly transparent ancestor, so the iOS card only slides in.
+        opacity: Platform.OS === 'ios' ? 1 : shown,
         transform: [{ translateY }],
       }}
     >
