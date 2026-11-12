@@ -19,21 +19,19 @@ name: 자료 → 서류 삭제 → 되돌리기 → 자료 없음 → 서류 올
     visible: "‘김서준_백엔드_이력서.pdf’를 삭제할까요?"
     timeout: 5000
 - takeScreenshot: 09_materials_delete_undo_empty-02
-- runFlow:
-    file: _tap_sheet_button.yaml
-    env:
-      TEXT: "삭제"
+# A plain tap: _tap_sheet_button's "still visible?" check waits about 7 s, longer than the 5 s undo toast lives.
+- tapOn: "삭제"
 # The confirm and the detail sheet close, the row leaves the list, and the server keeps the file for 30 days.
 - extendedWaitUntil:
     visible: "서류를 삭제했어요"
-    timeout: 10000
+    timeout: 4000
 - assertNotVisible: "김서준_백엔드_이력서.pdf 자세히"
-- assertNotVisible: "서류로 들어가기"
 - takeScreenshot: 09_materials_delete_undo_empty-03
 - tapOn: "되돌리기"
 - extendedWaitUntil:
     visible: "김서준_백엔드_이력서.pdf 자세히"
     timeout: 10000
+- assertNotVisible: "서류로 들어가기"
 - takeScreenshot: 09_materials_delete_undo_empty-04
 
 # The modal asks again each time it opens, so a fixture switch shows on the next open.
