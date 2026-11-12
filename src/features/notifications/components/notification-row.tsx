@@ -1,21 +1,12 @@
 import { memo } from 'react'
 import { Pressable, View } from 'react-native'
-import type { AppNotification, NotificationType } from '@push/api-client'
-import { Icon, Text, type IconName } from '../../../shared/components'
-import { radius, spacing, useColors, type Colors } from '../../../theme'
+import type { AppNotification } from '@push/api-client'
+import { Text } from '../../../shared/components'
+import { radius, spacing, useColors } from '../../../theme'
 import { notificationTitle, timeLabel } from '../utils'
-
-const KIND: Record<NotificationType, { icon: IconName; fg: keyof Colors; bg: keyof Colors }> = {
-  AI_DONE: { icon: 'spark', fg: 'acText', bg: 'acSoft' },
-  OFFER: { icon: 'inbox', fg: 'green', bg: 'greenSoft' },
-  DEADLINE: { icon: 'clock', fg: 'red', bg: 'redSoft' },
-  COMMENT: { icon: 'chat', fg: 'orange', bg: 'orangeSoft' },
-  APPLICATION_STAGE: { icon: 'job-check', fg: 'green', bg: 'greenSoft' },
-}
 
 const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: (item: AppNotification) => void }) => {
   const c = useColors()
-  const k = KIND[n.type]
   const unread = !n.readAt
   return (
     <Pressable
@@ -24,9 +15,6 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: (item: A
       onPress={() => onPress(n)}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: spacing[5], paddingVertical: 14, backgroundColor: pressed ? c.fill : undefined })}
     >
-      <View style={{ width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: c[k.bg] }}>
-        <Icon name={k.icon} size={22} color={k.fg} filled={n.type === 'AI_DONE'} />
-      </View>
       <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
         <View style={{ flexDirection: 'row', gap: spacing[2] }}>
           <Text v="c1" weight="600" color="t3" style={{ flex: 1 }}>

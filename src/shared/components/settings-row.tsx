@@ -36,7 +36,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, accent }: RowP
                 {value}
               </Text>
             ) : null}
-            <Icon name="chev" size={18} color="t4" />
+            <Icon name="chev" size={16} color={value ? 't3' : 't1'} />
           </View>
         ) : value ? (
           <Text v="b2" color="t3">

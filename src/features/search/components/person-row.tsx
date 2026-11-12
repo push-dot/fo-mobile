@@ -32,7 +32,7 @@ const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void
           </Text>
         ) : null}
       </View>
-      <Icon name="chev" size={18} color="t4" />
+      <Icon name="chev" size={18} color="t1" />
     </Pressable>
   )
 }

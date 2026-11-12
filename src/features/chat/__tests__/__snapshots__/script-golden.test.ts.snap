@@ -3113,7 +3113,7 @@ card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > run switch 1`] = `
 "
 {"text":"모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요","type":"user"}
-{"code":"NOT_CONFIGURED","text":"지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.","type":"error"}
+{"code":"NOT_CONFIGURED","text":"지금은 봇을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.","type":"error"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -5666,7 +5666,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token err-unavailable 1`] = `
 "
 {"text":"err-unavailable","type":"user"}
-{"code":"NOT_CONFIGURED","text":"지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.","type":"error"}
+{"code":"NOT_CONFIGURED","text":"지금은 봇을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.","type":"error"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "

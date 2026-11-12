@@ -364,18 +364,21 @@ const convert = (source) => {
 module.exports = { convert }
 
 if (require.main === module) {
-  const args = process.argv.slice(2)
-  const fromAt = args.indexOf('--from')
-  const from = fromAt >= 0 ? args[fromAt + 1] : DEFAULT_FROM
-  const next = convert(readSource(from))
-  if (args.includes('--check')) {
-    const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf8') : ''
-    if (current !== next) {
-      console.error(`mock-wire-frames: ${path.relative(root, OUT)} differs from the codemod output of ${from}`)
-      process.exitCode = 1
+  import('./bot-copy.mjs').then(({ renameCopy }) => {
+    const args = process.argv.slice(2)
+    const fromAt = args.indexOf('--from')
+    const from = fromAt >= 0 ? args[fromAt + 1] : DEFAULT_FROM
+    // The app's 에이전트 copy became 봇 (bot-copy.mjs) after the pin, so the output carries that rename too.
+    const next = renameCopy(convert(readSource(from)))
+    if (args.includes('--check')) {
+      const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf8') : ''
+      if (current !== next) {
+        console.error(`mock-wire-frames: ${path.relative(root, OUT)} differs from the codemod output of ${from}`)
+        process.exitCode = 1
+      }
+    } else {
+      fs.writeFileSync(OUT, next)
+      console.log(`mock-wire-frames: wrote ${path.relative(root, OUT)} from ${from}`)
     }
-  } else {
-    fs.writeFileSync(OUT, next)
-    console.log(`mock-wire-frames: wrote ${path.relative(root, OUT)} from ${from}`)
-  }
+  })
 }

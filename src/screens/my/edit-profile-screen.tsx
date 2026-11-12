@@ -345,7 +345,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
         />
         {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
-          label="에이전트로 다듬기"
+          label="봇으로 다듬기"
           icon="spark"
           variant="secondary"
           size="md"

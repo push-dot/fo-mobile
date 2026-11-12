@@ -41,16 +41,16 @@ tags:
       - runFlow: _settings_end.yaml
       - tapOn: "기본 말투.*"
       - extendedWaitUntil:
-          visible: "에이전트가 어떤 말투로 쓸까요?"
+          visible: "봇이 어떤 말투로 쓸까요?"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.4
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "에이전트가 어떤 말투로 쓸까요?"
+            TITLE: "봇이 어떤 말투로 쓸까요?"
       - extendedWaitUntil:
-          notVisible: "에이전트가 어떤 말투로 쓸까요?"
+          notVisible: "봇이 어떤 말투로 쓸까요?"
           timeout: 5000
       - runFlow: _settings_end.yaml
       - tapOn: "로그아웃"

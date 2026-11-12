@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 에이전트 · ULTRA 요금제 · 크레딧을 다 쓴 ULTRA
+name: 봇 · ULTRA 요금제 · 크레딧을 다 쓴 ULTRA
 tags:
   - visual
 ---
@@ -16,7 +16,7 @@ tags:
     timeout: 10000
 - tapOn: ".*계정 열기"
 - extendedWaitUntil:
-    visible: "에이전트가 참고하는 내 정보"
+    visible: "봇이 참고하는 내 정보"
     timeout: 10000
 - tapOn: "ULTRA"
 - extendedWaitUntil:

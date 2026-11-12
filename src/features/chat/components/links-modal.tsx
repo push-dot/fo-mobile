@@ -106,7 +106,7 @@ export const LinksModal = () => {
               )
             })}
           </View>
-          <Note>에이전트에서 @언급으로 불러오거나, 서류를 고칠 때 근거로 써요.</Note>
+          <Note>봇에서 @언급으로 불러오거나, 서류를 고칠 때 근거로 써요.</Note>
         </>
       )}
     </PageModal>
@@ -144,7 +144,7 @@ const LinkRow = ({ link, onAct }: { link: UserLink; onAct: (what: 'open' | 'copy
           actions={[
             { key: 'open', label: '열기', systemImage: 'arrow.up.right.square', onPress: () => onAct('open') },
             { key: 'copy', label: '링크 복사', systemImage: 'doc.on.doc', onPress: () => onAct('copy') },
-            { key: 'use', label: '에이전트에서 쓰기', systemImage: 'bubble.left', onPress: () => onAct('use') },
+            { key: 'use', label: '봇에서 쓰기', systemImage: 'bubble.left', onPress: () => onAct('use') },
             { key: 'delete', label: '삭제', systemImage: 'xmark', destructive: true, onPress: () => onAct('delete') },
           ]}
         >

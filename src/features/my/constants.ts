@@ -122,7 +122,7 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
 ]
 export const SETTINGS_PICKS = {
   contact: { field: 'contactVisibility', title: '누구에게 연락처를 보여 줄까요?', items: CONTACT },
-  tone: { field: 'defaultTone', title: '에이전트가 어떤 말투로 쓸까요?', items: TONES },
+  tone: { field: 'defaultTone', title: '봇이 어떤 말투로 쓸까요?', items: TONES },
 } as const satisfies Record<string, { field: keyof Settings; title: string; items: { key: string; label: string }[] }>
 export type SettingsPickKind = keyof typeof SETTINGS_PICKS
 export const NOTIFY_SUB: Partial<Record<keyof Settings, string>> = {

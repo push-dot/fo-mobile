@@ -1,6 +1,6 @@
 import { NativeTabs } from 'expo-router/native-tabs'
 import { Platform } from 'react-native'
-import { fontFor, tabColor, type, useColors, useThemeMode } from '@/theme'
+import { tabColor, useColors, useThemeMode } from '@/theme'
 
 // Tab bar icons rendered from the Claude Design line icons and the mascot (assets/tabs, @2x/@3x).
 const ICONS = {
@@ -11,6 +11,16 @@ const ICONS = {
   agent: { light: require('../../../../../assets/tabs/tab-agent.png'), dark: require('../../../../../assets/tabs/tab-agent-dark.png') },
 }
 
+// The boards draw icons only. The name is what a screen reader says (the boards' aria-label).
+const TABS = [
+  { route: '(home)', name: '홈', icon: ICONS.home },
+  { route: '(hub)', name: '허브', icon: ICONS.hub },
+  { route: '(social)', name: '소셜', icon: ICONS.social },
+  // The mascot keeps its own colors in both states, as in the design.
+  { route: '(chat)', name: '봇', mascot: ICONS.agent },
+  { route: '(my)', name: '마이', icon: ICONS.my },
+] as const
+
 const TabsLayout = () => {
   const c = useColors()
   const mode = useThemeMode()
@@ -18,41 +28,26 @@ const TabsLayout = () => {
   const idle = tabColor(platform, false, c)
   const selected = tabColor(platform, true, c)
   const android = platform === 'android'
-  // The iOS floating tab bar draws 10px labels, Android 11px (design .ios .tabbar a).
-  const label = { ...fontFor(type.tab.weight), fontSize: android ? type.tab.fontSize : 10 }
   return (
-    // Android: label every tab like the design boards (Material hides unselected labels by default).
     <NativeTabs
       minimizeBehavior="onScrollDown"
-      labelVisibilityMode="labeled"
+      labelVisibilityMode="unlabeled"
       tintColor={selected}
       iconColor={{ default: idle, selected }}
-      labelStyle={{ default: { ...label, color: idle }, selected: { ...label, color: selected } }}
       backgroundColor={android ? c.bg : undefined}
       rippleColor={c.fill}
       disableIndicator
     >
-      <NativeTabs.Trigger name="(home)">
-        <NativeTabs.Trigger.Icon src={ICONS.home} renderingMode="template" />
-        <NativeTabs.Trigger.Label>홈</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(hub)">
-        <NativeTabs.Trigger.Icon src={ICONS.hub} renderingMode="template" />
-        <NativeTabs.Trigger.Label>허브</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(social)">
-        <NativeTabs.Trigger.Icon src={ICONS.social} renderingMode="template" />
-        <NativeTabs.Trigger.Label>소셜</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(chat)">
-        {/* The mascot keeps its own colors in both states, as in the design. */}
-        <NativeTabs.Trigger.Icon src={ICONS.agent[mode]} renderingMode="original" />
-        <NativeTabs.Trigger.Label>에이전트</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(my)">
-        <NativeTabs.Trigger.Icon src={ICONS.my} renderingMode="template" />
-        <NativeTabs.Trigger.Label>마이</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
+      {TABS.map((tab) => (
+        <NativeTabs.Trigger key={tab.route} name={tab.route} accessibilityLabel={tab.name}>
+          {'mascot' in tab ? (
+            <NativeTabs.Trigger.Icon src={tab.mascot[mode]} renderingMode="original" />
+          ) : (
+            <NativeTabs.Trigger.Icon src={tab.icon} renderingMode="template" />
+          )}
+          <NativeTabs.Trigger.Label hidden />
+        </NativeTabs.Trigger>
+      ))}
     </NativeTabs>
   )
 }
