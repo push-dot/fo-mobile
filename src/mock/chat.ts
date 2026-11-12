@@ -44,6 +44,7 @@ let referenceData = false
 export const grantReference = () => {
   referenceData = true
 }
+export const hasReferenceConsent = () => referenceData
 const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)

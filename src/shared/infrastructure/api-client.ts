@@ -1,4 +1,4 @@
-import { createApi, createClient } from '@push/api-client'
+import { createApi, createBotApi, createClient } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
 import { API_BASE_URL } from './config'
@@ -44,3 +44,5 @@ export const refreshSession = () => {
 export const http = createClient({ ...clientConfig, refresh: refreshSession })
 
 export const api = createApi(http)
+
+export const botApi = createBotApi(http)

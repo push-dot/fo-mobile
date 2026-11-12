@@ -25,7 +25,7 @@ import {
   Appear,
   accountPath,
   docsPath,
-  materialsPath,
+  materialPickerPath,
   quickStartPath,
   renamePath,
   send,
@@ -208,7 +208,7 @@ const ConversationScreen = ({ id }: { id: string }) => {
               onAnswer={(text, choice) => answer(id, text, choice)}
               onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
               // The picked material lands in the composer; sending it re-asks the gate with that material.
-              onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialsPath()))}
+              onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialPickerPath()))}
             />
           ) : (
             <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
