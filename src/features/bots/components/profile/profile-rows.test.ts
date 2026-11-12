@@ -1,0 +1,61 @@
+import { describe, expect, it } from 'vitest'
+import {
+  DELETE_BODY,
+  allowedA11y,
+  allowedSheetTitle,
+  colorA11y,
+  deleteTitle,
+  grantIntro,
+  grantMeta,
+  profileGroups,
+  revokeA11y,
+  revokeToast,
+} from './profile-rows'
+
+const ids = (kind: 'push' | 'company', over: Partial<Parameters<typeof profileGroups>[0]> = {}) =>
+  profileGroups({ kind, posting: { deadline: new Date(2026, 10, 20) }, fitScore: 8.1, materialCount: 8, grantCount: 2, ...over }).flat().map((row) => row.id)
+
+describe('bot profile rows', () => {
+  it('hides colour and delete on Push Bot', () => {
+    expect(ids('push')).toEqual(['posting', 'fit', 'materials', 'allowed', 'notify'])
+  })
+
+  it('hides a row whose fact is missing, and the allow row when nothing is allowed', () => {
+    expect(ids('company', { posting: null, fitScore: null, materialCount: null, grantCount: 0 })).toEqual(['color', 'notify', 'delete'])
+  })
+
+  it('formats the posting, fit, materials, and allow rows', () => {
+    const rows = profileGroups({
+      kind: 'company',
+      posting: { deadline: null },
+      fitScore: 7.4,
+      materialCount: 8,
+      grantCount: 2,
+    }).flat()
+    expect(rows).toEqual([
+      { id: 'posting', label: '공고', value: '상시 채용' },
+      { id: 'fit', label: '적합도', value: '7.4' },
+      { id: 'materials', label: '자료', value: '8개' },
+      { id: 'allowed', label: '허용한 사이트', value: '2개' },
+      { id: 'color', label: '색' },
+      { id: 'notify', label: '알림' },
+      { id: 'delete', label: '봇 삭제' },
+    ])
+    expect(profileGroups({ kind: 'company', posting: { deadline: new Date(2026, 10, 20) }, fitScore: 8.1, materialCount: 1, grantCount: 1 }).flat()[0]).toMatchObject({ value: '11월 20일 마감' })
+    expect(allowedA11y(2)).toBe('허용한 사이트 2개')
+    expect(allowedSheetTitle(2)).toBe('허용한 사이트 2')
+  })
+
+  it('labels a grant, the intro, the toast, and the delete question from the boards', () => {
+    expect(grantMeta('2026-11-03', 'posting')).toBe('11월 3일 허용 · 채용 공고')
+    expect(grantMeta('2026-11-05', 'company')).toBe('11월 5일 허용 · 회사 소개')
+    expect(grantMeta('2026-10-29', 'other')).toBe('10월 29일 허용')
+    expect(grantIntro({ kind: 'push', name: 'Push Bot' })).toBe('Push Bot이 읽어도 된다고 허용한 사이트예요. 해제하면 다음 작업부터 이 사이트를 읽지 않아요.')
+    expect(grantIntro({ kind: 'company', name: '모아페이' })).toBe('모아페이 봇이 읽어도 된다고 허용한 사이트예요. 해제하면 다음 작업부터 이 사이트를 읽지 않아요.')
+    expect(revokeToast('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용을 해제했어요')
+    expect(revokeA11y('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용 해제')
+    expect(deleteTitle('모아페이')).toBe('모아페이 봇을 삭제할까요?')
+    expect(DELETE_BODY).toBe('이 봇과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.')
+    expect(colorA11y(0)).toBe('색 1')
+  })
+})

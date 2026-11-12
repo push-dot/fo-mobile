@@ -3,6 +3,7 @@ import { FlatList, Pressable, ScrollView, View } from 'react-native'
 import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
 import {
+  chipCount,
   PersonRow,
   PostingRow,
   PostRow,
@@ -17,6 +18,7 @@ import {
   TABS,
   useRecentSearches,
   useSearch,
+  useSearchCounts,
   useSearchQuery,
   useTrending,
   type SearchSort,
@@ -37,6 +39,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
     people: useSearch(q, 'people', sort, tab === 'people'),
     posts: useSearch(q, 'posts', sort, tab === 'posts'),
   }
+  const counts = useSearchCounts(q).data
   const active = results[tab]
   const loading = active.isPending || active.isPlaceholderData
   const pageItems = useMemo(
@@ -147,7 +150,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             <>
               <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
                 {TABS.map((t) => {
-                  const n = totalOf(t.key)
+                  const n = chipCount(results[t.key], counts?.[t.key])
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>

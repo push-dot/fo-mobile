@@ -49,6 +49,17 @@ describe('mock data drawn on the design boards', () => {
     expect((await fetchJson<Listed>('search?q=데브옵스 인턴&type=postings')).page.total).toBe(0)
   })
 
+  it('counts every search tab without opening it, with the same totals the tabs report', async () => {
+    const counts = (q: string) => fetchJson<{ data: Record<'postings' | 'people' | 'posts', number> }>(`search/counts?q=${encodeURIComponent(q)}`)
+    expect((await counts('백엔드')).data).toEqual({ postings: 24, people: 8, posts: 13 })
+    const q = 'ㅂㅇㄷ'
+    const totals = await Promise.all(
+      (['postings', 'people', 'posts'] as const).map(async (type) => [type, (await fetchJson<Listed>(`search?q=${q}&type=${type}`)).page.total]),
+    )
+    expect((await counts(q)).data).toEqual(Object.fromEntries(totals))
+    expect(Object.values((await counts(q)).data).some((n) => n > 0)).toBe(true)
+  })
+
   it('has three unread notifications', async () => {
     const list = await fetchJson<{ data: { readAt: string | null }[] }>('me/notifications')
     expect(list.data.filter((n) => !n.readAt)).toHaveLength(3)
