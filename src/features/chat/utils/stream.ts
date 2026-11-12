@@ -89,20 +89,23 @@ const fitOf = (ev: Extract<StreamEvent, { type: 'fit' }>): ChatItem => {
   }
 }
 
+/** One finished document is one run's result: the frame's seq keeps a second run on the same document from overwriting the first. */
+const resultKey = (ev: Extract<StreamEvent, { type: 'result' }>) => (ev.seq === undefined ? ev.documentId : `${ev.documentId}-${ev.seq}`)
+
 /** 다 됐어요! line above the result card, with the score change in bold. */
 const doneLine = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] => {
   if (!ev.summary) return []
   const change = ev.fitFrom !== undefined && ev.fitTo !== undefined ? `${ev.fitFrom.toFixed(1)} → ${ev.fitTo.toFixed(1)}` : ''
   const text = change ? ev.summary.replace(change, `**${change}**`) : ev.summary
-  return [{ type: 'agentText', id: `done-${ev.documentId}`, text, ...(ev.bullets?.length ? { bullets: ev.bullets } : {}) }]
+  return [{ type: 'agentText', id: `done-${resultKey(ev)}`, text, ...(ev.bullets?.length ? { bullets: ev.bullets } : {}) }]
 }
 
 /** 이력서 수정 · 올린 파일 · 경력 → a finished tool line above the summary, as the done artboards draw it. */
 const taskOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] =>
-  ev.taskLine ? [{ type: 'tool', id: `task-${ev.documentId}`, state: 'ok', ...resultTask(ev.taskLine) }] : []
+  ev.taskLine ? [{ type: 'tool', id: `task-${resultKey(ev)}`, state: 'ok', ...resultTask(ev.taskLine) }] : []
 
 const resultOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem => {
-  const base = { type: 'result' as const, id: `result-${ev.documentId}`, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
+  const base = { type: 'result' as const, id: `result-${resultKey(ev)}`, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
   return ev.source === 'external'
     ? { ...base, source: ev.source, fileName: ev.fileName, pageLine: ev.pageLine, savedLine: ev.savedLine, cardMeta: ev.cardMeta }
     : { ...base, source: ev.source, name: ev.name, headline: ev.headline, title: ev.title, subtitle: ev.subtitle }

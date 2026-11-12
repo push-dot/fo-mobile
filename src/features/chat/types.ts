@@ -1,4 +1,4 @@
-import type { ResultAction } from '@push/api-client'
+import type { ResultAction, StreamEvent } from '@push/api-client'
 import type { PickedFile } from '@/features/my'
 import type { BadgeTone } from '@/shared/components'
 
@@ -126,5 +126,5 @@ export type ChatState = {
   runStartedAt: number | null
 }
 
-/** One scripted step: wait `wait` ms, then apply `event`. Mock runs and tests share this shape. */
-export type Step = { wait: number; event: ChatEvent }
+/** One step of a scripted mock run: wait `wait` ms, then deliver `frame` as the server's stream would. */
+export type Step = { wait: number; frame: StreamEvent }
