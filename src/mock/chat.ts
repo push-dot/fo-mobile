@@ -200,10 +200,8 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
 // What the mapper makes of the server's result frame: the task line, the summary, then the card.
 // The done boards draw the finished task line above the to-do card, so it comes first when the card is new to the thread.
 const TASK_RESULT = '반영했어요 · 2줄 추가, 1줄 삭제'
-const profileCard = (score: string, josa = '로'): Step[] => [
-  s(400, tool('task', '프로필 수정', 'Push 프로필 · 경력', 'ok', TASK_RESULT)),
-  s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
-  s(200, agent('done', `다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`, BULLETS)),
+const profileDone = (wait: number, score: string, josa: string, bullets?: string[]): Step[] => [
+  s(wait, agent('done', `다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`, bullets)),
   s(200, {
     type: 'result',
     id: 'result',
@@ -221,11 +219,13 @@ const profileCard = (score: string, josa = '로'): Step[] => [
     ],
   }),
 ]
-const finish = (score: string, josa = '로'): Step[] => [
-  ...profileCard(score, josa),
-  ask({ ...numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기']), pendingNote: 'PDF는 Push 프로필에서 내보낼 수 있어요.' }),
-  awaitingDone,
+const profileCard = (score: string, josa = '로'): Step[] => [
+  s(400, tool('task', '프로필 수정', 'Push 프로필 · 경력', 'ok', TASK_RESULT)),
+  s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
+  ...profileDone(200, score, josa, BULLETS),
 ]
+const present = ask({ ...numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기']), pendingNote: 'PDF는 Push 프로필에서 내보낼 수 있어요.' })
+const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), present, awaitingDone]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
 const EXT_FILE = '김서준_모아페이_백엔드.pdf'
@@ -470,12 +470,6 @@ const ph4Quality: Step[] = [
     zeroSubmit: '그대로 디자인으로',
   }),
 ]
-const TEMPLATES = [
-  { label: '클래식', layout: 'classic' },
-  { label: '모던', layout: 'modern' },
-  { label: '컴팩트', layout: 'compact' },
-  { label: 'ATS', layout: 'ats' },
-] as const
 const ph4Design: Step[] = [
   s(300, tool('applied', '추천 수정 반영', '2개', 'ok', '쉼표 정리 · 현재형 문장 고침')),
   s(400, agent('tpl', '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
@@ -483,7 +477,16 @@ const ph4Design: Step[] = [
     id: 'ph4-design',
     question: '검증을 마쳤어요. 어떤 디자인을 적용할까요?',
     sections: [
-      { kind: 'templates', items: TEMPLATES.map((tpl, i) => ({ id: `t${i}`, ...tpl, ...(i === 0 ? { recommended: true } : {}) })), selected: [0] },
+      {
+        kind: 'templates',
+        items: [
+          { id: 't0', label: '클래식', layout: 'classic', recommended: true },
+          { id: 't1', label: '모던', layout: 'modern' },
+          { id: 't2', label: '컴팩트', layout: 'compact' },
+          { id: 't3', label: 'ATS', layout: 'ats' },
+        ],
+        selected: [0],
+      },
       { kind: 'toggle', items: [{ label: '프로필 사진 넣기', desc: '마이 › 프로필 사진을 써요 · 모든 템플릿' }], selected: [], ids: ['photo'] },
     ],
     submit: '클래식으로 만들기',
@@ -627,7 +630,7 @@ const awaitReply: Step[] = [
 const fail = (id: string, code: string, text: string): Step[] => [s(300, { type: 'error', id, text, code })]
 
 // Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
-const TOKENS: Record<string, Step[]> = {
+export const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('err', 'NOT_CONFIGURED', ERROR_TEXT.NOT_CONFIGURED!),
   'err-credit': fail('err', 'INSUFFICIENT_CREDITS', ERROR_TEXT.INSUFFICIENT_CREDITS!),
   'err-other': [s(300, agent('hi', '좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('err', 'UNKNOWN', DEFAULT_ERROR_TEXT)],
@@ -654,7 +657,7 @@ const TOKENS: Record<string, Step[]> = {
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
   // ChatPh6Result: the closing line and the card under the open gate, with no task lines, bullets or 작업했어요 footer.
-  'profile-gate': [s(300, agent('done', '다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.')), ...finish('6.9 → 8.1', '으로').filter((st) => st.event.type === 'result' || st.event.type === 'approval')],
+  'profile-gate': [...profileDone(300, '6.9 → 8.1', '으로'), present],
   'ph1-free': ph1Plan('FREE'),
   'ph1-ultra': ph1Plan('ULTRA'),
   // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.
