@@ -1,7 +1,6 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { NATIVE_FONTS } from '@/theme/fonts'
-import { palette, type } from '@/theme/tokens'
+import { palette } from '@/theme/tokens'
 import { find, findAll } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
@@ -10,8 +9,9 @@ vi.mock('@expo/ui/swift-ui', async () => (await import('./native-stubs')).stubs.
 vi.mock('@expo/ui/swift-ui/modifiers', async () => (await import('./native-stubs')).stubs.swiftUIModifiers)
 vi.mock('@/theme', async () => (await import('./native-stubs')).stubs.theme)
 vi.mock('@/shared/utility/asset-url', () => ({}))
-const setSegmentedTitleFont = vi.hoisted(() => vi.fn())
-vi.mock('../../../../modules/segmented-appearance', () => ({ setSegmentedTitleFont }))
+const a11y = vi.hoisted(() => ({ reduceTransparency: false }))
+vi.mock('../glass', () => ({ default: 'Glass', useReduceTransparency: () => a11y.reduceTransparency }))
+vi.mock('../text', () => ({ default: 'Text' }))
 
 const { default: SegmentedControl } = await import('../segmented-control.ios')
 const { default: MenuButtons } = await import('../menu-buttons')
@@ -26,23 +26,53 @@ const actions = [
 ]
 
 describe('SegmentedControl (iOS)', () => {
-  it('sets the 600 label face and the normal-state t3 grey on every UISegmentedControl', () => {
-    expect(setSegmentedTitleFont).toHaveBeenCalledWith(NATIVE_FONTS[type.segLabel.weight], type.segLabel.fontSize, palette.light.t3, palette.dark.t3)
+  const items = [
+    { key: 'received', label: '받은 제안 4' },
+    { key: 'sent', label: '보낸 제안 3' },
+  ]
+  const segments = (tree: ReturnType<typeof SegmentedControl>) => findAll(tree, 'Pressable')
+
+  it('draws the boards\' .ios .seg: a 44pt glass track whose selected segment is filled', () => {
+    const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
+    expect(find(tree, 'Glass').props.style).toContainEqual({ height: 44, width: undefined, borderRadius: 22 })
+    const style = (s: { props: Record<string, unknown> }) => s.props.style as { backgroundColor?: string; boxShadow?: string }
+    expect(find(tree, 'View').props.accessibilityRole).toBe('tablist')
+    expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState, style(s).backgroundColor, style(s).boxShadow])).toEqual([
+      ['tab', { selected: true }, palette.light.fill, '0 2px 8px rgba(0,0,0,.08)'],
+      ['tab', { selected: false }, undefined, undefined],
+    ])
+    expect(findAll(tree, 'Text').map((t) => [t.props.children, t.props.v, t.props.color])).toEqual([
+      ['받은 제안 4', 'segLabel', 't1'],
+      ['보낸 제안 3', 'segLabel', 't3'],
+    ])
   })
 
-  it('renders a SwiftUI segmented picker tagged by item key', () => {
+  it('draws the boards\' plain .seg under Reduce Transparency, so the selected segment stays visible on the opaque track', () => {
+    a11y.reduceTransparency = true
+    try {
+      const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
+      expect(find(tree, 'Glass').props.style).toContainEqual({ backgroundColor: palette.light.fill })
+      expect(segments(tree).map((s) => (s.props.style as { backgroundColor?: string }).backgroundColor)).toEqual([palette.light.bg, undefined])
+    } finally {
+      a11y.reduceTransparency = false
+    }
+  })
+
+  it('reports the pressed segment', () => {
     const onChange = vi.fn()
-    const tree = SegmentedControl({ items: [{ key: 'a', label: '받은' }, { key: 'b', label: '보낸' }], value: 'a', onChange })
-    const picker = find(tree, 'Picker')
-    expect(picker.props.selection).toBe('a')
-    expect(picker.props.modifiers).toContainEqual({ name: 'pickerStyle', arg: 'segmented' })
-    expect(picker.props.modifiers).not.toContainEqual(expect.objectContaining({ name: 'tint' }))
-    expect(findAll(tree, 'SText').map((t) => [t.props.children, t.props.modifiers])).toEqual([
-      ['받은', [{ name: 'tag', arg: 'a' }]],
-      ['보낸', [{ name: 'tag', arg: 'b' }]],
+    const [, sent] = segments(SegmentedControl({ items, value: 'received', onChange }))
+    ;(sent!.props.onPress as () => void)()
+    expect(onChange).toHaveBeenCalledWith('sent')
+  })
+
+  it('draws the 196 x 34 compact control of the theme row as a radio group, as Settings marks it', () => {
+    const tree = SegmentedControl({ items, value: 'sent', onChange: vi.fn(), compact: true })
+    expect(find(tree, 'Glass').props.style).toContainEqual({ width: 196, height: 34, borderRadius: 17 })
+    expect(find(tree, 'View').props.accessibilityRole).toBe('radiogroup')
+    expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState])).toEqual([
+      ['radio', { checked: false }],
+      ['radio', { checked: true }],
     ])
-    ;(picker.props.onSelectionChange as (k: string) => void)('b')
-    expect(onChange).toHaveBeenCalledWith('b')
   })
 })
 

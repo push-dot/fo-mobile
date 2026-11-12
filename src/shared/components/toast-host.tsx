@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { AccessibilityInfo, Animated, Platform, View, type ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { onAccent, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
+import { cssShadow, onAccent, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP, TOAST_SHEET_GAP } from './constants'
 import Glass from './glass'
 import GlassPressable from './glass-pressable'
@@ -14,8 +14,8 @@ const TOAST_HEIGHT = 52
 const ACTION_HEIGHT = 44
 const ALERT_ICON = 20
 const SHAPE = {
-  plain: { inset: spacing[4], radius: radius.md, shadow: '0 8px 24px rgba(0,0,0,0.16)' },
-  tone: { inset: spacing[5], radius: 18, shadow: '0 10px 30px rgba(0,0,0,0.18)' },
+  plain: { inset: spacing[4], radius: radius.md, shadow: cssShadow.toast },
+  tone: { inset: spacing[5], radius: 18, shadow: cssShadow.toneToast },
 }
 
 const ToneIcon = ({ tone }: { tone: ToastTone }) => {
@@ -38,7 +38,13 @@ const ToneIcon = ({ tone }: { tone: ToastTone }) => {
 // Not the Material snackbar: @expo/ui's Snackbar has a fixed shape (no 16pt radius or 52pt height) and no dismiss API.
 const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow: string; opaque?: boolean; children: ReactNode }) => {
   const c = useColors()
-  if (Platform.OS === 'ios' && !opaque) return <Glass interactive style={shape}>{children}</Glass>
+  const dark = useThemeMode() === 'dark'
+  if (Platform.OS === 'ios' && !opaque)
+    return (
+      <Glass tint={dark ? c.glass : undefined} style={[shape, { boxShadow: shadow }]}>
+        {children}
+      </Glass>
+    )
   return <View style={[shape, { backgroundColor: Platform.OS === 'ios' ? c.paper : c.t1, boxShadow: shadow }]}>{children}</View>
 }
 
@@ -82,7 +88,8 @@ const ToastHost = () => {
         left: shape.inset,
         right: shape.inset,
         bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP),
-        opacity: shown,
+        // UIKit drops a glass effect that installs under a nearly transparent ancestor, so the iOS card only slides in.
+        opacity: Platform.OS === 'ios' ? 1 : shown,
         transform: [{ translateY }],
       }}
     >

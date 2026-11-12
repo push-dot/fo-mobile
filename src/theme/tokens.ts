@@ -31,3 +31,10 @@ const nativeShadows = <T extends Record<string, string>>(theme: T) =>
   Object.fromEntries(Object.entries(theme).map(([k, v]) => [k, nativeShadow(v)])) as { [K in keyof T]: ReturnType<typeof nativeShadow> }
 
 export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows(shadows.dark) }
+
+/** CSS shadows the boards draw inline on one component, outside the design system's set. */
+export const cssShadow = {
+  segment: '0 2px 8px rgba(0,0,0,.08)',
+  toast: '0 8px 24px rgba(0,0,0,.16)',
+  toneToast: '0 10px 30px rgba(0,0,0,.18)',
+} as const

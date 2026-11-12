@@ -11,4 +11,9 @@ name: 홈 → 검색 → 많이 찾는 검색어 → 결과
 - extendedWaitUntil:
     visible: "‘프론트엔드’ 공고.*"
     timeout: 10000
+# The closed tabs are not fetched, so their chips get the number from search/counts.
+- extendedWaitUntil:
+    visible: "사람 [0-9]+"
+    timeout: 10000
+- assertVisible: "게시글 [0-9]+"
 - takeScreenshot: 06_search_trending-02

@@ -156,10 +156,29 @@ describe('bot chat', () => {
     expect(await api.bots.answer('b-moa', 'card-moa-page', { optionId: 'approve_always' })).toMatchObject({ answer: { status: 'APPROVED' }, resumed: true })
   })
 
-  it('resumes the run on an approval only, and keeps the waiting status of an answered card', async () => {
-    expect(await api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'reject' })).toMatchObject({ answer: { status: 'REJECTED' }, resumed: false })
+  it('closes an expired card with reject and resumes nothing', async () => {
+    expireCard()
+    expect(await api.bots.answer('b-moa', 'card-moa-page', { optionId: 'reject' })).toEqual({ answer: { id: 'card-moa-page', status: 'REJECTED', optionId: 'reject' }, resumed: false })
+    await expect(api.bots.answer('b-moa', 'card-moa-page', { optionId: 'reject' })).rejects.toMatchObject({ status: 409, code: 'APPROVAL_ALREADY_RESOLVED' })
+  })
+
+  it('resumes the run on a reject of an open tool card as push-be does, and keeps the waiting status of an answered card', async () => {
+    expect(await api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'reject' })).toMatchObject({ answer: { status: 'REJECTED' }, resumed: true })
     const [turn] = (await api.bots.transcript('b-moa')).data
     expect(turn?.events.filter((e) => e.type === 'status').map((e) => e.type === 'status' && e.phase)).toEqual(['waiting'])
+  })
+
+  it('checks the bot, then consent, then the body, in the order push-be does', async () => {
+    await withdrawConsent()
+    await expect(frames(api.bots.send('b-gone', { text: '' }))).rejects.toMatchObject({ status: 404 })
+    await expect(frames(api.bots.send('push', { text: '' }))).rejects.toMatchObject({ status: 403, code: 'CONSENT_REQUIRED' })
+    await expect(api.bots.answer('b-gone', 'card-moa-edit', { optionId: 'nope' })).rejects.toMatchObject({ status: 404 })
+    await expect(api.bots.answer('b-moa', 'card-gone', { optionId: 'nope' })).rejects.toMatchObject({ status: 403, code: 'CONSENT_REQUIRED' })
+    grantReference()
+    await expect(frames(api.bots.send('push', { text: '' }))).rejects.toMatchObject({ status: 400, details: { field: 'text' } })
+    await expect(api.bots.answer('b-moa', 'card-gone', { optionId: 'nope', note: 'x' } as BotContract.CardAnswerBody)).rejects.toMatchObject({ status: 400, details: { field: 'note' } })
+    await expect(api.bots.answer('b-moa', 'card-gone', { optionId: 'nope' })).rejects.toMatchObject({ status: 404 })
+    await expect(api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'nope' })).rejects.toMatchObject({ status: 400, details: { field: 'optionId' } })
   })
 })
 

@@ -111,16 +111,17 @@ const MAX_ATTACHMENTS = 10
 const attachable = (ref: BotContract.AttachmentRef) =>
   findMaterial(ref.kind, ref.id) ?? (ref.kind === 'posting' ? postings.find((p) => p.id === ref.id) : undefined)
 
+// push-be checks the bot, then consent, then the body (postBotMessage, answerBotCard), so only that order's status comes back.
 mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
+  if (!hasReferenceConsent()) return consentRequired()
   const b = (body ?? {}) as Partial<BotContract.SendBody>
   const extra = Object.keys(b).find((k) => !SEND_FIELDS.includes(k))
   if (extra) return error(400, 'VALIDATION_ERROR', 'unknown field', { field: extra })
   const text = typeof b.text === 'string' ? b.text.trim() : ''
   if (!text || text.length > 20_000) return error(400, 'VALIDATION_ERROR', 'text must be 1-20000 characters', { field: 'text' })
   if ((b.attachments ?? []).length > MAX_ATTACHMENTS) return error(400, 'VALIDATION_ERROR', `at most ${MAX_ATTACHMENTS} attachments`, { field: 'attachments' })
-  if (!hasReferenceConsent()) return consentRequired()
   const attachments: BotContract.Attachment[] = []
   for (const ref of b.attachments ?? []) {
     const m = attachable(ref)
@@ -166,21 +167,36 @@ mock('POST', 'bots/:id/stream/cancel', ({ params }) => {
 
 const cardOf = (f: BotFixture, id: string) => f.cards.find((c) => c.id === id)
 
-/** An approval resumes the run that asked (202, follow the stream). A rejection only closes the card. */
+const ANSWER_FIELDS = ['optionId', 'optionIds']
+
+/**
+ * Every answer resumes the run that asked (202, follow the stream): push-be's resolveApproval resumes a tool card's reject too.
+ * Only 닫기 on an expired card, which answers reject, closes it without a run (200).
+ */
 mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
-  if (!hasReferenceConsent()) return consentRequired()
   const f = fixtureOf(params.id!)
-  const card = f && cardOf(f, params.approvalId!)
-  if (!card) return notFound()
-  if (card.status !== 'PENDING') return error(409, 'APPROVAL_ALREADY_RESOLVED', 'the card was answered')
+  if (!f) return notFound()
+  if (!hasReferenceConsent()) return consentRequired()
   const b = (body ?? {}) as { optionId?: string; optionIds?: string[] }
+  const extra = Object.keys(b).find((k) => !ANSWER_FIELDS.includes(k))
+  if (extra) return error(400, 'VALIDATION_ERROR', 'unknown field', { field: extra })
+  const card = cardOf(f, params.approvalId!)
+  if (!card) return notFound()
   const optionId = b.optionId ?? b.optionIds?.[0]
   if (!optionId || !card.options.some((o) => o.id === optionId)) return error(400, 'VALIDATION_ERROR', 'unknown option', { field: 'optionId' })
-  const expired = card.expiresAt !== null && atOf(card.expiresAt, new Date()) <= new Date()
-  if (expired && optionId !== 'reject') return error(410, 'APPROVAL_EXPIRED', 'the card expired')
-  card.status = optionId === 'reject' ? 'REJECTED' : 'APPROVED'
+  const now = new Date()
+  const expired = card.status === 'PENDING' && card.expiresAt !== null && atOf(card.expiresAt, now) <= now
+  if (expired && optionId === 'reject') {
+    card.status = 'REJECTED'
+    const closed: BotContract.CardAnswer = { id: card.id, status: 'REJECTED', optionId }
+    return { data: closed }
+  }
+  if (expired) return error(410, 'APPROVAL_EXPIRED', 'the card expired')
+  if (card.status !== 'PENDING') return error(409, 'APPROVAL_ALREADY_RESOLVED', 'the card was answered')
+  // Only a tool card can be rejected. A choice card's "reject" option is an answer like any other.
+  card.status = card.for === 'confirm' && optionId === 'reject' ? 'REJECTED' : 'APPROVED'
   const data: BotContract.CardAnswer = { id: card.id, status: card.status, optionId }
-  return { status: card.status === 'APPROVED' ? 202 : 200, body: { data } }
+  return { status: 202, body: { data } }
 })
 
 const DEFAULT_LIFETIME_MIN = 10

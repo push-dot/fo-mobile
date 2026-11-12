@@ -41,7 +41,6 @@ src/
   theme/          토큰과 글꼴
   mock/           목업 API
 assets/           아이콘, 탭 PNG, Noto Sans KR
-modules/          segmented-appearance (Expo 모듈)
 .maestro/         Maestro E2E (flows/, visual/)
 app.json
 package.json
