@@ -63,22 +63,36 @@ const onlyOrdered = <T,>(items: T[], idOf: (t: T) => string, order: string[]) =>
 // The board draws 도토리증권 as 서버·백엔드 under ‘백엔드’; the other boards show the plain title.
 const BOARD_TITLES: Record<string, string> = { p3: '서버·백엔드 개발자 (Go)' }
 
-mock('GET', 'search', ({ query }) => {
-  const q = query.get('q') ?? ''
-  const type = query.get('type') === 'people' ? 'people' : query.get('type') === 'posts' ? 'posts' : 'postings'
+type SearchKind = keyof typeof BOARD_TOTALS
+const SEARCH_KINDS = Object.keys(BOARD_TOTALS) as SearchKind[]
+
+const searchHits = (type: SearchKind, q: string): (Posting | Profile | Post)[] => {
   const board = q.trim() === BOARD_QUERY
   const rank = <T,>(items: T[], fields: (t: T) => string[], idOf: (t: T) => string) => {
     const found = searchHangul(items, q, fields).map((h) => h.item)
     return board ? onlyOrdered(found, idOf, BOARD_ORDER[type]) : found
   }
-  const hits =
-    type === 'people'
-      ? rank(people, (p) => [p.displayName, p.headline, ...p.skills], (p) => p.userId)
-      : type === 'posts'
-        ? rank(posts, (p) => [p.title, p.body], (p) => p.id)
-        : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
+  return type === 'people'
+    ? rank(people, (p) => [p.displayName, p.headline, ...p.skills], (p) => p.userId)
+    : type === 'posts'
+      ? rank(posts, (p) => [p.title, p.body], (p) => p.id)
+      : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
+}
+
+// The tab chips read search/counts and the open tab reads its list's total, so both come from here and agree.
+const searchTotal = (type: SearchKind, q: string, hits = searchHits(type, q)) => (q.trim() === BOARD_QUERY ? BOARD_TOTALS[type] : hits.length)
+
+mock('GET', 'search', ({ query }) => {
+  const q = query.get('q') ?? ''
+  const type = SEARCH_KINDS.find((k) => k === query.get('type')) ?? 'postings'
+  const hits = searchHits(type, q)
   const out = page<Posting | Profile | Post>(hits, query, true)
-  return { ...out, page: { ...out.page, total: board ? BOARD_TOTALS[type] : hits.length } }
+  return { ...out, page: { ...out.page, total: searchTotal(type, q, hits) } }
+})
+
+mock('GET', 'search/counts', ({ query }) => {
+  const q = query.get('q') ?? ''
+  return { data: Object.fromEntries(SEARCH_KINDS.map((k) => [k, searchTotal(k, q)])) }
 })
 
 mock('GET', 'search/trending', () => ({
