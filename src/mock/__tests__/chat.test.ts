@@ -111,6 +111,14 @@ describe('chat mock', () => {
     expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ status: null, lastLine: '' })
   })
 
+  it('numbers a new run in a seeded conversation after its stored frames, also once its restored card is closed', async () => {
+    const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { events: { seq?: number }[] }[]
+    const stored = turns.flatMap((t) => t.events.map((e) => e.seq ?? 0))
+    expect(await steps('c-dotori', { resolve: { approvalId: 'ph3-review', optionId: 'review' } })).toEqual([])
+    const frames = await steps('c-dotori', { text: '이어서 봐 주세요' })
+    expect(Math.min(...frames.map((s) => s.frame.seq ?? 0))).toBeGreaterThan(Math.max(...stored))
+  })
+
   it('restores a deleted link with its fit count and date, and restores a live link as is', async () => {
     const ids = async () => ((await call('GET', 'me/links')).data as { id: string }[]).map((l) => l.id)
     const before = ((await call('GET', 'me/links')).data as { id: string }[]).find((l) => l.id === 'l1')

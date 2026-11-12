@@ -5,6 +5,7 @@
 //
 // Reads the scripted-run section of src/mock/chat.ts at --from (default: the commit that pinned the golden test),
 // writes src/mock/bot-scripts/runs.ts, or with --check fails when that file differs from what it would write.
+// --check proves this one conversion only. Once runs.ts is edited by hand, as its header asks, it fails by design.
 // The golden test (src/features/chat/__tests__/script-golden.test.ts) proves both forms draw the same chat.
 const fs = require('node:fs')
 const path = require('node:path')

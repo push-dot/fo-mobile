@@ -124,8 +124,6 @@ const BUSY = new Set(['queue-busy', '도토리증권 공고도 맞춰 줘'])
 const scenario = new Map<string, { prefix: string; labels: string[]; verified?: boolean }>()
 /** The card each conversation waits on: the last one its newest run sent. */
 const waiting = new Map<string, Card>()
-/** Each conversation's newest frame seq. Like push-be's, a conversation's frames count up across its runs. */
-const lastSeq = new Map<string, number>()
 let runs = 0
 
 const isCard = (f: Frame): f is Card => (f.type === 'choice' && !f.auto) || f.type === 'approval'
@@ -272,6 +270,12 @@ const storedTurns: Record<string, ConversationTurn['events']> = {
     },
   ],
 }
+
+/**
+ * Each conversation's newest frame seq, starting after its stored turns. push-be numbers every frame from one counter,
+ * so a new run never reuses a restored frame's seq, which the mapper turns into ids such as fit-<seq>.
+ */
+const lastSeq = new Map(Object.entries(storedTurns).map(([id, events]) => [id, Math.max(...events.map((e) => e.seq ?? 0))]))
 
 mock('GET', 'conversations/:id/turns', ({ params, query }) => {
   const c = find(params.id!)
