@@ -9,7 +9,8 @@ vi.mock('@expo/ui/swift-ui', async () => (await import('./native-stubs')).stubs.
 vi.mock('@expo/ui/swift-ui/modifiers', async () => (await import('./native-stubs')).stubs.swiftUIModifiers)
 vi.mock('@/theme', async () => (await import('./native-stubs')).stubs.theme)
 vi.mock('@/shared/utility/asset-url', () => ({}))
-vi.mock('../glass', () => ({ default: 'Glass' }))
+const a11y = vi.hoisted(() => ({ reduceTransparency: false }))
+vi.mock('../glass', () => ({ default: 'Glass', useReduceTransparency: () => a11y.reduceTransparency }))
 vi.mock('../text', () => ({ default: 'Text' }))
 
 const { default: SegmentedControl } = await import('../segmented-control.ios')
@@ -33,7 +34,7 @@ describe('SegmentedControl (iOS)', () => {
 
   it('draws the boards\' .ios .seg: a 44pt glass track whose selected segment is filled', () => {
     const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
-    expect(find(tree, 'Glass').props.style).toMatchObject({ height: 44, borderRadius: 22 })
+    expect(find(tree, 'Glass').props.style).toContainEqual({ height: 44, width: undefined, borderRadius: 22 })
     const style = (s: { props: Record<string, unknown> }) => s.props.style as { backgroundColor?: string; boxShadow?: string }
     expect(find(tree, 'View').props.accessibilityRole).toBe('tablist')
     expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState, style(s).backgroundColor, style(s).boxShadow])).toEqual([
@@ -46,6 +47,17 @@ describe('SegmentedControl (iOS)', () => {
     ])
   })
 
+  it('draws the boards\' plain .seg under Reduce Transparency, so the selected segment stays visible on the opaque track', () => {
+    a11y.reduceTransparency = true
+    try {
+      const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
+      expect(find(tree, 'Glass').props.style).toContainEqual({ backgroundColor: palette.light.fill })
+      expect(segments(tree).map((s) => (s.props.style as { backgroundColor?: string }).backgroundColor)).toEqual([palette.light.bg, undefined])
+    } finally {
+      a11y.reduceTransparency = false
+    }
+  })
+
   it('reports the pressed segment', () => {
     const onChange = vi.fn()
     const [, sent] = segments(SegmentedControl({ items, value: 'received', onChange }))
@@ -55,7 +67,7 @@ describe('SegmentedControl (iOS)', () => {
 
   it('draws the 196 x 34 compact control of the theme row as a radio group, as Settings marks it', () => {
     const tree = SegmentedControl({ items, value: 'sent', onChange: vi.fn(), compact: true })
-    expect(find(tree, 'Glass').props.style).toMatchObject({ width: 196, height: 34, borderRadius: 17 })
+    expect(find(tree, 'Glass').props.style).toContainEqual({ width: 196, height: 34, borderRadius: 17 })
     expect(find(tree, 'View').props.accessibilityRole).toBe('radiogroup')
     expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState])).toEqual([
       ['radio', { checked: false }],

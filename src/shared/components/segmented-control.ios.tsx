@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native'
 import { cssShadow, spacing, useColors, useThemeMode } from '../../theme'
-import Glass from './glass'
+import Glass, { useReduceTransparency } from './glass'
 import type { SegmentedControlProps } from './segmented-control.android'
 import { COMPACT_HEIGHT, COMPACT_WIDTH } from './segmented-control.compact'
 import Text from './text'
@@ -13,14 +13,23 @@ const VARIANT = {
   compact: { height: COMPACT_HEIGHT, width: COMPACT_WIDTH, group: 'radiogroup', item: 'radio', state: (on: boolean) => ({ checked: on }) },
 } as const
 
-/** iOS: the boards' `.ios .seg`, a glass track whose selected segment is filled. UISegmentedControl draws the reverse. */
+/**
+ * iOS: the boards' `.ios .seg`, a glass track whose selected segment is filled. UISegmentedControl draws the reverse.
+ * Reduce Transparency turns Glass into an opaque `bg2` view, on which a `fill` segment does not show, so it paints their plain `.seg`.
+ */
 const SegmentedControl = <K extends string,>({ items, value, onChange, compact }: SegmentedControlProps<K>) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
+  const plain = useReduceTransparency()
   const variant = VARIANT[compact ? 'compact' : 'regular']
   const segment = variant.height - 2 * INSET
+  const selected = plain ? (dark ? c.fill2 : c.bg) : c.fill
   return (
-    <Glass interactive tint={dark ? c.glass : undefined} style={{ height: variant.height, width: variant.width, borderRadius: variant.height / 2 }}>
+    <Glass
+      interactive
+      tint={dark ? c.glass : undefined}
+      style={[{ height: variant.height, width: variant.width, borderRadius: variant.height / 2 }, plain && { backgroundColor: c.fill }]}
+    >
       <View accessibilityRole={variant.group} style={{ flex: 1, flexDirection: 'row', padding: INSET }}>
         {items.map((it) => {
           const on = it.key === value
@@ -36,7 +45,7 @@ const SegmentedControl = <K extends string,>({ items, value, onChange, compact }
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: segment / 2,
-                backgroundColor: on ? c.fill : undefined,
+                backgroundColor: on ? selected : undefined,
                 boxShadow: on ? cssShadow.segment : undefined,
               }}
             >
