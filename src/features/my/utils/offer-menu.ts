@@ -3,17 +3,21 @@ import type { Offer } from '@push/api-client'
 import type { ConfirmRequest } from '@/shared/components/confirm-store'
 import type { MenuSection } from '@/shared/components/menu-action'
 import { toastOffsets, type ToastInput } from '@/shared/components/toast-store'
+import { spacing } from '@/theme/tokens'
 
 export { offerMenu, otherParty, viewerBox } from '@push/shared'
 
 const hasBottomBar = (o: Offer, box: OfferBox) => o.status === 'ACCEPTED' || (box === 'received' && (o.status === 'SENT' || o.status === 'READ'))
 
-/** The app toast for a shared offer-menu toast; the report toast sits above the offer's bottom bar when it has one. */
+/**
+ * The app toast for a shared offer-menu toast. The report toast sits above the offer's bottom bar when it has one.
+ * Every other one sits 20pt above the safe inset, where ProposalToastArchived and ProposalToastBlocked draw it.
+ */
 export const offerToast = (offer: Offer, box: OfferBox, { kind, message, undo }: OfferMenuToast): ToastInput => ({
   message,
   ...(kind === 'failed' ? { tone: 'error' as const } : {}),
   ...(undo ? { action: { label: OFFER_MENU_COPY.undo, onPress: undo } } : {}),
-  ...(kind === 'reported' && hasBottomBar(offer, box) ? { bottom: toastOffsets(0).cta } : {}),
+  bottom: kind === 'reported' && hasBottomBar(offer, box) ? toastOffsets(0).cta : spacing[5],
 })
 
 export type OfferMenuDeps = Omit<SharedDeps, 'toast'> & { toast: (t: ToastInput) => void }

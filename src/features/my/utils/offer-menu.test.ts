@@ -21,7 +21,7 @@ describe('offerToast', () => {
   const sent = { ...offer, status: 'SENT' } as Offer
 
   it('shows failures as the error toast', () => {
-    expect(offerToast(sent, 'received', { kind: 'failed', message: '잠시 뒤에 다시 시도해 주세요.' })).toEqual({ message: '잠시 뒤에 다시 시도해 주세요.', tone: 'error' })
+    expect(offerToast(sent, 'received', { kind: 'failed', message: '잠시 뒤에 다시 시도해 주세요.' })).toEqual({ message: '잠시 뒤에 다시 시도해 주세요.', tone: 'error', bottom: 20 })
   })
 
   it('turns undo into the 되돌리기 action', () => {
@@ -30,7 +30,11 @@ describe('offerToast', () => {
     expect(toast.action?.label).toBe('되돌리기')
     toast.action!.onPress()
     expect(undo).toHaveBeenCalled()
-    expect(toast.bottom).toBeUndefined()
+  })
+
+  it('draws the archive and block toasts 20pt above the safe inset, as the proposal toast boards do', () => {
+    expect(offerToast(sent, 'received', { kind: 'archived', message: '제안을 보관했어요', undo: vi.fn() }).bottom).toBe(20)
+    expect(offerToast(sent, 'received', { kind: 'blocked', message: '오지현 님을 차단했어요' }).bottom).toBe(20)
   })
 })
 
@@ -105,8 +109,8 @@ describe('offerMenuSections', () => {
     }
     expect(await bottomOf({ ...offer, status: 'SENT' } as Offer, 'received')).toBe(92)
     expect(await bottomOf({ ...offer, status: 'ACCEPTED' } as Offer, 'received')).toBe(92)
-    expect(await bottomOf({ ...offer, status: 'DECLINED' } as Offer, 'received')).toBeUndefined()
-    expect(await bottomOf({ ...offer, status: 'SENT' } as Offer, 'sent')).toBeUndefined()
+    expect(await bottomOf({ ...offer, status: 'DECLINED' } as Offer, 'received')).toBe(20)
+    expect(await bottomOf({ ...offer, status: 'SENT' } as Offer, 'sent')).toBe(20)
   })
 
   it('blocks the sender of a received offer and the recipient of a sent one', async () => {
