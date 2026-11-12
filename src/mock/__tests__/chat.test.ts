@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatEvent, Step } from '@/features/chat'
+import { applyEvent, emptyChat } from '../../features/chat/utils/reducer'
 import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
 import { setAccount } from '../chat'
@@ -166,6 +167,20 @@ describe('chat mock', () => {
     expect(await order('ext-done')).toEqual(['tool', 'tool', 'todo'])
     expect(await order('profile-done')).toEqual(['tool', 'todo'])
     expect(types(await run('t-profile-done-2', { text: 'profile-done' }))).not.toContain('approval')
+  })
+
+  it('stacks two results of one document in one conversation, each below its own message', async () => {
+    const id = 't-twice'
+    let state = emptyChat
+    for (const n of [1, 2]) {
+      state = applyEvent(state, { type: 'user', id: `u${n}`, text: '프로필 고쳐 줘' })
+      for (const e of await run(id, { text: 'profile-done' })) state = applyEvent(state, e)
+    }
+    const at = (type: string) => state.items.flatMap((it, i) => (it.type === type ? [i] : []))
+    const [u1, u2] = at('user')
+    const [r1, r2] = at('result')
+    expect(at('result')).toHaveLength(2)
+    expect(u1 < r1 && r1 < u2 && u2 < r2).toBe(true)
   })
 
   it('plays a chat token for any text when a run: switch is set, until reset', async () => {
