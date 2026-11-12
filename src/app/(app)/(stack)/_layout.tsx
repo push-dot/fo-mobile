@@ -50,7 +50,7 @@ const SignedInStack = () => {
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
       <Stack.Screen name="terms-view" />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
-      <Stack.Screen name="materials" options={sheetOptions(c)} />
+      <Stack.Screen name="material-picker" options={sheetOptions(c)} />
       <Stack.Screen
         name="job-filter"
         options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}

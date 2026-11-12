@@ -14,7 +14,7 @@ import { Appear } from './motion'
 import Mark from './mark'
 import { CHAT_ATTACHMENT_OPTIONS, MENTION_SHORTCUT_KEYS, QUICK_STARTS, type QuickStart } from '../constants'
 import { useMaterialBridge } from '../stores'
-import { materialsPath, quickStartPath } from '../utils/sheet-routes'
+import { materialPickerPath, quickStartPath } from '../utils/sheet-routes'
 
 type Props = {
   placeholder: string
@@ -99,7 +99,7 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, a
         placeholder={placeholder}
         working={working}
         onStop={onStop}
-        onAttach={() => router.push(materialsPath())}
+        onAttach={() => router.push(materialPickerPath())}
         // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         // shortcut: no speech dependency; the keyboard's dictation key handles voice for now.
