@@ -11,7 +11,7 @@ type Row = { id: string; title: string; meta: string }
 // `.pnl-sub { padding: 10px 4px 2px }`
 const SECTION_LABEL = { paddingTop: 10, paddingBottom: 2, paddingHorizontal: spacing[1] }
 
-const MaterialsScreen = () => {
+const MaterialPickerScreen = () => {
   const c = useColors()
   const ring = selectedRing(c)
   const bound = useSheetScrollMax(0.6)
@@ -115,4 +115,4 @@ const MaterialsScreen = () => {
   )
 }
 
-export default MaterialsScreen
+export default MaterialPickerScreen
