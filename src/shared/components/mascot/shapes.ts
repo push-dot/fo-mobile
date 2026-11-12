@@ -37,5 +37,8 @@ export const SPARKS = [
   { d: 'M100 39Q100 44 105 44Q100 44 100 49Q100 44 95 44Q100 44 100 39Z', x: 100, y: 44, reach: 5 },
 ]
 
-/** The unread dot of the 52 px list avatar, as shares of the mascot's size: the dot, the ring around it, and how far it sits outside the corner. */
-export const UNREAD = { dot: 14 / 52, ring: 2.5 / 52, out: 3 / 52 }
+// The boards draw the unread dot on the 52 px list avatar: 14 px wide, 3 px outside the top right corner, inside a 2.5 px ring.
+const LIST = 100 / 52
+
+/** The unread dot's centre and radius, and the radius of the ring around it. */
+export const UNREAD = { x: (52 + 3 - 7) * LIST, y: (7 - 3) * LIST, r: 7 * LIST, ring: 9.5 * LIST }

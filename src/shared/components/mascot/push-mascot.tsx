@@ -11,7 +11,6 @@ import {
   DOT_STAGGER_MS,
   EYES,
   HELD,
-  heldPose,
   LOOK_UP_MS,
   MARK,
   poseTransform,
@@ -42,18 +41,28 @@ type Drivers = { body: Animated.Value; blink: Animated.Value; dots: Animated.Val
 
 const STILL: MascotMotion = { mode: 'still' }
 
+// react-native-svg cuts a numeric width or height down to a whole number, which squeezes a layer that is a fraction of a
+// point wide. Every Svg fills a view that carries the exact size.
+const FILL = { width: '100%', height: '100%' } as const
+
 const EASE: Record<CssEasing, (t: number) => number> = {
   ease: Easing.bezier(0.25, 0.1, 0.25, 1),
   'ease-in-out': Easing.bezier(0.42, 0, 0.58, 1),
   'ease-out': Easing.bezier(0, 0, 0.58, 1),
 }
 
+// Where each driver rests while a mascot holds keyframe ③. A loop begins at 0, the frame it holds. The dots rest below 0,
+// because no moment of their staggered loop shows all three full. The eyes have risen and the spark has gone.
+const HOLD: Record<keyof Drivers, number> = { body: 0, blink: 0, dots: -1, look: 1, spark: 1 }
+
+const DRIVERS = Object.keys(HOLD) as (keyof Drivers)[]
+
 const newDrivers = (): Drivers => ({
-  body: new Animated.Value(0),
-  blink: new Animated.Value(0),
-  dots: new Animated.Value(0),
-  look: new Animated.Value(0),
-  spark: new Animated.Value(0),
+  body: new Animated.Value(HOLD.body),
+  blink: new Animated.Value(HOLD.blink),
+  dots: new Animated.Value(HOLD.dots),
+  look: new Animated.Value(HOLD.look),
+  spark: new Animated.Value(HOLD.spark),
 })
 
 // Every run is one linear native timing, so a loop never returns to JS. The easing lives in the sampled interpolation.
@@ -69,15 +78,21 @@ const cycle = <T extends Record<string, number>>(driver: Animated.Value, track: 
   return (pick: (value: T) => number | string) => driver.interpolate({ inputRange, outputRange: points.map((p) => pick(p.value)) as number[] })
 }
 
-const layersOf = (state: MascotState, mode: MascotMotion['mode'], size: number, d: Drivers) => {
+const dotOpacity = (d: Drivers, index: number) => {
+  const points = sampleCycle(DOT, EASE[DOT.easing], (1 - (index * DOT_STAGGER_MS) / DOT.duration) % 1)
+  return d.dots.interpolate({ inputRange: [HOLD.dots, ...points.map((p) => p.at)], outputRange: [HELD.dot, ...points.map((p) => p.value.opacity)] })
+}
+
+// A mascot that can move is always drawn from its drivers, also while it holds. A native animation changes a view behind
+// React's back, so a plain style equal to the last rendered one would leave the view wherever the animation stopped.
+const layersOf = (state: MascotState, moves: boolean, size: number, d: Drivers) => {
   const unit = size / 100
   const track = bodyTrackOf(state)
   const up = EYES[state] === 'up'
-  if (mode !== 'animate') {
-    const t = poseTransform(heldPose(state, mode), size)
+  if (!moves) {
     return {
-      body: { transformOrigin: track?.origin, transform: [{ rotate: `${t.rotate}deg` }, { translateY: t.translateY }, { scaleY: t.scaleY }, { scale: t.scale }] } as AnimatedStyle,
-      eyes: { transform: [{ translateX: up ? LOOK_UP.x * unit : 0 }, { translateY: up ? LOOK_UP.y * unit : 0 }, { scaleY: HELD.lid }] } as AnimatedStyle,
+      body: {} as AnimatedStyle,
+      eyes: { transform: [{ translateX: up ? LOOK_UP.x * unit : 0 }, { translateY: up ? LOOK_UP.y * unit : 0 }] } as AnimatedStyle,
       dots: DOTS.xs.map(() => ({ opacity: HELD.dot }) as AnimatedStyle),
       spark: null,
       loops: [],
@@ -103,13 +118,10 @@ const layersOf = (state: MascotState, mode: MascotMotion['mode'], size: number, 
       transform: [
         { translateX: up ? lift(LOOK_UP.x) : 0 },
         { translateY: up ? lift(LOOK_UP.y) : 0 },
-        { scaleY: state === 'idle' ? cycle(d.blink, BLINK)((v) => v.lid) : HELD.lid },
+        { scaleY: state === 'idle' ? cycle(d.blink, BLINK)((v) => v.lid) : 1 },
       ],
     } as AnimatedStyle,
-    dots:
-      MARK[state] === 'dots'
-        ? DOTS.xs.map((_, i) => ({ opacity: cycle(d.dots, DOT, (1 - (i * DOT_STAGGER_MS) / DOT.duration) % 1)((v) => v.opacity) }) as AnimatedStyle)
-        : [],
+    dots: MARK[state] === 'dots' ? DOTS.xs.map((_, i) => ({ opacity: dotOpacity(d, i) }) as AnimatedStyle) : [],
     spark: spark && ({ opacity: spark((v) => v.opacity), transform: [{ scale: spark((v) => v.scale) }] } as AnimatedStyle),
     loops: [
       ...(track ? [loop(d.body, track.duration)] : []),
@@ -133,8 +145,9 @@ const useSettledState = (state: MascotState) => {
 
 type LayerProps = { x: number; y: number; reach: number; unit: number; style?: AnimatedStyle | null; children: ReactNode }
 
-// A part that moves on its own is drawn in its own small layer around (x, y). The layer's edges sit on device pixels and
-// its viewBox is those same edges in drawing units, so the part lands where one whole drawing would have put it.
+// A part that moves on its own, or that reaches outside the body's box, is drawn in a small layer around (x, y). The
+// layer's edges sit on device pixels and its viewBox is those same edges in drawing units, so the part lands where one
+// whole drawing would have put it.
 const Layer = ({ x, y, reach, unit, style, children }: LayerProps) => {
   const ratio = PixelRatio.get()
   const px = unit * ratio
@@ -144,7 +157,7 @@ const Layer = ({ x, y, reach, unit, style, children }: LayerProps) => {
   const height = Math.ceil((y + reach) * px) - top
   return (
     <Animated.View style={[{ position: 'absolute', left: left / ratio, top: top / ratio, width: width / ratio, height: height / ratio }, style]}>
-      <Svg width={width / ratio} height={height / ratio} viewBox={`${left / px} ${top / px} ${width / px} ${height / px}`}>
+      <Svg {...FILL} viewBox={`${left / px} ${top / px} ${width / px} ${height / px}`}>
         {children}
       </Svg>
     </Animated.View>
@@ -158,7 +171,8 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
   const resolved = resolveMotion(motion, useReduceMotion())
   const delayMs = resolved.mode === 'animate' ? (resolved.delayMs ?? 0) : 0
   const [drivers] = useState(newDrivers)
-  const layers = useMemo(() => layersOf(shown, resolved.mode, size, drivers), [shown, resolved.mode, size, drivers])
+  const moves = resolved.mode !== 'still'
+  const layers = useMemo(() => layersOf(shown, moves, size, drivers), [shown, moves, size, drivers])
 
   // The eyes rise and the spark plays once when a state begins, not each time a hold ends.
   const entered = useRef(false)
@@ -166,7 +180,16 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
     entered.current = false
   }, [shown])
   useEffect(() => {
-    if (resolved.mode !== 'animate') return
+    if (resolved.mode === 'still') return
+    if (resolved.mode === 'frame3') {
+      // A stopped native animation reports its last value to JS a moment later. Parking each driver after that report
+      // leaves JS and native agreeing on the held frame.
+      let holding = true
+      DRIVERS.forEach((name) => drivers[name].stopAnimation(() => holding && drivers[name].setValue(HOLD[name])))
+      return () => {
+        holding = false
+      }
+    }
     const runs = entered.current ? layers.loops : [...layers.loops, ...layers.entry]
     ;[drivers.body, drivers.blink, drivers.dots].forEach((driver) => driver.setValue(0))
     ;[drivers.look, drivers.spark].forEach((driver) => driver.setValue(entered.current ? 1 : 0))
@@ -182,8 +205,6 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
   const eyes = EYES[shown]
   const mark = MARK[shown]
   const labelled = accessibilityLabel != null
-  const dot = UNREAD.dot * size
-  const ring = UNREAD.ring * size
 
   return (
     <View
@@ -194,8 +215,8 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
       importantForAccessibility={labelled ? 'yes' : 'no-hide-descendants'}
       style={{ width: size, height: size, pointerEvents: 'none' }}
     >
-      <Animated.View style={[{ width: size, height: size }, layers.body]}>
-        <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Animated.View key={moves ? 'moves' : 'still'} style={[{ width: size, height: size }, layers.body]}>
+        <Svg {...FILL} viewBox="0 0 100 100">
           <Path d={BODY} fill={pal.body} />
           <Path d={FOLD_OUT} fill={pal.foldDark} />
           <Path d={FOLD_IN} fill={pal.foldLight} />
@@ -242,21 +263,10 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
           : null}
       </Animated.View>
       {unread ? (
-        <View
-          style={{
-            position: 'absolute',
-            top: -(UNREAD.out * size + ring),
-            right: -(UNREAD.out * size + ring),
-            width: dot + ring * 2,
-            height: dot + ring * 2,
-            borderRadius: dot / 2 + ring,
-            backgroundColor: accent.ring,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <View style={{ width: dot, height: dot, borderRadius: dot / 2, backgroundColor: accent.unread }} />
-        </View>
+        <Layer x={UNREAD.x} y={UNREAD.y} reach={UNREAD.ring} unit={unit}>
+          <Circle cx={UNREAD.x} cy={UNREAD.y} r={UNREAD.ring} fill={accent.ring} />
+          <Circle cx={UNREAD.x} cy={UNREAD.y} r={UNREAD.r} fill={accent.unread} />
+        </Layer>
       ) : null}
     </View>
   )
