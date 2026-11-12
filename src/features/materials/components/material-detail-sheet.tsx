@@ -1,16 +1,17 @@
 import { ApiError } from '@push/api-client'
-import { router, useIsFocused } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
-import { View } from 'react-native'
-import { Button, GlassButton, Sheet, Spinner, Text, askConfirm, showToast } from '@/shared/components'
+import { router } from 'expo-router'
+import { useMemo, useState } from 'react'
+import { Platform, View } from 'react-native'
+import { Button, GlassButton, Sheet, Spinner, Text, showToast } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { radius, spacing, useColors } from '@/theme'
 import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
 import { CITED, DELETE_LABEL, LOAD_ERROR, OPEN_LABEL, RESTORE_FAILED, SEND_LABEL, UNDO_LABEL } from '../constants'
 import type { Material, MaterialKind } from '../types'
 import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
+import { DeleteConfirm } from './delete-confirm'
 import { sendMaterial } from './materials-modal'
-import { TOAST_ABOVE_SEARCH } from './materials-search'
+import { useSearchRoom } from './materials-search'
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind => KINDS.includes(value as MaterialKind)
@@ -37,12 +38,8 @@ export const MaterialDetailSheet = ({ kind, id, forBot }: { kind: MaterialKind; 
   const remove = useDeleteMaterial()
   const restore = useRestoreMaterial()
   const now = useMemo(() => new Date(), [])
-  // The confirm is a sheet over this one: this sheet closes once it is back on top.
-  const [deleted, setDeleted] = useState(false)
-  const focused = useIsFocused()
-  useEffect(() => {
-    if (deleted && focused) router.back()
-  }, [deleted, focused])
+  const toastBottom = useSearchRoom().toast
+  const [confirm, setConfirm] = useState<'closed' | 'asking' | 'deleting'>('closed')
 
   const m = detail.data?.material
   if (!m) {
@@ -65,58 +62,62 @@ export const MaterialDetailSheet = ({ kind, id, forBot }: { kind: MaterialKind; 
   }
 
   const copy = deleteCopy(m)
-  const confirmDelete = () =>
-    askConfirm({
-      title: copy.title,
-      body: copy.body,
-      confirm: '삭제',
-      cancel: '취소',
-      danger: true,
-      onConfirm: () => {
-        setDeleted(true)
-        remove(m.kind, m.id).then(
-          () =>
-            showToast({
-              message: copy.done,
-              bottom: TOAST_ABOVE_SEARCH,
-              action: { label: UNDO_LABEL, onPress: () => void restore(m.kind, m.id).catch(() => showToast({ message: RESTORE_FAILED, alert: true, bottom: TOAST_ABOVE_SEARCH })) },
-            }),
-          (error: unknown) => showToast({ message: cited(error) ? CITED : copy.failed, alert: true, bottom: TOAST_ABOVE_SEARCH }),
-        )
-      },
-    })
+  const onDelete = () => {
+    setConfirm('deleting')
+    // iOS closes this sheet once the confirm has faded (onHidden), so the two dismissals do not overlap. Android's dialog is gone already.
+    if (Platform.OS !== 'ios') router.back()
+    remove(m.kind, m.id).then(
+      () =>
+        showToast({
+          message: copy.done,
+          bottom: toastBottom,
+          action: { label: UNDO_LABEL, onPress: () => void restore(m.kind, m.id).catch(() => showToast({ message: RESTORE_FAILED, alert: true, bottom: toastBottom })) },
+        }),
+      (error: unknown) => showToast({ message: cited(error) ? CITED : copy.failed, alert: true, bottom: toastBottom }),
+    )
+  }
 
   return (
-    <Sheet gap={14}>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <GlassButton actions={[{ icon: 'delete', label: DELETE_LABEL, color: 'red', onPress: confirmDelete }]} />
-      </View>
-      <Text v="h3" accessibilityRole="header">
-        {detailTitle(m)}
-      </Text>
-      <View style={{ gap: spacing[2], paddingVertical: 14, paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-        {detailFacts(m, detail.data?.usedBy ?? [], now).map((f) => (
-          <View key={f.label} style={{ flexDirection: 'row', gap: spacing[3] }}>
-            <Text v="c1" color="t3" style={{ width: 72, fontSize: 14, lineHeight: 20 }}>
-              {f.label}
-            </Text>
-            <Text v="c1" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
-              {f.value}
-            </Text>
-          </View>
-        ))}
-      </View>
-      <View style={{ gap: spacing[2], marginTop: spacing[1] }}>
-        <Button
-          label={SEND_LABEL}
-          onPress={() => {
-            const context = sendContextOf(forBot)
-            if (context.from === 'home') router.back()
-            sendMaterial(context, m)
-          }}
-        />
-        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m)} />
-      </View>
-    </Sheet>
+    <>
+      <Sheet gap={14}>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <GlassButton actions={[{ icon: 'delete', label: DELETE_LABEL, color: 'red', onPress: () => setConfirm('asking') }]} />
+        </View>
+        <Text v="h3" accessibilityRole="header">
+          {detailTitle(m)}
+        </Text>
+        <View style={{ gap: spacing[2], paddingVertical: 14, paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
+          {detailFacts(m, detail.data?.usedBy ?? [], now).map((f) => (
+            <View key={f.label} style={{ flexDirection: 'row', gap: spacing[3] }}>
+              <Text v="c1" color="t3" style={{ width: 72, fontSize: 14, lineHeight: 20 }}>
+                {f.label}
+              </Text>
+              <Text v="c1" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
+                {f.value}
+              </Text>
+            </View>
+          ))}
+        </View>
+        <View style={{ gap: spacing[2], marginTop: spacing[1] }}>
+          <Button
+            label={SEND_LABEL}
+            onPress={() => {
+              const context = sendContextOf(forBot)
+              if (context.from === 'home') router.back()
+              sendMaterial(context, m)
+            }}
+          />
+          <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m)} />
+        </View>
+      </Sheet>
+      <DeleteConfirm
+        visible={confirm === 'asking'}
+        title={copy.title}
+        body={copy.body}
+        onCancel={() => setConfirm('closed')}
+        onConfirm={onDelete}
+        onHidden={() => confirm === 'deleting' && router.back()}
+      />
+    </>
   )
 }
