@@ -52,6 +52,7 @@ const BODY_TRACKS: Partial<Record<MascotState, BodyTrack>> = {
       [1, pose({ rotate: -6 })],
     ],
   },
+  // A crouch, then a 530 ms jump from the deepest crouch to the landing, every 2.4 s.
   help: {
     duration: 2400,
     easing: 'ease-out',
@@ -71,7 +72,7 @@ const BODY_TRACKS: Partial<Record<MascotState, BodyTrack>> = {
 
 export const bodyTrackOf = (state: MascotState) => BODY_TRACKS[state]
 
-/** The lids close in 120 ms and open in 160 ms, once every 4 s. */
+/** One blink of 280 ms every 4 s, from 93 % of the cycle to its end. */
 export const BLINK: Track<{ lid: number }> = {
   duration: 4000,
   easing: 'ease',
@@ -145,6 +146,18 @@ export const sampleCycle = <T extends Numbers>(track: Track<T>, ease: Ease, star
 
 /** What the lids, the dots, and the spark show on keyframe ③. */
 export const HELD = { lid: valueAt(BLINK, BLINK.frame3).lid, dot: valueAt(DOT, DOT.frame3).opacity, spark: valueAt(SPARK, SPARK.frame3).opacity }
+
+/**
+ * Where each driver of a moving mascot rests while it holds keyframe ③. A loop begins at 0, the frame it holds. The dots
+ * rest below 0, because no moment of their staggered loop shows all three full. The eyes have risen and the spark has gone.
+ */
+export const HOLD = { body: 0, blink: 0, dots: -1, look: 1, spark: 1 } as const
+
+/** Dot `index` of 생각 over one loop of the dots driver, each dot DOT_STAGGER_MS behind the one before, and its rest at HOLD. */
+export const dotCycle = (index: number, ease: Ease) => [
+  { at: HOLD.dots, value: HELD.dot },
+  ...sampleCycle(DOT, ease, (1 - (index * DOT_STAGGER_MS) / DOT.duration) % 1).map((p) => ({ at: p.at, value: p.value.opacity })),
+]
 
 /** The transform a pose puts on a mascot of `size`. The sink is the same 3 px at every size and the lift grows with it. */
 export const poseTransform = (p: Pose, size: number) => ({ rotate: p.rotate, translateY: p.sink + p.lift * size, scaleY: p.squash, scale: p.scale })

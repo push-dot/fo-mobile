@@ -2,42 +2,68 @@ import { describe, expect, it } from 'vitest'
 import {
   BLINK,
   bodyTrackOf,
+  dotCycle,
   EYES,
   HELD,
+  HOLD,
   MARK,
+  MASCOT_STATES,
   poseTransform,
   resolveMotion,
-  REST,
   sampleCycle,
   settleMs,
   SPARK,
   valueAt,
+  type MascotState,
 } from './motion'
+import { LOOK_UP } from './shapes'
 
 const linear = (t: number) => t
 
-describe('a mascot held on keyframe ③ of the AgentHomeMascot board', () => {
-  it.each([
-    ['idle', { ...REST, scale: 1.03 }],
-    ['work', { ...REST, rotate: 6 }],
-    ['help', REST],
-  ] as const)('%s holds the board pose, where its loop begins and ends', (state, expected) => {
+const valueOn = <T>(points: readonly { at: number; value: T }[], input: number) => points.find((p) => p.at === input)?.value
+
+// What a mascot shows while its drivers rest at HOLD, read through the same cycles push-mascot.tsx interpolates.
+const held = (state: MascotState) => {
+  const track = bodyTrackOf(state)
+  const body = track && valueOn(sampleCycle(track, linear), HOLD.body)
+  return {
+    body: track && body ? { origin: track.origin, ...poseTransform(body, 100) } : null,
+    eyes: EYES[state],
+    lid: state === 'idle' ? valueOn(sampleCycle(BLINK, linear), HOLD.blink)?.lid : HELD.lid,
+    look: EYES[state] === 'up' ? { x: LOOK_UP.x * HOLD.look, y: LOOK_UP.y * HOLD.look } : null,
+    dots: MARK[state] === 'dots' ? [0, 1, 2].map((i) => valueOn(dotCycle(i, linear), HOLD.dots)) : null,
+    badge: MARK[state] === 'badge',
+    spark: MARK[state] === 'sparks' ? valueOn(sampleCycle(SPARK, linear, 0), HOLD.spark) : null,
+  }
+}
+
+const still = { rotate: 0, translateY: 0, scaleY: 1, scale: 1 }
+
+// The ③ frames of AgentHomeMascot (version 396), as the harness HOLD table reads the board's keyframes.
+const FRAME_3: Record<MascotState, ReturnType<typeof held>> = {
+  idle: { body: { origin: '50% 90%', ...still, scale: 1.03 }, eyes: 'open', lid: 1, look: null, dots: null, badge: false, spark: null },
+  think: { body: null, eyes: 'up', lid: 1, look: { x: 2.5, y: -4 }, dots: [1, 1, 1], badge: false, spark: null },
+  work: { body: { origin: '50% 90%', ...still, rotate: 6 }, eyes: 'open', lid: 1, look: null, dots: null, badge: false, spark: null },
+  help: { body: { origin: '50% 100%', ...still }, eyes: 'open', lid: 1, look: null, dots: null, badge: true, spark: null },
+  done: { body: null, eyes: 'smile', lid: 1, look: null, dots: null, badge: false, spark: { opacity: 0, scale: 1 } },
+}
+
+describe('a mascot held on keyframe ③ (Reduce Motion, off-screen rows, captures)', () => {
+  it.each(MASCOT_STATES)('%s shows the ③ frame of the board', (state) => {
+    expect(held(state)).toEqual(FRAME_3[state])
+  })
+
+  it.each(['idle', 'work', 'help'] as const)('%s starts its loop on the frame it holds, so a hold ends without a jump', (state) => {
     const points = sampleCycle(bodyTrackOf(state)!, linear)
-    expect(points[0]).toEqual({ at: 0, value: expected })
-    expect(points.at(-1)).toEqual({ at: 1, value: expected })
+    expect(points.at(-1)!.value).toEqual(points[0]!.value)
   })
 
-  it.each(['think', 'done'] as const)('%s keeps its body still', (state) => {
-    expect(bodyTrackOf(state)).toBeUndefined()
-  })
-
-  it('keeps its eyes open and all three dots full, with no spark left', () => {
-    expect(HELD).toEqual({ lid: 1, dot: 1, spark: 0 })
-  })
-
-  it('draws the face and the mark of its state', () => {
-    expect(EYES).toEqual({ idle: 'open', think: 'up', work: 'open', help: 'open', done: 'smile' })
-    expect(MARK).toEqual({ idle: null, think: 'dots', work: null, help: 'badge', done: 'sparks' })
+  it('rests the dots outside their loop, the one place all three are full', () => {
+    ;[0, 1, 2].forEach((i) => {
+      const inputs = dotCycle(i, linear).map((p) => p.at)
+      expect(inputs).toEqual([...inputs].sort((a, b) => a - b))
+      expect(new Set(inputs).size).toBe(inputs.length)
+    })
   })
 })
 
@@ -70,9 +96,21 @@ describe('board keyframes', () => {
     expect(poseTransform(valueAt(help, 0.84), 100)).toEqual({ rotate: 0, translateY: -8, scaleY: 1.02, scale: 1 })
   })
 
-  it('the lids shut for 120 ms and reopen in 160 ms at the end of each 4 s', () => {
-    const at = (ms: number) => valueAt(BLINK, ms / BLINK.duration).lid
-    expect([at(0), at(3720), at(3840), at(4000)]).toEqual([1, 1, 0.12, 1])
+  it('blinks once every 4 s, for 280 ms', () => {
+    const lid = (ms: number) => valueAt(BLINK, ms / BLINK.duration).lid
+    const shut = Array.from({ length: BLINK.duration }, (_, ms) => ms).filter((ms) => lid(ms) < 1)
+    expect(BLINK.duration).toBe(4000)
+    expect([shut[0]! - 1, shut.at(-1)! + 1]).toEqual([3720, 4000])
+    expect(shut).toHaveLength(4000 - 3720 - 1)
+    expect(lid(3840)).toBeCloseTo(0.12)
+  })
+
+  it('jumps for about 530 ms every 2.4 s, from the deepest crouch to the landing', () => {
+    const help = bodyTrackOf('help')!
+    const [crouch] = help.keys.reduce((low, key) => (key[1].squash < low[1].squash ? key : low))
+    const [landing] = help.keys.find(([at, p]) => at > crouch && p.lift === 0 && p.squash === 1)!
+    expect(help.duration).toBe(2400)
+    expect(Math.round((landing - crouch) * help.duration)).toBe(528)
   })
 
   it('the spark grows past its size while it shows, then fades at its size', () => {

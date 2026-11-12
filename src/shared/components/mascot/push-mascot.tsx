@@ -8,9 +8,10 @@ import {
   BLINK,
   bodyTrackOf,
   DOT,
-  DOT_STAGGER_MS,
+  dotCycle,
   EYES,
   HELD,
+  HOLD,
   LOOK_UP_MS,
   MARK,
   poseTransform,
@@ -37,7 +38,7 @@ export type MascotProps = {
 }
 
 type AnimatedStyle = Animated.WithAnimatedValue<ViewStyle>
-type Drivers = { body: Animated.Value; blink: Animated.Value; dots: Animated.Value; look: Animated.Value; spark: Animated.Value }
+type Drivers = Record<keyof typeof HOLD, Animated.Value>
 
 const STILL: MascotMotion = { mode: 'still' }
 
@@ -50,10 +51,6 @@ const EASE: Record<CssEasing, (t: number) => number> = {
   'ease-in-out': Easing.bezier(0.42, 0, 0.58, 1),
   'ease-out': Easing.bezier(0, 0, 0.58, 1),
 }
-
-// Where each driver rests while a mascot holds keyframe ③. A loop begins at 0, the frame it holds. The dots rest below 0,
-// because no moment of their staggered loop shows all three full. The eyes have risen and the spark has gone.
-const HOLD: Record<keyof Drivers, number> = { body: 0, blink: 0, dots: -1, look: 1, spark: 1 }
 
 const DRIVERS = Object.keys(HOLD) as (keyof Drivers)[]
 
@@ -79,8 +76,8 @@ const cycle = <T extends Record<string, number>>(driver: Animated.Value, track: 
 }
 
 const dotOpacity = (d: Drivers, index: number) => {
-  const points = sampleCycle(DOT, EASE[DOT.easing], (1 - (index * DOT_STAGGER_MS) / DOT.duration) % 1)
-  return d.dots.interpolate({ inputRange: [HOLD.dots, ...points.map((p) => p.at)], outputRange: [HELD.dot, ...points.map((p) => p.value.opacity)] })
+  const points = dotCycle(index, EASE[DOT.easing])
+  return d.dots.interpolate({ inputRange: points.map((p) => p.at), outputRange: points.map((p) => p.value) })
 }
 
 // A mascot that can move is always drawn from its drivers, also while it holds. A native animation changes a view behind
