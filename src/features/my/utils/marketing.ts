@@ -1,6 +1,6 @@
 export const MARKETING_COPY = {
   label: '혜택·이벤트 알림',
-  sub: '새 기능, 이벤트, 할인 소식',
+  sub: '할인, 이벤트, 새 기능 소식을 보내 드려요',
 } as const
 
 // 정보통신망법 §50⑦: tell the user who processed the change, when, and the result.

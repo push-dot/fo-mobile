@@ -35,7 +35,7 @@ export const DocsModal = () => {
           </Text>
           <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
             <Button label="파일 등록" size="pill" variant="secondary" onPress={() => upload.mutate()} />
-            <Button label="에이전트로 만들기" size="pill" variant="secondary" onPress={() => leave(() => router.dismissTo('/chat'))} />
+            <Button label="봇으로 만들기" size="pill" variant="secondary" onPress={() => leave(() => router.dismissTo('/chat'))} />
           </View>
         </PageEmpty>
       ) : null}

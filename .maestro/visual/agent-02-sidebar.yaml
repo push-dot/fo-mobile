@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 에이전트 · 사이드바 → 계정 → 요금제 → 내 서류 → 북마크한 공고
+name: 봇 · 사이드바 → 계정 → 요금제 → 내 서류 → 북마크한 공고
 tags:
   - visual
 ---
@@ -28,7 +28,7 @@ tags:
 - takeScreenshot: ChatDrawer
 - tapOn: ".*계정 열기"
 - extendedWaitUntil:
-    visible: "에이전트가 참고하는 내 정보"
+    visible: "봇이 참고하는 내 정보"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: ChatAccount

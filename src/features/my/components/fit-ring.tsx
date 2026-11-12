@@ -1,12 +1,17 @@
 import { View } from 'react-native'
 import Svg, { Circle } from 'react-native-svg'
 import { Text } from '@/shared/components'
-import { useColors } from '../../../theme'
+import { type, useColors } from '../../../theme'
 
-const FitRing = ({ score, size = 44 }: { score: string; size?: number }) => {
+// The two rings the boards draw: a document row's (PushDocs, MyResume, PushDocView) and the applied job's fit card (MyAppliedJob).
+const RINGS = {
+  row: { size: 44, r: 18, stroke: 3.5, v: 'b2', fontSize: type.b2.fontSize, lineHeight: 20 },
+  card: { size: 64, r: 27, stroke: 7, v: 'h2', fontSize: 22, lineHeight: type.h2.lineHeight },
+} as const
+
+const FitRing = ({ score, kind = 'row' }: { score: string; kind?: keyof typeof RINGS }) => {
   const c = useColors()
-  const stroke = Math.max(3, Math.round(size / 14))
-  const r = (size - stroke) / 2
+  const { size, r, stroke, v, fontSize, lineHeight } = RINGS[kind]
   const length = 2 * Math.PI * r
   return (
     <View accessibilityLabel={`적합도 ${score}점`} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
@@ -23,7 +28,7 @@ const FitRing = ({ score, size = 44 }: { score: string; size?: number }) => {
           fill="none"
         />
       </Svg>
-      <Text v={size >= 56 ? 'h3' : 'b2'} weight="800">
+      <Text v={v} weight="800" style={{ fontSize, lineHeight, fontVariant: ['tabular-nums'] }}>
         {score}
       </Text>
     </View>

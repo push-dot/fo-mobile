@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 에이전트 · 큰 글씨 · 작업 중 + 대기 중인 말
+name: 봇 · 큰 글씨 · 작업 중 + 대기 중인 말
 tags:
   - visual
 ---

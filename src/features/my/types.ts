@@ -1,4 +1,4 @@
-import type { Profile, SourceItem, UserRef } from '@push/api-client'
+import type { Application, ApplicationStage, Profile, SourceItem, UserRef } from '@push/api-client'
 
 export type CalendarEventType = 'INTERVIEW' | 'DEADLINE' | 'FOLLOW_UP' | 'COFFEE_CHAT' | 'CUSTOM'
 
@@ -9,7 +9,24 @@ export type CalendarEvent = {
   startsAt: string
   endsAt: string | null
   notes: string
+  location?: string | null
   applicationId?: string | null
+}
+
+export type FitPartKey = 'techStack' | 'experienceLink' | 'careerLevel' | 'keyword' | 'domain'
+
+/** push-be GET /applications/{id}. `fit` is the stored posting fit of the applied document, absent until one was run. */
+export type ApplicationDetail = Application & {
+  stageEnteredAt?: Partial<Record<ApplicationStage, string>>
+  fit?: {
+    fitScore: number
+    parts: Record<FitPartKey, number>
+    topGap: string
+    plan: string
+    reachable: number
+    documentId: string
+    documentTitle: string | null
+  }
 }
 
 export type ResumeDraft = {

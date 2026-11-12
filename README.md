@@ -1,6 +1,6 @@
 # fo-mobile
 
-Push의 iOS·Android 앱입니다. Expo Router로 화면을 구성하고, 탭은 홈, 허브, 소셜, 에이전트, 마이입니다. 공고 상세와 허브 프로필 상세는 네이티브 크롬 안의 WebView로 fo-web을 엽니다.
+Push의 iOS·Android 앱입니다. Expo Router로 화면을 구성하고, 탭은 홈, 허브, 소셜, 봇, 마이이고 탭 바에는 아이콘만 보입니다. 공고 상세와 허브 프로필 상세는 네이티브 크롬 안의 WebView로 fo-web을 엽니다.
 
 화면 문구는 한국어이고, 글꼴은 Noto Sans KR입니다. 번들 ID는 iOS·Android 모두 `app.push.mobile`이고, URL 스킴은 `push`입니다.
 
@@ -9,7 +9,7 @@ Push의 iOS·Android 앱입니다. Expo Router로 화면을 구성하고, 탭은
 - 홈·공고: 공고 목록과 섹션, 필터, 지원
 - 허브: 프로필 탐색과 제안
 - 소셜: 게시물 작성과 열람
-- 에이전트: AI 채팅. 메시지는 SSE로 받고, 진행 중인 응답은 이어 받을 수 있습니다. 대화 목록은 탭 위에 쌓이는 스택 화면(`/sidebar`)으로 열려 탭 바까지 덮습니다
+- 봇: AI 채팅. 메시지는 SSE로 받고, 진행 중인 응답은 이어 받을 수 있습니다. 대화 목록은 탭 위에 쌓이는 스택 화면(`/sidebar`)으로 열려 탭 바까지 덮습니다
 - 마이: 프로필, 서류, 활동, 북마크, 팔로우, 게시물, 제안, 설정
 - 검색, 알림, 제안함, 설정(차단·공개 범위·약관)
 - 로그인: Google, Apple(iOS만), GitHub, 휴대폰 번호. OAuth는 PKCE이고 콜백은 `push://auth/callback`입니다. `__DEV__` 빌드에서만 `EXPO_PUBLIC_DEV_AUTH_TOKEN`으로 들어갈 수 있습니다
@@ -105,6 +105,8 @@ pnpm --filter @push/fo-mobile test
 pnpm --filter @push/fo-mobile lint
 pnpm --filter @push/fo-mobile typecheck
 ```
+
+화면 문구는 `에이전트` 대신 `봇`을 씁니다. `src`나 `.maestro`에 `에이전트`가 남아 있으면 `src/shared/__tests__/bot-copy.test.ts`가 실패합니다. `node scripts/bot-copy.mjs`는 조사까지 맞춰 바꾸고, `--check`를 붙이면 남은 줄만 보여 줍니다. 약관 원문은 push-fe `packages/shared`에 있어 이 검사 밖입니다. 같은 원문을 앱 렌더링은 `봇`으로, 웹 렌더링은 `에이전트`로 보여 줍니다.
 
 Maestro 플로우는 `.maestro/`에 있습니다. `.maestro/config.yaml`은 `flows/*`를 실행하고, `_*.yaml` 서브플로와 `visual/`(디자인 비교용 스크린샷)은 제외합니다. iOS 시뮬레이터와 Android 에뮬레이터에서 돌립니다. `.env.local`에 `EXPO_PUBLIC_API_MOCK=1`과 `EXPO_PUBLIC_DEV_AUTH_TOKEN`을 넣고 Metro를 띄운 뒤, push-fe 루트에서 `maestro test apps/fo-mobile/.maestro`를 실행합니다. npm 스크립트와 CI에는 연결되어 있지 않습니다.
 

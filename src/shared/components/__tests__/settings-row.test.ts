@@ -26,4 +26,10 @@ describe('SettingsRow', () => {
     expect(props).toMatchObject({ children: '커리어 상태', color: 't1' })
     expect(props?.weight).toBeUndefined()
   })
+
+  it('draws the chevron in t3 beside a value and in t1 on its own, as Settings does', () => {
+    const chevron = (props: Parameters<typeof SettingsRow>[0]) => findAll(SettingsRow(props), 'Icon')[0]?.props
+    expect(chevron({ label: '커리어 상태', value: '모두에게', onPress: vi.fn() })).toMatchObject({ name: 'chev', size: 16, color: 't3' })
+    expect(chevron({ label: '고객센터', onPress: vi.fn() })).toMatchObject({ name: 'chev', size: 16, color: 't1' })
+  })
 })

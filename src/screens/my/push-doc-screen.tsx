@@ -283,7 +283,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
       {application ? (
         <CtaBar>
           <Button
-            label="에이전트로 고치기"
+            label="봇으로 고치기"
             icon="spark"
             variant="secondary"
             onPress={() => void start(FIX_DOC, FIX_DOC, undefined, undefined, undefined, { documentId: id })}

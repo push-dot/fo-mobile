@@ -15,7 +15,7 @@ const FilterRow = ({ label, count, on, check, onPress }: { label: string; count:
         {label}
       </Text>
       {count ? (
-        <Text v="c1" color={on ? 'acText' : 't3'}>
+        <Text v="c1" weight={on ? '700' : undefined} color={on ? 'acText' : 't3'}>
           {count}
         </Text>
       ) : null}
