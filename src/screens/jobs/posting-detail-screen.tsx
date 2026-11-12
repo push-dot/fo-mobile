@@ -29,7 +29,7 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
         }}
       >
         <Button
-          label="에이전트로 맞추기"
+          label="봇으로 맞추기"
           variant="secondary"
           onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: id } })}
         />

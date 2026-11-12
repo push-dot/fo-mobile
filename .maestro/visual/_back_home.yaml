@@ -1,7 +1,7 @@
 appId: app.push.mobile
 tags:
   - subflow
-# From a conversation back to the 에이전트 first screen (pushed route: edge swipe on iOS, back on Android).
+# From a conversation back to the 봇 first screen (pushed route: edge swipe on iOS, back on Android).
 ---
 - runFlow:
     when:
@@ -25,7 +25,7 @@ tags:
       notVisible: "공고 링크로 맞추기"
     commands:
       - tapOn:
-          text: "에이전트"
+          text: "봇"
           optional: true
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"

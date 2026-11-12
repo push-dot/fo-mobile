@@ -131,7 +131,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
                 답장 전에 이 공고에 맞춰 볼까요?
               </Text>
               <Text v="c1" color="t2">
-                에이전트가 적합도를 보고 이력서를 고쳐 드려요
+                봇이 적합도를 보고 이력서를 고쳐 드려요
               </Text>
             </View>
             <Icon name="chev" size={18} color={c.ac} />

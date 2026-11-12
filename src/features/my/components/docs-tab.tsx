@@ -152,11 +152,11 @@ const DocsTab = () => {
           아직 등록한 서류가 없어요
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-          {'PDF나 DOCX 파일을 올리거나\n에이전트로 새로 만들어 보세요.'}
+          {'PDF나 DOCX 파일을 올리거나\n봇으로 새로 만들어 보세요.'}
         </Text>
         <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: spacing[4] }}>
           <Button label="파일 등록" onPress={pickFile} />
-          <Button label="에이전트로 만들기" variant="secondary" onPress={openChat} />
+          <Button label="봇으로 만들기" variant="secondary" onPress={openChat} />
         </View>
       </View>
     )

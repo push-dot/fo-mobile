@@ -4,34 +4,39 @@ import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
 import {
-  FitRing,
-  fitTen,
+  APPLICATION_LOAD_FAILED,
+  AppliedFitCard,
+  appliedFit,
   INTERVIEW_PREP,
   ListSkeleton,
   Empty,
   emptyCta,
   Logo,
+  RETRY_LABEL,
   PostingSection,
   StageTracker,
+  useApplication,
   useDocuments,
   useMyApplications,
   usePostingDetail,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { openBrowser, shareMessage } from '@/shared/infrastructure'
-import { radius, spacing, useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 
 const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const { data, isLoading } = useMyApplications()
   const item = data?.data.find((a) => a.id === id)
+  const detailQuery = useApplication(id)
+  const { data: detail, isLoading: detailLoading } = detailQuery
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
   const doc = docs.data?.data.find((d) => d.applicationId === id)
   const career = p ? careerLabel(p) : null
-  const score = fitTen(item?.fitScore)
+  const fit = appliedFit(item?.fitScore, detail?.fit)
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -48,14 +53,16 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           ) : null
         }
       />
-      {isLoading ? (
+      {isLoading || detailLoading ? (
         <ListSkeleton />
+      ) : detailQuery.isError && !detail ? (
+        <Empty text={APPLICATION_LOAD_FAILED} action={RETRY_LABEL} onAction={() => void detailQuery.refetch()} />
       ) : !item ? (
         <Empty text={emptyCta('applications').title} />
       ) : (
         <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120, gap: spacing[6] }}>
-          <View style={{ gap: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ gap: spacing[3] }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
               <Logo name={item.company} size={44} />
               <Text v="b2" weight="700">
                 {item.company}
@@ -65,21 +72,19 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               {item.title}
             </Text>
             {p ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
                 <Badge label={p.location} />
                 {career ? <Badge label={career === '신입' ? career : `경력 ${career}`} /> : null}
                 <Badge label={EMPLOYMENT_TYPES.find((t) => t.key === p.employmentType)?.label ?? ''} />
               </View>
             ) : null}
           </View>
-          <StageTracker a={item} />
-          {score ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: spacing[5], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-              <FitRing score={score} size={64} />
-              <Text v="c1" weight="700" color="t3">
-                내 적합도
-              </Text>
-            </View>
+          <StageTracker a={detail ?? item} />
+          {fit ? (
+            <AppliedFitCard
+              fit={fit}
+              onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: item.jobId } })}
+            />
           ) : null}
           {p ? (
             <>
@@ -99,7 +104,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               <Text v="c1" weight="600" color="t3">
                 원문 보기 · {item.company} 채용 사이트
               </Text>
-              <Icon name="chev" size={14} color="t4" />
+              <Icon name="chev" size={14} color="t3" />
             </Pressable>
           ) : null}
         </ScrollView>
