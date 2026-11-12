@@ -15,6 +15,7 @@ import {
   LOGIN_LABEL,
   MARKETING_COPY,
   NOTIFICATION_ROWS,
+  READ_FILES_ROW,
   REFERENCE_LABEL,
   REFERENCE_SUB,
   signOutSession,
@@ -200,6 +201,7 @@ const SettingsScreen = () => {
           value={TONES.find((t) => t.key === s.defaultTone)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
         />
+        <SettingsRow label={READ_FILES_ROW.label} right={sw(READ_FILES_ROW.key, READ_FILES_ROW.label)} />
         <SettingsRow
           label={REFERENCE_LABEL}
           sub={REFERENCE_SUB}

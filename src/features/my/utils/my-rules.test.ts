@@ -8,6 +8,7 @@ import {
   CALENDAR_ADD,
   INTERVIEW_PREP,
   NOTIFICATION_ROWS,
+  READ_FILES_ROW,
   OFFER_DECLINE,
   OFFER_EMPTY_ACTION,
   OFFER_FAIL,
@@ -198,7 +199,7 @@ describe('my screen rules', () => {
       '지원 상태 변경',
     ])
     expect(AGENT_TITLE).toBe('봇')
-    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 봇이 읽어서 이력서를 고쳐요.')
+    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 봇이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
     expect(REFERENCE_SUB).toBe('봇을 쓰려면 켜 두어야 해요')
   })
@@ -251,10 +252,10 @@ describe('my screen rules', () => {
 })
 
 describe('settings screen', () => {
-  // push-be never reads allowAiReadMyFiles, so the switch would be a dead control (D19).
-  it('hides the 내 자료 읽기 허용 switch until the server enforces it', () => {
+  // The board draws the switch. push-be enforces allowAiReadMyFiles in the read-switch PR, before any release.
+  it('shows the 내 자료 읽기 허용 switch in the 봇 group', () => {
+    expect(READ_FILES_ROW).toEqual({ key: 'allowAiReadMyFiles', label: '내 자료 읽기 허용' })
     const screen = readFileSync(join(__dirname, '../../../screens/my/settings-screen.tsx'), 'utf8')
-    expect(screen).not.toContain('allowAiReadMyFiles')
-    expect(screen).not.toContain('내 자료 읽기 허용')
+    expect(screen).toContain('sw(READ_FILES_ROW.key, READ_FILES_ROW.label)')
   })
 })

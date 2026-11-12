@@ -14,6 +14,9 @@ name: 마이 → 설정 → 로그아웃
 - takeScreenshot: 05_my_settings_logout-01
 - tapOn: "설정"
 - scrollUntilVisible:
+    element: "내 자료 읽기 허용"
+    direction: DOWN
+- scrollUntilVisible:
     element: "로그아웃"
     direction: DOWN
 - tapOn: "로그아웃"
