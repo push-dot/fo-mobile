@@ -41,7 +41,7 @@ const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow
   const dark = useThemeMode() === 'dark'
   if (Platform.OS === 'ios' && !opaque)
     return (
-      <Glass interactive tint={dark ? c.glass : undefined} style={shape}>
+      <Glass tint={dark ? c.glass : undefined} style={[shape, { boxShadow: shadow }]}>
         {children}
       </Glass>
     )
