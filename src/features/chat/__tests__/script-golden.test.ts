@@ -236,7 +236,7 @@ afterAll(() => {
 
 describe('every scripted run (golden)', () => {
   it('leaves the same chat on screen at every card and at the end', async () => {
-    const { TOKENS } = await import('../../../mock/chat')
+    const { TOKENS } = await import('../../../mock/bot-scripts/runs')
     const queue = roots(Object.keys(TOKENS))
     // Each answer to each card is walked once per history of answered cards.
     const seen = new Set<string>()

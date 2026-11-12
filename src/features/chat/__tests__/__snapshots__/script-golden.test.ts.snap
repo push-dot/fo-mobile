@@ -2362,7 +2362,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2378,7 +2381,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2394,7 +2400,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"네, 시작해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"GitHub 살펴보기","state":"done"},{"label":"공고 분석","state":"done"},{"label":"적합도 계산","state":"done"}],"type":"todo"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
@@ -2418,9 +2427,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2435,7 +2449,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2454,7 +2471,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2473,7 +2493,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2489,7 +2512,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2549,7 +2574,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서부터 쓸게요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2563,9 +2588,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"기획만 볼게요","type":"user"}
 {"text":"기획서 4개를 내 서류에 저장했어요.","type":"agentText"}
@@ -2584,9 +2610,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -2605,9 +2632,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -2626,9 +2654,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -2644,9 +2673,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -2662,9 +2692,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -4881,7 +4912,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -4895,7 +4929,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -4909,7 +4946,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -4923,7 +4963,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4975,7 +5017,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"1번, 지금 이력서로 할게요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6321,7 +6363,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph0-input","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7568,9 +7610,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"기획만 볼게요","type":"user"}
 {"text":"기획서 4개를 내 서류에 저장했어요.","type":"agentText"}
@@ -7587,9 +7630,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -7606,9 +7650,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -7625,9 +7670,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -7641,9 +7687,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -7657,9 +7704,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -10780,6 +10828,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10793,6 +10842,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10806,6 +10856,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"네, 시작해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"GitHub 살펴보기","state":"done"},{"label":"공고 분석","state":"done"},{"label":"적합도 계산","state":"done"}],"type":"todo"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
@@ -10827,8 +10878,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"자료를 바꿀래요","type":"user"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+{"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
+{"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10841,6 +10895,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10857,6 +10912,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10873,6 +10929,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
+{"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10885,7 +10942,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"answer":"1번, 지금 이력서로 할게요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"foot":"여러 개 고를 수 있어요","id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"그만하기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10937,11 +10994,13 @@ card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-bp: pick 0 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"기획만 볼게요","type":"user"}
 {"text":"기획서 4개를 내 서류에 저장했어요.","type":"agentText"}
@@ -10954,11 +11013,13 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-bp: pick 1 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10971,11 +11032,13 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-bp: say 이렇게 해 주세요 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10988,11 +11051,13 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 0 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
+{"text":"다시 고르기","type":"user"}
+{"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
-{"text":"다시 고르기","type":"user"}
-{"text":"가벼운 제약으로","type":"user"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -11002,11 +11067,13 @@ card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","qu
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 1 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -11016,11 +11083,13 @@ card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","qu
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 중간 제약으로 > ph2x-verify: pick 0 > ph2x-level: pick 0 > ph2x-verify: pick 0 > ph2x-level: pick 2 1`] = `
 "
 {"text":"중간 제약으로","type":"user"}
-{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -11033,6 +11102,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -11048,6 +11118,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -11063,6 +11134,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -11075,6 +11147,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -11089,6 +11162,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -11103,6 +11177,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -11114,6 +11189,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -11125,6 +11201,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
+{"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "

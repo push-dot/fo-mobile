@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatEvent, Step } from '@/features/chat'
+import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
 import { setAccount } from '../chat'
 
@@ -7,7 +8,10 @@ const call = async (method: string, path: string, body?: unknown) => {
   const res = await mockFetch(new Request(`http://x/api/v1/${path}`, { method, body: body === undefined ? undefined : JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }))
   return (await res.json()) as { data: unknown }
 }
-const run = async (conversationId: string, extra: object) => ((await call('POST', 'chat/runs', { conversationId, ...extra })).data as Step[]).map((s) => s.event)
+const steps = async (conversationId: string, extra: object) => (await call('POST', 'chat/runs', { conversationId, ...extra })).data as Step[]
+/** A run as the screen gets it: its frames through the live stream's mapper. */
+const run = async (conversationId: string, extra: object) => (await steps(conversationId, extra)).flatMap((s) => mapEvent(s.frame))
+const answer = (conversationId: string, approvalId: string, optionId: string) => run(conversationId, { resolve: { approvalId, optionId } })
 const types = (events: ChatEvent[]) => events.map((e) => e.type)
 
 describe('chat mock', () => {
@@ -42,8 +46,10 @@ describe('chat mock', () => {
 
   it('fails the first 병목 강도 pick and passes the second', async () => {
     await run('t-verify', { text: 'ph2x' })
-    const first = await run('t-verify', { answer: { approvalId: 'ph2x-level', choice: 1 } })
-    const second = await run('t-verify', { answer: { approvalId: 'ph2x-level', choice: 1 } })
+    await answer('t-verify', 'ph2x-approach', '0')
+    const first = await answer('t-verify', 'ph2x-level', '1')
+    await answer('t-verify', 'ph2x-verify', '0')
+    const second = await answer('t-verify', 'ph2x-level', '1')
     expect(first.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
     expect(types(second)).toContain('plan')
   })
@@ -61,7 +67,7 @@ describe('chat mock', () => {
 
   it('selects 중간 제약으로 in the 병목 강도 gate', async () => {
     const events = await run('t-level', { text: 'ph2x' })
-    const gate = (await run('t-level', { answer: { approvalId: 'ph2x-approach', choice: 0 } })).find((e) => e.type === 'approval')
+    const gate = (await answer('t-level', 'ph2x-approach', '0')).find((e) => e.type === 'approval')
     expect(events).not.toHaveLength(0)
     expect(gate).toMatchObject({ approval: { id: 'ph2x-level', sections: [{ selected: [1] }] } })
   })
@@ -74,12 +80,12 @@ describe('chat mock', () => {
   })
 
   it('holds the writing state with the draft card, while the run to the review gate has no draft card', async () => {
-    const writing = (await call('POST', 'chat/runs', { conversationId: 't-write', text: '네, 써 주세요' })).data as Step[]
-    const paper = writing.findIndex((st) => st.event.type === 'paper')
+    const writing = await steps('t-write', { text: '네, 써 주세요' })
+    const paper = writing.findIndex((st) => st.frame.type === 'paper')
     expect(paper).toBeGreaterThan(-1)
     expect(writing[paper + 1]!.wait).toBeGreaterThan(30_000)
     await run('t-draft', { text: 'ph2' })
-    const review = await run('t-draft', { answer: { approvalId: 'ph2', choice: 0 } })
+    const review = await answer('t-draft', 'ph2', '0')
     expect(types(review)).not.toContain('paper')
     expect(types(review)).not.toContain('file')
     expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(true)
@@ -98,6 +104,13 @@ describe('chat mock', () => {
     expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }, { type: 'choice', resolution: { status: 'EXPIRED' } }] })
   })
 
+  it('closes a card restored from the stored turns without a run, and clears the list badge', async () => {
+    expect(((await call('GET', 'conversations/c-moa/turns')).data as unknown[]).length).toBe(1)
+    expect(await steps('c-moa', { text: '적용', resolve: { approvalId: 'moa-edit', optionId: 'apply' } })).toEqual([])
+    expect((await call('GET', 'conversations/c-moa/turns')).data).toEqual([])
+    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ status: null, lastLine: '' })
+  })
+
   it('restores a deleted link with its fit count and date, and restores a live link as is', async () => {
     const ids = async () => ((await call('GET', 'me/links')).data as { id: string }[]).map((l) => l.id)
     const before = ((await call('GET', 'me/links')).data as { id: string }[]).find((l) => l.id === 'l1')
@@ -110,9 +123,9 @@ describe('chat mock', () => {
 
   it('holds the working line well past the 8s dwell for the Android tour token', async () => {
     const wait = async (text: string) => {
-      const steps = (await call('POST', 'chat/runs', { conversationId: `t-hold-${text}`, text })).data as Step[]
-      const run = steps.findIndex((s) => s.event.type === 'tool' && s.event.id.endsWith('-fit') && s.event.state === 'run')
-      return steps[run + 1]!.wait
+      const frames = await steps(`t-hold-${text}`, { text })
+      const at = frames.findIndex((s) => s.frame.type === 'tool' && s.frame.name.endsWith('-fit') && s.frame.state === 'run')
+      return frames[at + 1]!.wait
     }
     expect(await wait('tailor hold')).toBeGreaterThan(30_000)
     expect(await wait('tailor resume')).toBeLessThan(10_000)

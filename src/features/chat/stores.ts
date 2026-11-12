@@ -135,11 +135,17 @@ const sleep = (ms: number, signal: AbortSignal) =>
     signal.addEventListener('abort', () => (clearTimeout(t), reject(new Error('aborted'))), { once: true })
   })
 
+// The mock answers a run with its frames at once and the app plays them on the clock, because RN cannot stream a synthetic body.
+// They go through the live stream's mapper, so a mock run draws what the server's frames would.
 const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> {
-  for (const step of await chatApi.run(input)) {
-    await sleep(step.wait, signal)
-    yield step.event
+  const steps = await chatApi.run(input)
+  const frames = async function* () {
+    for (const step of steps) {
+      await sleep(step.wait, signal)
+      yield step.frame
+    }
   }
+  yield* fromStream(frames(), async function* () {})
 }
 
 const streamed = (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> => {
@@ -183,7 +189,7 @@ const startRun = async (input: Outgoing) => {
     if (!run) {
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
     } else {
-      for await (const e of (run.resolve ? resolved : run.follow ? followed : API_MOCK ? scripted : streamed)(run, ctrl.signal)) {
+      for await (const e of (API_MOCK ? scripted : run.resolve ? resolved : run.follow ? followed : streamed)(run, ctrl.signal)) {
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
       if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
