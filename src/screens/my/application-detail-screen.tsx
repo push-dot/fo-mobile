@@ -27,7 +27,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const { data, isLoading } = useMyApplications()
   const item = data?.data.find((a) => a.id === id)
-  const { data: detail } = useApplication(id)
+  const { data: detail, isLoading: detailLoading } = useApplication(id)
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
@@ -50,7 +50,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           ) : null
         }
       />
-      {isLoading ? (
+      {isLoading || detailLoading ? (
         <ListSkeleton />
       ) : !item ? (
         <Empty text={emptyCta('applications').title} />

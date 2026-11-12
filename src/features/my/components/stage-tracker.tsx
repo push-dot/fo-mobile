@@ -67,10 +67,10 @@ const NextEvent = ({ applicationId }: { applicationId: string }) => {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.paper }}>
       <View style={{ width: 40, height: 40, borderRadius: radius.sm, backgroundColor: c.bg2, alignItems: 'center', justifyContent: 'center' }}>
-        <Text v="c2" color="t3">
+        <Text v="tab" weight="400" color="t3">
           {d.getMonth() + 1}월
         </Text>
-        <Text v="b2" weight="700">
+        <Text v="b2" weight="700" style={{ lineHeight: 17, fontVariant: ['tabular-nums'] }}>
           {d.getDate()}
         </Text>
       </View>

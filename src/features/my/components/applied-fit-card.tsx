@@ -37,7 +37,7 @@ const AppliedFitCard = ({ fit, onPress }: { fit: AppliedFit; onPress: () => void
       style={({ pressed }) => ({ padding: spacing[5], borderRadius: radius.card, backgroundColor: pressed ? c.fill : c.bg2, gap: spacing[3] })}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
-        <FitRing score={fit.score} size={64} />
+        <FitRing score={fit.score} kind="card" />
         <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
           <Text v="c1" weight="700" color="t3" numberOfLines={1}>
             {fit.title}
