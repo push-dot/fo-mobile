@@ -76,29 +76,28 @@ const writeBot = (qc: QueryClient, id: BotId, update: (bot: Bot) => Bot | null) 
   })
 }
 
+type Patch = { bot: Bot; patch: { notificationsMuted?: boolean; color?: BotColor } }
+
 /** Optimistic. A failure restores what was drawn, and a revision conflict also reloads the bots. */
-const usePatchBot = () => {
-  const qc = useQueryClient()
-  const m = useMutation({
-    mutationFn: ({ bot, patch }: { bot: Bot; patch: { notificationsMuted?: boolean; color?: BotColor } }) =>
-      updateBot(bot.id, { expectedRevision: bot.revision, ...patch }),
-    onMutate: async ({ bot, patch }) => {
-      await qc.cancelQueries({ queryKey: BOTS })
-      const before = snapshot(qc)
-      writeBot(qc, bot.id, (b) => {
-        const muted = patch.notificationsMuted ?? b.muted
-        return b.kind === 'push' ? { ...b, muted } : { ...b, muted, color: patch.color ?? b.color }
-      })
-      return before
-    },
-    onError: (error, _vars, before) => {
-      if (before) restore(qc, before)
-      if (error instanceof ApiError && error.code === 'REVISION_CONFLICT') void qc.invalidateQueries({ queryKey: BOTS })
-    },
-    onSuccess: (server) => writeBot(qc, server.id, () => server),
-  })
-  return m.mutateAsync
-}
+export const patchBotMutation = (qc: QueryClient) => ({
+  mutationFn: ({ bot, patch }: Patch) => updateBot(bot.id, { expectedRevision: bot.revision, ...patch }),
+  onMutate: async ({ bot, patch }: Patch) => {
+    await qc.cancelQueries({ queryKey: BOTS })
+    const before = snapshot(qc)
+    writeBot(qc, bot.id, (b) => {
+      const muted = patch.notificationsMuted ?? b.muted
+      return b.kind === 'push' ? { ...b, muted } : { ...b, muted, color: patch.color ?? b.color }
+    })
+    return before
+  },
+  onError: (error: unknown, _vars: Patch, before: Snapshot | undefined) => {
+    if (before) restore(qc, before)
+    if (error instanceof ApiError && error.code === 'REVISION_CONFLICT') void qc.invalidateQueries({ queryKey: BOTS })
+  },
+  onSuccess: (server: Bot) => writeBot(qc, server.id, () => server),
+})
+
+const usePatchBot = () => useMutation(patchBotMutation(useQueryClient())).mutateAsync
 
 export const useSetBotColor = () => {
   const patch = usePatchBot()

@@ -155,7 +155,7 @@ const home = (): BotFixture[] => [
       detail: { posting: { id: 'p3', title: '서버 개발자', deadlineIn: 3, closed: false }, fit: { score: 7.2 }, materialCount: 5 },
       readAt: 60,
       messages: [
-        said('m-dotori-1', 't-dotori-1', '도토리증권 서버 개발자 공고를 읽고, 내 경력 중에 모아페이 경력과 겹치는 부분을 정리했어요', 61),
+        said('m-dotori-1', 't-dotori-1', '도토리증권 서버 개발자 공고 요건을 읽고, 그동안의 모아페이 경력과 겹치는 부분을 정리했어요', 61),
         said('m-dotori-2', 't-dotori-2', '경력 섹션도 공고에 맞게 고쳐 줘', 60, 'USER'),
       ],
       job: { turn: 't-dotori-2', at: 60, status: 'RUNNING', statuses: [{ phase: 'queued', text: '대기 중' }, { phase: 'thinking', text: '생각 중' }, { phase: 'working', text: '경력 섹션 고치는 중' }] },
