@@ -1,5 +1,5 @@
 export { API_BASE_URL, WEB_BASE_URL, DEV_AUTH_TOKEN, API_MOCK } from './config'
-export { http, api } from './api-client'
+export { http, api, botApi } from './api-client'
 export { createPkce } from './pkce'
 export { useSession } from './session-store'
 export { signIn, signInWithApple, signOut, deleteAccount, signInWithDevToken } from './auth'
