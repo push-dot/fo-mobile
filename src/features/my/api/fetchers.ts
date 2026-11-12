@@ -1,6 +1,6 @@
 import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
-import type { CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
+import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
 import { profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
 
 const c = http
@@ -94,6 +94,8 @@ export const addLink = api.me.addLink
 export const fetchMyApplications = () => api.applications.list(FIRST)
 
 export const fetchAppliedApplications = () => api.applications.list({ ...FIRST, applied: true })
+
+export const fetchApplication = async (id: string) => (await c.get<DataEnvelope<ApplicationDetail>>(`applications/${id}`)).data
 
 export const fetchMyBookmarks = () => api.me.bookmarks(FIRST)
 

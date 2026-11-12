@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react'
 import { SectionList, View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
 import {
-  EmptyBell,
   groupLabel,
   NOTIFICATION_EMPTY,
   NOTIFICATION_SETTINGS_LABEL,
@@ -78,7 +77,6 @@ const NotificationsScreen = () => {
             </Text>
           ) : (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingVertical: 60, paddingHorizontal: 32 }}>
-              <EmptyBell />
               <StatusNote
                 lines={[NOTIFICATION_EMPTY]}
                 action={settingsVisible ? { label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings } : undefined}

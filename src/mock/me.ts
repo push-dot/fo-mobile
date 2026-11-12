@@ -11,7 +11,7 @@ import type {
   Source,
   UserRef,
 } from '@push/api-client'
-import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
+import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
 import { removeChatDoc } from './chat'
 import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
@@ -26,11 +26,6 @@ const on = (m: number, d: number, h = 12, min = 0) => new Date(2026, m - 1, d, h
 const withTotal = <T>(items: T[], query: URLSearchParams, total: number) => {
   const r = page(items, query)
   return { ...r, page: { ...r.page, total } }
-}
-const tomorrowAt = (h: number) => {
-  const d = new Date(Date.now() + D)
-  d.setHours(h, 0, 0, 0)
-  return d.toISOString()
 }
 
 let profile: Profile = {
@@ -232,6 +227,27 @@ const applications: Application[] = [
 mock('GET', 'applications', ({ query }) => {
   const applied = query.get('applied') === 'true'
   return page(applied ? appliedOnly(applications) : applications, query, applied)
+})
+// MyAppliedJob draws the stage dates and the stored fit; its parts are the chat's p1 fit card's.
+const appliedDetail: Record<string, Omit<ApplicationDetail, keyof Application>> = {
+  a1: {
+    stageEnteredAt: { APPLIED: on(10, 14), SCREENING: on(10, 17), INTERVIEW: on(10, 21) },
+    fit: {
+      fitScore: 6.9,
+      parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },
+      topGap: 'Kafka 운영 경험과 부하 테스트 근거가 부족해요',
+      plan: 'PRO',
+      reachable: 8.2,
+      documentId: 'd-a1',
+      documentTitle: '김서준_백엔드_이력서_2026',
+    },
+  },
+}
+mock('GET', 'applications/:id', ({ params }) => {
+  const a = applications.find((x) => x.id === params.id)
+  return a
+    ? { data: { ...a, ...appliedDetail[a.id] } }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '지원 내역을 찾지 못했어요' } } }
 })
 
 const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
@@ -440,16 +456,16 @@ const events: CalendarEvent[] = [
 // The board lists the 면접 once on the calendar and once on the application, so this one is only
 // served to the application's next-event query. shortcut: told apart by `from`, which is the
 // current time there and a local midnight on the calendar grid; drop when /calendar is real.
-const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
-  endsAt: tomorrowAt(16),
-  notes: 'Google Meet',
+const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', on(10, 21, 15), {
+  endsAt: on(10, 21, 16),
+  location: 'Google Meet',
   applicationId: 'a1',
 })
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
   const to = query.get('to') ?? '9999'
-  const list = Date.parse(from) % 60_000 === 0 ? events : [...events, nextInterview]
-  return page(list.filter((e) => e.startsAt >= from && e.startsAt < to), query)
+  const inWindow = events.filter((e) => e.startsAt >= from && e.startsAt < to)
+  return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
 mock('POST', 'calendar/events', ({ body }) => {

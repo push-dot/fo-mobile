@@ -16,7 +16,7 @@ export const ACCESS_MODES: { key: AccessMode; label: string; desc: string }[] = 
   { key: 'BYPASS', label: '바로 실행', desc: '묻지 않고 실행해요' },
 ]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
-export const ACCESS_MODE_TITLE = '에이전트가 어떻게 실행할까요?'
+export const ACCESS_MODE_TITLE = '봇이 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
@@ -57,18 +57,18 @@ export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크
 export const CHAT_STOP_FORBIDDEN = '다른 담당자가 시작한 작업이라 멈출 수 없어요'
 export const CHAT_STOP_FAILED = '멈추지 못했어요. 한 번 더 눌러 주세요'
 
-export const CONSENT_TITLE = '에이전트를 쓰려면\n동의가 필요해요'
-export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 에이전트가 참고 자료로 써요.'
+export const CONSENT_TITLE = '봇을 쓰려면\n동의가 필요해요'
+export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 봇이 참고 자료로 써요.'
 export const PLAN_HEADER = '요금제마다\n쓸 수 있는 양이 달라요'
 export const PLAN_FOOTER = ['매월 1일에 사용량이 다시 채워져요.', '언제든 해지할 수 있어요'] as const
-export const ACCOUNT_REFERENCE_TITLE = '에이전트가 참고하는 내 정보'
-export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 에이전트가 이 정보부터 읽어요.'
+export const ACCOUNT_REFERENCE_TITLE = '봇이 참고하는 내 정보'
+export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 봇이 이 정보부터 읽어요.'
 export const MENTION_SHORTCUT_KEYS = ['link', 'gap', 'fit'] as const
-export const docAiSub = (ago: string) => `에이전트로 만듦 · ${ago}`
+export const docAiSub = (ago: string) => `봇으로 만듦 · ${ago}`
 export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
 export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크에서 지워요.`
 export const LINK_EMPTY = '아직 모아 둔 링크가 없어요.'
-export const LINK_ADD_NOTE = '추가하면 에이전트가 README와 커밋을 읽어 둬요'
+export const LINK_ADD_NOTE = '추가하면 봇이 README와 커밋을 읽어 둬요'
 export const LINK_DELETED_TOAST = '링크를 삭제했어요'
 export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 뒤에 다시 해 주세요.'
 export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
@@ -78,7 +78,7 @@ export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
-export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 에이전트를 쓸 수 없어요.'
+export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 봇을 쓸 수 없어요.'
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 

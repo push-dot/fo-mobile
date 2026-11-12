@@ -5,7 +5,7 @@ import Skeleton from './skeleton'
 
 export type SkeletonRowsShape = {
   count: number
-  lead: { size: number; radius: number }
+  lead?: { size: number; radius: number }
   lines: readonly { width: DimensionValue; height: number }[]
 }
 
@@ -13,7 +13,7 @@ const SkeletonRows = ({ count, lead, lines }: SkeletonRowsShape) => (
   <View accessible accessibilityRole="progressbar" accessibilityLabel={LOADING_LABEL}>
     {Array.from({ length: count }, (_, row) => (
       <View key={row} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingHorizontal: spacing[5], paddingVertical: spacing[3] }}>
-        <Skeleton width={lead.size} height={lead.size} radius={lead.radius} />
+        {lead ? <Skeleton width={lead.size} height={lead.size} radius={lead.radius} /> : null}
         <View style={{ flex: 1, gap: spacing[2] }}>
           {lines.map((line, index) => (
             <Skeleton key={index} width={line.width} height={line.height} />

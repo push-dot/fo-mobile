@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 에이전트 · 진행 상태 (자동 선택 · 답 기다림, iOS 전용 패널)
+name: 봇 · 진행 상태 (자동 선택 · 답 기다림, iOS 전용 패널)
 tags:
   - visual
 ---
