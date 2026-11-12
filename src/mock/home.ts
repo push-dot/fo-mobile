@@ -1,6 +1,7 @@
 // Mock routes for the home area (search, notifications). Owned by that area's screens.
 import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
+import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
 import { MOCK_USER_ID, mock, page } from './server'
 
@@ -133,5 +134,6 @@ mock('POST', 'auth/phone/verify', ({ body }) => {
   if (code === '482111') return authError(400, 'PHONE_CODE_INVALID', 'invalid code')
   if (code === '482222') return authError(400, 'PHONE_CODE_EXPIRED', 'expired code')
   if (code === '482333') return authError(429, 'RATE_LIMITED', 'too many attempts')
+  forgetRequiredTerms()
   return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: true } }
 })
