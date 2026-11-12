@@ -1,4 +1,12 @@
-// Scaffold: the route is registered and not linked from any screen yet. The PR that owns this screen replaces the body.
-const BotColorSheetScreen = () => null
+import { router, useLocalSearchParams } from 'expo-router'
+import { BotColorSheet, useBot, type BotAddress } from '@/features/bots'
+
+const BotColorSheetScreen = () => {
+  const { botId } = useLocalSearchParams<{ botId: string }>()
+  const address = (typeof botId === 'string' ? botId : 'push') as BotAddress
+  const { data } = useBot(address)
+  if (!data || data.kind !== 'company') return null
+  return <BotColorSheet bot={data} onClose={() => router.back()} />
+}
 
 export default BotColorSheetScreen

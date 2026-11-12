@@ -1,0 +1,28 @@
+appId: app.push.mobile
+name: 봇 프로필 · Push Bot
+tags:
+  - visual
+---
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=reset"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/push/profile
+- extendedWaitUntil:
+    visible: "Push Bot"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "허용한 사이트"
+    timeout: 10000
+- assertNotVisible: "봇 삭제"
+- assertNotVisible: "봇 색 바꾸기"
+- waitForAnimationToEnd
+- takeScreenshot: BotProfilePush
+- tapOn: "허용한 사이트.*"
+- extendedWaitUntil:
+    visible: "Push Bot이 읽어도 된다고 허용한 사이트예요.*"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileChiefAllowed
+- tapOn: "닫기"
