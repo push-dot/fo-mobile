@@ -1,0 +1,54 @@
+appId: app.push.mobile
+name: 자료 → 서류 삭제 → 되돌리기 → 자료 없음 → 서류 올리기
+---
+# The bot home has no entry to the modal yet (A14 adds it), so the flow opens it by deep link.
+- runFlow: _login.yaml
+- openLink: push://materials
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 자세히"
+    timeout: 20000
+- tapOn: "김서준_백엔드_이력서.pdf 자세히"
+- extendedWaitUntil:
+    visible: "서류로 들어가기"
+    timeout: 10000
+- assertVisible: "모아페이 봇, 도토리증권 봇"
+- takeScreenshot: 09_materials_delete_undo_empty-01
+
+- tapOn: "자료 삭제"
+- extendedWaitUntil:
+    visible: "‘김서준_백엔드_이력서.pdf’를 삭제할까요?"
+    timeout: 5000
+- takeScreenshot: 09_materials_delete_undo_empty-02
+- runFlow:
+    file: _tap_sheet_button.yaml
+    env:
+      TEXT: "삭제"
+# The confirm and the detail sheet close, the row leaves the list, and the server keeps the file for 30 days.
+- extendedWaitUntil:
+    visible: "서류를 삭제했어요"
+    timeout: 10000
+- assertNotVisible: "김서준_백엔드_이력서.pdf 자세히"
+- assertNotVisible: "서류로 들어가기"
+- takeScreenshot: 09_materials_delete_undo_empty-03
+- tapOn: "되돌리기"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 자세히"
+    timeout: 10000
+- takeScreenshot: 09_materials_delete_undo_empty-04
+
+# The modal asks again each time it opens, so a fixture switch shows on the next open.
+- tapOn: "닫기"
+- extendedWaitUntil:
+    visible: "새로 올라온 공고"
+    timeout: 10000
+- openLink: push://materials?mock=materials:none
+- extendedWaitUntil:
+    visible: "아직 자료가 없어요"
+    timeout: 20000
+- assertVisible: "0개"
+- takeScreenshot: 09_materials_delete_undo_empty-05
+- tapOn: "서류 올리기"
+- extendedWaitUntil:
+    visible: "서류 가져오기"
+    timeout: 10000
+- takeScreenshot: 09_materials_delete_undo_empty-06

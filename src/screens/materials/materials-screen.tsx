@@ -1,4 +1,9 @@
-// Scaffold: the route is registered and not linked from any screen yet. The PR that owns this screen replaces the body.
-const MaterialsScreen = () => null
+import { useLocalSearchParams } from 'expo-router'
+import { MaterialsModal } from '@/features/materials'
+
+const MaterialsScreen = () => {
+  const { for: forBot } = useLocalSearchParams<{ for?: string }>()
+  return <MaterialsModal forBot={forBot} />
+}
 
 export default MaterialsScreen

@@ -34,7 +34,7 @@ export const madeByLabel = (madeBy: MadeBy): string => {
 }
 
 /** "PDF" from "이력서.pdf". A title without an extension reads 파일. */
-const formatOf = (title: string) => /\.([a-z0-9]{1,5})$/i.exec(title)?.[1]?.toUpperCase() ?? '파일'
+export const formatOf = (title: string) => /\.([a-z0-9]{1,5})$/i.exec(title)?.[1]?.toUpperCase() ?? '파일'
 
 export const withoutScheme = (url: string) => url.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
 

@@ -1,0 +1,13 @@
+appId: app.push.mobile
+name: 자료 · 큰 글씨
+tags:
+  - visual
+---
+# Run with the system text size raised (xl/ is a separate run).
+- runFlow: ../../flows/_login.yaml
+- openLink: push://materials
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 자세히"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsXL
