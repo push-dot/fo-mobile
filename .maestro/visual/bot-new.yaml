@@ -1,0 +1,15 @@
+appId: app.push.mobile
+name: BotNew
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new
+- extendedWaitUntil:
+    visible: "봇 만들기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "이름"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotNew

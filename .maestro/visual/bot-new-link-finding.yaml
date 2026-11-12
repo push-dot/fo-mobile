@@ -1,0 +1,18 @@
+appId: app.push.mobile
+name: BotNewLinkFinding
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?mock=hang:POST:bots/link-preview
+- extendedWaitUntil:
+    visible: "이름"
+    timeout: 20000
+- tapOn: "회사, 공고, 링크로 찾아보세요"
+- inputText: "careers.moapay.co.kr/jobs/1042"
+- extendedWaitUntil:
+    visible: "Push에서 이 링크의 공고를 찾고 있어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewLinkFinding
+- openLink: push://?mock=reset

@@ -1,0 +1,19 @@
+appId: app.push.mobile
+name: BotNewConsent
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15
+- extendedWaitUntil:
+    visible: "만들기"
+    timeout: 20000
+- tapOn: "만들기"
+- extendedWaitUntil:
+    visible: "봇을 쓰려면"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "동의하고 시작하기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewConsent
