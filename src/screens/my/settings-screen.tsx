@@ -147,7 +147,7 @@ const SettingsScreen = () => {
         </Pressable>
       </SettingsGroup>
 
-      <SettingsGroup title="일반" note="앱 화면과 에이전트 답변 언어가 함께 바뀌어요.">
+      <SettingsGroup title="일반" note="앱 화면과 봇 답변 언어가 함께 바뀌어요.">
         <SettingsRow
           label="언어"
           right={<LanguageMenu value={s.locale} onPick={(locale) => set({ locale })} />}

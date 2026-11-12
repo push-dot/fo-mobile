@@ -47,7 +47,7 @@ const TabsLayout = () => {
       <NativeTabs.Trigger name="(chat)">
         {/* The mascot keeps its own colors in both states, as in the design. */}
         <NativeTabs.Trigger.Icon src={ICONS.agent[mode]} renderingMode="original" />
-        <NativeTabs.Trigger.Label>에이전트</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>봇</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(my)">
         <NativeTabs.Trigger.Icon src={ICONS.my} renderingMode="template" />
