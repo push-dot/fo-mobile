@@ -4,8 +4,12 @@ tags:
   - visual
 ---
 # The mock starts with 2 blocked people. It has no company (push-be GET me/blocks sends none), so the rows read "{date} 차단" only.
-- runFlow: ../flows/_login.yaml
-- runFlow: ../flows/_dismiss_logbox.yaml
+# The board has 참고 데이터 제공 on.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
 - tapOn: "마이"
 - extendedWaitUntil:
     visible: "김서준"

@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { ActivityIndicator, FlatList, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, View } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -13,8 +13,12 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Badge, Button, Chip, Glass, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
+
+// The boards draw the search pill as glass on iOS and as a filled pill on Android.
+const SearchPill = Platform.OS === 'ios' ? Glass : View
+const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
 
 const HubScreen = () => {
   const c = useColors()
@@ -37,12 +41,12 @@ const HubScreen = () => {
           accessibilityLabel="이름, 직무, 기술 검색"
           onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
         >
-          <View style={{ height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2], backgroundColor: c.fill }}>
+          <SearchPill style={[SEARCH_PILL, Platform.OS === 'ios' ? null : { backgroundColor: c.fill }]}>
             <Icon name="search" size={20} color="t3" />
             <Text v="b1" color="t3">
               이름, 직무, 기술 검색
             </Text>
-          </View>
+          </SearchPill>
         </Pressable>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[4] }}>
