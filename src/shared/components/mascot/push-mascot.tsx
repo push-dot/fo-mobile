@@ -118,7 +118,7 @@ const layersOf = (state: MascotState, moves: boolean, size: number, d: Drivers) 
       transform: [
         { translateX: up ? lift(LOOK_UP.x) : 0 },
         { translateY: up ? lift(LOOK_UP.y) : 0 },
-        { scaleY: state === 'idle' ? cycle(d.blink, BLINK)((v) => v.lid) : 1 },
+        { scaleY: state === 'idle' ? cycle(d.blink, BLINK)((v) => v.lid) : HELD.lid },
       ],
     } as AnimatedStyle,
     dots: MARK[state] === 'dots' ? DOTS.xs.map((_, i) => ({ opacity: dotOpacity(d, i) }) as AnimatedStyle) : [],

@@ -4,9 +4,7 @@ import {
   bodyTrackOf,
   EYES,
   HELD,
-  heldPose,
   MARK,
-  MASCOT_STATES,
   poseTransform,
   resolveMotion,
   REST,
@@ -21,12 +19,16 @@ const linear = (t: number) => t
 describe('a mascot held on keyframe ③ of the AgentHomeMascot board', () => {
   it.each([
     ['idle', { ...REST, scale: 1.03 }],
-    ['think', REST],
     ['work', { ...REST, rotate: 6 }],
     ['help', REST],
-    ['done', REST],
-  ] as const)('%s holds the board pose', (state, expected) => {
-    expect(heldPose(state, 'frame3')).toEqual(expected)
+  ] as const)('%s holds the board pose, where its loop begins and ends', (state, expected) => {
+    const points = sampleCycle(bodyTrackOf(state)!, linear)
+    expect(points[0]).toEqual({ at: 0, value: expected })
+    expect(points.at(-1)).toEqual({ at: 1, value: expected })
+  })
+
+  it.each(['think', 'done'] as const)('%s keeps its body still', (state) => {
+    expect(bodyTrackOf(state)).toBeUndefined()
   })
 
   it('keeps its eyes open and all three dots full, with no spark left', () => {
@@ -36,12 +38,6 @@ describe('a mascot held on keyframe ③ of the AgentHomeMascot board', () => {
   it('draws the face and the mark of its state', () => {
     expect(EYES).toEqual({ idle: 'open', think: 'up', work: 'open', help: 'open', done: 'smile' })
     expect(MARK).toEqual({ idle: null, think: 'dots', work: null, help: 'badge', done: 'sparks' })
-  })
-})
-
-describe('a still mascot', () => {
-  it.each(MASCOT_STATES)('%s stands upright at its drawn size', (state) => {
-    expect(heldPose(state, 'still')).toEqual(REST)
   })
 })
 
@@ -89,12 +85,6 @@ describe('board keyframes', () => {
 })
 
 describe('a sampled cycle', () => {
-  it.each(['idle', 'work', 'help'] as const)('%s starts and ends on the held pose, so a hold ends without a jump', (state) => {
-    const points = sampleCycle(bodyTrackOf(state)!, linear)
-    expect(points[0]).toEqual({ at: 0, value: heldPose(state, 'frame3') })
-    expect(points.at(-1)).toEqual({ at: 1, value: heldPose(state, 'frame3') })
-  })
-
   it('gives inputs that only rise, as a native interpolation requires', () => {
     const inputs = sampleCycle(bodyTrackOf('help')!, linear).map((p) => p.at)
     expect(inputs).toEqual([...inputs].sort((a, b) => a - b))

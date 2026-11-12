@@ -131,8 +131,8 @@ export const valueAt = <T extends Numbers>(track: Track<T>, progress: number, ea
 }
 
 /**
- * One cycle as points for a native interpolation, which cannot ease. Input 0 is the cycle at `start`: a loop that
- * begins on the held frame does not jump when a hold ends.
+ * One cycle as points for a native interpolation, which cannot ease. Input 0 is the cycle at `start`, keyframe ③ unless
+ * told otherwise: a loop that begins on the frame a hold shows does not jump when the hold ends.
  */
 export const sampleCycle = <T extends Numbers>(track: Track<T>, ease: Ease, start = track.frame3, steps = 8) => {
   const stops = track.keys.slice(1).flatMap(([to], i) => {
@@ -143,13 +143,7 @@ export const sampleCycle = <T extends Numbers>(track: Track<T>, ease: Ease, star
   return [...inputs, 1].map((at) => ({ at, value: valueAt(track, start + at > 1 ? start + at - 1 : start + at, ease) }))
 }
 
-/** The body of a mascot that is not animating: upright when still, keyframe ③ of its state when held. */
-export const heldPose = (state: MascotState, mode: 'still' | 'frame3'): Pose => {
-  const track = bodyTrackOf(state)
-  return mode === 'frame3' && track ? valueAt(track, track.frame3) : REST
-}
-
-/** What the looping marks show on a mascot that is not animating. */
+/** What the lids, the dots, and the spark show on keyframe ③. */
 export const HELD = { lid: valueAt(BLINK, BLINK.frame3).lid, dot: valueAt(DOT, DOT.frame3).opacity, spark: valueAt(SPARK, SPARK.frame3).opacity }
 
 /** The transform a pose puts on a mascot of `size`. The sink is the same 3 px at every size and the lift grows with it. */
