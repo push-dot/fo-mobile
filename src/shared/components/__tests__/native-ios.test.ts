@@ -34,9 +34,11 @@ describe('SegmentedControl (iOS)', () => {
   it('draws the boards\' .ios .seg: a 44pt glass track whose selected segment is filled', () => {
     const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
     expect(find(tree, 'Glass').props.style).toMatchObject({ height: 44, borderRadius: 22 })
-    expect(segments(tree).map((s) => [s.props.accessibilityState, (s.props.style as { backgroundColor?: string }).backgroundColor])).toEqual([
-      [{ selected: true }, palette.light.fill],
-      [{ selected: false }, undefined],
+    const style = (s: { props: Record<string, unknown> }) => s.props.style as { backgroundColor?: string; boxShadow?: string }
+    expect(find(tree, 'View').props.accessibilityRole).toBe('tablist')
+    expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState, style(s).backgroundColor, style(s).boxShadow])).toEqual([
+      ['tab', { selected: true }, palette.light.fill, '0 2px 8px rgba(0,0,0,.08)'],
+      ['tab', { selected: false }, undefined, undefined],
     ])
     expect(findAll(tree, 'Text').map((t) => [t.props.children, t.props.v, t.props.color])).toEqual([
       ['받은 제안 4', 'segLabel', 't1'],
@@ -51,10 +53,14 @@ describe('SegmentedControl (iOS)', () => {
     expect(onChange).toHaveBeenCalledWith('sent')
   })
 
-  it('draws the 196 x 34 compact control of the theme row', () => {
-    const tree = SegmentedControl({ items, value: null, onChange: vi.fn(), compact: true })
+  it('draws the 196 x 34 compact control of the theme row as a radio group, as Settings marks it', () => {
+    const tree = SegmentedControl({ items, value: 'sent', onChange: vi.fn(), compact: true })
     expect(find(tree, 'Glass').props.style).toMatchObject({ width: 196, height: 34, borderRadius: 17 })
-    expect(segments(tree).map((s) => s.props.accessibilityState)).toEqual([{ selected: false }, { selected: false }])
+    expect(find(tree, 'View').props.accessibilityRole).toBe('radiogroup')
+    expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState])).toEqual([
+      ['radio', { checked: false }],
+      ['radio', { checked: true }],
+    ])
   })
 })
 
