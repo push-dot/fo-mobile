@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { AccessibilityInfo, Animated, Platform, View, type ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { onAccent, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
+import { cssShadow, onAccent, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP, TOAST_SHEET_GAP } from './constants'
 import Glass from './glass'
 import GlassPressable from './glass-pressable'
@@ -14,8 +14,8 @@ const TOAST_HEIGHT = 52
 const ACTION_HEIGHT = 44
 const ALERT_ICON = 20
 const SHAPE = {
-  plain: { inset: spacing[4], radius: radius.md, shadow: '0 8px 24px rgba(0,0,0,0.16)' },
-  tone: { inset: spacing[5], radius: 18, shadow: '0 10px 30px rgba(0,0,0,0.18)' },
+  plain: { inset: spacing[4], radius: radius.md, shadow: cssShadow.toast },
+  tone: { inset: spacing[5], radius: 18, shadow: cssShadow.toneToast },
 }
 
 const ToneIcon = ({ tone }: { tone: ToastTone }) => {
