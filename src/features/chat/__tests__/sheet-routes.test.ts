@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { accountPath, bookmarksPath, consentPath, conversationsPath, docsPath, linkAddPath, linksPath, materialsPath, quickStartPath, renamePath, sidebarDepth, sidebarPath } from '../utils/sheet-routes'
+import { accountPath, bookmarksPath, consentPath, conversationsPath, docsPath, linkAddPath, linksPath, materialPickerPath, quickStartPath, renamePath, sidebarDepth, sidebarPath } from '../utils/sheet-routes'
 
 const STACK = join(__dirname, '../../../app/(app)/(stack)')
 const layout = readFileSync(join(STACK, '_layout.tsx'), 'utf8')
@@ -15,7 +15,7 @@ describe('chat sheet routes', () => {
   const cases: [string, string?][] = [
     [consentPath()],
     [quickStartPath('link'), 'key'],
-    [materialsPath()],
+    [materialPickerPath()],
     [accountPath()],
     [accountPath('plan')],
     [docsPath()],
