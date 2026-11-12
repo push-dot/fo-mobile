@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { attach } from '@/features/chat'
 import { botChatPath, botPickPath, materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, useImportRequest, useUpload } from '@/features/my'
+import { useSearchQuery } from '@/features/search'
 import { Button, Glass, GlassButton, SegmentedControl, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
 import { sheetHeaderTop } from '@/shared/navigation'
 import { spacing, useColors } from '@/theme'
@@ -13,8 +14,9 @@ import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMP
 import type { Material, MaterialTab, SendContext } from '../types'
 import { toAttachment, totalCount } from '../utils/material-row'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
+import { useListSize } from './list-size'
 import { MaterialItem, SectionTitle } from './material-item'
-import { MaterialsSearch, TOAST_ABOVE_SEARCH, useSearchClearance } from './materials-search'
+import { MaterialsSearch, useGlassTint, useSearchRoom } from './materials-search'
 
 const HEADER_ROW = 44
 const ios = Platform.OS === 'ios'
@@ -36,13 +38,15 @@ const runAdd = (action: AddAction) => {
 
 const CountPill = ({ count }: { count: number }) => {
   const c = useColors()
+  const tint = useGlassTint()
+  const { count: size } = useListSize()
   const label = (
     <Text v="c1" weight="700" color="t2" style={{ fontSize: 14 }}>
       {`${count}개`}
     </Text>
   )
-  const shape = { height: 36, paddingHorizontal: 14, borderRadius: 18, justifyContent: 'center' } as const
-  return ios ? <Glass style={shape}>{label}</Glass> : <View style={[shape, { backgroundColor: c.fill }]}>{label}</View>
+  const shape = { ...size, paddingHorizontal: 14, justifyContent: 'center' } as const
+  return ios ? <Glass tint={tint} style={shape}>{label}</Glass> : <View style={[shape, { backgroundColor: c.fill }]}>{label}</View>
 }
 
 /** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. */
@@ -95,7 +99,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const [tab, setTab] = useState<MaterialTab>('all')
-  const [q, setQ] = useState('')
+  const { text, q, setText } = useSearchQuery()
   const bot = forBot as BotId | undefined
   const list = useMaterials({ tab, q, bot })
   // The header counts what there is, not what the search found (MaterialsSearchEmpty keeps 24개).
@@ -104,11 +108,11 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const context = useMemo(() => sendContextOf(forBot), [forBot])
   const now = useMemo(() => new Date(), [])
   const refresh = useRefreshMaterials()
-  const clearance = useSearchClearance()
+  const room = useSearchRoom()
 
   const { start } = useUpload(() => {
     refresh()
-    showToast({ message: UPLOADED, tone: 'success', bottom: TOAST_ABOVE_SEARCH })
+    showToast({ message: UPLOADED, tone: 'success', bottom: room.toast })
   })
   useImportRequest(() => void pickResume().then((file) => file && start(file)))
 
@@ -147,7 +151,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
             windowSize={7}
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: clearance }}
+            contentContainerStyle={{ paddingBottom: room.list }}
           />
         )
     }
@@ -167,7 +171,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
         <SegmentedControl items={TABS} value={tab} onChange={setTab} />
       </View>
       <View style={{ flex: 1 }}>{body}</View>
-      <MaterialsSearch value={q} onChange={setQ} />
+      <MaterialsSearch value={text} onChange={setText} />
       {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
     </View>

@@ -58,6 +58,3 @@ export const LINK_ADD = {
   note: '추가하면 봇이 README와 커밋을 읽어 둬요',
   submit: '추가하기',
 }
-
-/** Past this system text size the rows wrap their title to two lines and their line under it in full (MaterialsXL). */
-export const LARGE_TEXT_SCALE = 1.3
