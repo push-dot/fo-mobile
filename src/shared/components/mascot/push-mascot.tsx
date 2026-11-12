@@ -176,20 +176,22 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
 
   // The eyes rise and the spark plays once when a state begins, not each time a hold ends.
   const entered = useRef(false)
+  // The drivers start on the held frame, so a mascot that has not moved yet has nothing to park.
+  const holding = useRef(true)
   useEffect(() => {
     entered.current = false
   }, [shown])
   useEffect(() => {
     if (resolved.mode === 'still') return
     if (resolved.mode === 'frame3') {
+      if (holding.current) return
+      holding.current = true
       // A stopped native animation reports its last value to JS a moment later. Parking each driver after that report
-      // leaves JS and native agreeing on the held frame.
-      let holding = true
-      DRIVERS.forEach((name) => drivers[name].stopAnimation(() => holding && drivers[name].setValue(HOLD[name])))
-      return () => {
-        holding = false
-      }
+      // leaves JS and native agreeing on the held frame. A hold that ended in the meantime parks nothing.
+      DRIVERS.forEach((name) => drivers[name].stopAnimation(() => holding.current && drivers[name].setValue(HOLD[name])))
+      return
     }
+    holding.current = false
     const runs = entered.current ? layers.loops : [...layers.loops, ...layers.entry]
     ;[drivers.body, drivers.blink, drivers.dots].forEach((driver) => driver.setValue(0))
     ;[drivers.look, drivers.spark].forEach((driver) => driver.setValue(entered.current ? 1 : 0))
