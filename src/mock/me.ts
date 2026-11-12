@@ -27,11 +27,6 @@ const withTotal = <T>(items: T[], query: URLSearchParams, total: number) => {
   const r = page(items, query)
   return { ...r, page: { ...r.page, total } }
 }
-const tomorrowAt = (h: number) => {
-  const d = new Date(Date.now() + D)
-  d.setHours(h, 0, 0, 0)
-  return d.toISOString()
-}
 
 let profile: Profile = {
   userId: MOCK_USER_ID,
@@ -461,16 +456,16 @@ const events: CalendarEvent[] = [
 // The board lists the 면접 once on the calendar and once on the application, so this one is only
 // served to the application's next-event query. shortcut: told apart by `from`, which is the
 // current time there and a local midnight on the calendar grid; drop when /calendar is real.
-const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
-  endsAt: tomorrowAt(16),
+const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', on(10, 21, 15), {
+  endsAt: on(10, 21, 16),
   location: 'Google Meet',
   applicationId: 'a1',
 })
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
   const to = query.get('to') ?? '9999'
-  const list = Date.parse(from) % 60_000 === 0 ? events : [...events, nextInterview]
-  return page(list.filter((e) => e.startsAt >= from && e.startsAt < to), query)
+  const inWindow = events.filter((e) => e.startsAt >= from && e.startsAt < to)
+  return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
 mock('POST', 'calendar/events', ({ body }) => {

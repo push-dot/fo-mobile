@@ -4,6 +4,7 @@ import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
 import {
+  APPLICATION_LOAD_FAILED,
   AppliedFitCard,
   appliedFit,
   INTERVIEW_PREP,
@@ -11,6 +12,7 @@ import {
   Empty,
   emptyCta,
   Logo,
+  RETRY_LABEL,
   PostingSection,
   StageTracker,
   useApplication,
@@ -27,7 +29,8 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const { data, isLoading } = useMyApplications()
   const item = data?.data.find((a) => a.id === id)
-  const { data: detail, isLoading: detailLoading } = useApplication(id)
+  const detailQuery = useApplication(id)
+  const { data: detail, isLoading: detailLoading } = detailQuery
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
@@ -52,6 +55,8 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       />
       {isLoading || detailLoading ? (
         <ListSkeleton />
+      ) : detailQuery.isError && !detail ? (
+        <Empty text={APPLICATION_LOAD_FAILED} action={RETRY_LABEL} onAction={() => void detailQuery.refetch()} />
       ) : !item ? (
         <Empty text={emptyCta('applications').title} />
       ) : (
@@ -99,7 +104,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               <Text v="c1" weight="600" color="t3">
                 원문 보기 · {item.company} 채용 사이트
               </Text>
-              <Icon name="chev" size={14} color="t4" />
+              <Icon name="chev" size={14} color="t3" />
             </Pressable>
           ) : null}
         </ScrollView>

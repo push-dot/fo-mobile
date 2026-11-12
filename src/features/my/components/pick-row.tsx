@@ -16,7 +16,7 @@ const PickRow = ({ title, sub, onPress }: { title: string; sub: string; onPress:
         {sub}
       </Text>
     </View>
-    <Icon name="chev" size={18} color="t4" />
+    <Icon name="chev" size={18} color="t1" />
   </Pressable>
 )
 

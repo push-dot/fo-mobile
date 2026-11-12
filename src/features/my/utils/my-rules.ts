@@ -107,6 +107,7 @@ export const stageFlow = (stage: string) => {
 }
 
 export const INTERVIEW_PREP = 'Push Bot으로 면접 준비'
+export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
 export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'

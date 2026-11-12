@@ -144,7 +144,7 @@ const SettingsScreen = () => {
               {login}
             </Text>
           </View>
-          <Icon name="chev" size={18} color="t4" />
+          <Icon name="chev" size={18} color="t1" />
         </Pressable>
       </SettingsGroup>
 
@@ -220,8 +220,8 @@ const SettingsScreen = () => {
       </SettingsGroup>
 
       <SettingsGroup title="기타">
-        <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} right={<Icon name="chev" size={18} color="t4" />} />
-        <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} right={<Icon name="chev" size={18} color="t4" />} />
+        <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
+        <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>
