@@ -5,6 +5,9 @@ import type { Approval, ChatDoc, ChatEvent, ChatItem, Choice, ConversationRow, Q
 import { DEFAULT_ERROR_TEXT, ERROR_TEXT, MULTI_PICK_FOOT, MULTI_PICK_SUBMIT, PICK_HINT, queueBusyText } from '../features/chat/constants'
 import { kindOf } from '../features/chat/utils/links'
 import { mock, page } from './server'
+import { LEGAL_VERSION } from '@push/shared'
+
+type Terms = { version: string; age14At: string | null; serviceTermsAt: string | null; privacyAt: string | null; marketing: boolean; marketingAt: string | null }
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 
@@ -80,7 +83,10 @@ mock('DELETE', 'conversations/:id', ({ params }) => {
   if (i >= 0) conversations.splice(i, 1)
   archived.delete(params.id!)
 })
-const terms = { version: '1.0', age14At: null, serviceTermsAt: null, privacyAt: null, marketing: false, marketingAt: null as string | null }
+// The default signed-in user accepted the required terms, like a real one; phone sign-in of a new user clears them (home.ts) so the 약관 동의 screens stay reachable.
+const accepted = () => new Date().toISOString()
+const terms: Terms = { version: LEGAL_VERSION, age14At: accepted(), serviceTermsAt: accepted(), privacyAt: accepted(), marketing: false, marketingAt: null }
+export const forgetRequiredTerms = () => Object.assign(terms, { age14At: null, serviceTermsAt: null, privacyAt: null })
 mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null, terms } }))
 mock('PUT', 'me/consents', ({ body }) => {
   referenceData = (body as { referenceData?: boolean }).referenceData === true
