@@ -15,7 +15,8 @@ type TabList = { data?: { pages: { page: { total?: number } }[] }; isPlaceholder
 
 /**
  * A chip's count. A tab whose list is loaded for this query shows that list's total, the number its header repeats.
- * Any other tab shows the server's count. A list kept from the previous query counts as not loaded.
+ * Any other tab shows the server's count. A list kept from the previous query counts as not loaded. The server's
+ * counts stay from the previous query until the new ones arrive, one request, so the chips keep a number while loading.
  */
 export const chipCount = (list: TabList, counted: number | undefined) =>
   (list.isPlaceholderData ? undefined : list.data?.pages[0]?.page.total) ?? counted
