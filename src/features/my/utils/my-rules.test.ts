@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { LANGS, MAX_BYTES } from '../constants'
 import {
@@ -174,7 +172,7 @@ describe('my screen rules', () => {
   })
 
   it('locks the activity, offer, and calendar labels', () => {
-    expect(INTERVIEW_PREP).toBe('Push 에이전트로 면접 준비')
+    expect(INTERVIEW_PREP).toBe('Push Bot으로 면접 준비')
     expect(CALENDAR_ADD).toBe('일정 추가하기')
     expect(OFFER_DECLINE).toBe('거절')
     expect(OFFER_FAIL).toBe('잠시 뒤에 다시 보내 주세요.')
@@ -194,13 +192,13 @@ describe('my screen rules', () => {
       '마감 임박 공고',
       '제안 받음',
       '댓글과 답글',
-      '에이전트 작업 완료',
+      '봇 작업 완료',
       '지원 상태 변경',
     ])
-    expect(AGENT_TITLE).toBe('에이전트')
-    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요.')
+    expect(AGENT_TITLE).toBe('봇')
+    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 봇이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
-    expect(REFERENCE_SUB).toBe('에이전트를 쓰려면 켜 두어야 해요')
+    expect(REFERENCE_SUB).toBe('봇을 쓰려면 켜 두어야 해요')
   })
 
   it('stores light, dark, or system and resolves system from the device', () => {
@@ -247,14 +245,5 @@ describe('my screen rules', () => {
       score: '',
       doc: '',
     })
-  })
-})
-
-describe('settings screen', () => {
-  // push-be never reads allowAiReadMyFiles, so the switch would be a dead control (D19).
-  it('hides the 내 자료 읽기 허용 switch until the server enforces it', () => {
-    const screen = readFileSync(join(__dirname, '../../../screens/my/settings-screen.tsx'), 'utf8')
-    expect(screen).not.toContain('allowAiReadMyFiles')
-    expect(screen).not.toContain('내 자료 읽기 허용')
   })
 })

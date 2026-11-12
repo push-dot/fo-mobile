@@ -22,26 +22,26 @@ import { conversationRowMenu, headerMenu } from '../utils/conversation-menu'
 
 describe('agent s copy', () => {
   it('access mode title', () => {
-    expect(ACCESS_MODE_TITLE).toBe('에이전트가 어떻게 실행할까요?')
+    expect(ACCESS_MODE_TITLE).toBe('봇이 어떻게 실행할까요?')
   })
 
   it('consent title and body', () => {
-    expect(CONSENT_TITLE).toBe('에이전트를 쓰려면\n동의가 필요해요')
-    expect(CONSENT_BODY).toBe('내 서류와 평가 결과를 가공해 다른 사용자와 기업의 에이전트가 참고 자료로 써요.')
+    expect(CONSENT_TITLE).toBe('봇을 쓰려면\n동의가 필요해요')
+    expect(CONSENT_BODY).toBe('내 서류와 평가 결과를 가공해 다른 사용자와 기업의 봇이 참고 자료로 써요.')
     expect(CONSENT_BODY).not.toContain('기업의 AI')
   })
 
   it('plan header and footer', () => {
     expect(PLAN_HEADER).toBe('요금제마다\n쓸 수 있는 양이 달라요')
     expect(PLAN_FOOTER).toEqual(['매월 1일에 사용량이 다시 채워져요.', '언제든 해지할 수 있어요'])
-    expect(ACCOUNT_REFERENCE_TITLE).toBe('에이전트가 참고하는 내 정보')
-    expect(ACCOUNT_REFERENCE_NOTE).toBe('대화를 시작할 때 에이전트가 이 정보부터 읽어요.')
+    expect(ACCOUNT_REFERENCE_TITLE).toBe('봇이 참고하는 내 정보')
+    expect(ACCOUNT_REFERENCE_NOTE).toBe('대화를 시작할 때 봇이 이 정보부터 읽어요.')
   })
 
   it('link delete body', () => {
     expect(linkDeleteBody('모아페이 · 결제 플랫폼 시니어 엔지니어')).toBe('모아페이 · 결제 플랫폼 시니어 엔지니어 링크를 내 링크에서 지워요.')
     expect(LINK_EMPTY).toBe('아직 모아 둔 링크가 없어요.')
-    expect(LINK_ADD_NOTE).toBe('추가하면 에이전트가 README와 커밋을 읽어 둬요')
+    expect(LINK_ADD_NOTE).toBe('추가하면 봇이 README와 커밋을 읽어 둬요')
     expect(LINK_DELETED_TOAST).toBe('링크를 삭제했어요')
     expect(LINK_UNDO).toBe('되돌리기')
     expect(BOOKMARK_EMPTY).toBe('북마크한 공고가 없어요.')
@@ -50,7 +50,7 @@ describe('agent s copy', () => {
   it('mention shortcuts are three', () => {
     const labels = QUICK_STARTS.filter((q) => (MENTION_SHORTCUT_KEYS as readonly string[]).includes(q.key)).map((q) => q.label)
     expect(labels).toEqual(['공고 링크로 맞추기', '부족한 점 찾기', '적합도 보기'])
-    expect(docAiSub('방금')).toBe('에이전트로 만듦 · 방금')
+    expect(docAiSub('방금')).toBe('봇으로 만듦 · 방금')
     expect(linkMentionSub('공고', 'https://careers.moapay.kr/jobs/1182')).toBe('공고 · careers.moapay.kr/jobs/1182')
   })
 })

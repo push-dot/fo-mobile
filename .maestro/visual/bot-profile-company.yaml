@@ -1,0 +1,49 @@
+appId: app.push.mobile
+name: 봇 프로필 · 회사 봇
+tags:
+  - visual
+---
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=reset"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa/profile
+- extendedWaitUntil:
+    visible: "백엔드 엔지니어"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "허용한 사이트"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfile
+- tapOn: "봇 색 바꾸기"
+- extendedWaitUntil:
+    visible: "봇 색"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileColor
+- tapOn: "완료"
+- extendedWaitUntil:
+    visible: "백엔드 엔지니어"
+    timeout: 5000
+- tapOn: "허용한 사이트.*"
+- extendedWaitUntil:
+    visible: "careers.moapay.co.kr"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileAllowed
+- tapOn: "careers.moapay.co.kr 허용 해제"
+- extendedWaitUntil:
+    visible: "careers.moapay.co.kr 허용을 해제했어요"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileAllowedRevoke
+- tapOn: "닫기"
+- tapOn: "봇 삭제"
+- extendedWaitUntil:
+    visible: "모아페이 봇을 삭제할까요?"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileDelete
+- tapOn: "취소"
