@@ -51,6 +51,15 @@ const SignedInStack = () => {
       <Stack.Screen name="terms-view" />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
       <Stack.Screen name="material-picker" options={sheetOptions(c)} />
+      <Stack.Screen name="bots/[botId]/index" />
+      <Stack.Screen name="bots/[botId]/profile" />
+      <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
+      <Stack.Screen name="bots/new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="bots/pick" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/index" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
+      <Stack.Screen name="account" options={{ presentation: 'modal' }} />
       <Stack.Screen
         name="job-filter"
         options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}
