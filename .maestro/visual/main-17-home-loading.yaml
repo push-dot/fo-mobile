@@ -4,11 +4,11 @@ tags:
   - visual
 ---
 # The rules are set on the signed-out screen: GET postings feeds the home sections and the 채용공고 list,
-# GET search the results (it also holds the trending terms back, which the board does not need), GET me/notifications the inbox and the bell badge.
+# GET search the result lists only (search$ leaves search/counts answering, so the chips keep the 공고 24 · 사람 8 · 게시글 13 the board draws), GET me/notifications the inbox and the bell badge.
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:search,hang:GET:me/notifications"
+      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:search$,hang:GET:me/notifications"
       READY: "채용공고"
 - assertNotVisible: "마감 임박 공고"
 - waitForAnimationToEnd

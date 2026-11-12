@@ -1,5 +1,5 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
-import { palette, radius, spacing, type } from '@/theme/tokens'
+import { cssShadow, palette, radius, spacing, type } from '@/theme/tokens'
 
 type El = ReactElement<Record<string, unknown>>
 
@@ -53,6 +53,7 @@ export const stubs = {
   },
   composeModifiers: modifiers(['semantics', 'fillMaxWidth', 'fillMaxSize', 'weight', 'selectable']),
   theme: {
+    cssShadow,
     palette,
     radius,
     spacing,
