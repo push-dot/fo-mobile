@@ -175,7 +175,7 @@ describe('my screen rules', () => {
   })
 
   it('locks the activity, offer, and calendar labels', () => {
-    expect(INTERVIEW_PREP).toBe('Push 봇으로 면접 준비')
+    expect(INTERVIEW_PREP).toBe('Push Bot으로 면접 준비')
     expect(CALENDAR_ADD).toBe('일정 추가하기')
     expect(OFFER_DECLINE).toBe('거절')
     expect(OFFER_FAIL).toBe('잠시 뒤에 다시 보내 주세요.')

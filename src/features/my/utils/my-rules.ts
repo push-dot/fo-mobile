@@ -106,7 +106,7 @@ export const stageFlow = (stage: string) => {
   return { step: 0, headline: '지원함', labels: STAGE_LABELS }
 }
 
-export const INTERVIEW_PREP = 'Push 봇으로 면접 준비'
+export const INTERVIEW_PREP = 'Push Bot으로 면접 준비'
 export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'
