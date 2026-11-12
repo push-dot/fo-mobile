@@ -256,6 +256,21 @@ const LIMITS: BotContract.BotLimit['table'] = { FREE: 3, PRO: 20, ULTRA: null }
 let fixtures: BotFixture[] = home()
 let plan: Plan = 'PRO'
 let seq = 0
+
+type SiteGrant = { host: string; kind: 'posting' | 'company' | 'other'; grantedAt: string }
+
+const grantSeed = (): Record<string, SiteGrant[]> => ({
+  'b-moa': [
+    { host: 'careers.moapay.co.kr', kind: 'posting', grantedAt: '2026-11-03' },
+    { host: 'moapay.notion.site', kind: 'company', grantedAt: '2026-11-05' },
+  ],
+  'b-push': [
+    { host: 'careers.moapay.co.kr', kind: 'posting', grantedAt: '2026-11-03' },
+    { host: 'nuricloud.career.greetinghr.com', kind: 'posting', grantedAt: '2026-10-29' },
+  ],
+})
+
+let grants = grantSeed()
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 /** Tour switches (links.ts). */
@@ -284,6 +299,7 @@ export const expireCard = () => {
 export const resetBots = () => {
   setBots('home')
   plan = 'PRO'
+  grants = grantSeed()
 }
 
 export const fixturesNow = () => fixtures
@@ -486,5 +502,23 @@ mock('DELETE', 'bots/:id/transcript', ({ params }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
   Object.assign(f, { messages: [], cards: [], job: null })
+  return undefined
+})
+
+const grantsOf = (address: string) => {
+  const id = fixtureOf(address)?.bot.id
+  if (!id) return null
+  return [...(grants[id] ?? [])].sort((a, b) => a.host.localeCompare(b.host))
+}
+
+mock('GET', 'bots/:id/site-grants', ({ params }) => {
+  const data = grantsOf(params.id!)
+  return data ? { data } : notFound()
+})
+
+mock('DELETE', 'bots/:id/site-grants/:host', ({ params }) => {
+  const id = fixtureOf(params.id!)?.bot.id
+  if (!id) return notFound()
+  grants[id] = (grants[id] ?? []).filter((grant) => grant.host !== params.host)
   return undefined
 })

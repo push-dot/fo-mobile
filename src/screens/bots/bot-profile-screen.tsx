@@ -1,4 +1,10 @@
-// Scaffold: the route is registered and not linked from any screen yet. The PR that owns this screen replaces the body.
-const BotProfileScreen = () => null
+import { useLocalSearchParams } from 'expo-router'
+import { BotProfileView, type BotAddress } from '@/features/bots'
+
+const BotProfileScreen = () => {
+  const { botId } = useLocalSearchParams<{ botId: string }>()
+  const address = (typeof botId === 'string' ? botId : 'push') as BotAddress
+  return <BotProfileView address={address} />
+}
 
 export default BotProfileScreen
