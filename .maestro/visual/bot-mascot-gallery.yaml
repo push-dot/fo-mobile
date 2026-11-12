@@ -1,0 +1,14 @@
+appId: app.push.mobile
+name: 마스코트 갤러리 → 5상태 ③ 프레임
+tags:
+  - visual
+---
+# AgentHomeMascot draws no phone, so the harness has no target for it. This shot is compared with crops of the board's ③ frames.
+# A visual run has Reduce Motion on, so every mascot of the two tiles holds its ③ frame.
+- runFlow: ../flows/_login.yaml
+- openLink: push://dev/mascot
+- extendedWaitUntil:
+    visible: "완료 안 읽음"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MascotGallery

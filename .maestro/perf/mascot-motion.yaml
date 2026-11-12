@@ -1,0 +1,25 @@
+appId: app.push.mobile
+name: 마스코트 모션 녹화 → JS 프레임 측정
+tags:
+  - perf
+---
+# Needs Reduce Motion off, so run it through the gate and not a visual run:
+#   E2E_ONLY="perf/mascot-motion.yaml" gate-subset.sh <sha> ios
+# The recording is judged against the timing text of AgentHomeMascot. The probe prints its rows on screen and to the Metro log.
+- runFlow: ../flows/_login.yaml
+- startRecording: MascotMotion
+- openLink: push://dev/mascot
+- extendedWaitUntil:
+    visible: "완료 안 읽음"
+    timeout: 20000
+# 14 s holds three blinks (one every 4 s), five hops (one every 2.4 s) and the one spark.
+- extendedWaitUntil:
+    visible: "측정 끝"
+    timeout: 14000
+    optional: true
+- stopRecording
+- openLink: push://dev/mascot?probe=1
+- extendedWaitUntil:
+    visible: "측정 끝"
+    timeout: 120000
+- takeScreenshot: MascotProbe
