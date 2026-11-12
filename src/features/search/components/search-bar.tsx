@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
-import { Pressable, TextInput, View } from 'react-native'
+import { Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Icon, Text } from '../../../shared/components'
+import { Glass, Icon, Text } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors } from '../../../theme'
 
@@ -37,7 +37,7 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
     <View style={{ paddingTop: insets.top, backgroundColor: c.bg, zIndex: 3 }}>
       <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[3] }}>
         <View style={{ flex: 1 }}>
-          <View style={{ borderRadius: 22, backgroundColor: c.fill }}>{field}</View>
+          {Platform.OS === 'ios' ? <Glass style={{ borderRadius: 22 }}>{field}</Glass> : <View style={{ borderRadius: 22, backgroundColor: c.fill }}>{field}</View>}
         </View>
         <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 6 }}>
           <Text v="b2" weight="700">
