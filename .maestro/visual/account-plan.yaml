@@ -1,0 +1,32 @@
+appId: app.push.mobile
+name: PlanUpgrade
+tags:
+  - visual
+---
+# PRO account. The plan row on /account opens PlanUpgrade. Mock omits paymentsEnabled, so the buy button stays.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "(새 회사 봇 만들기|Push Bot)"
+- tapOn: "계정 · .*"
+- extendedWaitUntil:
+    visible: "봇이 참고하는 내 정보"
+    timeout: 10000
+- tapOn: "PRO"
+- extendedWaitUntil:
+    visible: "요금제마다.*"
+    timeout: 5000
+- extendedWaitUntil:
+    visible: "ULTRA로 업그레이드"
+    timeout: 5000
+- extendedWaitUntil:
+    visible: "크레딧 구매"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: PlanUpgrade

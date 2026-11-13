@@ -1,20 +1,29 @@
 appId: app.push.mobile
-name: 봇 · ULTRA 요금제 · 크레딧을 다 쓴 ULTRA
+name: 봇 · ULTRA 플랜 · 크레딧을 다 쓴 ULTRA
 tags:
   - visual
 ---
-# plan-ultra makes GET chat/account an ULTRA account; credits-out spends every credit, so the next message answers with the usage card.
+# plan-ultra makes GET chat/account an ULTRA account. The plan page opens from the bot home account button.
+# credits-out spends every credit, so the next message in Push Bot's chat answers with the usage card.
 - runFlow:
     file: _login_mock.yaml
     env:
       MOCK: "push://sign-in?mock=plan-ultra,credits-out"
       READY: "새로 올라온 공고"
-- runFlow: _agent_tab.yaml
-- tapOn: "대화 목록 열기"
-- extendedWaitUntil:
-    visible: "최근 대화"
-    timeout: 10000
-- tapOn: ".*계정 열기"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+      - extendedWaitUntil:
+          notVisible: "동의하고 시작하기"
+          timeout: 10000
+- tapOn: "계정 · .*"
 - extendedWaitUntil:
     visible: "봇이 참고하는 내 정보"
     timeout: 10000
@@ -25,11 +34,12 @@ tags:
 - extendedWaitUntil:
     visible: "지금 ULTRA를 쓰고 있어요"
     timeout: 5000
+- assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
 - takeScreenshot: PlanUltra
 - tapOn: "뒤로"
 - tapOn: "닫기"
-- tapOn: "사이드바 닫기"
+- openLink: push://bots/push
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

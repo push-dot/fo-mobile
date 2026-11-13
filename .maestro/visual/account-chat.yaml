@@ -1,0 +1,29 @@
+appId: app.push.mobile
+name: ChatAccount
+tags:
+  - visual
+---
+# Bot home avatar opens /account (ChatAccount). The old sidebar account route stays until A20.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "(새 회사 봇 만들기|Push Bot)"
+- tapOn: "계정 · .*"
+- extendedWaitUntil:
+    visible: "봇이 참고하는 내 정보"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "이번 달 64% 썼어요"
+    timeout: 5000
+- extendedWaitUntil:
+    visible: "대화를 시작할 때 봇이 이 정보부터 읽어요."
+    timeout: 5000
+- assertNotVisible: "ULTRA로 업그레이드"
+- waitForAnimationToEnd
+- takeScreenshot: ChatAccount
