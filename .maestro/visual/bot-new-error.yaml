@@ -10,7 +10,7 @@ tags:
     timeout: 20000
 - tapOn: "만들기"
 - extendedWaitUntil:
-    visible: "봇을 만들지 못했어요."
+    visible: ".*봇을 만들지 못했어요.*"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewError

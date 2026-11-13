@@ -1,0 +1,24 @@
+appId: app.push.mobile
+name: 봇 · 적합도 카드 (결제 닫힘)
+tags:
+  - visual
+---
+# payments-closed hides every buy button, so the FREE fit card draws without its plan button.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=payments-closed,consent-on"
+      READY: "새로 올라온 공고"
+# _agent_tab.yaml enters the 봇 tab itself.
+- runFlow: _agent_tab.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ph1-free"
+      EN: "ph1-free"
+- extendedWaitUntil:
+    visible: "이 공고에 맞춰 이력서를 고칠까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh1FitClosed
+- openLink: push://?mock=reset

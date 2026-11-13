@@ -29,6 +29,9 @@ tags:
     visible: "추천 프로필"
     timeout: 10000
 - assertNotVisible: ".*김태윤.*"
+# The board draws the loading rows under an applied filter, so pick a category first (the chips stay up while the list loads).
+- tapOn: "개발"
+- assertNotVisible: ".*김태윤.*"
 - waitForAnimationToEnd
 - takeScreenshot: HubLoading
 - tapOn: "소셜"
