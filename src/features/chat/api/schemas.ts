@@ -11,6 +11,8 @@ export type Account = {
   credits: { used: number; total: number } | null
   /** GET billing paymentsEnabled; false hides every buy button. */
   paymentsEnabled?: boolean
+  /** GET billing creditsRefillAt: when the monthly allowance is granted again. */
+  creditsRefillAt?: string
 }
 
 export type QsItem = {

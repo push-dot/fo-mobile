@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, KeyboardAvoidingView, View, type TextInputInstance } from 'react-native'
+import { FlatList, KeyboardAvoidingView, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
 import { materialPickerPath as botMaterialPath, useBot, useBotProfile, type BotId } from '@/features/bots'
@@ -10,8 +10,12 @@ import {
   AwaitingRow,
   ComposerArea,
   ConsentSheet,
+  CreditBanner,
+  FindBar,
+  FindHighlight,
   HeaderPill,
   Item,
+  NewMessagesPill,
   Onboarding,
   Queued,
   StatusRow,
@@ -22,6 +26,8 @@ import {
   answer,
   closeApproval,
   composerPlaceholder,
+  followScroll,
+  headerLightOf,
   openBot,
   retryApproval,
   quickStartPath,
@@ -29,14 +35,19 @@ import {
   stop,
   useCardState,
   useChat,
+  useChatLimit,
+  useFind,
+  useUnseen,
   WaitingLine,
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
-import { Button, Text, useKeyboardHeight } from '@/shared/components'
+import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
+// An inverted list sits at the bottom while its offset is near zero.
+const AT_BOTTOM = 40
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
@@ -112,6 +123,26 @@ const Thread = ({ id }: { id: string }) => {
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
   const data = [...chat.items].reverse()
 
+  const find = useFind(id)
+  const limit = useChatLimit(chat.items)
+  const [atBottom, setAtBottom] = useState(true)
+  const unseen = useUnseen(chat.items, atBottom)
+  const reduceMotion = useReduceMotion()
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen })
+  const list = useRef<FlatList<ChatItem>>(null)
+  const itemsRef = useRef(chat.items)
+  useEffect(() => {
+    itemsRef.current = chat.items
+  })
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => setAtBottom(e.nativeEvent.contentOffset.y < AT_BOTTOM), [])
+  const toBottom = () => list.current?.scrollToOffset({ offset: 0, animated: !reduceMotion })
+  const currentId = find.currentId
+  useEffect(() => {
+    if (!currentId) return
+    const at = itemsRef.current.length - 1 - itemsRef.current.findIndex((i) => i.id === currentId)
+    if (at < itemsRef.current.length) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
+  }, [currentId])
+
   const onAction = useCallback((text: string) => send(id, text), [id])
   const convertRef = useRef(convert.mutate)
   const buyCredits = useRef(purchase.buyCredits)
@@ -151,13 +182,26 @@ const Thread = ({ id }: { id: string }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <HeaderPill botId={id} name={name} kind={kind} color={color} />
+      {find.open ? (
+        <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
+      ) : (
+        <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} onFind={find.show} />
+      )}
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {empty && kind && name ? (
         <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} onChip={(key) => router.push(quickStartPath(key))} />
       ) : (
+      <View style={{ flex: 1 }}>
+      <FindHighlight.Provider value={find.highlight}>
       <FlatList
+        ref={list}
         inverted
+        onScroll={onScroll}
+        scrollEventThrottle={100}
+        onScrollToIndexFailed={({ index, averageItemLength }) => {
+          list.current?.scrollToOffset({ offset: index * averageItemLength, animated: false })
+          setTimeout(() => list.current?.scrollToIndex({ index, viewPosition: 0.5, animated: true }), 100)
+        }}
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
@@ -178,6 +222,9 @@ const Thread = ({ id }: { id: string }) => {
           ) : undefined
         }
       />
+      </FindHighlight.Provider>
+      {unseen > 0 && followScroll(atBottom, !!chat.working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
+      </View>
       )}
       {showPanel ? (
         <ApprovalPanel
@@ -191,12 +238,15 @@ const Thread = ({ id }: { id: string }) => {
           onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}
         />
       ) : (
+        <>
+        {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
         <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
           <ComposerArea
             botId={id}
             inputRef={input}
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
             working={!!chat.working}
+            disabled={!!limit.banner}
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
             onShortcut={(qs) => router.push(quickStartPath(qs.key))}
@@ -209,6 +259,7 @@ const Thread = ({ id }: { id: string }) => {
             }
           />
         </View>
+        </>
       )}
       <ConsentSheet />
       </KeyboardAvoidingView>

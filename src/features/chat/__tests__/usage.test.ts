@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { paymentsOpen } from '../../billing/utils/settle'
 import { ERROR_TEXT } from '../constants'
 import {
   askPlaceholder,
@@ -12,51 +11,17 @@ import {
   isUsageExhausted,
   onboardingGreeting,
   planRequired,
-  usageExhausted,
   withMaterial,
 } from '../utils/usage'
 import type { ChatItem } from '../types'
 
-const FREE_BODY = '이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.'
-const ULTRA_BODY = '이번 달 사용량을 다 썼어요. 크레딧을 구매하면 바로 이어서 쓸 수 있어요.'
-
 describe('usage exhausted copy', () => {
-  it('gives FREE and PRO an upgrade and a credit purchase', () => {
-    for (const plan of ['FREE', 'PRO'] as const) {
-      expect(usageExhausted(plan)).toEqual({
-        body: FREE_BODY,
-        actions: [
-          { id: 'plan', label: '요금제 올리기', variant: 'secondary' },
-          { id: 'credits', label: '크레딧 구매', variant: 'primary' },
-        ],
-      })
-    }
-  })
-
-  it('gives ULTRA only a credit purchase', () => {
-    expect(usageExhausted('ULTRA')).toEqual({ body: ULTRA_BODY, actions: [{ id: 'credits', label: '크레딧 구매', variant: 'primary' }] })
-  })
-
-  it('offers no buy button while payments are closed', () => {
-    for (const plan of ['FREE', 'PRO', 'ULTRA'] as const) {
-      expect(usageExhausted(plan, false)).toEqual({ body: '이번 달 사용량을 다 썼어요. 결제는 아직 준비 중이에요.', actions: [] })
-    }
-  })
-
-  it('offers no buy button before the account loads', () => {
-    expect(usageExhausted(undefined, false)).toEqual({ body: '이번 달 사용량을 다 썼어요.', actions: [] })
-    expect(usageExhausted(undefined)).toEqual({ body: '이번 달 사용량을 다 썼어요.', actions: [] })
-  })
-
-  it('keeps the buy buttons for an older server that sends no flag', () => {
-    expect(usageExhausted('FREE', paymentsOpen({}))).toEqual(usageExhausted('FREE'))
-  })
-
   it('drops 충전, an AI key, and a yearly discount', () => {
-    const text = JSON.stringify([usageExhausted('FREE'), usageExhausted('ULTRA'), ERROR_TEXT])
+    const text = JSON.stringify(ERROR_TEXT)
     expect(text).not.toContain('충전')
     expect(text).not.toContain('AI 키를 연결해야 쓸 수 있어요')
     expect(text).not.toContain('연간 -20%')
+    expect(text).not.toContain('요금제')
   })
 
   it('treats the credit errors as usage, and nothing else', () => {
@@ -104,9 +69,9 @@ describe('composerPlaceholder', () => {
   })
 
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
-    expect(planRequired('FREE', true)).toBe('요금제를 올리면 쓸 수 있어요.')
-    expect(planRequired('FREE', false)).toBe('지금 요금제에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')
-    expect(planRequired(undefined, false)).toBe('지금 요금제에서는 쓸 수 없어요.')
+    expect(planRequired('FREE', true)).toBe('플랜을 올리면 쓸 수 있어요.')
+    expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')
+    expect(planRequired(undefined, false)).toBe('지금 플랜에서는 쓸 수 없어요.')
   })
 })
 

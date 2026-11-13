@@ -3,6 +3,7 @@ import { Text } from '@/shared/components'
 import { spacing } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import UserBubbleView from '../bubbles'
+import { Marked } from '../header/highlight'
 import { Appear } from '../motion'
 
 export const useBubbleMax = (chrome: number) => (useWindowDimensions().width - spacing[5] * 2) * 0.82 + chrome
@@ -13,7 +14,7 @@ const UserBubble = ({ item }: { item: Extract<ChatItem, { type: 'user' }> }) => 
     <Appear kind="bubble" style={{ alignSelf: 'flex-end', maxWidth }}>
       <UserBubbleView attachment={item.attachment}>
         <Text v="b1" style={{ lineHeight: 23 }}>
-          {item.text}
+          <Marked text={item.text} itemId={item.id} />
         </Text>
       </UserBubbleView>
     </Appear>

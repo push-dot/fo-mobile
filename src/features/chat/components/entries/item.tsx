@@ -20,7 +20,6 @@ import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
 import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
-import { UsageExhausted } from '../usage-exhausted'
 import type { ChatItem, ToolState } from '../../types'
 
 
@@ -669,9 +668,8 @@ const ItemComponent = ({
     case 'worked':
       return null
     case 'error':
-      return isUsageExhausted(item.code) && onUsage ? (
-        <UsageExhausted onPlan={() => onUsage('plan')} onCredits={() => onUsage('credits')} />
-      ) : item.code === 'PLAN_REQUIRED' ? (
+      // The credit banner above the composer says it; the refused turn leaves no line of its own.
+      return isUsageExhausted(item.code) ? null : item.code === 'PLAN_REQUIRED' ? (
         <PlanRequired />
       ) : (
         <ErrorLine text={item.text} />
