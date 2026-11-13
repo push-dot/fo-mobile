@@ -1,6 +1,7 @@
 import type { ButtonProps } from '@expo/ui/swift-ui'
 import type { IconName } from '@push/design-system'
 import type { ReactElement } from 'react'
+import type { AppIconName } from './icon'
 import type { PressableProps } from 'react-native'
 
 export type MenuAction = {
@@ -10,7 +11,7 @@ export type MenuAction = {
   /** SF Symbol shown on iOS only. */
   systemImage?: ButtonProps['systemImage']
   /** Design icon shown on Android only (Material leading icon). */
-  icon?: IconName
+  icon?: IconName | AppIconName
   destructive?: boolean
   selected?: boolean
 }

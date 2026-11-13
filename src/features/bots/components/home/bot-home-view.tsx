@@ -29,7 +29,7 @@ const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
   profile: 'user',
   find: 'search',
   read: 'check',
-  mute: 'bell',
+  mute: 'bell-off',
   delete: 'delete',
 }
 
@@ -108,7 +108,7 @@ const BotHomeView = ({
       key: item.key,
       label: item.label,
       destructive: item.destructive,
-      icon: MENU_ICON[item.key],
+      icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
       onPress: () => run(item.key, bot),
     }))
 
