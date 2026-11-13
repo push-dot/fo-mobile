@@ -72,7 +72,7 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
           {close}
           {title ? (
-            <View style={{ flex: 1, gap: 2 }}>
+            <View style={{ flex: 1, gap: spacing[1] }}>
               <Text v="h2" accessibilityRole="header">
                 {title}
               </Text>

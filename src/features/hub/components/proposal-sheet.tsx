@@ -1,7 +1,7 @@
 import { brandColor } from '@push/shared'
 import { Platform, ScrollView, View } from 'react-native'
 import { Chip, GlassButton, Text, TextField } from '../../../shared/components'
-import { spacing, useColors } from '../../../theme'
+import { onAccent, spacing } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
 
@@ -23,7 +23,6 @@ type Props = {
 const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
 
 const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError, onClose }: Props) => {
-  const c = useColors()
   return (
     <View style={{ gap: 14 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
@@ -64,11 +63,12 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, on
             {postings.map((p) => (
               <Chip
                 key={p.id}
-                check
+                check="end"
+                leadInset={8}
                 label={`${p.company} · ${p.title}`}
                 lead={
                   <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandColor(p.company), alignItems: 'center', justifyContent: 'center' }}>
-                    <Text weight="700" style={{ color: c.card }}>
+                    <Text v="tab" weight="800" style={{ color: onAccent }}>
                       {[...p.company][0]}
                     </Text>
                   </View>
