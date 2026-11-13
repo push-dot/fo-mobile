@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { notificationHref } from './href'
+import { notificationHref, notificationHrefFromPush } from './href'
 
 vi.mock('@/features/bots', async () => {
-  const { botHomePath } = await import('@/features/bots/utils/paths')
-  return { botHomePath }
+  const { botChatPath, botHomePath } = await import('@/features/bots/utils/paths')
+  return { botChatPath, botHomePath }
 })
 
 describe('notificationHref', () => {
@@ -23,6 +23,16 @@ describe('notificationHref', () => {
       pathname: '/(app)/(stack)/(tabs)/(my)/my',
       params: { tab: 'activity', sub: 'applications' },
     })
+  })
+
+  it('opens that bot when the notification target is a bot', () => {
+    expect(notificationHref({ target: { kind: 'bot', id: 'b-moa' } })).toBe('/bots/b-moa')
+  })
+
+  it('opens that bot when a push tap carries the bot target', () => {
+    expect(notificationHrefFromPush({ kind: 'bot', id: 'b-moa' })).toBe('/bots/b-moa')
+    expect(notificationHrefFromPush(null)).toBeNull()
+    expect(notificationHrefFromPush({ kind: 'bot' })).toBeNull()
   })
 
   it('returns null for an unknown target', () => {
