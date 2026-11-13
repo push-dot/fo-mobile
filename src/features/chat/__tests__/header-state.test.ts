@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { creditBanner, headerLightOf, unseenBotMessages } from '../components/header/state'
+import { creditBanner, endsInError, headerLightOf, unseenBotMessages } from '../components/header/state'
 import type { ChatItem } from '../types'
 
 describe('headerLightOf', () => {
@@ -7,6 +7,14 @@ describe('headerLightOf', () => {
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 0 })).toBe('none')
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 2 })).toBe('new')
     expect(headerLightOf({ creditsOut: true, unseenBotMessages: 0 })).toBe('limit')
+  })
+
+  it('turns red when the last run failed, and clears once the thread moves on', () => {
+    expect(headerLightOf({ creditsOut: false, unseenBotMessages: 0, failed: true })).toBe('error')
+    expect(headerLightOf({ creditsOut: false, unseenBotMessages: 2, failed: true })).toBe('error')
+    expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x' }])).toBe(true)
+    expect(endsInError([{ type: 'error', id: 'e', text: 'x' }, { type: 'user', id: 'u', text: 'x' }])).toBe(false)
+    expect(endsInError([])).toBe(false)
   })
 
   it('lets red win over green', () => {

@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { memo, useCallback, useMemo, type ReactElement } from 'react'
-import { ActivityIndicator, FlatList, useWindowDimensions, View } from 'react-native'
+import { ActivityIndicator, FlatList, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import type { Posting, PostingFilters } from '@push/api-client'
 import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
@@ -12,6 +12,9 @@ type Props = {
   filters: PostingFilters
   header?: ReactElement
   onReset?: () => void
+  /** Space for a header floating over the list, and its scroll listener. */
+  topInset?: number
+  onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
 const Gap = () => <View style={{ height: 22 }} />
@@ -21,7 +24,7 @@ const GridCard = ({ posting, width, onBookmark }: { posting: Posting; width: num
 )
 const MemoGridCard = memo(GridCard)
 
-const PostingGrid = ({ filters, header, onReset }: Props) => {
+const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props) => {
   const { width } = useWindowDimensions()
   const cardWidth = Math.floor((width - spacing[5] * 2 - spacing[3]) / 2)
   const q = usePostingPages(filters)
@@ -36,7 +39,9 @@ const PostingGrid = ({ filters, header, onReset }: Props) => {
       contentInsetAdjustmentBehavior="automatic"
       ListHeaderComponent={header}
       columnWrapperStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+      contentContainerStyle={{ flexGrow: 1, paddingTop: topInset, paddingBottom: 32 }}
+      onScroll={onScroll}
+      scrollEventThrottle={64}
       ItemSeparatorComponent={Gap}
       renderItem={renderItem}
       onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}

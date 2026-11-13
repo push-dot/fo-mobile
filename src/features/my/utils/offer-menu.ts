@@ -1,4 +1,4 @@
-import { offerMenu, offerMenuKeys, OFFER_MENU_COPY, offerBlockConfirm, otherParty, type OfferBox, type OfferMenuDeps as SharedDeps, type OfferMenuToast } from '@push/shared'
+import { offerMenu, offerMenuKeys, OFFER_MENU_COPY, otherParty, type OfferBox, type OfferMenuDeps as SharedDeps, type OfferMenuToast } from '@push/shared'
 import type { Offer } from '@push/api-client'
 import type { ConfirmRequest } from '@/shared/components/confirm-store'
 import type { MenuSection } from '@/shared/components/menu-action'
@@ -27,6 +27,13 @@ export type OfferMenuSectionDeps = OfferMenuDeps & {
   confirm: (r: ConfirmRequest) => void
 }
 
+// ProposalBlockConfirm (v415): the app's sub text is one short line; the shared copy (also the web's) stays longer.
+const blockConfirm = (name: string) => ({
+  title: `${name} 님을 차단할까요?`,
+  body: '제안과 메시지를 더 받지 않아요. 상대에게는 알리지 않아요.',
+  confirm: '차단',
+})
+
 const ACTIONS = {
   profile: { label: OFFER_MENU_COPY.profile, systemImage: 'person', icon: 'user' },
   archive: { label: OFFER_MENU_COPY.archive, systemImage: 'archivebox', icon: 'archive' },
@@ -43,7 +50,7 @@ export const offerMenuSections = (offer: Offer, box: OfferBox, d: OfferMenuSecti
     archive: () => void run.archive(),
     unarchive: () => void run.unarchive(),
     report: () => void run.report(),
-    block: () => d.confirm({ ...offerBlockConfirm(who.displayName), danger: true, onConfirm: () => void run.block() }),
+    block: () => d.confirm({ ...blockConfirm(who.displayName), danger: true, onConfirm: () => void run.block() }),
   }
   return offerMenuKeys(offer, box).map((keys, i) => ({
     key: i ? 'harm' : 'keep',

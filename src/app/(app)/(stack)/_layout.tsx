@@ -27,6 +27,7 @@ const SignedInStack = () => {
       <Stack.Screen name="offers/[id]/messages" />
       <Stack.Screen name="settings/index" />
       <Stack.Screen name="settings/blocked" />
+      <Stack.Screen name="settings/career" />
       <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
       <Stack.Screen name="docs/push/index" />
@@ -51,6 +52,7 @@ const SignedInStack = () => {
       <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
       <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="account" options={modalOptions(c)} />
+      <Stack.Screen name="account-usage" />
       <Stack.Screen name="plan" />
       <Stack.Screen name="plan-notice" />
       <Stack.Screen

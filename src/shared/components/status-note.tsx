@@ -12,7 +12,7 @@ type Props = {
 const StatusNote = ({ lines, action, style }: Props) => {
   return (
     <View style={[{ alignItems: 'center', paddingHorizontal: 40, gap: spacing[2] }, style]}>
-      <Text v="b1" weight="700" color="t2" style={{ textAlign: 'center' }}>
+      <Text v="b1" color="t2" style={{ textAlign: 'center' }}>
         {lines.join('\n')}
       </Text>
       {action ? (

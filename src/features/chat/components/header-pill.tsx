@@ -81,7 +81,7 @@ const HeaderPill = ({
             circle
             actions={[
               {
-                icon: 'menu',
+                icon: 'more',
                 label: '더 보기',
                 menu: botHeaderMenu(kind).map((item) => ({
                   key: item.id,

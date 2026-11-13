@@ -49,10 +49,7 @@ export const grantMeta = (grantedAt: string, kind: string) => {
   return label ? `${when} · ${label}` : when
 }
 
-export const grantIntro = (bot: { kind: 'push' | 'company'; name: string }) =>
-  bot.kind === 'push'
-    ? 'Push Bot이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.'
-    : `${bot.name} Bot이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.`
+export const GRANT_INTRO = 'Bot이 묻지 않고 읽는 사이트예요.'
 
 export const revokeToast = (host: string) => `${host} 허용을 해제했어요`
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { router } from 'expo-router'
 import {
   OTHER_NUMBER,
@@ -23,12 +23,17 @@ const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   router.replace('/phone')
 }
 
+// A failed login is the platform's own alert, not a red line drawn under the body.
+const fail = (provider: LoginProvider) => {
+  const { title, body } = loginFailureCopy(provider)
+  Alert.alert(title, body, [{ text: '확인' }])
+}
+
 const PhoneRegisteredScreen = () => {
   const c = useColors()
   const apple = useAppleSignIn()
   const providers = usePhoneAuth((state) => state.providers)
   const [busy, setBusy] = useState(false)
-  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null)
   const target = loginTarget(providers, apple)
   const list = registeredButton(providers)
 
@@ -38,18 +43,17 @@ const PhoneRegisteredScreen = () => {
 
   const login = (provider: LoginProvider) => {
     setBusy(true)
-    setFailure(null)
     const attempt = provider === 'apple' ? signInWithApple() : signIn(provider)
     attempt
       .then((outcome) => {
         if (outcome.kind === 'cancelled') return
         if (outcome.kind === 'failed') {
-          setFailure(loginFailureCopy(provider))
+          fail(provider)
           return
         }
         continueWith(provider, outcome)
       })
-      .catch(() => setFailure(loginFailureCopy(provider)))
+      .catch(() => fail(provider))
       .finally(() => setBusy(false))
   }
 
@@ -71,16 +75,6 @@ const PhoneRegisteredScreen = () => {
         <Text v="b2" color="t2">
           {registeredBody(providers)}
         </Text>
-        {failure ? (
-          <View accessibilityRole="alert" style={{ gap: spacing[1] }}>
-            <Text v="c1" weight="700" color="red">
-              {failure.title}
-            </Text>
-            <Text v="c1" color="red">
-              {failure.body}
-            </Text>
-          </View>
-        ) : null}
       </View>
       <CtaBar>
         <View style={{ flex: 1, gap: spacing[2] }}>

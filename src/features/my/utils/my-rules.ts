@@ -113,7 +113,7 @@ export const stageFlow = (stage: string) => {
   return { step: 0, headline: '지원함', labels: STAGE_LABELS }
 }
 
-export const INTERVIEW_PREP = 'Bot한테 보내서 면접 준비'
+export const INTERVIEW_PREP = 'Bot으로 면접 준비'
 export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
 export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
@@ -152,8 +152,8 @@ export { THEME_CHOICES, themeMode, type ThemeChoice } from '../../../theme/mode'
 
 export const hideCompanyLabel = (company: string) => `${company || '지금 다니는 회사'} 사람에게 숨기기`
 
-export const WITHDRAW_BODY =
-  '구독은 탈퇴해도 자동으로 해지되지 않아요. App Store나 Google Play에서 직접 해지해 주세요. 30일 안에 다시 로그인하면 계정이 복구되고, 30일이 지나면 이력서·서류·글·댓글이 모두 삭제돼요. 삭제된 뒤에는 되돌릴 수 없어요.'
+// v415 SettingsStates.2: two short sentences (the owner found the long body too long).
+export const WITHDRAW_BODY = '30일 안에 다시 로그인하면 복구돼요. 구독은 스토어에서 따로 해지해 주세요.'
 
 export const PREVIEW_HEADINGS = ['경력', '프로젝트', '기술 스택'] as const
 
@@ -164,3 +164,13 @@ export const pushCardLines = (
   application
     ? { title: application.title, company: application.company, score: fitTen(application.fitScore), doc: doc.title }
     : { title: doc.title, company: '', score: '', doc: '' }
+
+/**
+ * v415 Settings rows show only the value. Where the value alone is unclear the row keeps a short name with it
+ * ('커리어 상태 모두 공개', as Claude Design drew it). 언어 and 테마 read as the value alone.
+ */
+export const careerRowLabel = (key: Settings['careerStatusVisibility']) =>
+  ({ everyone: '커리어 상태 모두 공개', followers: '커리어 상태 팔로워에게만 공개', private: '커리어 상태 나만 보기' })[key]
+export const contactRowLabel = (key: Settings['contactVisibility']) => (key === 'everyone' ? '연락처는 모두에게' : '연락처는 제안 수락한 사람만')
+export const toneRowLabel = (label: string) => `말투 ${label}`
+export const themeRowLabel = (label: string) => `${label} 테마`

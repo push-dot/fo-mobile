@@ -1,7 +1,6 @@
 export const LOADING_LABEL = 'Bot 목록을 불러오는 중이에요'
 export const ERROR_TITLE = 'Bot 목록을 불러오지 못했어요'
 export const ERROR_BODY = '인터넷 연결을 확인하고 다시 시도해 주세요.'
-export const ERROR_NOTE = 'Push Bot과의 대화는 그대로 쓸 수 있어요.'
 export const RETRY_LABEL = '다시 시도'
 export const NEW_BOT_LABEL = '새 회사 Bot 만들기'
 export const MATERIALS_LABEL = '자료'

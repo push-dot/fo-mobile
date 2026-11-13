@@ -13,7 +13,7 @@ import {
   useNotifications,
   useReadNotifications,
 } from '@/features/notifications'
-import { Button, Skeleton, SkeletonRows, StatusNote, Text, TopBar } from '@/shared/components'
+import { Button, ScreenBar, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const NotificationsScreen = () => {
@@ -44,45 +44,52 @@ const NotificationsScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar
-        title="알림"
-        onBack={() => router.back()}
-        right={<Button label="모두 읽음" variant="secondary" size="sm" disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />}
-      />
-      <SectionList
-        sections={sections}
-        keyExtractor={(n) => n.id}
-        contentInsetAdjustmentBehavior="automatic"
-        stickySectionHeadersEnabled={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-        renderSectionHeader={({ section }) => (
-          <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: spacing[6], paddingTop: section.title === sections[0]?.title ? spacing[2] : 22, paddingBottom: spacing[2] }}>
-            {section.title}
-          </Text>
-        )}
-        renderItem={renderItem}
-        ListEmptyComponent={
-          q.isPending ? (
-            <View>
-              <View style={{ paddingHorizontal: spacing[6], paddingVertical: spacing[2] }}>
-                <Skeleton width={40} height={12} />
-              </View>
-              <SkeletonRows {...NOTIFICATION_SKELETON} />
-            </View>
-          ) : q.isError ? (
-            <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 40 }}>
-              알림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
+      <ScreenBar
+        bar={{
+          title: '알림',
+          onBack: () => router.back(),
+          right: <Button label="모두 읽음" variant="secondary" size="sm" disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
+        }}
+      >
+        {({ topInset, onScroll }) => (
+        <SectionList
+          sections={sections}
+          keyExtractor={(n) => n.id}
+          contentInsetAdjustmentBehavior="automatic"
+          stickySectionHeadersEnabled={false}
+          contentContainerStyle={{ flexGrow: 1, paddingTop: topInset }}
+            onScroll={onScroll}
+            scrollEventThrottle={64}
+          renderSectionHeader={({ section }) => (
+            <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: spacing[6], paddingTop: section.title === sections[0]?.title ? spacing[2] : 22, paddingBottom: spacing[2] }}>
+              {section.title}
             </Text>
-          ) : (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingVertical: 60, paddingHorizontal: 32 }}>
-              <StatusNote
-                lines={[NOTIFICATION_EMPTY]}
-                action={{ label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings }}
-              />
-            </View>
-          )
-        }
-      />
+          )}
+          renderItem={renderItem}
+          ListEmptyComponent={
+            q.isPending ? (
+              <View>
+                <View style={{ paddingHorizontal: spacing[6], paddingVertical: spacing[2] }}>
+                  <Skeleton width={40} height={12} />
+                </View>
+                <SkeletonRows {...NOTIFICATION_SKELETON} />
+              </View>
+            ) : q.isError ? (
+              <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 40 }}>
+                알림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
+              </Text>
+            ) : (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingVertical: 60, paddingHorizontal: 32 }}>
+                <StatusNote
+                  lines={[NOTIFICATION_EMPTY]}
+                  action={{ label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings }}
+                />
+              </View>
+            )
+          }
+        />
+        )}
+      </ScreenBar>
     </View>
   )
 }

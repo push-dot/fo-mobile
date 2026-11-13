@@ -64,7 +64,7 @@ const LegalDocument = ({ document }: { document: Document }) => (
         {document.title}
       </Text>
       <Text v="c1" color="t3">
-        {document.key === 'termsOfService' && LEGAL_OPERATOR.kind === 'individual'
+        {(document.key === 'termsOfService' || document.key === 'privacyPolicy') && LEGAL_OPERATOR.kind === 'individual'
           ? `${legalEffectiveLabel(document)} · 운영자 ${LEGAL_OPERATOR.displayName}`
           : legalEffectiveLabel(document)}
       </Text>

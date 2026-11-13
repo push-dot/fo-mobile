@@ -82,7 +82,7 @@ describe('stream v3', () => {
     expect(sel({ type: 'choice', id: 'x', options, recommended: 'b' })?.sections[0]).toMatchObject({ selected: [1] })
     const multi = sel({ type: 'choice', id: 'x', options, multiple: true })
     expect(multi?.sections[0]).toMatchObject({ selected: [] })
-    expect(multi?.foot).toBe('여러 개 고를 수 있어요')
+    expect(multi?.foot).toBeUndefined()
   })
 
   it('a sectioned multi card draws no foot (ChatPh0Input); toggle rows put sub on the second line; templates get a layout', () => {

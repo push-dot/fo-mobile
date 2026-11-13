@@ -10,9 +10,11 @@ export type WheelPickerProps = {
   accessibilityLabel: string
   /** One of two wheels side by side (시·도 and 구 in the job filter) instead of a full-width picker. */
   columns?: boolean
+  /** iOS: a 120pt wheel for a list of three or fewer (SettingsLanguage), so the modal is as high as its content. */
+  short?: boolean
 }
 
-export const WHEEL_HEIGHT = { full: 180, columns: 150 } as const
+export const WHEEL_HEIGHT = { full: 180, columns: 150, short: 120 } as const
 
 const RADIO = 20
 const ROW = 38

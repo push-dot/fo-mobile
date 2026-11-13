@@ -61,4 +61,3 @@ export const LINK_ADD = {
 }
 
 export const SEND_PICK_TITLE = '어느 Bot한테 보낼까요?'
-export const SEND_PICK_CANCEL = '취소'

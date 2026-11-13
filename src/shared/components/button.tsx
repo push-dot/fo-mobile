@@ -31,7 +31,8 @@ const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHori
 
 const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
   primary: { glass: false, fill: 'ac', pressedFill: 'acPress', ink: 'accent' },
-  secondary: { glass: true, fill: 'fill', ink: 't1' },
+  // A sub button inside a screen is a plain fill, never glass: glass is for the header and navigation buttons only.
+  secondary: { glass: false, fill: 'fill', ink: 't1' },
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 

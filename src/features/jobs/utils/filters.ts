@@ -59,17 +59,11 @@ const withRegion = (list: string[], value: string) => {
   return [...list.filter((x) => (whole ? sidoOf(x) !== sido : x !== sido)), value]
 }
 
-export const toggleRegion = (list: string[], value: string): string[] =>
-  list.includes(value) ? list.filter((x) => x !== value) : withRegion(list, value)
-
-/** The wheel picker's 추가: never removes, and stops at MAX_REGIONS (a pick that replaces others still fits). */
-export const addRegion = (list: string[], value: string): string[] => {
-  if (list.includes(value)) return list
+/** Picking a district past MAX_REGIONS does nothing; removing one always works. */
+export const toggleRegion = (list: string[], value: string): string[] => {
+  if (list.includes(value)) return list.filter((x) => x !== value)
   const next = withRegion(list, value)
   return next.length > MAX_REGIONS ? list : next
 }
-
-/** What the wheel pair currently points at: a whole sido reads "서울 전체", a district "서울 강남구". */
-export const regionLabel = (value: string) => (value === sidoOf(value) && value !== '원격' ? `${value} 전체` : value)
 
 export const formatCount = (n: number) => n.toLocaleString('en-US')

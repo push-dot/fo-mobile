@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import { FILTER_KEYS, POSTING_SORTS, PostingGrid, chipText, formatCount, isEmpty, toQuery, useJobListStore, usePostingPages, EMPTY } from '@/features/jobs'
-import { Chip, ChipRow, GlassButton, Icon, Menu, Skeleton, Text, TopBar } from '@/shared/components'
+import { Chip, ChipRow, GlassButton, Icon, Menu, ScreenBar, Skeleton, Text } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 
@@ -55,12 +55,15 @@ const JobListScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar
-        title="채용공고"
-        onBack={() => router.back()}
-        right={<GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />}
-      />
-      <PostingGrid filters={query} header={header} onReset={() => setFilters(EMPTY)} />
+      <ScreenBar
+        bar={{
+          title: '채용공고',
+          onBack: () => router.back(),
+          right: <GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />,
+        }}
+      >
+        {({ topInset, onScroll }) => <PostingGrid filters={query} header={header} onReset={() => setFilters(EMPTY)} topInset={topInset} onScroll={onScroll} />}
+      </ScreenBar>
     </View>
   )
 }

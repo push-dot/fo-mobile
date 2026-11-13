@@ -36,13 +36,26 @@ tags:
           visible: "모아페이에 바로 지원하기"
           timeout: 8000
 - waitForAnimationToEnd
-- takeScreenshot: ChatDoneProfile
+# The run's end asks in an action sheet (ChatDoneNext); the chat itself holds no buttons.
+- takeScreenshot: ChatDoneNext
 - tapOn: "모아페이에 바로 지원하기"
 - extendedWaitUntil:
     visible: "이 공고에 지원해요"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply
+# ChatDoneProfile: the finished card with the sheet closed.
+- runFlow: _fresh_chat.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "profile-done"
+      EN: "profile-done"
+- extendedWaitUntil:
+    visible: "다음으로 무엇을 할까요?"
+    timeout: 20000
+- runFlow: _dismiss_next.yaml
+- takeScreenshot: ChatDoneProfile
 # ChatPh6Result draws only the closing line and the card under the open gate, so it jumps there in a fresh conversation (mock token).
 - runFlow: _fresh_chat.yaml
 - runFlow:

@@ -18,6 +18,7 @@ tags:
           visible: "프로필로 전환"
           timeout: 30000
       - waitForAnimationToEnd
+      - runFlow: _dismiss_next.yaml
       - tapOn: "메시지.*"
       - inputText: "Tailor it for Nuri Cloud too"
       - waitForAnimationToEnd

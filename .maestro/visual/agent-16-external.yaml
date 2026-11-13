@@ -14,6 +14,8 @@ tags:
     visible: "프로필로 전환"
     timeout: 30000
 - waitForAnimationToEnd
+- takeScreenshot: ChatDoneNext
+- runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDone
 - runFlow: _fresh_chat.yaml
 - runFlow:
@@ -25,6 +27,7 @@ tags:
     visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDoneNoJob
 - runFlow: _fresh_chat.yaml
 - runFlow:
@@ -36,6 +39,7 @@ tags:
     visible: "모아페이에 바로 지원하기"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDoneSaveFail
 - runFlow: _fresh_chat.yaml
 - runFlow:
