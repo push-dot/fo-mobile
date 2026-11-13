@@ -11,7 +11,7 @@ const noticeOf = (state: TranscriptState) => {
 }
 const thinking = { kind: 'run' as const, phase: 'thinking' as const, since: new Date(0), text: '생각 중' }
 const working = { kind: 'run' as const, phase: 'working' as const, since: new Date(0), text: '공고 요건을 읽는 중' }
-const waiting = { kind: 'waiting' as const, since: new Date(0), for: 'answer' as const, cardId: 'c1', text: '선택을 기다리고 있어요' }
+const waiting = { kind: 'waiting' as const, since: new Date(0), for: 'answer' as const, cardId: 'c1', text: '답을 기다리고 있어요' }
 
 describe('applyTranscript', () => {
   it('keeps text around a tool call as two bot entries, live and stored', () => {
