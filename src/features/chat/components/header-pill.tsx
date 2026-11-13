@@ -72,6 +72,7 @@ const HeaderPill = ({
   return (
     <TopBar
       translucent
+      chat
       onBack={() => router.back()}
       left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
       right={

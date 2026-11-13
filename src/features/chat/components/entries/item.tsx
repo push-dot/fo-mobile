@@ -7,6 +7,7 @@ import Notice from './notice'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
+import { monoNumber } from '../../../../theme/mono'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
@@ -251,7 +252,7 @@ const Diff = ({ item }: { item: Of<'diff'> }) => {
             duration={300}
             style={{ flexDirection: 'row', gap: 10, paddingVertical: 5, paddingHorizontal: spacing[3], backgroundColor: add ? c.greenSoft : del ? c.redSoft : 'transparent' }}
           >
-            <Text v="c2" color="t3" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, fontVariant: ['tabular-nums'] }}>
+            <Text v="c2" color="t3" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, ...monoNumber }}>
               {l.n ?? ' '}
             </Text>
             <Text v="c1" weight="700" style={{ width: 10, lineHeight: 20, color: add ? c.green : del ? c.red : c.t3 }}>
