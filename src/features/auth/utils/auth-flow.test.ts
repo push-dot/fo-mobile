@@ -87,11 +87,11 @@ describe('apple sign-in gating', () => {
     expect(isAppleCancel(new Error('no'))).toBe(false)
     expect(loginFailureCopy('apple')).toEqual({
       title: 'Apple 로그인에 실패했어요',
-      body: '잠시 후 다시 시도하거나 다른 방법으로 계속해 주세요.',
+      body: '잠시 후 다시 시도해 주세요.',
     })
     expect(loginFailureCopy('google').title).toBe('Google 로그인에 실패했어요')
     expect(loginFailureCopy('github').title).toBe('GitHub 로그인에 실패했어요')
-    expect(loginFailureCopy('github').body).toBe('잠시 후 다시 시도하거나 다른 방법으로 계속해 주세요.')
+    expect(loginFailureCopy('github').body).toBe('잠시 후 다시 시도해 주세요.')
   })
 })
 

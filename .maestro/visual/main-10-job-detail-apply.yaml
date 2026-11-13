@@ -58,7 +58,7 @@ tags:
           env:
             TEXT: "이 서류로 지원하기"
 - extendedWaitUntil:
-    visible: "지원했어요. 내 활동에서.*"
+    visible: "지원했어요"
     timeout: 10000
     optional: true
 - takeScreenshot: Applied

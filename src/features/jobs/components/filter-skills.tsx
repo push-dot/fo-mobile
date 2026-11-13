@@ -1,11 +1,9 @@
 import { searchHangul } from '@push/shared'
 import { useState } from 'react'
-import { Text, TextField } from '../../../shared/components'
+import { Chip, Text, TextField } from '../../../shared/components'
 import { useProfile } from '../api/hooks'
 import { POPULAR_SKILL_COUNT, SKILL_CATALOG } from '../constants'
-import ChoiceList from './choice-list'
-
-const asOptions = (skills: string[]) => skills.map((s) => ({ key: s, label: s }))
+import FilterGroup from './filter-group'
 
 const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; trending: string[]; onToggle: (s: string) => void }) => {
   const [q, setQ] = useState('')
@@ -13,22 +11,41 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
   const mine = (profile.data?.skills ?? []).filter((s) => !selected.includes(s))
   const popular = trending.filter((s) => !selected.includes(s)).slice(0, POPULAR_SKILL_COUNT)
   const found = q.trim() ? searchHangul(SKILL_CATALOG, q, (s) => [s]).map((r) => r.item) : []
-  const group = (title: string, skills: string[]) => (skills.length ? <ChoiceList title={title} options={asOptions(skills)} selected={selected} onToggle={onToggle} /> : null)
   return (
     <>
       <TextField compact icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
       {q.trim() ? (
-        found.length ? (
-          group('검색 결과', found)
-        ) : (
-          <Text v="b2" color="t3">
-            맞는 기술이 없어요. 다른 이름으로 찾아보세요.
-          </Text>
-        )
+        <FilterGroup title="검색 결과">
+          {found.length ? (
+            found.map((s) => <Chip key={s} label={s} check on={selected.includes(s)} onPress={() => onToggle(s)} />)
+          ) : (
+            <Text v="b2" color="t3">
+              맞는 기술이 없어요. 다른 이름으로 찾아보세요.
+            </Text>
+          )}
+        </FilterGroup>
       ) : null}
-      {group('선택한 기술', selected)}
-      {group('내 프로필 기술', mine)}
-      {group('많이 찾는 기술', popular)}
+      {selected.length ? (
+        <FilterGroup title="선택한 기술">
+          {selected.map((s) => (
+            <Chip key={s} label={s} on check onPress={() => onToggle(s)} />
+          ))}
+        </FilterGroup>
+      ) : null}
+      {mine.length ? (
+        <FilterGroup title="내 프로필 기술">
+          {mine.map((s) => (
+            <Chip key={s} label={s} onPress={() => onToggle(s)} />
+          ))}
+        </FilterGroup>
+      ) : null}
+      {popular.length ? (
+        <FilterGroup title="많이 찾는 기술">
+          {popular.map((s) => (
+            <Chip key={s} label={s} onPress={() => onToggle(s)} />
+          ))}
+        </FilterGroup>
+      ) : null}
     </>
   )
 }

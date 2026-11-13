@@ -1,4 +1,5 @@
-import ChoiceList from './choice-list'
+import { Chip } from '../../../shared/components'
+import FilterGroup from './filter-group'
 
 const FilterOptions = <K extends string>({
   options,
@@ -8,6 +9,12 @@ const FilterOptions = <K extends string>({
   options: { key: K; label: string }[]
   selected: K[]
   onToggle: (k: K) => void
-}) => <ChoiceList options={options} selected={selected} onToggle={(k) => onToggle(k as K)} />
+}) => (
+  <FilterGroup>
+    {options.map((o) => (
+      <Chip key={o.key} label={o.label} check on={selected.includes(o.key)} onPress={() => onToggle(o.key)} />
+    ))}
+  </FilterGroup>
+)
 
 export default FilterOptions

@@ -11,22 +11,10 @@ import { useReduceMotion } from './use-reduce-motion'
 
 const TOAST_HEIGHT = 52
 const ACTION_HEIGHT = 44
-// v412 boards: iOS shows a top notification banner (app tile + one line), Android the Material snackbar (8pt side margin, 4pt corners).
+// v415 boards: iOS shows a top notification banner (one line of text, no app tile), Android the Material snackbar (8pt side margin, 4pt corners).
 const SHAPE = Platform.OS === 'ios'
   ? { inset: spacing[4], radius: 22, shadow: cssShadow.toast }
   : { inset: spacing[2], radius: 4, shadow: cssShadow.toast }
-const APP_TILE = 32
-
-const AppTile = () => {
-  const c = useColors()
-  return (
-    <View style={{ width: APP_TILE, height: APP_TILE, borderRadius: radius.sm, backgroundColor: c.t1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text v="c1" weight="800" style={{ color: c.bg }}>
-        P.
-      </Text>
-    </View>
-  )
-}
 
 // Not the Material snackbar: @expo/ui's Snackbar has a fixed shape (no 16pt radius or 52pt height) and no dismiss API.
 const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow: string; opaque?: boolean; children: ReactNode }) => {
@@ -89,7 +77,6 @@ const ToastHost = () => {
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
-          {ios ? <AppTile /> : null}
           <Text v="b2" weight="600" style={{ flex: 1, color: ink.text }}>
             {toast.message}
           </Text>

@@ -10,7 +10,7 @@ export const PROVIDER_MARK = {
 
 export const PROVIDER_LABEL = { google: 'Google', apple: 'Apple', github: 'GitHub' } as const
 export const PROVIDER_ORDER = ['google', 'apple', 'github'] as const
-export const FAILURE_BODY = '잠시 후 다시 시도하거나 다른 방법으로 계속해 주세요.'
+export const FAILURE_BODY = '잠시 후 다시 시도해 주세요.'
 
 export const GOOGLE_START = 'Google로 시작하기'
 export const APPLE_START = 'Apple로 시작하기'

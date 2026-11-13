@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pressable, useWindowDimensions, View } from 'react-native'
+import { Alert, Pressable, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import {
@@ -25,7 +25,7 @@ import {
 } from '@/features/auth'
 import { DEV_AUTH_TOKEN, signIn, signInWithApple, signInWithDevToken, type SignInOutcome } from '@/shared/infrastructure'
 import { Mascot, Text } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { spacing, useColors } from '@/theme'
 
 const devToken = __DEV__ ? DEV_AUTH_TOKEN : undefined
 
@@ -35,28 +35,32 @@ const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   router.push('/phone')
 }
 
+// A failed login is the platform's own alert (iOS alert, Android dialog), not a box drawn on the screen.
+const fail = (provider: LoginProvider) => {
+  const { title, body } = loginFailureCopy(provider)
+  Alert.alert(title, body, [{ text: '확인' }])
+}
+
 const SignInScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const compact = useWindowDimensions().height < COMPACT_HEIGHT
   const apple = useAppleSignIn()
   const [busy, setBusy] = useState(false)
-  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null)
 
   const run = (provider: LoginProvider) => {
     setBusy(true)
-    setFailure(null)
     const attempt = provider === 'apple' ? signInWithApple() : signIn(provider)
     attempt
       .then((outcome) => {
         if (outcome.kind === 'cancelled') return
         if (outcome.kind === 'failed') {
-          setFailure(loginFailureCopy(provider))
+          fail(provider)
           return
         }
         continueWith(provider, outcome)
       })
-      .catch(() => setFailure(loginFailureCopy(provider)))
+      .catch(() => fail(provider))
       .finally(() => setBusy(false))
   }
 
@@ -105,23 +109,6 @@ const SignInScreen = () => {
           </Pressable>
         ) : null}
       </View>
-
-      {failure ? (
-        <View
-          accessibilityRole="alert"
-          style={{ position: 'absolute', left: 20, right: 20, top: insets.top + 16, flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], padding: spacing[4], borderRadius: radius.lg, backgroundColor: c.redSoft }}
-        >
-          <Text weight="800" color="red">
-            !
-          </Text>
-          <View style={{ flex: 1, gap: spacing[1] }}>
-            <Text weight="700">{failure.title}</Text>
-            <Text v="c1" color="t2">
-              {failure.body}
-            </Text>
-          </View>
-        </View>
-      ) : null}
     </View>
   )
 }

@@ -3,7 +3,7 @@ import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client
 import { GlassButton, SheetScroll, Text } from '../../../shared/components'
 import { hitSlopTo, type } from '../../../theme'
 import { FILTER_TITLES } from '../constants'
-import { EMPTY, toggle, type FilterKey, type Filters } from '../utils'
+import { EMPTY, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
 import FilterOptions from './filter-options'
 import FilterRegions from './filter-regions'
 import FilterSkills from './filter-skills'
@@ -31,7 +31,7 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, scroll }: P
     ) : kind === 'skills' ? (
       <FilterSkills selected={draft.skills} trending={trending} onToggle={(s) => set(toggle(draft.skills, s))} />
     ) : (
-      <FilterRegions draft={draft} onChange={set} />
+      <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} />
     )
   return (
     <View style={{ gap: 14, flexGrow: 1 }}>
