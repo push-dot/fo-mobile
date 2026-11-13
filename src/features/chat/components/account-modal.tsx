@@ -1,7 +1,7 @@
 import { brandColor } from '@push/shared'
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
-import { spacing, useColors } from '../../../theme'
+import { spacing } from '../../../theme'
 import { Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
@@ -49,26 +49,6 @@ const AccountRow = ({ label, value, bold, onPress }: { label: string; value?: st
   )
 }
 
-// The board's row is min-height 56 content-box plus 16 padding top and bottom, so the bar sits high with room below.
-const USAGE_ROW_HEIGHT = 88
-
-const UsageRow = ({ percent }: { percent: number }) => {
-  const c = useColors()
-  return (
-    <View style={{ minHeight: USAGE_ROW_HEIGHT, paddingVertical: spacing[4], gap: spacing[2] }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Text v="b1">사용량</Text>
-        <Text v="b2" color="t2">
-          이번 달 {percent}% 썼어요
-        </Text>
-      </View>
-      <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: percent }} style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}>
-        <View style={{ width: `${percent}%`, height: 6, backgroundColor: c.ac }} />
-      </View>
-    </View>
-  )
-}
-
 // The boards pad a group title 22 above and 8 below, and the page stacks its blocks 4 apart.
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
@@ -95,7 +75,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
       <View style={GROUP}>
         <SettingsGroup>
           <AccountRow label={account?.plan ?? ' '} bold onPress={onPlan} />
-          {usage == null ? null : <UsageRow percent={usage} />}
+          {usage == null ? null : <AccountRow label={`이번 달 사용량 ${usage}%`} onPress={() => router.push('/account-usage')} />}
         </SettingsGroup>
       </View>
       <GroupTitle style={TITLE}>{ACCOUNT_REFERENCE_TITLE}</GroupTitle>

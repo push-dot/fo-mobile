@@ -19,7 +19,7 @@ tags:
     visible: "Bot이 참고하는 내 정보"
     timeout: 10000
 - extendedWaitUntil:
-    visible: "이번 달 64% 썼어요"
+    visible: "이번 달 사용량 64%"
     timeout: 5000
 - extendedWaitUntil:
     visible: "대화를 시작할 때 Bot이 이 정보부터 읽어요."
@@ -27,3 +27,13 @@ tags:
 - assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
 - takeScreenshot: ChatAccount
+# The usage row opens ChatAccountUsage, one page deeper.
+- tapOn: "이번 달 사용량 64%"
+- extendedWaitUntil:
+    visible: "크레딧 구매"
+    timeout: 5000
+- extendedWaitUntil:
+    visible: ".*월 1일에 다시 채워져요."
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: ChatAccountUsage
