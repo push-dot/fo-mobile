@@ -123,7 +123,7 @@ describe('botRow', () => {
   it('draws the Push Bot body and says the state that has no visible label', () => {
     const push: Bot = { ...bot({ unread: true }), kind: 'push', name: 'Push Bot' }
     expect(botRow(push, undefined, now)).toMatchObject({ color: 'push', accessibilityLabel: 'Push Bot, 완료 안 읽음' })
-    expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now).accessibilityLabel).toBe('모아페이, 확인 필요')
+    expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now).accessibilityLabel).toBe('모아페이 봇, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전')
   })
 
   it('follows this session over the list: a stream in progress and a chat open at its bottom', () => {

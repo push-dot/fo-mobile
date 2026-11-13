@@ -4,6 +4,7 @@ import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors, useShadow } from '@/theme'
 import { GlassButton, Icon, Text, type IconName } from '@/shared/components'
+import { botHomePath } from '@/features/bots'
 import { useChatAccount, useMe } from '../api/hooks'
 import Mark from './mark'
 import { accountPath, bookmarksPath, docsPath, linksPath } from '../utils'
@@ -21,7 +22,7 @@ export const ChatSidebar = ({ currentId }: { currentId?: string }) => {
   const account = useChatAccount(true)
 
   const onClose = () => router.back()
-  const newChat = () => (currentId ? router.dismissTo('/chat') : onClose())
+  const newChat = () => (currentId ? router.dismissTo(botHomePath) : onClose())
 
   const menu: { icon: IconName; label: string; onPress: () => void }[] = [
     { icon: 'edit', label: '새 대화', onPress: newChat },

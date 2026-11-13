@@ -1,0 +1,21 @@
+appId: app.push.mobile
+name: BotHomeSearch
+tags:
+  - visual
+---
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "새 회사 봇 만들기"
+- tapOn: "검색"
+- extendedWaitUntil:
+    visible: "봇 이름이나 대화 내용으로 찾아보세요"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotHomeSearch

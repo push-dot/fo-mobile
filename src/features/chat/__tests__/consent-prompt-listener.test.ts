@@ -30,7 +30,7 @@ const { askConsent, useConsentPrompt } = await import('../stores')
 const { routeConsentWhenOpen } = await import('../components/consent-prompt-listener')
 
 const chatTabSource = readFileSync(
-  new URL('../../../app/(app)/(stack)/(tabs)/(chat)/chat.tsx', import.meta.url),
+  new URL('../../../app/(app)/(stack)/(tabs)/(bots)/bots.tsx', import.meta.url),
   'utf8',
 )
 const stackLayoutSource = readFileSync(
