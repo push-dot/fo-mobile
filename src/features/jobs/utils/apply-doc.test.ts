@@ -4,16 +4,10 @@ import { applyBody, applyDoc, splitApplyDocs } from './apply-doc'
 const item = { id: 's1', fileName: '이력서.pdf', mimeType: 'application/pdf', size: 1, pageCount: null }
 
 describe('applyDoc', () => {
-  it('labels AI documents and uploads from the sources list', () => {
+  it('shows the date only, never how the document was made', () => {
     const createdAt = new Date(2026, 9, 12).toISOString()
-    expect(applyDoc({ ...item, origin: 'AI', createdAt })).toEqual({ id: 's1', name: '이력서.pdf', ai: true, note: '봇으로 맞춘 서류 · 10월 12일', kind: null, date: createdAt })
-    expect(applyDoc({ ...item, origin: 'UPLOAD', createdAt: null })).toEqual({ id: 's1', name: '이력서.pdf', ai: false, note: '원본', kind: null, date: null })
-  })
-
-  it('says 오늘 when the document was made today', () => {
-    const now = new Date(2026, 9, 12, 15, 0)
-    const createdAt = new Date(2026, 9, 12, 9, 0).toISOString()
-    expect(applyDoc({ ...item, origin: 'AI', createdAt }, now).note).toBe('봇으로 맞춘 서류 · 오늘')
+    expect(applyDoc({ ...item, origin: 'AI', createdAt })).toEqual({ id: 's1', name: '이력서.pdf', ai: true, note: '10월 12일', kind: null, date: createdAt })
+    expect(applyDoc({ ...item, origin: 'UPLOAD', createdAt: null })).toEqual({ id: 's1', name: '이력서.pdf', ai: false, note: '', kind: null, date: null })
   })
 
   it('splitApplyDocs puts portfolios into extras', () => {

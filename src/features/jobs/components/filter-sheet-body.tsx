@@ -1,9 +1,9 @@
-import { Pressable, View, type LayoutChangeEvent } from 'react-native'
+import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
 import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
-import { SheetScroll, Text } from '../../../shared/components'
+import { GlassButton, SheetScroll, Text } from '../../../shared/components'
 import { hitSlopTo, type } from '../../../theme'
 import { FILTER_TITLES } from '../constants'
-import { EMPTY, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
+import { EMPTY, toggle, type FilterKey, type Filters } from '../utils'
 import FilterOptions from './filter-options'
 import FilterRegions from './filter-regions'
 import FilterSkills from './filter-skills'
@@ -13,10 +13,13 @@ type Props = {
   draft: Filters
   trending: string[]
   onChange: (filters: Filters) => void
+  /** iOS draws a glass close button left of the centred title (the boards' native sheet header). */
+  onClose: () => void
   scroll?: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
-const FilterSheetBody = ({ kind, draft, trending, onChange, scroll }: Props) => {
+const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, scroll }: Props) => {
+  const ios = Platform.OS === 'ios'
   const set = (list: Filters[FilterKey]) => onChange({ ...draft, [kind]: list })
   const options =
     kind === 'category' ? (
@@ -28,12 +31,13 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, scroll }: Props) => 
     ) : kind === 'skills' ? (
       <FilterSkills selected={draft.skills} trending={trending} onToggle={(s) => set(toggle(draft.skills, s))} />
     ) : (
-      <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} />
+      <FilterRegions draft={draft} onChange={set} />
     )
   return (
     <View style={{ gap: 14, flexGrow: 1 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text v="h2" accessibilityRole="header">
+        {ios ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null}
+        <Text v={ios ? 'h3' : 'h2'} accessibilityRole="header" style={ios ? { flex: 1, textAlign: 'center' } : undefined}>
           {FILTER_TITLES[kind]}
         </Text>
         <Pressable accessibilityRole="button" onPress={() => set(EMPTY[kind])} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }}>

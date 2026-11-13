@@ -3,11 +3,13 @@ import { View } from 'react-native'
 import { spacing } from '../../../theme'
 import { Text } from '../../../shared/components'
 
-const FilterGroup = ({ title, children }: { title: string; children: ReactNode }) => (
+const FilterGroup = ({ title, children }: { title?: string; children: ReactNode }) => (
   <View style={{ gap: spacing[3] }}>
-    <Text v="b2" weight="700">
-      {title}
-    </Text>
+    {title ? (
+      <Text v="b2" weight="700">
+        {title}
+      </Text>
+    ) : null}
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>{children}</View>
   </View>
 )

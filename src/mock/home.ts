@@ -116,12 +116,12 @@ const READ = daysAgo(0, 0)
 const morning = () => new Date(Math.max(startOfToday, Math.min(new Date().setHours(9, 0, 0, 0), Date.now() - 181 * 60_000))).toISOString()
 const notifications: AppNotification[] = [
   { id: 'n1', type: 'APPLICATION_STAGE', title: '지원 상태가 바뀌었어요', body: '모아페이 백엔드 엔지니어 · 면접 진행 중', target: { kind: 'activity', id: 'a1' }, readAt: null, createdAt: today(0) },
-  { id: 'n2', type: 'AI_DONE', title: '봇 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
+  { id: 'n2', type: 'AI_DONE', title: 'Bot 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
   { id: 'n3', type: 'OFFER', title: '제안 받음', body: '오지현 님이 결제 플랫폼팀 커피챗을 제안했어요.', target: { kind: 'offer', id: 'o1' }, readAt: null, createdAt: today(120) },
   { id: 'n4', type: 'DEADLINE', title: '마감 임박 공고', body: '북마크한 파도AI 데이터 분석가 공고가 2일 남았어요.', target: { kind: 'posting', id: 'p2' }, readAt: READ, createdAt: morning() },
   { id: 'n5', type: 'COMMENT', title: '댓글과 답글', body: '박도윤 님이 내 글에 답글을 남겼어요. “저도 같은 고민이었어요!”', target: { kind: 'post', id: 'post-1' }, readAt: READ, createdAt: daysAgo(1, 15) },
   { id: 'n6', type: 'DEADLINE', title: '마감 임박 공고', body: '도토리증권 서버 개발자 (Go) 공고가 3일 남았어요.', target: { kind: 'posting', id: 'p3' }, readAt: READ, createdAt: daysAgo(3, 10) },
-  { id: 'n7', type: 'AI_DONE', title: '봇 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
+  { id: 'n7', type: 'AI_DONE', title: 'Bot 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
   { id: 'n8', type: 'OFFER', title: '제안 받음', body: '한지민 님이 정산팀 채용 제안을 보냈어요.', target: { kind: 'offer', id: 'o2' }, readAt: READ, createdAt: daysAgo(12, 11) },
 ]
 

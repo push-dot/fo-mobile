@@ -17,6 +17,8 @@ type Props = {
   sheet?: boolean
   /** Floats over the content below (the caller positions it): a veil and blur instead of a solid bar. */
   translucent?: boolean
+  /** No fill at all: the content scrolls visibly under the bar (the caller positions it and draws any fade). */
+  transparent?: boolean
   /** The chat header (.chead): 60 high, 16 edges, 10 gap; Android draws it solid with a 1 px line under it. */
   chat?: boolean
 }
@@ -25,7 +27,7 @@ const ios = Platform.OS === 'ios'
 const EDGE = ios ? spacing[3] : spacing[2]
 const CHAT_ROW = 60
 
-const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, chat = false }: Props) => {
+const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { xl, row: baseRow, button } = useXlChrome()
@@ -36,7 +38,7 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
     <View
       style={{
         paddingTop: safeTop ? sheetHeaderTop(Platform.OS, sheet, insets.top, row) : 0,
-        backgroundColor: veil ? undefined : c.bg,
+        backgroundColor: veil || transparent ? undefined : c.bg,
         borderBottomWidth: solidChat ? 1 : 0,
         borderBottomColor: c.line,
         zIndex: 3,
