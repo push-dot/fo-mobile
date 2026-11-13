@@ -73,7 +73,7 @@ const tailorRead: Step[] = [
 
 // 마이 › 서류 › 봇으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
 const fixDocRun: Step[] = [
-  s(200, status('읽는 중…')),
+  s(200, status('서류를 읽는 중')),
   s(300, tool('resume', '이력서 읽기', RESUME, 'run', '서류를 읽는 중')),
   s(HOLD, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')),
   done,

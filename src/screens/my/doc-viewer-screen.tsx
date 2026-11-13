@@ -151,7 +151,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           label="봇으로 고치기"
           icon="spark"
           variant="secondary"
-          onPress={() => void start(FIX_DOC, FIX_DOC, undefined, undefined, undefined, { evidenceIds: [id] })}
+          onPress={() => void start(FIX_DOC, FIX_DOC, s?.fileName, undefined, undefined, { evidenceIds: [id] })}
         />
         <Button label="내 프로필로 전환" icon="user" disabled={!d} onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
       </CtaBar>

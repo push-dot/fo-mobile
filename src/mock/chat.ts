@@ -353,7 +353,8 @@ mock('POST', 'chat/docs', ({ body }) => {
 })
 // Tour switches (links.ts): `plan-ultra` is an ULTRA account (4x PRO's credits), `credits-out` has spent all of them (ChatNoCreditUltra).
 // `few-materials` is the account ChatMention draws: two bookmarks, two documents, one link. `run` is the token the next messages play.
-let account: { ultra: boolean; spent: boolean; few: boolean; run?: string } = { ultra: false, spent: false, few: false }
+// `payments-closed` answers paymentsEnabled: false, so every buy button hides (PlanUpgradeClosed, PlanUltraClosed, ChatPh1FitClosed).
+let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; run?: string } = { ultra: false, spent: false, few: false, closed: false }
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }
 }
@@ -361,7 +362,7 @@ mock('GET', 'chat/account', () => {
   const total = account.ultra ? 20_000 : 5000
   const used = account.spent ? total : account.ultra ? 12_800 : 3200
   const now = new Date()
-  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
+  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
 })
 
 // ---------- quick-start ingredients ----------

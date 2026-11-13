@@ -18,6 +18,7 @@ import {
   onPostingChosen,
   pickPosting,
   postingMeta,
+  postingOf,
   retryCreate,
   startLinkCheck,
   submitCreate,
@@ -144,5 +145,21 @@ describe('posting lines', () => {
     expect(asLink('careers.moapay.co.kr/jobs/1042')).toBe('https://careers.moapay.co.kr/jobs/1042')
     expect(asLink('https://moapay.co.kr/about')).toBe('https://moapay.co.kr/about')
     expect(linkLabel('https://careers.moapay.co.kr/jobs/1042')).toBe('careers.moapay.co.kr/jobs/1042')
+  })
+})
+
+describe('postingOf', () => {
+  const posting: PostingPick = { postingId: 'p1', company: '모아', title: '백엔드 엔지니어' }
+
+  it('has no posting while searching, checking a link, or at the limit', () => {
+    const form = initialForm()
+    expect(postingOf(form.phase)).toBeNull()
+    expect(postingOf(focusSearch(form).phase)).toBeNull()
+    expect(postingOf(startLinkCheck(focusSearch(form), 'https://a.test/jobs/1').phase)).toBeNull()
+    expect(postingOf(failCreate(form, 'limit').phase)).toBeNull()
+  })
+
+  it('returns the posting once one is picked', () => {
+    expect(postingOf(pickPosting(initialForm(), posting).phase)).toEqual(posting)
   })
 })

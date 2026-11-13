@@ -24,6 +24,7 @@ import {
   Avatar,
   careerDeleteBody,
   careerDeleteCopy,
+  restoreAt,
   careerPeriod,
   FieldLabel,
   AVATAR_IMAGE_OPTIONS,
@@ -362,7 +363,12 @@ const EditIntro = ({ p }: { p: Profile }) => {
   )
 }
 
+// Stable keys: index keys let a deleted card's field state leak into the next card and into the restored one.
+let draftSeq = 0
+const draftKey = () => `career-${++draftSeq}`
+
 type CareerDraft = {
+  key: string
   company: string
   role: string
   start: string
@@ -372,6 +378,7 @@ type CareerDraft = {
   saved?: { head: string; period: string }
 }
 const toDraft = (c: Career): CareerDraft => ({
+  key: draftKey(),
   company: c.company,
   role: c.role,
   start: c.startedOn.replace('-', '.'),
@@ -408,11 +415,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
       action: {
         label: careerDeleteCopy.undo,
         onPress: () => {
-          setItems((xs) => {
-            const next = [...xs]
-            next.splice(i, 0, item)
-            return next
-          })
+          setItems((xs) => restoreAt(xs, i, item))
           setOpen(i)
         },
       },
@@ -449,7 +452,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
           const end = it.current ? null : parseYm(it.end)
           const period = it.saved?.period ?? (start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null)
           return (
-            <View key={i} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
+            <View key={it.key} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                 <Pressable
                   accessibilityRole="button"
@@ -590,7 +593,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
           onPress={() => {
             setItems((xs) => [
               ...xs,
-              { company: '', role: '', start: '', end: '', current: true, description: '' },
+              { key: draftKey(), company: '', role: '', start: '', end: '', current: true, description: '' },
             ])
             setOpen(items.length)
           }}

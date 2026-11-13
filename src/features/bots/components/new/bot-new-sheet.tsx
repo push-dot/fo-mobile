@@ -31,6 +31,7 @@ import {
   onPostingChosen,
   pickPosting,
   postingMeta,
+  postingOf,
   retryCreate,
   setQuery,
   startLinkCheck,
@@ -278,7 +279,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   }, [onOpenBot])
   const phase = form.phase
   const searching = searchPhase(form)
-  const posting = 'posting' in phase ? phase.posting : null
+  const posting = postingOf(phase)
   const query = phase.kind === 'searching' ? phase.query : ''
 
   useEffect(() => {
@@ -456,8 +457,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     </View>
   )
 
+  // Only a phase that carries a posting has a line to show; searching, link and limit phases have none.
   const mainField =
-    phase.kind === 'idle'
+    !posting
       ? shell(
           <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
             {searchIcon}
@@ -470,9 +472,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       : shell(
           <>
             {searchIcon}
-            <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting!)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
               <Text numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
-                {pickedLine(posting!)}
+                {pickedLine(posting)}
               </Text>
             </Pressable>
             {phase.kind === 'creating' ? null : (
