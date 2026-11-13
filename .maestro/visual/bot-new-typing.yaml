@@ -1,0 +1,17 @@
+appId: app.push.mobile
+name: BotNewTyping
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new
+- extendedWaitUntil:
+    visible: "이름"
+    timeout: 20000
+- tapOn: "회사, 공고, 링크로 찾아보세요"
+- inputText: "모아"
+- extendedWaitUntil:
+    visible: "백엔드 엔지니어"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewTyping

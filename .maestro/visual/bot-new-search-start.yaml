@@ -1,0 +1,16 @@
+appId: app.push.mobile
+name: BotNewSearchStart
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new
+- extendedWaitUntil:
+    visible: "이름"
+    timeout: 20000
+- tapOn: "회사, 공고, 링크로 찾아보세요"
+- extendedWaitUntil:
+    visible: "회사 이름이나 공고 이름을 입력해 보세요. 링크를 붙여 넣어도 돼요."
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewSearchStart
