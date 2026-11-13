@@ -51,6 +51,7 @@ const SignedInStack = () => {
       <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
       <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="account" options={modalOptions(c)} />
+      <Stack.Screen name="account-usage" />
       <Stack.Screen name="plan" />
       <Stack.Screen name="plan-notice" />
       <Stack.Screen

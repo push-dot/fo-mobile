@@ -79,7 +79,8 @@ export const PLAN_NOTICES = [
   '결제 후 7일 안에 쓰지 않았다면 청약을 철회할 수 있어요. 사용량을 쓴 뒤에는 철회가 제한될 수 있어요.',
   '미성년자가 법정대리인 동의 없이 결제했다면 본인이나 법정대리인이 취소할 수 있어요.',
 ] as const
-export const PLAN_FOOT = '매월 1일에 사용량이 다시 채워져요.'
+export const PLAN_FOOT = '구독은 매월 자동으로 갱신돼요.'
+export const PLAN_NOTICE_LINK = '구독 안내'
 export const PLAN_NOTICE_FOOT = '결제와 환불은 서비스 이용약관 제6조를 따라요.'
 export const ACCOUNT_REFERENCE_TITLE = 'Bot이 참고하는 내 정보'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'

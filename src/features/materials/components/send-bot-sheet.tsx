@@ -1,10 +1,10 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import { useBots, type Bot } from '@/features/bots'
-import { Button, Icon, Mascot, Sheet, Text } from '@/shared/components'
+import { GlassButton, Icon, Mascot, Sheet, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
-import { SEND_PICK_CANCEL, SEND_PICK_TITLE } from '../constants'
+import { SEND_PICK_TITLE } from '../constants'
 import type { MaterialKind } from '../types'
 import { toAttachment } from '../utils/material-row'
 import { sendToBot } from './send-material'
@@ -32,9 +32,12 @@ export const SendBotSheet = ({ kind, id }: { kind: MaterialKind; id: string }) =
   const attachment = material ? toAttachment(material) : null
   return (
     <Sheet gap={10}>
-      <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1], paddingHorizontal: spacing[1] }}>
-        {SEND_PICK_TITLE}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+        <Text v="h3" accessibilityRole="header" style={{ flex: 1, minWidth: 0, paddingHorizontal: spacing[1] }}>
+          {SEND_PICK_TITLE}
+        </Text>
+        <GlassButton circle iconSize={18} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
+      </View>
       {attachment ? (
         <View style={{ alignSelf: 'flex-start', maxWidth: 270, padding: 6, borderRadius: 14, backgroundColor: c.bg2 }}>
           <Text v="c1" weight="600" numberOfLines={1}>
@@ -45,7 +48,6 @@ export const SendBotSheet = ({ kind, id }: { kind: MaterialKind; id: string }) =
       <View>
         {attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}
       </View>
-      <Button label={SEND_PICK_CANCEL} variant="secondary" onPress={() => router.back()} />
     </Sheet>
   )
 }

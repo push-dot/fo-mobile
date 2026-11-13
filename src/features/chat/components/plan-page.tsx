@@ -4,7 +4,7 @@ import { radius, selectedRing, spacing, useColors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { useChatAccount } from '../api/hooks'
-import { PLAN_FOOT, PLAN_HEADER, PLAN_NOTICES, PLAN_NOTICE_FOOT } from '../constants'
+import { PLAN_FOOT, PLAN_HEADER, PLAN_NOTICES, PLAN_NOTICE_FOOT, PLAN_NOTICE_LINK } from '../constants'
 import { Appear } from './motion'
 import PageModal from './page-modal'
 
@@ -105,10 +105,16 @@ export const PlanPage = () => {
             ))}
           </View>
           <LinkRow label="크레딧 구매" onPress={pay(() => purchase.buyCredits())} />
-          <LinkRow label="구독 안내" onPress={() => router.push('/plan-notice')} />
-          <Text v="c1" color="t3" style={{ paddingTop: spacing[3], paddingHorizontal: spacing[6] }}>
-            {PLAN_FOOT}
-          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: spacing[3], paddingHorizontal: spacing[6] }}>
+            <Text v="c1" color="t3">
+              {PLAN_FOOT}
+            </Text>
+            <Pressable accessibilityRole="link" onPress={() => router.push('/plan-notice')} hitSlop={spacing[2]}>
+              <Text v="c1" color="t3" style={{ textDecorationLine: 'underline' }}>
+                {PLAN_NOTICE_LINK}
+              </Text>
+            </Pressable>
+          </View>
         </Appear>
       ) : null}
     </PageModal>

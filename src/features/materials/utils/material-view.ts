@@ -59,12 +59,6 @@ const careerOf = (min: number | null, max: number | null): string | null => {
   return max ? `${min ?? 0}–${max}년` : `${min}년 이상`
 }
 
-const checkedFact = (check: { at: Date; ok: boolean }, now: Date) => {
-  const ago = daysBetween(check.at, now)
-  const day = ago === 0 ? '오늘' : ago === 1 ? '어제' : monthDay(check.at)
-  return `${day} · ${check.ok ? '열림' : '열리지 않음'}`
-}
-
 export type Fact = { label: string; value: string }
 
 const facts = (rows: [string, string | null][]): Fact[] => rows.flatMap(([label, value]) => (value ? [{ label, value }] : []))
@@ -92,12 +86,11 @@ const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: 
       ['위치', m.location],
       ['북마크', monthDay(m.bookmarkedAt)],
     ]),
-  link: (m, _usedBy, now) =>
+  link: (m) =>
     facts([
       ['주소', hostOf(m.url)],
       ['종류', LINK_LABEL[m.linkKind]],
       ['추가', monthDay(m.addedAt)],
-      ['마지막 확인', m.lastCheck && checkedFact(m.lastCheck, now)],
     ]),
 }
 
@@ -114,7 +107,7 @@ export const deleteCopy = (m: Material) => {
   const noun = NOUN[m.kind]
   return {
     title: `‘${title}’${hasBatchim(title) ? '을' : '를'} 삭제할까요?`,
-    body: `삭제하면 어느 Bot에서도 이 ${noun}를 쓸 수 없어요. 지운 ${noun}는 30일 동안 보관된 뒤 완전히 지워지고, 이미 나눈 대화 내용은 그대로 남아요.`,
+    body: '30일 뒤 완전히 지워져요.',
     done: `${noun}를 삭제했어요`,
     failed: `${noun}를 삭제하지 못했어요`,
   }

@@ -119,12 +119,13 @@ export const MaterialDetailSheet = ({
   }
 
   const facts = detailFacts(m, detail.data?.usedBy ?? [], now)
-  // 마지막 확인 breaks on two lines in the 72 wide label column the other facts fit.
-  const labelWidth = facts.some((f) => f.label.length > 5) ? 88 : 72
 
   return (
     <Sheet gap={14}>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3] }}>
+        <Text v="h3" accessibilityRole="header" style={{ flex: 1, minWidth: 0, paddingTop: spacing[1] }}>
+          {detailTitle(m)}
+        </Text>
         <GlassButton
           circle
           iconSize={21}
@@ -145,9 +146,6 @@ export const MaterialDetailSheet = ({
           ]}
         />
       </View>
-      <Text v="h3" accessibilityRole="header">
-        {detailTitle(m)}
-      </Text>
       <View
         style={{
           gap: spacing[2],
@@ -159,7 +157,7 @@ export const MaterialDetailSheet = ({
       >
         {facts.map((f) => (
           <View key={f.label} style={{ flexDirection: 'row', gap: spacing[3] }}>
-            <Text v="c1" color="t3" style={{ width: labelWidth, fontSize: 14, lineHeight: 20 }}>
+            <Text v="c1" color="t3" style={{ width: 72, fontSize: 14, lineHeight: 20 }}>
               {f.label}
             </Text>
             <Text v="c1" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
