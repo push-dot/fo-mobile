@@ -51,28 +51,15 @@ name: 봇 → 사이드바 → 북마크·링크에서 공고 보기·대화 시
     timeout: 10000
 - tapOn: ".*모아페이.*"
 - tapOn: "이 공고에 맞춰 대화 시작"
-# The thread header's menu button exists only on the conversation screen.
 - extendedWaitUntil:
-    visible: "대화 더 보기"
-    timeout: 20000
+    visible: "이 수정을 적용할까요?"
+    timeout: 60000
 - takeScreenshot: 08_sidebar_bookmark_posting_back-04
-# The thread has no back button: Android back, iOS edge swipe.
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - back
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - swipe:
-          start: 1%, 50%
-          end: 80%, 50%
+- tapOn: "뒤로"
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000
-- assertNotVisible: "대화 더 보기"
+- assertNotVisible: "이 수정을 적용할까요?"
 - assertNotVisible: "북마크한 공고"
 - takeScreenshot: 08_sidebar_bookmark_posting_back-05
 
@@ -88,24 +75,13 @@ name: 봇 → 사이드바 → 북마크·링크에서 공고 보기·대화 시
 - tapOn: ".*결제 플랫폼 시니어 엔지니어 더 보기"
 - tapOn: "봇에서 쓰기"
 - extendedWaitUntil:
-    visible: "대화 더 보기"
-    timeout: 20000
+    visible: "이 수정을 적용할까요?"
+    timeout: 60000
 - takeScreenshot: 08_sidebar_bookmark_posting_back-06
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - back
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - swipe:
-          start: 1%, 50%
-          end: 80%, 50%
+- tapOn: "뒤로"
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000
-- assertNotVisible: "대화 더 보기"
+- assertNotVisible: "이 수정을 적용할까요?"
 - assertNotVisible: "내 링크"
 - takeScreenshot: 08_sidebar_bookmark_posting_back-07
