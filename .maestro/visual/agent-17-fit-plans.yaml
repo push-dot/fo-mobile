@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -16,7 +16,7 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh1FitFree
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -28,7 +28,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh1FitUltra
 # The card cannot be tapped once the gate is up, so a second run holds the gate back (mock token) until the card is open.
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:

@@ -12,9 +12,9 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "Bot"
-      READY: "Push Bot"
+      READY: "Push Bot.*"
 - extendedWaitUntil:
-    visible: "Push Bot"
+    visible: "Push Bot.*"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHomeNoBots

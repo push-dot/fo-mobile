@@ -3,7 +3,7 @@ name: 회사 봇 · 상태 줄 (생각 중 · 작업 중 · 중지됨 · 순서 
 tags:
   - visual
 ---
-# One empty 모아페이 chat. run:<token> (links.ts) makes the next message play that status board: st-think / st-work / st-queue / st-long hold
+# One empty 모아페이 chat per board (each later link empties it again with bot:b-moa:empty, so a board shows its own turn only). run:<token> (links.ts) makes the next message play that status board: st-think / st-work / st-queue / st-long hold
 # one status line until 중지 ends it, st-help and st-approve stop at a card. The tour types the board's own user line (Android types the token).
 - runFlow:
     file: _login_mock.yaml
@@ -33,7 +33,7 @@ tags:
     notVisible: ".*생각 중.*"
     timeout: 10000
 # 작업 중, then 중지 on it (nothing was edited yet, so the stop drops the work).
-- openLink: "push://bots/b-moa?mock=run:st-work"
+- openLink: "push://bots/b-moa?mock=run:st-work,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml
     env:
@@ -56,7 +56,7 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusStopped
-- openLink: "push://bots/b-moa?mock=run:st-queue"
+- openLink: "push://bots/b-moa?mock=run:st-queue,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml
     env:
@@ -75,7 +75,7 @@ tags:
 - extendedWaitUntil:
     notVisible: ".*순서를 기다리는 중.*"
     timeout: 10000
-- openLink: "push://bots/b-moa?mock=run:st-long"
+- openLink: "push://bots/b-moa?mock=run:st-long,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml
     env:
@@ -95,7 +95,7 @@ tags:
     notVisible: ".*공고 3개의 필수 요건과 우대 요건을.*"
     timeout: 10000
 # 선택 카드: the run waits for an answer.
-- openLink: "push://bots/b-moa?mock=run:st-help"
+- openLink: "push://bots/b-moa?mock=run:st-help,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml
     env:
@@ -110,10 +110,10 @@ tags:
 - runFlow:
     file: _pick.yaml
     env:
-      PICK: "제품 관점"
+      PICK: ".*제품 관점.*"
       ASK: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
       NEXT: ".*메시지.*"
-- openLink: "push://bots/b-moa?mock=run:st-approve"
+- openLink: "push://bots/b-moa?mock=run:st-approve,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml
     env:

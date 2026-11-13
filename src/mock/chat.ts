@@ -126,6 +126,12 @@ const scenario = new Map<string, { prefix: string; labels: string[]; verified?: 
 const waiting = new Map<string, Card>()
 let runs = 0
 
+/** Clear chat drops the open card and the scenario, so the next message starts a run instead of answering the old card. */
+export const forgetRun = (id: string) => {
+  waiting.delete(id)
+  scenario.delete(id)
+}
+
 const isCard = (f: Frame): f is Card => (f.type === 'choice' && !f.auto) || f.type === 'approval'
 
 /** The branch the scripts take for an answer: the option's position, 0 for a section card's submit, -1 for its 그만하기. */

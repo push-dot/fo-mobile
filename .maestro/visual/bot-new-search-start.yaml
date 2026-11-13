@@ -9,8 +9,9 @@ tags:
     visible: "이름"
     timeout: 20000
 - tapOn: "회사, 공고, 링크로 찾아보세요"
+# 검색 닫기 only shows in the search state, so it proves the field took focus.
 - extendedWaitUntil:
-    visible: "회사 이름이나 공고 이름을 입력해 보세요. 링크를 붙여 넣어도 돼요."
+    visible: "검색 닫기"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewSearchStart

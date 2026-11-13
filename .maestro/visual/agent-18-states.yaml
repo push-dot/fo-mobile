@@ -8,7 +8,7 @@ tags:
     when:
       platform: iOS
     commands:
-      - runFlow: _agent_tab.yaml
+      - runFlow: _company_tab.yaml
       - runFlow:
           file: _say.yaml
           env:
@@ -19,7 +19,7 @@ tags:
           timeout: 30000
       - waitForAnimationToEnd
       - takeScreenshot: ChatStates.1
-      - runFlow: _fresh_chat.yaml
+      - runFlow: _fresh_company.yaml
       - runFlow:
           file: _say.yaml
           env:

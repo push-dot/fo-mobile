@@ -3,18 +3,35 @@ name: 봇 · 공고를 아직 모를 때 헤더는 로고만
 tags:
   - visual
 ---
+# The board draws a user line with the file chip, answered by the Push Bot asking for a posting. 서류 › Bot한테 보내기 opens a new
+# Push Bot chat with that line and chip; run:no-posting makes the mock answer it with the no-posting reply (a bot line is not
+# tapped here: that would open the profile).
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
-- runFlow:
-    file: _say.yaml
-    env:
-      KO: "no-posting"
-      EN: "no-posting"
+- runFlow: ../flows/_dismiss_logbox.yaml
+- openLink: push://?mock=run:no-posting,bot:push:empty
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "서류"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서_2026.pdf"
+    timeout: 10000
+- tapOn: "김서준_백엔드_이력서_2026.pdf"
+- extendedWaitUntil:
+    visible: "Bot한테 보내기"
+    timeout: 10000
+- tapOn: "Bot한테 보내기"
+# The mock starts with the reference-data consent off, so the chat opens behind its sheet.
+- extendedWaitUntil:
+    visible: "동의하고 시작하기"
+    timeout: 10000
+- tapOn: "동의하고 시작하기"
+- extendedWaitUntil:
+    notVisible: "동의하고 시작하기"
+    timeout: 10000
 - extendedWaitUntil:
     visible: ".*공고 링크를 보내 주시면.*"
     timeout: 30000
-- runFlow:
-    file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*공고 링크를 보내 주시면.*"
+- waitForAnimationToEnd
 - takeScreenshot: ChatHeaderNoCompany

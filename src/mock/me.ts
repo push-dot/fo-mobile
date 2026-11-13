@@ -66,6 +66,11 @@ let profile: Profile = {
 // Followed people, shared with hub.ts. 이하은 starts unfollowed (프로필 상세 board shows 팔로우); me/follows marks everyone it lists.
 export const following = new Set<string>()
 export const myProfile = () => profile
+/** EditIntro draws two paragraphs while MyProfile draws the first only, so the edit tour switches the longer intro on (`mock=long-intro`) after MyProfile's shot. */
+const INTRO_MORE = '요즘은 Kafka 기반 이벤트 처리와 부하 테스트에 관심이 많아요.'
+export const longIntro = () => {
+  if (!profile.intro.includes(INTRO_MORE)) profile = { ...profile, intro: `${profile.intro}\n\n${INTRO_MORE}` }
+}
 mock('GET', 'me/profile', () => ({ data: profile }))
 mock('PATCH', 'me/profile', ({ body }) => {
   const { avatarKey, ...patch } = body as Partial<Profile> & { avatarKey?: string }
@@ -712,7 +717,8 @@ const update = (id: string, patch: Partial<Offer>) => {
   const o = findOffer(id)
   if (!o) return notFound
   Object.assign(o, patch)
-  return { data: o }
+  // The answer reads like GET: an accepted o1 is the thread's one-paragraph opener, not the detail's two paragraphs the app may have cached.
+  return { data: o1View(o) }
 }
 
 // The 받은 제안 board's first row previews the opening line and 2시간 전; the detail keeps the full message and its date.

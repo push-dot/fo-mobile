@@ -1,0 +1,11 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# The company Bot has no clear-chat menu (only the Push Bot does), so a board that needs its own thread empties 모아페이's chat through the
+# mock link: bot:b-moa:empty drops the thread and the app's copy of it, and the chat is back on its greeting and chips.
+---
+- openLink: push://bots/b-moa?mock=bot:b-moa:empty
+- extendedWaitUntil:
+    visible: "적합도 보기"
+    timeout: 10000
+- waitForAnimationToEnd
