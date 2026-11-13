@@ -21,7 +21,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*작업을 중지했어요.*"
     timeout: 5000
-- openLink: push://bots/push?mock=run:
+- openLink: "push://bots/push?mock=run:"
 - runFlow:
     file: _say.yaml
     env:
