@@ -6,7 +6,7 @@ tags:
 - runFlow: ../flows/_login.yaml
 - openLink: push://bots/new
 - extendedWaitUntil:
-    visible: "봇 만들기"
+    visible: "Bot 만들기"
     timeout: 20000
 - extendedWaitUntil:
     visible: "이름"

@@ -8,6 +8,7 @@ export const botChatPath = (bot: BotAddress) => `/bots/${bot}` as const
 /** Opens the chat at one message (a search hit). */
 export const botChatAtPath = (id: BotId, messageId: string) => `/bots/${id}?at=${messageId}` as const
 export const botProfilePath = (id: BotId) => `/bots/${id}/profile` as const
+export const botCompaniesPath = (id: BotId) => `/bots/${id}/companies` as const
 export const botColorPath = (id: BotId) => `/bots/${id}/color` as const
 /** With a posting the sheet opens with it picked (BotNewLinkPicked). */
 export const botNewPath = (postingId?: string) => (postingId ? (`/bots/new?posting=${postingId}` as const) : ('/bots/new' as const))

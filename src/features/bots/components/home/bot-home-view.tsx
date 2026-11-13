@@ -6,14 +6,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useKeyboardHeight, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
-import BotDeleteSheet from '../profile/bot-delete-sheet'
+import { confirmDeleteBot } from '../profile/confirm-delete-bot'
 import { XL_FONT_SCALE } from '../new/copy'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
 import { accountPath, botChatAtPath, botChatPath, botNewPath, botProfilePath, materialsPath } from '../../utils/paths'
 import BotHomeBar from './bot-home-bar'
-import BotHomeEmpty from './bot-home-empty'
 import BotHomeError from './bot-home-error'
 import BotHomeHeader from './bot-home-header'
 import BotHomeHero from './bot-home-hero'
@@ -67,7 +66,6 @@ const BotHomeView = ({
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
-  const [doomed, setDoomed] = useState<CompanyBot | null>(null)
   const [scrolling, setScrolling] = useState(false)
   const [visible, setVisible] = useState<ReadonlySet<string> | null>(null)
   const searching = query !== null
@@ -100,7 +98,12 @@ const BotHomeView = ({
     if (key === 'find') router.push(botChatPath(bot.id))
     if (key === 'read') onRead(bot)
     if (key === 'mute') onMute(bot, !bot.muted)
-    if (key === 'delete') setDoomed(bot)
+    if (key === 'delete')
+      confirmDeleteBot(bot.name, () => {
+        void onDelete(bot)
+          .then(() => dropDeleted(home.companies, bot.id, onForget))
+          .catch(() => undefined)
+      })
   }
 
   const actionsFor = (bot: CompanyBot): MenuAction[] =>
@@ -164,7 +167,6 @@ const BotHomeView = ({
             <View>
               {hero}
               {error && !bots ? <BotHomeError onRetry={onRetry} /> : null}
-              {bots && home.companies.length === 0 ? <BotHomeEmpty onCreate={() => router.push(botNewPath())} /> : null}
             </View>
           }
           renderItem={({ item, index }) => {
@@ -182,20 +184,6 @@ const BotHomeView = ({
           }}
         />
       )}
-      {doomed ? (
-        <BotDeleteSheet
-          bot={doomed}
-          disabled={false}
-          onClose={() => setDoomed(null)}
-          onDelete={() => {
-            const bot = doomed
-            setDoomed(null)
-            void onDelete(bot)
-              .then(() => dropDeleted(home.companies, bot.id, onForget))
-              .catch(() => undefined)
-          }}
-        />
-      ) : null}
       <LinearGradient
         pointerEvents="none"
         colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
