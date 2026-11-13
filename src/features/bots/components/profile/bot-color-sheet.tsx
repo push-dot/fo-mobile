@@ -47,7 +47,14 @@ const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void 
                 backgroundColor: on ? c.bg : 'transparent',
               }}
             >
-              <View style={{ width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: mascotPalette(color, mode).body }} />
+              <View
+                style={{
+                  width: DOT,
+                  height: DOT,
+                  borderRadius: DOT / 2,
+                  backgroundColor: mascotPalette(color, mode).body,
+                }}
+              />
             </View>
           </Pressable>
         )
@@ -55,7 +62,7 @@ const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void 
     </View>
   )
   return (
-    <Sheet>
+    <Sheet gap={16}>
       <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
         {COLOR_TITLE}
       </Text>

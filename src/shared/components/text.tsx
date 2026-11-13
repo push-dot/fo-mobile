@@ -14,16 +14,15 @@ type Props = TextProps & {
 const Text = ({ v = 'b2', color = 't1', weight, style, ...rest }: Props) => {
   const c = useColors()
   const t = type[v]
-  const lineHeight = StyleSheet.flatten(style)?.lineHeight ?? t.lineHeight
+  const flat = StyleSheet.flatten(style)
+  const lineHeight = flat?.lineHeight ?? t.lineHeight
+  // The boards track -0.02em of the size actually drawn, so a style that sets fontSize scales the token's tracking with it.
+  const fontSize = flat?.fontSize ?? t.fontSize
+  const letterSpacing = (t.letterSpacing / t.fontSize) * fontSize
   return (
     <RNText
       {...rest}
-      style={[
-        { fontSize: t.fontSize, letterSpacing: t.letterSpacing, color: c[color] },
-        fontFor(weight ?? t.weight),
-        style,
-        { lineHeight: lineHeight - LINE_EPSILON },
-      ]}
+      style={[{ fontSize: t.fontSize, letterSpacing, color: c[color] }, fontFor(weight ?? t.weight), style, { lineHeight: lineHeight - LINE_EPSILON }]}
     />
   )
 }

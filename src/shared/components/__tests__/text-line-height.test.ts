@@ -18,3 +18,19 @@ describe('Text line height on iOS', () => {
     expect(lineHeight({ v: 'c1', style: [{ fontSize: 14 }, { lineHeight: 20 }] })).toBeCloseTo(19.99)
   })
 })
+
+describe('Text tracking', () => {
+  const tracking = (props: Parameters<typeof Text>[0]) => flatten(Text(props)!.props.style).letterSpacing as number
+
+  it('keeps the token tracking at the token size', () => {
+    expect(tracking({ v: 'b2' })).toBeCloseTo(type.b2.letterSpacing)
+  })
+
+  it('computes tracking from the size a style sets', () => {
+    expect(tracking({ v: 'b2', style: { fontSize: 22 } })).toBeCloseTo(22 * -0.02)
+  })
+
+  it('leaves a tracking the caller sets alone', () => {
+    expect(tracking({ v: 'b2', style: { fontSize: 22, letterSpacing: 1 } })).toBe(1)
+  })
+})

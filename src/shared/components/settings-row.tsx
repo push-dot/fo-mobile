@@ -13,14 +13,28 @@ type RowProps = {
   danger?: boolean
   /** The entry state (SettingsBlockedEntry): acSoft row with an acText, 700 label. */
   entry?: boolean
+  /** Accent label (acText, 700) without the row tint. Used for 차단한 사람. */
+  accent?: boolean
+  /** Draws the chevron on a row that does not open anything (the board shows it before there is a posting). */
+  chevron?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger, entry }: RowProps) => {
+const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent, chevron }: RowProps) => {
   const c = useColors()
+  const accented = entry || accent
   const body = (
-    <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], ...(entry ? { backgroundColor: c.acSoft } : {}) }}>
+    <View
+      style={{
+        minHeight: 56,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing[3],
+        paddingVertical: spacing[2],
+        ...(entry ? { backgroundColor: c.acSoft } : {}),
+      }}
+    >
       <View style={{ flex: 1 }}>
-        <Text v="b1" color={danger ? 'red' : entry ? 'acText' : 't1'} weight={entry ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
+        <Text v="b1" color={danger ? 'red' : accented ? 'acText' : 't1'} weight={accented ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
           {label}
         </Text>
         {sub ? (
@@ -30,7 +44,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, entry }: RowPr
         ) : null}
       </View>
       {right ??
-        (onPress ? (
+        (onPress || chevron ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
             {value ? (
               <Text v="b2" color="t3">
