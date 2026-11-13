@@ -21,6 +21,9 @@ const Text = ({ v = 'b2', color = 't1', weight, style, ...rest }: Props) => {
   const letterSpacing = (t.letterSpacing / t.fontSize) * fontSize
   return (
     <RNText
+      // Rule 5: Korean breaks between words, never inside one, so no syllable is left alone on a line (supersedes DESIGN-GAPS G29).
+      // Android has no word-keep option in RN; its default break already falls on the space.
+      lineBreakStrategyIOS="hangul-word"
       {...rest}
       style={[{ fontSize: t.fontSize, letterSpacing, color: c[color] }, fontFor(weight ?? t.weight), style, { lineHeight: lineHeight - LINE_EPSILON }]}
     />
