@@ -98,6 +98,7 @@ export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: stri
       piece = null
       for (const e of mapEvent(ev as StreamEvent, t.id)) put(e)
     }
+    if (t.assistant?.sources.length) put({ type: 'sources', sources: t.assistant.sources })
   }
   return { ...s, working: null, runStartedAt: null }
 }

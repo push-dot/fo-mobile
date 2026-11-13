@@ -26,6 +26,13 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       if (last?.type === 'agentText') return { ...s, items: [...s.items.slice(0, -1), { ...last, text: last.text + e.text }] }
       return { ...s, items: [...s.items, { type: 'agentText', id: `tok-${s.items.length}`, text: e.text }] }
     }
+    case 'sources': {
+      // Only a bot line of the turn that just ended can cite sources.
+      const at = s.items.findLastIndex((x) => x.type === 'agentText' || x.type === 'user')
+      const line = s.items[at]
+      if (!e.sources.length || line?.type !== 'agentText') return s
+      return { ...s, items: s.items.map((x, i) => (i === at ? { ...line, sources: e.sources } : x)) }
+    }
     case 'approval':
       return { ...s, working: null, approval: e.approval, items: attachPendingNote(s.items, e.approval.pendingNote) }
     case 'answer':

@@ -1,4 +1,4 @@
-import type { ResultAction, StreamEvent } from '@push/api-client'
+import type { BotContract, ResultAction, StreamEvent } from '@push/api-client'
 import type { PickedFile } from '@/features/my'
 import type { BadgeTone } from '@/shared/components'
 import type { Notice } from './utils/status-line'
@@ -11,7 +11,8 @@ export type TodoState = 'todo' | 'now' | 'done'
 export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
-  | { type: 'agentText'; id: string; text: string; bullets?: string[] }
+  /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
+  | { type: 'agentText'; id: string; text: string; bullets?: string[]; sources?: BotContract.Attachment[] }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
   /** How a run ended badly, drawn as a status line (ChatInterrupt, ChatVerifyFail). */
@@ -118,6 +119,7 @@ export type ChatEvent =
   | { type: 'start'; at: number }
   | { type: 'status'; verbs: string[] }
   | { type: 'token'; text: string }
+  | { type: 'sources'; sources: BotContract.Attachment[] }
   | { type: 'approval'; approval: Approval }
   | { type: 'answer'; text: string }
   | { type: 'retried'; openedAt: number; expiresAt: number }
