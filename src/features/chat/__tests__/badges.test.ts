@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 const src = (path: string) => readFileSync(new URL(`../../../${path}`, import.meta.url), 'utf8')
 
 const files = [
-  'features/chat/components/items.tsx',
+  'features/chat/components/entries/item.tsx',
   'features/chat/components/docs-modal.tsx',
   'features/chat/components/composer-area.tsx',
   'features/chat/components/quick-start-sheet.tsx',
