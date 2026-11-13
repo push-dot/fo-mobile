@@ -191,9 +191,9 @@ describe('one chat per bot', () => {
     })
     send('b-drop', '하나')
     send('b-drop', '둘', undefined, 'fit')
-    await vi.waitFor(() => expect(botApi.bots.follow).toHaveBeenCalledWith('b-drop', 1, expect.anything()))
+    await vi.waitFor(() => expect(botApi.bots.follow).toHaveBeenCalledTimes(2))
     expect(botApi.bots.send).toHaveBeenCalledTimes(1)
-    expect(chat('b-drop').working).not.toBeNull()
+    expect(chat('b-drop').working).toBeNull()
     expect(chat('b-drop').queue.map((item) => item.text)).toEqual(['둘'])
     expect(chat('b-drop').items.some((item) => item.type === 'worked')).toBe(false)
   })
@@ -218,6 +218,25 @@ describe('one chat per bot', () => {
     await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalledTimes(2))
     expect(botApi.bots.send).toHaveBeenLastCalledWith('b-next', expect.objectContaining({ text: '둘', intent: 'fit' }), expect.anything())
     expect(chat('b-next').queue.map((item) => item.text)).toEqual(['셋'])
+  })
+
+  it('sends the held line first when the reattach follow drops too', async () => {
+    botApi.bots.send.mockImplementation(async function* () {
+      yield live('t1', 1, '안')
+    })
+    botApi.bots.follow.mockImplementation(async function* () {
+      throw new Error('dropped')
+    })
+    send('b-twice', '하나')
+    send('b-twice', '둘', undefined, 'fit')
+    await vi.waitFor(() => expect(botApi.bots.follow).toHaveBeenCalledTimes(2))
+    expect(chat('b-twice').working).toBeNull()
+    expect(chat('b-twice').queue.map((item) => item.text)).toEqual(['둘'])
+    expect(botApi.bots.send).toHaveBeenCalledTimes(1)
+    send('b-twice', '셋')
+    await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalledTimes(2))
+    expect(botApi.bots.send).toHaveBeenLastCalledWith('b-twice', expect.objectContaining({ text: '둘', intent: 'fit' }), expect.anything())
+    expect(chat('b-twice').queue.map((item) => item.text)).toEqual(['셋'])
   })
 
   it('sends the held line before the one typed after a stop', async () => {

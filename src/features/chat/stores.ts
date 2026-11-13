@@ -266,7 +266,6 @@ const startRun = async (input: Outgoing) => {
         void startRun({ conversationId: id, follow: true, after: seen.seq, piece: input.piece, reattach: true })
         return
       }
-      if (input.reattach) return
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: errorText() })
       return
     }
