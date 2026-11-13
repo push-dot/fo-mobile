@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native'
+import { useState } from 'react'
+import { KeyboardAvoidingView, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Glass, Icon, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
@@ -31,6 +32,8 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
   const { field: size } = useListSize()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
+  const screen = useWindowDimensions().height
+  const [sheetHeight, setSheetHeight] = useState(screen)
   const field = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: size.height, paddingLeft: spacing[4], paddingRight: 6 }}>
       <Icon name="search" size={20} color="t3" />
@@ -55,7 +58,14 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
     </View>
   )
   return (
-    <KeyboardAvoidingView behavior="padding" pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+    // The view measures itself in the sheet but reads the keyboard in screen y. An iOS page sheet ends at the screen's bottom, so its top is the offset.
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? screen - sheetHeight : 0}
+      onLayout={(e) => setSheetHeight(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
+      pointerEvents="box-none"
+      style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}
+    >
       <View style={{ paddingTop: FADE, paddingHorizontal: spacing[4], paddingBottom: (keyboard ? 0 : insets.bottom) + GAP_BELOW }}>
         <LinearGradient
           pointerEvents="none"
