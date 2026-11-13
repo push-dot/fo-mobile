@@ -30,6 +30,7 @@ export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
   )
   return (
     <TopBar
+      translucent
       left={ios ? <Glass style={{ height: 44, borderRadius: radius.pill }}>{field}</Glass> : field}
       right={
         <>

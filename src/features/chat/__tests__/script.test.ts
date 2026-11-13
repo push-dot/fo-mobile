@@ -107,6 +107,11 @@ describe('scripted runs (mock)', () => {
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '멈춘 곳부터 이어서 할게요.' })
   }, 10_000)
 
+  it('the running 도토리증권 bot asks to continue too', async () => {
+    const s = play(emptyChat, await run({ conversationId: 'b-dotori', text: '새 이력서 만들어 줘' }))
+    expect(s.approval?.question).toBe('이어서 작성할까요?')
+  }, 10_000)
+
   it('talking after stop resumes with the added to-do', async () => {
     await run({ conversationId: 't3', text: '공고에 맞춰 고쳐 주세요' })
     const steps = await run({ conversationId: 't3', text: '자기소개서도 같이 써 줘', interrupted: true })

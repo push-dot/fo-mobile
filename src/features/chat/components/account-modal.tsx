@@ -8,7 +8,7 @@ import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/fe
 import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
-import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
+import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_NOTICES, PLAN_HEADER } from '../constants'
 import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import { Appear } from './motion'
 import GroupTitle from './group-title'
@@ -17,16 +17,16 @@ import Note from './note'
 import PageModal from './page-modal'
 
 
-/** 계정 modal (ChatAccount) with the 요금제 page inside it (PlanUpgrade). */
+/** 계정 modal (ChatAccount) with the 플랜 page inside it (PlanUpgrade). */
 export const AccountModal = ({ initialPage = 'account' }: { initialPage?: 'account' | 'plan' }) => {
   const [page, setPage] = useState<'account' | 'plan'>(initialPage)
   const account = useChatAccount(true)
   const purchase = usePersonalPurchase()
   const plan = page === 'plan' && account.data
-  // One modal for both pages: 요금제 navigates inside the sheet instead of stacking another.
+  // One modal for both pages: 플랜 navigates inside the sheet instead of stacking another.
   return (
     <PageModal
-      title={plan ? '요금제' : '계정'}
+      title={plan ? '플랜' : '계정'}
       tight
       left={plan ? <GlassButton actions={[{ icon: 'back', label: '뒤로', onPress: () => setPage('account') }]} /> : undefined}
       footer={
@@ -223,14 +223,14 @@ const PlanPage = ({ account, purchase }: { account: Account; purchase: ReturnTyp
         </Pressable>
       ) : null}
       <View style={{ paddingTop: spacing[3], paddingHorizontal: spacing[6], gap: spacing[1] }}>
-        {PLAN_FOOTER.map((line) => (
+        {PLAN_NOTICES.map((line) => (
           <Text key={line} v="c1" color="t3">
             {line}
           </Text>
         ))}
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[5], paddingHorizontal: spacing[6] }}>
-        {paid ? <PlanLink label="요금제 낮추기" onPress={() => purchase.manage(paid)} /> : null}
+        {paid ? <PlanLink label="플랜 낮추기" onPress={() => purchase.manage(paid)} /> : null}
         {open ? <PlanLink label="구매 복원" onPress={() => !purchase.pending && purchase.restore()} /> : null}
       </View>
     </Appear>

@@ -7,6 +7,7 @@ import {
   HINTLESS_GATES,
   MULTI_PICK_FOOT,
   MULTI_PICK_SUBMIT,
+  EDIT_FOOT,
   PICK_HINT,
   queueBusyMessage,
 } from '../constants'
@@ -89,7 +90,7 @@ const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] =>
   const approval: Approval = {
     id: ev.id,
     question: ev.title,
-    foot: PICK_HINT,
+    foot: EDIT_FOOT,
     optionIds: ev.options.map((o) => o.id),
     sections: [],
     ...(apply ? { submit: apply.label } : {}),

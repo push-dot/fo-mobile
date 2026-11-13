@@ -69,7 +69,7 @@ describe('draft per bot', () => {
     expect(useDraftStore.getState().byBot.b1?.chip).toBe('김서준_백엔드_이력서.pdf')
     expect(useDraftStore.getState().byBot.b1?.file).toBeUndefined()
     expect(useDraftStore.getState().byBot.b2?.text).toBe('그대로')
-    attachDraftChip('b1', '다른 자료')
+    attachDraftChip('b1', '다른 자료', 'document')
     detachDraft('b1')
     expect(useDraftStore.getState().byBot.b1?.chip).toBeUndefined()
   })

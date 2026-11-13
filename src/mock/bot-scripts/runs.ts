@@ -598,6 +598,8 @@ export const TOKENS: Record<string, Step[]> = {
   // Jump straight to a phase: the design draws each phase under its own user line.
   analyze: ph1,
   boost: ph3Boost,
+  // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
+  'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), ...ph4Quality],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
   quality: ph4Quality,
   '품질 검사로 넘어가기': ph4Quality,

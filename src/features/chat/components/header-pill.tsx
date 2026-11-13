@@ -58,7 +58,7 @@ const HeaderPill = ({
         accessibilityRole="button"
         accessibilityLabel={`${spoken} 프로필 보기`}
         onPress={() => openProfile(botId)}
-        style={{ alignSelf: 'flex-start', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: 14, backgroundColor: ios ? 'transparent' : c.fill }}
+        style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: 14, backgroundColor: ios ? 'transparent' : c.fill }}
       >
         <View style={{ width: 32, height: 32 }}>
           <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
@@ -71,8 +71,9 @@ const HeaderPill = ({
     ) : undefined
   return (
     <TopBar
+      translucent
       onBack={() => router.back()}
-      left={nameButton && ios ? <Glass style={{ alignSelf: 'flex-start', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
+      left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
       right={
         kind && botId && name ? (
           <GlassButton

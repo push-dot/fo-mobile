@@ -29,7 +29,7 @@ tags:
     timeout: 10000
 - tapOn: "ULTRA"
 - extendedWaitUntil:
-    visible: "요금제마다.*"
+    visible: "플랜마다.*"
     timeout: 5000
 - extendedWaitUntil:
     visible: "지금 ULTRA를 쓰고 있어요"

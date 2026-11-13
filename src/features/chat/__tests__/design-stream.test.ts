@@ -2,7 +2,7 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream } from '../utils/stream'
-import { PICK_HINT } from '../constants'
+import { EDIT_FOOT, PICK_HINT } from '../constants'
 import type { ChatEvent } from '../types'
 
 async function* frames(...evs: StreamEvent[]) {
@@ -111,7 +111,7 @@ describe('agent stream for the new design', () => {
       }),
     )
     expect(s.items).toMatchObject([{ type: 'diff', lines: [{ n: 13, sign: '-', text: '결제 API 개발' }, { n: 13, sign: '+', text: '결제 승인 API 재설계' }] }])
-    expect(s.approval).toMatchObject({ question: '이 수정을 적용할까요?', submit: '적용', secondary: '그대로 두기', sections: [], optionIds: ['apply', 'skip'], foot: PICK_HINT })
+    expect(s.approval).toMatchObject({ question: '이 수정을 적용할까요?', submit: '적용', secondary: '그대로 두기', sections: [], optionIds: ['apply', 'skip'], foot: EDIT_FOOT })
   })
 
   it('shows the server warning under a risky action instead of the hint', async () => {

@@ -75,7 +75,8 @@ const BotHomeView = ({
   const home = splitHome(bots ?? [])
   const push = home.push ?? (fallbackPush?.kind === 'push' ? fallbackPush : undefined)
   const top = insets.top + chrome.header
-  const lift = keyboard > 0 ? Math.max(0, keyboard - TAB_CLEARANCE) : 8
+  // The iOS tab bar floats over this view, so the bar rests above it; Android's tab bar takes its own space.
+  const lift = keyboard > 0 ? Math.max(0, keyboard - TAB_CLEARANCE) : Platform.OS === 'ios' ? TAB_CLEARANCE + 8 : 8
   const screen = { flex: 1, backgroundColor: c.bg }
   const fade = { position: 'absolute' as const, left: 0, right: 0, bottom: keyboard > 0 ? lift : 0, height: ios ? 200 : 190, zIndex: 3 }
   const listPad = { paddingTop: top, paddingBottom: LIST_BOTTOM }
