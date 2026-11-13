@@ -13,7 +13,7 @@ tags:
     visible: "Push Bot"
     timeout: 10000
 - extendedWaitUntil:
-    visible: "허용한 사이트"
+    visible: "허용한 사이트.*"
     timeout: 10000
 - assertNotVisible: "봇 삭제"
 - assertNotVisible: "봇 색 바꾸기"

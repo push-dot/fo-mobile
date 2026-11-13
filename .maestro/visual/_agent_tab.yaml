@@ -18,7 +18,20 @@ tags:
       - extendedWaitUntil:
           notVisible: "동의하고 시작하기"
           timeout: 10000
-- openLink: push://bots/push
+# consent-on seeds 참고 데이터 제공 (the mock starts it off, so the chat would open behind its sheet);
+# tap 동의하고 시작하기 when the sheet still comes up, so every tour reaches the chat.
+- openLink: push://bots/push?mock=consent-on
+- extendedWaitUntil:
+    visible: "(동의하고 시작하기|공고 링크로 맞추기)"
+    timeout: 10000
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+      - extendedWaitUntil:
+          notVisible: "동의하고 시작하기"
+          timeout: 10000
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

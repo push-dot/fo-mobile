@@ -13,7 +13,7 @@ tags:
     visible: "백엔드 엔지니어"
     timeout: 10000
 - extendedWaitUntil:
-    visible: "허용한 사이트"
+    visible: "허용한 사이트.*"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfile

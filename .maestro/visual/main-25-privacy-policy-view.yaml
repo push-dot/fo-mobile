@@ -3,7 +3,7 @@ name: 약관 동의 → 개인정보 처리방침 보기
 tags:
   - visual
 ---
-# No artboard: the brief (D12) adds this link; the shot is the evidence for the iOS light check.
+# The privacy policy opened from the 약관 동의 screen is the TermsViewPrivacy board (v408).
 - runFlow: _phone_code.yaml
 - inputText: "482915"
 - runFlow: _hide_kbd.yaml
@@ -18,5 +18,5 @@ tags:
     visible: "1. 수집하는 개인정보"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: PrivacyPolicyView
+- takeScreenshot: TermsViewPrivacy
 - assertNotVisible: "동의하기"
