@@ -17,12 +17,15 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: Main
-# About a third of the screen: the board scrolls past the shortcuts so 마감 임박 공고 sits near the top.
+# About a third of the screen: the board scrolls past the shortcuts so 마감 임박 공고 sits near the top. A quick swipe, as a thumb
+# does: the tab bar folds into the home circle only on a real downward scroll, and the fold animation finishes before the shot.
 - swipe:
     start: 50%, 70%
     end: 50%, 37%
-    duration: 1200
+    duration: 400
 - waitForAnimationToEnd
+- waitForAnimationToEnd:
+    timeout: 3000
 - takeScreenshot: HomeScrolled
 - tapOn: "마감 임박 공고 전체보기"
 - extendedWaitUntil:

@@ -8,7 +8,7 @@ tags:
       platform: iOS
     commands:
       - runFlow: ../flows/_login.yaml
-      - runFlow: _agent_tab.yaml
+      - runFlow: _company_tab.yaml
       - runFlow:
           file: _say.yaml
           env:

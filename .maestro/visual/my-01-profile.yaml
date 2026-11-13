@@ -23,6 +23,12 @@ tags:
 - takeScreenshot: EditProfileBasic
 - tapOn: "닫기"
 
+# EditIntro draws two paragraphs (MyProfile above shows the first only), so the longer intro goes in before the sheet opens
+# (its text starts from the profile); wait for the second paragraph to reach the page.
+- openLink: push://my?mock=long-intro
+- extendedWaitUntil:
+    visible: ".*Kafka 기반 이벤트 처리.*"
+    timeout: 10000
 - tapOn: "소개 편집"
 - extendedWaitUntil:
     visible: "AI로 다듬기"

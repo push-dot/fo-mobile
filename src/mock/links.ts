@@ -1,8 +1,11 @@
 import { Linking } from 'react-native'
-import { emptyBot, expireCard, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
+import { forget } from '@/features/chat'
+import { queryClient } from '@/providers/query-client'
+import { copyText } from '@/shared/infrastructure'
+import { emptyBot, expireCard, fixtureOf, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
 import { grantReference, setAccount } from './chat'
 import { pendingSocialPhone, unreadDeadline } from './home'
-import { setBlockedByThem } from './me'
+import { longIntro, setBlockedByThem } from './me'
 import { setMaterials } from './materials'
 import { closeMoapay, fewBookmarks } from './postings'
 import { setRules, type Rule } from './server'
@@ -18,13 +21,15 @@ const toRule = (spec: string): Rule | null => {
 const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
-// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
+// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
 // Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request),
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
   Linking.addEventListener('url', ({ url }) => {
     const specs = decodeURIComponent(/[?&]mock=([^&#]*)/.exec(url)?.[1] ?? '').split(',').filter(Boolean)
     if (specs.includes('empty-feed')) emptyFeed()
+    // The app writes its own pasteboard, so iOS shows no paste prompt when the link sheet reads it (Maestro setClipboard never reaches it).
+    if (specs.includes('clipboard-link')) void copyText('https://careers.moapay.co.kr/jobs/1042')
     if (specs.includes('reset')) {
       setRules([])
       setAccount({ ultra: false, spent: false, closed: false, run: undefined })
@@ -40,7 +45,11 @@ export const listenMockLinks = () =>
       const muted = /^bot:(.+):muted$/.exec(s)
       if (muted) muteBot(muted[1]!)
       const empty = /^bot:(.+):empty$/.exec(s)
-      if (empty) emptyBot(empty[1]!)
+      if (empty) {
+        // A company chat has no clear-chat menu, so the open chat's client copy goes too: the next message draws on a bare thread.
+        emptyBot(empty[1]!)
+        forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
+      }
       const seeded = /^bot:(.+):(thread|done)$/.exec(s)
       if (seeded) seedThread(seeded[1]!, seeded[2] as 'thread' | 'done')
       const materials = MATERIAL_SET.exec(s)
@@ -50,6 +59,10 @@ export const listenMockLinks = () =>
     if (specs.includes('unread-deadline')) unreadDeadline()
     if (specs.includes('phone-social')) pendingSocialPhone()
     if (specs.includes('blocked-by-them')) setBlockedByThem(true)
+    if (specs.includes('long-intro')) {
+      longIntro()
+      void queryClient.invalidateQueries({ queryKey: ['me', 'profile'] })
+    }
     if (specs.includes('close-moapay')) closeMoapay()
     if (specs.includes('consent-on')) grantReference()
     if (specs.includes('few-materials')) {

@@ -9,7 +9,7 @@ tags:
     when:
       platform: iOS
     commands:
-      - runFlow: _agent_tab.yaml
+      - runFlow: _company_tab.yaml
       - runFlow:
           file: _say.yaml
           env:

@@ -25,11 +25,12 @@ tags:
 - takeScreenshot: MaterialsBookmarks
 - tapOn: "링크"
 - extendedWaitUntil:
-    visible: "github.com/seojun-kim/pay-gw 자세히"
+    visible: "github.com 자세히"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLinks
-- tapOn: "github.com/seojun-kim 자세히"
+# A link row is named by its host, and two rows are github.com: the first is the newest (김서준 GitHub, 10월 3일), the board's.
+- tapOn: "github.com 자세히"
 - extendedWaitUntil:
     visible: "바로가기"
     timeout: 10000

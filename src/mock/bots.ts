@@ -2,7 +2,7 @@
 // version 396: AgentHome, AgentHomeLong, AgentHomeSearch, BotProfile*, BotNewLinkOk, BotNewLimit.
 import type { BotContract } from '@push/api-client'
 import { BOT_COLORS } from '../features/bots/constants'
-import { hasReferenceConsent } from './chat'
+import { forgetRun, hasReferenceConsent } from './chat'
 import { postings } from './postings'
 import { mock } from './server'
 
@@ -329,7 +329,10 @@ export const expireCard = () => {
 /** `bot:<id>:empty`: a bot that has not said a word, so its chat opens on the greeting (ChatBotOnboard, ChatConsentCompany). Clear chat does the same. */
 export const emptyBot = (id: string) => {
   const f = fixtureOf(id)
-  if (f) Object.assign(f, { messages: [], cards: [], job: null })
+  if (!f) return
+  Object.assign(f, { messages: [], cards: [], job: null })
+  forgetRun(f.bot.id)
+  forgetRun(id)
 }
 const DESIGN_ASK = '모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요'
 const DESIGN_SOURCES: BotContract.Attachment[] = [

@@ -10,9 +10,9 @@ tags:
     timeout: 20000
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "careers.moapay.co.kr/jobs/1042"
-- extendedWaitUntil:
-    visible: "Push에서 이 링크의 공고를 찾고 있어요"
-    timeout: 20000
-- waitForAnimationToEnd
+- runFlow: _link_wait.yaml
+# Both link states draw the same screen; the second wait gives the 1.2s check time to turn into the finding state.
+- waitForAnimationToEnd:
+    timeout: 2000
 - takeScreenshot: BotNewLinkFinding
 - openLink: push://?mock=reset

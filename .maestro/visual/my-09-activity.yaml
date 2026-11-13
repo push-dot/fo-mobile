@@ -27,7 +27,7 @@ tags:
 
 - tapOn: "캘린더"
 - extendedWaitUntil:
-    visible: "Google 캘린더"
+    visible: "Google 캘린더 연결됨"
     timeout: 10000
 # v412: the screen lists one day; its title opens the month sheet. The mock events are all in October 2026 and the sheet opens on
 # the device's month, so step back from November, then pick the day (picking closes the sheet).

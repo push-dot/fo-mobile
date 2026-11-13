@@ -5,6 +5,9 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: ../flows/_dismiss_logbox.yaml
+# The board opens a new conversation with the Push Bot (one user line and the file), not the fixture's older history, so empty it first.
+# No consent-on here: the tour accepts the consent sheet below.
+- openLink: push://?mock=bot:push:empty
 - tapOn: "마이"
 - extendedWaitUntil:
     visible: "김서준"

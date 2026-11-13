@@ -420,6 +420,8 @@ const ph5: Step[] = [
   s(300, tool('design', '디자인 적용', '모던', 'ok', 'A4 1쪽 · 여백과 줄 간격 맞춤')),
   s(300, tool('photo', '프로필 사진', '마이 › 프로필', 'ok', '헤더 왼쪽 원형 80px')),
   s(300, tool('save', 'Push 프로필', '마이 › 프로필', 'run', 'Push 프로필에 저장하는 중…')),
+  // Tool lines are not drawn, so ChatPh5's status line needs its own frame (tailorDone does the same).
+  s(200, status('Push 프로필에 저장하는 중…')),
   s(HOLD, tool('save', 'Push 프로필', '마이 › 프로필', 'ok', '저장했어요')),
 ]
 const ph2xApproach: Step[] = [
@@ -623,6 +625,8 @@ export const TOKENS: Record<string, Step[]> = {
   // The long-held working line: a second message or 중지 must land while it still runs (ChatWorking, ChatInterrupt on Android).
   // ChatHeaderNoCompany: no posting yet, so the conversation has no company and the header pill shows the logo only.
   'no-posting': noPosting,
+  // ChatResume: the work that was running when the chat was left, asked about on the next message.
+  'resume-doc': startDocument,
   // The company-bot boards (ChatBotStatus*): hold one status line (중지 on it is ChatBotStatusStopped), or stop at a card.
   'st-think': held('생각 중'),
   'st-work': held('공고 요건을 읽는 중'),

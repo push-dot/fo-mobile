@@ -3,6 +3,7 @@ import type { ChatEvent, Step } from '@/features/chat'
 import { applyEvent, emptyChat } from '../../features/chat/utils/reducer'
 import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
+import '../bots'
 import { setAccount } from '../chat'
 
 const call = async (method: string, path: string, body?: unknown) => {
@@ -213,5 +214,17 @@ describe('chat mock', () => {
     expect((await call('GET', 'me/links')).data).toHaveLength(1)
     setAccount({ few: false })
     expect((await call('GET', 'chat/docs')).data).toHaveLength(4)
+  })
+})
+
+describe('clear chat', () => {
+  const stale = (events: ChatEvent[]) => events.some((e) => e.type === 'token' && e.text.includes('다시 불러 주세요'))
+
+  it('forgets the open card, so the next token runs its script', async () => {
+    await run('push', { text: 'ph0-start' })
+    expect(stale(await run('push', { text: 'profile-done' }))).toBe(true)
+    await run('push', { text: 'ph0-start' })
+    await mockFetch(new Request('http://x/api/v1/bots/push/transcript', { method: 'DELETE' }))
+    expect(stale(await run('push', { text: 'profile-done' }))).toBe(false)
   })
 })

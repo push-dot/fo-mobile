@@ -15,6 +15,11 @@ tags:
 - extendedWaitUntil:
     visible: "지금은 Bot을 쓸 수 없어요.*"
     timeout: 20000
+# The board has no keyboard; a tap on the user's own bubble lowers it (a tap on a bot line would open the profile).
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*이력서 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
 - runFlow: _fresh_chat.yaml
