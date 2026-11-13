@@ -96,9 +96,9 @@ describe('paymentsOpen', () => {
 })
 
 describe('verifyFailedMessage', () => {
-  it('says payments are not open yet for 503 PAYMENTS_DISABLED', () => {
+  it('says payments are not available for 503 PAYMENTS_DISABLED', () => {
     expect(verifyFailedMessage(new ApiError('closed', 'PAYMENTS_DISABLED', 503))).toBe(PAYMENTS_CLOSED_MESSAGE)
-    expect(PAYMENTS_CLOSED_MESSAGE).toBe('결제는 아직 준비 중이에요')
+    expect(PAYMENTS_CLOSED_MESSAGE).toBe('지금은 결제할 수 없어요. 잠시 뒤에 다시 해 주세요.')
   })
 
   it('keeps the generic failure for anything else', () => {

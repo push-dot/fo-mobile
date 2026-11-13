@@ -1,10 +1,9 @@
-import { router } from 'expo-router'
-import { create } from 'zustand'
+import { Alert } from 'react-native'
 
 export type ConfirmRequest = {
   title: string
   body: string
-  /** A quieter line under the body (caption, t3). */
+  /** A quieter line under the body. */
   note?: string
   confirm: string
   cancel?: string
@@ -12,16 +11,9 @@ export type ConfirmRequest = {
   onConfirm: () => void
 }
 
-export type ConfirmHref = '/confirm' | '/(app)/(stack)/(tabs)/(my)/confirm'
-
-type ConfirmState = { request: ConfirmRequest | null; set: (request: ConfirmRequest | null) => void }
-
-export const useConfirmStore = create<ConfirmState>()((set) => ({
-  request: null,
-  set: (request) => set({ request }),
-}))
-
-export const askConfirm = (request: ConfirmRequest, href: ConfirmHref = '/confirm') => {
-  useConfirmStore.getState().set(request)
-  router.push(href)
-}
+/** The platform's own confirm: an iOS alert, an Android Material dialog (DeleteCareer, DeleteDoc, ...). `danger` makes the confirm button the red destructive one. */
+export const askConfirm = (request: ConfirmRequest) =>
+  Alert.alert(request.title, [request.body, request.note].filter(Boolean).join('\n\n'), [
+    { text: request.cancel ?? '취소', style: 'cancel' },
+    { text: request.confirm, style: request.danger ? 'destructive' : 'default', onPress: request.onConfirm },
+  ])

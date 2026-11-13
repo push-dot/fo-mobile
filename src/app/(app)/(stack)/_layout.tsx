@@ -30,7 +30,7 @@ const SignedInStack = () => {
       <Stack.Screen name="settings/blocked" />
       <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
-      <Stack.Screen name="docs/push/index" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="docs/push/index" />
       <Stack.Screen name="docs/push/[id]" />
       <Stack.Screen name="docs/push/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="activity/follows" />
@@ -51,6 +51,8 @@ const SignedInStack = () => {
       <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
       <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="account" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="plan" />
+      <Stack.Screen name="plan-notice" />
       <Stack.Screen
         name="job-filter"
         options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}
@@ -58,12 +60,10 @@ const SignedInStack = () => {
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />
-      <Stack.Screen name="confirm" options={sheetOptions(c)} />
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
       <Stack.Screen name="settings/pick" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/import" options={sheetOptions(c)} />
       <Stack.Screen name="docs/[id]/to-profile" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/[id]/more" options={sheetOptions(c)} />
+      <Stack.Screen name="docs/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="offers/[id]/reply" options={sheetOptions(c)} />
     </Stack>
     </View>

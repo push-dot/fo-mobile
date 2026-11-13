@@ -43,7 +43,7 @@ export const everyBuilderCompiles = (push: Push) => {
   push(accountPath('plan'))
   // @ts-expect-error a route that does not exist. If typed routes were not generated, this line would compile.
   push('/no-such-route')
-  const widened = (page?: 'plan') => (page ? `/account?page=${page}` : '/account')
+  const widened = (page?: 'plan') => (page ? `/plan?page=${page}` : '/account')
   // @ts-expect-error a builder without literal types widens to string
   push(widened('plan'))
 }
@@ -63,7 +63,8 @@ describe('bot and material routes', () => {
     [materialDetailPath('posting', 'p1'), 'materials/[kind]/[id]', '{sheetOptions(c)}'],
     [materialLinkAddPath(), 'materials/link-add', '{sheetOptions(c)}'],
     [materialPickerPath(id), 'material-picker', '{sheetOptions(c)}'],
-    [accountPath('plan'), 'account', "{{ presentation: 'modal' }}"],
+    [accountPath(), 'account', "{{ presentation: 'modal' }}"],
+    [accountPath('plan'), 'plan', null],
   ])('%s opens %s', (_href, route, options) => {
     expect(existsSync(join(STACK, `${route}.tsx`))).toBe(true)
     expect(layout).toContain(options ? `name="${route}" options=${options}` : `name="${route}" />`)

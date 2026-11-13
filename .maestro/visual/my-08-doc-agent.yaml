@@ -15,9 +15,9 @@ tags:
     timeout: 10000
 - tapOn: "김서준_백엔드_이력서_2026.pdf"
 - extendedWaitUntil:
-    visible: "봇으로 고치기"
+    visible: "Bot한테 보내기"
     timeout: 10000
-- tapOn: "봇으로 고치기"
+- tapOn: "Bot한테 보내기"
 # The mock starts with the reference-data consent off, so the chat opens behind its sheet.
 - extendedWaitUntil:
     visible: "동의하고 시작하기"

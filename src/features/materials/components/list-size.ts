@@ -5,7 +5,7 @@ import { radius, spacing } from '@/theme'
 const LARGE_TEXT_SCALE = 1.3
 
 /**
- * The boxes of `.mrow`, `.usep`, `.cntp` and `.spill` as Materials draws them, and under `.xl` (MaterialsXL). The text in
+ * The boxes of `.mrow`, `.usep` and `.spill` as Materials draws them, and under `.xl` (MaterialsXL). The text in
  * them grows with the system size by itself.
  */
 const SIZES = {
@@ -14,7 +14,6 @@ const SIZES = {
     titleLines: 1,
     subLines: 1,
     send: { minHeight: 34, borderRadius: radius.chip, paddingHorizontal: 13 },
-    count: { height: 36, borderRadius: 18 },
     field: { height: 44, borderRadius: 22 },
   },
   large: {
@@ -22,7 +21,6 @@ const SIZES = {
     titleLines: 2,
     subLines: undefined,
     send: { minHeight: 44, borderRadius: 22, paddingHorizontal: spacing[4], marginLeft: 56 },
-    count: { height: 44, borderRadius: 22 },
     field: { height: 52, borderRadius: 26 },
   },
 } as const

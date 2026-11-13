@@ -58,7 +58,7 @@ describe('copy that names a word', () => {
   it('asks before a delete in the words of MaterialDetailDelete, and toasts as DeleteDoc', () => {
     expect(deleteCopy(resume)).toEqual({
       title: '‘김서준_백엔드_이력서.pdf’를 삭제할까요?',
-      body: '삭제하면 어느 봇에서도 이 서류를 쓸 수 없어요. 지운 서류는 30일 동안 보관된 뒤 완전히 지워지고, 이미 나눈 대화 내용은 그대로 남아요.',
+      body: '삭제하면 어느 Bot에서도 이 서류를 쓸 수 없어요. 지운 서류는 30일 동안 보관된 뒤 완전히 지워지고, 이미 나눈 대화 내용은 그대로 남아요.',
       done: '서류를 삭제했어요',
       failed: '서류를 삭제하지 못했어요',
     })
@@ -77,9 +77,9 @@ describe('detail sheet', () => {
     expect(detailTitle(resume)).toBe('김서준_백엔드_이력서.pdf')
     expect(detailFacts(resume, [moapay, dotori], now)).toEqual([
       { label: '종류', value: 'PDF · 2쪽 · 312KB' },
-      { label: '만든 곳', value: '모아페이 봇' },
+      { label: '만든 곳', value: '모아페이 Bot' },
       { label: '수정', value: '11월 2일 오후 3:14' },
-      { label: '쓰인 대화', value: '모아페이 봇, 도토리증권 봇' },
+      { label: '쓰인 대화', value: '모아페이 Bot, 도토리증권 Bot' },
     ])
   })
 
@@ -96,7 +96,7 @@ describe('detail sheet', () => {
   it('prints MaterialDetailLink', () => {
     expect(detailTitle(github)).toBe('김서준 GitHub')
     expect(detailFacts(github, [moapay], now)).toEqual([
-      { label: '주소', value: 'https://github.com/seojun-kim' },
+      { label: '주소', value: 'github.com' },
       { label: '종류', value: 'GitHub' },
       { label: '추가', value: '10월 3일' },
       { label: '마지막 확인', value: '어제 · 열림' },

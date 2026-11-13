@@ -15,7 +15,7 @@ tags:
     timeout: 10000
 - tapOn: ".*다온뱅크.*"
 - extendedWaitUntil:
-    visible: "봇으로 고치기"
+    visible: "Bot한테 보내기"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: PushDocView

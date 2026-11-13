@@ -55,7 +55,8 @@ const Section = ({
   )
 }
 
-const ProfileTab = () => {
+/** `share`: MyProfile has the 공유 button under the name; ProfileDetailMe has it in the header instead. */
+const ProfileTab = ({ share = true }: { share?: boolean }) => {
   const c = useColors()
   const { data: p, isLoading } = useMyProfile()
   if (isLoading || !p) return <SkeletonRows {...LOADING_ROWS} />
@@ -76,7 +77,7 @@ const ProfileTab = () => {
         ) : null}
         <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] }}>
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
-          {status ? <Badge label={status} tone={p.careerStatus === 'seeking' ? 'ac' : 'grey'} /> : null}
+          {status ? <Badge label={status} tone="grey" /> : null}
         </View>
         <View style={{ flexDirection: 'row', gap: spacing[4], marginTop: spacing[2] }}>
           {(
@@ -101,14 +102,10 @@ const ProfileTab = () => {
           ))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
-          <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />
-          <Button
-            label="공유"
-            icon="share"
-            variant="secondary"
-            size="sm"
-            onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })}
-          />
+          <Button label="기본 정보 편집" variant="secondary" size="sm" onPress={() => edit('basic')} />
+          {share ? (
+            <Button label="공유" variant="secondary" size="sm" onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })} />
+          ) : null}
         </View>
       </View>
 
