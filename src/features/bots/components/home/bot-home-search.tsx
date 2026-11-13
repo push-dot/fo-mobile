@@ -77,9 +77,8 @@ const BotHomeSearch = ({
       ) : null}
       {data && !hint
         ? data.bots.map(({ bot, line: match }) => {
-            const row = botRow(bot, local[bot.id], now)
-            const shown = match ? { ...row, line: match } : row
-            return <BotHomeRow key={bot.id} row={shown} chrome={chrome} index={0} held={false} query={trimmed} actions={[]} onPress={() => onOpenBot(bot)} />
+            const row = botRow(bot, local[bot.id], now, match)
+            return <BotHomeRow key={bot.id} row={row} chrome={chrome} index={0} held={false} query={trimmed} actions={[]} onPress={() => onOpenBot(bot)} />
           })
         : null}
       {messageTitle ? (

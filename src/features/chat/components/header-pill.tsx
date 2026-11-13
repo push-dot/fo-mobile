@@ -10,6 +10,14 @@ import type { HeaderLight } from './header/state'
 import { clearPushChat, deleteCompanyBot } from '../stores'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'
 
+// ChatBotHeaderMenu board: a leading icon on every item, and the destructive one stands apart under a divider.
+const MENU_ICON = {
+  profile: { systemImage: 'person', icon: 'user' },
+  find: { systemImage: 'magnifyingglass', icon: 'search' },
+  clear: { systemImage: 'trash', icon: 'delete' },
+  delete: { systemImage: 'trash', icon: 'delete' },
+} as const
+
 const openProfile = (botId: string) => router.push(botProfilePath(botId as BotId))
 
 const HeaderPill = ({
@@ -83,11 +91,11 @@ const HeaderPill = ({
               {
                 icon: 'more',
                 label: '더 보기',
-                menu: botHeaderMenu(kind).map((item) => ({
-                  key: item.id,
-                  label: item.label,
-                  destructive: item.destructive,
-                  onPress: () => run(item.id),
+                menu: [false, true].map((destructive) => ({
+                  key: destructive ? 'danger' : 'plain',
+                  actions: botHeaderMenu(kind)
+                    .filter((item) => !!item.destructive === destructive)
+                    .map((item) => ({ key: item.id, label: item.label, destructive: item.destructive, ...MENU_ICON[item.id], onPress: () => run(item.id) })),
                 })),
               },
             ]}

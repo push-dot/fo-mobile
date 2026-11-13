@@ -1,12 +1,11 @@
 import { matchHangul } from '@push/shared'
 import { Text as RNText } from 'react-native'
-import { fontFor, useColors } from '../../../../theme'
+import { fontFor } from '../../../../theme'
 
 const Highlight = ({ text, q }: { text: string; q: string }) => {
-  const c = useColors()
   const hit = q ? matchHangul(text, q) : null
   if (!hit) return <>{text}</>
-  const mark = { color: c.ac, ...fontFor('700') }
+  const mark = fontFor('700')
   return (
     <>
       {text.slice(0, hit.start)}

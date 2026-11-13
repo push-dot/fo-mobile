@@ -1,6 +1,6 @@
 import type { AccessMode } from '@push/api-client'
 import type { Ref } from 'react'
-import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
+import { ActivityIndicator, Platform, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
@@ -45,8 +45,10 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const inline = p.layout === 'inline'
   const showTools = !inline && (p.tools ?? true)
+  // ChatBotHeader board: on iOS the tools sit bare on the flat box; Android draws them as fill chips.
+  const toolFill = Platform.OS === 'ios' && !inline ? 'transparent' : c.fill
   const round = { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
-  const chip = { minHeight: 40, paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
+  const chip = { minHeight: 40, paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: toolFill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
   const textType = inline ? type.b1 : type.h3
   if (inline) {
     return (
@@ -107,7 +109,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         {showTools ? (
           <>
-            <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: toolFill }]}>
               <Icon name="plus" size={20} />
             </Pressable>
             <Pressable
