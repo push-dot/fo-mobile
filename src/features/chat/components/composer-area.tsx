@@ -27,16 +27,17 @@ type Props = {
   inputRef?: React.RefObject<TextInputInstance | null>
   /** First screen only (see ComposerProps.roomy). */
   roomy?: boolean
+  disabled?: boolean
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy }: Props) => {
+export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy, disabled }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
   const own = useRef<TextInputInstance>(null)
   const ref = inputRef ?? own
-  const query = mentionQuery(text)
+  const query = disabled ? null : mentionQuery(text)
   const access = useAccessMode()
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}
         accessMode={access.mode}
+        disabled={disabled}
       />
     </View>
   )
