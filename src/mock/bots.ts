@@ -322,7 +322,7 @@ export const expireCard = () => {
     {
       id: 'card-moa-page', turn: 't-moa-2', for: 'confirm', title: '모아페이 채용 페이지를 열어도 될까요?', status: 'PENDING', at: 11, expiresAt: 1,
       summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
-      options: [{ id: 'approve', label: '한 번 허용' }, { id: 'approve_always', label: '항상 허용', desc: '이 봇이 이 사이트를 읽을 때 다시 묻지 않아요' }, { id: 'reject', label: '거절' }],
+      options: [{ id: 'approve', label: '한 번 허용' }, { id: 'approve_always', label: '항상 허용', desc: '이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요' }, { id: 'reject', label: '거절' }],
     },
   ]
 }

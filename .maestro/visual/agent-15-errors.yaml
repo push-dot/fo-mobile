@@ -13,7 +13,7 @@ tags:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "err-unavailable"
 - extendedWaitUntil:
-    visible: "지금은 봇을 쓸 수 없어요.*"
+    visible: "지금은 Bot을 쓸 수 없어요.*"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable

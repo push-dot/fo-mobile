@@ -62,11 +62,11 @@ describe('composerPlaceholder', () => {
   })
 
   it('asks the named bot on an empty chat, while working, and after work', () => {
-    expect(composerPlaceholder({ items: [], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
+    expect(composerPlaceholder({ items: [], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     expect(composerPlaceholder({ items: [], working: null }, 'Push Bot')).toBe('Push Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 봇에게 물어보기')
+    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, 'Push Bot')).toBe('Push Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
+    expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
   it('asks what to do with the attached material, by its kind, over the bot name', () => {
@@ -85,10 +85,10 @@ describe('composerPlaceholder', () => {
 })
 
 describe('bot header and onboarding', () => {
-  it('names a company with 봇 and leaves Push Bot alone', () => {
-    expect(botSpokenName('모아페이')).toBe('모아페이 봇')
+  it('names a company with Bot and leaves Push Bot alone', () => {
+    expect(botSpokenName('모아페이')).toBe('모아페이 Bot')
     expect(botSpokenName('Push Bot')).toBe('Push Bot')
-    expect(askPlaceholder('모아페이')).toBe('모아페이 봇에게 물어보기')
+    expect(askPlaceholder('모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
   it('follows the bot kind and refuses the other destructive row', () => {
@@ -108,21 +108,21 @@ describe('bot header and onboarding', () => {
       cancel: '취소',
       confirm: '지우기',
     })
-    expect(deleteBotConfirm('모아페이').title).toBe('모아페이 봇을 삭제할까요?')
+    expect(deleteBotConfirm('모아페이').title).toBe('모아페이 Bot을 삭제할까요?')
     expect(deleteBotConfirm('모아페이').confirm).toBe('삭제')
-    expect(onboardingGreeting('company', '모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요. 무엇부터 할까요?')
+    expect(onboardingGreeting('company', '모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 Bot이에요. 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요. 무엇부터 할까요?')
     expect(onboardingGreeting('push', 'Push Bot')).toBe('안녕하세요. Push Bot이에요. 공고 찾기부터 서류, 지원까지 함께 챙길게요. 무엇부터 할까요?')
   })
 
   it('keeps the company greeting above the thread as the board draws it', () => {
-    expect(threadGreeting('모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 이 회사 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요.')
-    expect(threadGreeting('모아페이')).toBe('안녕하세요. 모아페이 봇이에요.')
+    expect(threadGreeting('모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 Bot이에요. 이 회사 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요.')
+    expect(threadGreeting('모아페이')).toBe('안녕하세요. 모아페이 Bot이에요.')
   })
 
   it('appends material text onto one draft', () => {
-    const next = withMaterial({ a: { text: '안녕', chip: '이력서' }, b: { text: '다른 봇' } }, 'a', '공고', { text: '' })
+    const next = withMaterial({ a: { text: '안녕', chip: '이력서' }, b: { text: '다른 Bot' } }, 'a', '공고', { text: '' })
     expect(next.a).toEqual({ text: '안녕 공고', chip: '이력서' })
-    expect(next.b).toEqual({ text: '다른 봇' })
+    expect(next.b).toEqual({ text: '다른 Bot' })
     expect(withMaterial({}, 'b', '링크', { text: '' }).b.text).toBe('링크')
   })
 })

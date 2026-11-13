@@ -16,12 +16,12 @@ name: 봇 → 실행 방식 시트 → 항상 묻기
 - tapOn: "실행 방식, .*"
 # Native form sheet: iOS grabber sheet, Android Material bottom sheet.
 - extendedWaitUntil:
-    visible: "봇이 어떻게 실행할까요?"
+    visible: "Bot이 어떻게 실행할까요?"
     timeout: 5000
 - takeScreenshot: 06_chat_access_mode-02
 # Each option reads as one label: name and description.
 - tapOn: "항상 묻기.*"
 - extendedWaitUntil:
-    notVisible: "봇이 어떻게 실행할까요?"
+    notVisible: "Bot이 어떻게 실행할까요?"
     timeout: 5000
 - assertVisible: "실행 방식, 항상 묻기"

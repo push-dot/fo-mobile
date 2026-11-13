@@ -16,7 +16,7 @@ export const ACCESS_MODES: { key: AccessMode; label: string; desc: string }[] = 
   { key: 'BYPASS', label: '바로 실행', desc: '묻지 않고 실행해요' },
 ]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
-export const ACCESS_MODE_TITLE = '봇이 어떻게 실행할까요?'
+export const ACCESS_MODE_TITLE = 'Bot이 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
@@ -28,7 +28,7 @@ export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › �
 export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
 export const EDIT_FOOT = '번호를 누르거나 바로 말해도 돼요'
-export const PICK_HINT = '답할 때까지 이 봇은 기다려요'
+export const PICK_HINT = '답할 때까지 이 Bot은 기다려요'
 export const HINTLESS_GATES = ['validate_cap']
 
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
@@ -67,8 +67,8 @@ export const THREAD_BATCH = 8
 export const THREAD_WINDOW = 2
 export const THREAD_MOUNT_CAP = THREAD_INITIAL_RENDER + THREAD_BATCH * THREAD_WINDOW
 
-export const CONSENT_TITLE = '봇을 쓰려면\n동의가 필요해요'
-export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 봇이 참고 자료로 써요.'
+export const CONSENT_TITLE = 'Bot을 쓰려면\n동의가 필요해요'
+export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 Bot이 참고 자료로 써요.'
 export const PLAN_HEADER = '플랜마다\n쓸 수 있는 양이 달라요'
 export const PLAN_NOTICES = [
   '· 구독은 매월 자동으로 갱신돼요. 갱신일 24시간 전까지 해지하지 않으면 다음 달 요금이 결제돼요.',
@@ -76,14 +76,14 @@ export const PLAN_NOTICES = [
   '· 결제 후 7일 안에 쓰지 않았다면 청약을 철회할 수 있어요. 사용량을 쓴 뒤에는 철회가 제한될 수 있어요.',
   '· 미성년자가 법정대리인 동의 없이 결제했다면 본인이나 법정대리인이 취소할 수 있어요.',
 ] as const
-export const ACCOUNT_REFERENCE_TITLE = '봇이 참고하는 내 정보'
-export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 봇이 이 정보부터 읽어요.'
+export const ACCOUNT_REFERENCE_TITLE = 'Bot이 참고하는 내 정보'
+export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'
 export const MENTION_SHORTCUT_KEYS = ['link', 'gap', 'fit'] as const
-export const docAiSub = (ago: string) => `봇으로 만듦 · ${ago}`
+export const docAiSub = (ago: string) => `Bot으로 만듦 · ${ago}`
 export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
 export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크에서 지워요.`
 export const LINK_EMPTY = '아직 모아 둔 링크가 없어요.'
-export const LINK_ADD_NOTE = '추가하면 봇이 README와 커밋을 읽어 둬요'
+export const LINK_ADD_NOTE = '추가하면 Bot이 README와 커밋을 읽어 둬요'
 export const LINK_DELETED_TOAST = '링크를 삭제했어요'
 export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 뒤에 다시 해 주세요.'
 export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
@@ -93,7 +93,7 @@ export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
-export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 봇을 쓸 수 없어요.'
+export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 Bot을 쓸 수 없어요.'
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 

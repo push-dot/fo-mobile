@@ -12,7 +12,7 @@ export const PAGE_READ_TRIGGER = '채용 페이지'
 
 export const PAGE_READ_OPTIONS: MockCard['options'] = [
   { id: 'approve', label: '한 번 허용' },
-  { id: 'approve_always', label: '항상 허용', desc: '이 봇이 이 사이트를 읽을 때 다시 묻지 않아요' },
+  { id: 'approve_always', label: '항상 허용', desc: '이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요' },
   { id: 'reject', label: '거절' },
 ]
 

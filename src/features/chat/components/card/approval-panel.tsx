@@ -157,7 +157,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
                   <Text v="b2" weight="700" numberOfLines={1}>
                     {r.title}
                   </Text>
-                  <Text v="c2" weight={r.ac ? '700' : '400'} color={r.ac ? 'acText' : 't3'}>
+                  <Text v="c2" weight={r.ac ? '700' : '400'} color={r.ac ? 't1' : 't3'}>
                     {r.sub}
                   </Text>
                 </View>

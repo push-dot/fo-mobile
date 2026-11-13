@@ -42,7 +42,7 @@ tags:
 - tapOn: "닫기"
 - tapOn: "봇 삭제"
 - extendedWaitUntil:
-    visible: "모아페이 봇을 삭제할까요?"
+    visible: "모아페이 Bot을 삭제할까요?"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileDelete
