@@ -15,8 +15,18 @@ export const pickDocument = (
   options: DocumentPicker.DocumentPickerOptions,
 ) => DocumentPicker.getDocumentAsync(options)
 
-export const pickImage = (options: ImagePicker.ImagePickerOptions) =>
-  ImagePicker.launchImageLibraryAsync(options)
+let stubbedPick: ImagePicker.ImagePickerAsset[] | null = null
+
+/** Mock tours (`mock=two-photos`): the next pickImage returns these assets instead of opening the system picker, whose labels the app does not set. */
+export const stubPickImage = (assets: ImagePicker.ImagePickerAsset[]) => {
+  stubbedPick = assets
+}
+
+export const pickImage = (options: ImagePicker.ImagePickerOptions): Promise<ImagePicker.ImagePickerResult> => {
+  const assets = stubbedPick
+  stubbedPick = null
+  return assets ? Promise.resolve({ canceled: false, assets }) : ImagePicker.launchImageLibraryAsync(options)
+}
 
 export const hapticImpactLight = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 

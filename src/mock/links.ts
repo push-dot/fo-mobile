@@ -1,7 +1,7 @@
-import { Linking } from 'react-native'
+import { Image, Linking } from 'react-native'
 import { forget } from '@/features/chat'
 import { queryClient } from '@/providers/query-client'
-import { copyText } from '@/shared/infrastructure'
+import { copyText, stubPickImage } from '@/shared/infrastructure'
 import { emptyBot, expireCard, fixtureOf, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
 import { grantReference, setAccount } from './chat'
 import { pendingSocialPhone, unreadDeadline } from './home'
@@ -18,10 +18,17 @@ const toRule = (spec: string): Rule | null => {
   return { kind, method: method!, re: new RegExp(`^${path.join(':')}`) }
 }
 
+// The two photos ComposeSheet draws (2/4): the app's own icon and splash images stand in for the library.
+const photo = (module: number, fileName: string) => {
+  const source = Image.resolveAssetSource(module)
+  if (!source) throw new Error(`mock photo ${fileName} did not resolve`)
+  return { uri: source.uri, fileName, mimeType: 'image/png', fileSize: 100_000, width: source.width ?? 1024, height: source.height ?? 1024 }
+}
+
 const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
-// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
+// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
 // Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request),
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
@@ -30,6 +37,8 @@ export const listenMockLinks = () =>
     if (specs.includes('empty-feed')) emptyFeed()
     // The app writes its own pasteboard, so iOS shows no paste prompt when the link sheet reads it (Maestro setClipboard never reaches it).
     if (specs.includes('clipboard-link')) void copyText('https://careers.moapay.co.kr/jobs/1042')
+    if (specs.includes('two-photos'))
+      stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
     if (specs.includes('reset')) {
       setRules([])
       setAccount({ ultra: false, spent: false, closed: false, run: undefined })

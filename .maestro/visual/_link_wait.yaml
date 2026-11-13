@@ -2,23 +2,12 @@ appId: app.push.mobile
 tags:
   - subflow
 # Waits until the Bot 만들기 sheet shows a link check (linkChecking, then linkFinding after 1.2s: the same screen, a skeleton and a spinner).
-# The typed link is on screen before the 300ms debounce, so the link text alone proves nothing. iOS reads the field's plain link text
-# with the "링크" trait, which only the check state draws; Android has no trait, but the check state replaces the input, so its label goes.
+# The typed link is on screen before the 300ms debounce, so the link text alone proves nothing. The check state replaces the labelled
+# search input with plain text (bot-new-sheet.tsx linkWait), so the input's label going away proves it on both platforms.
 ---
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - extendedWaitUntil:
-          visible: "링크"
-          timeout: 20000
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - extendedWaitUntil:
-          notVisible: "회사, 공고, 링크로 찾아보세요"
-          timeout: 20000
+- extendedWaitUntil:
+    notVisible: "회사, 공고, 링크로 찾아보세요"
+    timeout: 20000
 - extendedWaitUntil:
     visible: "careers.moapay.co.kr/jobs.*"
     timeout: 20000
