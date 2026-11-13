@@ -566,6 +566,7 @@ const statusHelp: Step[] = [
     options: [
       { id: '0', label: '제품 관점', desc: '결제 경험을 사용자 입장에서 풀어요' },
       { id: '1', label: '데이터 관점', desc: '처리량과 지연 수치를 앞세워요' },
+      { id: '2', label: '직접 입력할게요' },
     ],
   }),
   awaitingDone,

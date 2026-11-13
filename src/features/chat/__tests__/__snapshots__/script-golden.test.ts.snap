@@ -8438,6 +8438,20 @@ card null
 "
 `;
 
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help > st-help: pick 2 1`] = `
+"
+{"text":"st-help","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"직접 입력할게요","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"직접 입력할게요","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help > st-help: say 이렇게 해 주세요 1`] = `
 "
 {"text":"st-help","type":"user"}
@@ -8456,7 +8470,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"st-help","type":"user"}
 {"seconds":1,"type":"worked"}
-card {"id":"st-help","question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"}],"kind":"choices","selected":[0]}]}
+card {"id":"st-help","question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"},{"label":"직접 입력할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
