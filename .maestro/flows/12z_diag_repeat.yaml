@@ -24,10 +24,12 @@ name: diag queued send repeat
 - extendedWaitUntil:
     visible: ".*기술 스택을 비교하는 중.*"
     timeout: 40000
-- tapOn: "메시지.*"
 - repeat:
-    times: 15
+    times: 12
     commands:
+      - tapOn:
+          point: "50%,30%"
+      - tapOn: "메시지.*"
       - inputText: "use numbers"
       - takeScreenshot: diag-before-send
       - tapOn: "보내기"
