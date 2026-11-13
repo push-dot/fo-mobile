@@ -1,13 +1,16 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
 import { useShareFile, useStartChat } from '@/features/chat'
 import { usePosting } from '@/features/jobs'
 import {
+  askDocName,
   Avatar,
   careerPeriod,
+  DOC_RENAME_COPY,
+  DOC_TITLE_MAX,
   deleteConfirm,
   deleteDocCopy,
   FitRing,
@@ -18,7 +21,6 @@ import {
   PROFILE_ACTIONS_TOP,
   PROFILE_NAME_TOP,
   RETRY_LABEL,
-  SHEET_SWAP_MS,
   pushCardLines,
   pushDocMenu,
   SET_BASE_COPY,
@@ -29,6 +31,7 @@ import {
   useIngestJob,
   useMyApplications,
   useMyProfile,
+  useRenameDocument,
   useSetBaseProfile,
 } from '@/features/my'
 import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
@@ -69,7 +72,7 @@ const Section = ({
   </View>
 )
 
-const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet?: boolean }) => {
+const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   const c = useColors()
   const doc = useDocument(id)
   const versions = useDocumentVersions(id)
@@ -85,6 +88,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   const share = useShareFile()
   const deleteCopy = deleteDocCopy(doc.data?.data.title ?? '')
   const archive = useArchiveDocument(doc.data?.data)
+  const rename = useRenameDocument(doc.data?.data)
   const [based, setBased] = useState(false)
   const setBase = useSetBaseProfile(() => {
     setBased(true)
@@ -116,8 +120,15 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
     {
       posting: () => router.push(`/postings/${application?.jobId}`),
       export: () => share.mutate({ documentId: id }),
-      rename: () => router.push(`/docs/push/${id}/rename`),
-      delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, () => setTimeout(removeDoc, SHEET_SWAP_MS))),
+      rename: () =>
+        askDocName({
+          title: DOC_RENAME_COPY.title,
+          current: item?.title ?? '',
+          max: DOC_TITLE_MAX,
+          onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true, opaque: true }) }),
+          fallback: () => router.push(`/docs/push/${id}/rename`),
+        }),
+      delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, removeDoc)),
     },
   )
   const editable = (s: ProfileSection) => (application ? () => edit(s) : undefined)
@@ -141,8 +152,6 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
             ]}
           />
         }
-        safeTop={!(sheet && Platform.OS === 'ios')}
-        sheet={sheet}
       />
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />
@@ -200,7 +209,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
+              <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
             ) : null}
             {application || based ? null : (
               <Button
@@ -284,14 +293,12 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
       {application ? (
         <CtaBar>
           <Button
-            label="봇으로 고치기"
-            icon="spark"
+            label="Bot한테 보내기"
             variant="secondary"
             onPress={() => void start(FIX_DOC, FIX_DOC, doc.data?.data.title, undefined, undefined, { documentId: id })}
           />
           <Button
             label={applied ? '지원 완료' : '이 공고에 지원'}
-            icon={applied ? undefined : 'chevron-right-2'}
             disabled={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}

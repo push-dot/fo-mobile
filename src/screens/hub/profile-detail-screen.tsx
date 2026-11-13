@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, Pressable, ScrollView, View } from 'react-native'
+import { ProfileTab } from '@/features/my'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
 import { DetailWebView, Glass, Text, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
@@ -39,7 +40,14 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         onBack={() => router.back()}
         right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
       />
-      <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} />
+      {self ? (
+        // ProfileDetailMe: the own profile is MyProfile's page, edited section by section like the 마이 edit pages.
+        <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+          <ProfileTab share={false} />
+        </ScrollView>
+      ) : (
+        <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} />
+      )}
     </View>
   )
 }

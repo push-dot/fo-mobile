@@ -349,8 +349,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
         />
         {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
-          label="봇으로 다듬기"
-          icon="spark"
+          label="AI로 다듬기"
           variant="secondary"
           size="md"
           onPress={() => router.push(botChatPath('push'))}
@@ -558,16 +557,13 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Pressable
                     accessibilityRole="button"
                     onPress={() =>
-                      askConfirm(
-                        {
-                          title: careerDeleteCopy.title,
-                          body: careerDeleteBody(it),
-                          confirm: careerDeleteCopy.confirm,
-                          danger: true,
-                          onConfirm: () => removeAt(i, it),
-                        },
-                        '/(app)/(stack)/(tabs)/(my)/confirm',
-                      )
+                      askConfirm({
+                        title: careerDeleteCopy.title,
+                        body: careerDeleteBody(it),
+                        confirm: careerDeleteCopy.confirm,
+                        danger: true,
+                        onConfirm: () => removeAt(i, it),
+                      })
                     }
                     style={{
                       height: 40,

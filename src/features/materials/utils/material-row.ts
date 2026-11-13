@@ -32,18 +32,25 @@ export const deadlineLabel = (deadline: Date | null, now: Date): string => {
 
 export const madeByLabel = (madeBy: MadeBy): string => {
   if (madeBy.by === 'user') return '직접 올림'
-  if (madeBy.bot === null) return '봇이 만듦'
-  return madeBy.bot.kind === 'push' ? `${madeBy.bot.name}이 만듦` : `${madeBy.bot.name} 봇이 만듦`
+  if (madeBy.bot === null) return 'Bot이 만듦'
+  return madeBy.bot.kind === 'push' ? `${madeBy.bot.name}이 만듦` : `${madeBy.bot.name} Bot이 만듦`
 }
 
 /** "PDF" from "이력서.pdf". A title without an extension reads 파일. */
 export const formatOf = (title: string) => /\.([a-z0-9]{1,5})$/i.exec(title)?.[1]?.toUpperCase() ?? '파일'
 
-export const withoutScheme = (url: string) => url.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
+/** A link shows its host only: "https://www.google.com/search?q=x" reads google.com (MaterialDetailLong). */
+export const hostOf = (url: string) =>
+  url
+    .trim()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
+    .replace(/^[^/?#@]*@/, '')
+    .split(/[/?#:]/)[0]!
+    .replace(/^www\./i, '')
 
 /** The row's first line, also the title an attachment keeps. */
 export const materialTitle = (m: Material): string =>
-  m.kind === 'posting' ? `${m.company} · ${m.title}` : m.kind === 'link' ? withoutScheme(m.url) : m.title
+  m.kind === 'posting' ? `${m.company} · ${m.title}` : m.kind === 'link' ? hostOf(m.url) : m.title
 
 const subOf = (m: Material, now: Date): string => {
   switch (m.kind) {

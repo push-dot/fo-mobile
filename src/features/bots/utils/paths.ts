@@ -21,4 +21,5 @@ export const materialDetailPath = (kind: AttachmentKind, id: string, forBot?: Bo
 export const materialLinkAddPath = () => '/materials/link-add' as const
 /** The 자료 고르기 sheet. Its picks go to that bot's draft. */
 export const materialPickerPath = (bot: BotId) => `/material-picker?bot=${bot}` as const
-export const accountPath = (page?: 'plan') => (page ? (`/account?page=${page}` as const) : ('/account' as const))
+/** `plan`: the 플랜 page is its own page, not a part of the 계정 modal. */
+export const accountPath = (page?: 'plan') => (page ? ('/plan' as const) : ('/account' as const))

@@ -5,6 +5,7 @@ import {
   FIX_DOC,
   PREVIEW_HEADINGS,
   useResumeDraft,
+  useFileMenu,
   useSource,
   useUndoRemove,
   type ResumeDraft,
@@ -110,6 +111,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
   const draft = useResumeDraft(id)
   useUndoRemove(() => router.back())
   const s = doc.data
+  const openMenu = useFileMenu(s)
   const d = draft.data
 
   return (
@@ -125,7 +127,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
-              { icon: 'menu', label: '더 보기', onPress: () => router.push({ pathname: '/docs/[id]/more', params: { id, viewing: '1' } }) },
+              { icon: 'menu', label: '더 보기', onPress: openMenu },
             ]}
           />
         }
@@ -148,12 +150,11 @@ const DocViewerScreen = ({ id }: { id: string }) => {
       </ScrollView>
       <CtaBar>
         <Button
-          label="봇으로 고치기"
-          icon="spark"
+          label="Bot한테 보내기"
           variant="secondary"
           onPress={() => void start(FIX_DOC, FIX_DOC, s?.fileName, undefined, undefined, { evidenceIds: [id] })}
         />
-        <Button label="내 프로필로 전환" icon="user" disabled={!d} onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
+        <Button label="내 프로필로 전환" disabled={!d} onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
       </CtaBar>
     </View>
   )

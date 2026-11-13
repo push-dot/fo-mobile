@@ -25,9 +25,8 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: UploadPick
-- swipe:
-    start: "50%,72%"
-    end: "50%,99%"
+# UploadPick is the platform's action list now: 취소 closes it.
+- tapOn: "취소"
 - extendedWaitUntil:
     notVisible: "서류 가져오기"
     timeout: 10000
@@ -47,6 +46,19 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: MyResumeStates.1
+      # 이름 변경 asks in the system alert with a text field (MyResumeStates.2).
+      - tapOn: "이름 변경"
+      - extendedWaitUntil:
+          visible: "파일 이름 바꾸기"
+          timeout: 5000
+      - waitForAnimationToEnd
+      - takeScreenshot: MyResumeStates.2
+      - tapOn: "취소"
+      - tapOn:
+          point: "90%,56%"
+      - extendedWaitUntil:
+          visible: "서류 삭제하기"
+          timeout: 5000
       - tapOn: "서류 삭제하기"
       - extendedWaitUntil:
           visible: "이 서류를 삭제할까요?"

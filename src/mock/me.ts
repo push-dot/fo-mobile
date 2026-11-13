@@ -128,6 +128,14 @@ mock('GET', 'sources/:id', ({ params }) => {
 mock('GET', 'sources/:id/content', ({ params }) =>
   sources.some((x) => x.id === params.id) ? pdfResponse() : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } },
 )
+mock('PATCH', 'sources/:id', ({ params, body }) => {
+  const s = sources.find((x) => x.id === params.id)
+  const fileName = typeof (body as { fileName?: unknown })?.fileName === 'string' ? (body as { fileName: string }).fileName.trim() : ''
+  if (!s) return { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
+  if (!fileName || fileName.length > 200) return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: '이름을 확인해 주세요' } } }
+  s.fileName = fileName
+  return { data: s }
+})
 mock('DELETE', 'sources/:id', ({ params }) => {
   sources = sources.filter((x) => x.id !== params.id)
   removeChatDoc(params.id!)

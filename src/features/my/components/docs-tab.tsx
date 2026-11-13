@@ -4,11 +4,11 @@ import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { botChatPath } from '@/features/bots'
-import { Button, GlassPressable, Icon, Icon3D, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { Button, GlassPressable, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
-import { pickResume, useImportRequest, useUndoRemove } from '../hooks'
+import { pickResume, showImportMenu, useFileMenu, useImportRequest, useUndoRemove } from '../hooks'
 import type { HubDocument, MySource } from '../types'
 import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
 import { TAB_EMPTY_LIFT } from './empty'
@@ -20,7 +20,6 @@ const HIT = 44
 const PUSH_CARD_RADIUS = 24
 const RETRY_H = 32
 const PROGRESS_H = 6
-const EMPTY_ART = 88
 const EMPTY_INSET = 40
 
 const openChat = () => router.push(botChatPath('push'))
@@ -28,6 +27,7 @@ const openChat = () => router.push(botChatPath('push'))
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
   const qc = useQueryClient()
   const job = useIngestJob(doc.jobId, live).data
+  const openMenu = useFileMenu(doc)
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
   const retry = () => {
@@ -71,7 +71,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${doc.fileName} 더 보기`}
-        onPress={() => router.push(`/docs/${doc.id}/more`)}
+        onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
         <Icon name="menu" size={20} color="t3" />
@@ -147,18 +147,15 @@ const DocsTab = () => {
           paddingBottom: TAB_EMPTY_LIFT,
         }}
       >
-        <View style={{ marginBottom: spacing[2] }}>
-          <Icon3D name="paper" size={EMPTY_ART} />
-        </View>
         <Text v="h2" style={{ textAlign: 'center' }}>
           아직 등록한 서류가 없어요
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-          {'PDF나 DOCX 파일을 올리거나\n봇으로 새로 만들어 보세요.'}
+          {'PDF나 DOCX 파일을 올리거나\nBot 채팅에서 새로 만들어 보세요.'}
         </Text>
         <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
           <Button label="파일 등록" onPress={pickFile} />
-          <Button label="봇으로 만들기" variant="secondary" onPress={openChat} />
+          <Button label="Bot 채팅에서 새로 만들기" variant="secondary" onPress={openChat} />
         </View>
       </View>
     )
@@ -232,10 +229,8 @@ const DocsTab = () => {
         <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <Button
             label="파일 등록"
-            icon="plus"
-            iconSize={20}
             disabled={!!upload}
-            onPress={() => router.push('/docs/import')}
+            onPress={showImportMenu}
           />
         </View>
         <Text v="c1" color="t3" style={{ textAlign: 'center', paddingTop: spacing[3] }}>
