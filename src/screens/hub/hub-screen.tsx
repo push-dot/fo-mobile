@@ -34,6 +34,8 @@ const HubScreen = () => {
   const list = useProfileList(category, sheet)
   const items = useMemo(() => list.data?.pages.flatMap((p) => p.data) ?? [], [list.data])
   const summary = filterSummary(sheet)
+  // HubEmpty board: the title row sits 8pt under the chips; every other Hub board keeps 12pt.
+  const emptyList = !list.isPending && !list.isError && items.length === 0
 
   const header = useMemo(
     () => (
@@ -57,7 +59,7 @@ const HubScreen = () => {
           <Chip key={k.key} label={k.label} check on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
         ))}
       </ChipRow>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: emptyList ? spacing[2] : spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
         <Text v="h2" accessibilityRole="header">
           추천 프로필
         </Text>
@@ -65,7 +67,7 @@ const HubScreen = () => {
       </View>
     </View>
     ),
-    [c.fill, category, setCategory, summary, viewerId],
+    [c.fill, category, setCategory, summary, viewerId, emptyList],
   )
 
   const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])

@@ -24,9 +24,9 @@ tags:
           timeout: 10000
       # The boards show the list scrolled to its end, backed off ~30pt (허브 공개 header under the title).
       - runFlow: _settings_end.yaml
-      - tapOn: "연락처.*"
+      - tapOn: "연락처는.*"
       - extendedWaitUntil:
-          visible: "완료"
+          visible: "누구에게 연락처를 보여 줄까요?"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.3
@@ -34,23 +34,23 @@ tags:
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "완료"
+            TITLE: "누구에게 연락처를 보여 줄까요?"
       - extendedWaitUntil:
-          notVisible: "완료"
+          notVisible: "누구에게 연락처를 보여 줄까요?"
           timeout: 5000
       - runFlow: _settings_end.yaml
-      - tapOn: "기본 말투.*"
+      - tapOn: "말투.*"
       - extendedWaitUntil:
-          visible: "완료"
+          visible: "Bot이 어떤 말투로 쓸까요?"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.4
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "완료"
+            TITLE: "Bot이 어떤 말투로 쓸까요?"
       - extendedWaitUntil:
-          notVisible: "완료"
+          notVisible: "Bot이 어떤 말투로 쓸까요?"
           timeout: 5000
       - runFlow: _settings_end.yaml
       - tapOn: "로그아웃"

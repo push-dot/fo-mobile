@@ -135,7 +135,7 @@ describe('offerMenuSections', () => {
     block.onPress()
     expect(d.block).not.toHaveBeenCalled()
     const ask = vi.mocked(d.confirm).mock.calls[0]![0]
-    expect(ask).toMatchObject({ title: 'them 님을 차단할까요?', confirm: '차단', danger: true, note: '설정 › 차단한 사람에서 언제든 풀 수 있어요.' })
+    expect(ask).toMatchObject({ title: 'them 님을 차단할까요?', confirm: '차단', danger: true, body: '제안과 메시지를 더 받지 않아요. 상대에게는 알리지 않아요.' })
     ask.onConfirm()
     await flush()
     expect(d.block).toHaveBeenCalledWith('them')

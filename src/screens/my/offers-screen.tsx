@@ -31,7 +31,7 @@ const ArchivedRow = ({ count }: { count: number }) => (
   </View>
 )
 
-// The board ends the list and lifts its empty state by the same 40pt.
+// The board lifts the empty state by 40pt; the footer note ends the list with no extra gap (ProposalInbox).
 const LIST_END = 40
 
 const OffersScreen = () => {
@@ -71,7 +71,7 @@ const OffersScreen = () => {
         ))}
         {box === 'received' && archived > 0 ? <ArchivedRow count={archived} /> : null}
         {q.data?.data.length ? (
-          <Text v="c2" color="t3" style={{ paddingTop: spacing[1], paddingBottom: LIST_END, paddingHorizontal: spacing[6], lineHeight: 17 }}>
+          <Text v="c2" color="t3" style={{ paddingTop: box === 'received' ? spacing[1] : spacing[5], paddingBottom: spacing[4], paddingHorizontal: box === 'received' ? spacing[5] : spacing[6], lineHeight: 17 }}>
             {box === 'received'
               ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
               : '상대가 읽으면 ‘읽음’으로 바뀌고, 수락하면 대화를 시작할 수 있어요.'}

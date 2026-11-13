@@ -27,6 +27,7 @@ const SignedInStack = () => {
       <Stack.Screen name="offers/[id]/messages" />
       <Stack.Screen name="settings/index" />
       <Stack.Screen name="settings/blocked" />
+      <Stack.Screen name="settings/career" />
       <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
       <Stack.Screen name="docs/push/index" />

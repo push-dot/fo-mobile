@@ -4,12 +4,12 @@ import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 
 import type { Settings } from '@push/api-client'
 import {
   Avatar,
-  CONTACT,
   deleteAccountSession,
   AGENT_NOTE,
   AGENT_TITLE,
-  BLOCKED_COPY,
-  blockedCount,
+  blockedRowLabel,
+  careerRowLabel,
+  contactRowLabel,
   LANGS,
   NOTIFY_SUB,
   LOGIN_LABEL,
@@ -21,6 +21,8 @@ import {
   REFERENCE_SUB,
   signOutSession,
   SUPPORT_MAIL,
+  themeRowLabel,
+  toneRowLabel,
   TONES,
   useAuthMe,
   useBlocked,
@@ -28,7 +30,6 @@ import {
   useMyProfile,
   useReferenceConsent,
   useSettings,
-  VISIBILITY,
   WITHDRAW_BODY,
 } from '@/features/my'
 import {
@@ -123,15 +124,13 @@ const SettingsScreen = () => {
 
       <SettingsGroup title="일반" note="앱 화면과 Bot 답변 언어가 함께 바뀌어요.">
         <SettingsRow
-          label="언어"
+          label={LANGS.find((l) => l.key === s.locale)?.label ?? ''}
           picker
-          value={LANGS.find((l) => l.key === s.locale)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'locale' } })}
         />
         <SettingsRow
-          label="테마"
+          label={themeRowLabel(THEME_CHOICES.find((t) => t.key === theme)?.label ?? '')}
           picker
-          value={THEME_CHOICES.find((t) => t.key === theme)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'theme' } })}
         />
       </SettingsGroup>
@@ -154,21 +153,10 @@ const SettingsScreen = () => {
 
       <SettingsGroup title="허브 공개">
         <SettingsRow label="프로필 공개" right={sw('profilePublic', '프로필 공개')} />
+        <SettingsRow label={careerRowLabel(s.careerStatusVisibility)} onPress={() => router.push('/settings/career')} />
+        <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} />
         <SettingsRow
-          label="커리어 상태"
-          picker
-          value={VISIBILITY.find((v) => v.key === s.careerStatusVisibility)?.label ?? ''}
-          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'career' } })}
-        />
-        <SettingsRow
-          label="연락처"
-          picker
-          value={CONTACT.find((v) => v.key === s.contactVisibility)?.label ?? ''}
-          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })}
-        />
-        <SettingsRow
-          label={BLOCKED_COPY.title}
-          value={blockedCount(blocked.data?.page.total)}
+          label={blockedRowLabel(blocked.data?.page.total)}
           entry={entry === 'blocked'}
           onPress={() => router.push('/settings/blocked')}
         />
@@ -176,9 +164,7 @@ const SettingsScreen = () => {
 
       <SettingsGroup title={AGENT_TITLE} note={AGENT_NOTE}>
         <SettingsRow
-          label="기본 말투"
-          picker
-          value={TONES.find((t) => t.key === s.defaultTone)?.label ?? ''}
+          label={toneRowLabel(TONES.find((t) => t.key === s.defaultTone)?.label ?? '')}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
         />
         <SettingsRow label={READ_FILES_ROW.label} right={sw(READ_FILES_ROW.key, READ_FILES_ROW.label)} />
