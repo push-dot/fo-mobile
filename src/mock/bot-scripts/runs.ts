@@ -132,10 +132,7 @@ const profileDone = (wait: number, score: string, josa: string, bullets?: string
     subtitle: 'Push 프로필 · 방금 수정',
     documentId: 'd1',
     company: '모아페이',
-    actions: [
-      { id: 'apply', label: '모아페이에 바로 지원하기' },
-      { id: 'view', label: '프로필 보기' },
-    ],
+    actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }],
     ...closing(`다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`, bullets),
   }),
 ]
@@ -413,7 +410,7 @@ const ph4Design: Step[] = [
     recommended: 't0',
     sections: [
       { kind: 'thumbnails', id: 's0', options: [{ id: 't0', label: '클래식' }, { id: 't1', label: '모던' }, { id: 't2', label: '컴팩트' }, { id: 't3', label: 'ATS' }], selected: ['t0'] },
-      { kind: 'toggle', id: 's1', options: [{ id: 'photo', label: '프로필 사진 넣기', desc: '마이 › 프로필 사진을 써요 · 모든 템플릿' }], selected: [] },
+      { kind: 'toggle', id: 's1', options: [{ id: 'photo', label: '프로필 사진 넣기' }], selected: [] },
     ],
     submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
   }),

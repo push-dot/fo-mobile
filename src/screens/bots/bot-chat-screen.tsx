@@ -18,13 +18,16 @@ import {
   NewMessagesPill,
   Onboarding,
   Queued,
+  QuickStartRow,
   StatusRow,
   THREAD_BATCH,
   THREAD_INITIAL_RENDER,
   THREAD_WINDOW,
   answer,
+  applyText,
   closeApproval,
   composerPlaceholder,
+  endsInError,
   followScroll,
   headerLightOf,
   openBot,
@@ -34,6 +37,7 @@ import {
   send,
   stop,
   useCardState,
+  useDoneNext,
   useChat,
   useChatLimit,
   useDraftStore,
@@ -122,7 +126,6 @@ const Thread = ({ id }: { id: string }) => {
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
-  const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
   const greeting: ChatItem[] =
     !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
   const data = [...chat.items].reverse().concat(greeting)
@@ -133,7 +136,7 @@ const Thread = ({ id }: { id: string }) => {
   const [atBottom, setAtBottom] = useState(true)
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
   const list = useRef<FlatList<ChatItem>>(null)
   const itemsRef = useRef(chat.items)
   useEffect(() => {
@@ -148,16 +151,12 @@ const Thread = ({ id }: { id: string }) => {
     if (at < itemsRef.current.length) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
-  const onAction = useCallback((text: string) => send(id, text), [id])
   const convertRef = useRef(convert.mutate)
   const buyCredits = useRef(purchase.buyCredits)
   useEffect(() => {
     convertRef.current = convert.mutate
     buyCredits.current = purchase.buyCredits
   }, [convert.mutate, purchase.buyCredits])
-  const onConvert = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
-    convertRef.current(card.documentId)
-  }, [])
   const onView = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
     router.push(`/docs/push/${card.documentId}`)
   }, [])
@@ -169,20 +168,20 @@ const Thread = ({ id }: { id: string }) => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }, [])
+  useDoneNext(chat, (action, card) => {
+    if (action.id === 'apply') send(id, applyText(card.company))
+    else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
+  })
   const renderItem = useCallback(
     ({ item }: { item: ChatItem }) => (
       <Item
         item={item}
-        onAction={onAction}
-        onConvert={onConvert}
         onView={onView}
-        resultPending={item.type === 'result' && item.id === lastResultId && convert.isPending}
-        resultAwaiting={item.type === 'result' && item.id === lastResultId && !!chat.approval}
         onUsage={onUsage}
         onReadOff={onReadOff}
       />
     ),
-    [onAction, onConvert, onView, onUsage, onReadOff, lastResultId, convert.isPending, chat.approval],
+    [onView, onUsage, onReadOff],
   )
 
   return (
@@ -196,7 +195,7 @@ const Thread = ({ id }: { id: string }) => {
       </View>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {empty && kind && name ? (
-        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} onChip={(key) => router.push(quickStartPath(key))} />
+        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
       ) : (
       <View style={{ flex: 1 }}>
       <FindHighlight.Provider value={find.highlight}>
@@ -263,6 +262,8 @@ const Thread = ({ id }: { id: string }) => {
                 <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} color={color} />
               ) : chat.awaiting ? (
                 <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
+              ) : empty && kind ? (
+                <QuickStartRow kind={kind} onChip={(key) => router.push(quickStartPath(key))} />
               ) : null
             }
           />

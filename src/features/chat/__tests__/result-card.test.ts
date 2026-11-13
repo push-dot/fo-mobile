@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
 import { describe, expect, it } from 'vitest'
-import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
+import { applyText, doneNextActions, doneNextCopy, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -66,8 +66,12 @@ describe('agent result cards', () => {
     expect(meta).not.toContain('내 서류에 자동 저장됨')
   })
 
-  it('picks the button look by action id, so a lone convert stays secondary', () => {
-    expect(RESULT_VARIANT).toEqual({ apply: 'primary', convert: 'secondary', view: 'secondary' })
+  it('asks the next step in an action sheet with apply and convert, never 프로필 보기 (ChatDoneNext)', () => {
+    expect(doneNextActions(file).map((a) => a.id)).toEqual(['apply', 'convert'])
+    expect(doneNextActions(profile).map((a) => a.id)).toEqual(['apply'])
+    expect(doneNextActions({ ...profile, pendingNote: 'x' })).toEqual([])
+    expect(doneNextCopy(file)).toEqual({ title: '이력서를 다 고쳤어요', message: '다음으로 무엇을 할까요?' })
+    expect(doneNextCopy(profile).title).toBe('프로필을 다 고쳤어요')
   })
 
   it('hides the buttons while the card waits on an approval, or while a profile save is pending', () => {

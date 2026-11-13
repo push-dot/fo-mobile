@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
-import { Badge, Chip, GlassButton, GlassPressable, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Badge, Chip, GlassButton, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
@@ -78,9 +78,11 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
           <Text v="h2" accessibilityRole="header">
             {title}
           </Text>
-          <Text v="b2" color="t3">
-            {qs.description}
-          </Text>
+          {qs.description ? (
+            <Text v="b2" color="t3">
+              {qs.description}
+            </Text>
+          ) : null}
         </View>
         <View style={{ margin: -spacing[1] }}>
           <GlassButton filled actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />
@@ -117,7 +119,6 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                   />
                 ) : null}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-                  <Icon name="spark" size={18} color="t1" filled />
                   <Text v="b2" style={{ flex: 1 }}>
                     적합도 7점 이상인 공고만 보여 드려요
                   </Text>
@@ -267,17 +268,22 @@ const LinkField = ({ value, onChangeText }: { value: string; onChangeText: (v: s
   )
 }
 
-// The board's glass chip: the shared Chip leaves light glass untinted, which reads flat grey on the sheet.
+// A plain grey chip: a chip inside a sheet is not glass (QsMatch).
 const AddChip = ({ onPress }: { onPress: () => void }) => {
   const c = useColors()
   const fg = Platform.OS === 'ios' ? c.t1 : c.t2
   return (
-    <GlassPressable accessibilityRole="button" onPress={onPress} hitSlop={hitSlopTo(34)} tint={c.glass} style={{ minHeight: 34, borderRadius: radius.chip }} contentStyle={{ paddingHorizontal: 14, gap: spacing[1] }}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      hitSlop={hitSlopTo(34)}
+      style={{ minHeight: 34, borderRadius: radius.chip, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: spacing[1], backgroundColor: c.fill }}
+    >
       <Icon name="plus" size={14} color={fg} />
       <Text v="c1" weight="600" style={{ fontSize: 14, color: fg }}>
         조건 추가
       </Text>
-    </GlassPressable>
+    </Pressable>
   )
 }
 

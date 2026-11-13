@@ -1,10 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { Alert, Platform, Pressable, View } from 'react-native'
+import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, LOCAL_DRAFT, isChatAttachment, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
 import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
 import { pickDocument } from '@/shared/infrastructure'
-import { Button, Chip, GlassButton, Icon, Sheet, SheetScroll, Text, TextField, useSheetScrollMax, type IconName } from '@/shared/components'
+import { Button, Icon, Sheet, SheetScroll, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { onAccent, selectedRing, spacing, type, useColors } from '@/theme'
 
 type Row = { id: string; title: string; meta: string }
@@ -21,7 +21,7 @@ const MaterialPickerScreen = () => {
     const id = Array.isArray(rawBot) ? rawBot[0] : rawBot
     return id || LOCAL_DRAFT
   })
-  const [kind, setKind] = useState<'github' | 'posting' | null>(null)
+  const [pasting, setPasting] = useState(false)
   const [text, setText] = useState('')
   const [picks, setPicks] = useState<string[]>([])
   const docs = useChatDocs()
@@ -52,31 +52,27 @@ const MaterialPickerScreen = () => {
     attachDraftFile(target, { uri: asset.uri, name: asset.name, mimeType: asset.mimeType, size: asset.size })
     router.back()
   }
-  const others: [string, IconName, () => void][] = [
-    ['파일', 'pdf', () => void pickFile()],
-    ['GitHub 링크', 'at', () => setKind('github')],
-    ['공고 붙여넣기', 'doc', () => setKind('posting')],
+  // MaterialsLinkAdd sorts a pasted link by itself, so one row covers GitHub and posting links.
+  const others: [string, () => void][] = [
+    ['파일에서 고르기', () => void pickFile()],
+    ['링크 붙여넣기', () => setPasting(true)],
   ]
   return (
-    <Sheet gap={spacing[2]} onLayout={bound.onSheetLayout} action={kind ? { label: '넣기', onPress: submit, disabled: !text.trim() } : undefined}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
-        {Platform.OS === 'ios' ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} /> : null}
-        <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
-          자료 고르기
-        </Text>
-        {kind ? null : <Button size="sm" label={`${picks.length}개 추가`} disabled={!picks.length} onPress={add} />}
-      </View>
-      {kind ? (
+    <Sheet gap={spacing[2]} onLayout={bound.onSheetLayout}>
+      <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1], paddingBottom: spacing[2] }}>
+        자료 고르기
+      </Text>
+      {pasting ? (
         <TextField
           value={text}
           onChangeText={setText}
-          placeholder={kind === 'github' ? 'https://github.com/' : 'https://'}
+          placeholder="https://"
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
           autoFocus
           onSubmitEditing={submit}
-          accessibilityLabel={kind === 'github' ? 'GitHub 링크' : '공고 링크'}
+          accessibilityLabel="링크"
         />
       ) : (
         <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[2] }}>
@@ -125,13 +121,31 @@ const MaterialPickerScreen = () => {
           <Text v="c1" weight="700" color="t3" style={SECTION_LABEL}>
             다른 곳에서
           </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], padding: spacing[1] }}>
-            {others.map(([label, icon, onPress]) => (
-              <Chip key={label} label={label} lead={<Icon name={icon} size={16} color="t2" />} onPress={onPress} />
-            ))}
-          </View>
+          {others.map(([label, onPress]) => (
+            <Pressable
+              key={label}
+              accessibilityRole="button"
+              onPress={onPress}
+              style={{ flexDirection: 'row', alignItems: 'center', minHeight: 52, paddingHorizontal: spacing[1], borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.line }}
+            >
+              <Text v="b1" style={{ flex: 1 }}>
+                {label}
+              </Text>
+              <Icon name="chev" size={18} color="t3" />
+            </Pressable>
+          ))}
         </SheetScroll>
       )}
+      {/* The footer: cancel and confirm side by side in the sheet's action area (ChatPh0Picker). */}
+      <View style={{ flexDirection: 'row', gap: spacing[2], paddingTop: spacing[2] }}>
+        <Button label="취소" variant="secondary" onPress={() => router.back()} style={{ flex: 1 }} />
+        <Button
+          label={pasting ? '넣기' : `${picks.length}개 추가`}
+          disabled={pasting ? !text.trim() : !picks.length}
+          onPress={pasting ? submit : add}
+          style={{ flex: 1.4 }}
+        />
+      </View>
     </Sheet>
   )
 }

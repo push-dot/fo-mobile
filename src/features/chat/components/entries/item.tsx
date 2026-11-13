@@ -8,7 +8,7 @@ import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
 import { monoNumber } from '../../../../theme/mono'
-import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
+import { Badge, Button, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
@@ -16,9 +16,9 @@ import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
 import { usePop, usePulse } from '../../hooks'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { isVerdictPlan } from '../../utils/stream-v3'
-import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../../utils/result-card'
+import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
+import { FIT_LOCKED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -330,8 +330,8 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
           style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.bg, elevation: 3, ...shadow }}
         >
           <Icon name="lock" size={14} color="t1" />
-          <Text v="c1" weight="700" style={{ flexShrink: 1, textAlign: 'center' }}>
-            {onPlan ? FIT_LOCKED : FIT_LOCKED_CLOSED}
+          <Text v="c1" numberOfLines={1} style={{ flexShrink: 1, textAlign: 'center' }}>
+            {FIT_LOCKED}
           </Text>
         </Pressable>
       </View>
@@ -489,14 +489,12 @@ const Surface = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-const ShareButton = ({ onPress }: { onPress: () => void }) =>
-  Platform.OS === 'ios' ? (
-    <GlassButton iconSize={20} actions={[{ icon: 'share', label: '공유', color: 't2', onPress }]} />
-  ) : (
-    <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-      <Icon name="share" size={20} color="t2" />
-    </Pressable>
-  )
+/** A plain icon: sub buttons inside the chat are not glass (ChatDone). */
+const ShareButton = ({ onPress }: { onPress: () => void }) => (
+  <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+    <Icon name="share" size={20} color="t2" />
+  </Pressable>
+)
 
 const FileCard = ({ item }: { item: Of<'file'> }) => {
   const c = useColors()
@@ -527,55 +525,36 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
   )
 }
 
-const ResultCard = ({
-  item,
-  onApply,
-  onConvert,
-  onView,
-  convertPending,
-  awaiting,
-}: {
-  item: Of<'result'>
-  onApply: () => void
-  onConvert: () => void
-  onView: () => void
-  convertPending?: boolean
-  awaiting?: boolean
-}) => {
+const ResultCard = ({ item, onView }: { item: Of<'result'>; onView: () => void }) => {
   const chrome = resultChrome(item)
   const share = useShareFile()
   const save = profileSaveCopy(item)
   const title = save?.title ?? resultTitle(item)
-  const press = (id: ResultActionId) => (id === 'apply' ? onApply() : id === 'convert' ? onConvert() : onView())
-  const actions = resultActionsFor(item, awaiting)
+  const body = (
+    <Surface>
+      {chrome.initials && chrome.color ? <Mark text={chrome.initials} color={chrome.color} size={40} round /> : null}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text v="b2" weight="700" numberOfLines={1}>
+          {title}
+        </Text>
+        <Text v="c1" color="t3">
+          {save?.body ?? resultMeta(item)}
+        </Text>
+      </View>
+      {save ? <Button label={save.buttons[0]} variant="secondary" size="sm" onPress={onView} /> : null}
+      {chrome.share ? <ShareButton onPress={() => share.mutate({ documentId: item.documentId, name: item.source === 'external' ? item.fileName : undefined })} /> : null}
+    </Surface>
+  )
+  // The chat holds no action buttons (ChatDoneNext); the profile card itself opens the profile.
   return (
-    <Appear style={{ gap: 18 }}>
-      <Surface>
-        {chrome.initials && chrome.color ? <Mark text={chrome.initials} color={chrome.color} size={40} round /> : null}
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text v="b2" weight="700" numberOfLines={1}>
-            {title}
-          </Text>
-          <Text v="c1" color="t3">
-            {save?.body ?? resultMeta(item)}
-          </Text>
-        </View>
-        {save ? <Button label={save.buttons[0]} variant={RESULT_VARIANT.view} size="sm" onPress={onView} /> : null}
-        {chrome.share ? <ShareButton onPress={() => share.mutate({ documentId: item.documentId, name: item.source === 'external' ? item.fileName : undefined })} /> : null}
-      </Surface>
-      {actions.length ? (
-        <View style={{ gap: spacing[2] }}>
-          {actions.map((action) => (
-            <Button
-              key={action.id}
-              label={action.label}
-              variant={RESULT_VARIANT[action.id]}
-              disabled={action.id === 'convert' && convertPending}
-              onPress={() => press(action.id)}
-            />
-          ))}
-        </View>
-      ) : null}
+    <Appear>
+      {item.source === 'profile' && !save ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={`${title} 열기`} onPress={onView}>
+          {body}
+        </Pressable>
+      ) : (
+        body
+      )}
     </Appear>
   )
 }
@@ -612,22 +591,14 @@ const Paper = ({ item }: { item: Of<'paper'> }) => {
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
 const ItemComponent = ({
   item,
-  onAction,
   onUsage,
-  onConvert,
   onView,
   onReadOff,
-  resultPending,
-  resultAwaiting,
 }: {
   item: ChatItem
-  onAction: (text: string) => void
   onUsage?: (action: 'plan' | 'credits') => void
-  onConvert?: (item: Of<'result'>) => void
   onView?: (item: Of<'result'>) => void
   onReadOff?: (action: ReadOffAction) => void
-  resultPending?: boolean
-  resultAwaiting?: boolean
 }) => {
   switch (item.type) {
     case 'user':
@@ -656,16 +627,7 @@ const ItemComponent = ({
     case 'paper':
       return <Paper item={item} />
     case 'result':
-      return (
-        <ResultCard
-          item={item}
-          onApply={() => onAction(applyText(item.company))}
-          onConvert={() => onConvert?.(item)}
-          onView={() => onView?.(item)}
-          convertPending={resultPending}
-          awaiting={resultAwaiting}
-        />
-      )
+      return <ResultCard item={item} onView={() => onView?.(item)} />
     case 'worked':
       return null
     case 'error':

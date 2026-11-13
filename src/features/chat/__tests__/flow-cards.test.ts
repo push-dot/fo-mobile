@@ -44,11 +44,11 @@ describe('ChatPh3Review moved line', () => {
 })
 
 describe('ChatPh0Input', () => {
-  it('draws no foot under a sectioned card; the multi-choice card keeps its own', () => {
+  it('draws no foot under a sectioned or a multi-choice card', () => {
     const [sectioned] = mapEvent({ type: 'choice', id: 'g', options: [], sections: [{ id: 'p', kind: 'chips', multiple: true, options: [{ id: 'a', label: '이력서' }], selected: [] }] } as StreamEvent)
     expect(sectioned?.type === 'approval' && sectioned.approval.foot).toBeUndefined()
     const [multi] = mapEvent({ type: 'choice', id: 'x', options: [{ id: 'a', label: '성능' }], multiple: true } as StreamEvent)
-    expect(multi?.type === 'approval' && multi.approval.foot).toBe('여러 개 고를 수 있어요')
+    expect(multi?.type === 'approval' && multi.approval.foot).toBeUndefined()
   })
 })
 

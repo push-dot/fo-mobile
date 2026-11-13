@@ -4,11 +4,7 @@ import {
   DEFAULT_ERROR_TEXT,
   ERROR_TEXT,
   FIT_ROWS,
-  HINTLESS_GATES,
-  MULTI_PICK_FOOT,
   MULTI_PICK_SUBMIT,
-  EDIT_FOOT,
-  PICK_HINT,
   queueBusyMessage,
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
@@ -34,7 +30,6 @@ type Ask = {
   options: StreamOption[]
   multiple?: boolean
   warning?: string
-  hint?: boolean
   recommended?: string
   /** Set for a card with a lifetime. `foot` replaces the pick hint, `detail` sits under the question. */
   tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt' | 'expiresAt'>
@@ -55,12 +50,11 @@ const autoPicks = (ev: Extract<StreamEvent, { type: 'choice' }>) => {
   return labels.length ? labels.join(', ') : (ev.submit.zeroLabel ?? recommended)
 }
 
-const ask = ({ id, question, options, multiple, warning, hint = true, recommended, tool }: Ask): ChatEvent => {
+const ask = ({ id, question, options, multiple, warning, recommended, tool }: Ask): ChatEvent => {
   const first = Math.max(0, options.findIndex((o) => o.id === recommended))
   const approval: Approval = {
     id,
     question,
-    foot: multiple ? MULTI_PICK_FOOT : warning || !hint ? undefined : PICK_HINT,
     warning,
     submit: multiple ? MULTI_PICK_SUBMIT : undefined,
     optionIds: options.map((o) => o.id),
@@ -94,7 +88,6 @@ const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] =>
   const approval: Approval = {
     id: ev.id,
     question: ev.title,
-    foot: EDIT_FOOT,
     optionIds: ev.options.map((o) => o.id),
     sections: [],
     ...(apply ? { submit: apply.label } : {}),
@@ -180,7 +173,7 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       if (!ev.auto && ev.sections?.length) return [{ type: 'approval', approval: approvalFromSections(ev) }]
       if (!ev.auto) {
         const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
-        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, hint: !HINTLESS_GATES.includes(ev.gate ?? ''), recommended: ev.recommended })
+        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, recommended: ev.recommended })
         if (event.type === 'approval' && pending) event.approval.pendingNote = pending
         return [event]
       }

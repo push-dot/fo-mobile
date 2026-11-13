@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useReferenceConsent } from '@/features/my'
-import { CONSENT_AGREE, CONSENT_BODY, CONSENT_DETAIL, CONSENT_FOOT, CONSENT_LATER, CONSENT_MORE, CONSENT_TITLE, grantConsent, laterConsent, useConsentPrompt } from '@/features/chat'
+import { CONSENT_AGREE, CONSENT_BODY, CONSENT_DETAIL, CONSENT_LATER, CONSENT_MORE, CONSENT_TITLE, grantConsent, laterConsent, useConsentPrompt } from '@/features/chat'
 import { Button, Sheet, Text } from '@/shared/components'
 import { spacing } from '@/theme'
 
@@ -33,9 +33,6 @@ const ConsentScreen = () => {
         <Button label={CONSENT_AGREE} disabled={consent.saving} onPress={() => consent.save(true, { onSuccess: () => (grantConsent(), router.back()) })} />
         <Button variant="secondary" label={CONSENT_LATER} onPress={() => (laterConsent(), router.back())} />
       </View>
-      <Text v="c1" color="t3" style={{ textAlign: 'center' }}>
-        {CONSENT_FOOT}
-      </Text>
     </Sheet>
   )
 }

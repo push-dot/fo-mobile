@@ -1,10 +1,13 @@
 import type { ChatItem } from '../../types'
 
-export type HeaderLight = 'none' | 'new' | 'limit'
+export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
 
-/** Red (the bot cannot be used) wins over green (bot messages below the fold). */
-export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number }): HeaderLight =>
-  input.creditsOut ? 'limit' : input.unseenBotMessages > 0 ? 'new' : 'none'
+/** Red (the bot cannot be used, or the last run failed: ChatBotStatusError) wins over green (bot messages below the fold). */
+export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean }): HeaderLight =>
+  input.creditsOut ? 'limit' : input.failed ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
+
+/** The thread ends on a failed run; the next message clears it. */
+export const endsInError = (items: readonly ChatItem[]) => items.at(-1)?.type === 'error'
 
 /** Bot lines after the newest line the reader saw at the bottom. Identity, not a count: paging older turns in at the front must not look like news. */
 export const unseenBotMessages = (items: readonly ChatItem[], seenId: string | undefined) => {

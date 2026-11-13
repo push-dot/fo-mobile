@@ -23,13 +23,10 @@ export const MICRO_CREDITS_PER_CREDIT = 6000
 
 export const CHOICE_QUESTION = '어떻게 할까요?'
 export const MULTI_PICK_SUBMIT = '이대로 진행'
-export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 /** push-be material_access.REFUSED: the notice a tool sends when 내 자료 읽기 허용 is off (ChatBotReadOff). */
 export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
 export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
-export const EDIT_FOOT = '번호를 누르거나 바로 말해도 돼요'
-export const PICK_HINT = '답할 때까지 이 Bot은 기다려요'
 export const HINTLESS_GATES = ['validate_cap']
 
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
@@ -42,8 +39,8 @@ export const FIT_ROWS = [
   { key: 'keyword', label: '키워드' },
   { key: 'domain', label: '도메인' },
 ] as const
-export const FIT_LOCKED = 'PRO로 올리면 항목별 점수와 약점을 볼 수 있어요'
-export const FIT_LOCKED_CLOSED = '항목별 점수와 약점은 PRO에서 볼 수 있어요'
+/** One line on the FREE lock (ChatPh1FitFree). */
+export const FIT_LOCKED = 'PRO에서 항목별 점수를 볼 수 있어요'
 export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
 /** Decorative bar widths behind the FREE lock, from the design. */
 export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]
@@ -98,7 +95,6 @@ export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
-export const CONSENT_FOOT = '마이 › 설정에서 언제든 끌 수 있어요. 끄면 Bot을 쓸 수 없어요.'
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 
@@ -128,6 +124,7 @@ export type QuickStart = {
   label: string
   icon: Icon3DName
   title: string
+  /** Under the title; empty draws nothing (QsMatch). */
   description: string
   layout: QsLayout
   /** Button label; omitted when tapping a row starts the conversation (제안 답장). */
@@ -159,7 +156,7 @@ export const QUICK_STARTS: QuickStart[] = [
   },
   {
     key: 'match', label: '나에게 맞는 공고 찾기', icon: 'target', layout: 'match', action: '공고 찾기',
-    title: '이 조건으로 찾아볼까요?', description: '내 프로필과 서류에서 가져온 조건이에요. 바꿔도 돼요.',
+    title: '이 조건으로 찾아볼까요?', description: '',
     start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
