@@ -11,7 +11,7 @@ import { useReduceMotion } from './use-reduce-motion'
 
 const TOAST_HEIGHT = 52
 const ACTION_HEIGHT = 44
-// v415 boards: iOS shows a top notification banner (one line of text, no app tile), Android the Material snackbar (8pt side margin, 4pt corners).
+// v415 boards: iOS shows a top notification banner (one line, no app tile: rule 16), Android the Material snackbar (8pt side margin, 4pt corners).
 const SHAPE = Platform.OS === 'ios'
   ? { inset: spacing[4], radius: 22, shadow: cssShadow.toast }
   : { inset: spacing[2], radius: 4, shadow: cssShadow.toast }
@@ -76,7 +76,7 @@ const ToastHost = () => {
       }}
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
           <Text v="b2" weight="600" style={{ flex: 1, color: ink.text }}>
             {toast.message}
           </Text>

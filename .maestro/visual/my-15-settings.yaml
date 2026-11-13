@@ -18,8 +18,8 @@ tags:
 # SettingsMarketing is the same list with the 혜택·이벤트 알림 row (off by default in the mock) in the 알림 group.
 - takeScreenshot: SettingsMarketing
 
-# v412: the language row shows only the value; the choice is a wheel in a modal (iOS) or a radio dialog (Android) with 취소 first.
-- tapOn: "언어.*"
+# v415: the language row is the value itself (한국어); the choice is a wheel in a modal (iOS) or a radio dialog (Android) with 취소 first.
+- tapOn: "한국어"
 - extendedWaitUntil:
     visible: "취소"
     timeout: 5000
@@ -34,7 +34,7 @@ tags:
     direction: DOWN
     centerElement: true
 - tapOn: "커리어 상태.*"
-# The 커리어 상태 picker carries the 숨기기 switch.
+# 커리어 상태 is its own page again (v415) and carries the 숨기기 switch.
 - extendedWaitUntil:
     visible: ".*사람에게 숨기기.*"
     timeout: 10000

@@ -18,6 +18,10 @@ import {
   SIZE_LIMIT,
   THEME_CHOICES,
   WITHDRAW_BODY,
+  careerRowLabel,
+  contactRowLabel,
+  themeRowLabel,
+  toneRowLabel,
   careerDeleteBody,
   careerDeleteCopy,
   commentedSee,
@@ -174,7 +178,7 @@ describe('my screen rules', () => {
   })
 
   it('locks the activity, offer, and calendar labels', () => {
-    expect(INTERVIEW_PREP).toBe('Bot한테 보내서 면접 준비')
+    expect(INTERVIEW_PREP).toBe('Bot으로 면접 준비')
     expect(CALENDAR_ADD).toBe('일정 추가하기')
     expect(OFFER_DECLINE).toBe('거절')
     expect(OFFER_FAIL).toBe('잠시 뒤에 다시 보내 주세요.')
@@ -226,9 +230,7 @@ describe('my screen rules', () => {
   })
 
   it('says withdrawal does not cancel the store subscription', () => {
-    expect(WITHDRAW_BODY).toBe(
-      '구독은 탈퇴해도 자동으로 해지되지 않아요. App Store나 Google Play에서 직접 해지해 주세요. 30일 안에 다시 로그인하면 계정이 복구되고, 30일이 지나면 이력서·서류·글·댓글이 모두 삭제돼요. 삭제된 뒤에는 되돌릴 수 없어요.',
-    )
+    expect(WITHDRAW_BODY).toBe('30일 안에 다시 로그인하면 복구돼요. 구독은 스토어에서 따로 해지해 주세요.')
   })
 
   it('keeps a project heading on the preview', () => {
@@ -261,5 +263,12 @@ describe('restoreAt', () => {
     const list = ['a']
     expect(restoreAt(list, 5, 'b')).toEqual(['a', 'b'])
     expect(list).toEqual(['a'])
+  })
+
+  it('names a setting row by its value, with a short name where the value alone is unclear', () => {
+    expect(careerRowLabel('everyone')).toBe('커리어 상태 모두 공개')
+    expect(contactRowLabel('accepted')).toBe('연락처는 제안 수락한 사람만')
+    expect(toneRowLabel('그대로')).toBe('말투 그대로')
+    expect(themeRowLabel('시스템')).toBe('시스템 테마')
   })
 })

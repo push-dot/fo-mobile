@@ -23,7 +23,7 @@ name: 마이 → 내 활동 → 지원한 공고 상세
 - scrollUntilVisible:
     element: "적합도 자세히 보기 · Bot으로 이동"
     direction: DOWN
-- assertVisible: "Bot한테 보내서 면접 준비"
+- assertVisible: "Bot으로 면접 준비"
 - takeScreenshot: 06_my_application_detail-04
 - assertVisible: "지원한 서류"
 - takeScreenshot: 06_my_application_detail-05

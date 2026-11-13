@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Pressable, View } from 'react-native'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
-import { GlassButton, Icon, Text } from '@/shared/components'
+import { Icon, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useCalendarEvents } from '../api/hooks'
 import { EVENT_TYPES } from '../constants'
@@ -42,9 +42,16 @@ const CalendarView = () => {
           </Text>
           <Icon name="down" size={18} color="t1" />
         </Pressable>
-        <GlassButton
-          actions={[{ icon: 'plus', label: '일정 추가', onPress: () => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } }) }]}
-        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="일정 추가"
+          onPress={() => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } })}
+          style={{ height: 44, paddingHorizontal: spacing[1], justifyContent: 'center' }}
+        >
+          <Text v="b1" weight="600" color="acText">
+            추가
+          </Text>
+        </Pressable>
       </View>
       {data ? (
         <Text v="c1" color="t3" style={{ paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[5] }}>
