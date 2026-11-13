@@ -1,11 +1,11 @@
 import { router } from 'expo-router'
 import { Platform, Pressable, View } from 'react-native'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
-import { DetailWebView, Glass, Text, TopBar } from '@/shared/components'
+import { DetailWebView, Glass, Text, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
 
-const ProfileDetailScreen = ({ id }: { id: string }) => {
+const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
   const me = useViewerId()
   const { data: p } = useProfile(id)
@@ -39,7 +39,7 @@ const ProfileDetailScreen = ({ id }: { id: string }) => {
         onBack={() => router.back()}
         right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
       />
-      <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} />
+      <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} />
     </View>
   )
 }

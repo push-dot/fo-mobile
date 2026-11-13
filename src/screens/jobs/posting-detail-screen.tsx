@@ -3,11 +3,11 @@ import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
-import { Button, DetailWebView, GlassButton, TopBar } from '@/shared/components'
+import { Button, DetailWebView, GlassButton, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
 
-const PostingDetailScreen = ({ id }: { id: string }) => {
+const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { data: p } = usePosting(id)
@@ -30,7 +30,7 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
           ) : null
         }
       />
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} />
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} />
       <View
         style={{
           flexDirection: 'row',

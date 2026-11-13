@@ -3,17 +3,18 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { spacing, useColors, useThemeMode } from '../../theme'
-import { detailUrl, textSizeScript } from './detail-url'
+import { detailUrl, textSizeScript, type DetailFrom } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import Text from './text'
 
 type Props = {
   path: string
+  from?: DetailFrom
   onBridge?: (message: Record<string, unknown>) => void
 }
 
-const DetailWebView = ({ path, onBridge }: Props) => {
+const DetailWebView = ({ path, from, onBridge }: Props) => {
   const c = useColors()
   const mode = useThemeMode()
   const ref = useRef<WebView<object>>(null)
@@ -55,7 +56,7 @@ const DetailWebView = ({ path, onBridge }: Props) => {
       <WebView<object>
         ref={ref}
         key={mode}
-        source={{ uri: detailUrl(WEB_BASE_URL, path, mode, API_MOCK) }}
+        source={{ uri: detailUrl(WEB_BASE_URL, path, mode, API_MOCK, from) }}
         injectedJavaScriptBeforeContentLoaded={boot}
         injectedJavaScript={applyZoom}
         textZoom={zoom}

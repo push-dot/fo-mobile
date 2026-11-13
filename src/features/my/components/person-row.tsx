@@ -15,7 +15,7 @@ const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => 
   const following = picked ?? known
   const toggle = useFollowToggle(p.userId, setPicked)
   return (
-    <Row label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}`)}>
+    <Row label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}?from=following`)}>
       <Avatar name={p.displayName} url={p.avatarUrl} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="700">

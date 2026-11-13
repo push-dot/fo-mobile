@@ -98,7 +98,7 @@ const Bookmarks = () => {
           key={p.id}
           accessibilityRole="button"
           accessibilityLabel={`${p.company} ${p.title}`}
-          onPress={() => router.push(`/postings/${p.id}`)}
+          onPress={() => router.push(`/postings/${p.id}?from=bookmark`)}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
