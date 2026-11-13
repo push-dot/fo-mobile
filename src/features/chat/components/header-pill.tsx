@@ -2,7 +2,8 @@ import { router } from 'expo-router'
 import { Platform, Pressable, View } from 'react-native'
 import { botProfilePath, type BotId } from '@/features/bots'
 import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
-import { spacing, useColors } from '../../../theme'
+import { useXlChrome } from '@/shared/components/xl-chrome'
+import { largeType, spacing, useColors } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { HeaderLamp } from './header/header-lamp'
 import type { HeaderLight } from './header/state'
@@ -49,6 +50,7 @@ const HeaderPill = ({
   }
   const c = useColors()
   const ios = Platform.OS === 'ios'
+  const { xl, button } = useXlChrome()
   const spoken = name ? botSpokenName(name) : ''
   const nameButton =
     name && botId ? (
@@ -56,13 +58,13 @@ const HeaderPill = ({
         accessibilityRole="button"
         accessibilityLabel={`${spoken} 프로필 보기`}
         onPress={() => openProfile(botId)}
-        style={{ alignSelf: 'center', maxWidth: '100%', height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: spacing[3], backgroundColor: ios ? 'transparent' : c.fill }}
+        style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: 14, backgroundColor: ios ? 'transparent' : c.fill }}
       >
         <View style={{ width: 32, height: 32 }}>
           <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
           <HeaderLamp light={light} />
         </View>
-        <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
+        <Text v="b1" weight="700" numberOfLines={1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, xl ? { fontSize: largeType.b2.fontSize, lineHeight: largeType.b2.lineHeight } : null]}>
           {name}
         </Text>
       </Pressable>
@@ -71,7 +73,7 @@ const HeaderPill = ({
     <TopBar
       translucent
       onBack={() => router.back()}
-      left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: '100%', height: 44, borderRadius: 22 }}>{nameButton}</Glass> : nameButton}
+      left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
       right={
         kind && botId && name ? (
           <GlassButton

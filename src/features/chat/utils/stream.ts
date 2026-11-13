@@ -1,4 +1,4 @@
-import type { StreamEvent, StreamOption } from '@push/api-client'
+import type { BotContract, StreamEvent, StreamOption } from '@push/api-client'
 import {
   CHOICE_QUESTION,
   DEFAULT_ERROR_TEXT,
@@ -207,8 +207,11 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
     }
     case 'cancelled':
       return [{ type: 'stop', resumable: (ev as { resumable?: boolean }).resumable === true, ...(turn ? { turn } : {}) }]
-    case 'done':
-      return [{ type: 'done', at: 0, awaiting: ev.awaiting }]
+    case 'done': {
+      // The legacy StreamEvent type predates the bot stream's `sources`.
+      const sources = (ev as { sources?: BotContract.Attachment[] }).sources
+      return [...(sources?.length ? [{ type: 'sources' as const, sources }] : []), { type: 'done', at: 0, awaiting: ev.awaiting }]
+    }
     default: {
       // push-be #224: a type this build does not know must not stop the stream.
       const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; code?: string; seq?: number }, turn) : null

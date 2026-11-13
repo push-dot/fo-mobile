@@ -1,6 +1,7 @@
 import { Platform, View } from 'react-native'
 import { radius, spacing } from '../../theme'
 import Glass from './glass'
+import { useXlChrome } from './xl-chrome'
 import GlassActionButton, { type GlassAction } from './glass-action'
 
 export type { GlassAction }
@@ -9,14 +10,15 @@ export type { GlassAction }
  * `filled`: the design's solid `fill` icon chip with a 16pt glyph (sheet close buttons), on both platforms. */
 const GlassButton = ({ actions, filled, iconSize }: { actions: GlassAction[]; filled?: boolean; iconSize?: number }) => {
   const single = actions.length === 1
+  const { button } = useXlChrome()
   const row = (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: single ? 0 : spacing[1] }}>
       {actions.map((a) => (
-        <GlassActionButton key={a.label} a={a} width={single ? 44 : 40} iconSize={iconSize ?? (filled ? 16 : 22)} filled={filled} />
+        <GlassActionButton key={a.label} a={a} width={single ? button : 40} iconSize={iconSize ?? (filled ? 16 : 22)} filled={filled} />
       ))}
     </View>
   )
-  const shape = { borderRadius: radius.pill, minWidth: 44, height: 44, justifyContent: 'center' } as const
+  const shape = { borderRadius: radius.pill, minWidth: button, height: button, justifyContent: 'center' } as const
   if (filled || Platform.OS === 'android') return row
   return (
     <Glass interactive style={shape}>

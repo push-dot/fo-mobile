@@ -6,6 +6,7 @@ import Icon from './icon'
 import Menu from './menu'
 import type { MenuProps } from './menu-action'
 import Text from './text'
+import { useXlChrome } from './xl-chrome'
 
 export type GlassAction = {
   icon: IconName
@@ -21,7 +22,8 @@ export type GlassAction = {
 /** `filled`: the button is its own solid chip and answers presses like other solid buttons (ripple, 0.97). */
 const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction; width: number; iconSize?: number; filled?: boolean }) => {
   const c = useColors()
-  const box = { height: 44, minWidth: width, alignItems: 'center', justifyContent: 'center' } as const
+  const { button } = useXlChrome()
+  const box = { height: button, minWidth: width, alignItems: 'center', justifyContent: 'center' } as const
   const face = (
     <>
       <Icon name={a.icon} size={iconSize} color={a.active ? c.acText : c[a.color ?? 't1']} filled={a.active} />

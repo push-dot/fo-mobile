@@ -65,6 +65,7 @@ const BotHomeView = ({
   const keyboard = useKeyboardHeight()
   const xl = useWindowDimensions().fontScale >= XL_FONT_SCALE
   const chrome = homeChrome(xl)
+  const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
   const [scrolling, setScrolling] = useState(false)
   const [visible, setVisible] = useState<ReadonlySet<string> | null>(null)
@@ -77,7 +78,7 @@ const BotHomeView = ({
   // The iOS tab bar floats over this view, so the bar rests above it; Android's tab bar takes its own space.
   const lift = keyboard > 0 ? Math.max(0, keyboard - TAB_CLEARANCE) : Platform.OS === 'ios' ? TAB_CLEARANCE + 8 : 8
   const screen = { flex: 1, backgroundColor: c.bg }
-  const fade = { position: 'absolute' as const, left: 0, right: 0, bottom: lift, height: 160, zIndex: 3 }
+  const fade = { position: 'absolute' as const, left: 0, right: 0, bottom: keyboard > 0 ? lift : 0, height: ios ? 200 : 190, zIndex: 3 }
   const listPad = { paddingTop: top, paddingBottom: LIST_BOTTOM }
   const onViewableItemsChanged = useCallback<NonNullable<FlatList<Bot>['props']['onViewableItemsChanged']>>(({ viewableItems }) => {
     setVisible(new Set(viewableItems.flatMap((item) => (item.key ? [item.key] : []))))
@@ -134,7 +135,7 @@ const BotHomeView = ({
           local={local}
           now={now}
           chrome={chrome}
-          top={insets.top + 12}
+          top={insets.top + 8}
           onOpenBot={openChat}
           onOpenMessage={(id, messageId) => router.push(botChatAtPath(id as Bot['id'], messageId))}
         />
@@ -174,7 +175,7 @@ const BotHomeView = ({
           }}
         />
       )}
-      <LinearGradient pointerEvents="none" colors={[`${c.bg}00`, c.bg, c.bg]} locations={[0, 0.45, 1]} style={fade} />
+      <LinearGradient pointerEvents="none" colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]} locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]} style={fade} />
       <BotHomeBar
         chrome={chrome}
         lift={lift}
