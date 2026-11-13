@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
-import { Chip, Text } from '../../../shared/components'
+import { Chip, Text, WheelPicker } from '../../../shared/components'
 import { onAccent, radius, spacing, useColors } from '../../../theme'
 import { usePostingLocations } from '../api/hooks'
 import { MAX_REGIONS, SIDOS, addRegion, regionLabel, sidoOf, type Filters } from '../utils'
-import Wheel from './wheel'
 
-const sidoOptions = SIDOS.map((s) => ({ value: s, label: s }))
+const sidoOptions = SIDOS.map((s) => ({ key: s, label: s }))
 
 /** Two wheels (시·도, then 구) in the sheet; 추가 turns the current pick into a chip, up to MAX_REGIONS. */
 const FilterRegions = ({ draft, onChange }: { draft: Filters; onChange: (location: string[]) => void }) => {
@@ -15,8 +14,8 @@ const FilterRegions = ({ draft, onChange }: { draft: Filters; onChange: (locatio
   const [pick, setPick] = useState<string>(sido)
   const counts = usePostingLocations(draft)
   const districts = (counts.data ?? []).filter((d) => sidoOf(d.location) === sido && d.location !== sido)
-  const guOptions = [{ value: sido, label: sido === '원격' ? '원격' : '전체' }].concat(districts.map((d) => ({ value: d.location, label: d.location.slice(sido.length + 1) })))
-  const value = guOptions.some((o) => o.value === pick) ? pick : sido
+  const guOptions = [{ key: sido, label: sido === '원격' ? '원격' : '전체' }].concat(districts.map((d) => ({ key: d.location, label: d.location.slice(sido.length + 1) })))
+  const value = guOptions.some((o) => o.key === pick) ? pick : sido
   const picked = draft.location
   const canAdd = !picked.includes(value) && addRegion(picked, value) !== picked
   const changeSido = (next: string) => {
@@ -26,8 +25,8 @@ const FilterRegions = ({ draft, onChange }: { draft: Filters; onChange: (locatio
   return (
     <View style={{ gap: spacing[3] }}>
       <View style={{ flexDirection: 'row', gap: spacing[2] }}>
-        <Wheel label="시·도" options={sidoOptions} value={sido} onChange={changeSido} />
-        <Wheel label="구" options={guOptions} value={value} onChange={setPick} />
+        <WheelPicker columns accessibilityLabel="시·도" items={sidoOptions} value={sido} onChange={changeSido} />
+        <WheelPicker columns accessibilityLabel="구" items={guOptions} value={value} onChange={setPick} />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
         <Text v="b1" weight="700">

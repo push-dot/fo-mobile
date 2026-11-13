@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import type { ReactNode } from 'react'
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 'react-native'
 import type { Settings } from '@push/api-client'
 import {
   Avatar,
@@ -16,6 +16,7 @@ import {
   MARKETING_COPY,
   NOTIFICATION_ROWS,
   READ_FILES_ROW,
+  RESTORE_PURCHASES_LABEL,
   REFERENCE_LABEL,
   REFERENCE_SUB,
   signOutSession,
@@ -40,6 +41,7 @@ import {
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
@@ -64,6 +66,7 @@ const SettingsScreen = () => {
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const blocked = useBlocked()
+  const purchase = usePersonalPurchase()
   const { entry } = useLocalSearchParams<{ entry?: string }>()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   if (!s) {
@@ -199,6 +202,7 @@ const SettingsScreen = () => {
       <SettingsGroup title="기타">
         <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
         <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
+        {Platform.OS === 'ios' ? <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} /> : null}
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>

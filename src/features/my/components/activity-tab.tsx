@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, stageBadge } from '@push/api-client'
 import { careerLabel, monthDay } from '@push/shared'
-import { Badge, Chip, Icon, Text } from '@/shared/components'
+import { Badge, Chip, ChipRow, Icon, Text } from '@/shared/components'
 import { hitSlopTo, spacing, useColors } from '../../../theme'
 import {
   useAppliedApplications,
@@ -262,16 +262,11 @@ const Posts = () => {
 const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub) => void }) => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: LIST_PAD }}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0 }}
-        contentContainerStyle={{ gap: spacing[2], paddingTop: spacing[4], paddingBottom: 0, paddingHorizontal: spacing[5] }}
-      >
+      <ChipRow paddingTop={spacing[4]}>
         {SUBS.map((s) => (
           <Chip key={s.key} label={s.label} on={s.key === sub} onPress={() => onSub(s.key)} />
         ))}
-      </ScrollView>
+      </ChipRow>
       {sub === 'applications' ? <Applications /> : null}
       {sub === 'calendar' ? <CalendarView /> : null}
       {sub === 'bookmarks' ? <Bookmarks /> : null}

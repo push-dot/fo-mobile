@@ -3,6 +3,7 @@ import { LANGS, MAX_BYTES } from '../constants'
 import {
   AGENT_NOTE,
   AGENT_TITLE,
+  RESTORE_PURCHASES_LABEL,
   CALENDAR_ADD,
   INTERVIEW_PREP,
   NOTIFICATION_ROWS,
@@ -196,6 +197,7 @@ describe('my screen rules', () => {
       'Bot 작업 완료',
       '지원 상태 변경',
     ])
+    expect(RESTORE_PURCHASES_LABEL).toBe('구매 복원')
     expect(AGENT_TITLE).toBe('Bot')
     expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 Bot이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
