@@ -57,10 +57,10 @@ const ComposeScreen = () => {
               카테고리
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
-              <Text v="b1" weight="700" color={category ? 'acText' : 't4'}>
+              <Text v="b1" weight="700" color={category ? 't1' : 't4'}>
                 {category ? categoryLabel(category) : '골라 주세요'}
               </Text>
-              <Icon name="down" size={16} color={category ? 'acText' : 't4'} />
+              <Icon name="down" size={16} color={category ? 't1' : 't4'} />
             </View>
           </View>
         </Menu>
@@ -122,8 +122,8 @@ const ComposeScreen = () => {
           {images.length < MAX_IMAGES ? (
             <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
               <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                <Icon name="plus" size={22} color="acText" />
-                <Text v="c2" weight="700" color="acText">
+                <Icon name="plus" size={22} color="t1" />
+                <Text v="c2" weight="700" color="t1">
                   {images.length}/{MAX_IMAGES}
                 </Text>
               </View>

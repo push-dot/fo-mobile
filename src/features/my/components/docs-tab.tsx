@@ -4,7 +4,7 @@ import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { botChatPath } from '@/features/bots'
-import { Button, GlassPressable, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { Button, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
@@ -25,6 +25,7 @@ const EMPTY_INSET = 40
 const openChat = () => router.push(botChatPath('push'))
 
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
+  const c = useColors()
   const qc = useQueryClient()
   const job = useIngestJob(doc.jobId, live).data
   const openMenu = useFileMenu(doc)
@@ -47,26 +48,24 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
             {doc.createdAt ? ` · ${monthDay(doc.createdAt)}` : ''}
             {reading || failed ? ' · ' : ''}
           </Text>
-          {reading && !failed ? <Spinner /> : null}
+          {reading && !failed ? <Spinner color="t3" /> : null}
           {reading || failed ? (
-            <Text v="c1" weight="700" color={failed ? 'red' : 'acText'}>
+            <Text v="c1" weight="700" color={failed ? 'red' : 't1'}>
               {failed ? INGEST_TEXT.failed : INGEST_TEXT.reading}
             </Text>
           ) : null}
         </View>
       </View>
       {failed ? (
-        <GlassPressable
+        <Pressable
           accessibilityRole="button"
           onPress={retry}
-          style={{ height: RETRY_H, borderRadius: RETRY_H / 2 }}
-          contentStyle={{ paddingHorizontal: spacing[3], gap: spacing[1] }}
+          style={{ height: RETRY_H, borderRadius: RETRY_H / 2, paddingHorizontal: spacing[3], justifyContent: 'center', backgroundColor: c.fill }}
         >
-          <Icon name="retry" size={14} color="t1" />
           <Text v="c1" weight="700">
             {RETRY_LABEL}
           </Text>
-        </GlassPressable>
+        </Pressable>
       ) : null}
       <Pressable
         accessibilityRole="button"

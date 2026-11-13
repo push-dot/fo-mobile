@@ -88,7 +88,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           onPress={p.onClearAttachment ?? (() => undefined)}
           style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, borderRadius: radius.sm, backgroundColor: c.fill, maxWidth: '90%' }}
         >
-          <Icon name="paper" size={16} color="t2" />
+          <Icon name="pdf" size={16} color="t2" />
           <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
             {p.attachment}
           </Text>
