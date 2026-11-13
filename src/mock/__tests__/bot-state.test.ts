@@ -73,3 +73,18 @@ describe('botDtoOf, the mock twin of bot_state_v', () => {
     expect(dto.lastActivityAt).toBe(since(10))
   })
 })
+
+describe('outcome', () => {
+  const outcome = (f: BotFixture) => botDtoOf(f, now).outcome
+
+  it('says expired once an unanswered card passes its time, and failed after a failed run', () => {
+    expect(outcome(base({ messages: [user(30)], cards: [card(20, 10)] }))).toEqual({ kind: 'expired', at: since(10) })
+    expect(outcome(base({ messages: [user(30), bot(29)], failedAt: 15 }))).toEqual({ kind: 'failed', at: since(15) })
+  })
+
+  it('is null while a card is open or a run is under way, and after anything newer', () => {
+    expect(outcome(base({ messages: [user(30)], cards: [card(20, -5)] }))).toBeNull()
+    expect(outcome(base({ messages: [user(9)], failedAt: 15, job: running([{ text: '생각 중' }]) }))).toBeNull()
+    expect(outcome(base({ messages: [user(30), user(5)], failedAt: 15 }))).toBeNull()
+  })
+})

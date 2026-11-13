@@ -27,8 +27,9 @@ export const splitHome = (bots: readonly Bot[]) => ({
   companies: bots.filter((bot) => bot.kind !== 'push'),
 })
 
-export const homeRowLabel = (row: { name: string; mascot: MascotState; line: string; time: string }) =>
-  [`${row.name} 봇`, SPOKEN[row.mascot], row.line, row.time].filter((part) => part !== '').join(', ')
+/** `spoken` replaces the mascot's state word; '' says none. */
+export const homeRowLabel = (row: { name: string; mascot: MascotState; line: string; time: string; spoken?: string }) =>
+  [`${row.name} 봇`, row.spoken ?? SPOKEN[row.mascot], row.line, row.time].filter((part) => part !== '').join(', ')
 
 export const heroLabel = (unread: boolean) => (unread ? 'Push Bot 대화 열기, 새 활동 있음' : 'Push Bot 대화 열기')
 
