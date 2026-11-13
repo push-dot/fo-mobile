@@ -94,7 +94,7 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingTop: spacing[4], paddingHorizontal: spacing[3], paddingBottom: spacing[5] }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text v="h2" weight="800" numberOfLines={1}>
+          <Text v="h2" weight="800" numberOfLines={1} style={{ lineHeight: 27, letterSpacing: -0.6 }}>
             {lines.title}
           </Text>
           {lines.company ? (
@@ -155,7 +155,7 @@ const DocsTab = () => {
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
           {'PDF나 DOCX 파일을 올리거나\n봇으로 새로 만들어 보세요.'}
         </Text>
-        <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: spacing[4] }}>
+        <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
           <Button label="파일 등록" onPress={pickFile} />
           <Button label="봇으로 만들기" variant="secondary" onPress={openChat} />
         </View>
@@ -178,7 +178,7 @@ const DocsTab = () => {
                 </Text>
               </Pressable>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: spacing[2] }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
               {preview.map((d) => (
                 <PushCard
                   key={d.id}
