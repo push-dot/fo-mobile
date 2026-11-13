@@ -1,4 +1,5 @@
 import { COMPOSER_PLACEHOLDER } from '../composer-placeholder'
+import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
@@ -6,6 +7,10 @@ const BOT_SUFFIX = /(?:봇|Bot)$/
 export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} 봇`)
 
 export const askPlaceholder = (name: string) => `${botSpokenName(name)}에게 물어보기`
+
+const CHIP_NOUN: Record<AttachmentKind, string> = { file: '서류', document: '서류', posting: '공고', link: '링크' }
+
+export const chipPlaceholder = (kind: AttachmentKind) => `이 ${CHIP_NOUN[kind]}로 무엇을 할까요?`
 
 export type HeaderMenuId = 'profile' | 'find' | 'clear' | 'delete'
 
@@ -45,6 +50,10 @@ export const onboardingGreeting = (kind: 'push' | 'company', name: string, posti
   return `안녕하세요. ${botSpokenName(name)}이에요. ${job}무엇부터 할까요?`
 }
 
+/** The first line that stays above a company bot's thread once the conversation starts (ChatBotStatus*). */
+export const threadGreeting = (name: string, postingTitle?: string | null) =>
+  `안녕하세요. ${botSpokenName(name)}이에요.${postingTitle ? ` 이 회사 ${postingTitle} 공고를 기준으로 서류를 챙길게요.` : ''}`
+
 export type DraftText = { text: string }
 
 export const withMaterial = <T extends DraftText>(drafts: Record<string, T>, id: string, text: string, blank: T): Record<string, T> => {
@@ -70,7 +79,8 @@ const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 // A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
 const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
 
-export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string) => {
+export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
+  if (chipKind) return chipPlaceholder(chipKind)
   if (name) return askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp

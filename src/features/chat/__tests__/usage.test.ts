@@ -10,6 +10,7 @@ import {
   headerAction,
   isUsageExhausted,
   onboardingGreeting,
+  threadGreeting,
   planRequired,
   withMaterial,
 } from '../utils/usage'
@@ -68,6 +69,14 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
   })
 
+  it('asks what to do with the attached material, by its kind, over the bot name', () => {
+    const chat = { items: [], working: null }
+    expect(composerPlaceholder(chat, '모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, '모아페이', 'document')).toBe('이 서류로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, '모아페이', 'posting')).toBe('이 공고로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, 'Push Bot', 'link')).toBe('이 링크로 무엇을 할까요?')
+  })
+
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
     expect(planRequired('FREE', true)).toBe('플랜을 올리면 쓸 수 있어요.')
     expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')
@@ -103,6 +112,11 @@ describe('bot header and onboarding', () => {
     expect(deleteBotConfirm('모아페이').confirm).toBe('삭제')
     expect(onboardingGreeting('company', '모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요. 무엇부터 할까요?')
     expect(onboardingGreeting('push', 'Push Bot')).toBe('안녕하세요. Push Bot이에요. 공고 찾기부터 서류, 지원까지 함께 챙길게요. 무엇부터 할까요?')
+  })
+
+  it('keeps the company greeting above the thread as the board draws it', () => {
+    expect(threadGreeting('모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 이 회사 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요.')
+    expect(threadGreeting('모아페이')).toBe('안녕하세요. 모아페이 봇이에요.')
   })
 
   it('appends material text onto one draft', () => {

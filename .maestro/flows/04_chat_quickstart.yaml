@@ -3,11 +3,7 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- runFlow:
-    file: _tap_tab.yaml
-    env:
-      TAB: "봇"
-      READY: "(동의하고 시작하기|공고 링크로 맞추기)"
+- runFlow: _open_push_bot.yaml
 - runFlow:
     when:
       visible: "동의하고 시작하기"

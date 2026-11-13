@@ -175,6 +175,9 @@ const closeStored = (id: string): Step[] => {
   return []
 }
 
+// The 도토리증권 chat is one chat under two ids: the legacy row above and the bot (b-dotori) whose job the mock leaves running.
+const RESUMABLE_BOT = 'b-dotori'
+
 const script = (b: RunInput, card: Card | undefined, choice: number | undefined): Step[] => {
   const id = b.conversationId
   const state = scenario.get(id)
@@ -184,7 +187,7 @@ const script = (b: RunInput, card: Card | undefined, choice: number | undefined)
     if (verifying) state.verified = true
     return verifying ? verifyFail : (next[card.id] ?? (() => generic(b.text ?? '')))(choice, state.labels)
   }
-  if (!state && find(id)?.status === 'RUNNING') {
+  if (!state && (find(id)?.status === 'RUNNING' || id === RESUMABLE_BOT)) {
     scenario.set(id, { prefix: `r${++runs}`, labels: TODO })
     return startDocument
   }
