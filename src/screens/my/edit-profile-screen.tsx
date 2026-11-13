@@ -45,6 +45,7 @@ import {
   Button,
   Chip,
   DatePicker,
+  Highlight,
   Icon,
   Menu,
   SegmentedControl,
@@ -648,8 +649,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
               paddingHorizontal: spacing[2],
             }}
           >
-            {hits.map(({ item, match }, n) => {
-              const [a, b] = match ? [match.start, match.end] : [0, 0]
+            {hits.map(({ item }, n) => {
               return (
                 <Pressable
                   key={item}
@@ -667,11 +667,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
                 >
                   <Icon name="plus" size={16} />
                   <Text v="b1" weight={n === 0 ? '700' : undefined}>
-                    {item.slice(0, a)}
-                    <Text v="b1" weight="700">
-                      {item.slice(a, b)}
-                    </Text>
-                    {item.slice(b)}
+                    <Highlight text={item} q={q.trim()} weight={n === 0 ? '700' : '400'} />
                   </Text>
                 </Pressable>
               )

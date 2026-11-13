@@ -44,6 +44,7 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
         returnKeyType="search"
         autoCorrect={false}
         autoCapitalize="none"
+        lineBreakStrategyIOS="hangul-word"
         accessibilityLabel="자료 검색"
         style={[{ flex: 1, fontSize: type.b1.fontSize, letterSpacing: type.b1.letterSpacing, color: c.t1, ...inputReset }, fontFor('400')]}
       />

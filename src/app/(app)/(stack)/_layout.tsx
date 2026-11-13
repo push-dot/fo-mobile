@@ -65,7 +65,8 @@ const SignedInStack = () => {
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
       <Stack.Screen name="activity/calendar" options={sheetOptions(c)} />
       <Stack.Screen name="settings/pick" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/[id]/to-profile" options={sheetOptions(c)} />
+      {/* DocToProfile draws a solid sheet: over the translucent system material the viewer's purple CTA behind it bleeds through the sheet's own CTA. */}
+      <Stack.Screen name="docs/[id]/to-profile" options={{ ...sheetOptions(c), contentStyle: { backgroundColor: c.bg } }} />
       <Stack.Screen name="docs/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="offers/[id]/reply" options={sheetOptions(c)} />
     </Stack>
