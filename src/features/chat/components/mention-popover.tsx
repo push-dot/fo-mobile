@@ -1,7 +1,7 @@
 import { brandColor } from '@push/shared'
 import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { onAccent, radius, spacing, useColors, useShadow, useThemeMode } from '../../../theme'
+import { radius, spacing, useColors, useShadow, useThemeMode } from '../../../theme'
 import { Chip, Icon, Text, useKeyboardHeight, type IconName } from '@/shared/components'
 import { useMentionGroups } from '../api/hooks'
 import { MENTION_SHORTCUT_KEYS } from '../constants'
@@ -55,11 +55,6 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
                       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 10, borderRadius: radius.sm, backgroundColor: m.id === firstId || pressed ? c.fill : 'transparent' })}
                     >
                       {m.kind === 'job' ? <Mark text={m.tag ?? ''} color={brandColor(m.tag ?? '')} size={36} /> : null}
-                      {m.kind === 'link' ? (
-                        <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: brandColor(m.title), alignItems: 'center', justifyContent: 'center' }}>
-                          <Icon name="brief" size={18} color={onAccent} />
-                        </View>
-                      ) : null}
                       <View style={{ flex: 1, minWidth: 0 }}>
                         <Text v="b2" weight="600" numberOfLines={1} style={{ lineHeight: 21 }}>
                           {m.title}
