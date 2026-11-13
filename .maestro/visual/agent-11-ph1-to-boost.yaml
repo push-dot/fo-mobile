@@ -17,7 +17,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh1Feedback
 # Each phase board draws its thread under its own user line and without the earlier phases, so each one jumps there in a fresh conversation (mock tokens).
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -35,7 +35,7 @@ tags:
 - waitForAnimationToEnd
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Review
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -47,8 +47,45 @@ tags:
 - waitForAnimationToEnd
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Boost
+# ChatPh3BoostStop draws two stops under the same boost line: all five rounds used (한 번 더 올리기 answers the card), and the score stuck early
+# (the boost-stuck run, played through run: for the board's own user line). The quality check streams in right after the stop line, so wait it out and scroll back up to the line.
+- runFlow:
+    file: _pick.yaml
+    env:
+      ASK: "점수를 한 번 더 올릴까요?"
+      PICK: ".*한 번 더 올리기"
+      NEXT: ".*최대 5번까지 올렸어요.*"
+- extendedWaitUntil:
+    visible: "추천 수정도 반영할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- scrollUntilVisible:
+    element: ".*최대 5번까지 올렸어요.*"
+    direction: UP
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh3BoostStop
+- runFlow: _fresh_chat.yaml
+# run:boost-stuck plays the stuck run for the board's own user line, so no mock token shows in the bubble.
+- openLink: push://bots/push?mock=run:boost-stuck
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "좋아요, 계속해 주세요"
+      EN: "ok, continue"
+- extendedWaitUntil:
+    visible: "추천 수정도 반영할까요?"
+    timeout: 40000
+- waitForAnimationToEnd
+- scrollUntilVisible:
+    element: ".*더 올리기 어려워서 여기서 멈출게요.*"
+    direction: UP
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh3BoostStop.2
 # The writing state holds for a minute (to-do 1/5, the draft card streaming), so this one goes last.
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
+- openLink: push://bots/push?mock=run:ph3-write
 - runFlow:
     file: _say.yaml
     env:

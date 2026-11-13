@@ -16,7 +16,7 @@ tags:
             KO: "states-file"
             EN: "states-file"
       - extendedWaitUntil:
-          visible: ".* 동안 작업했어요"
+          visible: ".*김서준_모아페이_백엔드.pdf.*"
           timeout: 30000
       - waitForAnimationToEnd
       - runFlow:

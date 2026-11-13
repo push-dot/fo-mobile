@@ -1,6 +1,7 @@
 import type { Settings, Tone } from '@push/api-client'
 import { LEGAL_OPERATOR } from '@push/shared'
 import { TOAST_MS } from '@/shared/components/constants'
+import { THEME_CHOICES } from '../../theme/mode'
 import type { CalendarEventType } from './types'
 
 export const MIN = 60_000
@@ -120,10 +121,14 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
   { key: 'ko', label: '한국어' },
   { key: 'en', label: 'English' },
 ]
+/** Every value Settings lets you choose; each opens the wheel modal (iOS) or the radio dialog (Android), and the row shows only the current value. */
 export const SETTINGS_PICKS = {
-  contact: { field: 'contactVisibility', title: '누구에게 연락처를 보여 줄까요?', items: CONTACT },
-  tone: { field: 'defaultTone', title: '봇이 어떤 말투로 쓸까요?', items: TONES },
-} as const satisfies Record<string, { field: keyof Settings; title: string; items: { key: string; label: string }[] }>
+  locale: { title: '언어', items: LANGS },
+  theme: { title: '테마', items: THEME_CHOICES },
+  career: { title: '커리어 상태', items: VISIBILITY },
+  contact: { title: '연락처', items: CONTACT },
+  tone: { title: '기본 말투', items: TONES },
+} as const satisfies Record<string, { title: string; items: readonly { key: string; label: string }[] }>
 export type SettingsPickKind = keyof typeof SETTINGS_PICKS
 export const NOTIFY_SUB: Partial<Record<keyof Settings, string>> = {
   notifyDeadline: '북마크한 공고 마감 3일 전',

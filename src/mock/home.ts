@@ -3,6 +3,7 @@ import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
 import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
+import { usePhoneAuth } from '../features/auth/stores'
 import { MOCK_USER_ID, mock, page } from './server'
 
 // Search-only samples; hub/social own their full fixtures.
@@ -115,12 +116,12 @@ const READ = daysAgo(0, 0)
 const morning = () => new Date(Math.max(startOfToday, Math.min(new Date().setHours(9, 0, 0, 0), Date.now() - 181 * 60_000))).toISOString()
 const notifications: AppNotification[] = [
   { id: 'n1', type: 'APPLICATION_STAGE', title: '지원 상태가 바뀌었어요', body: '모아페이 백엔드 엔지니어 · 면접 진행 중', target: { kind: 'activity', id: 'a1' }, readAt: null, createdAt: today(0) },
-  { id: 'n2', type: 'AI_DONE', title: '봇 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
+  { id: 'n2', type: 'AI_DONE', title: 'Bot 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
   { id: 'n3', type: 'OFFER', title: '제안 받음', body: '오지현 님이 결제 플랫폼팀 커피챗을 제안했어요.', target: { kind: 'offer', id: 'o1' }, readAt: null, createdAt: today(120) },
   { id: 'n4', type: 'DEADLINE', title: '마감 임박 공고', body: '북마크한 파도AI 데이터 분석가 공고가 2일 남았어요.', target: { kind: 'posting', id: 'p2' }, readAt: READ, createdAt: morning() },
   { id: 'n5', type: 'COMMENT', title: '댓글과 답글', body: '박도윤 님이 내 글에 답글을 남겼어요. “저도 같은 고민이었어요!”', target: { kind: 'post', id: 'post-1' }, readAt: READ, createdAt: daysAgo(1, 15) },
   { id: 'n6', type: 'DEADLINE', title: '마감 임박 공고', body: '도토리증권 서버 개발자 (Go) 공고가 3일 남았어요.', target: { kind: 'posting', id: 'p3' }, readAt: READ, createdAt: daysAgo(3, 10) },
-  { id: 'n7', type: 'AI_DONE', title: '봇 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
+  { id: 'n7', type: 'AI_DONE', title: 'Bot 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
   { id: 'n8', type: 'OFFER', title: '제안 받음', body: '한지민 님이 정산팀 채용 제안을 보냈어요.', target: { kind: 'offer', id: 'o2' }, readAt: READ, createdAt: daysAgo(12, 11) },
 ]
 
@@ -139,15 +140,25 @@ mock('POST', 'me/notifications/read', ({ body }) => {
   if (b.all) notifications.splice(0, notifications.length, ...notifications.filter((n) => n.createdAt < new Date(startOfToday).toISOString()))
 })
 
+/** PhoneInput: a Google sign-in that handed back a pending token, so the phone screen shows the account pill (links.ts `phone-social`). */
+export const pendingSocialPhone = () => {
+  const claims = btoa(JSON.stringify({ email: 'seojun.kim@gmail.com' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  usePhoneAuth.getState().beginSocial(`${claims}.mock`, 'seojun.kim@gmail.com', 'google')
+}
+
 // Phone sign-in. The code's tail picks the outcome so the boards' error states can be reached: 482111 wrong, 482222 expired,
-// 482333 too many tries, anything else signs in a new user (who then lands on the terms screen).
-const authError = (status: number, code: string, message: string) => ({ status, body: { error: { code, message } } })
+// 482333 too many tries, 482444 / 482555 / 482666 the number already belongs to a Google / Apple / Google+GitHub account (AuthPhoneTaken),
+// anything else signs in a new user (who then lands on the terms screen).
+const authError = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
+const REGISTERED_BY: Record<string, string[]> = { '482444': ['google'], '482555': ['apple'], '482666': ['google', 'github'] }
 mock('POST', 'auth/phone/send', () => ({ data: { cooldownSeconds: 170, expiresAt: new Date(Date.now() + 180_000).toISOString() } }))
 mock('POST', 'auth/phone/verify', ({ body }) => {
   const code = (body as { code?: string } | undefined)?.code
   if (code === '482111') return authError(400, 'PHONE_CODE_INVALID', 'invalid code')
   if (code === '482222') return authError(400, 'PHONE_CODE_EXPIRED', 'expired code')
   if (code === '482333') return authError(429, 'RATE_LIMITED', 'too many attempts')
+  const registered = code && REGISTERED_BY[code]
+  if (registered) return authError(409, 'PHONE_ALREADY_REGISTERED', 'phone already registered', { existingProviders: registered })
   forgetRequiredTerms()
   return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: true } }
 })

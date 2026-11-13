@@ -7,6 +7,9 @@ import { UNDO_MS } from './constants'
 import type { MySource } from './types'
 import { createUndo, DELETE_REFERENCED, deleteDocCopy, RESTORE_FAILED, RETRY_LABEL } from './utils'
 
+/** The day the 캘린더 tab lists; the month sheet sets it. */
+export const useCalendarDay = create<{ day: Date }>(() => ({ day: new Date() }))
+
 export const useDocImport = create<{ requested: boolean }>(() => ({ requested: false }))
 
 export const useDocDelete = create<{ doc: Pick<MySource, 'id' | 'fileName'> | null }>(() => ({ doc: null }))

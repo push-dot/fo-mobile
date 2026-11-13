@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import type { ReactNode } from 'react'
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 'react-native'
 import type { Settings } from '@push/api-client'
 import {
   Avatar,
@@ -16,6 +16,7 @@ import {
   MARKETING_COPY,
   NOTIFICATION_ROWS,
   READ_FILES_ROW,
+  RESTORE_PURCHASES_LABEL,
   REFERENCE_LABEL,
   REFERENCE_SUB,
   signOutSession,
@@ -32,8 +33,6 @@ import {
 } from '@/features/my'
 import {
   Icon,
-  Menu,
-  SegmentedControl,
   SettingsGroup,
   SettingsRow,
   Switch,
@@ -41,36 +40,9 @@ import {
   TopBar,
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { radius, spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
-
-const LanguageMenu = ({ value, onPick }: { value: Settings['locale']; onPick: (l: Settings['locale']) => void }) => {
-  const c = useColors()
-  const label = LANGS.find((l) => l.key === value)?.label
-  return (
-    <Menu
-      accessibilityLabel={`언어 선택, ${label}`}
-      actions={LANGS.map((l) => ({ key: l.key, label: l.label, selected: l.key === value, onPress: () => onPick(l.key) }))}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: spacing[1],
-          height: 34,
-          paddingHorizontal: spacing[3],
-          borderRadius: radius.sm,
-          backgroundColor: c.fill,
-        }}
-      >
-        <Text v="b2" weight="600">
-          {label}
-        </Text>
-        <Icon name="down" size={14} color="t1" />
-      </View>
-    </Menu>
-  )
-}
 
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
   const c = useColors()
@@ -89,12 +61,12 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
 const SettingsScreen = () => {
   const { s, set } = useSettings()
   const theme = useThemePreference((state) => state.choice)
-  const setTheme = useThemePreference((state) => state.setChoice)
   const consent = useReferenceConsent()
   const marketing = useMarketingConsent()
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const blocked = useBlocked()
+  const purchase = usePersonalPurchase()
   const { entry } = useLocalSearchParams<{ entry?: string }>()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   if (!s) {
@@ -149,14 +121,18 @@ const SettingsScreen = () => {
         </Pressable>
       </SettingsGroup>
 
-      <SettingsGroup title="일반" note="앱 화면과 봇 답변 언어가 함께 바뀌어요.">
+      <SettingsGroup title="일반" note="앱 화면과 Bot 답변 언어가 함께 바뀌어요.">
         <SettingsRow
           label="언어"
-          right={<LanguageMenu value={s.locale} onPick={(locale) => set({ locale })} />}
+          picker
+          value={LANGS.find((l) => l.key === s.locale)?.label ?? ''}
+          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'locale' } })}
         />
         <SettingsRow
           label="테마"
-          right={<SegmentedControl compact items={[...THEME_CHOICES]} value={theme} onChange={(k) => void setTheme(k)} />}
+          picker
+          value={THEME_CHOICES.find((t) => t.key === theme)?.label ?? ''}
+          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'theme' } })}
         />
       </SettingsGroup>
 
@@ -180,11 +156,13 @@ const SettingsScreen = () => {
         <SettingsRow label="프로필 공개" right={sw('profilePublic', '프로필 공개')} />
         <SettingsRow
           label="커리어 상태"
-          value={VISIBILITY.find((v) => v.key === s.careerStatusVisibility)?.label}
-          onPress={() => router.push('/settings/visibility')}
+          picker
+          value={VISIBILITY.find((v) => v.key === s.careerStatusVisibility)?.label ?? ''}
+          onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'career' } })}
         />
         <SettingsRow
           label="연락처"
+          picker
           value={CONTACT.find((v) => v.key === s.contactVisibility)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })}
         />
@@ -199,6 +177,7 @@ const SettingsScreen = () => {
       <SettingsGroup title={AGENT_TITLE} note={AGENT_NOTE}>
         <SettingsRow
           label="기본 말투"
+          picker
           value={TONES.find((t) => t.key === s.defaultTone)?.label ?? ''}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
         />
@@ -223,6 +202,7 @@ const SettingsScreen = () => {
       <SettingsGroup title="기타">
         <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
         <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
+        {Platform.OS === 'ios' ? <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} /> : null}
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>

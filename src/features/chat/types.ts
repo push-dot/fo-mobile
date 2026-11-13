@@ -73,7 +73,8 @@ export type ChatItem =
       pendingNote?: string
     }
   | { type: 'worked'; id: string; seconds: number }
-  | { type: 'error'; id: string; text: string; code?: string }
+  /** `reason` set: the run broke with no line of its own to show, so the status line draws "작업 중 문제가 생겼어요 · {reason}" (ChatBotStatusError). */
+  | { type: 'error'; id: string; text: string; code?: string; reason?: string }
   | { type: 'stale'; id: string; text: string }
 
 export type Choice = { label: string; desc?: string; hint?: string; badge?: { label: string; tone: BadgeTone } }

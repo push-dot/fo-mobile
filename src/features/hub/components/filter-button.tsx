@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 import { GlassPressable, Icon, Text } from '../../../shared/components'
-import { onAccent, radius, useColors } from '../../../theme'
+import { radius, useColors } from '../../../theme'
 
 const FilterButton = ({ count, onPress }: { count: number; onPress: () => void }) => {
   const c = useColors()
@@ -13,11 +13,11 @@ const FilterButton = ({ count, onPress }: { count: number; onPress: () => void }
         fill={null}
         style={{ width: 44, height: 44, borderRadius: radius.pill }}
       >
-        <Icon name="filter" size={22} color={count ? c.acText : c.t1} />
+        <Icon name="filter" size={22} color={c.t1} />
       </GlassPressable>
       {count ? (
-        <View pointerEvents="none" style={{ position: 'absolute', top: 4, right: 2, minWidth: 18, height: 18, paddingHorizontal: 5, borderRadius: radius.pill, backgroundColor: c.ac, borderWidth: 2, borderColor: c.bg, alignItems: 'center', justifyContent: 'center' }}>
-          <Text v="c2" weight="800" style={{ color: onAccent }}>
+        <View pointerEvents="none" style={{ position: 'absolute', top: 4, right: 2, minWidth: 18, height: 18, paddingHorizontal: 5, borderRadius: radius.pill, backgroundColor: c.t1, borderWidth: 2, borderColor: c.bg, alignItems: 'center', justifyContent: 'center' }}>
+          <Text v="c2" weight="800" style={{ color: c.bg }}>
             {count}
           </Text>
         </View>

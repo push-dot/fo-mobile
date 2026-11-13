@@ -6,7 +6,7 @@ name: 봇으로 시작 → 홈을 열기 전에 그 탭으로 이동 → 탭 첫
 - stopApp
 - openLink: push://bots
 - extendedWaitUntil:
-    visible: "(동의하고 시작하기|새 회사 봇 만들기)"
+    visible: "(동의하고 시작하기|새 회사 Bot 만들기)"
     timeout: 60000
 - runFlow: _dismiss_logbox.yaml
 - runFlow:
@@ -15,7 +15,7 @@ name: 봇으로 시작 → 홈을 열기 전에 그 탭으로 이동 → 탭 첫
     commands:
       - tapOn: "동의하고 시작하기"
 - extendedWaitUntil:
-    visible: "새 회사 봇 만들기"
+    visible: "새 회사 Bot 만들기"
     timeout: 10000
 - takeScreenshot: 14_unopened_tab_push-01
 - openLink: push://jobs

@@ -73,7 +73,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
           {who.kind === 'COMPANY' ? (
-            <Logo name={who.companyName ?? who.displayName} size={56} />
+            <Logo name={who.companyName ?? who.displayName} size={56} mono />
           ) : (
             <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
           )}
@@ -120,22 +120,21 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
               paddingVertical: spacing[4],
               paddingHorizontal: spacing[5],
               borderRadius: radius.card,
-              backgroundColor: c.acSoft,
+              backgroundColor: c.bg2,
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing[3],
             }}
           >
-            <Icon name="spark" size={22} color={c.ac} />
             <View style={{ flex: 1 }}>
               <Text v="b2" weight="700">
-                답장 전에 이 공고에 맞춰 볼까요?
+                이 공고를 Bot한테 보내서 고쳐 보세요
               </Text>
               <Text v="c1" color="t2">
-                봇이 적합도를 보고 이력서를 고쳐 드려요
+                Bot이 적합도를 보고 공고에 맞게 고쳐요
               </Text>
             </View>
-            <Icon name="chev" size={18} color={c.ac} />
+            <Icon name="chev" size={18} color="t3" />
           </Pressable>
         ) : null}
       </ScrollView>

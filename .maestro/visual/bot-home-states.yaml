@@ -1,0 +1,58 @@
+appId: app.push.mobile
+name: 봇 홈 · 로딩 · 오류 · 긴 이름 · 만료·실패 행
+tags:
+  - visual
+---
+# Each state is a cold start: the bot list is cached after its first answer, so a rule set later would not show.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,hang:GET:bots$"
+      READY: "새로 올라온 공고"
+- tapOn: "Bot"
+- extendedWaitUntil:
+    visible: "Bot 목록을 불러오는 중이에요"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomeLoading
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,fail:GET:bots$"
+      READY: "새로 올라온 공고"
+- tapOn: "Bot"
+- extendedWaitUntil:
+    visible: "Bot 목록을 불러오지 못했어요"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomeError
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bots:long"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
+- extendedWaitUntil:
+    visible: ".*누리클라우드 플랫폼엔지니어링코리아.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomeLong
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bots:outcome"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
+- extendedWaitUntil:
+    visible: ".*승인 요청이 만료됐어요.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomeRowExpiredFailed

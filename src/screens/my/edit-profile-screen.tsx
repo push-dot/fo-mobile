@@ -54,6 +54,7 @@ import {
   Text,
   TextField,
   ToastHost,
+  useKeyboardHeight,
   type MenuAction,
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
@@ -349,8 +350,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
         />
         {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
-          label="봇으로 다듬기"
-          icon="spark"
+          label="AI로 다듬기"
           variant="secondary"
           size="md"
           onPress={() => router.push(botChatPath('push'))}
@@ -558,16 +558,13 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Pressable
                     accessibilityRole="button"
                     onPress={() =>
-                      askConfirm(
-                        {
-                          title: careerDeleteCopy.title,
-                          body: careerDeleteBody(it),
-                          confirm: careerDeleteCopy.confirm,
-                          danger: true,
-                          onConfirm: () => removeAt(i, it),
-                        },
-                        '/(app)/(stack)/(tabs)/(my)/confirm',
-                      )
+                      askConfirm({
+                        title: careerDeleteCopy.title,
+                        body: careerDeleteBody(it),
+                        confirm: careerDeleteCopy.confirm,
+                        danger: true,
+                        onConfirm: () => removeAt(i, it),
+                      })
                     }
                     style={{
                       height: 40,
@@ -716,6 +713,7 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   const raw = useSafeAreaInsets()
   // A modal over the tab bar reports the tab bar as part of the bottom inset (home indicator + bar); the modal only has the window's home inset.
   const insets = { ...raw, bottom: Platform.OS === 'ios' ? (initialWindowMetrics?.insets.bottom ?? 0) : raw.bottom }
+  const keyboardUp = useKeyboardHeight() > 0
   const { data: p } = useMyProfile()
   const Form =
     { basic: EditBasic, intro: EditIntro, career: EditCareer, skills: EditSkills }[section] ??
@@ -723,12 +721,13 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   return (
     <View style={{ flex: 1 }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
         style={{
           flex: 1,
           backgroundColor: c.bg,
           paddingTop: Platform.OS === 'android' ? insets.top : 0,
-          paddingBottom: insets.bottom,
+          // Android: the padding behaviour already clears the keyboard (which includes the nav inset).
+          paddingBottom: Platform.OS === 'android' && keyboardUp ? 0 : insets.bottom,
         }}
       >
         {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}

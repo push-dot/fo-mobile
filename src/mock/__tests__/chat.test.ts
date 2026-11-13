@@ -33,7 +33,7 @@ describe('chat mock', () => {
     expect((await call('GET', 'conversations/c-dotori')).data).toMatchObject({ company: '모아페이' })
   })
 
-  it('starts 봇으로 고치기 by reading the file, with no todo yet', async () => {
+  it('starts Bot으로 고치기 by reading the file, with no todo yet', async () => {
     const events = await run('t-fixdoc', { text: '이 서류를 고쳐 줘' })
     expect(types(events).slice(0, 2)).toEqual(['status', 'tool'])
     expect(events.some((e) => e.type === 'todo')).toBe(false)
@@ -164,7 +164,8 @@ describe('chat mock', () => {
     const file = await run('t-states', { text: 'states-file' })
     expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [] })
     const applied = await run('t-states', { text: 'states-apply' })
-    expect(applied).toContainEqual(expect.objectContaining({ type: 'tool', state: 'ok', result: '지원했어요 · 마이 › 내 활동에 기록했어요' }))
+    // Tool lines are not drawn, so the record is a bot line of its own.
+    expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '지원했어요 · 마이 › 내 활동에 기록했어요' }))
     expect(await run('t-states', { text: '도토리증권 공고도 맞춰 줘' })).toContainEqual(
       expect.objectContaining({ type: 'error', code: 'QUEUE_BUSY', text: '지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.' }),
     )

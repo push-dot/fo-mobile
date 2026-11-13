@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Modal, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Text } from '@/shared/components'
+import { Text, ToastHost } from '@/shared/components'
+import { GRABBER } from '@/shared/components/constants'
 import { radius, spacing, useColors } from '../../../../theme'
 
 const FLOAT_RADIUS = 40
@@ -27,17 +28,16 @@ export const SheetCard = ({ label, title, onClose, children }: { label: string; 
         paddingHorizontal: spacing[5],
         paddingTop: spacing[3],
         paddingBottom: insets.bottom + spacing[3],
-        gap: spacing[2],
+        gap: 14,
       }
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
+      {/* The scrim is not one accessibility element: a grouping Pressable hides the sheet's rows from VoiceOver and Maestro. */}
+      <Pressable accessible={false} onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
         <Pressable accessible={false} accessibilityLabel={label} onPress={() => undefined} style={card}>
           <View
             style={{
-              width: 36,
-              height: 5,
-              borderRadius: 3,
+              ...(float ? GRABBER.ios : GRABBER.android),
               backgroundColor: c.deco,
               alignSelf: 'center',
             }}
@@ -50,6 +50,8 @@ export const SheetCard = ({ label, title, onClose, children }: { label: string; 
           {children}
         </Pressable>
       </Pressable>
+      {/* iOS: the root ToastHost sits under this modal (허용 해제 toast); Android shows the root one. */}
+      {float ? <ToastHost /> : null}
     </Modal>
   )
 }

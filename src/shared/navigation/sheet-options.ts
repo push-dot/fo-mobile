@@ -19,3 +19,6 @@ export const sheetOptions = (c: Colors, detents: SheetDetents = 'fitToContents')
 
 /** A sheet drawn to the top of the screen: iOS attaches it 10pt under the status bar, opaque; Android right under it. */
 export const fullSheetOptions = (c: Colors): NativeStackNavigationOptions => ({ ...sheetOptions(c, [1]), contentStyle: { backgroundColor: c.bg } })
+
+/** A full-screen modal: iOS keeps the system `modal`; Android's `modal` is a plain full-screen slide, so it takes the boards' full sheet (radius 28, the screen behind shows above it). */
+export const modalOptions = (c: Colors): NativeStackNavigationOptions => (Platform.OS === 'android' ? fullSheetOptions(c) : { presentation: 'modal' })

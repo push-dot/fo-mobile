@@ -8,13 +8,13 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on"
+      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on,bot:push:empty"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
+      TAB: "Bot"
+      READY: "(동의하고 시작하기|새 회사 Bot 만들기|Push Bot)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"
@@ -25,7 +25,7 @@ tags:
           timeout: 10000
 - tapOn: "계정 · .*"
 - extendedWaitUntil:
-    visible: "봇이 참고하는 내 정보"
+    visible: "Bot이 참고하는 내 정보"
     timeout: 10000
 - tapOn: "ULTRA"
 - extendedWaitUntil:
@@ -37,6 +37,12 @@ tags:
 - assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
 - takeScreenshot: PlanUltra
+# PlanUltraNotice: the same page scrolled to the 구독 안내 lines (credits-out leaves payments open, so 구매 복원 stays).
+- scrollUntilVisible:
+    element: ".*미성년자가 법정대리인.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: PlanUltraNotice
 - tapOn: "뒤로"
 - tapOn: "닫기"
 - openLink: push://bots/push

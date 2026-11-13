@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 봇 프로필 · Push Bot
+name: Bot 프로필 · Push Bot
 tags:
   - visual
 ---
@@ -15,13 +15,13 @@ tags:
 - extendedWaitUntil:
     visible: "허용한 사이트.*"
     timeout: 10000
-- assertNotVisible: "봇 삭제"
-- assertNotVisible: "봇 색 바꾸기"
+- assertNotVisible: "Bot 삭제"
+- assertNotVisible: "Bot 색 바꾸기"
 - waitForAnimationToEnd
-- takeScreenshot: BotProfilePush
+- takeScreenshot: BotProfileChief
 - tapOn: "허용한 사이트.*"
 - extendedWaitUntil:
-    visible: "Push Bot이 읽어도 된다고 허용한 사이트예요.*"
+    visible: "Push Bot이 묻지 않고 읽도록 허용한 사이트예요.*"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileChiefAllowed

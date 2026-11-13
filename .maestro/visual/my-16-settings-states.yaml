@@ -26,7 +26,7 @@ tags:
       - runFlow: _settings_end.yaml
       - tapOn: "연락처.*"
       - extendedWaitUntil:
-          visible: "누구에게 연락처를 보여 줄까요?"
+          visible: "완료"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.3
@@ -34,23 +34,23 @@ tags:
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "누구에게 연락처를 보여 줄까요?"
+            TITLE: "완료"
       - extendedWaitUntil:
-          notVisible: "누구에게 연락처를 보여 줄까요?"
+          notVisible: "완료"
           timeout: 5000
       - runFlow: _settings_end.yaml
       - tapOn: "기본 말투.*"
       - extendedWaitUntil:
-          visible: "봇이 어떤 말투로 쓸까요?"
+          visible: "완료"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.4
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "봇이 어떤 말투로 쓸까요?"
+            TITLE: "완료"
       - extendedWaitUntil:
-          notVisible: "봇이 어떤 말투로 쓸까요?"
+          notVisible: "완료"
           timeout: 5000
       - runFlow: _settings_end.yaml
       - tapOn: "로그아웃"

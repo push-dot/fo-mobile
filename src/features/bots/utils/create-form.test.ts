@@ -13,7 +13,6 @@ import {
   linkFailed,
   linkLabel,
   linkMissing,
-  linkStatus,
   markFinding,
   onPostingChosen,
   pickPosting,
@@ -38,9 +37,7 @@ describe('create form', () => {
     expect(searching.phase).toEqual({ kind: 'searching', query: '' })
     const checking = startLinkCheck(searching, 'https://careers.moapay.co.kr/jobs/1042')
     expect(checking.phase).toMatchObject({ kind: 'linkChecking', url: 'https://careers.moapay.co.kr/jobs/1042' })
-    expect(linkStatus(checking)).toBe('링크에서 공고를 읽고 있어요')
     const finding = markFinding(checking)
-    expect(linkStatus(finding)).toBe('Push에서 이 링크의 공고를 찾고 있어요')
     expect(markFinding(finding)).toBe(finding)
     const found = linkFound(finding, { ...posting, host: 'careers.moapay.co.kr', meta: '마감 11월 20일 · 경력 3년 이상 · 서울' })
     expect(found.phase.kind).toBe('linkOk')
@@ -111,8 +108,8 @@ describe('create form', () => {
 
   it('reads the limit table from the server limit', () => {
     expect(limitCopy(limit)).toEqual({
-      title: '봇을 3개까지 만들 수 있어요',
-      body: '지금은 FREE 플랜이라 봇 3개를 모두 쓰고 있어요. 플랜을 올리거나 쓰지 않는 봇을 정리하면 새로 만들 수 있어요.',
+      title: 'Bot을 3개까지 만들 수 있어요',
+      body: '지금은 FREE 플랜이라 Bot 3개를 모두 쓰고 있어요. 플랜을 올리거나 쓰지 않는 Bot을 삭제하면 새로 만들 수 있어요.',
       rows: [
         { plan: 'FREE', value: '3개', current: true },
         { plan: 'PRO', value: '20개', current: false },
@@ -124,7 +121,7 @@ describe('create form', () => {
 
   it('says 무제한 when the plan has no cap', () => {
     const ultra = limitCopy({ plan: 'ULTRA', max: null, used: 4, table: { FREE: 3, PRO: 20, ULTRA: null } })
-    expect(ultra.title).toBe('봇을 무제한으로 만들 수 있어요')
+    expect(ultra.title).toBe('Bot을 무제한으로 만들 수 있어요')
     expect(ultra.rows[2]).toEqual({ plan: 'ULTRA', value: '무제한', current: true })
   })
 })

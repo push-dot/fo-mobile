@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: BotHome
+name: 봇 홈 · 목록 · 길게 눌러 메뉴 · 삭제 확인
 tags:
   - visual
 ---
@@ -11,10 +11,33 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - extendedWaitUntil:
     visible: ".*Push Bot.*"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: BotHome
+- takeScreenshot: AgentHome
+# The board lifts 도토리증권 over the blurred list with its five actions under it.
+- longPressOn: ".*도토리증권.*"
+- extendedWaitUntil:
+    visible: "Bot 프로필 보기"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomePress
+- tapOn: "메뉴 닫기"
+- extendedWaitUntil:
+    notVisible: "Bot 프로필 보기"
+    timeout: 5000
+# The delete board asks about 모아페이.
+- longPressOn: ".*모아페이.*"
+- extendedWaitUntil:
+    visible: "Bot 프로필 보기"
+    timeout: 5000
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "모아페이 Bot을 삭제할까요?"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: AgentHomeDelete
+- tapOn: "취소"

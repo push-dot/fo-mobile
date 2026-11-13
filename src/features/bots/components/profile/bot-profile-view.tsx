@@ -1,27 +1,22 @@
 import { router } from 'expo-router'
-import { useState, type ReactNode } from 'react'
-import { Modal, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useState } from 'react'
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, showToast } from '@/shared/components'
 import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
-import { useBot, useBotProfile, useDeleteBot, useSetBotMuted } from '../../api/hooks'
-import { botColorPath, materialsPath } from '../../utils/paths'
-import type { Bot, BotAddress, CompanyBot } from '../../types'
+import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
+import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
+import type { Bot, BotAddress } from '../../types'
 import {
   ALLOWED_SHEET_LABEL,
-  CANCEL_LABEL,
   CLOSE_LABEL,
   COLOR_A11Y,
-  DELETE_ACTION,
-  DELETE_BODY,
   PROFILE_ERROR_BODY,
   PROFILE_ERROR_TITLE,
   PROFILE_LOADING_LABEL,
   RETRY_LABEL,
   REVOKE_LABEL,
   allowedSheetTitle,
-  deleteTitle,
   grantIntro,
   grantMeta,
   profileGroups,
@@ -29,7 +24,8 @@ import {
   revokeToast,
   type ProfileRow,
 } from './profile-rows'
-import BotDeleteSheet from './bot-delete-sheet'
+import { companyNames } from './companies'
+import { confirmDeleteBot } from './confirm-delete-bot'
 import { SheetCard } from './sheet-card'
 import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 
@@ -44,7 +40,7 @@ const Loading = () => {
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       <View
         style={{
           alignItems: 'center',
@@ -133,7 +129,7 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
       <View
         accessibilityRole="alert"
@@ -165,7 +161,8 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const revoke = useRevokeSiteGrant(address)
   const setMuted = useSetBotMuted()
   const remove = useDeleteBot()
-  const [sheet, setSheet] = useState<'allowed' | 'delete' | null>(null)
+  const companies = companyNames(useBots().data)
+  const [sheet, setSheet] = useState<'allowed' | null>(null)
   const [deleting, setDeleting] = useState(false)
   if (profile.isLoading) return <Loading />
   if (profile.isError || !profile.data) return <Failed bot={listed.data} onRetry={() => void profile.refetch()} />
@@ -177,13 +174,15 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     fitScore: profile.data.fitScore,
     materialCount: profile.data.materialCount,
     grantCount: count,
+    companyCount: companies.length,
   })
   const open = (row: ProfileRow) => {
     if ((row.id === 'posting' || row.id === 'fit') && posting) router.push(`/postings/${posting.id}`)
     if (row.id === 'materials') router.push(materialsPath(bot.id))
     if (row.id === 'allowed') setSheet('allowed')
+    if (row.id === 'companies') router.push(botCompaniesPath(bot.id))
     if (row.id === 'color' && bot.kind === 'company') router.push(botColorPath(bot.id))
-    if (row.id === 'delete') setSheet('delete')
+    if (row.id === 'delete' && bot.kind === 'company') confirmDeleteBot(bot.name, () => void onDelete())
   }
   const onRevoke = async (host: string) => {
     const left = grants.filter((grant) => grant.host !== host).length
@@ -245,7 +244,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     if (row.id === 'delete') {
       return <SettingsRow key={row.id} label={row.label} danger onPress={() => open(row)} right={<View />} />
     }
-    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed') {
+    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed' || row.id === 'companies') {
       const dead = row.id === 'fit' && !posting
       return <SettingsRow key={row.id} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
     }
@@ -253,7 +252,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   }
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
         <ProfileHead name={bot.name} color={color} sub={posting?.title} />
         {groups.map((group, index) => (
@@ -307,9 +306,6 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
           </View>
           <Button label={CLOSE_LABEL} variant="secondary" onPress={() => setSheet(null)} style={{ marginTop: spacing[2] }} />
         </SheetCard>
-      ) : null}
-      {sheet === 'delete' && bot.kind === 'company' ? (
-        <BotDeleteSheet bot={bot} disabled={deleting} onClose={() => setSheet(null)} onDelete={() => void onDelete()} />
       ) : null}
     </View>
   )

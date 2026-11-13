@@ -6,19 +6,19 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
 # The boards draw the user's own request above each error; run:<token> makes the mock answer it with that error (Android types the ASCII alias).
-- openLink: push://chat?mock=run:err-unavailable
+- openLink: push://bots/push?mock=run:err-unavailable
 - runFlow:
     file: _say.yaml
     env:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "err-unavailable"
 - extendedWaitUntil:
-    visible: "지금은 봇을 쓸 수 없어요.*"
+    visible: "지금은 Bot을 쓸 수 없어요.*"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
-- runFlow: _back_home.yaml
-- openLink: push://chat?mock=run:err-other
+- runFlow: _fresh_chat.yaml
+- openLink: push://bots/push?mock=run:err-other
 - runFlow:
     file: _say.yaml
     env:
@@ -29,8 +29,8 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrOther
-- runFlow: _back_home.yaml
-- openLink: push://chat?mock=run:err-credit
+- runFlow: _fresh_chat.yaml
+- openLink: push://bots/push?mock=run:err-credit
 - runFlow:
     file: _say.yaml
     env:
@@ -41,8 +41,8 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderLimit
-- runFlow: _back_home.yaml
-- openLink: push://chat?mock=reset
+- runFlow: _fresh_chat.yaml
+- openLink: push://bots/push?mock=reset,bot:push:empty
 - runFlow:
     file: _say.yaml
     env:

@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: BotHomeSearch
+name: 봇 홈 · 검색 · 처음 · 결과 · 결과 없음
 tags:
   - visual
 ---
@@ -11,11 +11,31 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - tapOn: "검색"
 - extendedWaitUntil:
-    visible: "봇 이름이나 대화 내용으로 찾아보세요"
+    visible: "Bot 이름이나 대화 내용으로 찾아보세요"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: BotHomeSearch
+- takeScreenshot: AgentHomeSearchStart
+# inputText is ASCII-only on Android; the boards are iOS shots, so the Korean queries run on iOS only.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "모아"
+      - extendedWaitUntil:
+          visible: ".*백엔드 엔지니어.*"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: AgentHomeSearch
+      # The field keeps its text, so close the search and open it again for the next query.
+      - tapOn: "검색 닫기"
+      - tapOn: "검색"
+      - inputText: "하늘커머스"
+      - extendedWaitUntil:
+          visible: "검색 결과가 없어요"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: AgentHomeSearchEmpty

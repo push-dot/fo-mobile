@@ -5,6 +5,8 @@ import { Glass, Icon, Text } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '../../../theme'
 
+const CLOSE_SHAPE = { height: 44, borderRadius: 22, paddingHorizontal: spacing[4], justifyContent: 'center' } as const
+
 const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v: string) => void; onSubmit: () => void }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
@@ -35,6 +37,11 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
       ) : null}
     </View>
   )
+  const closeLabel = (
+    <Text v="b2" weight="700">
+      닫기
+    </Text>
+  )
   return (
     <View style={{ paddingTop: insets.top, backgroundColor: c.bg, zIndex: 3 }}>
       <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: ios ? spacing[3] : spacing[2] }}>
@@ -48,10 +55,15 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
             <View style={{ borderRadius: 22, backgroundColor: c.fill }}>{field}</View>
           )}
         </View>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing[2] }}>
-          <Text v="b2" weight="700">
-            취소
-          </Text>
+        <Pressable accessibilityRole="button" onPress={() => router.back()}>
+          {/* Same height as the field (44), a glass button like the field itself. */}
+          {ios ? (
+            <Glass interactive tint={dark ? c.glass : undefined} style={CLOSE_SHAPE}>
+              {closeLabel}
+            </Glass>
+          ) : (
+            <View style={[CLOSE_SHAPE, { backgroundColor: c.fill }]}>{closeLabel}</View>
+          )}
         </Pressable>
       </View>
     </View>

@@ -117,7 +117,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
                   />
                 ) : null}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-                  <Icon name="spark" size={18} color="acText" filled />
+                  <Icon name="spark" size={18} color="t1" filled />
                   <Text v="b2" style={{ flex: 1 }}>
                     적합도 7점 이상인 공고만 보여 드려요
                   </Text>
@@ -227,16 +227,16 @@ const LinkInput = ({ url, setUrl }: { url: string; setUrl: (v: string) => void }
           onPress={() => setUrl(clip)}
           style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.acSoft }}
         >
-          <Icon name="copy" size={18} color="acText" />
+          <Icon name="copy" size={18} color="t1" />
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text v="c2" weight="700" color="acText">
+            <Text v="c2" weight="700" color="t1">
               복사한 링크
             </Text>
             <Text v="b2" numberOfLines={1}>
               {clip.replace(/^https?:\/\//, '')}
             </Text>
           </View>
-          <Text v="b2" weight="700" color="acText">
+          <Text v="b2" weight="700" color="t1">
             붙여넣기
           </Text>
         </Pressable>
@@ -329,7 +329,7 @@ const DocField = ({
         onPress={onToggle}
         trailing={
           chevron ? undefined : (
-            <Text v="c1" weight="700" color="acText">
+            <Text v="c1" weight="700" color="t1">
               변경
             </Text>
           )
@@ -393,7 +393,7 @@ const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; 
         <View style={{ alignItems: 'flex-end', gap: spacing[1] }}>
           {item.badge ? <Badge {...item.badge} /> : null}
           {item.note ? (
-            <Text v="c2" weight="600" color={item.note.ac ? 'acText' : 't3'}>
+            <Text v="c2" weight="600" color={item.note.ac ? 't1' : 't3'}>
               {item.note.label}
             </Text>
           ) : null}
@@ -513,7 +513,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
           {connected ? 'Google 캘린더와 연결됨' : 'Google 캘린더와 연결 안 됨'}
         </Text>
         <Pressable accessibilityRole="button" accessibilityLabel="캘린더 변경" onPress={onChange} hitSlop={hitSlopTo(18)}>
-          <Text v="c1" weight="700" color="acText">
+          <Text v="c1" weight="700" color="t1">
             변경
           </Text>
         </Pressable>

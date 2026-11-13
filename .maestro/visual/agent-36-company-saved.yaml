@@ -1,0 +1,30 @@
+appId: app.push.mobile
+name: 회사 봇 · 완료 후 사라진 상태 줄 · 승인 만료
+tags:
+  - visual
+---
+# Two launches: a stored chat is read once per launch, so each board starts from a fresh app.
+# bot:b-moa:done keeps one request and its answer with the 출처 row (ChatBotStatusDone).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:done"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: ".*경력 섹션 3줄을 고쳤어요.*"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusDone
+# card:expired is 모아페이's page-read card ten minutes past its time (ChatBotStatusExpired).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,card:expired"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: "만료됨"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusExpired

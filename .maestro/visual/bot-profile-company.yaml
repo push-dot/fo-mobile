@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 봇 프로필 · 회사 봇
+name: Bot 프로필 · 회사 Bot
 tags:
   - visual
 ---
@@ -17,9 +17,9 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfile
-- tapOn: "봇 색 바꾸기"
+- tapOn: "Bot 색 바꾸기"
 - extendedWaitUntil:
-    visible: "봇 색"
+    visible: "Bot 색"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileColor
@@ -29,7 +29,7 @@ tags:
     timeout: 5000
 - tapOn: "허용한 사이트.*"
 - extendedWaitUntil:
-    visible: "careers.moapay.co.kr"
+    visible: "careers.moapay.co.kr 허용 해제"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileAllowed
@@ -40,9 +40,9 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileAllowedRevoke
 - tapOn: "닫기"
-- tapOn: "봇 삭제"
+- tapOn: "Bot 삭제"
 - extendedWaitUntil:
-    visible: "모아페이 봇을 삭제할까요?"
+    visible: "모아페이 Bot을 삭제할까요?"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileDelete

@@ -337,7 +337,15 @@ export const useAddCalendarEvent = (onAdded: () => void) => {
 }
 
 export const useSource = (id: string) =>
-  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => fetchSource(id) })
+  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => fetchSource(id), enabled: !!id })
+
+export const useRenameSource = (id: string | undefined) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (fileName: string) => myApi.renameSource(id!, fileName),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
+  })
+}
 
 export const useResumeDraft = (id: string) =>
   useQuery({

@@ -1,0 +1,18 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Push Bot keeps one chat, so a board that needs its own thread starts from an empty chat: 더 보기 › 대화 지우기 › 지우기
+# leaves the onboarding chips (공고 링크로 맞추기) as on first open.
+# The 더 보기 button is tapped by position: an open approval panel hides the header from accessibility, and a tap lands anyway.
+---
+- tapOn:
+    point: "90%,10%"
+- tapOn: "대화 지우기"
+- extendedWaitUntil:
+    visible: "Push Bot과 나눈 대화를 지울까요?"
+    timeout: 5000
+- tapOn: "지우기"
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- waitForAnimationToEnd

@@ -42,6 +42,4 @@ export const SECTIONS: Record<SectionKind, { title: string; description: string 
   popular: { title: '이번 주 많이 본 공고', description: '이번 주에 사람들이 많이 본 공고예요' },
 }
 
-export const APPLY_DOC_NOTE = { ai: '봇으로 맞춘 서류', upload: '원본' } as const
-
 export const APPLY_DOC_LIMIT = 100

@@ -91,7 +91,7 @@ const TermsScreen = () => {
         <View style={{ marginTop: spacing[6] }}>
           <TermsAllRow checked={all} onPress={toggleAll} />
         </View>
-        <View style={{ paddingTop: spacing[2] }}>
+        <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[4] }}>
           {TERM_ROWS.map((row) => (
             <TermRow
               key={row.id}

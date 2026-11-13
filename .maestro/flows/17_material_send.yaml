@@ -6,15 +6,15 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
 - runFlow:
     file: _tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "(동의하고 시작하기|새 회사 봇 만들기)"
+      TAB: "Bot"
+      READY: "(동의하고 시작하기|새 회사 Bot 만들기)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"
     commands:
       - tapOn: "동의하고 시작하기"
 - extendedWaitUntil:
-    visible: ".*모아페이 봇.*"
+    visible: ".*모아페이 Bot.*"
     timeout: 10000
 - tapOn:
     text: "자료"
@@ -24,7 +24,7 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     timeout: 20000
 - tapOn: "김서준_백엔드_이력서.pdf 보내기"
 - extendedWaitUntil:
-    visible: "어느 봇에게 보낼까요?"
+    visible: "어느 Bot한테 보낼까요?"
     timeout: 10000
 - tapOn: "모아페이"
 - extendedWaitUntil:
@@ -33,5 +33,5 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
 - takeScreenshot: 17_material_send
 - tapOn: "뒤로"
 - extendedWaitUntil:
-    visible: ".*모아페이 봇.*"
+    visible: ".*모아페이 Bot.*"
     timeout: 10000

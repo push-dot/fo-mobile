@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 봇 프로필 · 긴 이름 · 음소거 · 로딩 · 오류
+name: Bot 프로필 · 긴 이름 · 음소거 · 로딩 · 오류
 tags:
   - visual
 ---
@@ -23,13 +23,13 @@ tags:
 # A bot whose profile is already cached never shows the skeleton or the error, so these two open bots the tour has not opened yet.
 - openLink: "push://bots/b-sodam/profile?mock=reset,hang:GET:bots/b-sodam"
 - extendedWaitUntil:
-    visible: "봇 프로필을 불러오는 중이에요"
+    visible: "Bot 프로필을 불러오는 중이에요"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileLoading
 - openLink: "push://bots/b-hanbit/profile?mock=reset,fail:GET:bots/b-hanbit"
 - extendedWaitUntil:
-    visible: "봇 정보를 불러오지 못했어요"
+    visible: "Bot 정보를 불러오지 못했어요"
     timeout: 10000
 - extendedWaitUntil:
     visible: ".*한빛모빌리티.*"

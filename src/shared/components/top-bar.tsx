@@ -17,15 +17,19 @@ type Props = {
   sheet?: boolean
   /** Floats over the content below (the caller positions it): a veil and blur instead of a solid bar. */
   translucent?: boolean
+  /** No fill at all: the content scrolls visibly under the bar (the caller positions it and draws any fade). */
+  transparent?: boolean
   /** The chat header (.chead): 60 high, 16 edges, 10 gap; Android draws it solid with a 1 px line under it. */
   chat?: boolean
+  /** The back button is the board's `.gbtn` (Android: a solid `fill` circle); the chat header always is. */
+  circleBack?: boolean
 }
 
 const ios = Platform.OS === 'ios'
 const EDGE = ios ? spacing[3] : spacing[2]
 const CHAT_ROW = 60
 
-const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, chat = false }: Props) => {
+const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false, circleBack = false }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { xl, row: baseRow, button } = useXlChrome()
@@ -36,7 +40,7 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
     <View
       style={{
         paddingTop: safeTop ? sheetHeaderTop(Platform.OS, sheet, insets.top, row) : 0,
-        backgroundColor: veil ? undefined : c.bg,
+        backgroundColor: veil || transparent ? undefined : c.bg,
         borderBottomWidth: solidChat ? 1 : 0,
         borderBottomColor: c.line,
         zIndex: 3,
@@ -49,7 +53,7 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
         </>
       ) : null}
       <View style={{ minHeight: row, flexDirection: 'row', alignItems: 'center', paddingLeft: chat ? spacing[4] : onBack ? EDGE : spacing[5], paddingRight: chat ? spacing[4] : EDGE, gap: chat ? 10 : 2 }}>
-        {onBack ? <GlassButton actions={[{ icon: 'back', label: '뒤로', onPress: onBack }]} /> : null}
+        {onBack ? <GlassButton circle={chat || circleBack} actions={[{ icon: 'back', label: '뒤로', onPress: onBack }]} /> : null}
         {left ? <View style={{ flex: 1 }}>{left}</View> : null}
         {title ? (
           <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>

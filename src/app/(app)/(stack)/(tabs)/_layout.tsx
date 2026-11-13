@@ -1,6 +1,7 @@
 import { NativeTabs } from 'expo-router/native-tabs'
-import { Platform } from 'react-native'
-import { tabColor, useColors, useThemeMode } from '@/theme'
+import { Platform, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { platformTheme, tabColor, useColors, useThemeMode } from '@/theme'
 
 // Tab bar icons rendered from the Claude Design line icons and the mascot (assets/tabs, @2x/@3x).
 const ICONS = {
@@ -17,18 +18,23 @@ const TABS = [
   { route: '(hub)', name: '허브', icon: ICONS.hub },
   { route: '(social)', name: '소셜', icon: ICONS.social },
   // The mascot keeps its own colors in both states, as in the design.
-  { route: '(bots)', name: '봇', mascot: ICONS.agent },
+  { route: '(bots)', name: 'Bot', mascot: ICONS.agent },
   { route: '(my)', name: '마이', icon: ICONS.my },
 ] as const
 
+// The Material 3 bar is 80dp plus the nav inset (the boards draw 58 plus the inset) and has no border API,
+// so Android lays the boards' top 1px `line` over the bar's top edge; the 22dp of extra height cannot be changed from here.
+const BAR_HEIGHT = platformTheme.tabBarHeight - platformTheme.safeBottom
+
 const TabsLayout = () => {
   const c = useColors()
+  const insets = useSafeAreaInsets()
   const mode = useThemeMode()
   const platform = Platform.OS === 'android' ? 'android' : 'ios'
   const idle = tabColor(platform, false, c)
   const selected = tabColor(platform, true, c)
   const android = platform === 'android'
-  return (
+  const tabs = (
     <NativeTabs
       minimizeBehavior="onScrollDown"
       labelVisibilityMode="unlabeled"
@@ -49,6 +55,13 @@ const TabsLayout = () => {
         </NativeTabs.Trigger>
       ))}
     </NativeTabs>
+  )
+  if (!android) return tabs
+  return (
+    <View style={{ flex: 1 }}>
+      {tabs}
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: BAR_HEIGHT + insets.bottom, height: 1, backgroundColor: c.line }} />
+    </View>
   )
 }
 

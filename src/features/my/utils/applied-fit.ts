@@ -1,7 +1,7 @@
 import type { ApplicationDetail, FitPartKey } from '../types'
 import { fitTen } from './fit-ten'
 
-export const APPLIED_FIT_LABEL = '적합도 자세히 보기 · 봇으로 이동'
+export const APPLIED_FIT_LABEL = '적합도 자세히 보기 · Bot으로 이동'
 
 // MyAppliedJob draws three of the five parts.
 const PARTS: readonly (readonly [FitPartKey, string])[] = [

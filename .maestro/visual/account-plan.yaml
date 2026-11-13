@@ -12,11 +12,11 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "(새 회사 봇 만들기|Push Bot)"
+      TAB: "Bot"
+      READY: "(새 회사 Bot 만들기|Push Bot)"
 - tapOn: "계정 · .*"
 - extendedWaitUntil:
-    visible: "봇이 참고하는 내 정보"
+    visible: "Bot이 참고하는 내 정보"
     timeout: 10000
 - tapOn: "PRO"
 - extendedWaitUntil:
@@ -30,3 +30,9 @@ tags:
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: PlanUpgrade
+# PlanUpgradeNotice draws the same page with its four 구독 안내 lines and the 플랜 낮추기 · 구매 복원 links, below the cards.
+- scrollUntilVisible:
+    element: ".*미성년자가 법정대리인.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: PlanUpgradeNotice

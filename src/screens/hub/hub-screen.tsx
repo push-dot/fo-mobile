@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, FlatList, Platform, Pressable, View } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -13,7 +13,7 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, Glass, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Badge, Button, Chip, ChipRow, Glass, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 // The boards draw the search pill as glass on iOS and as a filled pill on Android.
@@ -52,16 +52,16 @@ const HubScreen = () => {
           </SearchPill>
         </Pressable>
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[4] }}>
+      <ChipRow paddingTop={spacing[4]}>
         {HUB_CATEGORIES.map((k) => (
           <Chip key={k.key} label={k.label} check on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
         ))}
-      </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[1], gap: spacing[2] }}>
+      </ChipRow>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
         <Text v="h2" accessibilityRole="header">
           추천 프로필
         </Text>
-        {summary ? <Badge label={summary} tone="ac" /> : null}
+        {summary ? <Badge label={summary} /> : null}
       </View>
     </View>
     ),

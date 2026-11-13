@@ -2,8 +2,9 @@
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 // Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
-import { HINTLESS_GATES } from '../../features/chat/constants'
+import { HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
 import type { Step } from '../../features/chat/types'
+import { PAGE_READ_FOOT, PAGE_READ_OPTIONS } from './cards'
 
 type Frame = Step['frame']
 type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
@@ -71,7 +72,7 @@ const tailorRead: Step[] = [
   s(1500, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
 ]
 
-// 마이 › 서류 › 봇으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
+// 마이 › 서류 › Bot으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
 const fixDocRun: Step[] = [
   s(200, status('서류를 읽는 중')),
   s(300, tool('resume', '이력서 읽기', RESUME, 'run', '서류를 읽는 중')),
@@ -81,7 +82,8 @@ const fixDocRun: Step[] = [
 
 const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(200, todo('todo', labels, 2, added)),
-  s(100, status(added < 0 ? '맞춰보는 중…' : '다시 맞춰보는 중…')),
+  // The status line draws the status frame, not the tool's result line (ChatStates.3 reads "기술 스택을 비교하는 중 14초").
+  s(100, status(added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(hold + 1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
   s(300, {
@@ -544,7 +546,9 @@ const statesFile: Step[] = [
 ]
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
-  s(900, tool('apply', '지원하기', MOA, 'ok', '지원했어요 · 마이 › 내 활동에 기록했어요')),
+  s(900, tool('apply', '지원하기', MOA, 'ok')),
+  // The record is a line of its own (tool lines are not drawn), as ChatStates.4 shows it between the file card and the busy error.
+  s(300, agent('지원했어요 · 마이 › 내 활동에 기록했어요')),
   done,
 ]
 const awaitReply: Step[] = [
@@ -554,9 +558,39 @@ const awaitReply: Step[] = [
 ]
 export const fail = (code: string, details?: Record<string, unknown>): Step[] => [s(300, { type: 'error', error: { code, message: code, ...(details ? { details } : {}) } })]
 
+// The company-bot status boards (ChatBotStatus*, ChatBotReadOff): one status line held, one card, or one finished answer.
+const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
+const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
+const statusHelp: Step[] = [
+  ask({
+    type: 'choice',
+    id: 'st-help',
+    title: STATUS_ASK,
+    options: [
+      { id: '0', label: '제품 관점', desc: '결제 경험을 사용자 입장에서 풀어요' },
+      { id: '1', label: '데이터 관점', desc: '처리량과 지연 수치를 앞세워요' },
+    ],
+  }),
+  awaitingDone,
+]
+const statusApprove: Step[] = [
+  ask({
+    type: 'approval',
+    id: 'st-approve',
+    kind: 'TOOL_ACTION',
+    title: '모아페이 채용 페이지를 열어도 될까요?',
+    summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
+    options: PAGE_READ_OPTIONS,
+    foot: PAGE_READ_FOOT,
+  }),
+  awaitingDone,
+]
+
 // Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
 export const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('NOT_CONFIGURED'),
+  // ChatBotStatusError: the run broke with a reason the app has no sentence for, so the status line carries it.
+  'err-disconnect': fail('DISCONNECTED', { reason: '연결 끊김' }),
   'err-credit': fail('INSUFFICIENT_CREDITS'),
   'err-other': [s(300, agent('좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('UNKNOWN')],
   'ext-done': ext({}),
@@ -591,6 +625,15 @@ export const TOKENS: Record<string, Step[]> = {
   // The long-held working line: a second message or 중지 must land while it still runs (ChatWorking, ChatInterrupt on Android).
   // ChatHeaderNoCompany: no posting yet, so the conversation has no company and the header pill shows the logo only.
   'no-posting': noPosting,
+  // The company-bot boards (ChatBotStatus*): hold one status line (중지 on it is ChatBotStatusStopped), or stop at a card.
+  'st-think': held('생각 중'),
+  'st-work': held('공고 요건을 읽는 중'),
+  'st-queue': held('순서를 기다리는 중 · 앞에 작업 1개'),
+  'st-long': held('누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사 공고 3개의 필수 요건과 우대 요건을 서로 비교하는 중'),
+  'st-help': statusHelp,
+  'st-approve': statusApprove,
+  // The stream mapper reads a notice frame at runtime (notices.ts), though the scripted frame type does not list one.
+  'read-off': [s(300, { type: 'notice', text: READ_OFF_TEXT } as unknown as Frame), done],
   'tailor hold': [...tailorRead, ...tailorFit(TODO, -1, HOLD)],
   // ChatStates.4 in one conversation: the file card, then the apply record, then (busy below) the 혼잡 error.
   'states-file': statesFile,
@@ -616,7 +659,8 @@ export const pick = (text: string, interrupted: boolean, attachment?: string, in
   // `run:<token>` (links.ts) plays that scenario for any text, so a tour can type the design's own user line (ChatErrUnavailable, ChatErrOther).
   const token = TOKENS[run ?? t]
   if (token) return { steps: token }
-  if (attachment) return { steps: fileRun() }
+  // 서류 보기 › 봇으로 고치기 sends the file name as its attachment; that is the read-then-fix run below, not an external file.
+  if (attachment && t !== '이 서류를 고쳐 줘') return { steps: fileRun() }
   if (intent === 'fit') return { steps: ph1 }
   if (intent === 'boost') return { steps: ph3Boost }
   if (intent === 'experience') return { steps: ph2xApproach }

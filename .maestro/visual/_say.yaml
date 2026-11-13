@@ -19,3 +19,13 @@ tags:
       - hideKeyboard:
           optional: true
 - tapOn: "보내기"
+# A tap that lands while the keyboard is still settling can leave the typed line in the composer; tap again while the send button shows
+# the line is still there (a sent line empties the composer, so a second tap sends nothing).
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "보내기"
+    commands:
+      - tapOn:
+          text: "보내기"
+          optional: true

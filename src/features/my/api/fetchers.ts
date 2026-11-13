@@ -9,6 +9,8 @@ const c = http
 const uploaded = new Map<string, string | undefined>()
 
 export const myApi = {
+  // PATCH sources/:id sets the file name of an upload (push-be contracts/spec/documents.ts).
+  renameSource: (id: string, fileName: string) => c.patch<DataEnvelope<MySource>>(`sources/${id}`, { body: { fileName } }),
   // shortcut: first 100 uploads only; page once the docs tab loads more on scroll.
   sources: async (): Promise<ListEnvelope<MySource>> => {
     const r = await api.sources.list({ kind: 'UPLOAD', limit: 100 })

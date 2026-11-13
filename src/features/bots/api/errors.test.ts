@@ -13,7 +13,7 @@ describe('bot errors', () => {
 
   it('maps BOT_LIMIT without details to generic copy', () => {
     const e = new ApiError('limit', 'BOT_LIMIT', 403, null)
-    expect(botErrorCopy(e).body).toBe('플랜에서 만들 수 있는 회사 봇 수에 도달했어요.')
+    expect(botErrorCopy(e).body).toBe('플랜에서 만들 수 있는 회사 Bot 수에 도달했어요.')
   })
 
   it('maps DEFAULT_BOT_PROTECTED', () => {

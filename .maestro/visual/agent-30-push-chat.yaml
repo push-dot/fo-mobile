@@ -1,0 +1,63 @@
+appId: app.push.mobile
+name: Push Bot · 처음 열기 · 헤더 메뉴 · 대화 지우기 확인 · 실행 방식 · @언급
+tags:
+  - visual
+---
+# bots:none leaves the Push Bot with no history, so its chat opens on the greeting and all 13 quick starts (ChatBotOnboardPush).
+# few-materials is the account ChatMention draws (two bookmarks, two documents, one link).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=bots:none,consent-on,few-materials"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/push
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotOnboardPush
+- tapOn: "더 보기"
+- extendedWaitUntil:
+    visible: "대화 지우기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPushHeaderMenu
+- tapOn: "대화 지우기"
+- extendedWaitUntil:
+    visible: "Push Bot과 나눈 대화를 지울까요?"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPushClearConfirm
+# Cancel: clearing would empty the chat the next shots need.
+- tapOn: "취소"
+- extendedWaitUntil:
+    notVisible: "Push Bot과 나눈 대화를 지울까요?"
+    timeout: 5000
+- tapOn: ".*실행 방식.*"
+- extendedWaitUntil:
+    visible: "Bot이 어떻게 실행할까요?"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatRunMode
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "Bot이 어떻게 실행할까요?"
+- extendedWaitUntil:
+    notVisible: "Bot이 어떻게 실행할까요?"
+    timeout: 5000
+- tapOn: "메시지.*"
+- inputText: "@"
+- extendedWaitUntil:
+    visible: "북마크 공고"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatMention
+# ChatEmpty filters the same list by 모아; inputText is ASCII-only on Android, so that board is iOS only.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "모아"
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatEmpty

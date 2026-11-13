@@ -23,11 +23,14 @@ tags:
       TEXT: "공고 214개 보기"
 - tapOn: "전체"
 - waitForAnimationToEnd
-# iOS merges a row's label and count into one element, Android keeps them apart.
+# 지역 is two wheels (시·도, 구): tapping a wheel row selects it, 추가 turns the pick into a chip.
 - tapOn: "지역"
-- tapOn: "강남구(.*214)?"
-- tapOn: "서초구(.*96)?"
-- tapOn: "마포구(.*88)?"
+- tapOn: "강남구"
+- tapOn: "추가"
+- tapOn: "서초구"
+- tapOn: "추가"
+- tapOn: "마포구"
+- tapOn: "추가"
 - extendedWaitUntil:
     visible: "공고 398개 보기"
     timeout: 10000

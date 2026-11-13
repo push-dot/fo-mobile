@@ -22,7 +22,12 @@ tags:
 - extendedWaitUntil:
     visible: "Google 연결 안 됨"
     timeout: 10000
-# The mock events are all in October 2026 and the calendar opens on the device's month, so step back from November.
+# v412: the screen lists one day; its title opens the month sheet. The mock events are all in October 2026 and the sheet opens on
+# the device's month, so step back from November, then pick the day (picking closes the sheet).
+- tapOn: ".*달력 열기.*"
+- extendedWaitUntil:
+    visible: "이전 달"
+    timeout: 10000
 - runFlow:
     when:
       visible: "2026년 11월"
@@ -33,6 +38,7 @@ tags:
     timeout: 10000
 # 10월 23일 has no event; the board selects it.
 - tapOn: ".*10월 23일.*"
+- waitForAnimationToEnd
 - extendedWaitUntil:
     visible: "이날은 일정이 없어요."
     timeout: 10000

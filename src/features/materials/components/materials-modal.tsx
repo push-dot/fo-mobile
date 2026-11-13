@@ -1,54 +1,38 @@
 import { router } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
-import { pickResume, useImportRequest, useUpload } from '@/features/my'
+import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
-import { Button, Glass, GlassButton, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
-import { sheetHeaderTop } from '@/shared/navigation'
+import { Button, GlassButton, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
 import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, UPLOADED, type AddAction } from '../constants'
-import type { Material, MaterialTab, SendContext } from '../types'
-import { totalCount } from '../utils/material-row'
+import type { Material, MaterialTab } from '../types'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
-import { useListSize } from './list-size'
 import { sendMaterial } from './send-material'
 import { MaterialItem, SectionTitle } from './material-item'
 import { MaterialsTabs } from './materials-tabs'
-import { MaterialsSearch, useGlassTint, useSearchRoom } from './materials-search'
+import { MaterialsSearch, useSearchRoom } from './materials-search'
 
-const HEADER_ROW = 44
 const ios = Platform.OS === 'ios'
 
 /** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
 const runAdd = (action: AddAction) => {
   if (action === 'link') return router.push(materialLinkAddPath())
-  if (action === 'upload') return router.push('/docs/import')
+  if (action === 'upload') return showImportMenu()
   router.back()
   router.push('/jobs')
 }
 
-const CountPill = ({ count }: { count: number }) => {
-  const c = useColors()
-  const tint = useGlassTint()
-  const { count: size } = useListSize()
-  const label = (
-    <Text v="c1" weight="700" color="t2" style={{ fontSize: 14 }}>
-      {`${count}개`}
-    </Text>
-  )
-  const shape = { ...size, paddingHorizontal: 14, justifyContent: 'center' } as const
-  return ios ? <Glass tint={tint} style={shape}>{label}</Glass> : <View style={[shape, { backgroundColor: c.fill }]}>{label}</View>
-}
-
 /** RN has no `text-wrap: balance`; this width rebuilds the three lines MaterialsEmpty draws for its body. */
 const NOTE_BODY_WIDTH = 252
+/** The boards centre the note in the body, a little above the middle (the search field sits under it). */
+const NOTE_RESERVE = 40
 
 /** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. */
 const Note = ({ title, body, action, alert }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean }) => (
-  <View accessibilityRole={alert ? 'alert' : undefined} style={{ alignItems: 'center', gap: spacing[2], paddingTop: 120, paddingHorizontal: 36 }}>
+  <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: NOTE_RESERVE }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
       {title}
     </Text>
@@ -94,13 +78,10 @@ const Loading = () => (
  */
 export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const [tab, setTab] = useState<MaterialTab>('all')
   const { text, q, setText } = useSearchQuery()
   const bot = forBot as BotId | undefined
   const list = useMaterials({ tab, q, bot })
-  // The header counts what there is, not what the search found (MaterialsSearchEmpty keeps 24개).
-  const all = useMaterials({ tab, q: '', bot })
   const view = listView(list, tab, q)
   const context = useMemo(() => sendContextOf(forBot), [forBot])
   const now = useMemo(() => new Date(), [])
@@ -156,13 +137,12 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: ios ? 14 : sheetHeaderTop(Platform.OS, true, insets.top, HEADER_ROW), paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <GlassButton iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {MATERIALS_TITLE}
         </Text>
-        {all.data && view.state !== 'error' ? <CountPill count={totalCount(all.data.counts)} /> : null}
-        <GlassButton actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
+        <GlassButton circle actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
       </View>
       <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
         <MaterialsTabs value={tab} onChange={setTab} />

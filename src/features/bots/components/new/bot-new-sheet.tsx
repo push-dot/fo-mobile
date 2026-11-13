@@ -26,7 +26,6 @@ import {
   linkFound,
   linkLabel,
   linkMissing,
-  linkStatus,
   markFinding,
   onPostingChosen,
   pickPosting,
@@ -62,12 +61,13 @@ import {
   SEARCH_CLOSE,
   SEARCH_DEBOUNCE_MS,
   SEARCH_EMPTY,
-  SEARCH_HINT,
   SEARCH_PLACEHOLDER,
   SHEET_TITLE,
   UPGRADE_LABEL,
   XL_FONT_SCALE,
 } from './copy'
+import { GRABBER } from '@/shared/components/constants'
+import { useHardwareBack } from '@/shared/utility'
 import { loadPosting, searchPostings, type PostingRow } from './posting-search'
 
 type Props = {
@@ -136,7 +136,7 @@ const Highlight = ({ text, query }: { text: string; query: string }) => {
   )
 }
 
-const Cta = ({ label, onPress, busy, enabled, xl, icon }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean; icon?: 'retry' }) => {
+const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean }) => {
   const c = useColors()
   return (
     <GlassPressable
@@ -146,12 +146,11 @@ const Cta = ({ label, onPress, busy, enabled, xl, icon }: { label: string; onPre
       fill={enabled ? 'ac' : 'fill2'}
       pressedFill="acPress"
       onPress={!enabled || busy ? undefined : onPress}
-      contentStyle={icon ? { gap: spacing[2] } : undefined}
+      contentStyle={busy ? { gap: spacing[2] } : undefined}
       style={{ minHeight: xl ? CTA_XL : CTA, borderRadius: platformTheme.buttonRadius }}
     >
       {busy ? <Spinner size={18} color="onFill" /> : null}
-      {!busy && icon ? <Icon name={icon} size={18} color={enabled ? 'onFill' : 't3'} /> : null}
-      <Text weight="700" allowFontScaling={!xl} style={{ color: enabled ? onAccent : c.t3, fontSize: xl ? CTA_FONT_XL : type.button.fontSize, lineHeight: xl ? 30 : type.button.lineHeight }}>
+      <Text weight="700" numberOfLines={1} allowFontScaling={!xl} style={{ flexShrink: 1, color: enabled ? onAccent : c.t3, fontSize: xl ? CTA_FONT_XL : type.button.fontSize, lineHeight: xl ? 30 : type.button.lineHeight }}>
         {label}
       </Text>
     </GlassPressable>
@@ -238,7 +237,7 @@ const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree
   return (
     <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end' }}>
       <View style={[{ backgroundColor: c.bg, gap: spacing[3] }, card]}>
-        <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
+        <View style={{ ...(ios ? GRABBER.ios : GRABBER.android), backgroundColor: c.deco, alignSelf: 'center' }} />
         <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {CONSENT_TITLE}
         </Text>
@@ -266,7 +265,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
-  const xl = useWindowDimensions().fontScale >= XL_FONT_SCALE
+  const window = useWindowDimensions()
+  const xl = window.fontScale >= XL_FONT_SCALE
+  const [sheetBottom, setSheetBottom] = useState(window.height)
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -277,6 +278,8 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   useEffect(() => {
     openRef.current = onOpenBot
   }, [onOpenBot])
+  // The consent overlay is a View, not a Modal: back closes it rather than the whole sheet.
+  useHardwareBack(form.consent ? () => setForm(dismissConsent) : null)
   const phase = form.phase
   const searching = searchPhase(form)
   const posting = postingOf(phase)
@@ -422,7 +425,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       </View>
     )
   const searchIcon = <Icon name="search" size={20} color="t3" />
-  const closeButton = <GlassButton iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
+  const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const section = { paddingTop: 14, paddingBottom: spacing[1], paddingHorizontal: spacing[5], fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }
@@ -434,7 +437,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       {searching ? (
         <View style={{ width: control, height: control }} />
       ) : (
-        <GlassButton iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
+        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
       )}
       <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
         {SHEET_TITLE}
@@ -491,7 +494,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const searchBody = (
     <>
       <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: keepTop ? 'flex-start' : 'flex-end' }}>
-        {phase.kind === 'searching' && !query ? <Text color="t3" style={note}>{SEARCH_HINT}</Text> : null}
         {phase.kind === 'searching' && query && !asLink(query) && !loading && rows.length === 0 ? <Text color="t3" style={note}>{SEARCH_EMPTY}</Text> : null}
         {showRows
           ? rows.map((row, i) => (
@@ -512,12 +514,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
               <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
             </View>
-            <Text color="t3" style={[note, { paddingTop: spacing[2] }]}>
-              {linkStatus(form)}
-            </Text>
           </>
         ) : null}
-        {phase.kind === 'linkBad' ? <Text style={[note, { color: c.red }]}>{LINK_BAD}</Text> : null}
+        {phase.kind === 'linkBad' ? <Text style={note}>{LINK_BAD}</Text> : null}
         {phase.kind === 'linkRetry' ? <Text color="t3" style={note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
           <>
@@ -542,7 +541,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {shell(
           linkWait ? (
             <>
-              <Icon name="link" size={20} color="t3" />
+              {searchIcon}
               <Text numberOfLines={1} style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
                 {linkLabel(linkUrl ?? '')}
               </Text>
@@ -574,23 +573,19 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   const retry = phase.kind === 'error'
   const footer = (
-    <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
+    <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2], backgroundColor: c.bg }}>
       {retry ? (
-        <View accessibilityRole="alert" style={{ backgroundColor: c.redSoft, borderRadius: radius.md, paddingVertical: spacing[3], paddingHorizontal: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-          <Icon name="alert" size={18} color="red" />
-          <Text color="red" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
-            <Text weight="700" color="red" style={{ fontSize: 14, lineHeight: 20 }}>
-              {ERROR_TITLE}
-            </Text>{' '}
-            {ERROR_BODY}
-          </Text>
-        </View>
+        <Text accessibilityRole="alert" style={{ textAlign: 'center', fontSize: 14, lineHeight: 20 }}>
+          <Text weight="700" style={{ fontSize: 14, lineHeight: 20 }}>
+            {ERROR_TITLE}
+          </Text>{' '}
+          {ERROR_BODY}
+        </Text>
       ) : null}
       <Cta
         xl={xl}
         enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
         busy={phase.kind === 'creating'}
-        icon={retry ? 'retry' : undefined}
         label={phase.kind === 'creating' ? CREATING_LABEL : retry ? RETRY_LABEL : CREATE_LABEL}
         onPress={retry ? () => void run(form) : onCreate}
       />
@@ -599,7 +594,13 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={ios ? 'padding' : undefined}>
+      {/* The modal ends at the screen's bottom, so the keyboard offset is the sheet's top edge; without it the search field stays under the keyboard. */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={ios ? window.height - sheetBottom : 0}
+        onLayout={(e) => setSheetBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
+      >
         {header}
         {phase.kind === 'limit' ? (
           <>
@@ -615,7 +616,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           searchBody
         ) : (
           <>
-            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[1] }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[1] }}>
               {preview}
               <View style={{ marginBottom: 'auto' }}>
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />

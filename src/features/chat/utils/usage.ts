@@ -4,7 +4,7 @@ import type { ChatItem, ChatState } from '../types'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
-export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} 봇`)
+export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} Bot`)
 
 export const askPlaceholder = (name: string) => `${botSpokenName(name)}에게 물어보기`
 
@@ -39,7 +39,7 @@ export const clearChatConfirm = () => ({
 
 export const deleteBotConfirm = (name: string) => ({
   title: `${botSpokenName(name)}을 삭제할까요?`,
-  body: '이 봇과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.',
+  body: '이 Bot과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.',
   cancel: '취소',
   confirm: '삭제',
 })

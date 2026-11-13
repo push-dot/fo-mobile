@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { StyleSheet, View, useWindowDimensions } from 'react-native'
-import { legalEffectiveLabel, type LegalBlock, type LegalDocument as Document } from '@push/shared'
+import { LEGAL_OPERATOR, legalEffectiveLabel, type LegalBlock, type LegalDocument as Document } from '@push/shared'
 import { Text } from '@/shared/components'
 import { radius, spacing, type, useColors } from '@/theme'
 
@@ -64,7 +64,9 @@ const LegalDocument = ({ document }: { document: Document }) => (
         {document.title}
       </Text>
       <Text v="c1" color="t3">
-        {legalEffectiveLabel(document)}
+        {document.key === 'termsOfService' && LEGAL_OPERATOR.kind === 'individual'
+          ? `${legalEffectiveLabel(document)} · 운영자 ${LEGAL_OPERATOR.displayName}`
+          : legalEffectiveLabel(document)}
       </Text>
     </View>
     {document.intro.map((block, index) => (

@@ -42,29 +42,26 @@ beforeEach(() => {
 describe('Switch (Android)', () => {
   it('renders a Material 3 switch in theme colors with a TalkBack label', () => {
     const onValueChange = vi.fn()
-    const sw = find(Switch({ value: true, onValueChange, label: '제안 받기' }), 'CSwitch')
+    const sw = find(Switch({ value: true, onValueChange, label: '제안 받기' }), stubs.compose.Switch)
     expect(sw.props.value).toBe(true)
     expect(sw.props.colors).toMatchObject({ checkedTrackColor: c.ac, uncheckedTrackColor: c.fill2 })
     expect(sw.props.modifiers).toContainEqual({ name: 'semantics', arg: { contentDescription: '제안 받기' } })
+    expect(find(sw, stubs.compose.Switch.ThumbContent)).toBeTruthy()
     ;(sw.props.onCheckedChange as (v: boolean) => void)(false)
     expect(onValueChange).toHaveBeenCalledWith(false)
   })
 })
 
 describe('SegmentedControl (Android)', () => {
-  it('renders Material segmented buttons and reports the picked key', () => {
+  it('draws the boards\' track and raised selected pill, and reports the picked key', () => {
     const onChange = vi.fn()
     const tree = SegmentedControl({ items: [{ key: 'a', label: '받은' }, { key: 'b', label: '보낸' }], value: 'b', onChange })
-    const buttons = findAll(find(tree, 'SegmentedRow'), stubs.compose.SegmentedButton)
-    expect(buttons.map((b) => b.props.selected)).toEqual([false, true])
-    expect(findAll(tree, 'CText').map((t) => t.props.children)).toEqual(['받은', '보낸'])
-    expect(buttons[0]!.props.colors).toMatchObject({
-      activeContainerColor: c.bg,
-      activeContentColor: c.t1,
-      inactiveContainerColor: c.fill,
-      inactiveContentColor: c.t3,
-    })
-    ;(buttons[0]!.props.onClick as () => void)()
+    expect(tree.props).toMatchObject({ accessibilityRole: 'tablist', style: { height: 44, backgroundColor: c.fill, borderRadius: 22 } })
+    const tabs = findAll(tree, 'Pressable')
+    expect(tabs.map((t) => (t.props.accessibilityState as { selected: boolean }).selected)).toEqual([false, true])
+    expect((tabs[1]!.props.style as { backgroundColor?: string }).backgroundColor).toBe(c.bg)
+    expect((tabs[0]!.props.style as { backgroundColor?: string }).backgroundColor).toBeUndefined()
+    ;(tabs[0]!.props.onPress as () => void)()
     expect(onChange).toHaveBeenCalledWith('a')
   })
 })

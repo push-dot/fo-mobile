@@ -6,9 +6,9 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - tapOn: "봇"
+      - tapOn: "Bot"
       - extendedWaitUntil:
-          visible: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
+          visible: "(동의하고 시작하기|새 회사 Bot 만들기|Push Bot)"
           timeout: 6000
 - runFlow:
     when:
@@ -18,9 +18,9 @@ tags:
       - extendedWaitUntil:
           notVisible: "동의하고 시작하기"
           timeout: 10000
-# consent-on seeds 참고 데이터 제공 (the mock starts it off, so the chat would open behind its sheet);
+# bot:push:empty clears the Push Bot history (the fixture has an older chat, so no chips would show); consent-on seeds 참고 데이터 제공 (the mock starts it off, so the chat would open behind its sheet);
 # tap 동의하고 시작하기 when the sheet still comes up, so every tour reaches the chat.
-- openLink: push://bots/push?mock=consent-on
+- openLink: push://bots/push?mock=consent-on,bot:push:empty
 - extendedWaitUntil:
     visible: "(동의하고 시작하기|공고 링크로 맞추기)"
     timeout: 10000

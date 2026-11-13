@@ -44,7 +44,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         }}
       >
         <Button
-          label="봇으로 맞추기"
+          label="Bot한테 보내기"
           variant="secondary"
           onPress={() => {
             void findBotForPosting(id).then(

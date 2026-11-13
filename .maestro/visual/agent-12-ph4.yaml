@@ -24,7 +24,7 @@ tags:
 - tapOn: "프로필 사진 넣기"
 - takeScreenshot: ChatPh4Design
 # ChatPh5 draws the running save under the 클래식으로 만들기 line alone, so it jumps there in a fresh conversation (the run holds for a minute).
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:

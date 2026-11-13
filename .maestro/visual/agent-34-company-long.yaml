@@ -1,0 +1,20 @@
+appId: app.push.mobile
+name: 회사 봇 · 채팅 헤더 · 긴 회사 이름
+tags:
+  - visual
+---
+# bots:long names 누리클라우드 after the 판교캠퍼스 branch (AgentHomeLong), so its header pill shows the long name.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=bots:long,consent-on"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-nuri
+- extendedWaitUntil:
+    visible: ".*누리클라우드 플랫폼엔지니어링코리아.*"
+    timeout: 15000
+- extendedWaitUntil:
+    visible: "메시지.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeaderLong

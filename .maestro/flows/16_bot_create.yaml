@@ -5,7 +5,7 @@ name: 공고에서 회사 봇 만들기 → 그 채팅
 - runFlow: _dismiss_logbox.yaml
 - openLink: push://bots/new?mock=consent-on
 - extendedWaitUntil:
-    visible: "봇 만들기"
+    visible: "Bot 만들기"
     timeout: 20000
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "새벽"
@@ -18,6 +18,6 @@ name: 공고에서 회사 봇 만들기 → 그 채팅
     timeout: 10000
 - tapOn: "만들기"
 - extendedWaitUntil:
-    visible: "새벽마켓 봇에게 물어보기"
+    visible: "새벽마켓 Bot에게 물어보기"
     timeout: 20000
 - assertVisible: "새벽마켓"

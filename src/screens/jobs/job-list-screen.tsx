@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
 import { useEffect } from 'react'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 import { FILTER_KEYS, POSTING_SORTS, PostingGrid, chipText, formatCount, isEmpty, toQuery, useJobListStore, usePostingPages, EMPTY } from '@/features/jobs'
-import { Chip, GlassButton, Icon, Menu, Skeleton, Text, TopBar } from '@/shared/components'
+import { Chip, ChipRow, GlassButton, Icon, Menu, Skeleton, Text, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
+
 
 const JobListScreen = () => {
   const c = useColors()
@@ -20,12 +21,12 @@ const JobListScreen = () => {
 
   const header = (
     <View style={{ backgroundColor: c.bg }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
+      <ChipRow paddingTop={spacing[1]}>
         <Chip label="전체" on={isEmpty(filters)} onPress={() => setFilters(EMPTY)} />
         {FILTER_KEYS.map((k) => (
           <Chip key={k} label={chipText(k, filters)} menu on={filters[k].length > 0} onPress={() => router.push({ pathname: '/job-filter', params: { kind: k } })} />
         ))}
-      </ScrollView>
+      </ChipRow>
       {pages.isPending ? (
         <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[5], paddingBottom: spacing[3] }}>
           <Skeleton width={80} height={12} />

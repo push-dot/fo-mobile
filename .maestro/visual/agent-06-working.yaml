@@ -5,6 +5,8 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
+# run:tailor hold plays the held run for the typed line, so the working line stays up for the screenshot on iOS too.
+- openLink: push://bots/push?mock=run:tailor%20hold
 - runFlow:
     file: _say.yaml
     env:

@@ -3,7 +3,7 @@ import { fileSize } from '@push/shared'
 import type { BotId, BotRef } from '@/features/bots'
 import { formatTime } from '@/shared/utility/picker-date'
 import type { MadeBy, Material, MaterialKind, MaterialSection, MaterialsPage, MaterialTab, SendContext } from '../types'
-import { daysBetween, formatOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
+import { daysBetween, formatOf, hostOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
 
 const hasBatchim = (word: string) => {
   const code = word.charCodeAt(word.length - 1) - 0xac00
@@ -42,7 +42,7 @@ export const searchEmptyTitle = (q: string) => {
 /** Opened from a bot (its profile), 보내기 attaches there; from the bot home it asks for a bot. */
 export const sendContextOf = (forBot: string | undefined): SendContext => (forBot ? { from: 'bot', botId: forBot as BotId } : { from: 'home' })
 
-const botName = (bot: BotRef) => (bot.kind === 'push' ? bot.name : `${bot.name} 봇`)
+const botName = (bot: BotRef) => (bot.kind === 'push' ? bot.name : `${bot.name} Bot`)
 
 /** 만든 곳. A bot deleted since has no name to print, so the row hides. */
 const madeByFact = (madeBy: MadeBy): string | null => (madeBy.by === 'user' ? '직접 올림' : madeBy.bot && botName(madeBy.bot))
@@ -94,7 +94,7 @@ const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: 
     ]),
   link: (m, _usedBy, now) =>
     facts([
-      ['주소', m.url],
+      ['주소', hostOf(m.url)],
       ['종류', LINK_LABEL[m.linkKind]],
       ['추가', monthDay(m.addedAt)],
       ['마지막 확인', m.lastCheck && checkedFact(m.lastCheck, now)],
@@ -114,7 +114,7 @@ export const deleteCopy = (m: Material) => {
   const noun = NOUN[m.kind]
   return {
     title: `‘${title}’${hasBatchim(title) ? '을' : '를'} 삭제할까요?`,
-    body: `삭제하면 어느 봇에서도 이 ${noun}를 쓸 수 없어요. 지운 ${noun}는 30일 동안 보관된 뒤 완전히 지워지고, 이미 나눈 대화 내용은 그대로 남아요.`,
+    body: `삭제하면 어느 Bot에서도 이 ${noun}를 쓸 수 없어요. 지운 ${noun}는 30일 동안 보관된 뒤 완전히 지워지고, 이미 나눈 대화 내용은 그대로 남아요.`,
     done: `${noun}를 삭제했어요`,
     failed: `${noun}를 삭제하지 못했어요`,
   }

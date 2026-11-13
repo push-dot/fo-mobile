@@ -56,7 +56,6 @@ const CheckRow = ({ label, sub, on, onPress }: { label: string; sub: string; on:
 }
 
 const DocToProfileSheetScreen = () => {
-  const c = useColors()
   const { id } = useLocalSearchParams<{ id: string }>()
   const query = useResumeDraft(id)
   const draft = query.data?.profile
@@ -99,9 +98,6 @@ const DocToProfileSheetScreen = () => {
             alignItems: 'center',
             gap: spacing[2],
             paddingVertical: spacing[3],
-            paddingHorizontal: spacing[4],
-            borderRadius: 14,
-            backgroundColor: c.orangeSoft,
           }}
         >
           <Text v="c1" weight="800" color="orange">

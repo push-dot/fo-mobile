@@ -67,7 +67,7 @@ describe('mock data drawn on the design boards', () => {
 
   it('lets the phone code pick the outcome', async () => {
     const verify = (code: string) =>
-      fetchJson<{ error?: { code: string }; data?: { accessToken: string } }>('auth/phone/verify', {
+      fetchJson<{ error?: { code: string; details?: unknown }; data?: { accessToken: string } }>('auth/phone/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: '+821012345678', code }),
@@ -75,7 +75,18 @@ describe('mock data drawn on the design boards', () => {
     expect((await verify('482111')).error?.code).toBe('PHONE_CODE_INVALID')
     expect((await verify('482222')).error?.code).toBe('PHONE_CODE_EXPIRED')
     expect((await verify('482333')).error?.code).toBe('RATE_LIMITED')
+    expect((await verify('482666')).error).toMatchObject({ code: 'PHONE_ALREADY_REGISTERED', details: { existingProviders: ['google', 'github'] } })
     expect((await verify('482915')).data?.accessToken).toBeTruthy()
+  })
+
+  it('opens the phone screen as after a Google sign-in', async () => {
+    const { pendingSocialPhone } = await import('../home')
+    const { usePhoneAuth } = await import('../../features/auth/stores')
+    const { emailFromPendingToken } = await import('../../features/auth/utils/auth-flow')
+    pendingSocialPhone()
+    const draft = usePhoneAuth.getState()
+    expect(draft).toMatchObject({ mode: 'social', email: 'seojun.kim@gmail.com', provider: 'google' })
+    expect(emailFromPendingToken(draft.pendingToken!)).toBe('seojun.kim@gmail.com')
   })
 
   it('leaves no 오늘 notifications after 모두 읽음', async () => {

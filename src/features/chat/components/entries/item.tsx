@@ -402,7 +402,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
           <Text color="t3">→</Text>
         </>
       ) : null}
-      <FitNum size="big" color="acText" rowDrop>{item.score.toFixed(1)}</FitNum>
+      <FitNum size="big" color="t1" rowDrop>{item.score.toFixed(1)}</FitNum>
     </View>
   ) : item.from !== undefined ? (
     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
@@ -411,7 +411,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
       </Text>
       <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>
       <Text color="t3">→</Text>
-      <FitNum size="mid" color="acText">{item.score.toFixed(1)}</FitNum>
+      <FitNum size="mid" color="t1">{item.score.toFixed(1)}</FitNum>
       <View style={{ flex: 1 }} />
       {item.delta ? <Badge label={item.delta} tone="green" /> : null}
     </View>
@@ -672,6 +672,8 @@ const ItemComponent = ({
       // The credit banner above the composer says it; the refused turn leaves no line of its own.
       return isUsageExhausted(item.code) ? null : item.code === 'PLAN_REQUIRED' ? (
         <PlanRequired />
+      ) : item.reason ? (
+        <Notice notice={{ kind: 'error', code: item.code, reason: item.reason }} />
       ) : (
         <ErrorLine text={item.text} />
       )

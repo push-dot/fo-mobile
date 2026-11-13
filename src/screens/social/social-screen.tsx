@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
-import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native'
+import { ActivityIndicator, FlatList, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
-import { Chip, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Chip, ChipRow, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const SocialScreen = () => {
@@ -32,20 +32,16 @@ const SocialScreen = () => {
                 },
               ]}
             />
-            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
+            <GlassButton actions={[{ icon: 'plus', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
           </>
         }
       />
       <View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[2] }}
-        >
+        <ChipRow paddingTop={spacing[1]} paddingBottom={spacing[2]}>
           {POST_CATEGORIES.map((cat) => (
             <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
           ))}
-        </ScrollView>
+        </ChipRow>
       </View>
       <FlatList
         data={posts}

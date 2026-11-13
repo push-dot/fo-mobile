@@ -6,13 +6,13 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=consent-on"
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:thread"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - tapOn:
     text: "자료"
     index: 0
@@ -21,7 +21,7 @@ tags:
     timeout: 20000
 - tapOn: "김서준_백엔드_이력서.pdf 보내기"
 - extendedWaitUntil:
-    visible: "어느 봇에게 보낼까요?"
+    visible: "어느 Bot한테 보낼까요?"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotPick
@@ -33,7 +33,7 @@ tags:
 - takeScreenshot: BotPickSent
 - openLink: push://bots/b-moa/profile
 - extendedWaitUntil:
-    visible: "허용한 사이트"
+    visible: "허용한 사이트.*"
     timeout: 10000
 - tapOn: "자료.*"
 - extendedWaitUntil:
