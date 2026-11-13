@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const nav = vi.hoisted(() => ({ push: vi.fn(), dismissTo: vi.fn() }))
 const drafts = vi.hoisted(() => ({ byBot: {} as Record<string, string> }))
+const toast = vi.hoisted(() => vi.fn())
 vi.mock('expo-router', () => ({ router: nav }))
+vi.mock('@/shared/components/toast-store', () => ({ showToast: toast }))
 vi.mock('@/features/chat', () => ({ attach: (id: string, a: { title: string }) => void (drafts.byBot[id] = a.title) }))
 // The bots barrel pulls in React Native; the route builders are the part under test.
 vi.mock('@/features/bots', () => import('../../bots/utils/paths'))
@@ -24,6 +26,7 @@ beforeEach(() => {
 describe('send a material to a bot', () => {
   it('from the bot home asks which bot and attaches nothing yet', () => {
     sendMaterial({ from: 'home' }, file)
+    expect(toast).not.toHaveBeenCalled()
     expect(nav.push).toHaveBeenCalledWith('/bots/pick?kind=file&id=f1')
     expect(drafts.byBot).toEqual({})
   })
@@ -33,6 +36,7 @@ describe('send a material to a bot', () => {
     expect(Object.keys(drafts.byBot)).toEqual(['b1'])
     expect(drafts.byBot.b1).toBe('a.pdf')
     expect(nav.dismissTo).toHaveBeenCalledWith('/bots/b1')
+    expect(toast).toHaveBeenCalledWith({ message: '자료를 붙였어요', tone: 'success' })
   })
 
   it('the picked company bot gets the chip and its chat opens over the home', () => {
@@ -40,6 +44,7 @@ describe('send a material to a bot', () => {
     expect(Object.keys(drafts.byBot)).toEqual(['b2'])
     expect(nav.dismissTo).toHaveBeenCalledWith('/(app)/(stack)/(tabs)/(bots)/bots')
     expect(nav.push).toHaveBeenCalledWith('/bots/b2')
+    expect(toast).toHaveBeenCalledWith({ message: '자료를 붙였어요', tone: 'success' })
   })
 
   it('the Push Bot opens by its address, the chip is under its id', () => {

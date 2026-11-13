@@ -14,9 +14,9 @@ name: 봇 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
     commands:
       - tapOn: "동의하고 시작하기"
 - extendedWaitUntil:
-    visible: "모아페이"
+    visible: ".*모아페이 봇.*"
     timeout: 10000
-- tapOn: "모아페이"
+- tapOn: ".*모아페이 봇.*"
 - extendedWaitUntil:
     visible: "메시지.*"
     timeout: 15000

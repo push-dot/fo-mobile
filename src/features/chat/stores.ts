@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode, type BotContract, type ChatIntent } from '@push/api-client'
-import type { Attachment, BotId } from '@/features/bots'
+import type { Attachment, AttachmentKind, BotId } from '@/features/bots'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
@@ -28,7 +28,7 @@ export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(()
 
 export const LOCAL_DRAFT = 'local'
 
-type Draft = { text: string; file?: PickedFile; chip?: string }
+type Draft = { text: string; file?: PickedFile; chip?: string; chipKind?: AttachmentKind }
 
 const EMPTY_DRAFT: Draft = { text: '' }
 
@@ -64,14 +64,14 @@ export const appendDraftText = (id: string, text: string) => {
 export const attachDraftFile = (id: string, file: PickedFile) => {
   useDraftStore.setState((s) => {
     const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined } } }
+    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined, chipKind: undefined } } }
   })
 }
 
-export const attachDraftChip = (id: string, chip: string) => {
+export const attachDraftChip = (id: string, chip: string, chipKind: AttachmentKind) => {
   useDraftStore.setState((s) => {
     const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, chip, file: undefined } } }
+    return { byBot: { ...s.byBot, [id]: { ...current, chip, chipKind, file: undefined } } }
   })
 }
 
@@ -89,7 +89,7 @@ export const detachDraft = (id: string) => {
 
 export const clearDraft = (id: string) => writeDraft(id, undefined)
 
-export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title)
+export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title, attachment.kind)
 
 type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 

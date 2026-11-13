@@ -14,5 +14,5 @@ export const SEARCH_EMPTY = '검색 결과가 없어요'
 export const SEARCH_CLOSE = '검색 닫기'
 export const HERO_NAME = 'Push Bot'
 export const FIRST_SCREEN = 8
-export const LIST_BOTTOM = 120
+export const LIST_BOTTOM = 150
 export const TAB_CLEARANCE = 84
