@@ -5,6 +5,8 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
+# run:tailor hold holds the working line on iOS too (the typed line is the board's own); run: with no token ends it again below.
+- openLink: push://bots/push?mock=run:tailor%20hold
 - runFlow:
     file: _say.yaml
     env:
@@ -19,6 +21,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*작업을 중지했어요.*"
     timeout: 5000
+- openLink: push://bots/push?mock=run:
 - runFlow:
     file: _say.yaml
     env:
