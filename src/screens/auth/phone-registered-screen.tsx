@@ -64,8 +64,8 @@ const PhoneRegisteredScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3], gap: 10 }}>
-        <Text accessibilityRole="header" v="h1">
+      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3], gap: spacing[2] }}>
+        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
           {REGISTERED_TITLE}
         </Text>
         <Text v="b2" color="t2">
