@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 자료 → 서류 삭제 → 되돌리기 → 자료 없음 → 서류 올리기
+name: 자료 → 서류 삭제 → 되돌리기 → 검색 → 자료 없음 → 서류 올리기
 ---
 # The bot home has no entry to the modal yet (A14 adds it), so the flow opens it by deep link.
 - runFlow: _login.yaml
@@ -34,6 +34,20 @@ name: 자료 → 서류 삭제 → 되돌리기 → 자료 없음 → 서류 올
 - assertNotVisible: "서류로 들어가기"
 - takeScreenshot: 09_materials_delete_undo_empty-04
 
+# 자료 검색 rides above the keyboard. Behind the keyboard, the clear tap lands on a key and the list stays filtered.
+- tapOn: "자료 검색.*"
+- inputText: "github"
+- extendedWaitUntil:
+    notVisible: "김서준_백엔드_이력서.pdf 자세히"
+    timeout: 10000
+- assertVisible: "김서준 GitHub 자세히"
+- takeScreenshot: 09_materials_delete_undo_empty-05
+- tapOn: "검색어 지우기"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 자세히"
+    timeout: 10000
+- assertNotVisible: "검색어 지우기"
+
 # The modal asks again each time it opens, so a fixture switch shows on the next open.
 - tapOn: "닫기"
 - extendedWaitUntil:
@@ -44,9 +58,9 @@ name: 자료 → 서류 삭제 → 되돌리기 → 자료 없음 → 서류 올
     visible: "아직 자료가 없어요"
     timeout: 20000
 - assertVisible: "0개"
-- takeScreenshot: 09_materials_delete_undo_empty-05
+- takeScreenshot: 09_materials_delete_undo_empty-06
 - tapOn: "서류 올리기"
 - extendedWaitUntil:
     visible: "서류 가져오기"
     timeout: 10000
-- takeScreenshot: 09_materials_delete_undo_empty-06
+- takeScreenshot: 09_materials_delete_undo_empty-07
