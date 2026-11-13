@@ -10,6 +10,7 @@ import {
   headerAction,
   isUsageExhausted,
   onboardingGreeting,
+  threadGreeting,
   planRequired,
   withMaterial,
 } from '../utils/usage'
@@ -103,6 +104,11 @@ describe('bot header and onboarding', () => {
     expect(deleteBotConfirm('모아페이').confirm).toBe('삭제')
     expect(onboardingGreeting('company', '모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요. 무엇부터 할까요?')
     expect(onboardingGreeting('push', 'Push Bot')).toBe('안녕하세요. Push Bot이에요. 공고 찾기부터 서류, 지원까지 함께 챙길게요. 무엇부터 할까요?')
+  })
+
+  it('keeps the company greeting above the thread as the board draws it', () => {
+    expect(threadGreeting('모아페이', '백엔드 엔지니어')).toBe('안녕하세요. 모아페이 봇이에요. 이 회사 백엔드 엔지니어 공고를 기준으로 서류를 챙길게요.')
+    expect(threadGreeting('모아페이')).toBe('안녕하세요. 모아페이 봇이에요.')
   })
 
   it('appends material text onto one draft', () => {

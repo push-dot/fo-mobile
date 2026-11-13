@@ -19,13 +19,15 @@ const Onboarding = ({
   name,
   postingTitle,
   onChip,
+  top = 0,
 }: {
   kind: 'push' | 'company'
   name: string
   postingTitle?: string | null
   onChip: (key: string) => void
+  top?: number
 }) => (
-  <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingVertical: spacing[4], gap: spacing[4] }} keyboardShouldPersistTaps="handled">
+  <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingTop: top + spacing[4], paddingBottom: spacing[4], gap: spacing[4] }} keyboardShouldPersistTaps="handled">
     <Text v="b1">
       {onboardingGreeting(kind, name, postingTitle)}
     </Text>

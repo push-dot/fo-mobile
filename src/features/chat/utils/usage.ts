@@ -45,6 +45,10 @@ export const onboardingGreeting = (kind: 'push' | 'company', name: string, posti
   return `안녕하세요. ${botSpokenName(name)}이에요. ${job}무엇부터 할까요?`
 }
 
+/** The first line that stays above a company bot's thread once the conversation starts (ChatBotStatus*). */
+export const threadGreeting = (name: string, postingTitle?: string | null) =>
+  `안녕하세요. ${botSpokenName(name)}이에요.${postingTitle ? ` 이 회사 ${postingTitle} 공고를 기준으로 서류를 챙길게요.` : ''}`
+
 export type DraftText = { text: string }
 
 export const withMaterial = <T extends DraftText>(drafts: Record<string, T>, id: string, text: string, blank: T): Record<string, T> => {

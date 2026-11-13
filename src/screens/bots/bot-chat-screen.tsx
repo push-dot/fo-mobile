@@ -28,6 +28,7 @@ import {
   followScroll,
   headerLightOf,
   openBot,
+  threadGreeting,
   retryApproval,
   quickStartPath,
   send,
@@ -120,10 +121,13 @@ const Thread = ({ id }: { id: string }) => {
   const placeholder = composerPlaceholder(chat, name)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
-  const data = [...chat.items].reverse()
+  const greeting: ChatItem[] =
+    !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
+  const data = [...chat.items].reverse().concat(greeting)
 
   const find = useFind(id)
   const limit = useChatLimit(chat.items)
+  const [headerH, setHeaderH] = useState(0)
   const [atBottom, setAtBottom] = useState(true)
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
@@ -181,14 +185,16 @@ const Thread = ({ id }: { id: string }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      {find.open ? (
-        <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
-      ) : (
-        <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} onFind={find.show} />
-      )}
+      <View onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 }}>
+        {find.open ? (
+          <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
+        ) : (
+          <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} onFind={find.show} />
+        )}
+      </View>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {empty && kind && name ? (
-        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} onChip={(key) => router.push(quickStartPath(key))} />
+        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} onChip={(key) => router.push(quickStartPath(key))} />
       ) : (
       <View style={{ flex: 1 }}>
       <FindHighlight.Provider value={find.highlight}>
@@ -210,10 +216,11 @@ const Thread = ({ id }: { id: string }) => {
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
+        ListFooterComponent={<View style={{ height: headerH }} />}
         ListHeaderComponent={
           chat.queue.length || showPanel ? (
             <View style={{ gap: 18 }}>
-              {showPanel ? <WaitingLine approval={chat.approval!} /> : null}
+              {showPanel ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}
@@ -251,9 +258,9 @@ const Thread = ({ id }: { id: string }) => {
             onShortcut={(qs) => router.push(quickStartPath(qs.key))}
             above={
               chat.working ? (
-                <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} />
+                <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} color={color} />
               ) : chat.awaiting ? (
-                <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} />
+                <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
               ) : null
             }
           />
