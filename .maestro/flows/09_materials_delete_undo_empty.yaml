@@ -40,7 +40,7 @@ name: 자료 → 서류 삭제 → 되돌리기 → 검색 → 자료 없음 →
 - extendedWaitUntil:
     notVisible: "김서준_백엔드_이력서.pdf 자세히"
     timeout: 10000
-- assertVisible: "김서준 GitHub 자세히"
+- assertVisible: "github.com/seojun-kim 자세히"
 - takeScreenshot: 09_materials_delete_undo_empty-05
 - tapOn: "검색어 지우기"
 - extendedWaitUntil:
