@@ -48,7 +48,7 @@ export const chipText = (key: FilterKey, f: Filters): string => {
   return `${selected[0]} 외 ${selected.length - 1}`
 }
 
-export const SIDOS = ['서울', '경기', '인천', '부산', '대전', '원격'] as const
+export const SIDOS = ['서울', '경기', '인천', '부산', '대전', '원격', '대구', '광주', '울산', '세종', '강원', '제주'] as const
 export const sidoOf = (location: string) => location.split(' ')[0]!
 
 export const toggleRegion = (list: string[], value: string): string[] => {

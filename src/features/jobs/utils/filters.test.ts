@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EMPTY, chipText, toQuery, toggleRegion } from './filters'
+import { EMPTY, SIDOS, chipText, toQuery, toggleRegion } from './filters'
 
 describe('jobs filters', () => {
   it('labels chips in sheet order', () => {
@@ -26,5 +26,9 @@ describe('jobs filters', () => {
     expect(toggleRegion(['서울 강남구', '서울 서초구', '경기 성남시'], '서울')).toEqual(['경기 성남시', '서울'])
     expect(toggleRegion(['서울', '원격'], '서울 강남구')).toEqual(['원격', '서울 강남구'])
     expect(toggleRegion(['서울 강남구'], '서울 강남구')).toEqual([])
+  })
+
+  it('lists the 12 provinces in board order', () => {
+    expect([...SIDOS]).toEqual(['서울', '경기', '인천', '부산', '대전', '원격', '대구', '광주', '울산', '세종', '강원', '제주'])
   })
 })

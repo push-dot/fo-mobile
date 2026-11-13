@@ -487,13 +487,13 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Input
                     label="회사"
                     value={it.company}
-                    invalid={!valid && !it.company.trim()}
+                    invalid={tried && !valid && !it.company.trim()}
                     onChangeText={(t) => set(i, { company: t })}
                   />
                   <Input
                     label="직무"
                     value={it.role}
-                    invalid={!valid && !it.role.trim()}
+                    invalid={tried && !valid && !it.role.trim()}
                     onChangeText={(t) => set(i, { role: t })}
                   />
                   <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
