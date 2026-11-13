@@ -2,8 +2,7 @@ import { router } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { attach } from '@/features/chat'
-import { botChatPath, botPickPath, materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
+import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
 import { Button, Glass, GlassButton, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
@@ -12,22 +11,16 @@ import { spacing, useColors } from '@/theme'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
 import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, UPLOADED, type AddAction } from '../constants'
 import type { Material, MaterialTab, SendContext } from '../types'
-import { toAttachment, totalCount } from '../utils/material-row'
+import { totalCount } from '../utils/material-row'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
 import { useListSize } from './list-size'
+import { sendMaterial } from './send-material'
 import { MaterialItem, SectionTitle } from './material-item'
 import { MaterialsTabs } from './materials-tabs'
 import { MaterialsSearch, useGlassTint, useSearchRoom } from './materials-search'
 
 const HEADER_ROW = 44
 const ios = Platform.OS === 'ios'
-
-/** 보내기: from the bot home it asks for a bot (BotPick); opened from a bot it attaches to that bot's composer and closes. */
-export const sendMaterial = (context: SendContext, m: Material) => {
-  if (context.from === 'home') return router.push(botPickPath(m))
-  attach(context.botId, toAttachment(m))
-  router.dismissTo(botChatPath(context.botId))
-}
 
 /** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
 const runAdd = (action: AddAction) => {
