@@ -17,6 +17,7 @@ import ListTitle from './list-title'
 import Row from './row'
 
 const HIT = 44
+const PUSH_CARD_RADIUS = 24
 const RETRY_H = 32
 const PROGRESS_H = 6
 const EMPTY_ART = 88
@@ -90,7 +91,7 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, date].filter(Boolean).join(', ')}
       onPress={() => router.push(`/docs/push/${doc.id}`)}
-      style={{ width: PUSH_CARD_WIDTH, borderRadius: radius.card, borderWidth: 1, borderColor: c.line, backgroundColor: c.paper, padding: spacing[2] }}
+      style={{ width: PUSH_CARD_WIDTH, borderRadius: PUSH_CARD_RADIUS, borderWidth: 1, borderColor: c.line, backgroundColor: c.paper, padding: spacing[2] }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingTop: spacing[4], paddingHorizontal: spacing[3], paddingBottom: spacing[5] }}>
         <View style={{ flex: 1, minWidth: 0 }}>
@@ -232,6 +233,7 @@ const DocsTab = () => {
           <Button
             label="파일 등록"
             icon="plus"
+            iconSize={20}
             disabled={!!upload}
             onPress={() => router.push('/docs/import')}
           />

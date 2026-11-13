@@ -60,6 +60,7 @@ import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
+const BORDER = 1.5
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
 
@@ -115,10 +116,11 @@ const Input = ({
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
           backgroundColor: c.bg,
-          borderWidth: 1.5,
+          borderWidth: BORDER,
           borderColor: invalid ? c.red : 'transparent',
-          paddingHorizontal: spacing[4],
-          paddingTop: multiline ? spacing[3] : 0,
+          // the 1.5 border is inside the box; the board's field has none, so its 16 / 12 insets shrink by it
+          paddingHorizontal: spacing[4] - BORDER,
+          paddingTop: multiline ? spacing[3] - BORDER : 0,
           fontSize: font.fontSize,
           lineHeight: font.lineHeight,
           letterSpacing: font.letterSpacing,
@@ -157,7 +159,7 @@ const SelectField = ({
           }}
         >
           <Text v="b1">{value}</Text>
-          <Icon name="down" size={18} color="t3" />
+          <Icon name="down" size={16} color="t3" />
         </View>
       </Menu>
     </View>
@@ -227,11 +229,11 @@ const EditBasic = ({ p }: { p: Profile }) => {
             <View
               style={{
                 position: 'absolute',
-                right: -2,
-                bottom: -2,
-                width: 24,
-                height: 24,
-                borderRadius: radius.sm,
+                right: -4,
+                bottom: -4,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
                 backgroundColor: c.t1,
                 borderWidth: 2,
                 borderColor: c.bg,
@@ -242,7 +244,7 @@ const EditBasic = ({ p }: { p: Profile }) => {
               {uploading ? (
                 <ActivityIndicator size="small" color={c.bg} />
               ) : (
-                <Icon name="edit" size={12} color={c.bg} />
+                <Icon name="edit" size={13} color={c.bg} />
               )}
             </View>
           </Pressable>
@@ -456,7 +458,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   onPress={() => moveUp(i)}
                   hitSlop={spacing[3]}
                 >
-                  <Icon name="drag-handle" size={18} color="t4" />
+                  <Icon name="drag-handle" size={18} color="t3" />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
@@ -645,7 +647,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
         {hits.length ? (
           <View
             style={{
-              marginTop: -spacing[2],
+              marginTop: -6,
               borderRadius: radius.card,
               backgroundColor: c.bg2,
               paddingVertical: spacing[1],
@@ -663,9 +665,9 @@ const EditSkills = ({ p }: { p: Profile }) => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: spacing[2],
+                    gap: 10,
                     height: 44,
-                    paddingHorizontal: spacing[3],
+                    paddingHorizontal: 14,
                     borderRadius: radius.sm,
                   }}
                 >
@@ -682,7 +684,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
             })}
           </View>
         ) : null}
-        <Text v="b2" weight="700" style={{ marginTop: spacing[2] }}>
+        <Text v="b2" weight="700" style={{ marginTop: 6 }}>
           내 기술 {skills.length}개
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>

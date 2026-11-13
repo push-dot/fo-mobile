@@ -7,7 +7,7 @@ import { useDocument, useRenameDocument } from '../api/hooks'
 import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, typedTitle } from '../utils'
 
 const CLEAR_SIZE = 24
-const CLEAR_ICON = 14
+const CLEAR_ICON = 12
 
 const DocRenameSheet = ({ id }: { id: string }) => {
   const c = useColors()
