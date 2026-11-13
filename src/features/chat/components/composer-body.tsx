@@ -1,6 +1,6 @@
 import type { AccessMode } from '@push/api-client'
 import type { Ref } from 'react'
-import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
+import { ActivityIndicator, Platform, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
@@ -45,8 +45,10 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const inline = p.layout === 'inline'
   const showTools = !inline && (p.tools ?? true)
+  // ChatBotHeader board: on iOS the tools sit bare on the flat box; Android draws them as fill chips.
+  const toolFill = Platform.OS === 'ios' && !inline ? 'transparent' : c.fill
   const round = { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
-  const chip = { minHeight: 40, paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
+  const chip = { minHeight: 40, paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: toolFill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
   const textType = inline ? type.b1 : type.h3
   if (inline) {
     return (
@@ -58,6 +60,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           placeholder={p.placeholder}
           placeholderTextColor={c.t4}
           multiline
+          lineBreakStrategyIOS="hangul-word"
           maxLength={p.maxLength}
           accessibilityLabel={p.label ?? '메시지'}
           style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor(hasText ? '600' : '400')]}
@@ -85,29 +88,36 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           onPress={p.onClearAttachment ?? (() => undefined)}
           style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, borderRadius: radius.sm, backgroundColor: c.fill, maxWidth: '90%' }}
         >
-          <Icon name="paper" size={16} color="t2" />
+          <Icon name="pdf" size={16} color="t2" />
           <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
             {p.attachment}
           </Text>
           <Icon name="x" size={12} color="t3" />
         </Pressable>
       ) : null}
-      <TextInput
-        ref={inputRef}
-        value={p.value}
-        onChangeText={p.onChangeText}
-        placeholder={p.placeholder}
-        placeholderTextColor={c.t4}
-        multiline
-        editable={!p.disabled}
-        accessibilityLabel={p.label ?? '메시지'}
-        maxLength={p.maxLength}
-        style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
-      />
+      {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
+      <View>
+        {p.value ? null : (
+          <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+            {p.placeholder}
+          </Text>
+        )}
+        <TextInput
+          ref={inputRef}
+          value={p.value}
+          onChangeText={p.onChangeText}
+          multiline
+          lineBreakStrategyIOS="hangul-word"
+          editable={!p.disabled}
+          accessibilityLabel={p.label ?? '메시지'}
+          maxLength={p.maxLength}
+          style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
+        />
+      </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         {showTools ? (
           <>
-            <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: toolFill }]}>
               <Icon name="plus" size={20} />
             </Pressable>
             <Pressable

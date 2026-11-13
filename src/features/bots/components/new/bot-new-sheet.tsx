@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Glass, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
+import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { botErrorKind } from '../../api/errors'
@@ -86,6 +86,7 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
+const CREATING_DIM = 0.7
 const CTA_XL = 64
 const CTA_FONT_XL = 21
 
@@ -115,27 +116,6 @@ const fieldValue = (form: CreateForm) => {
   return ''
 }
 
-const Highlight = ({ text, query }: { text: string; query: string }) => {
-  const needle = query.trim()
-  const at = needle ? text.toLowerCase().indexOf(needle.toLowerCase()) : -1
-  if (at < 0) {
-    return (
-      <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
-        {text}
-      </Text>
-    )
-  }
-  return (
-    <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
-      {text.slice(0, at)}
-      <Text v="b1" weight="700" color="acText" style={{ lineHeight: type.b2.lineHeight }}>
-        {text.slice(at, at + needle.length)}
-      </Text>
-      {text.slice(at + needle.length)}
-    </Text>
-  )
-}
-
 const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean }) => {
   const c = useColors()
   return (
@@ -147,7 +127,7 @@ const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: ()
       pressedFill="acPress"
       onPress={!enabled || busy ? undefined : onPress}
       contentStyle={busy ? { gap: spacing[2] } : undefined}
-      style={{ minHeight: xl ? CTA_XL : CTA, borderRadius: platformTheme.buttonRadius }}
+      style={{ minHeight: xl ? CTA_XL : CTA, borderRadius: platformTheme.buttonRadius, opacity: busy ? CREATING_DIM : 1 }}
     >
       {busy ? <Spinner size={18} color="onFill" /> : null}
       <Text weight="700" numberOfLines={1} allowFontScaling={!xl} style={{ flexShrink: 1, color: enabled ? onAccent : c.t3, fontSize: xl ? CTA_FONT_XL : type.button.fontSize, lineHeight: xl ? 30 : type.button.lineHeight }}>
@@ -171,10 +151,17 @@ const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (ne
   )
 }
 
+const SWATCH_ROW = 6
+
+// BotNew board: 6 + 5, centered, whatever the screen's width.
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
-    {BOT_COLORS.map((name) => (
-      <Swatch key={name} name={name} on={name === color} onPick={onPick} />
+  <View style={{ alignItems: 'center', rowGap: spacing[1] }}>
+    {[BOT_COLORS.slice(0, SWATCH_ROW), BOT_COLORS.slice(SWATCH_ROW)].map((names, i) => (
+      <View key={i} style={{ flexDirection: 'row', columnGap: spacing[2] }}>
+        {names.map((name) => (
+          <Swatch key={name} name={name} on={name === color} onPick={onPick} />
+        ))}
+      </View>
     ))}
   </View>
 )
@@ -436,6 +423,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
+  const card = { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
@@ -486,7 +474,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <>
             {searchIcon}
             <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <Text numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+              <Text color={phase.kind === 'creating' ? 't3' : 't1'} numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
                 {pickedLine(posting)}
               </Text>
             </Pressable>
@@ -506,9 +494,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: keepTop ? 'flex-start' : 'flex-end' }}>
         {phase.kind === 'searching' && query && !asLink(query) && !loading && rows.length === 0 ? <Text color="t3" style={note}>{SEARCH_EMPTY}</Text> : null}
         {showRows
-          ? rows.map((row, i) => (
-              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, i > 0 ? { borderTopWidth: 1, borderTopColor: c.line } : null]}>
-                <Highlight text={pickedLine(row)} query={query} />
+          ? rows.map((row) => (
+              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
+                <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
+                  <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
+                </Text>
                 <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
                   {row.meta}
                 </Text>
@@ -524,7 +514,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {phase.kind === 'linkBad' ? <Text lineBreakStrategyIOS="hangul-word" style={note}>{LINK_BAD}</Text> : null}
         {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
-          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }]}>
+          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, card]}>
             <Text weight="700" numberOfLines={2} style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
               {pickedLine(phase.posting)}
             </Text>
@@ -572,7 +562,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 
   const footer = (
-    <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2], backgroundColor: c.bg }}>
+    <View style={{ gap: spacing[2], paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
       <Cta
         xl={xl}
         enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
@@ -609,7 +599,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           searchBody
         ) : (
           <>
-            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[1] }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[3] }}>
               {preview}
               <View style={{ marginBottom: 'auto' }}>
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />

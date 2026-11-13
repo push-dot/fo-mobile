@@ -3,11 +3,12 @@ name: BotNewLong
 tags:
   - visual
 ---
-# Fixture companies are short. The name clamps at two lines when a company name is long.
+# The board draws a long company name: two lines with an ellipsis above, one line with an ellipsis in the search field. The fixture
+# companies are short, so p-nuri-long (a hidden posting, see mock/postings.ts) carries the long name.
 - runFlow: ../flows/_login.yaml
-- openLink: push://bots/new?posting=p15
+- openLink: push://bots/new?posting=p-nuri-long
 - extendedWaitUntil:
-    visible: "바다물류"
+    visible: ".*플랫폼엔지니어링코리아.*"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLong

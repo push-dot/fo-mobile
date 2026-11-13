@@ -1,12 +1,13 @@
-import { Glass } from '@/shared/components'
-import { radius } from '../../../theme'
+import { View } from 'react-native'
+import { radius, useColors } from '../../../theme'
 import { ComposerBody, type ComposerProps } from './composer-body'
 
-/** iOS: Liquid Glass box, 28px radius. */
+/** iOS: the chat box and the post comment box are flat bg2 with no shadow (ChatBotHeader, PostDetail boards; rule 18: glass is for header buttons). */
 export const Composer = (p: ComposerProps) => {
+  const c = useColors()
   return (
-    <Glass interactive style={{ borderRadius: radius.xl }}>
+    <View style={{ borderRadius: radius.xl, backgroundColor: c.bg2 }}>
       <ComposerBody {...p} />
-    </Glass>
+    </View>
   )
 }

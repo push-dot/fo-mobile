@@ -11,6 +11,7 @@ export {
   openSystemSettings,
   pickDocument,
   pickImage,
+  stubPickImage,
   hapticImpactLight,
   hapticNotify,
   readClipboard,

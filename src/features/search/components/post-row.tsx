@@ -3,9 +3,8 @@ import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Post } from '@push/api-client'
 import { postInfo } from '@/features/social'
-import { Icon, Text } from '../../../shared/components'
+import { Highlight, Icon, Text } from '../../../shared/components'
 import { spacing, useColors } from '../../../theme'
-import Highlight from './highlight'
 
 const PostRow = ({ p, q, onOpen }: { p: Post; q: string; onOpen: () => void }) => {
   const c = useColors()

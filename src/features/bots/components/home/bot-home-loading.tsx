@@ -13,7 +13,7 @@ const BotHomeLoading = ({ chrome, top }: { chrome: HomeChrome; top: number }) =>
   const lines = { flex: 1, gap: spacing[2] }
   const caption = { marginTop: 6 }
   return (
-    <View accessibilityLabel={LOADING_LABEL} style={wrap}>
+    <View accessible accessibilityLabel={LOADING_LABEL} style={wrap}>
       <View style={hero}>
         <Skeleton width={chrome.hero} height={chrome.hero} radius={34} />
         <View style={caption}>

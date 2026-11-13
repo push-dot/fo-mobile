@@ -33,8 +33,10 @@ tags:
       LABEL: "점수 올리기"
       WAIT: ".*올릴 서류.*"
       SHOT: QsBoost
-# QsLink draws the 복사한 링크 row for a link on the clipboard.
-- setClipboard: "https://careers.moapay.co.kr/jobs/1042"
+# QsLink draws the 복사한 링크 row for a link on the clipboard. Maestro setClipboard only fills Maestro's own buffer, never the
+# device pasteboard the sheet reads, so the app writes its own pasteboard (no iOS paste prompt) through this mock link.
+- openLink: push://bots/push?mock=clipboard-link
+- waitForAnimationToEnd
 # The link sheet autofocuses its field, so it goes last and is left open (QsLink).
 - runFlow:
     file: _pill.yaml

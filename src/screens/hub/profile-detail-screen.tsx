@@ -24,7 +24,7 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
           onPress={() => follow.mutate(!following)}
           style={{ height: 44, minWidth: 40, paddingHorizontal: 10, justifyContent: 'center' }}
         >
-          <Text v="b2" weight="700" style={{ color: following ? c.t3 : c.acText }}>
+          <Text v="b2" weight="700" style={{ color: following ? c.t3 : c.t1 }}>
             {following ? '팔로잉' : '팔로우'}
           </Text>
         </Pressable>

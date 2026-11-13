@@ -4,7 +4,7 @@ export type MentionItem = {
   id: string
   title: string
   sub: string
-  kind: 'job' | 'doc' | 'link' | 'shortcut'
+  kind: 'job' | 'doc' | 'link'
   /** Logo initial (jobs) or file tag (docs). */
   tag?: string
 }

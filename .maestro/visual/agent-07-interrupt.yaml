@@ -4,9 +4,9 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 # run:tailor hold holds the working line on iOS too (the typed line is the board's own); run: with no token ends it again below.
-- openLink: push://bots/push?mock=run:tailor%20hold
+- openLink: push://bots/b-moa?mock=run:tailor%20hold
 - runFlow:
     file: _say.yaml
     env:
@@ -21,7 +21,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*작업을 중지했어요.*"
     timeout: 5000
-- openLink: "push://bots/push?mock=run:"
+- openLink: "push://bots/b-moa?mock=run:"
 - runFlow:
     file: _say.yaml
     env:
@@ -30,8 +30,9 @@ tags:
 - extendedWaitUntil:
     visible: ".*경력 수준을 비교하는 중.*"
     timeout: 20000
+# A tap on a bot line opens the Bot's profile, so the keyboard goes down on the user's own bubble.
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
-      TEXT: ".*멈춘 곳부터 이어서 할게요.*"
+      TEXT: ".*자기소개서도 같이 써 줘.*"
 - takeScreenshot: ChatInterrupt

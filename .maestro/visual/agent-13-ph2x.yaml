@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -47,7 +47,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XBlueprints
 # ChatVerifyFail draws the failed check under the 중간 제약으로 line alone, so it jumps there in a fresh conversation (mock token).
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:

@@ -1,0 +1,23 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Opens the 모아페이 company Bot's empty chat. The Flow boards and the company-chat boards draw this Bot (header pill 모아페이, teal mascot),
+# so their tours run here and not in the Push Bot (_agent_tab.yaml). consent-on seeds 참고 데이터 제공; bot:b-moa:empty drops the thread
+# (server and the app's copy) so the chat opens on its greeting and chips; the consent sheet is accepted if it still comes up.
+---
+- openLink: push://bots/b-moa?mock=consent-on,bot:b-moa:empty
+- extendedWaitUntil:
+    visible: "(동의하고 시작하기|적합도 보기)"
+    timeout: 20000
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+      - extendedWaitUntil:
+          notVisible: "동의하고 시작하기"
+          timeout: 10000
+- extendedWaitUntil:
+    visible: "적합도 보기"
+    timeout: 15000
+- waitForAnimationToEnd

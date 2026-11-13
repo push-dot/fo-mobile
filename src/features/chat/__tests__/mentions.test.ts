@@ -10,7 +10,7 @@ const groups: MentionGroup[] = [
       { id: 'd2', kind: 'doc', title: '포트폴리오_결제시스템.pdf', sub: '8월 3일' },
     ],
   },
-  { title: '바로가기', items: [{ id: 's', kind: 'shortcut', title: '캘린더 관리', sub: '' }] },
+  { title: '내 링크', items: [{ id: 'l', kind: 'link', title: '캘린더 관리', sub: '' }] },
 ]
 
 describe('mentions', () => {
@@ -28,7 +28,7 @@ describe('mentions', () => {
   })
 
   it('matches choseong while typing', () => {
-    expect(filterMentions(groups, 'ㅋㄹㄷ').map((g) => g.title)).toEqual(['바로가기'])
+    expect(filterMentions(groups, 'ㅋㄹㄷ').map((g) => g.title)).toEqual(['내 링크'])
   })
 
   it('shows everything for a bare @', () => {

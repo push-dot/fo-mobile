@@ -1,7 +1,7 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
@@ -28,6 +28,7 @@ const ComposeScreen = () => {
   const ready = !!category && title.trim().length > 0 && body.trim().length > 0 && !submit.isPending
 
   const pick = async () => {
+    Keyboard.dismiss()
     const res = await pickImage({ ...POST_IMAGE_OPTIONS, selectionLimit: MAX_IMAGES - images.length })
     if (res.canceled) return
     const ok = acceptedPostImages(res.assets.map(toSocialImage))
@@ -57,10 +58,10 @@ const ComposeScreen = () => {
               카테고리
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
-              <Text v="b1" weight="700" color={category ? 'acText' : 't4'}>
+              <Text v="b1" weight="700" color={category ? 't1' : 't4'}>
                 {category ? categoryLabel(category) : '골라 주세요'}
               </Text>
-              <Icon name="down" size={16} color={category ? 'acText' : 't4'} />
+              <Icon name="down" size={16} color={category ? 't1' : 't4'} />
             </View>
           </View>
         </Menu>
@@ -122,8 +123,8 @@ const ComposeScreen = () => {
           {images.length < MAX_IMAGES ? (
             <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
               <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                <Icon name="plus" size={22} color="acText" />
-                <Text v="c2" weight="700" color="acText">
+                <Icon name="plus" size={22} color="t1" />
+                <Text v="c2" weight="700" color="t1">
                   {images.length}/{MAX_IMAGES}
                 </Text>
               </View>

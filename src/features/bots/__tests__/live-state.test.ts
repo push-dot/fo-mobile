@@ -127,6 +127,13 @@ describe('botRow', () => {
     expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now).accessibilityLabel).toBe('모아페이 Bot, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전')
   })
 
+  it('reads a search hit the way it is drawn: the matched line replaces the last message', () => {
+    const row = botRow(bot({ activity: ACTIVITY.waiting }), undefined, now, '모아페이 · 백엔드 엔지니어')
+    expect(row.line).toBe('모아페이 · 백엔드 엔지니어')
+    expect(row.accessibilityLabel).toBe('모아페이 Bot, 확인 필요, 모아페이 · 백엔드 엔지니어, 10분 전')
+    expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now, '').line).toBe('이 변경을 이력서에 반영할까요?')
+  })
+
   it('follows this session over the list: a stream in progress and a chat open at its bottom', () => {
     const row = botRow(bot({ unread: true }), { streaming: ACTIVITY.working, reading: true }, now)
     expect(row).toMatchObject({ mascot: 'work', line: '경력 섹션 고치는 중', unreadDot: false })

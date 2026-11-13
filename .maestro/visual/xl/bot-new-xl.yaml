@@ -1,0 +1,18 @@
+appId: app.push.mobile
+name: BotNewXL
+tags:
+  - visual
+---
+# Run with the system text size raised (xl/ is a separate run): the sheet's XL sizes apply at a font scale of 1.5 and up, which the
+# normal run never reaches. bots:none leaves 모아페이 without a Bot, so its posting fills the sheet instead of opening that Bot.
+- runFlow:
+    file: ../_login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=bots:none,consent-on"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/new?posting=p1
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewXL

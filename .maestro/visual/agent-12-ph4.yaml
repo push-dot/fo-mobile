@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 # ChatPh4Quality draws the quality check right under 품질 검사로 넘어가기, with no boost card above, so the token jumps there.
 - runFlow:
     file: _say.yaml
@@ -24,7 +24,7 @@ tags:
 - tapOn: "프로필 사진 넣기"
 - takeScreenshot: ChatPh4Design
 # ChatPh5 draws the running save under the 클래식으로 만들기 line alone, so it jumps there in a fresh conversation (the run holds for a minute).
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:

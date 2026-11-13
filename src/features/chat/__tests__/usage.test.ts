@@ -97,6 +97,9 @@ describe('bot header and onboarding', () => {
   it('follows the bot kind and refuses the other destructive row', () => {
     expect(botHeaderMenu('company').map((item) => item.label)).toEqual(['프로필 보기', '채팅에서 찾기', '삭제'])
     expect(botHeaderMenu('push').map((item) => item.label)).toEqual(['프로필 보기', '채팅에서 찾기', '대화 지우기'])
+    // ChatBotHeaderMenu board: an icon on every item, the destructive one last.
+    expect(botHeaderMenu('company').map((item) => item.systemImage)).toEqual(['person', 'magnifyingglass', 'trash'])
+    expect(botHeaderMenu('company').map((item) => item.icon)).toEqual(['user', 'search', 'delete'])
     expect(headerAction('delete', 'company')).toBe('confirm-delete')
     expect(headerAction('delete', 'push')).toBe('noop')
     expect(headerAction('clear', 'push')).toBe('confirm-clear')

@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
 import { useToggleBookmark } from '@/features/jobs/api/hooks'
 import { SECTIONS } from '@/features/jobs/constants'
@@ -17,6 +18,7 @@ const HomeScreen = () => {
   const kinds: SectionKind[] = useHomeSections()
   const [scrolled, setScrolled] = useState(false)
   const [barHeight, setBarHeight] = useState(0)
+  const { top } = useSafeAreaInsets()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {/* The scroll view must be the screen's first child: the native tab bar only minimizes on scroll for the first scroll view in the first-child chain. */}
@@ -24,7 +26,8 @@ const HomeScreen = () => {
         contentInsetAdjustmentBehavior="automatic"
         scrollEventThrottle={64}
         onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
-        contentContainerStyle={{ paddingTop: barHeight, paddingBottom: 32 }}
+        // `automatic` already adds the status-bar inset; the bar's measured height counts it too, so take it off once.
+        contentContainerStyle={{ paddingTop: Math.max(barHeight - top, 0), paddingBottom: 32 }}
       >
         <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2] }}>
           {SHORTCUTS.map((s) => (

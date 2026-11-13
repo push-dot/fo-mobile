@@ -2,14 +2,14 @@ import { Pressable, View } from 'react-native'
 import type { IconName } from '@push/design-system'
 import { radius, useColors, type Colors } from '../../theme'
 import { PRESS_SCALE } from './constants'
-import Icon from './icon'
+import Icon, { type AppIconName } from './icon'
 import Menu from './menu'
 import type { MenuProps } from './menu-action'
 import Text from './text'
 import { useXlChrome } from './xl-chrome'
 
 export type GlassAction = {
-  icon: IconName
+  icon: IconName | AppIconName
   label: string
   onPress?: () => void
   menu?: MenuProps['actions']

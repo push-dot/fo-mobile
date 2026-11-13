@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -17,19 +17,7 @@ tags:
 - takeScreenshot: ChatDoneNext
 - runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDone
-- runFlow: _fresh_chat.yaml
-- runFlow:
-    file: _say.yaml
-    env:
-      KO: "ext-nojob"
-      EN: "ext-nojob"
-- extendedWaitUntil:
-    visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
-    timeout: 30000
-- waitForAnimationToEnd
-- runFlow: _dismiss_next.yaml
-- takeScreenshot: ChatDoneNoJob
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -41,7 +29,7 @@ tags:
 - waitForAnimationToEnd
 - runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDoneSaveFail
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -52,7 +40,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6ResultFile
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -63,3 +51,20 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6ResultFail
+# ChatDoneNoJob draws no company (logo-only pill), so it runs last, in the Push Bot.
+- openLink: push://bots/push?mock=consent-on,bot:push:empty
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 15000
+- waitForAnimationToEnd
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "ext-nojob"
+      EN: "ext-nojob"
+- extendedWaitUntil:
+    visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
+    timeout: 30000
+- waitForAnimationToEnd
+- runFlow: _dismiss_next.yaml
+- takeScreenshot: ChatDoneNoJob

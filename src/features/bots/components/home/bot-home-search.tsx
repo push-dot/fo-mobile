@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, View } from 'react-native'
-import { Mascot, Text } from '@/shared/components'
+import { Highlight, Mascot, Text } from '@/shared/components'
 import { spacing, type } from '../../../../theme'
 import type { Bot, BotSearch, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
@@ -7,7 +7,6 @@ import { rowTime } from '../../utils/row-time'
 import { searchSections } from '../../utils/home-rows'
 import { LIST_BOTTOM, SEARCH_EMPTY, SEARCH_HINT } from './copy'
 import BotHomeRow from './bot-home-row'
-import Highlight from './highlight'
 import type { HomeChrome } from './metrics'
 
 const BotHomeSearch = ({
@@ -77,9 +76,8 @@ const BotHomeSearch = ({
       ) : null}
       {data && !hint
         ? data.bots.map(({ bot, line: match }) => {
-            const row = botRow(bot, local[bot.id], now)
-            const shown = match ? { ...row, line: match } : row
-            return <BotHomeRow key={bot.id} row={shown} chrome={chrome} index={0} held={false} query={trimmed} actions={[]} onPress={() => onOpenBot(bot)} />
+            const row = botRow(bot, local[bot.id], now, match)
+            return <BotHomeRow key={bot.id} row={row} chrome={chrome} index={0} held={false} query={trimmed} actions={[]} onPress={() => onOpenBot(bot)} />
           })
         : null}
       {messageTitle ? (

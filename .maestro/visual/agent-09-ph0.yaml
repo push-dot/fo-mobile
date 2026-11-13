@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -17,7 +17,7 @@ tags:
 - takeScreenshot: ChatPh0
 # Each board below draws one thread under its own user line, not the answers that led to it, so each takes a fresh run (mock tokens;
 # Android types the ASCII alias).
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -28,7 +28,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0Input
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -39,7 +39,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0Start
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:

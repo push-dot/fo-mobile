@@ -1,10 +1,9 @@
 import { Pressable, View } from 'react-native'
-import { Mascot, Text, type MenuAction } from '@/shared/components'
+import { Highlight, Mascot, Text, type MenuAction } from '@/shared/components'
 import { spacing } from '../../../../theme'
 import type { BotRow } from '../../types'
 import { rowMotion } from '../../utils/home-rows'
 import BotRowMenu from './bot-row-menu'
-import Highlight from './highlight'
 import type { HomeChrome } from './metrics'
 
 const BotHomeRow = ({

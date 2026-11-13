@@ -56,6 +56,10 @@ tags:
       - extendedWaitUntil:
           visible: "어떤 일정을 추가할까요?"
           timeout: 10000
+      # The board's 일정 추가하기 is enabled, and the app enables it only with a title; the date and time pickers are native (the owner's rule).
+      - tapOn: "일정 이름"
+      - inputText: "카카오 1차 면접"
+      - runFlow: _hide_kbd.yaml
       - waitForAnimationToEnd
       - takeScreenshot: MyCalendarStates.1
 

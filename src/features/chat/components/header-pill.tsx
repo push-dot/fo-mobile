@@ -83,12 +83,7 @@ const HeaderPill = ({
               {
                 icon: 'more',
                 label: '더 보기',
-                menu: botHeaderMenu(kind).map((item) => ({
-                  key: item.id,
-                  label: item.label,
-                  destructive: item.destructive,
-                  onPress: () => run(item.id),
-                })),
+                menu: botHeaderMenu(kind).map((item) => ({ key: item.id, label: item.label, destructive: item.destructive, systemImage: item.systemImage, icon: item.icon, onPress: () => run(item.id) })),
               },
             ]}
           />

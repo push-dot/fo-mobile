@@ -40,7 +40,7 @@ export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
           <GlassButton
             iconSize={20}
             actions={[
-              { icon: 'up', label: '이전 결과', onPress: () => onStep('older') },
+              { icon: 'chev-up', label: '이전 결과', onPress: () => onStep('older') },
               { icon: 'down', label: '다음 결과', onPress: () => onStep('newer') },
             ]}
           />

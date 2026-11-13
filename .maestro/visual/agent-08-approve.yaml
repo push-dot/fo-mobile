@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+- runFlow: _company_tab.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -21,7 +21,7 @@ tags:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 60000
 # ChatDoneProfile draws the finished run alone (one elapsed line, no 적용 / 확인했어요 bubbles), so it takes its own run (mock token).
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -45,7 +45,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply
 # ChatDoneProfile: the finished card with the sheet closed.
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -57,7 +57,7 @@ tags:
 - runFlow: _dismiss_next.yaml
 - takeScreenshot: ChatDoneProfile
 # ChatPh6Result draws only the closing line and the card under the open gate, so it jumps there in a fresh conversation (mock token).
-- runFlow: _fresh_chat.yaml
+- runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:

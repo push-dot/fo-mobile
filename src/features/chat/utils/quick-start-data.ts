@@ -1,6 +1,7 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
 import { brandColor, careerLabel, cardCareerLabel } from '@push/shared'
 import { dday, givenName, stageTone, timeAgo } from '@/features/my'
+import { palette } from '../../../theme/tokens'
 import type { ChatDoc, QsData, QsItem } from '../api/schemas'
 import type { QuickStart } from '../constants'
 
@@ -33,7 +34,8 @@ const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem
 const person = (id: string, name: string, extra: Partial<QsItem> = {}): QsItem => ({
   id,
   title: name,
-  avatar: { text: givenName(name), color: brandColor(name) },
+  // QsReply / QsCoffee boards: every person avatar is a black circle (rule 3: no colour where it is not needed).
+  avatar: { text: givenName(name), color: palette.light.t1 },
   ...extra,
 })
 

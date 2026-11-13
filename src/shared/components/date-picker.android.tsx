@@ -15,8 +15,8 @@ export type DatePickerProps = {
   mode?: 'date' | 'time' | 'month'
   min?: Date
   max?: Date
-  /** Field background: 'fill' on sheets, 'bg' inside bg2 cards. */
-  surface?: 'fill' | 'bg'
+  /** Field background: 'fill' on sheets, 'bg' inside bg2 cards, 'bg2' inside bg cards. */
+  surface?: 'fill' | 'bg' | 'bg2'
   minHeight?: number
 }
 

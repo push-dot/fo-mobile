@@ -3,9 +3,11 @@ name: 소셜 → 글쓰기 시트
 tags:
   - visual
 ---
-# Photos need the system picker, so the board's 2/4 shows here as 0/4.
+# The board draws the filled sheet: 커리어, a title and a body (게시 on), and two photos (2/4). mock=two-photos makes the next photo pick return
+# two images instead of the system picker (whose labels the app does not set); the pick is the last step, and it lowers the keyboard for the shot.
 - runFlow: ../flows/_login.yaml
 - runFlow: ../flows/_dismiss_logbox.yaml
+- openLink: push://?mock=two-photos
 - tapOn: "소셜"
 - extendedWaitUntil:
     visible: "직장 생활"
@@ -16,5 +18,16 @@ tags:
     timeout: 10000
 - tapOn: "카테고리.*"
 - tapOn: "커리어"
+- waitForAnimationToEnd
+- tapOn:
+    id: "compose-title"
+- inputText: "결제 도메인으로 이직한 후기"
+- tapOn:
+    id: "compose-body"
+- inputText: "정산 배치를 맡으며 배운 것을 정리했어요"
+- tapOn: "사진 추가.*"
+- extendedWaitUntil:
+    visible: "사진 추가, 2/4"
+    timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: ComposeSheet

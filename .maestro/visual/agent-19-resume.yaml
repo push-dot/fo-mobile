@@ -4,12 +4,9 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
-- openLink: push://bots/b-dotori
-- extendedWaitUntil:
-    visible: "메시지.*"
-    timeout: 10000
-- waitForAnimationToEnd
+- runFlow: _company_tab.yaml
+# run:resume-doc plays the interrupted-work scenario for the board's own line (b-dotori used to, but its pill reads 도토리증권).
+- openLink: push://bots/b-moa?mock=run:resume-doc
 - runFlow:
     file: _say.yaml
     env:

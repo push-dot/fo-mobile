@@ -51,12 +51,13 @@ const BotHomeBar = ({
     paddingLeft: spacing[4],
     paddingRight: 6,
     justifyContent: 'center' as const,
-    backgroundColor: Platform.OS === 'ios' ? 'transparent' : c.fill,
+    backgroundColor: c.fill,
   }
   const fill = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2] }
   const input = { flex: 1, fontSize: chrome.control > 44 ? type.h2.fontSize : type.b1.fontSize, color: c.t1, padding: 0, ...fontFor('400') }
   const hint = { fontSize: chrome.control > 44 ? type.h2.fontSize : type.b1.fontSize, lineHeight: chrome.control > 44 ? 26 : type.b2.lineHeight }
-  const shell = (child: ReactNode) => (Platform.OS === 'ios' ? <Glass style={field}>{child}</Glass> : <View style={field}>{child}</View>)
+  // AgentHome board: the search field is a flat grey pill (rule 18); only the folder and close buttons are glass.
+  const shell = (child: ReactNode) => <View style={field}>{child}</View>
   return (
     <View style={row} pointerEvents="box-none">
       {searching ? null : (

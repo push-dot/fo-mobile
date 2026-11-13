@@ -1,4 +1,6 @@
 import { COMPOSER_PLACEHOLDER } from '../composer-placeholder'
+import type { IconName } from '@push/design-system'
+import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
 
@@ -17,15 +19,17 @@ export const chipPlaceholder = (kind: AttachmentKind) => `이 ${CHIP_NOUN[kind]}
 
 export type HeaderMenuId = 'profile' | 'find' | 'clear' | 'delete'
 
-export type HeaderMenuItem = { id: HeaderMenuId; label: string; destructive?: boolean }
+/** ChatBotHeaderMenu board: every item leads with an icon (SF Symbol on iOS, design icon on Android). */
+export type HeaderMenuItem = { id: HeaderMenuId; label: string; destructive?: boolean; systemImage: NonNullable<MenuAction['systemImage']>; icon: IconName }
 
-const PROFILE = { id: 'profile', label: '프로필 보기' } as const
-const FIND = { id: 'find', label: '채팅에서 찾기' } as const
+const PROFILE = { id: 'profile', label: '프로필 보기', systemImage: 'person', icon: 'user' } as const
+const FIND = { id: 'find', label: '채팅에서 찾기', systemImage: 'magnifyingglass', icon: 'search' } as const
+const TRASH = { systemImage: 'trash', icon: 'delete', destructive: true } as const
 
 export const botHeaderMenu = (kind: 'push' | 'company'): HeaderMenuItem[] =>
   kind === 'push'
-    ? [PROFILE, FIND, { id: 'clear', label: '대화 지우기', destructive: true }]
-    : [PROFILE, FIND, { id: 'delete', label: '삭제', destructive: true }]
+    ? [PROFILE, FIND, { id: 'clear', label: '대화 지우기', ...TRASH }]
+    : [PROFILE, FIND, { id: 'delete', label: '삭제', ...TRASH }]
 
 export const headerAction = (id: HeaderMenuId, kind: 'push' | 'company') => {
   if (id === 'clear') return kind === 'push' ? 'confirm-clear' : 'noop'

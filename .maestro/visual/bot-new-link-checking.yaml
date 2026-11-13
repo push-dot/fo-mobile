@@ -10,9 +10,7 @@ tags:
     timeout: 20000
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "careers.moapay.co.kr/jobs/1042"
-- extendedWaitUntil:
-    visible: "careers.moapay.co.kr/jobs.*"
-    timeout: 20000
+- runFlow: _link_wait.yaml
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLinkChecking
 - openLink: push://?mock=reset

@@ -29,8 +29,35 @@ tags:
     visible: "추천 프로필"
     timeout: 10000
 - assertNotVisible: ".*김태윤.*"
-# The board draws the loading rows under an applied filter, so pick a category first (the chips stay up while the list loads).
+# The board draws the loading rows under the same filters as Hub (개발·데이터, 3–5년, 이직/구직중: filter badge 2), so apply them first;
+# the chips and the sheet stay up while the list loads. The sheet's button has no count yet (the count comes from the held list).
 - tapOn: "개발"
+- tapOn: "데이터"
+- tapOn: "필터"
+- extendedWaitUntil:
+    visible: "재직 기간"
+    timeout: 10000
+- tapOn: "3.5년"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "이직/구직중"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          text: "이직/구직중"
+          below: "커리어 상태"
+- waitForAnimationToEnd
+- runFlow:
+    file: ../flows/_tap_sheet_button.yaml
+    env:
+      TEXT: "프로필 .*보기"
+- extendedWaitUntil:
+    notVisible: "재직 기간"
+    timeout: 10000
 - assertNotVisible: ".*김태윤.*"
 - waitForAnimationToEnd
 - takeScreenshot: HubLoading

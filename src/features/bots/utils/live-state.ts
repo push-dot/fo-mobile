@@ -46,10 +46,11 @@ const lineOf = ({ activity, outcome }: Facts, bot: Bot): string => {
 /** AgentHomeRowExpiredFailed: the expired row is read without a state word, the failed one as 확인 필요. */
 const spokenOf = (mascot: MascotState, facts: Facts) => (mascot === 'idle' && facts.outcome?.kind === 'expired' && facts.activity.phase === 'idle' ? '' : undefined)
 
-export const botRow = (bot: Bot, local: LocalActivity | undefined, now: Date): BotRow => {
+/** `shown` replaces the row's line (a search hit) and the spoken label follows what is drawn. */
+export const botRow = (bot: Bot, local: LocalActivity | undefined, now: Date, shown?: string): BotRow => {
   const facts = mergeFacts(bot, local, now)
   const mascot = mascotStateOf(facts)
-  const line = lineOf(facts, bot)
+  const line = shown || lineOf(facts, bot)
   const time = rowTime(bot.lastActivityAt, now)
   return {
     id: bot.id,

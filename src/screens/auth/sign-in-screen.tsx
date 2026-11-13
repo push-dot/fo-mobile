@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Pressable, useWindowDimensions, View } from 'react-native'
+import { Alert, Platform, Pressable, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import {
@@ -81,7 +81,8 @@ const SignInScreen = () => {
       </View>
 
       <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 24, gap: spacing[3] }}>
-        <ProviderButton label={GOOGLE_START} logo={GOOGLE} bg={c.card} fg={c.t1} border={c.line} disabled={busy} onPress={() => run('google')} />
+        {/* SignIn board: iOS Google is a borderless grey pill, Android keeps the outlined card. */}
+        <ProviderButton label={GOOGLE_START} logo={GOOGLE} bg={Platform.OS === 'ios' ? c.fill : c.card} fg={c.t1} border={Platform.OS === 'ios' ? undefined : c.line} disabled={busy} onPress={() => run('google')} />
         {apple ? (
           <ProviderButton label={APPLE_START} logo={APPLE} bg={c.t1} fg={c.bg} disabled={busy} onPress={() => run('apple')} />
         ) : null}
