@@ -37,6 +37,12 @@ tags:
 - assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
 - takeScreenshot: PlanUltra
+# PlanUltraNotice: the same page scrolled to the 구독 안내 lines (credits-out leaves payments open, so 구매 복원 stays).
+- scrollUntilVisible:
+    element: ".*미성년자가 법정대리인.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: PlanUltraNotice
 - tapOn: "뒤로"
 - tapOn: "닫기"
 - openLink: push://bots/push
