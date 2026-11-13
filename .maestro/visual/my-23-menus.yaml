@@ -58,7 +58,7 @@ tags:
     visible: "댓글 단 글"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: MyPostsAllMenuNoSort
+- takeScreenshot: MyPostsAllMenu
 
 # The archive and file delete routes fail from the start: the Push document keeps its failure toast, and an uploaded file comes back to the list with the toast DeleteDocFail draws.
 - runFlow:
