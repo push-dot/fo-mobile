@@ -6,16 +6,17 @@ import { attach } from '@/features/chat'
 import { botChatPath, botPickPath, materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
-import { Button, Glass, GlassButton, SegmentedControl, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
+import { Button, Glass, GlassButton, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
 import { sheetHeaderTop } from '@/shared/navigation'
 import { spacing, useColors } from '@/theme'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
-import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, TABS, UPLOADED, type AddAction } from '../constants'
+import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, UPLOADED, type AddAction } from '../constants'
 import type { Material, MaterialTab, SendContext } from '../types'
 import { toAttachment, totalCount } from '../utils/material-row'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
 import { useListSize } from './list-size'
 import { MaterialItem, SectionTitle } from './material-item'
+import { MaterialsTabs } from './materials-tabs'
 import { MaterialsSearch, useGlassTint, useSearchRoom } from './materials-search'
 
 const HEADER_ROW = 44
@@ -171,7 +172,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
         <GlassButton actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
       </View>
       <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <SegmentedControl items={TABS} value={tab} onChange={setTab} />
+        <MaterialsTabs value={tab} onChange={setTab} />
       </View>
       <View style={{ flex: 1 }}>{body}</View>
       <MaterialsSearch value={text} onChange={setText} />
