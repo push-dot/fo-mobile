@@ -58,3 +58,6 @@ export const LINK_ADD = {
   note: '추가하면 봇이 README와 커밋을 읽어 둬요',
   submit: '추가하기',
 }
+
+export const SEND_PICK_TITLE = '어느 봇에게 보낼까요?'
+export const SEND_PICK_CANCEL = '취소'

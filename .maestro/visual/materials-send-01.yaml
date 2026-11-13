@@ -1,0 +1,49 @@
+appId: app.push.mobile
+name: 자료 보내기 · 봇 고르기 · 고른 봇 채팅 · 봇 프로필에서 연 자료 · 채팅에서 보내기
+tags:
+  - visual
+---
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "새 회사 봇 만들기"
+- tapOn:
+    text: "자료"
+    index: 0
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 보내기"
+    timeout: 20000
+- tapOn: "김서준_백엔드_이력서.pdf 보내기"
+- extendedWaitUntil:
+    visible: "어느 봇에게 보낼까요?"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotPick
+- tapOn: "모아페이"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: BotPickSent
+- openLink: push://bots/b-moa/profile
+- extendedWaitUntil:
+    visible: "허용한 사이트"
+    timeout: 10000
+- tapOn: "자료.*"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf 보내기"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsFromProfile
+- tapOn: "김서준_백엔드_이력서.pdf 보내기"
+- extendedWaitUntil:
+    visible: "김서준_백엔드_이력서.pdf"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsSendHere
