@@ -12,6 +12,7 @@ import {
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
 import { resultTask } from './result-card'
+import { isSiteCard } from './card'
 import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
@@ -20,7 +21,17 @@ const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
 export const errorText = (code?: string, retryAfterSec?: number, reason?: unknown) =>
   code === 'QUEUE_BUSY' ? queueBusyMessage(retryAfterSec, reason) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-type Ask = { id: string; question: string; options: StreamOption[]; multiple?: boolean; warning?: string; hint?: boolean; recommended?: string }
+type Ask = {
+  id: string
+  question: string
+  options: StreamOption[]
+  multiple?: boolean
+  warning?: string
+  hint?: boolean
+  recommended?: string
+  /** Set for a card with a lifetime. `foot` replaces the pick hint, `detail` sits under the question. */
+  tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt' | 'expiresAt'>
+}
 
 const choiceOf = (o: StreamOption): Choice => ({
   label: o.label,
@@ -37,7 +48,7 @@ const autoPicks = (ev: Extract<StreamEvent, { type: 'choice' }>) => {
   return labels.length ? labels.join(', ') : (ev.submit.zeroLabel ?? recommended)
 }
 
-const ask = ({ id, question, options, multiple, warning, hint = true, recommended }: Ask): ChatEvent => {
+const ask = ({ id, question, options, multiple, warning, hint = true, recommended, tool }: Ask): ChatEvent => {
   const first = Math.max(0, options.findIndex((o) => o.id === recommended))
   const approval: Approval = {
     id,
@@ -46,9 +57,28 @@ const ask = ({ id, question, options, multiple, warning, hint = true, recommende
     warning,
     submit: multiple ? MULTI_PICK_SUBMIT : undefined,
     optionIds: options.map((o) => o.id),
-    sections: [{ kind: 'choices', selected: multiple ? [] : [first], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
+    sections: [{ kind: 'choices', selected: multiple || tool?.detail ? [] : [first], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
+    ...(tool ? { confirm: true as const, ...tool } : {}),
   }
   return { type: 'approval', approval }
+}
+
+const timeOf = (iso: string | undefined) => {
+  const ms = iso === undefined ? NaN : Date.parse(iso)
+  return Number.isNaN(ms) ? undefined : ms
+}
+
+/** A tool card's words and times. A stored card has openedAt; a live frame has only its stamp `at`, so the app reads the ask from that. */
+const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id'> => {
+  const stored = ev as { openedAt?: string; at?: string; expiresAt?: string | null }
+  const expiresAt = timeOf(stored.expiresAt ?? undefined)
+  const openedAt = timeOf(stored.openedAt ?? stored.at)
+  // A frame with no stamp (a hand-written script) has no ask time, so it keeps no waiting line.
+  const times = openedAt === undefined ? undefined : { openedAt, ...(expiresAt === undefined ? {} : { expiresAt }) }
+  if (isSiteCard(ev.options.map((o) => o.id))) {
+    return { question: ev.title, options: ev.options, tool: { ...times, ...(ev.summary ? { detail: ev.summary } : {}), ...(ev.foot ? { foot: ev.foot } : {}) } }
+  }
+  return { question: ev.summary || ev.title, options: ev.options, warning: ev.foot, tool: times }
 }
 
 /** The edit card: preview of the change, then 그대로 두기 · 적용 side by side. */
@@ -137,7 +167,7 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
     }
     case 'approval':
       if (ev.kind === 'DOCUMENT_EDIT') return askEdit(ev)
-      return [ask({ id: ev.id, question: ev.summary || ev.title, options: ev.options, warning: ev.foot })]
+      return [ask({ id: ev.id, ...toolCard(ev) })]
     case 'choice': {
       // push-be #224 auto mode still sends sections; the auto line wins.
       if (!ev.auto && ev.sections?.length) return [{ type: 'approval', approval: approvalFromSections(ev) }]

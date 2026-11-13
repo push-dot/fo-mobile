@@ -99,6 +99,11 @@ export type Approval = {
   warning?: string
   detail?: string
   optionIds?: string[]
+  /** A tool asking permission (the wire's `approval`), as opposed to a choice. */
+  confirm?: true
+  /** Server times in ms. A card with no `expiresAt` waits until answered. 다시 요청 replaces both. */
+  openedAt?: number
+  expiresAt?: number
 }
 
 export type Awaiting = 'approval' | 'choice'
@@ -110,6 +115,9 @@ export type ChatEvent =
   | { type: 'token'; text: string }
   | { type: 'approval'; approval: Approval }
   | { type: 'answer'; text: string }
+  | { type: 'retried'; openedAt: number; expiresAt: number }
+  /** The card leaves with no answer bubble: 닫기 on an expired card, or a retry a newer message superseded. */
+  | { type: 'dismiss' }
   | { type: 'queue'; text: string; file?: PickedFile }
   | { type: 'dequeue' }
   | { type: 'stop' }

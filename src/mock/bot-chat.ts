@@ -3,6 +3,7 @@
 // A send answers a short scripted run as a real event stream. Board scenarios replace it in the chat lane.
 import type { BotContract } from '@push/api-client'
 import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
+import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
 import { hasReferenceConsent } from './chat'
 import { findMaterial } from './materials'
 import { postings } from './postings'
@@ -131,6 +132,12 @@ mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   const turn = nextId('t')
   const now = new Date().toISOString()
   f.messages.push({ id: nextId('m'), turn, role: 'USER', text, at: now, attachments })
+  if (text.includes(PAGE_READ_TRIGGER)) {
+    const when = new Date(now)
+    const card = pageReadCard(nextId('card'), turn, f.bot.companyName ?? f.bot.displayName, 'careers.example.com', when)
+    f.cards.push(card)
+    return sse(pageReadFrames(card, turn, when, 0))
+  }
   f.messages.push({ id: nextId('m'), turn, role: 'ASSISTANT', text: REPLY, at: now })
   let seq = 0
   const stamp = { turn, at: now }
