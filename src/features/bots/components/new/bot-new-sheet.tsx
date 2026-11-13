@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
@@ -8,9 +8,9 @@ import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } fr
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
-import { useBots, useCreateBot } from '../../api/hooks'
+import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
 import { BOT_COLORS } from '../../constants'
-import type { BotColor, BotId, BotLimit } from '../../types'
+import type { BotColor, BotId, BotLimit, CompanyBot } from '../../types'
 import {
   asLink,
   beginCreate,
@@ -38,23 +38,25 @@ import {
   type CreateForm,
   type PostingPick,
 } from '../../utils/create-form'
+import { confirmDeleteBot } from '../profile/confirm-delete-bot'
+import { SheetCard } from '../profile/sheet-card'
+import BotLimitDelete from './bot-limit-delete'
 import {
+  CANCEL_LABEL,
   CLOSE_LABEL,
   CONSENT_AGREE,
   CONSENT_BODY,
-  CONSENT_FOOT,
   CONSENT_LATER,
   CONSENT_MORE,
   CONSENT_TITLE,
   CREATE_LABEL,
   CREATING_LABEL,
   CURRENT_PLAN,
+  DELETE_TITLE,
   ERROR_BODY,
   ERROR_TITLE,
   LINK_BAD,
   LINK_FINDING_AFTER_MS,
-  LINK_FOUND_SECTION,
-  LINK_SECTION,
   NAME_PLACEHOLDER,
   ORGANIZE_LABEL,
   RETRY_LABEL,
@@ -66,8 +68,6 @@ import {
   UPGRADE_LABEL,
   XL_FONT_SCALE,
 } from './copy'
-import { GRABBER } from '@/shared/components/constants'
-import { useHardwareBack } from '@/shared/utility'
 import { loadPosting, searchPostings, type PostingRow } from './posting-search'
 
 type Props = {
@@ -218,48 +218,30 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
           </View>
         ))}
       </View>
-      <Text color="t3" style={{ paddingHorizontal: spacing[6], fontSize: type.c2.fontSize, lineHeight: 17 }}>
-        {copy.note}
+    </View>
+  )
+}
+
+// BotNewConsent is the platform's own sheet: the floating iOS sheet, the Android bottom sheet. Back and the scrim close it.
+const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => (
+  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} onClose={onLater}>
+    <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
+      {CONSENT_TITLE}
+    </Text>
+    <Text v="b2" color="t2">
+      {CONSENT_BODY}
+    </Text>
+    <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
+      <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+        {CONSENT_MORE}
       </Text>
     </View>
-  )
-}
-
-const FLOAT_RADIUS = 40
-
-const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => {
-  const c = useColors()
-  const insets = useSafeAreaInsets()
-  const ios = Platform.OS === 'ios'
-  const card = ios
-    ? { margin: spacing[2], borderRadius: FLOAT_RADIUS, paddingHorizontal: spacing[4], paddingTop: spacing[3], paddingBottom: spacing[5] }
-    : { borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: insets.bottom + spacing[3] }
-  return (
-    <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end' }}>
-      <View style={[{ backgroundColor: c.bg, gap: spacing[3] }, card]}>
-        <View style={{ ...(ios ? GRABBER.ios : GRABBER.android), backgroundColor: c.deco, alignSelf: 'center' }} />
-        <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
-          {CONSENT_TITLE}
-        </Text>
-        <Text v="b2" color="t2">
-          {CONSENT_BODY}
-        </Text>
-        <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
-          <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
-            {CONSENT_MORE}
-          </Text>
-        </View>
-        <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
-          <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
-          <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
-        </View>
-        <Text v="c1" color="t3" style={{ textAlign: 'center' }}>
-          {CONSENT_FOOT}
-        </Text>
-      </View>
+    <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
+      <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
+      <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
     </View>
-  )
-}
+  </SheetCard>
+)
 
 const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
@@ -271,15 +253,16 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])
   const [loading, setLoading] = useState(false)
+  const [organizing, setOrganizing] = useState(false)
+  const limitFrom = useRef<PostingPick | null>(null)
   const bots = useBots()
+  const removeBot = useDeleteBot()
   const consent = useReferenceConsent()
   const { create } = useCreateBot()
   const openRef = useRef(onOpenBot)
   useEffect(() => {
     openRef.current = onOpenBot
   }, [onOpenBot])
-  // The consent overlay is a View, not a Modal: back closes it rather than the whole sheet.
-  useHardwareBack(form.consent ? () => setForm(dismissConsent) : null)
   const phase = form.phase
   const searching = searchPhase(form)
   const posting = postingOf(phase)
@@ -386,7 +369,10 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       openRef.current(result.bot.id)
     } catch (error) {
       if (isConsentRequired(error)) setForm(failCreate(base, 'consent'))
-      else if (botErrorKind(error) === 'limit') setForm(failCreate(base, 'limit'))
+      else if (botErrorKind(error) === 'limit') {
+        limitFrom.current = postingOf(base.phase)
+        setForm(failCreate(base, 'limit'))
+      }
       else setForm(failCreate(base, 'error'))
     }
   }
@@ -394,6 +380,29 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const onCreate = () => {
     void run(form)
   }
+
+  // BotNewError: the platform's alert, not a box drawn in the screen. 다시 시도 creates again; the 만들기 button below does the same.
+  const failed = phase.kind === 'error'
+  useEffect(() => {
+    if (!failed) return
+    Alert.alert(ERROR_TITLE, ERROR_BODY, [
+      { text: CANCEL_LABEL, style: 'cancel' },
+      { text: RETRY_LABEL, onPress: () => void run(form) },
+    ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per failure, not per render
+  }, [failed])
+
+  const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')
+  const onDeleteBot = (bot: CompanyBot) =>
+    confirmDeleteBot(bot.name, () => {
+      void removeBot(bot)
+        .then(() => {
+          setOrganizing(false)
+          const from = limitFrom.current
+          setForm((current) => (from ? pickPosting(current, from) : closeSearch(current)))
+        })
+        .catch(() => undefined)
+    })
 
   const choose = async (row: PostingPick) => {
     const existing = await findBotForPosting(row.postingId).catch(() => null)
@@ -428,7 +437,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
-  const section = { paddingTop: 14, paddingBottom: spacing[1], paddingHorizontal: spacing[5], fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
 
@@ -436,11 +444,13 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: insets.top + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
       {searching ? (
         <View style={{ width: control, height: control }} />
+      ) : organizing ? (
+        <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => setOrganizing(false) }]} />
       ) : (
         <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
       )}
       <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
-        {SHEET_TITLE}
+        {organizing ? DELETE_TITLE : SHEET_TITLE}
       </Text>
       <View style={{ width: control, height: control }} />
     </View>
@@ -506,35 +516,25 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
             ))
           : null}
         {linkWait ? (
-          <>
-            <Text weight="700" color="t3" style={section}>
-              {LINK_SECTION}
-            </Text>
-            <View style={{ gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[5], paddingBottom: BAR }}>
-              <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
-              <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
-            </View>
-          </>
+          <View style={{ gap: spacing[2], paddingTop: spacing[4], paddingHorizontal: spacing[5], paddingBottom: BAR }}>
+            <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
+            <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
+          </View>
         ) : null}
-        {phase.kind === 'linkBad' ? <Text style={note}>{LINK_BAD}</Text> : null}
-        {phase.kind === 'linkRetry' ? <Text color="t3" style={note}>{ERROR_BODY}</Text> : null}
+        {phase.kind === 'linkBad' ? <Text lineBreakStrategyIOS="hangul-word" style={note}>{LINK_BAD}</Text> : null}
+        {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
-          <>
-            <Text weight="700" color="t3" style={section}>
-              {LINK_FOUND_SECTION}
+          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }]}>
+            <Text weight="700" numberOfLines={2} style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
+              {pickedLine(phase.posting)}
             </Text>
-            <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={rowTitle}>
-              <Text weight="600" style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
-                {pickedLine(phase.posting)}
-              </Text>
-              <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
-                {phase.meta}
-              </Text>
-              <Text color="t3" numberOfLines={1} style={{ fontSize: type.c2.fontSize, lineHeight: type.c2.lineHeight }}>
-                {phase.host}
-              </Text>
-            </Pressable>
-          </>
+            <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
+              {phase.meta}
+            </Text>
+            <Text color="t3" numberOfLines={1} style={{ fontSize: type.c2.fontSize, lineHeight: type.c2.lineHeight }}>
+              {phase.host}
+            </Text>
+          </Pressable>
         ) : null}
       </ScrollView>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: spacing[2], paddingHorizontal: spacing[4], paddingBottom: 10 + (keyboard > 0 ? 0 : insets.bottom) }}>
@@ -571,23 +571,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     </>
   )
 
-  const retry = phase.kind === 'error'
   const footer = (
     <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2], backgroundColor: c.bg }}>
-      {retry ? (
-        <Text accessibilityRole="alert" style={{ textAlign: 'center', fontSize: 14, lineHeight: 20 }}>
-          <Text weight="700" style={{ fontSize: 14, lineHeight: 20 }}>
-            {ERROR_TITLE}
-          </Text>{' '}
-          {ERROR_BODY}
-        </Text>
-      ) : null}
       <Cta
         xl={xl}
         enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
         busy={phase.kind === 'creating'}
-        label={phase.kind === 'creating' ? CREATING_LABEL : retry ? RETRY_LABEL : CREATE_LABEL}
-        onPress={retry ? () => void run(form) : onCreate}
+        label={phase.kind === 'creating' ? CREATING_LABEL : CREATE_LABEL}
+        onPress={onCreate}
       />
     </View>
   )
@@ -602,14 +593,16 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         onLayout={(e) => setSheetBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
       >
         {header}
-        {phase.kind === 'limit' ? (
+        {phase.kind === 'limit' && organizing ? (
+          <BotLimitDelete bots={companyBots} onDelete={onDeleteBot} />
+        ) : phase.kind === 'limit' ? (
           <>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
               <LimitBody limit={bots.limit} />
             </ScrollView>
             <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
               <Button label={UPGRADE_LABEL} onPress={onUpgrade} />
-              <Button label={ORGANIZE_LABEL} variant="secondary" onPress={onClose} />
+              <Button label={ORGANIZE_LABEL} variant="secondary" onPress={() => setOrganizing(true)} />
             </View>
           </>
         ) : searching ? (
@@ -628,7 +621,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         )}
       </KeyboardAvoidingView>
       {form.consent ? (
-        <ConsentOverlay
+        <ConsentSheet
           saving={consent.saving}
           onLater={() => setForm(dismissConsent)}
           onAgree={() => consent.save(true, { onSuccess: () => void run(dismissConsent(form)) })}

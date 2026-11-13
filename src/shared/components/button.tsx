@@ -31,7 +31,7 @@ const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHori
 
 const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
   primary: { glass: false, fill: 'ac', pressedFill: 'acPress', ink: 'accent' },
-  secondary: { glass: true, fill: 'fill', ink: 't1' },
+  secondary: { glass: false, fill: 'fill', ink: 't1' },
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 

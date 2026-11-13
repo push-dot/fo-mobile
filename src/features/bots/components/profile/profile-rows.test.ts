@@ -5,7 +5,7 @@ import {
   allowedSheetTitle,
   colorA11y,
   deleteTitle,
-  grantIntro,
+  GRANT_INTRO,
   grantMeta,
   profileGroups,
   revokeA11y,
@@ -57,8 +57,7 @@ describe('bot profile rows', () => {
     expect(grantMeta('2026-11-03', 'posting')).toBe('11월 3일 허용 · 채용 공고')
     expect(grantMeta('2026-11-05', 'company')).toBe('11월 5일 허용 · 회사 소개')
     expect(grantMeta('2026-10-29', 'other')).toBe('10월 29일 허용')
-    expect(grantIntro({ kind: 'push', name: 'Push Bot' })).toBe('Push Bot이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.')
-    expect(grantIntro({ kind: 'company', name: '모아페이' })).toBe('모아페이 Bot이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.')
+    expect(GRANT_INTRO).toBe('Bot이 묻지 않고 읽는 사이트예요.')
     expect(revokeToast('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용을 해제했어요')
     expect(revokeA11y('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용 해제')
     expect(deleteTitle('모아페이')).toBe('모아페이 Bot을 삭제할까요?')
