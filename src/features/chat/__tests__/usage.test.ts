@@ -67,6 +67,9 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, 'Push Bot')).toBe('Push Bot에게 물어보기')
     expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+    const result: ChatItem = { type: 'result', id: 'r', source: 'external', checklist: [], actions: [], documentId: 'd', fileName: 'a.pdf', pageLine: 'A4 1쪽' }
+    expect(composerPlaceholder({ items: [user, result, { type: 'worked', id: 'w', seconds: 3 }], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
+    expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
   it('asks what to do with the attached material, by its kind, over the bot name', () => {

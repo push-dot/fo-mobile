@@ -2,7 +2,6 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream } from '../utils/stream'
-import { PICK_HINT } from '../constants'
 import type { ChatEvent } from '../types'
 
 async function* frames(...evs: StreamEvent[]) {
@@ -47,7 +46,7 @@ describe('server gate labels', () => {
         { id: 'reject', label: '취소' },
       ],
     })
-    expect(ev).toMatchObject({ type: 'approval', approval: { question: '이 공고에 지원해요', foot: PICK_HINT, warning: undefined } })
+    expect(ev).toMatchObject({ type: 'approval', approval: { question: '이 공고에 지원해요' } })
     expect(labels(ev!)).toEqual(['실행', '취소'])
   })
 

@@ -2,7 +2,6 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream } from '../utils/stream'
-import { EDIT_FOOT, PICK_HINT } from '../constants'
 import type { ChatEvent } from '../types'
 
 async function* frames(...evs: StreamEvent[]) {
@@ -111,7 +110,7 @@ describe('agent stream for the new design', () => {
       }),
     )
     expect(s.items).toMatchObject([{ type: 'diff', lines: [{ n: 13, sign: '-', text: '결제 API 개발' }, { n: 13, sign: '+', text: '결제 승인 API 재설계' }] }])
-    expect(s.approval).toMatchObject({ question: '이 수정을 적용할까요?', submit: '적용', secondary: '그대로 두기', sections: [], optionIds: ['apply', 'skip'], foot: EDIT_FOOT })
+    expect(s.approval).toMatchObject({ question: '이 수정을 적용할까요?', submit: '적용', secondary: '그대로 두기', sections: [], optionIds: ['apply', 'skip'] })
   })
 
   it('shows the server warning under a risky action instead of the hint', async () => {
@@ -119,10 +118,10 @@ describe('agent stream for the new design', () => {
       type: 'approval', id: 'go', kind: 'TOOL_ACTION', title: '이 공고에 지원해요', summary: '이 공고에 지원해요', foot: '지원하면 취소할 수 없어요',
       options: [{ id: 'approve', label: '실행' }, { id: 'reject', label: '취소' }],
     })
-    expect(ev).toMatchObject({ type: 'approval', approval: { warning: '지원하면 취소할 수 없어요', foot: undefined } })
+    expect(ev).toMatchObject({ type: 'approval', approval: { warning: '지원하면 취소할 수 없어요' } })
   })
 
-  it('badges only the options the server tags and shows the pick hint on single-choice gates', async () => {
+  it('badges only the options the server tags and draws no pick hint under single-choice gates', async () => {
     const [review] = await map({
       type: 'choice', id: 'r', gate: 'review', title: '검증을 마쳤어요. 어떤 디자인을 적용할까요?', recommended: 'MODERN',
       detail: '템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.',
@@ -131,13 +130,12 @@ describe('agent stream for the new design', () => {
     expect(review).toMatchObject({
       type: 'approval',
       approval: {
-        foot: PICK_HINT,
         sections: [{ items: [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, { label: '모던', desc: '깔끔한 한 단' }, { label: '그만하기' }] }],
       },
     })
     const items = review?.type === 'approval' && review.approval.sections[0]?.kind === 'choices' ? review.approval.sections[0].items : []
     expect(items[1]).not.toHaveProperty('badge')
     const [cap] = await map({ type: 'choice', id: 'v', gate: 'validate_cap', title: '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', options: [{ id: 'retry', label: '다시 고르기' }] })
-    expect(cap).toMatchObject({ type: 'approval', approval: { foot: undefined } })
+    expect(cap).toMatchObject({ type: 'approval', approval: { optionIds: ['retry'] } })
   })
 })

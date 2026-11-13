@@ -1,0 +1,11 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# A finished run asks "다음으로 무엇을 할까요?" in the platform's action sheet (ChatDoneNext); close it to see the chat behind.
+---
+- runFlow:
+    when:
+      visible: "다음으로 무엇을 할까요?"
+    commands:
+      - tapOn: "취소"
+      - waitForAnimationToEnd

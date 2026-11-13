@@ -22,14 +22,24 @@ type ResultFields = {
 export const resultActions = (card: Pick<ResultFields, 'actions'>) =>
   card.actions.filter((action): action is ResultAction & { id: ResultActionId } => (KNOWN as readonly string[]).includes(action.id))
 
-export const RESULT_VARIANT: Record<ResultActionId, 'primary' | 'secondary'> = { apply: 'primary', convert: 'secondary', view: 'secondary' }
-
 export const resultActionsFor = (card: Pick<ResultFields, 'actions'> & { pendingNote?: string }, awaiting?: boolean) =>
   card.pendingNote || awaiting ? [] : resultActions(card)
 
 export const applyText = (company?: string) => (company ? `${company}에 바로 지원해 줘` : '바로 지원해 줘')
 
 export const resultButtons = (card: Pick<ResultFields, 'actions'>) => resultActions(card).map((action) => action.label)
+
+/**
+ * The chat room holds no action buttons (ChatDoneNext): a finished run asks what to do next in an action sheet.
+ * 프로필 보기 is not offered there; the profile card itself opens the profile.
+ */
+export const doneNextActions = (card: Pick<ResultFields, 'actions'> & { pendingNote?: string }) =>
+  resultActionsFor(card).filter((action) => action.id !== 'view')
+
+export const doneNextCopy = (card: Pick<ResultFields, 'source'>) => ({
+  title: card.source === 'profile' ? '프로필을 다 고쳤어요' : '이력서를 다 고쳤어요',
+  message: '다음으로 무엇을 할까요?',
+})
 
 export const PROFILE_SAVE_TITLE = 'Push 프로필에 저장했어요'
 

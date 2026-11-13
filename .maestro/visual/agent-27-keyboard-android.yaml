@@ -18,6 +18,7 @@ tags:
           visible: "프로필로 전환"
           timeout: 30000
       - waitForAnimationToEnd
+      - runFlow: _dismiss_next.yaml
       # The keyboard stays up for both shots (a one-line and a multi-line input).
       - tapOn: "메시지.*"
       - inputText: "Tailor it for Nuri Cloud too"

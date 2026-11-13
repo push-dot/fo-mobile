@@ -7,6 +7,9 @@ import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import ModePicker from './mode-picker'
 
 
+/** The box stops growing at five lines and scrolls inside (ChatKeyboardIOS). */
+export const COMPOSER_MAX_LINES = 5
+
 export type ComposerProps = {
   value: string
   onChangeText: (t: string) => void
@@ -57,7 +60,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           multiline
           maxLength={p.maxLength}
           accessibilityLabel={p.label ?? '메시지'}
-          style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: 120, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor(hasText ? '600' : '400')]}
+          style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor(hasText ? '600' : '400')]}
         />
         <Pressable
           accessibilityRole="button"
@@ -99,7 +102,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
         editable={!p.disabled}
         accessibilityLabel={p.label ?? '메시지'}
         maxLength={p.maxLength}
-        style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: 140, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
+        style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
       />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         {showTools ? (

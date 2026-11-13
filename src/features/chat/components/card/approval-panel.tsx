@@ -5,7 +5,7 @@ import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors, us
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
 import { expiredNote } from '../../utils/card'
-import type { Approval, ApprovalSection, Choice, TemplateLayout } from '../../types'
+import type { Approval, ApprovalSection, Choice } from '../../types'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
 
@@ -168,9 +168,9 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
         )
       case 'templates':
         return (
-          <View key={si} style={{ flexDirection: 'row', gap: spacing[2], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
+          <View key={si} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1], paddingBottom: spacing[1] }}>
             {s.items.map((t, i) => (
-              <Template key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} layout={t.layout ?? 'classic'} onPress={() => toggle(si, i)} />
+              <TemplateChip key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} onPress={() => toggle(si, i)} />
             ))}
           </View>
         )
@@ -381,41 +381,21 @@ const MiniChip = ({ label, on, onPress }: { label: string; on?: boolean; onPress
   )
 }
 
-const THUMB_LINES = ['90%', '72%', '84%', '56%']
-
-const Template = ({ label, recommended, on, layout, onPress }: { label: string; recommended?: boolean; on: boolean; layout: TemplateLayout; onPress: () => void }) => {
+/** A template is a word, not a drawing (ChatPh4Design): one chip row, the recommended one carries "· 추천". */
+const TemplateChip = ({ label, recommended, on, onPress }: { label: string; recommended?: boolean; on: boolean; onPress: () => void }) => {
   const c = useColors()
-  const ring = selectedRing(c)
-  const line = (w: string, key: string | number, extra?: object) => <View key={key} style={{ height: 7, width: w as `${number}%`, borderRadius: 4, backgroundColor: c.fill2, ...extra }} />
-  const heading = (w: string, h: number, color: string) => line(w, 'h', { height: h, backgroundColor: color })
-  const page = {
-    classic: [heading('60%', 9, c.t2), ...THUMB_LINES.map(line)],
-    modern: [
-      <View key="h" style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
-        <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: c.ac }} />
-        <View style={{ flex: 1, height: 8, borderRadius: 4, backgroundColor: c.t2 }} />
-      </View>,
-      ...THUMB_LINES.map(line),
-    ],
-    compact: [heading('64%', 7, c.t2), ...['92%', '80%', '92%', '70%', '88%', '60%'].map(line)],
-    ats: [heading('70%', 8, c.t3), ...THUMB_LINES.map(line)],
-  }[layout]
   return (
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ selected: on }}
       accessibilityLabel={recommended ? `${label}, 추천` : label}
       onPress={onPress}
-      style={{ flex: 1, gap: spacing[2], padding: spacing[2] - ring.borderWidth, borderRadius: radius.md, ...(on ? ring : { borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
+      hitSlop={hitSlopTo(34)}
+      style={{ height: 34, paddingHorizontal: 14, borderRadius: radius.chip, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
     >
-      {recommended ? (
-        <View pointerEvents="none" style={{ position: 'absolute', top: -9, left: 0, right: 0, alignItems: 'center', zIndex: 1 }}>
-          <Badge label="추천" tone="ac" />
-        </View>
-      ) : null}
-      <View style={{ height: 96, borderRadius: 10, backgroundColor: c.paper, boxShadow: `0 0 0 1px ${c.line}`, padding: 9, gap: layout === 'compact' ? 3 : 5 }}>{page}</View>
-      <Text v="c1" weight="700" style={{ textAlign: 'center' }}>
+      <Text v="c1" weight="600" style={{ fontSize: 14, color: on ? c.bg : c.t1 }}>
         {label}
+        {recommended ? <Text v="c1" style={{ fontSize: 14, color: on ? c.bg : c.t3, opacity: on ? 0.7 : 1 }}>{` · 추천`}</Text> : null}
       </Text>
     </Pressable>
   )
