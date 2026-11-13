@@ -24,17 +24,21 @@ import {
   THREAD_WINDOW,
   accountPath,
   answer,
+  closeApproval,
   composerPlaceholder,
   followScroll,
   headerLightOf,
   openBot,
+  retryApproval,
   quickStartPath,
   send,
   stop,
+  useCardState,
   useChat,
   useChatLimit,
   useFind,
   useUnseen,
+  WaitingLine,
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
@@ -113,6 +117,7 @@ const Thread = ({ id }: { id: string }) => {
   const input = useRef<TextInputInstance>(null)
   const saying = !!chat.approval && sayingFor === chat.approval.id
   const showPanel = chat.approval && !saying
+  const cardIs = useCardState(chat.approval)
   const placeholder = composerPlaceholder(chat, name)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
@@ -202,8 +207,9 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
         ListHeaderComponent={
-          chat.queue.length ? (
+          chat.queue.length || showPanel ? (
             <View style={{ gap: 18 }}>
+              {showPanel ? <WaitingLine approval={chat.approval!} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}
@@ -219,6 +225,9 @@ const Thread = ({ id }: { id: string }) => {
         <ApprovalPanel
           key={chat.approval!.id}
           approval={chat.approval!}
+          expired={cardIs === 'expired'}
+          onClose={() => closeApproval(id)}
+          onRetry={() => retryApproval(id)}
           onAnswer={(text, choice) => answer(id, text, choice)}
           onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
           onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}

@@ -220,7 +220,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -266,7 +266,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -285,7 +285,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -327,7 +327,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
 {"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -339,7 +339,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
 {"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -372,7 +372,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -382,7 +382,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경험을 만들어 주세요","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -397,7 +397,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -497,7 +497,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -549,7 +549,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -571,7 +571,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -585,7 +585,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -599,7 +599,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -731,7 +731,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -935,7 +935,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1153,7 +1153,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1246,7 +1246,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1355,7 +1355,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1499,7 +1499,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1719,7 +1719,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1961,7 +1961,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2066,7 +2066,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2191,7 +2191,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2275,7 +2275,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2347,7 +2347,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2366,7 +2366,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2385,7 +2385,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2412,7 +2412,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2497,7 +2497,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2562,7 +2562,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2659,7 +2659,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2678,7 +2678,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2697,7 +2697,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2751,7 +2751,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2877,7 +2877,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2950,7 +2950,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"성능","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3037,7 +3037,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경험부터 정리할게요","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3070,7 +3070,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"이력서 만들어 주세요","type":"user"}
 {"text":"좋아요! 시작하기 전에 하나만 여쭤볼게요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0","question":"어떤 방식으로 진행할까요?","sections":[{"items":[{"label":"이력서부터 쓸게요"},{"label":"경험부터 정리할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0","question":"어떤 방식으로 진행할까요?","sections":[{"items":[{"label":"이력서부터 쓸게요"},{"label":"경험부터 정리할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3079,7 +3079,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"make resume","type":"user"}
 {"text":"좋아요! 시작하기 전에 하나만 여쭤볼게요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0","question":"어떤 방식으로 진행할까요?","sections":[{"items":[{"label":"이력서부터 쓸게요"},{"label":"경험부터 정리할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0","question":"어떤 방식으로 진행할까요?","sections":[{"items":[{"label":"이력서부터 쓸게요"},{"label":"경험부터 정리할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3105,7 +3105,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[{"text":"use numbers"}],"working":null}
 "
 `;
@@ -3159,7 +3159,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"이어서 봐 주세요","type":"user"}
 {"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3202,7 +3202,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3219,7 +3219,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3231,7 +3231,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3243,7 +3243,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3369,7 +3369,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3565,7 +3565,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3771,7 +3771,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3858,7 +3858,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3959,7 +3959,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4097,7 +4097,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4309,7 +4309,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4539,7 +4539,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4638,7 +4638,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4755,7 +4755,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4833,7 +4833,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4899,7 +4899,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4916,7 +4916,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4933,7 +4933,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4950,7 +4950,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5007,7 +5007,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5039,7 +5039,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5120,7 +5120,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5146,7 +5146,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5243,7 +5243,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5306,7 +5306,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5357,7 +5357,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5436,7 +5436,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5552,7 +5552,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5638,7 +5638,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5691,7 +5691,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ext-fail","type":"user"}
 {"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[],"cardMeta":"A4 1쪽 · 186KB","checklist":["이력서 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","PDF로 만들기"],"company":"모아페이","documentId":"src-upload","fileName":"김서준_모아페이_백엔드.pdf","pageLine":"A4 1쪽 · 186KB","source":"external","type":"result"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ext-gate","question":"내 서류에 저장하지 못했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ext-gate","question":"내 서류에 저장하지 못했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5767,7 +5767,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ext-ok","type":"user"}
 {"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[],"cardMeta":"A4 1쪽 · 186KB · 내 서류에 자동 저장됨","checklist":["이력서 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","PDF로 만들기"],"company":"모아페이","documentId":"src-upload","fileName":"김서준_모아페이_백엔드.pdf","pageLine":"A4 1쪽 · 186KB","savedLine":"내 서류에 자동 저장됨","source":"external","type":"result"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ext-gate","question":"내 서류에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ext-gate","question":"내 서류에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5866,7 +5866,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6026,7 +6026,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6178,7 +6178,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6238,7 +6238,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6303,7 +6303,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6342,7 +6342,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6372,7 +6372,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"ph0-start","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6468,7 +6468,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6624,7 +6624,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6770,7 +6770,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6827,7 +6827,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6888,7 +6888,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6996,7 +6996,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7168,7 +7168,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7338,7 +7338,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7407,7 +7407,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7484,7 +7484,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7532,7 +7532,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7568,7 +7568,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph1-free","type":"user"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"FREE","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7578,7 +7578,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph1-ultra","type":"user"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","projected":{"bullets":["승인 API 성과를 숫자로 보여 주기","Kafka를 기술 스택 맨 앞으로 옮기기","정산 도메인 경험을 한 줄 추가하기"],"label":"8점대"},"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7588,7 +7588,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph1-ultra-open","type":"user"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","projected":{"bullets":["승인 API 성과를 숫자로 보여 주기","Kafka를 기술 스택 맨 앞으로 옮기기","정산 도메인 경험을 한 줄 추가하기"],"label":"8점대"},"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7598,7 +7598,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph2","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7675,7 +7675,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7692,7 +7692,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7709,7 +7709,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7757,7 +7757,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7867,7 +7867,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7932,7 +7932,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"성능","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8007,7 +8007,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph2x","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8019,7 +8019,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"heading":"김서준 · 백엔드 개발자","label":"이력서 초안 v1","lines":["모아페이 · 백엔드 엔지니어 · 2022.03–현재","• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms","• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을"],"type":"paper"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8035,7 +8035,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8096,7 +8096,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"profile-gate","type":"user"}
 {"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8147,7 +8147,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8243,7 +8243,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8383,7 +8383,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8425,7 +8425,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8442,7 +8442,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"tailor-apply","question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8538,7 +8538,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8682,7 +8682,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8810,7 +8810,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8858,7 +8858,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8907,7 +8907,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8922,7 +8922,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9003,7 +9003,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9139,7 +9139,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9255,7 +9255,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9297,7 +9297,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"heading":"김서준 · 백엔드 개발자","label":"이력서 초안 v1","lines":["모아페이 · 백엔드 엔지니어 · 2022.03–현재","• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms","• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을"],"type":"paper"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9414,7 +9414,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9598,7 +9598,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9786,7 +9786,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9864,7 +9864,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9953,7 +9953,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"네, 맞춰서 고쳐 주세요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10082,7 +10082,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10282,7 +10282,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10494,7 +10494,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10584,7 +10584,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"items":[{"label":"요약","state":"done"},{"label":"경력","state":"done"},{"label":"프로젝트","state":"done"},{"label":"기술 스택","state":"done"},{"label":"학력","state":"done"}],"type":"todo"}
 {"action":"초안 쓰기","result":"1쪽 · 섹션 5개 · 말투 그대로","state":"ok","target":"이력서 v1","type":"tool"}
 {"lines":[{"sign":"+","text":"승인 API 성과를 숫자로 강조"},{"sign":"+","text":"프로젝트 payment-retry-lab 추가"},{"sign":"~","text":"Kafka를 기술 스택 맨 앞으로"},{"sign":"-","text":"사내 동아리 활동 세부 내용"}],"type":"diff"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-review","question":"첫 번째 초안(v1)이에요. 이대로 검토할까요?","sections":[{"items":[{"label":"검토할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10689,7 +10689,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"반영해서 수정할게요","type":"user"}
 {"action":"전략 세우기","result":"섹션 5개 · 추가할 키워드 4개","state":"ok","target":"공고 요건 ↔ 내 경력","type":"tool"}
 {"keywords":["결제 승인","정산 배치","Kafka","장애 대응"],"meta":"섹션 5개","rows":[{"label":"경력 · 모아페이","note":"대용량 결제 요구 → 승인 API 성과를 숫자로","tag":"강화","tone":"ac"},{"label":"기술 스택","note":"Kafka 경험을 맨 앞으로","tag":"수정","tone":"grey"},{"label":"프로젝트 · payment-retry-lab","note":"우대 사항 “장애 대응” 근거","tag":"추가","tone":"green"},{"label":"사내 동아리 활동","note":"공고와 연관이 낮아요","tag":"축소","tone":"orange"}],"title":"수정 전략","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2","question":"이 전략대로 초안을 쓸까요?","sections":[{"items":[{"label":"초안 쓸게요"},{"label":"피드백만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10758,7 +10758,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10815,7 +10815,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10829,7 +10829,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"그만하기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10843,7 +10843,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10865,7 +10865,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
 {"caption":"보통 · 개선 여지 있어요","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"PRO","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10930,7 +10930,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10975,7 +10975,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"이력서만 · 자료 3개 · 말투 그대로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10986,7 +10986,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"점수 올리기 1회","result":"6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요","state":"ok","target":"키워드 밀도","type":"tool"}
 {"action":"점수 올리기 2회","result":"7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요","state":"ok","target":"도메인 경험","type":"tool"}
 {"delta":"+1.4","from":6.9,"note":"적합도 6.9 → 8.3 (+1.4)","score":8.3,"type":"fit"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph3-boost","question":"점수를 한 번 더 올릴까요?","sections":[{"items":[{"label":"한 번 더 올리기"},{"label":"여기서 멈추기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11059,7 +11059,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11075,7 +11075,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11091,7 +11091,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과","tone":"green"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과","tone":"green"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부","tone":"orange"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과","tone":"green"}],"title":"프로젝트 기획서","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"기획만 볼게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11136,7 +11136,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11238,7 +11238,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"text":"다시 고르기","type":"user"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11343,7 +11343,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
 {"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"},{"id":"view","label":"프로필 보기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"Push 프로필에 저장했어요. 결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11364,7 +11364,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"피드백 정리","result":"고칠 점 3개","state":"ok","target":"공고 요건 ↔ 내 이력서","type":"tool"}
 {"text":"이 공고 기준으로 고칠 점이에요.","type":"agentText"}
 {"keywords":[],"meta":"","rows":[{"label":"Kafka, 정산 배치가 없어요","note":"경험 문장에 직접 넣어 주세요","tag":"키워드","tone":"orange"},{"label":"정산 경험이 약해 보여요","note":"payment-retry-lab을 정산 맥락으로 써 주세요","tag":"도메인","tone":"orange"},{"label":"숫자가 부족해요","note":"승인 API 개선 결과를 수치로 보여 주세요","tag":"성과","tone":"grey"}],"title":"","type":"plan"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"feedback","question":"피드백을 반영해서 수정할까요?","sections":[{"items":[{"label":"반영해서 수정할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11374,7 +11374,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"필요한 프로젝트 경험까지 만들어 주세요","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
-card {"foot":"번호를 누르거나 바로 말해도 돼요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"ph2x-approach","question":"어떤 접근 방식으로 진행할까요?","sections":[{"items":[{"label":"병목을 만들게요"},{"label":"문제를 예방할게요"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
