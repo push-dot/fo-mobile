@@ -30,7 +30,7 @@ export const requestMaterialFile = () => useMaterialBridge.setState((s) => ({ fi
 
 type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
-type Outgoing = RunInput & { file?: PickedFile }
+type Outgoing = RunInput & { file?: PickedFile; reattach?: boolean }
 
 const posted = ({ file: _, ...rest }: Outgoing): RunInput => rest
 
@@ -152,7 +152,14 @@ const scripted = async function* (input: RunInput, signal: AbortSignal, end?: St
   yield* fromStream(frames(), async function* () {}, end)
 }
 
-const streamed = (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> => {
+const remember = async function* <T extends { seq?: number }>(source: AsyncIterable<T>, seen: { seq?: number }): AsyncGenerator<T> {
+  for await (const ev of source) {
+    if (typeof ev.seq === 'number') seen.seq = ev.seq
+    yield ev
+  }
+}
+
+const streamed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefined, seen: { seq?: number }): AsyncGenerator<ChatEvent> => {
   const intent = botIntent(input.intent)
   const attachments = attachmentsOf(input)
   const body: BotContract.SendBody = {
@@ -161,23 +168,27 @@ const streamed = (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncG
     ...(intent ? { intent } : {}),
     ...(attachments.length ? { attachments } : {}),
   }
-  return fromStream(botApi.bots.send(input.conversationId, body, signal), (after) => botApi.bots.follow(input.conversationId, after, signal), end)
+  return fromStream(
+    remember(botApi.bots.send(input.conversationId, body, signal), seen),
+    (after) => remember(botApi.bots.follow(input.conversationId, after, signal), seen),
+    end,
+  )
 }
 
-const followed = (input: RunInput, signal: AbortSignal, end?: StreamEnd) =>
+const followed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefined, seen: { seq?: number }) =>
   fromStream(
-    botApi.bots.follow(input.conversationId, input.after, signal),
-    (after) => botApi.bots.follow(input.conversationId, after, signal),
+    remember(botApi.bots.follow(input.conversationId, input.after, signal), seen),
+    (after) => remember(botApi.bots.follow(input.conversationId, after, signal), seen),
     end,
     input.piece,
   )
 
-const resolved = async function* (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> {
+const resolved = async function* (input: RunInput, signal: AbortSignal, end: StreamEnd | undefined, seen: { seq?: number }): AsyncGenerator<ChatEvent> {
   const { approvalId, optionId, optionIds } = input.resolve!
   const body = optionIds?.length ? { optionId, optionIds } : { optionId }
   const { resumed } = await botApi.bots.answer(input.conversationId, approvalId, body)
   if (!resumed) return
-  yield* followed(input, signal, end)
+  yield* followed(input, signal, end, seen)
 }
 
 const clearWorking = (id: string) => {
@@ -188,14 +199,27 @@ const clearWorking = (id: string) => {
   })
 }
 
+const launch = (id: string, next: Held) => {
+  dispatch(id, { type: 'user', id: `u-${Date.now()}`, text: next.text, attachment: next.attachment })
+  void startRun({
+    conversationId: id,
+    text: next.text,
+    attachment: next.attachment,
+    file: next.file,
+    interrupted: get(id).interrupted,
+    intent: next.intent,
+    context: next.context,
+  })
+}
+
 const flush = (id: string) => {
   const s = get(id)
   const q = heldQueues.get(id)
-  if (!q?.length || s.working || s.approval) return
+  if (!q?.length || s.working || s.approval || runs.has(id)) return
   const next = q.shift()!
   if (!q.length) heldQueues.delete(id)
   dispatch(id, { type: 'dequeue' })
-  send(id, next.text, next.file ?? next.attachment, next.intent, next.context)
+  launch(id, next)
 }
 
 const startRun = async (input: Outgoing) => {
@@ -204,6 +228,7 @@ const startRun = async (input: Outgoing) => {
   runs.set(id, ctrl)
   dispatch(id, { type: 'start', at: Date.now() })
   const end: StreamEnd = { reason: 'no-seq' }
+  const seen: { seq?: number } = {}
   let release = false
   let run: RunInput | undefined
   try {
@@ -212,7 +237,14 @@ const startRun = async (input: Outgoing) => {
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
       release = true
     } else {
-      for await (const e of (API_MOCK ? scripted : run.resolve ? resolved : run.follow ? followed : streamed)(run, ctrl.signal, end)) {
+      const events = API_MOCK
+        ? scripted(run, ctrl.signal, end)
+        : run.resolve
+          ? resolved(run, ctrl.signal, end, seen)
+          : run.follow
+            ? followed(run, ctrl.signal, end, seen)
+            : streamed(run, ctrl.signal, end, seen)
+      for await (const e of events) {
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
       if (end.reason === 'reattach-empty') {
@@ -229,10 +261,18 @@ const startRun = async (input: Outgoing) => {
       return
     }
     const apiError = err instanceof ApiError ? err : undefined
-    const retryAfter = err instanceof QueueBusyError ? err.retryAfterSec : apiError?.details?.retryAfterSec
-    const text = errorText(apiError?.code, typeof retryAfter === 'number' ? retryAfter : undefined, apiError?.details?.reason)
-    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: apiError?.code })
-    if (!apiError) return
+    if (!apiError) {
+      if (seen.seq !== undefined && !input.reattach) {
+        void startRun({ conversationId: id, follow: true, after: seen.seq, piece: input.piece, reattach: true })
+        return
+      }
+      if (input.reattach) return
+      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: errorText() })
+      return
+    }
+    const retryAfter = err instanceof QueueBusyError ? err.retryAfterSec : apiError.details?.retryAfterSec
+    const text = errorText(apiError.code, typeof retryAfter === 'number' ? retryAfter : undefined, apiError.details?.reason)
+    dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: apiError.code })
     release = true
   } finally {
     if (runs.get(id) === ctrl) runs.delete(id)
@@ -246,12 +286,14 @@ const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'str
 
 export const send = (id: string, text: string, attachment?: string | PickedFile, intent?: ChatIntent, context?: RunInput['context']) => {
   const s = get(id)
-  if (s.working) {
+  if (s.working || runs.has(id) || (heldQueues.get(id)?.length ?? 0) > 0) {
     const file = fileOf(attachment)
     const q = heldQueues.get(id) ?? []
     q.push({ text, file, attachment: nameOf(attachment), intent, context })
     heldQueues.set(id, q)
-    return dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })
+    dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })
+    if (!s.working && !s.approval && !runs.has(id)) flush(id)
+    return
   }
   if (s.approval?.optionIds) {
     // The server reads free text as the gate answer or as rejecting the pending approval.
@@ -263,9 +305,7 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
     const first = s.approval.sections.find((x) => x.kind === 'choices')
     return answer(id, text, first && first.kind === 'choices' ? first.items.length - 1 : 0)
   }
-  const name = nameOf(attachment)
-  dispatch(id, { type: 'user', id: `u-${Date.now()}`, text, attachment: name })
-  void startRun({ conversationId: id, text, attachment: name, file: fileOf(attachment), interrupted: s.interrupted, intent, context })
+  launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
 }
 
 export const answer = (id: string, text: string, choice: number | number[]) => {
@@ -287,7 +327,7 @@ const halting = new Set<string>()
 const finishStop = (id: string, ctrl: AbortController | undefined) => {
   halting.delete(id)
   if (ctrl && runs.get(id) !== ctrl) return
-  ctrl?.abort()
+  if (API_MOCK) ctrl?.abort()
   dispatch(id, { type: 'stop' })
 }
 

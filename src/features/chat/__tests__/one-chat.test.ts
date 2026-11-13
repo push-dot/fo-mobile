@@ -191,10 +191,62 @@ describe('one chat per bot', () => {
     })
     send('b-drop', '하나')
     send('b-drop', '둘', undefined, 'fit')
-    await vi.waitFor(() => expect(chat('b-drop').items.some((item) => item.type === 'error')).toBe(true))
+    await vi.waitFor(() => expect(botApi.bots.follow).toHaveBeenCalledWith('b-drop', 1, expect.anything()))
     expect(botApi.bots.send).toHaveBeenCalledTimes(1)
+    expect(chat('b-drop').working).not.toBeNull()
     expect(chat('b-drop').queue.map((item) => item.text)).toEqual(['둘'])
     expect(chat('b-drop').items.some((item) => item.type === 'worked')).toBe(false)
+  })
+
+  it('sends the held line before the one typed after a drop', async () => {
+    botApi.bots.send.mockImplementationOnce(async function* () {
+      yield live('t1', 1, '안')
+    })
+    botApi.bots.send.mockImplementation(async function* () {
+      yield live('t2', 1, '생각 중', 'status')
+      await new Promise(() => {})
+    })
+    let follows = 0
+    botApi.bots.follow.mockImplementation(async function* (_id: string, after?: number) {
+      follows += 1
+      if (follows === 1) throw new Error('dropped')
+      yield live('t1', (after ?? 0) + 1, '', 'done')
+    })
+    send('b-next', '하나')
+    send('b-next', '둘', undefined, 'fit')
+    send('b-next', '셋')
+    await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalledTimes(2))
+    expect(botApi.bots.send).toHaveBeenLastCalledWith('b-next', expect.objectContaining({ text: '둘', intent: 'fit' }), expect.anything())
+    expect(chat('b-next').queue.map((item) => item.text)).toEqual(['셋'])
+  })
+
+  it('sends the held line before the one typed after a stop', async () => {
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    botApi.bots.send.mockImplementationOnce(async function* () {
+      yield live('t', 1, '생각 중', 'status')
+      await gate
+      yield { type: 'cancelled', resumable: false, seq: 2, at, turn: 't' }
+    })
+    botApi.bots.send.mockImplementation(async function* () {
+      yield live('t2', 1, '생각 중', 'status')
+      await new Promise(() => {})
+    })
+    botApi.bots.cancel.mockResolvedValue({ status: 'CANCELLED', resumable: false })
+    send('b-stop', '하나')
+    await vi.waitFor(() => expect(chat('b-stop').working?.verbs).toEqual(['생각 중']))
+    send('b-stop', '둘', undefined, 'fit')
+    stop('b-stop')
+    await vi.waitFor(() => expect(chat('b-stop').working).toBeNull())
+    send('b-stop', '셋')
+    expect(botApi.bots.send).toHaveBeenCalledTimes(1)
+    expect(chat('b-stop').queue.map((item) => item.text)).toEqual(['둘', '셋'])
+    release()
+    await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalledTimes(2))
+    expect(botApi.bots.send).toHaveBeenLastCalledWith('b-stop', expect.objectContaining({ text: '둘', intent: 'fit' }), expect.anything())
+    expect(chat('b-stop').queue.map((item) => item.text)).toEqual(['셋'])
   })
 
   it('does not abort the run that replaced the one being cancelled', async () => {
