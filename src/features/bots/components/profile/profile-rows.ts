@@ -46,8 +46,8 @@ export const grantMeta = (grantedAt: string, kind: string) => {
 
 export const grantIntro = (bot: { kind: 'push' | 'company'; name: string }) =>
   bot.kind === 'push'
-    ? 'Push Bot이 읽어도 된다고 허용한 사이트예요. 해제하면 다음 작업부터 이 사이트를 읽지 않아요.'
-    : `${bot.name} 봇이 읽어도 된다고 허용한 사이트예요. 해제하면 다음 작업부터 이 사이트를 읽지 않아요.`
+    ? 'Push Bot이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.'
+    : `${bot.name} 봇이 묻지 않고 읽도록 허용한 사이트예요. 해제하면 이 사이트를 읽기 전에 먼저 물어요. 바로 실행에서는 묻지 않고 읽을 수 있어요.`
 
 export const revokeToast = (host: string) => `${host} 허용을 해제했어요`
 
