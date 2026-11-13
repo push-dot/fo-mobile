@@ -14,6 +14,10 @@ type Props = {
   variant?: Variant
   size?: Size
   icon?: IconName
+  /** Boards size the glyph per screen; defaults to the size's own. */
+  iconSize?: number
+  /** Horizontal padding when a board sets its own (the size's default otherwise). */
+  paddingX?: number
   disabled?: boolean
   style?: StyleProp<ViewStyle>
 }
@@ -31,7 +35,7 @@ const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFil
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 
-const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabled, style }: Props) => {
+const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, disabled, style }: Props) => {
   const c = useColors()
   const s = SIZES[size]
   const v = VARIANTS[variant]
@@ -46,9 +50,9 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, disabl
       fill={v.fill}
       pressedFill={v.pressedFill}
       style={[{ minHeight: s.minHeight, borderRadius: s.borderRadius }, style]}
-      contentStyle={{ paddingHorizontal: s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
+      contentStyle={{ paddingHorizontal: paddingX ?? s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
     >
-      {icon ? <Icon name={icon} size={s.icon} color={fg} /> : null}
+      {icon ? <Icon name={icon} size={iconSize ?? s.icon} color={fg} /> : null}
       <Text v={s.text} weight="700" style={{ color: fg, fontSize: s.fontSize }}>
         {label}
       </Text>

@@ -29,12 +29,12 @@ import {
   revokeToast,
   type ProfileRow,
 } from './profile-rows'
+import BotDeleteSheet from './bot-delete-sheet'
+import { SheetCard } from './sheet-card'
 import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 
 const HEADER_MASCOT = 104
 const XL_SCALE = 1.5
-const DELETE_MASCOT = 40
-const FLOAT_RADIUS = 40
 const COLOR_DOT = 22
 
 const LOADING_GROUPS: readonly (readonly number[])[] = [[60, 80], [60], [40, 60], [80]]
@@ -45,7 +45,15 @@ const Loading = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ alignItems: 'center', gap: spacing[1], paddingTop: spacing[1], paddingHorizontal: 28, paddingBottom: spacing[5] }}>
+      <View
+        style={{
+          alignItems: 'center',
+          gap: spacing[1],
+          paddingTop: spacing[1],
+          paddingHorizontal: 28,
+          paddingBottom: spacing[5],
+        }}
+      >
         <View style={{ marginBottom: 10 }}>
           <Skeleton width={HEADER_MASCOT} height={HEADER_MASCOT} radius={SKELETON_MASCOT_RADIUS} />
         </View>
@@ -55,9 +63,26 @@ const Loading = () => {
         </View>
       </View>
       {LOADING_GROUPS.map((widths, group) => (
-        <View key={group} style={{ marginHorizontal: spacing[5], marginTop: group > 0 ? spacing[3] : 0, borderRadius: radius.card, backgroundColor: c.bg2, paddingHorizontal: spacing[4] }}>
+        <View
+          key={group}
+          style={{
+            marginHorizontal: spacing[5],
+            marginTop: group > 0 ? spacing[3] : 0,
+            borderRadius: radius.card,
+            backgroundColor: c.bg2,
+            paddingHorizontal: spacing[4],
+          }}
+        >
           {widths.map((width, row) => (
-            <View key={row} style={{ minHeight: 56, justifyContent: 'center', borderTopWidth: row > 0 ? 1 : 0, borderTopColor: c.line }}>
+            <View
+              key={row}
+              style={{
+                minHeight: 56,
+                justifyContent: 'center',
+                borderTopWidth: row > 0 ? 1 : 0,
+                borderTopColor: c.line,
+              }}
+            >
               <Skeleton width={width} height={14} />
             </View>
           ))}
@@ -71,11 +96,28 @@ const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typ
   const xl = useWindowDimensions().fontScale >= XL_SCALE
   const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
   return (
-    <View style={{ alignItems: 'center', gap: spacing[1], paddingTop: spacing[1], paddingHorizontal: 28, paddingBottom: spacing[5] }}>
+    <View
+      style={{
+        alignItems: 'center',
+        gap: spacing[1],
+        paddingTop: spacing[1],
+        paddingHorizontal: 28,
+        paddingBottom: spacing[5],
+      }}
+    >
       <View style={{ marginBottom: 6 }}>
         <Mascot size={size.mascot} color={color} motion={{ mode: 'still' }} />
       </View>
-      <Text weight="800" numberOfLines={2} style={{ textAlign: 'center', maxWidth: 330, fontSize: size.name, lineHeight: size.nameLine }}>
+      <Text
+        weight="800"
+        numberOfLines={2}
+        style={{
+          textAlign: 'center',
+          maxWidth: 330,
+          fontSize: size.name,
+          lineHeight: size.nameLine,
+        }}
+      >
         {name}
       </Text>
       {sub ? (
@@ -93,7 +135,15 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
       {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
-      <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: 36, paddingTop: spacing[6] }}>
+      <View
+        accessibilityRole="alert"
+        style={{
+          alignItems: 'center',
+          gap: spacing[2],
+          paddingHorizontal: 36,
+          paddingTop: spacing[6],
+        }}
+      >
         <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {PROFILE_ERROR_TITLE}
         </Text>
@@ -103,30 +153,6 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
         <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={{ marginTop: spacing[3] }} />
       </View>
     </View>
-  )
-}
-
-const SheetCard = ({ label, title, onClose, children }: { label: string; title?: string; onClose: () => void; children: ReactNode }) => {
-  const c = useColors()
-  const insets = useSafeAreaInsets()
-  const float = Platform.OS === 'ios'
-  const card = float
-    ? { backgroundColor: c.bg, margin: spacing[2], borderRadius: FLOAT_RADIUS, paddingHorizontal: spacing[4], paddingTop: spacing[3], paddingBottom: spacing[5], gap: spacing[2] }
-    : { backgroundColor: c.bg, borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: insets.bottom + spacing[3], gap: spacing[2] }
-  return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
-        <Pressable accessible={false} accessibilityLabel={label} onPress={() => undefined} style={card}>
-          <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
-          {title ? (
-            <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
-              {title}
-            </Text>
-          ) : null}
-          {children}
-        </Pressable>
-      </Pressable>
-    </Modal>
   )
 }
 
@@ -182,22 +208,34 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const rowOf = (row: ProfileRow) => {
     if (row.id === 'notify') {
       return (
-        <SettingsRow
-          key={row.id}
-          label={row.label}
-          right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />}
-        />
+        <SettingsRow key={row.id} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />} />
       )
     }
     if (row.id === 'color' && bot.kind === 'company') {
       return (
         <Pressable key={row.id} accessibilityRole="button" accessibilityLabel={COLOR_A11Y} onPress={() => open(row)}>
-          <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2] }}>
+          <View
+            style={{
+              minHeight: 56,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing[3],
+              paddingVertical: spacing[2],
+            }}
+          >
             <Text v="b1" style={{ flex: 1, lineHeight: type.b2.lineHeight }}>
               {row.label}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-              <View style={{ width: COLOR_DOT, height: COLOR_DOT, borderRadius: COLOR_DOT / 2, marginRight: spacing[1], backgroundColor: mascotPalette(bot.color, mode).body }} />
+              <View
+                style={{
+                  width: COLOR_DOT,
+                  height: COLOR_DOT,
+                  borderRadius: COLOR_DOT / 2,
+                  marginRight: spacing[1],
+                  backgroundColor: mascotPalette(bot.color, mode).body,
+                }}
+              />
               <Icon name="chev" size={16} color="t3" />
             </View>
           </View>
@@ -209,14 +247,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     }
     if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed') {
       const dead = row.id === 'fit' && !posting
-      return (
-        <SettingsRow
-          key={row.id}
-          label={row.label}
-          value={row.value}
-          onPress={dead ? undefined : () => open(row)}
-        />
-      )
+      return <SettingsRow key={row.id} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
     }
     return null
   }
@@ -238,7 +269,17 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
           </Text>
           <View style={{ marginTop: spacing[2] }}>
             {grants.map((grant) => (
-              <View key={grant.host} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: 64, borderTopWidth: 1, borderTopColor: c.line }}>
+              <View
+                key={grant.host}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: spacing[3],
+                  minHeight: 64,
+                  borderTopWidth: 1,
+                  borderTopColor: c.line,
+                }}
+              >
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text v="b1" weight="600" numberOfLines={1}>
                     {grant.host}
@@ -268,28 +309,10 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
         </SheetCard>
       ) : null}
       {sheet === 'delete' && bot.kind === 'company' ? (
-        <DeleteSheet bot={bot} disabled={deleting} onClose={() => setSheet(null)} onDelete={() => void onDelete()} />
+        <BotDeleteSheet bot={bot} disabled={deleting} onClose={() => setSheet(null)} onDelete={() => void onDelete()} />
       ) : null}
     </View>
   )
 }
-
-const DeleteSheet = ({ bot, disabled, onClose, onDelete }: { bot: CompanyBot; disabled: boolean; onClose: () => void; onDelete: () => void }) => (
-  <SheetCard label={deleteTitle(bot.name)} onClose={onClose}>
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingTop: spacing[1] }}>
-      <Mascot size={DELETE_MASCOT} color={bot.color} motion={{ mode: 'still' }} />
-      <Text v="h3" accessibilityRole="header" style={{ flex: 1 }}>
-        {deleteTitle(bot.name)}
-      </Text>
-    </View>
-    <Text v="b2" color="t2">
-      {DELETE_BODY}
-    </Text>
-    <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
-      <Button label={CANCEL_LABEL} variant="secondary" onPress={onClose} style={{ flex: 1 }} />
-      <Button label={DELETE_ACTION} variant="danger" disabled={disabled} onPress={onDelete} style={{ flex: 1 }} />
-    </View>
-  </SheetCard>
-)
 
 export default BotProfileView

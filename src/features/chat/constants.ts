@@ -226,3 +226,10 @@ export const CALENDAR_TASKS = [
   { label: '면접·커피챗 잡기', sub: '시간 골라 일정 등록', icon: 'people' },
   { label: '준비 알림 만들기', sub: '면접 전날, 마감 3일 전', icon: 'bell' },
 ] as const
+
+/** Board `.kw-ok:before` / `.kw-miss:before`: the glyph's right margin differs (3px / 4px). */
+export const KEYWORD_GLYPH = {
+  ok: { char: '✓', gap: 3 },
+  // eslint-disable-next-line no-restricted-syntax -- board value; importing the theme here breaks the node tests
+  miss: { char: '!', gap: 4 },
+} as const

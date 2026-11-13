@@ -3,10 +3,10 @@ import { useCallback, useState } from 'react'
 import { FlatList, Platform, View, useWindowDimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { askConfirm, useKeyboardHeight, type MenuAction } from '@/shared/components'
+import { useKeyboardHeight, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
-import { CANCEL_LABEL, DELETE_ACTION, DELETE_BODY, deleteTitle } from '../profile/profile-rows'
+import BotDeleteSheet from '../profile/bot-delete-sheet'
 import { XL_FONT_SCALE } from '../new/copy'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
@@ -25,12 +25,12 @@ import { homeChrome } from './metrics'
 
 const VIEWABILITY = { itemVisiblePercentThreshold: 60 }
 
-const MENU_ICON: Record<HomeMenuKey, { icon: MenuAction['icon']; systemImage: MenuAction['systemImage'] }> = {
-  profile: { icon: 'user', systemImage: 'person' },
-  find: { icon: 'search', systemImage: 'magnifyingglass' },
-  read: { icon: 'check', systemImage: 'checkmark' },
-  mute: { icon: 'bell', systemImage: 'bell' },
-  delete: { icon: 'x', systemImage: 'trash' },
+const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
+  profile: 'user',
+  find: 'search',
+  read: 'check',
+  mute: 'bell-off',
+  delete: 'delete',
 }
 
 const BotHomeView = ({
@@ -67,6 +67,7 @@ const BotHomeView = ({
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
+  const [doomed, setDoomed] = useState<CompanyBot | null>(null)
   const [scrolling, setScrolling] = useState(false)
   const [visible, setVisible] = useState<ReadonlySet<string> | null>(null)
   const searching = query !== null
@@ -78,7 +79,14 @@ const BotHomeView = ({
   // The iOS tab bar floats over this view, so the bar rests above it; Android's tab bar takes its own space.
   const lift = keyboard > 0 ? Math.max(0, keyboard - TAB_CLEARANCE) : Platform.OS === 'ios' ? TAB_CLEARANCE + 8 : 8
   const screen = { flex: 1, backgroundColor: c.bg }
-  const fade = { position: 'absolute' as const, left: 0, right: 0, bottom: keyboard > 0 ? lift : 0, height: ios ? 200 : 190, zIndex: 3 }
+  const fade = {
+    position: 'absolute' as const,
+    left: 0,
+    right: 0,
+    bottom: keyboard > 0 ? lift : 0,
+    height: ios ? 200 : 190,
+    zIndex: 3,
+  }
   const listPad = { paddingTop: top, paddingBottom: LIST_BOTTOM }
   const onViewableItemsChanged = useCallback<NonNullable<FlatList<Bot>['props']['onViewableItemsChanged']>>(({ viewableItems }) => {
     setVisible(new Set(viewableItems.flatMap((item) => (item.key ? [item.key] : []))))
@@ -92,20 +100,7 @@ const BotHomeView = ({
     if (key === 'find') router.push(botChatPath(bot.id))
     if (key === 'read') onRead(bot)
     if (key === 'mute') onMute(bot, !bot.muted)
-    if (key === 'delete') {
-      askConfirm({
-        title: deleteTitle(bot.name),
-        body: DELETE_BODY,
-        confirm: DELETE_ACTION,
-        cancel: CANCEL_LABEL,
-        danger: true,
-        onConfirm: () => {
-          void onDelete(bot)
-            .then(() => dropDeleted(home.companies, bot.id, onForget))
-            .catch(() => undefined)
-        },
-      })
-    }
+    if (key === 'delete') setDoomed(bot)
   }
 
   const actionsFor = (bot: CompanyBot): MenuAction[] =>
@@ -113,19 +108,31 @@ const BotHomeView = ({
       key: item.key,
       label: item.label,
       destructive: item.destructive,
-      icon: MENU_ICON[item.key].icon,
-      systemImage: MENU_ICON[item.key].systemImage,
+      icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
       onPress: () => run(item.key, bot),
     }))
 
   const hero = push ? (
-    <BotHomeHero chrome={chrome} state={botRow(push, local[push.id], now).mascot} unread={botRow(push, local[push.id], now).unreadDot} motion={rowMotion(botRow(push, local[push.id], now).mascot, 0, false)} onPress={() => openChat(push)} />
+    <BotHomeHero
+      chrome={chrome}
+      state={botRow(push, local[push.id], now).mascot}
+      unread={botRow(push, local[push.id], now).unreadDot}
+      motion={rowMotion(botRow(push, local[push.id], now).mascot, 0, false)}
+      onPress={() => openChat(push)}
+    />
   ) : null
 
   return (
     <View style={screen}>
       {searching ? null : (
-        <BotHomeHeader chrome={chrome} topInset={insets.top} label={accountLabel(accountName, plan)} name={accountName} onAccount={() => router.push(accountPath())} onNew={() => router.push(botNewPath())} />
+        <BotHomeHeader
+          chrome={chrome}
+          topInset={insets.top}
+          label={accountLabel(accountName, plan)}
+          name={accountName}
+          onAccount={() => router.push(accountPath())}
+          onNew={() => router.push(botNewPath())}
+        />
       )}
       {searching ? (
         <BotHomeSearch
@@ -175,7 +182,26 @@ const BotHomeView = ({
           }}
         />
       )}
-      <LinearGradient pointerEvents="none" colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]} locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]} style={fade} />
+      {doomed ? (
+        <BotDeleteSheet
+          bot={doomed}
+          disabled={false}
+          onClose={() => setDoomed(null)}
+          onDelete={() => {
+            const bot = doomed
+            setDoomed(null)
+            void onDelete(bot)
+              .then(() => dropDeleted(home.companies, bot.id, onForget))
+              .catch(() => undefined)
+          }}
+        />
+      ) : null}
+      <LinearGradient
+        pointerEvents="none"
+        colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
+        locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]}
+        style={fade}
+      />
       <BotHomeBar
         chrome={chrome}
         lift={lift}

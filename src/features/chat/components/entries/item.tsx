@@ -7,6 +7,7 @@ import Notice from './notice'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
+import { monoNumber } from '../../../../theme/mono'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
@@ -17,7 +18,7 @@ import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { isVerdictPlan } from '../../utils/stream-v3'
 import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../../constants'
+import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -251,7 +252,7 @@ const Diff = ({ item }: { item: Of<'diff'> }) => {
             duration={300}
             style={{ flexDirection: 'row', gap: 10, paddingVertical: 5, paddingHorizontal: spacing[3], backgroundColor: add ? c.greenSoft : del ? c.redSoft : 'transparent' }}
           >
-            <Text v="c2" color="t3" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, fontVariant: ['tabular-nums'] }}>
+            <Text v="c2" color="t4" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, ...monoNumber }}>
               {l.n ?? ' '}
             </Text>
             <Text v="c1" weight="700" style={{ width: 10, lineHeight: 20, color: add ? c.green : del ? c.red : c.t3 }}>
@@ -316,7 +317,7 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
         ))}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
           {LOCKED_KEYWORDS.map((k) => (
-            <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
+            <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
           ))}
         </View>
       </View>
@@ -441,7 +442,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
             {item.keywords ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
                 {item.keywords.map((k) => (
-                  <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
+                  <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
                 ))}
               </View>
             ) : null}

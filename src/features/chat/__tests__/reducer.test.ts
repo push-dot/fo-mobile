@@ -18,7 +18,7 @@ describe('applyEvent', () => {
   it('tracks working state from start through approval', () => {
     let s = run([{ type: 'start', at: 1000 }, { type: 'status', verbs: ['맞춰보는 중…'] }])
     expect(s.working).toEqual({ verbs: ['맞춰보는 중…'], startedAt: 1000 })
-    s = applyEvent(s, { type: 'approval', approval: { id: 'ap', question: '바꿀까요?', sections: [] } })
+    s = applyEvent(s, { type: 'approval', approval: { id: 'ap', question: '바꿀까요?', optionIds: [], sections: [] } })
     expect(s.working).toBeNull()
     expect(s.approval?.id).toBe('ap')
     s = applyEvent(s, { type: 'answer', text: '네, 반영해 주세요' })

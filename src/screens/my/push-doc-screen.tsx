@@ -170,7 +170,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
             >
               <View style={{ flex: 1, minWidth: 0 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
-                  <Text v="h3" weight="800" numberOfLines={1} style={{ flexShrink: 1 }}>
+                  <Text v="h3" weight="800" numberOfLines={1} style={{ flexShrink: 1, letterSpacing: -0.51 }}>
                     {lines.title}
                   </Text>
                   <Text v="c1" weight="600" color="t2" numberOfLines={1}>
@@ -200,12 +200,13 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
+              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
             ) : null}
             {application || based ? null : (
               <Button
                 label={SET_BASE_COPY.action}
                 size="sm"
+                paddingX={18}
                 disabled={setBase.isPending}
                 onPress={() =>
                   askConfirm({

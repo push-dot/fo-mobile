@@ -1,5 +1,5 @@
 export { default as Badge } from './badge'
-export type { BadgeTone } from './badge'
+export type { BadgeGlyph, BadgeTone } from './badge'
 export { default as Blur } from './blur'
 export { default as Button } from './button'
 export { default as Chip } from './chip'

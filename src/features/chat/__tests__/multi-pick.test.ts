@@ -5,6 +5,7 @@ import { multiPick } from '../utils/multi-pick'
 const items = ['성능', '보안', '그만하기'].map((label) => ({ label }))
 const gate = (extra: Partial<Approval> = {}): Approval => ({
   id: 'g',
+  optionIds: [],
   question: '어떤 문제를 예방할까요?',
   submit: '이대로 진행',
   sections: [{ kind: 'choices', multi: true, selected: [], items }],
