@@ -52,12 +52,14 @@ const AccountRow = ({ label, value, bold, onPress }: { label: string; value?: st
       <Text v="b1" weight={bold ? '700' : undefined} style={{ flex: 1 }}>
         {label}
       </Text>
-      {value ? (
-        <Text v="b2" color="t2">
-          {value}
-        </Text>
-      ) : null}
-      <Icon name="chev" size={16} color="t3" />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+        {value ? (
+          <Text v="b2" color="t2">
+            {value}
+          </Text>
+        ) : null}
+        <Icon name="chev" size={16} color="t3" />
+      </View>
     </View>
   )
   return onPress ? (
@@ -168,7 +170,7 @@ const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[n
           {plan.key}
         </Text>
         {current ? <Badge label="지금 쓰는 중" tone="ac" /> : plan.key === 'ULTRA' ? <Badge label="추천" /> : null}
-        <Text v="b2" weight="700" style={{ flex: 1, textAlign: 'right' }}>
+        <Text v="b2" weight="700" style={{ flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
           {plan.price}
         </Text>
       </View>

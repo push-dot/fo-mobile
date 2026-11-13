@@ -468,7 +468,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               <Text v="c2" weight="600" color="t3">
                 {e.date?.dow}
               </Text>
-              <Text v="b1">
+              <Text v="b1" weight="800">
                 {e.date?.day}
               </Text>
             </View>
@@ -494,7 +494,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               onPress={() => setTask(i)}
-              style={{ flexGrow: 1, flexBasis: '48%', gap: spacing[2], padding: spacing[4] - ring.borderWidth, borderRadius: radius.md, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
+              style={{ flexGrow: 1, flexBasis: '48%', gap: spacing[2], padding: spacing[4] - ring.borderWidth, borderRadius: on ? radius.md : radius.card, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
             >
               <Icon name={t.icon} size={20} color={on ? 'acText' : 't2'} />
               <Text v="b2" weight="700">

@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { Platform, ScrollView, View } from 'react-native'
@@ -44,7 +45,12 @@ const PageModal = ({
       ) : (
         <View style={{ flex: 1, marginTop: spacing[1] }}>{children}</View>
       )}
-      {footer ? <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10), backgroundColor: c.bg }}>{footer}</View> : null}
+      {footer ? (
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10) }}>
+          <LinearGradient pointerEvents="none" colors={[c.bg, c.bg, `${c.bg}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} />
+          {footer}
+        </View>
+      ) : null}
       {/* iOS: the root ToastHost sits under this sheet; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
     </View>
