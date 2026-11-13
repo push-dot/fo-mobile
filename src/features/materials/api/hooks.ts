@@ -1,12 +1,7 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { MaterialKind, MaterialsFilter, MaterialsPage } from '../types'
-import { withoutMaterial } from '../utils/material-row'
+import { deleteOptions, LISTS, MATERIALS, type Pages } from './cache'
 import { deleteMaterial, fetchMaterial, fetchMaterials, restoreMaterial } from './fetchers'
-
-type Pages = InfiniteData<Awaited<ReturnType<typeof fetchMaterials>>, string | undefined>
-
-const MATERIALS = ['materials'] as const
-const LISTS = [...MATERIALS, 'list'] as const
 
 /** Pages of one tab joined into one MaterialsPage. Counts come from the first page, which the search filters too. */
 const joined = (data: Pages): MaterialsPage => {
@@ -28,6 +23,10 @@ export const useMaterials = ({ tab, q, bot }: MaterialsFilter) => {
     queryFn: ({ pageParam }) => fetchMaterials({ tab, q: q.trim(), bot }, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.next ?? undefined,
+    // Bots add materials while the modal is closed, so each open asks again; the rows on hand show meanwhile.
+    staleTime: 0,
+    // A new search word keeps the rows on screen until its answer comes; a new tab starts from its own skeleton.
+    placeholderData: (prev, prevQuery) => (prevQuery?.queryKey[2] === tab ? prev : undefined),
     select: joined,
   })
   return {
@@ -41,32 +40,31 @@ export const useMaterials = ({ tab, q, bot }: MaterialsFilter) => {
 
 export const useMaterialDetail = (kind: MaterialKind, id: string) => {
   const r = useQuery({ queryKey: [...MATERIALS, 'detail', kind, id], queryFn: () => fetchMaterial(kind, id) })
-  return { data: r.data, isLoading: r.isLoading, isError: r.isError }
+  return { data: r.data, isLoading: r.isLoading, isError: r.isError, refetch: () => void r.refetch() }
 }
 
-/** The row leaves every list at once and comes back if the server refuses. */
+// The 마이 tabs list the same files, documents, bookmarks, and links, so they reload after a change made here.
+const MY_LISTS = [['me'], ['documents']] as const
+
+/** Lists reload after a material is added elsewhere (a link, an upload) or comes back. */
+export const useRefreshMaterials = () => {
+  const qc = useQueryClient()
+  return () => {
+    void qc.invalidateQueries({ queryKey: MATERIALS })
+    MY_LISTS.forEach((queryKey) => void qc.invalidateQueries({ queryKey }))
+  }
+}
+
 export const useDeleteMaterial = () => {
   const qc = useQueryClient()
-  const m = useMutation({
-    mutationFn: ({ kind, id }: { kind: MaterialKind; id: string }) => deleteMaterial(kind, id),
-    onMutate: async ({ kind, id }) => {
-      await qc.cancelQueries({ queryKey: LISTS })
-      const before = qc.getQueriesData<Pages>({ queryKey: LISTS })
-      qc.setQueriesData<Pages>({ queryKey: LISTS }, (prev) => prev && { ...prev, pages: prev.pages.map((p) => ({ ...p, page: withoutMaterial(p.page, kind, id) })) })
-      return before
-    },
-    onError: (_error, _vars, before) => before?.forEach(([key, data]) => qc.setQueryData(key, data)),
-    onSettled: () => qc.invalidateQueries({ queryKey: MATERIALS }),
-  })
+  const refresh = useRefreshMaterials()
+  const m = useMutation({ ...deleteOptions(qc, deleteMaterial), onSettled: refresh })
   return async (kind: MaterialKind, id: string) => void (await m.mutateAsync({ kind, id }))
 }
 
 /** 되돌리기 on the delete toast. The lists refetch, so the row comes back in its place. */
 export const useRestoreMaterial = () => {
-  const qc = useQueryClient()
-  const m = useMutation({
-    mutationFn: ({ kind, id }: { kind: MaterialKind; id: string }) => restoreMaterial(kind, id),
-    onSettled: () => qc.invalidateQueries({ queryKey: MATERIALS }),
-  })
+  const refresh = useRefreshMaterials()
+  const m = useMutation({ mutationFn: ({ kind, id }: { kind: MaterialKind; id: string }) => restoreMaterial(kind, id), onSettled: refresh })
   return async (kind: MaterialKind, id: string) => void (await m.mutateAsync({ kind, id }))
 }

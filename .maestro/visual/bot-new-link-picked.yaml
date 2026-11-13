@@ -1,0 +1,15 @@
+appId: app.push.mobile
+name: BotNewLinkPicked
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15
+- extendedWaitUntil:
+    visible: "바다물류"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "데이터 엔지니어"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewLinkPicked

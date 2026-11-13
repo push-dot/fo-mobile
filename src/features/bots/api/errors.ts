@@ -23,7 +23,7 @@ export const botErrorCopy = (e: unknown): { title: string; body: string } => {
     }
     return {
       title: '봇을 더 만들 수 없어요',
-      body: '요금제에서 만들 수 있는 회사 봇 수에 도달했어요.',
+      body: '플랜에서 만들 수 있는 회사 봇 수에 도달했어요.',
     }
   }
   if (kind === 'protected') {

@@ -1,0 +1,13 @@
+appId: app.push.mobile
+name: BotNewXL
+tags:
+  - visual
+---
+# XL sizes apply when the OS font scale is at least 1.5. This harness leaves Dynamic Type at the default.
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15
+- extendedWaitUntil:
+    visible: "바다물류"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewXL

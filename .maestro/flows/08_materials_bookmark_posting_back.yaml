@@ -1,0 +1,43 @@
+appId: app.push.mobile
+name: 자료 → 북마크 탭 → 공고 자세히 → 공고로 이동 → 뒤로
+---
+# The bot home has no entry to the modal yet (A14 adds it), so the flow opens it by deep link.
+- runFlow: _login.yaml
+- openLink: push://materials
+- extendedWaitUntil:
+    visible: "모아페이 · 백엔드 엔지니어 자세히"
+    timeout: 20000
+- assertVisible: "서류 8"
+- takeScreenshot: 08_materials_bookmark_posting_back-01
+
+# 북마크 tab: past the three rows 전체 previews.
+- tapOn: "북마크"
+- extendedWaitUntil:
+    visible: "한빛모빌리티 · 데이터 엔지니어 자세히"
+    timeout: 10000
+- assertNotVisible: "서류 8"
+- takeScreenshot: 08_materials_bookmark_posting_back-02
+
+- tapOn: "모아페이 · 백엔드 엔지니어 자세히"
+- extendedWaitUntil:
+    visible: "공고로 이동"
+    timeout: 10000
+- assertVisible: "3년 이상 · 정규직"
+- takeScreenshot: 08_materials_bookmark_posting_back-03
+
+# 공고로 이동 closes the sheet and the modal, then opens the posting; 뒤로 lands where the modal was opened.
+- tapOn: "공고로 이동"
+- extendedWaitUntil:
+    notVisible: "공고로 이동"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "뒤로"
+    timeout: 20000
+- assertNotVisible: "자료 검색"
+- takeScreenshot: 08_materials_bookmark_posting_back-04
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "새로 올라온 공고"
+    timeout: 10000
+- assertNotVisible: "모아페이 · 백엔드 엔지니어 자세히"
+- takeScreenshot: 08_materials_bookmark_posting_back-05

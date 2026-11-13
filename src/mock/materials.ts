@@ -16,7 +16,8 @@ const DOTORI: BotContract.BotRef = { id: 'b-dotori', kind: 'company', displayNam
 const PUSH: BotContract.BotRef = { id: 'b-push', kind: 'push', displayName: 'Push Bot', color: null }
 const NURI_LONG: BotContract.BotRef = { id: 'b-nuri', kind: 'company', displayName: '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', color: 'pink' }
 
-const KB = 1024
+// Decimal, as @push/shared fileSize prints it: 312 KB reads "312KB" (MaterialDetailDoc).
+const KB = 1000
 const PDF = 'application/pdf'
 
 const pdf = (id: string, title: string, updatedAt: string, createdBy: BotContract.BotRef | null, size = 240 * KB, pageCount: number | null = 1): Material => ({
