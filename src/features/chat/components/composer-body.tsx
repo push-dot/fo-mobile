@@ -17,7 +17,6 @@ export type ComposerProps = {
   onStop?: () => void
   onAttach?: () => void
   onMention?: () => void
-  onMic?: () => void
   attachment?: string
   onClearAttachment?: () => void
   accessMode?: AccessMode
@@ -33,7 +32,7 @@ export type ComposerProps = {
   disabled?: boolean
 }
 
-/** Text line on top (17px), control row below: + 첨부 · @ 언급 … mic · send/stop. Shared by both platforms. */
+/** Text line on top (17px), control row below: + 첨부 · @ 언급 … send/stop. Shared by both platforms. */
 export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   const c = useColors()
   const { fontScale } = useWindowDimensions()
@@ -44,7 +43,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   const inline = p.layout === 'inline'
   const showTools = !inline && (p.tools ?? true)
   const round = { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
-  const chip = { minHeight: 40, paddingHorizontal: spacing[4], borderRadius: radius.pill, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
+  const chip = { minHeight: 40, paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.fill, flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
   const textType = inline ? type.b1 : type.h3
   if (inline) {
     return (
@@ -136,11 +135,6 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           </Pressable>
         ) : (
           <>
-            {hasText ? null : (
-              <Pressable accessibilityRole="button" accessibilityLabel="음성 입력" onPress={p.onMic} hitSlop={hitSlopTo(40, 40)} style={[round, { backgroundColor: c.fill }]}>
-                <Icon name="mic" size={18} />
-              </Pressable>
-            )}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="보내기"

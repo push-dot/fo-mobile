@@ -53,7 +53,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
   if (a.menu) {
     return (
       <Menu actions={a.menu} accessibilityLabel={a.label}>
-        <View style={box}>{face}</View>
+        <View style={[box, filled ? { backgroundColor: c.fill, borderRadius: radius.pill } : null]}>{face}</View>
       </Menu>
     )
   }

@@ -1,11 +1,12 @@
 import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Blur, Button, Text } from '@/shared/components'
+import { GRABBER } from '@/shared/components/constants'
 import { SheetSurface } from '@/shared/components/glass'
 import { radius, spacing, useColors } from '@/theme'
 
 const ios = Platform.OS === 'ios'
-const GRAB = { width: 36, height: 5, borderRadius: 3 }
+const GRAB = ios ? GRABBER.ios : GRABBER.android
 // `.ios .sheet2`: the sheet floats 8pt in from the screen edges with 40pt corners.
 const IOS_FLOAT = 8
 const IOS_CORNER = 40

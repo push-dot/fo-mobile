@@ -78,6 +78,7 @@ const HeaderPill = ({
       right={
         kind && botId && name ? (
           <GlassButton
+            circle
             actions={[
               {
                 icon: 'menu',

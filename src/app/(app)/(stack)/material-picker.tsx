@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Alert, Platform, Pressable, View } from 'react-native'
-import { CHAT_ATTACHMENT_OPTIONS, LOCAL_DRAFT, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
+import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, LOCAL_DRAFT, isChatAttachment, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
 import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
 import { pickDocument } from '@/shared/infrastructure'
 import { Button, Chip, GlassButton, Icon, Sheet, SheetScroll, Text, TextField, useSheetScrollMax, type IconName } from '@/shared/components'
@@ -38,9 +38,13 @@ const MaterialPickerScreen = () => {
   const add = () => done(sections.flatMap((s) => s.rows).filter((r) => picks.includes(r.id)).map((r) => r.title).join(', '))
   const submit = () => text.trim() && done(text.trim())
   const pickFile = async () => {
-    const picked = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
+    const picked = await pickDocument(Platform.OS === 'android' ? CHAT_ATTACHMENT_OPTIONS_ANDROID : CHAT_ATTACHMENT_OPTIONS)
     const asset = picked.canceled ? undefined : picked.assets[0]
     if (!asset) return
+    if (!isChatAttachment(asset.name)) {
+      Alert.alert('올릴 수 없는 파일이에요', 'PDF, Word, 텍스트 파일만 올릴 수 있어요.')
+      return
+    }
     if ((asset.size ?? 0) > MAX_BYTES) {
       Alert.alert(SIZE_LIMIT.title, SIZE_LIMIT.body)
       return

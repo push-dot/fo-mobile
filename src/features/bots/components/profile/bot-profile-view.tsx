@@ -44,7 +44,7 @@ const Loading = () => {
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       <View
         style={{
           alignItems: 'center',
@@ -133,7 +133,7 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
       <View
         accessibilityRole="alert"
@@ -253,7 +253,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   }
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
+      <TopBar circleBack onBack={() => router.back()} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
         <ProfileHead name={bot.name} color={color} sub={posting?.title} />
         {groups.map((group, index) => (

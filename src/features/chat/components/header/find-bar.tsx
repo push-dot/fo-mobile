@@ -1,6 +1,7 @@
 import { Platform, TextInput, View } from 'react-native'
 import { Glass, GlassButton, Icon, Text, TopBar } from '@/shared/components'
-import { radius, spacing, type, useColors } from '../../../../theme'
+import { fontFor, radius, spacing, type, useColors } from '../../../../theme'
+import { useHardwareBack } from '@/shared/utility'
 import type { FindStep } from '../../utils/find'
 
 const ios = Platform.OS === 'ios'
@@ -10,6 +11,7 @@ type Props = { query: string; label: string; onQuery: (q: string) => void; onSte
 /** Takes the place of the header pill (ChatBotHeaderFind). */
 export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
   const c = useColors()
+  useHardwareBack(onClose)
   const field = (
     <View style={{ height: 44, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: 14, backgroundColor: ios ? 'transparent' : c.fill }}>
       <Icon name="search" size={18} color="t1" />
@@ -21,7 +23,7 @@ export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
         accessibilityLabel="채팅에서 찾기"
         placeholder="채팅에서 찾기"
         placeholderTextColor={c.t3}
-        style={{ flex: 1, minWidth: 0, height: 44, padding: 0, fontSize: type.b1.fontSize, color: c.t1 }}
+        style={{ flex: 1, minWidth: 0, height: 44, padding: 0, ...fontFor('400'), fontSize: type.b1.fontSize, letterSpacing: type.b1.letterSpacing, color: c.t1 }}
       />
       <Text v="c1" weight="700" color="t3">
         {label}
@@ -42,7 +44,7 @@ export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
               { icon: 'down', label: '다음 결과', onPress: () => onStep('newer') },
             ]}
           />
-          <GlassButton iconSize={20} actions={[{ icon: 'x', label: '찾기 닫기', onPress: onClose }]} />
+          <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '찾기 닫기', onPress: onClose }]} />
         </>
       }
     />

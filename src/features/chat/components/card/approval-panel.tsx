@@ -1,7 +1,7 @@
 import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { onAccent, radius, selectedRing, spacing, type, useColors, useShadow } from '../../../../theme'
+import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors, useShadow } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
 import { expiredNote } from '../../utils/card'
@@ -267,7 +267,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
       style={[
         ios
           ? { marginHorizontal: spacing[2], marginBottom: spacing[2], backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
-          : { backgroundColor: c.bg, borderTopLeftRadius: radius.confirmPanelTop, borderTopRightRadius: radius.confirmPanelTop, ...shadow.pop, shadowOffset: { width: 0, height: -10 }, elevation: 12 },
+          : { backgroundColor: c.bg, borderTopLeftRadius: radius.confirmPanelTop, borderTopRightRadius: radius.confirmPanelTop, boxShadow: cssShadow.approvalSheet },
         motion,
       ]}
     >

@@ -1,15 +1,25 @@
 import * as Notifications from 'expo-notifications'
+import { AndroidImportance } from 'expo-notifications'
 import { Platform } from 'react-native'
 
 export const readNotificationPermission = () => Notifications.getPermissionsAsync()
 
-export const requestNotificationPermission = () =>
-  Notifications.requestPermissionsAsync({
+// Android 13+ shows no permission prompt, and a token call fails, until a notification channel exists; creating it again is a no-op.
+const ensureAndroidChannel = async () => {
+  if (Platform.OS !== 'android') return
+  await Notifications.setNotificationChannelAsync('default', { name: '알림', importance: AndroidImportance.DEFAULT })
+}
+
+export const requestNotificationPermission = async () => {
+  await ensureAndroidChannel()
+  return Notifications.requestPermissionsAsync({
     ios: { allowAlert: true, allowBadge: true, allowSound: true },
   })
+}
 
 export const readPushToken = async () => {
   try {
+    await ensureAndroidChannel()
     const token = await Notifications.getExpoPushTokenAsync()
     return token.data || null
   } catch {
@@ -17,7 +27,6 @@ export const readPushToken = async () => {
   }
 }
 
-// shortcut: no Android channel, add one before Android push at X1
 export const pushPlatform = (): 'ios' | 'android' | null =>
   Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : null
 

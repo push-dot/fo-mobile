@@ -6,12 +6,14 @@ export const POP = {
   right: 14,
   gap: spacing[4],
   padding: spacing[2],
-  radius: 26,
   item: 44,
   itemPad: 10,
   dividerGap: 4,
   height: (count: number) => 2 * spacing[2] + count * 44 + 9,
 }
+
+/** The pop's corner: the boards' `.ios .pop` is 26, the base `.pop` Android keeps is 20. */
+export const popRadius = (os: string) => (os === 'ios' ? 26 : 20)
 
 /** Under the held row; above it when the pop would run past the bottom of the screen. */
 export const popTop = (row: { y: number; height: number }, height: number, bottom: number) => {

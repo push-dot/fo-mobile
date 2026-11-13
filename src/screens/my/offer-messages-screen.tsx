@@ -26,7 +26,7 @@ import {
   useOfferMessages,
   type FailedSend,
 } from '@/features/my'
-import { Glass, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { Glass, GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
@@ -79,6 +79,7 @@ const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
 const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const keyboardUp = useKeyboardHeight() > 0
   const [text, setText] = useState('')
   const [composerH, setComposerH] = useState(0)
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
@@ -238,7 +239,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         style={{
           paddingHorizontal: ios ? spacing[4] : spacing[3],
           paddingTop: ios ? 6 : spacing[2],
-          paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : insets.bottom + spacing[2],
+          paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : (keyboardUp ? 0 : insets.bottom) + spacing[2],
           backgroundColor: ios ? undefined : c.bg,
         }}
       >

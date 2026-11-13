@@ -61,6 +61,8 @@ const report = (code?: string) => {
 }
 
 const accept = async (purchase: Purchase) => {
+  // A pending Play purchase is not paid yet: verifying or acknowledging it now would grant the plan early.
+  if (purchase.purchaseState === 'pending') return setPending(false)
   if (!claim(purchase)) return
   try {
     await settlePurchase(purchase, deps)

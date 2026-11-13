@@ -16,7 +16,10 @@ const extraGap = (approval: boolean, keyboard: number, status: boolean | undefin
   return THREAD_GAP
 }
 
-/** Android reports the keyboard without the nav bar, but KeyboardAvoidingView lifts the composer by both. */
+/**
+ * Unused: bot-chat-screen lifts the thread with its own keyboard state, so nothing calls this; only its test does. Do not read it as the Android keyboard rule
+ * (the composer sits 8 above the keyboard, with the nav inset dropped while it is open).
+ */
 export const threadInset = ({ bottomH, keyboard, navBar, approval, android, status }: Inset) => {
   const lift = keyboard && android ? keyboard + navBar : keyboard
   const platform = android ? 'android' : 'ios'

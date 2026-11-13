@@ -3,7 +3,7 @@ import { Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions, type
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Blur, Icon, Text, type MenuAction } from '@/shared/components'
 import { radius, spacing, useColors, useShadow } from '../../../../theme'
-import { popTop, POP } from './row-menu-layout'
+import { popRadius, popTop, POP } from './row-menu-layout'
 
 type Held = { y: number; height: number }
 
@@ -93,7 +93,7 @@ const BotRowMenu = ({
                   width: POP.width,
                   top: popTop(held, POP.height(actions.length), screen - insets.bottom),
                   padding: POP.padding,
-                  borderRadius: POP.radius,
+                  borderRadius: popRadius(Platform.OS),
                   backgroundColor: ios ? c.sheet : c.bg,
                   borderWidth: ios ? 0 : 1,
                   borderColor: c.line,

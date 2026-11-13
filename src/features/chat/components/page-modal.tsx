@@ -46,8 +46,14 @@ const PageModal = ({
         <View style={{ flex: 1, marginTop: spacing[1] }}>{children}</View>
       )}
       {footer ? (
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10) }}>
-          <LinearGradient pointerEvents="none" colors={[c.bg, c.bg, `${c.bg}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} />
+        <View
+          style={[
+            { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10) },
+            // The boards' `.and .ctabar`: a solid `bg` bar with a 1px line on top, no fade.
+            ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
+          ]}
+        >
+          {ios ? <LinearGradient pointerEvents="none" colors={[c.bg, c.bg, `${c.bg}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} /> : null}
           {footer}
         </View>
       ) : null}
