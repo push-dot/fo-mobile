@@ -49,13 +49,16 @@ const CountPill = ({ count }: { count: number }) => {
   return ios ? <Glass tint={tint} style={shape}>{label}</Glass> : <View style={[shape, { backgroundColor: c.fill }]}>{label}</View>
 }
 
+/** RN has no `text-wrap: balance`; this width rebuilds the three lines MaterialsEmpty draws for its body. */
+const NOTE_BODY_WIDTH = 252
+
 /** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. */
 const Note = ({ title, body, action, alert }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean }) => (
   <View accessibilityRole={alert ? 'alert' : undefined} style={{ alignItems: 'center', gap: spacing[2], paddingTop: 120, paddingHorizontal: 36 }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
       {title}
     </Text>
-    <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+    <Text v="b2" color="t3" style={{ textAlign: 'center', maxWidth: NOTE_BODY_WIDTH }}>
       {body}
     </Text>
     {action ? <Button label={action.label} variant="secondary" size="sm" onPress={action.onPress} style={{ marginTop: spacing[3] }} /> : null}
