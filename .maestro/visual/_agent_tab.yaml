@@ -6,9 +6,9 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - tapOn: "봇"
+      - tapOn: "Bot"
       - extendedWaitUntil:
-          visible: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
+          visible: "(동의하고 시작하기|새 회사 Bot 만들기|Push Bot)"
           timeout: 6000
 - runFlow:
     when:

@@ -11,7 +11,7 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
+      TAB: "Bot"
       READY: "새 회사 Bot 만들기"
 - tapOn: "검색"
 - extendedWaitUntil:

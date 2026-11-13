@@ -11,7 +11,7 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
+      TAB: "Bot"
       READY: "Push Bot"
 - extendedWaitUntil:
     visible: "Push Bot"

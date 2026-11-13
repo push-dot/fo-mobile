@@ -11,8 +11,8 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - tapOn:
     text: "자료"
     index: 0
@@ -21,7 +21,7 @@ tags:
     timeout: 20000
 - tapOn: "김서준_백엔드_이력서.pdf 보내기"
 - extendedWaitUntil:
-    visible: "어느 봇에게 보낼까요?"
+    visible: "어느 Bot한테 보낼까요?"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotPick

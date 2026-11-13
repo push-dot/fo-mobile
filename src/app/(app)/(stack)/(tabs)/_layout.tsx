@@ -18,7 +18,7 @@ const TABS = [
   { route: '(hub)', name: '허브', icon: ICONS.hub },
   { route: '(social)', name: '소셜', icon: ICONS.social },
   // The mascot keeps its own colors in both states, as in the design.
-  { route: '(bots)', name: '봇', mascot: ICONS.agent },
+  { route: '(bots)', name: 'Bot', mascot: ICONS.agent },
   { route: '(my)', name: '마이', icon: ICONS.my },
 ] as const
 

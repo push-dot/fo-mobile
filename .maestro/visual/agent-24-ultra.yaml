@@ -13,8 +13,8 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
+      TAB: "Bot"
+      READY: "(동의하고 시작하기|새 회사 Bot 만들기|Push Bot)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"

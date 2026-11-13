@@ -9,9 +9,9 @@ tags:
     env:
       MOCK: "push://sign-in?mock=consent-on,hang:GET:bots$"
       READY: "새로 올라온 공고"
-- tapOn: "봇"
+- tapOn: "Bot"
 - extendedWaitUntil:
-    visible: "봇 목록을 불러오는 중이에요"
+    visible: "Bot 목록을 불러오는 중이에요"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHomeLoading
@@ -20,9 +20,9 @@ tags:
     env:
       MOCK: "push://sign-in?mock=consent-on,fail:GET:bots$"
       READY: "새로 올라온 공고"
-- tapOn: "봇"
+- tapOn: "Bot"
 - extendedWaitUntil:
-    visible: "봇 목록을 불러오지 못했어요"
+    visible: "Bot 목록을 불러오지 못했어요"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHomeError
@@ -34,8 +34,8 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - extendedWaitUntil:
     visible: ".*누리클라우드 플랫폼엔지니어링코리아.*"
     timeout: 10000
@@ -49,8 +49,8 @@ tags:
 - runFlow:
     file: ../flows/_tap_tab.yaml
     env:
-      TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      TAB: "Bot"
+      READY: "새 회사 Bot 만들기"
 - extendedWaitUntil:
     visible: ".*승인 요청이 만료됐어요.*"
     timeout: 10000

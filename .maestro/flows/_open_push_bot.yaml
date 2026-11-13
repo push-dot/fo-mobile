@@ -6,7 +6,7 @@ tags:
 - runFlow:
     file: _tap_tab.yaml
     env:
-      TAB: "봇"
+      TAB: "Bot"
       READY: "(동의하고 시작하기|Push Bot 대화 열기.*)"
 - runFlow:
     when:

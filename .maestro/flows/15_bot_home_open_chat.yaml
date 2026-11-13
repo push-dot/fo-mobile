@@ -6,7 +6,7 @@ name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
 - runFlow:
     file: _tap_tab.yaml
     env:
-      TAB: "봇"
+      TAB: "Bot"
       READY: "(동의하고 시작하기|새 회사 Bot 만들기)"
 - runFlow:
     when:

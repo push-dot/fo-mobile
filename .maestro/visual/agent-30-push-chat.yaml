@@ -35,16 +35,16 @@ tags:
     timeout: 5000
 - tapOn: ".*실행 방식.*"
 - extendedWaitUntil:
-    visible: "봇이 어떻게 실행할까요?"
+    visible: "Bot이 어떻게 실행할까요?"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: ChatRunMode
 - runFlow:
     file: _close_sheet.yaml
     env:
-      TITLE: "봇이 어떻게 실행할까요?"
+      TITLE: "Bot이 어떻게 실행할까요?"
 - extendedWaitUntil:
-    notVisible: "봇이 어떻게 실행할까요?"
+    notVisible: "Bot이 어떻게 실행할까요?"
     timeout: 5000
 - tapOn: "메시지.*"
 - inputText: "@"
