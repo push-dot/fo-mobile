@@ -43,18 +43,18 @@ const BotHomeSearch = ({
     flexGrow: hint || empty ? 1 : 0,
     justifyContent: hint || empty ? ('center' as const) : ('flex-start' as const),
   }
-  const center = { textAlign: 'center' as const, fontSize: type.b1.fontSize, lineHeight: type.b1.lineHeight, paddingHorizontal: 32 }
+  const center = { textAlign: 'center' as const, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight, paddingHorizontal: spacing[6] }
   const sect = { fontSize: chrome.sectSize, lineHeight: chrome.sectLine, paddingTop: 6, paddingBottom: spacing[1], paddingHorizontal: spacing[5] }
   const hit = {
     flexDirection: 'row' as const,
-    alignItems: 'center' as const,
+    alignItems: chrome.rowAlign,
     gap: chrome.rowGap,
     paddingVertical: chrome.rowPadV,
     paddingHorizontal: chrome.rowPadH,
     minHeight: 76,
   }
-  const body = { flex: 1, minWidth: 0, gap: 2 }
-  const topRow = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2] }
+  const body = { flex: 1, minWidth: 0, gap: 3 }
+  const topRow = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: spacing[2] }
   const name = { flex: 1, fontSize: chrome.nameSize, lineHeight: chrome.nameLine }
   const time = { fontSize: chrome.timeSize, lineHeight: chrome.timeLine }
   const line = { fontSize: chrome.msgSize, lineHeight: chrome.msgLine }
@@ -83,7 +83,7 @@ const BotHomeSearch = ({
           })
         : null}
       {messageTitle ? (
-        <Text weight="700" color="t3" style={sect}>
+        <Text weight="700" color="t3" style={botTitle ? [sect, { paddingTop: 14 }] : sect}>
           {messageTitle}
         </Text>
       ) : null}
@@ -94,7 +94,9 @@ const BotHomeSearch = ({
             return (
               <Pressable key={message.messageId} accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
                 <View style={hit}>
-                  <Mascot size={chrome.rowMascot} state="idle" color={message.bot.color ?? 'push'} motion={{ mode: 'still' }} />
+                  <View style={{ marginTop: chrome.mascotTop }}>
+                    <Mascot size={chrome.rowMascot} state="idle" color={message.bot.color ?? 'push'} motion={{ mode: 'still' }} />
+                  </View>
                   <View style={body}>
                     <View style={topRow}>
                       <Text weight="700" numberOfLines={chrome.nameLines} style={name}>

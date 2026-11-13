@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { useState, type ReactNode } from 'react'
-import { Modal, Pressable, ScrollView, View } from 'react-native'
+import { Modal, Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, showToast } from '@/shared/components'
-import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useDeleteBot, useSetBotMuted } from '../../api/hooks'
 import { botColorPath, materialsPath } from '../../utils/paths'
@@ -32,24 +32,57 @@ import {
 import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 
 const HEADER_MASCOT = 104
-const DELETE_MASCOT = 32
+const XL_SCALE = 1.5
+const DELETE_MASCOT = 40
+const FLOAT_RADIUS = 40
 const COLOR_DOT = 22
+
+const LOADING_GROUPS: readonly (readonly number[])[] = [[60, 80], [60], [40, 60], [80]]
+const SKELETON_MASCOT_RADIUS = 36
 
 const Loading = () => {
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ alignItems: 'center', gap: spacing[3], padding: spacing[6] }}>
-        <Skeleton width={HEADER_MASCOT} height={HEADER_MASCOT} radius={HEADER_MASCOT / 2} />
-        <Skeleton width={120} height={20} />
-        <Skeleton width={88} height={14} />
+      <View style={{ alignItems: 'center', gap: spacing[1], paddingTop: spacing[1], paddingHorizontal: 28, paddingBottom: spacing[5] }}>
+        <View style={{ marginBottom: 10 }}>
+          <Skeleton width={HEADER_MASCOT} height={HEADER_MASCOT} radius={SKELETON_MASCOT_RADIUS} />
+        </View>
+        <Skeleton width={120} height={22} />
+        <View style={{ marginTop: 6 }}>
+          <Skeleton width={180} height={14} />
+        </View>
       </View>
-      <View style={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>
-        {[0, 1, 2, 3].map((key) => (
-          <Skeleton key={key} width="100%" height={56} />
-        ))}
+      {LOADING_GROUPS.map((widths, group) => (
+        <View key={group} style={{ marginHorizontal: spacing[5], marginTop: group > 0 ? spacing[3] : 0, borderRadius: radius.card, backgroundColor: c.bg2, paddingHorizontal: spacing[4] }}>
+          {widths.map((width, row) => (
+            <View key={row} style={{ minHeight: 56, justifyContent: 'center', borderTopWidth: row > 0 ? 1 : 0, borderTopColor: c.line }}>
+              <Skeleton width={width} height={14} />
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  )
+}
+
+const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typeof Mascot>[0]['color']; sub?: string }) => {
+  const xl = useWindowDimensions().fontScale >= XL_SCALE
+  const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
+  return (
+    <View style={{ alignItems: 'center', gap: spacing[1], paddingTop: spacing[1], paddingHorizontal: 28, paddingBottom: spacing[5] }}>
+      <View style={{ marginBottom: 6 }}>
+        <Mascot size={size.mascot} color={color} motion={{ mode: 'still' }} />
       </View>
+      <Text weight="800" numberOfLines={2} style={{ textAlign: 'center', maxWidth: 330, fontSize: size.name, lineHeight: size.nameLine }}>
+        {name}
+      </Text>
+      {sub ? (
+        <Text color="t3" numberOfLines={1} style={{ textAlign: 'center', fontSize: size.sub, lineHeight: size.subLine }}>
+          {sub}
+        </Text>
+      ) : null}
     </View>
   )
 }
@@ -59,22 +92,15 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      {bot ? (
-        <View style={{ alignItems: 'center', paddingBottom: 22 }}>
-          <Mascot size={HEADER_MASCOT} color={bot.kind === 'push' ? 'push' : bot.color} motion={{ mode: 'still' }} />
-          <Text v="h2" weight="800" numberOfLines={2} style={{ textAlign: 'center' }}>
-            {bot.name}
-          </Text>
-        </View>
-      ) : null}
-      <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[6] }}>
+      {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
+      <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: 36, paddingTop: spacing[6] }}>
         <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {PROFILE_ERROR_TITLE}
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
           {PROFILE_ERROR_BODY}
         </Text>
-        <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} />
+        <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={{ marginTop: spacing[3] }} />
       </View>
     </View>
   )
@@ -83,13 +109,17 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
 const SheetCard = ({ label, title, onClose, children }: { label: string; title?: string; onClose: () => void; children: ReactNode }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const float = Platform.OS === 'ios'
+  const card = float
+    ? { backgroundColor: c.bg, margin: spacing[2], borderRadius: FLOAT_RADIUS, paddingHorizontal: spacing[4], paddingTop: spacing[3], paddingBottom: spacing[5], gap: spacing[2] }
+    : { backgroundColor: c.bg, borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: insets.bottom + spacing[3], gap: spacing[2] }
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <Pressable onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
-        <Pressable accessible={false} accessibilityLabel={label} onPress={() => undefined} style={{ backgroundColor: c.bg, borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, paddingHorizontal: spacing[4], paddingTop: spacing[3], paddingBottom: insets.bottom + spacing[4], gap: spacing[2] }}>
+        <Pressable accessible={false} accessibilityLabel={label} onPress={() => undefined} style={card}>
           <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
           {title ? (
-            <Text v="h3" accessibilityRole="header">
+            <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
               {title}
             </Text>
           ) : null}
@@ -166,8 +196,10 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
             <Text v="b1" style={{ flex: 1, lineHeight: type.b2.lineHeight }}>
               {row.label}
             </Text>
-            <View style={{ width: COLOR_DOT, height: COLOR_DOT, borderRadius: COLOR_DOT / 2, backgroundColor: mascotPalette(bot.color, mode).body }} />
-            <Icon name="chev" size={18} color="t4" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <View style={{ width: COLOR_DOT, height: COLOR_DOT, borderRadius: COLOR_DOT / 2, marginRight: spacing[1], backgroundColor: mascotPalette(bot.color, mode).body }} />
+              <Icon name="chev" size={16} color="t3" />
+            </View>
           </View>
         </Pressable>
       )
@@ -191,20 +223,12 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[6], gap: spacing[3] }}>
-        <View style={{ alignItems: 'center', gap: spacing[1], paddingHorizontal: spacing[2], paddingBottom: 22 }}>
-          <Mascot size={HEADER_MASCOT} color={color} motion={{ mode: 'still' }} />
-          <Text v="h2" weight="800" numberOfLines={2} style={{ textAlign: 'center' }}>
-            {bot.name}
-          </Text>
-          {posting ? (
-            <Text v="c1" color="t3" numberOfLines={1} style={{ textAlign: 'center' }}>
-              {posting.title}
-            </Text>
-          ) : null}
-        </View>
-        {groups.map((group) => (
-          <SettingsGroup key={group.map((row) => row.id).join('-')}>{group.map(rowOf)}</SettingsGroup>
+      <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+        <ProfileHead name={bot.name} color={color} sub={posting?.title} />
+        {groups.map((group, index) => (
+          <View key={group.map((row) => row.id).join('-')} style={{ marginHorizontal: spacing[5], marginTop: index > 0 ? spacing[3] : 0 }}>
+            <SettingsGroup>{group.map(rowOf)}</SettingsGroup>
+          </View>
         ))}
       </ScrollView>
       {sheet === 'allowed' ? (
@@ -212,11 +236,11 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
           <Text v="b2" color="t2">
             {grantIntro(bot)}
           </Text>
-          <View>
+          <View style={{ marginTop: spacing[2] }}>
             {grants.map((grant) => (
               <View key={grant.host} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: 64, borderTopWidth: 1, borderTopColor: c.line }}>
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text v="b1" weight="600" numberOfLines={1} style={{ lineHeight: type.b2.lineHeight }}>
+                  <Text v="b1" weight="600" numberOfLines={1}>
                     {grant.host}
                   </Text>
                   <Text v="c1" color="t3">
@@ -230,8 +254,8 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
                   onPress={() => void onRevoke(grant.host)}
                   glass
                   fill="fill"
-                  style={{ minHeight: 40, borderRadius: radius.buttonSmIos }}
-                  contentStyle={{ paddingHorizontal: spacing[4] }}
+                  style={{ minHeight: 40, borderRadius: platformTheme.buttonSmRadius }}
+                  contentStyle={{ paddingHorizontal: 14 }}
                 >
                   <Text v="c1" weight="700">
                     {REVOKE_LABEL}
@@ -240,7 +264,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
               </View>
             ))}
           </View>
-          <Button label={CLOSE_LABEL} variant="secondary" onPress={() => setSheet(null)} />
+          <Button label={CLOSE_LABEL} variant="secondary" onPress={() => setSheet(null)} style={{ marginTop: spacing[2] }} />
         </SheetCard>
       ) : null}
       {sheet === 'delete' && bot.kind === 'company' ? (
@@ -252,7 +276,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
 
 const DeleteSheet = ({ bot, disabled, onClose, onDelete }: { bot: CompanyBot; disabled: boolean; onClose: () => void; onDelete: () => void }) => (
   <SheetCard label={deleteTitle(bot.name)} onClose={onClose}>
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingTop: spacing[1] }}>
       <Mascot size={DELETE_MASCOT} color={bot.color} motion={{ mode: 'still' }} />
       <Text v="h3" accessibilityRole="header" style={{ flex: 1 }}>
         {deleteTitle(bot.name)}
