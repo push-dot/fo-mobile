@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type AccessMode, type BotContract, type ChatIntent } from '@push/api-client'
+import type { Attachment, BotId } from '@/features/bots'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
@@ -13,6 +14,7 @@ import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream, type StreamEnd } from './utils/stream'
 import { openPieceId, restoreBotTurns } from './utils/turns'
+import { withMaterial } from './utils/usage'
 import type { ChatEvent, ChatState } from './types'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
@@ -23,10 +25,70 @@ export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: 
 
 export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
 
-/** 자료 고르기 sheet writes back into the composer. File picks stay in the composer. */
-export const useMaterialBridge = create<{ text: string | null; file: number }>(() => ({ text: null, file: 0 }))
-export const submitMaterialText = (text: string) => useMaterialBridge.setState({ text })
-export const requestMaterialFile = () => useMaterialBridge.setState((s) => ({ file: s.file + 1 }))
+export const LOCAL_DRAFT = 'local'
+
+type Draft = { text: string; file?: PickedFile; chip?: string }
+
+const EMPTY_DRAFT: Draft = { text: '' }
+
+export const useDraftStore = create<{ byBot: Record<string, Draft> }>(() => ({ byBot: {} }))
+
+const writeDraft = (id: string, next: Draft | undefined) => {
+  useDraftStore.setState((s) => {
+    if (!next) {
+      if (!s.byBot[id]) return s
+      const { [id]: _, ...rest } = s.byBot
+      return { byBot: rest }
+    }
+    return { byBot: { ...s.byBot, [id]: next } }
+  })
+}
+
+export const setDraftText = (id: string, text: string) => {
+  useDraftStore.setState((s) => {
+    const current = s.byBot[id] ?? EMPTY_DRAFT
+    if (!text && !current.file && !current.chip) {
+      if (!s.byBot[id]) return s
+      const { [id]: _, ...rest } = s.byBot
+      return { byBot: rest }
+    }
+    return { byBot: { ...s.byBot, [id]: { ...current, text } } }
+  })
+}
+
+export const appendDraftText = (id: string, text: string) => {
+  useDraftStore.setState((s) => ({ byBot: withMaterial(s.byBot, id, text, EMPTY_DRAFT) }))
+}
+
+export const attachDraftFile = (id: string, file: PickedFile) => {
+  useDraftStore.setState((s) => {
+    const current = s.byBot[id] ?? EMPTY_DRAFT
+    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined } } }
+  })
+}
+
+export const attachDraftChip = (id: string, chip: string) => {
+  useDraftStore.setState((s) => {
+    const current = s.byBot[id] ?? EMPTY_DRAFT
+    return { byBot: { ...s.byBot, [id]: { ...current, chip, file: undefined } } }
+  })
+}
+
+export const detachDraft = (id: string) => {
+  useDraftStore.setState((s) => {
+    const current = s.byBot[id]
+    if (!current) return s
+    if (!current.text) {
+      const { [id]: _, ...rest } = s.byBot
+      return { byBot: rest }
+    }
+    return { byBot: { ...s.byBot, [id]: { text: current.text } } }
+  })
+}
+
+export const clearDraft = (id: string) => writeDraft(id, undefined)
+
+export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title)
 
 type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
@@ -373,3 +435,29 @@ export const forget = (id: string) =>
     const { [id]: _, ...rest } = s.chats
     return { chats: rest }
   })
+
+const dropRun = (id: string) => {
+  runs.get(id)?.abort()
+  runs.delete(id)
+  heldQueues.delete(id)
+  pendingConsent.delete(id)
+}
+
+export const clearPushChat = async (id: string, kind: 'push' | 'company') => {
+  if (kind !== 'push') return false
+  await botApi.bots.clearChat(id)
+  dropRun(id)
+  useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: emptyChat } }))
+  clearDraft(id)
+  return true
+}
+
+export const deleteCompanyBot = async (id: string, kind: 'push' | 'company') => {
+  if (kind !== 'company') return false
+  await botApi.bots.remove(id)
+  dropRun(id)
+  forget(id)
+  clearDraft(id)
+  void queryClient.invalidateQueries({ queryKey: ['bots'] })
+  return true
+}

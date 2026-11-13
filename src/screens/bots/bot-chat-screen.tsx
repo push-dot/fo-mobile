@@ -3,13 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, KeyboardAvoidingView, View, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
+import { materialPickerPath as botMaterialPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
   AWAITING_TEXT,
   ApprovalPanel,
   AwaitingRow,
   ComposerArea,
   ConsentSheet,
+  HeaderPill,
   Item,
+  Onboarding,
   Queued,
   StatusRow,
   THREAD_BATCH,
@@ -18,7 +21,6 @@ import {
   accountPath,
   answer,
   composerPlaceholder,
-  materialPickerPath,
   openBot,
   quickStartPath,
   send,
@@ -27,7 +29,7 @@ import {
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
-import { Button, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { Button, Text, useKeyboardHeight } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
@@ -42,7 +44,6 @@ const BotChatScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
       <Opened key={`${address}:${tryN}`} address={address} onRetry={() => setTryN((n) => n + 1)} />
     </View>
   )
@@ -69,19 +70,28 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
   }, [address])
 
   if (id) return <Thread id={id} />
-  if (!failed) return null
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: spacing[5] }}>
-      <Text v="c1" color="t2" style={{ flex: 1 }}>
-        대화를 불러오지 못했어요
-      </Text>
-      <Button label="다시 불러오기" size="sm" variant="secondary" onPress={onRetry} />
+    <View style={{ flex: 1 }}>
+      <HeaderPill />
+      {failed ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: spacing[5] }}>
+          <Text v="c1" color="t2" style={{ flex: 1 }}>
+            대화를 불러오지 못했어요
+          </Text>
+          <Button label="다시 불러오기" size="sm" variant="secondary" onPress={onRetry} />
+        </View>
+      ) : null}
     </View>
   )
 }
 
 const Thread = ({ id }: { id: string }) => {
+  const bot = useBot(id as BotId)
+  const profile = useBotProfile(id as BotId)
   const chat = useChat(id)
+  const name = bot.data?.name
+  const kind = bot.data?.kind
+  const color = bot.data?.kind === 'company' ? bot.data.color : 'push'
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
   const purchase = usePersonalPurchase()
@@ -92,7 +102,8 @@ const Thread = ({ id }: { id: string }) => {
   const input = useRef<TextInputInstance>(null)
   const saying = !!chat.approval && sayingFor === chat.approval.id
   const showPanel = chat.approval && !saying
-  const placeholder = composerPlaceholder(chat)
+  const placeholder = composerPlaceholder(chat, name)
+  const empty = chat.items.length === 0 && chat.queue.length === 0
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
   const data = [...chat.items].reverse()
 
@@ -129,7 +140,12 @@ const Thread = ({ id }: { id: string }) => {
   )
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+      <HeaderPill botId={id} name={name} kind={kind} color={color} />
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      {empty && kind && name ? (
+        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} onChip={(key) => router.push(quickStartPath(key))} />
+      ) : (
       <FlatList
         inverted
         data={data}
@@ -151,17 +167,19 @@ const Thread = ({ id }: { id: string }) => {
           ) : undefined
         }
       />
+      )}
       {showPanel ? (
         <ApprovalPanel
           key={chat.approval!.id}
           approval={chat.approval!}
           onAnswer={(text, choice) => answer(id, text, choice)}
           onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
-          onMaterials={() => (setSayingFor(chat.approval?.id), router.push(materialPickerPath()))}
+          onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}
         />
       ) : (
         <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
           <ComposerArea
+            botId={id}
             inputRef={input}
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
             working={!!chat.working}
@@ -179,7 +197,8 @@ const Thread = ({ id }: { id: string }) => {
         </View>
       )}
       <ConsentSheet />
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   )
 }
 
