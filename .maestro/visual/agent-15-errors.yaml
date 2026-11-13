@@ -6,7 +6,7 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
 # The boards draw the user's own request above each error; run:<token> makes the mock answer it with that error (Android types the ASCII alias).
-- openLink: push://chat?mock=run:err-unavailable
+- openLink: push://bots/push?mock=run:err-unavailable
 - runFlow:
     file: _say.yaml
     env:
@@ -18,7 +18,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
 - runFlow: _fresh_chat.yaml
-- openLink: push://chat?mock=run:err-other
+- openLink: push://bots/push?mock=run:err-other
 - runFlow:
     file: _say.yaml
     env:
@@ -30,7 +30,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrOther
 - runFlow: _fresh_chat.yaml
-- openLink: push://chat?mock=run:err-credit
+- openLink: push://bots/push?mock=run:err-credit
 - runFlow:
     file: _say.yaml
     env:
@@ -42,7 +42,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderLimit
 - runFlow: _fresh_chat.yaml
-- openLink: push://chat?mock=reset
+- openLink: push://bots/push?mock=reset,bot:push:empty
 - runFlow:
     file: _say.yaml
     env:

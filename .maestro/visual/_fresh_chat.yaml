@@ -6,7 +6,7 @@ tags:
 # The 더 보기 button is tapped by position: an open approval panel hides the header from accessibility, and a tap lands anyway.
 ---
 - tapOn:
-    point: "90%,10.5%"
+    point: "90%,10%"
 - tapOn: "대화 지우기"
 - extendedWaitUntil:
     visible: "Push Bot과 나눈 대화를 지울까요?"

@@ -82,7 +82,8 @@ const fixDocRun: Step[] = [
 
 const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(200, todo('todo', labels, 2, added)),
-  s(100, status(added < 0 ? '맞춰보는 중…' : '다시 맞춰보는 중…')),
+  // The status line draws the status frame, not the tool's result line (ChatStates.3 reads "기술 스택을 비교하는 중 14초").
+  s(100, status(added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(hold + 1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
   s(300, {
@@ -545,7 +546,9 @@ const statesFile: Step[] = [
 ]
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
-  s(900, tool('apply', '지원하기', MOA, 'ok', '지원했어요 · 마이 › 내 활동에 기록했어요')),
+  s(900, tool('apply', '지원하기', MOA, 'ok')),
+  // The record is a line of its own (tool lines are not drawn), as ChatStates.4 shows it between the file card and the busy error.
+  s(300, agent('지원했어요 · 마이 › 내 활동에 기록했어요')),
   done,
 ]
 const awaitReply: Step[] = [

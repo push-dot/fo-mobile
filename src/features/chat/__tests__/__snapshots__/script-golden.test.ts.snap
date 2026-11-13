@@ -3189,7 +3189,8 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"actions":[],"cardMeta":"A4 1쪽 · 186KB","checklist":["이력서 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","PDF로 만들기"],"company":"모아페이","documentId":"src-upload","fileName":"김서준_모아페이_백엔드.pdf","pageLine":"A4 1쪽 · 186KB","source":"external","type":"result"}
 {"seconds":1,"type":"worked"}
 {"text":"states-apply","type":"user"}
-{"action":"지원하기","result":"지원했어요 · 마이 › 내 활동에 기록했어요","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
+{"action":"지원하기","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
+{"text":"지원했어요 · 마이 › 내 활동에 기록했어요","type":"agentText"}
 {"seconds":2,"type":"worked"}
 {"text":"도토리증권 공고도 맞춰 줘","type":"user"}
 {"code":"QUEUE_BUSY","text":"지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.","type":"error"}
@@ -8499,7 +8500,8 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token states-apply 1`] = `
 "
 {"text":"states-apply","type":"user"}
-{"action":"지원하기","result":"지원했어요 · 마이 › 내 활동에 기록했어요","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
+{"action":"지원하기","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
+{"text":"지원했어요 · 마이 › 내 활동에 기록했어요","type":"agentText"}
 {"seconds":2,"type":"worked"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
