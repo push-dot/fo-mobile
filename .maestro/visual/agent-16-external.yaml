@@ -11,17 +11,10 @@ tags:
       KO: "ext-done"
       EN: "ext-done"
 - extendedWaitUntil:
-    visible: ".* 동안 작업했어요"
+    visible: "프로필로 전환"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDone
-- tapOn: "대화 더 보기"
-- extendedWaitUntil:
-    visible: "쓴 서류·공고 보기"
-    timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: ChatMore
-- runFlow: _agent-dismiss-menu.yaml
 - runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
@@ -29,7 +22,7 @@ tags:
       KO: "ext-nojob"
       EN: "ext-nojob"
 - extendedWaitUntil:
-    visible: ".* 동안 작업했어요"
+    visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneNoJob
@@ -40,7 +33,7 @@ tags:
       KO: "ext-nosave"
       EN: "ext-nosave"
 - extendedWaitUntil:
-    visible: ".* 동안 작업했어요"
+    visible: "모아페이에 바로 지원하기"
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneSaveFail

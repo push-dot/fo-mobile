@@ -15,7 +15,7 @@ tags:
             KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
             EN: "auto-pick"
       - extendedWaitUntil:
-          visible: ".* 동안 작업했어요"
+          visible: ".*A4 1쪽 · 186KB.*"
           timeout: 30000
       - waitForAnimationToEnd
       - takeScreenshot: ChatStates.1

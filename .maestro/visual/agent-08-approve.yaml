@@ -33,7 +33,7 @@ tags:
     commands:
       - runFlow: _chat_bottom.yaml
       - extendedWaitUntil:
-          visible: ".* 동안 작업했어요"
+          visible: "모아페이에 바로 지원하기"
           timeout: 8000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneProfile

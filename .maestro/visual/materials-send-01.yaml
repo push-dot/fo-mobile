@@ -33,7 +33,7 @@ tags:
 - takeScreenshot: BotPickSent
 - openLink: push://bots/b-moa/profile
 - extendedWaitUntil:
-    visible: "허용한 사이트"
+    visible: "허용한 사이트.*"
     timeout: 10000
 - tapOn: "자료.*"
 - extendedWaitUntil:

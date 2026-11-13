@@ -15,7 +15,7 @@ tags:
             KO: "ext-done"
             EN: "ext-done"
       - extendedWaitUntil:
-          visible: ".* 동안 작업했어요"
+          visible: "프로필로 전환"
           timeout: 30000
       - waitForAnimationToEnd
       - tapOn: "메시지.*"
