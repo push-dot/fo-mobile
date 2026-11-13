@@ -3,11 +3,7 @@ name: 봇 → 실행 방식 시트 → 항상 묻기
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- runFlow:
-    file: _tap_tab.yaml
-    env:
-      TAB: "봇"
-      READY: "(동의하고 시작하기|실행 방식, .*)"
+- runFlow: _open_push_bot.yaml
 - runFlow:
     when:
       visible: "동의하고 시작하기"

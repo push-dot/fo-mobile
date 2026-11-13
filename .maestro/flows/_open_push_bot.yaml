@@ -1,0 +1,20 @@
+appId: app.push.mobile
+tags:
+  - subflow
+---
+# The 봇 tab lands on the bot home; the Push Bot chat opens from its hero row (heroLabel in home-rows.ts).
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "(동의하고 시작하기|Push Bot 대화 열기.*)"
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+- runFlow:
+    when:
+      visible: "Push Bot 대화 열기.*"
+    commands:
+      - tapOn: "Push Bot 대화 열기.*"
