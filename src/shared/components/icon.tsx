@@ -9,6 +9,9 @@ const APP_ICONS = {
   // Settings value rows (한국어 ⌃⌄): the board's up-down selector.
   updown:
     '<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8 9.5l4-4 4 4M8 14.5l4 4 4-4"></path></svg>',
+  // FindBar previous result: the mirror of 'down' (the board draws chevrons, not the send arrow 'up').
+  'chev-up':
+    '<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"></path></svg>',
 } as const
 
 export type AppIconName = keyof typeof APP_ICONS
