@@ -10,9 +10,9 @@ name: 공고에서 회사 봇 만들기 → 그 채팅
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "새벽"
 - extendedWaitUntil:
-    visible: "ML 엔지니어"
+    visible: ".*ML 엔지니어.*"
     timeout: 20000
-- tapOn: "ML 엔지니어"
+- tapOn: ".*ML 엔지니어.*"
 - extendedWaitUntil:
     visible: "만들기"
     timeout: 10000
