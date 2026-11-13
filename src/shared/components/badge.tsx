@@ -7,16 +7,10 @@ export type BadgeTone = 'ac' | 'grey' | 'red' | 'green' | 'orange'
 /** A bold lead glyph with its own right margin (the board's `.kw-ok:before` / `.kw-miss:before`). */
 export type BadgeGlyph = { char: string; gap: number }
 
-const Badge = ({ label, tone = 'grey', minWidth, glyph }: { label: string; tone?: BadgeTone; minWidth?: number; glyph?: BadgeGlyph }) => {
+const Badge = ({ label, minWidth, glyph }: { label: string; tone?: BadgeTone; minWidth?: number; glyph?: BadgeGlyph }) => {
   const c = useColors()
-  const map = {
-    ac: [c.acSoft, c.acText],
-    grey: [c.fill, c.t2],
-    red: [c.redSoft, c.red],
-    green: [c.greenSoft, c.green],
-    orange: [c.orangeSoft, c.orange],
-  } as const
-  const [bg, fg] = map[tone]
+  // One badge colour: the text, not the tint, tells the state (owner note 4, board v412). `tone` stays so callers keep compiling.
+  const [bg, fg] = [c.fill, c.t2]
   return (
     <View style={{ minWidth, minHeight: 22, paddingHorizontal: 7, borderRadius: radius.xs, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>

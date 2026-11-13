@@ -32,7 +32,7 @@ const SocialScreen = () => {
                 },
               ]}
             />
-            <GlassButton actions={[{ icon: 'edit', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
+            <GlassButton actions={[{ icon: 'plus', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
           </>
         }
       />

@@ -266,7 +266,7 @@ const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub)
         horizontal
         showsHorizontalScrollIndicator={false}
         style={{ flexGrow: 0 }}
-        contentContainerStyle={{ gap: spacing[2], paddingTop: spacing[5], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}
+        contentContainerStyle={{ gap: spacing[2], paddingTop: spacing[4], paddingBottom: 0, paddingHorizontal: spacing[5] }}
       >
         {SUBS.map((s) => (
           <Chip key={s.key} label={s.label} on={s.key === sub} onPress={() => onSub(s.key)} />

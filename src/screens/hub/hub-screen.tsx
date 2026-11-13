@@ -57,11 +57,11 @@ const HubScreen = () => {
           <Chip key={k.key} label={k.label} check on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
         ))}
       </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[1], gap: spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
         <Text v="h2" accessibilityRole="header">
           추천 프로필
         </Text>
-        {summary ? <Badge label={summary} tone="ac" /> : null}
+        {summary ? <Badge label={summary} /> : null}
       </View>
     </View>
     ),

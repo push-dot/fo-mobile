@@ -17,9 +17,11 @@ type RowProps = {
   accent?: boolean
   /** Draws the chevron on a row that does not open anything (the board shows it before there is a posting). */
   chevron?: boolean
+  /** A value row that opens a picker (v412 Settings): the value with the up-down selector, no chevron. */
+  picker?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent, chevron }: RowProps) => {
+const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent, chevron, picker }: RowProps) => {
   const c = useColors()
   const accented = entry || accent
   const body = (
@@ -44,7 +46,14 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent,
         ) : null}
       </View>
       {right ??
-        (onPress || chevron ? (
+        (picker ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <Text v="b2" color="t3">
+              {value}
+            </Text>
+            <Icon name="updown" size={14} color="t3" />
+          </View>
+        ) : onPress || chevron ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
             {value ? (
               <Text v="b2" color="t3">
