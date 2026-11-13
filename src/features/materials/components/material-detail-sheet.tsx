@@ -10,7 +10,7 @@ import { CITED, DELETE_LABEL, LOAD_ERROR, OPEN_LABEL, RESTORE_FAILED, SEND_LABEL
 import type { Material, MaterialKind } from '../types'
 import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
 import { DeleteConfirm } from './delete-confirm'
-import { sendMaterial } from './materials-modal'
+import { sendMaterial } from './send-material'
 import { useSearchRoom } from './materials-search'
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
