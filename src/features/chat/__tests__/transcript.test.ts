@@ -34,6 +34,21 @@ describe('applyTranscript', () => {
     expect(bots(fromLive)[1]).toMatchObject({ id: 't1:bot:1', sources: [{ id: 's', title: '공고' }] })
   })
 
+  it('grows the open bot when a later status moves in front of it', () => {
+    const live: TranscriptEvent[] = [
+      turn('t1'),
+      { type: 'status', line: thinking },
+      { type: 'token', text: '좋아' },
+      { type: 'status', line: working },
+      { type: 'token', text: '요.' },
+    ]
+    const stored = live.filter((event) => event.type !== 'status')
+    const fromLive = projectTranscript(live)
+    const fromStored = projectTranscript(stored)
+    expect(bots(fromLive).map((entry) => entry.text)).toEqual(['좋아요.'])
+    expect(bots(fromLive)).toEqual(bots(fromStored))
+  })
+
   it('keeps one run line and moves a new one to the end', () => {
     const state = projectTranscript([turn('t1'), { type: 'status', line: thinking }, { type: 'token', text: 'a' }, { type: 'status', line: working }])
     expect(state.entries.filter((entry) => entry.type === 'status')).toHaveLength(1)

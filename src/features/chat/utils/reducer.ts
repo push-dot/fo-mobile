@@ -124,11 +124,12 @@ export const applyTranscript = (state: TranscriptState, event: TranscriptEvent, 
   switch (event.type) {
     case 'turn':
       return { ...current, turnId: event.turnId, ended: false, botCount: 0, openIndex: null, entries: withoutKind(current.entries, 'waiting') }
-    case 'status':
-      return {
-        ...stamped,
-        entries: [...withoutKind(stamped.entries, event.line.kind), { type: 'status', id: `${stamped.turnId ?? 'turn'}:status:${event.line.kind}`, line: event.line }],
-      }
+    case 'status': {
+      const open = stamped.openIndex === null ? undefined : stamped.entries[stamped.openIndex]
+      const entries = [...withoutKind(stamped.entries, event.line.kind), { type: 'status' as const, id: `${stamped.turnId ?? 'turn'}:status:${event.line.kind}`, line: event.line }]
+      const openIndex = open?.type === 'bot' ? entries.indexOf(open) : -1
+      return { ...stamped, entries, openIndex: openIndex < 0 ? null : openIndex }
+    }
     case 'token': {
       const open = stamped.openIndex === null ? undefined : stamped.entries[stamped.openIndex]
       if (open?.type === 'bot' && stamped.openIndex !== null) {
