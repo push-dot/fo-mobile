@@ -17,9 +17,11 @@ const DocRow = ({ doc, on, onPress }: { doc: ApplyDoc; on: boolean; onPress: () 
         <Text v="b1" weight="600" numberOfLines={1}>
           {doc.name}
         </Text>
-        <Text v="c1" color="t3">
-          {doc.note}
-        </Text>
+        {doc.note ? (
+          <Text v="c1" color="t3">
+            {doc.note}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   )

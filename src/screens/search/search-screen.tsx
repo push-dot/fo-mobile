@@ -127,7 +127,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                 }}
                 style={{ width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3] }}
               >
-                <Text v="b1" weight="700" color="acText" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
+                <Text v="b1" weight="700" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
                   {i + 1}
                 </Text>
                 <Text v="b1" numberOfLines={1} style={{ flex: 1 }}>

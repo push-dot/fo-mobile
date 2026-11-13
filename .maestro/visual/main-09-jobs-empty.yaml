@@ -23,7 +23,8 @@ tags:
 - runFlow: _scroll_chips.yaml
 - tapOn: "지역"
 - tapOn: "대전"
-- tapOn: "유성구(.*28)?"
+- tapOn: "유성구"
+- tapOn: "추가"
 - waitForAnimationToEnd
 - runFlow:
     file: ../flows/_tap_sheet_button.yaml

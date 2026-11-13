@@ -44,6 +44,7 @@ const JobFilterSheetScreen = () => {
         draft={draft}
         trending={trending}
         onChange={setDraft}
+        onClose={() => router.back()}
         scroll={LONG_FILTER_KINDS.includes(kind) && !full ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
       />
     </Sheet>

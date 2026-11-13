@@ -24,7 +24,7 @@ tags:
     commands:
       - tapOn: "검색"
       - extendedWaitUntil:
-          visible: "취소"
+          visible: "닫기"
           timeout: 10000
       - tapOn: "검색어|회사, 직무, 기술 검색"
       - inputText: "백엔드"
@@ -32,7 +32,7 @@ tags:
       - assertNotVisible: "‘백엔드’ 공고.*"
       - waitForAnimationToEnd
       - takeScreenshot: HomeLoading.2
-      - tapOn: "취소"
+      - tapOn: "닫기"
 - tapOn: "알림.*"
 - extendedWaitUntil:
     visible: "모두 읽음"
