@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: BotHomeEmpty
+name: 봇 홈 · 회사 봇 없음
 tags:
   - visual
 ---
@@ -17,4 +17,4 @@ tags:
     visible: "봇 만들기"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: BotHomeEmpty
+- takeScreenshot: AgentHomeNoBots

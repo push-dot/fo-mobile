@@ -1,7 +1,7 @@
 import { Linking } from 'react-native'
 import { expireCard, muteBot, resetBots, setBotPlan, setBots } from './bots'
 import { grantReference, setAccount } from './chat'
-import { unreadDeadline } from './home'
+import { pendingSocialPhone, unreadDeadline } from './home'
 import { setBlockedByThem } from './me'
 import { setMaterials } from './materials'
 import { closeMoapay, fewBookmarks } from './postings'
@@ -18,7 +18,7 @@ const toRule = (spec: string): Rule | null => {
 const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
-// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
+// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
 // Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted,
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
@@ -44,6 +44,7 @@ export const listenMockLinks = () =>
     }
     if (specs.includes('card:expired')) expireCard()
     if (specs.includes('unread-deadline')) unreadDeadline()
+    if (specs.includes('phone-social')) pendingSocialPhone()
     if (specs.includes('blocked-by-them')) setBlockedByThem(true)
     if (specs.includes('close-moapay')) closeMoapay()
     if (specs.includes('consent-on')) grantReference()

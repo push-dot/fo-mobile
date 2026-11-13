@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 로그인 → 휴대폰 번호 → 인증번호
+name: 로그인 → 휴대폰 번호 → 인증번호 → Google 로그인 후 휴대폰 번호
 tags:
   - visual
 ---
@@ -39,3 +39,15 @@ tags:
 - runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: PhoneCode
+# PhoneInput: the phone screen as it opens after a Google sign-in (the native sign-in cannot run here). The mock link
+# seeds the pending sign-in, then the route opens with its account pill, the field filled and the pad down like PhoneInputDirect.
+- openLink: "push://sign-in?mock=phone-social"
+- openLink: "push://phone"
+- extendedWaitUntil:
+    visible: "seojun.kim@gmail.com"
+    timeout: 10000
+- tapOn: "휴대폰 번호"
+- inputText: "01012345678"
+- runFlow: _hide_kbd.yaml
+- waitForAnimationToEnd
+- takeScreenshot: PhoneInput
