@@ -93,13 +93,14 @@ describe('composerPlaceholder', () => {
 
   it('lets the person talk while the agent works', () => {
     expect(run([user], true)).toBe('작업 중에도 말할 수 있어요')
-    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
   })
 
-  it('asks the named bot when the chat has no work yet', () => {
+  it('asks the named bot on an empty chat, while working, and after work', () => {
     expect(composerPlaceholder({ items: [], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
     expect(composerPlaceholder({ items: [], working: null }, 'Push Bot')).toBe('Push Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('더 고칠 부분이 있으면 말해 주세요')
+    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 봇에게 물어보기')
+    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, 'Push Bot')).toBe('Push Bot에게 물어보기')
+    expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
   })
 
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {

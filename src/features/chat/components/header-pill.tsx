@@ -1,8 +1,8 @@
 import { router } from 'expo-router'
-import { Pressable } from 'react-native'
+import { Platform, Pressable } from 'react-native'
 import { botProfilePath, type BotId } from '@/features/bots'
-import { GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
-import { spacing } from '../../../theme'
+import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
+import { spacing, useColors } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { clearPushChat, deleteCompanyBot } from '../stores'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'
@@ -41,20 +41,27 @@ const HeaderPill = ({
       })
     }
   }
+  const c = useColors()
+  const ios = Platform.OS === 'ios'
   const spoken = name ? botSpokenName(name) : ''
+  const nameButton =
+    name && botId ? (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${spoken} 프로필 보기`}
+        onPress={() => openProfile(botId)}
+        style={{ alignSelf: 'flex-start', maxWidth: '100%', height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: spacing[3], backgroundColor: ios ? 'transparent' : c.fill }}
+      >
+        <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
+        <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
+          {name}
+        </Text>
+      </Pressable>
+    ) : undefined
   return (
     <TopBar
       onBack={() => router.back()}
-      left={
-        name && botId ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${spoken} 프로필 보기`} onPress={() => openProfile(botId)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minWidth: 0 }}>
-            <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
-            <Text v="h3" numberOfLines={1} style={{ flex: 1 }}>
-              {name}
-            </Text>
-          </Pressable>
-        ) : undefined
-      }
+      left={nameButton && ios ? <Glass style={{ alignSelf: 'flex-start', maxWidth: '100%', height: 44, borderRadius: 22 }}>{nameButton}</Glass> : nameButton}
       right={
         kind && botId && name ? (
           <GlassButton

@@ -87,7 +87,8 @@ const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
 
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string) => {
+  if (name) return askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp
-  return name ? askPlaceholder(name) : COMPOSER_PLACEHOLDER.first
+  return COMPOSER_PLACEHOLDER.first
 }
