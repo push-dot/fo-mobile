@@ -42,7 +42,6 @@ import {
   CLOSE_LABEL,
   CONSENT_AGREE,
   CONSENT_BODY,
-  CONSENT_DETAIL,
   CONSENT_FOOT,
   CONSENT_LATER,
   CONSENT_MORE,
@@ -236,7 +235,6 @@ const LimitBody = ({ limit, onUpgrade, onClose }: { limit: BotLimit | undefined;
 
 const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => {
   const c = useColors()
-  const [more, setMore] = useState(false)
   return (
     <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end', padding: spacing[4] }}>
       <View style={{ backgroundColor: c.bg, borderRadius: radius.xl, padding: spacing[5], gap: spacing[3] }}>
@@ -246,16 +244,9 @@ const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree
         <Text v="b2" color="t2">
           {CONSENT_BODY}
         </Text>
-        <Pressable accessibilityRole="button" onPress={() => setMore((v) => !v)} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
-          <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
-            {CONSENT_MORE}
-          </Text>
-        </Pressable>
-        {more ? (
-          <Text v="b2" color="t2">
-            {CONSENT_DETAIL}
-          </Text>
-        ) : null}
+        <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+          {CONSENT_MORE}
+        </Text>
         <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
         <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
         <Text v="c1" color="t3" style={{ textAlign: 'center' }}>
