@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
-import { Platform, View } from 'react-native'
-import { ConsentPromptListener } from '@/features/chat/components/consent-prompt-listener'
+import { View } from 'react-native'
+import { ConsentPromptListener } from '@/features/chat'
 import { FULL_SHEET_KIND } from '@/features/jobs'
 import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
@@ -15,7 +15,6 @@ const SignedInStack = () => {
       <ConsentPromptListener />
       <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="chat/[id]" />
       <Stack.Screen name="postings/[id]" />
       <Stack.Screen name="profiles/[id]" />
       <Stack.Screen name="posts/[id]" />
@@ -42,9 +41,7 @@ const SignedInStack = () => {
       <Stack.Screen name="sidebar/docs" options={{ presentation: 'modal' }} />
       <Stack.Screen name="sidebar/links" options={{ presentation: 'modal' }} />
       <Stack.Screen name="sidebar/bookmarks" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/conversations" options={{ presentation: 'modal', animation: Platform.OS === 'android' ? 'slide_from_bottom' : 'default' }} />
       <Stack.Screen name="sidebar/link-add" options={sheetOptions(c)} />
-      <Stack.Screen name="sidebar/rename/[id]" options={sheetOptions(c)} />
       <Stack.Screen name="access-mode" options={sheetOptions(c)} />
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />

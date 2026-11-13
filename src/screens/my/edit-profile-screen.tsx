@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { botChatPath } from '@/features/bots'
 import { useState } from 'react'
 import {
   ActivityIndicator,
@@ -349,7 +350,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
           icon="spark"
           variant="secondary"
           size="md"
-          onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
+          onPress={() => router.push(botChatPath('push'))}
         />
         <Text v="c1" color="t3">
           허브 프로필 맨 위에 보여요. 3~4문장이면 충분해요.

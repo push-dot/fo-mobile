@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
 import { usePosting } from '@/features/jobs'
 import { Button, DetailWebView, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
@@ -31,7 +32,12 @@ const PostingDetailScreen = ({ id }: { id: string }) => {
         <Button
           label="봇으로 맞추기"
           variant="secondary"
-          onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: id } })}
+          onPress={() => {
+            void findBotForPosting(id).then(
+              (bot) => router.push(bot ? botChatPath(bot.id) : botNewPath(id)),
+              () => router.push(botNewPath(id)),
+            )
+          }}
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { accountPath, bookmarksPath, consentPath, conversationsPath, docsPath, linkAddPath, linksPath, materialPickerPath, quickStartPath, renamePath, sidebarDepth, sidebarPath } from '../utils/sheet-routes'
+import { accountPath, bookmarksPath, consentPath, docsPath, linkAddPath, linksPath, materialPickerPath, quickStartPath, sidebarDepth, sidebarPath } from '../utils/sheet-routes'
 
 const STACK = join(__dirname, '../../../app/(app)/(stack)')
 const layout = readFileSync(join(STACK, '_layout.tsx'), 'utf8')
@@ -22,9 +22,6 @@ describe('chat sheet routes', () => {
     [linksPath()],
     [linkAddPath()],
     [bookmarksPath()],
-    [conversationsPath()],
-    [conversationsPath('c1')],
-    [renamePath('c1'), 'id'],
   ]
 
   it.each(cases)('%s has a route file and a native presentation', (href, param) => {
@@ -50,6 +47,6 @@ describe('chat sheet routes', () => {
 
   it('keeps the query a page needs', () => {
     expect(accountPath('plan')).toContain('page=plan')
-    expect(conversationsPath('c1')).toContain('current=c1')
+    expect(sidebarPath('c1')).toContain('current=c1')
   })
 })

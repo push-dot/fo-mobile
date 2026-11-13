@@ -1,12 +1,17 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { notificationHref } from './href'
+
+vi.mock('@/features/bots', async () => {
+  const { botHomePath } = await import('@/features/bots/utils/paths')
+  return { botHomePath }
+})
 
 describe('notificationHref', () => {
   it('opens the screen named by the target', () => {
     expect(notificationHref({ target: { kind: 'posting', id: 'p1' } })).toBe('/postings/p1')
     expect(notificationHref({ target: { kind: 'offer', id: 'o1' } })).toBe('/offers/o1')
     expect(notificationHref({ target: { kind: 'post', id: 'po1' } })).toBe('/posts/po1')
-    expect(notificationHref({ target: { kind: 'conversation', id: 'c1' } })).toBe('/chat/c1')
+    expect(notificationHref({ target: { kind: 'conversation', id: 'c1' } })).toBe('/(app)/(stack)/(tabs)/(chat)/chat')
   })
 
   it('opens my activity for calendar reminders and application stages', () => {

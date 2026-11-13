@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { type ChatIntent, type ListEnvelope } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
+import { botChatPath, type BotId } from '@/features/bots'
 import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
@@ -14,11 +15,10 @@ import { exclusive, pdfName, shareErrorText } from '../utils/share'
 import type { MentionGroup } from '../utils/mentions'
 import { isConsentRequired } from '../utils/consent'
 import { retryUnlessMissing } from '../utils/retry'
-import { askConsent, bindOpenChat, forget, holdOpen, pickAccessMode, send, usePrefs } from '../stores'
+import { askConsent, bindOpenChat, forget, holdOpen, openBot, pickAccessMode, send, usePrefs } from '../stores'
 import {
   archiveConversation,
   chatApi,
-  createConversation,
   deleteConversation,
   fetchArtifactBytes,
   fetchDocumentPdf,
@@ -34,15 +34,14 @@ import type { ConversationRow, RunInput } from './schemas'
 const RETRY_LATER = '잠시 뒤에 다시 해 주세요.'
 
 export const useStartChat = () => {
-  const qc = useQueryClient()
   const run = useCallback(
     async (title: string, message: string, attachment?: string | PickedFile, replace?: boolean, intent?: ChatIntent, context?: RunInput['context']) => {
       try {
-        const conv = await createConversation(title.slice(0, 300))
-        void qc.invalidateQueries({ queryKey: ['conversations'] })
-        if (replace) router.replace(`/chat/${conv.id}`)
-        else router.push(`/chat/${conv.id}`)
-        send(conv.id, message, attachment, intent, context)
+        const id = await openBot('push')
+        const path = botChatPath(id as BotId)
+        if (replace) router.replace(path)
+        else router.push(path)
+        send(id, message, attachment, intent, context)
       } catch (err) {
         if (isConsentRequired(err)) {
           holdOpen({ title, message, attachment, intent, context })
@@ -52,7 +51,7 @@ export const useStartChat = () => {
         Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)
       }
     },
-    [qc],
+    [],
   )
   useEffect(() => {
     bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent, p.context))

@@ -57,6 +57,11 @@ export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크
 export const CHAT_STOP_FORBIDDEN = '다른 담당자가 시작한 작업이라 멈출 수 없어요'
 export const CHAT_STOP_FAILED = '멈추지 못했어요. 한 번 더 눌러 주세요'
 
+export const THREAD_INITIAL_RENDER = 10
+export const THREAD_BATCH = 8
+export const THREAD_WINDOW = 2
+export const THREAD_MOUNT_CAP = THREAD_INITIAL_RENDER + THREAD_BATCH * THREAD_WINDOW
+
 export const CONSENT_TITLE = '봇을 쓰려면\n동의가 필요해요'
 export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 봇이 참고 자료로 써요.'
 export const PLAN_HEADER = '요금제마다\n쓸 수 있는 양이 달라요'

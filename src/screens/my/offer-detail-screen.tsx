@@ -15,6 +15,7 @@ import {
   useOfferMenu,
   useViewerBox,
 } from '@/features/my'
+import { botChatPath } from '@/features/bots'
 import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
@@ -114,7 +115,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
         {pending && p ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
+            onPress={() => router.push(botChatPath('push'))}
             style={{
               paddingVertical: spacing[4],
               paddingHorizontal: spacing[5],

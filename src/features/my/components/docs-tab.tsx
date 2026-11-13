@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
+import { botChatPath } from '@/features/bots'
 import { Button, GlassPressable, Icon, Icon3D, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
@@ -21,7 +22,7 @@ const PROGRESS_H = 6
 const EMPTY_ART = 88
 const EMPTY_INSET = 40
 
-const openChat = () => router.push('/(app)/(stack)/(tabs)/(chat)/chat')
+const openChat = () => router.push(botChatPath('push'))
 
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
   const qc = useQueryClient()
