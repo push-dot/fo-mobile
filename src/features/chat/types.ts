@@ -104,7 +104,7 @@ export type Approval = {
   /** Server warning shown in place of the hint, e.g. 지원하면 취소할 수 없어요. */
   warning?: string
   detail?: string
-  optionIds?: string[]
+  optionIds: string[]
   /** A tool asking permission (the wire's `approval`), as opposed to a choice. */
   confirm?: true
   /** Server times in ms. A card with no `expiresAt` waits until answered. 다시 요청 replaces both. */

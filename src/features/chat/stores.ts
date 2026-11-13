@@ -357,15 +357,10 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
     if (!s.working && !s.approval && !runs.has(id)) flush(id)
     return
   }
-  if (s.approval?.optionIds) {
+  if (s.approval) {
     // The server reads free text as the gate answer or as rejecting the pending approval.
     dispatch(id, { type: 'answer', text })
     return void startRun({ conversationId: id, text })
-  }
-  if (s.approval) {
-    // Talking instead of picking answers with the last ("직접 말하기") choice.
-    const first = s.approval.sections.find((x) => x.kind === 'choices')
-    return answer(id, text, first && first.kind === 'choices' ? first.items.length - 1 : 0)
   }
   launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
 }
@@ -374,13 +369,10 @@ export const answer = (id: string, text: string, choice: number | number[]) => {
   const approval = get(id).approval
   if (!approval) return
   const picks = Array.isArray(choice) ? choice : [choice]
-  dispatch(id, { type: 'answer', text })
-  const ids = picks.flatMap((n) => {
-    const optionId = approval.optionIds?.[n]
-    return optionId ? [optionId] : []
-  })
+  const ids = picks.flatMap((n) => approval.optionIds[n] ?? [])
   const optionId = ids[0]
-  if (!optionId) return void startRun({ conversationId: id, text })
+  if (!optionId) return
+  dispatch(id, { type: 'answer', text })
   void startRun({ conversationId: id, text, resolve: { approvalId: approval.id, optionId, ...(ids.length > 1 ? { optionIds: ids } : {}) } })
 }
 

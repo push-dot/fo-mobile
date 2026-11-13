@@ -1,4 +1,4 @@
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native'
 import type { Settings } from '@push/api-client'
@@ -95,6 +95,7 @@ const SettingsScreen = () => {
   const { data: me } = useMyProfile()
   const { data: account } = useAuthMe()
   const blocked = useBlocked()
+  const { entry } = useLocalSearchParams<{ entry?: string }>()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   if (!s) {
     return (
@@ -190,7 +191,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label={BLOCKED_COPY.title}
           value={blockedCount(blocked.data?.page.total)}
-          accent
+          entry={entry === 'blocked'}
           onPress={() => router.push('/settings/blocked')}
         />
       </SettingsGroup>

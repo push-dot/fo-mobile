@@ -166,6 +166,7 @@ describe('stream v3', () => {
     const approval: Approval = {
       id: 'r',
       question: '디자인',
+      optionIds: ['submit'],
       sections: [],
       submit: '만들기',
       submitLabels: { CLASSIC: '클래식으로 만들기', MODERN: '모던으로 만들기' },

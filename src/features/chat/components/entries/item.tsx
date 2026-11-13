@@ -17,7 +17,7 @@ import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { isVerdictPlan } from '../../utils/stream-v3'
 import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../../constants'
+import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -316,7 +316,7 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
         ))}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
           {LOCKED_KEYWORDS.map((k) => (
-            <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
+            <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
           ))}
         </View>
       </View>
@@ -441,7 +441,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
             {item.keywords ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
                 {item.keywords.map((k) => (
-                  <Badge key={k.label} label={`${k.ok ? '✓' : '!'} ${k.label}`} tone={k.ok ? 'green' : 'orange'} />
+                  <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
                 ))}
               </View>
             ) : null}

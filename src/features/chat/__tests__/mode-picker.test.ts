@@ -35,7 +35,7 @@ async function* frames(...evs: StreamEvent[]) {
 }
 const chat = (id: string) => useChatStore.getState().chats[id]!
 const settled = (id: string) => vi.waitFor(() => expect(chat(id).working).toBeNull())
-const pending = (id: string, optionIds?: string[]) =>
+const pending = (id: string, optionIds: string[]) =>
   useChatStore.setState({
     chats: {
       [id]: {
@@ -99,6 +99,14 @@ describe('server approvals', () => {
     await vi.waitFor(() => expect(chat('c3').items.at(-1)).toMatchObject({ type: 'error' }))
     expect(chat('c3').approval).toBeNull()
     expect(botApi.bots.follow).not.toHaveBeenCalled()
+  })
+
+  it('a pick with no option id sends nothing and keeps the card open', () => {
+    pending('c6', ['approve', 'reject'])
+    answer('c6', '??', 5)
+    expect(botApi.bots.answer).not.toHaveBeenCalled()
+    expect(botApi.bots.send).not.toHaveBeenCalled()
+    expect(chat('c6').approval).not.toBeNull()
   })
 
   it('free text while an approval waits goes out as a normal message', async () => {
