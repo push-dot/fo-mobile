@@ -11,7 +11,7 @@ import {
   LINK_EMPTY,
   LINK_UNDO,
   MENTION_SHORTCUT_KEYS,
-  PLAN_FOOTER,
+  PLAN_NOTICES,
   PLAN_HEADER,
   docAiSub,
   QUICK_STARTS,
@@ -32,8 +32,8 @@ describe('agent s copy', () => {
   })
 
   it('plan header and footer', () => {
-    expect(PLAN_HEADER).toBe('요금제마다\n쓸 수 있는 양이 달라요')
-    expect(PLAN_FOOTER).toEqual(['매월 1일에 사용량이 다시 채워져요.', '언제든 해지할 수 있어요'])
+    expect(PLAN_HEADER).toBe('플랜마다\n쓸 수 있는 양이 달라요')
+    expect(PLAN_NOTICES).toHaveLength(4)
     expect(ACCOUNT_REFERENCE_TITLE).toBe('봇이 참고하는 내 정보')
     expect(ACCOUNT_REFERENCE_NOTE).toBe('대화를 시작할 때 봇이 이 정보부터 읽어요.')
   })

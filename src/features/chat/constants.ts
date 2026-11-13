@@ -69,8 +69,13 @@ export const THREAD_MOUNT_CAP = THREAD_INITIAL_RENDER + THREAD_BATCH * THREAD_WI
 
 export const CONSENT_TITLE = '봇을 쓰려면\n동의가 필요해요'
 export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 봇이 참고 자료로 써요.'
-export const PLAN_HEADER = '요금제마다\n쓸 수 있는 양이 달라요'
-export const PLAN_FOOTER = ['매월 1일에 사용량이 다시 채워져요.', '언제든 해지할 수 있어요'] as const
+export const PLAN_HEADER = '플랜마다\n쓸 수 있는 양이 달라요'
+export const PLAN_NOTICES = [
+  '· 구독은 매월 자동으로 갱신돼요. 갱신일 24시간 전까지 해지하지 않으면 다음 달 요금이 결제돼요.',
+  '· 해지는 스토어의 구독 관리에서 할 수 있고, 해지해도 남은 기간까지는 계속 쓸 수 있어요.',
+  '· 결제 후 7일 안에 쓰지 않았다면 청약을 철회할 수 있어요. 사용량을 쓴 뒤에는 철회가 제한될 수 있어요.',
+  '· 미성년자가 법정대리인 동의 없이 결제했다면 본인이나 법정대리인이 취소할 수 있어요.',
+] as const
 export const ACCOUNT_REFERENCE_TITLE = '봇이 참고하는 내 정보'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 봇이 이 정보부터 읽어요.'
 export const MENTION_SHORTCUT_KEYS = ['link', 'gap', 'fit'] as const

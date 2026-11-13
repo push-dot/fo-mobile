@@ -20,7 +20,7 @@ tags:
     timeout: 10000
 - tapOn: "PRO"
 - extendedWaitUntil:
-    visible: "요금제마다.*"
+    visible: "플랜마다.*"
     timeout: 5000
 - extendedWaitUntil:
     visible: "ULTRA로 업그레이드"
