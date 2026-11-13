@@ -38,6 +38,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
         <TextInput
           value={value}
           multiline={multiline}
+          lineBreakStrategyIOS="hangul-word"
           maxLength={max}
           placeholderTextColor={c.t4}
           style={[{ flex: 1, fontSize: type.b1.fontSize, letterSpacing: type.b1.letterSpacing, color: c.t1, ...inputMetrics(multiline, fontScale), textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), multiline && iosLineBox(StyleSheet.flatten(style)?.lineHeight ?? type.b1.lineHeight, type.b1.fontSize, fontScale), style]}
