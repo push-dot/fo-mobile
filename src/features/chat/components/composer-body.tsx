@@ -29,6 +29,8 @@ export type ComposerProps = {
   maxLength?: number
   label?: string
   sending?: boolean
+  /** Credit-out state: the box is drawn at half opacity and takes no input. */
+  disabled?: boolean
 }
 
 /** Text line on top (17px), control row below: + 첨부 · @ 언급 … mic · send/stop. Shared by both platforms. */
@@ -38,7 +40,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   const typed = p.value.trim()
   const hasText = typed.length > 0
   // A bare "@" only opens the suggestions; there is nothing to send yet.
-  const canSend = hasText && typed !== '@' && !p.sending
+  const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const inline = p.layout === 'inline'
   const showTools = !inline && (p.tools ?? true)
   const round = { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
@@ -73,7 +75,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
     )
   }
   return (
-    <View style={{ paddingTop: spacing[4], paddingRight: roomy ? spacing[3] : 10, paddingBottom: roomy ? spacing[3] : 10, paddingLeft: roomy ? spacing[5] : 18, gap: roomy ? spacing[4] : 14 }}>
+    <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, paddingTop: spacing[4], paddingRight: roomy ? spacing[3] : 10, paddingBottom: roomy ? spacing[3] : 10, paddingLeft: roomy ? spacing[5] : 18, gap: roomy ? spacing[4] : 14 }}>
       {p.attachment ? (
         <Pressable
           accessibilityRole="button"
@@ -95,6 +97,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
         placeholder={p.placeholder}
         placeholderTextColor={c.t4}
         multiline
+        editable={!p.disabled}
         accessibilityLabel={p.label ?? '메시지'}
         maxLength={p.maxLength}
         style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: 140, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}

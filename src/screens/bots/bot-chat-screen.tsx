@@ -232,6 +232,7 @@ const Thread = ({ id }: { id: string }) => {
             inputRef={input}
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
             working={!!chat.working}
+            disabled={!!limit.banner}
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
             onShortcut={(qs) => router.push(quickStartPath(qs.key))}
