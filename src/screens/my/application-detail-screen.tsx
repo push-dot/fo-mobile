@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
 import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
+import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
 import {
   APPLICATION_LOAD_FAILED,
@@ -83,7 +84,12 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           {fit ? (
             <AppliedFitCard
               fit={fit}
-              onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: item.jobId } })}
+              onPress={() => {
+                void findBotForPosting(item.jobId).then(
+                  (bot) => router.push(bot ? botChatPath(bot.id) : botNewPath(item.jobId)),
+                  () => router.push(botNewPath(item.jobId)),
+                )
+              }}
             />
           ) : null}
           {p ? (
@@ -112,7 +118,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       {item ? (
         <CtaBar>
         <Button label="지원한 서류" variant="secondary" disabled={!doc} onPress={() => doc && router.push(`/docs/push/${doc.id}`)} />
-        <Button label={INTERVIEW_PREP} onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')} style={{ flex: 1 }} />
+        <Button label={INTERVIEW_PREP} onPress={() => router.push(botChatPath('push'))} style={{ flex: 1 }} />
         </CtaBar>
       ) : null}
     </View>

@@ -182,25 +182,51 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
   }
 }
 
-/**
- * push-be SSE frames → transcript events. The gateway closes long streams early, so a stream that ends without a
- * terminal frame is resumed from the last `seq` until a resume brings nothing (the run finished).
- */
+type Frame = { type: string; seq?: number; turn?: string; text?: string }
+
+export type StreamEnd = { reason: 'terminal' | 'reattach-empty' | 'no-seq' }
+
+const turnOf = (ev: Frame) => (typeof ev.turn === 'string' ? ev.turn : undefined)
+
 export const fromStream = async function* (
-  first: AsyncIterable<StreamEvent>,
-  resume: (after?: number) => AsyncIterable<StreamEvent>,
+  first: AsyncIterable<Frame>,
+  resume: (after?: number) => AsyncIterable<Frame>,
+  end?: StreamEnd,
+  open?: string,
 ): AsyncGenerator<ChatEvent> {
+  const mark = (reason: StreamEnd['reason']) => {
+    if (end) end.reason = reason
+  }
   let seq: number | undefined
+  let piece: string | null = open ?? null
   for (let source = first; ; source = resume(seq)) {
     let got = false
     for await (const ev of source) {
       got = true
       if (ev.seq !== undefined) seq = ev.seq
-      yield* mapEvent(ev)
-      if (ev.type === 'done' || ev.type === 'error' || ev.type === 'cancelled') return
+      const turn = turnOf(ev)
+      if (ev.type === 'token' && turn && ev.seq !== undefined && ev.text !== undefined) {
+        if (!piece?.startsWith(`${turn}:`)) {
+          piece = `${turn}:${ev.seq}`
+          yield { type: 'agentText', id: piece, text: ev.text }
+        } else yield { type: 'token', text: ev.text }
+      } else {
+        if (ev.type !== 'status') piece = null
+        yield* mapEvent(ev as StreamEvent)
+      }
+      if (ev.type === 'done' || ev.type === 'error' || ev.type === 'cancelled') {
+        mark('terminal')
+        return
+      }
     }
-    if (!got && source !== first) return
+    if (!got) {
+      mark('reattach-empty')
+      return
+    }
     // Without seq a resume would replay from the start and duplicate text.
-    if (got && seq === undefined) return
+    if (seq === undefined) {
+      mark('no-seq')
+      return
+    }
   }
 }

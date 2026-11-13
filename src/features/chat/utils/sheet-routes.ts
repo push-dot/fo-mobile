@@ -6,7 +6,5 @@ export const docsPath = () => '/sidebar/docs' as const
 export const linksPath = () => '/sidebar/links' as const
 export const linkAddPath = () => '/sidebar/link-add' as const
 export const bookmarksPath = () => '/sidebar/bookmarks' as const
-export const conversationsPath = (current?: string) => (current ? (`/sidebar/conversations?current=${current}` as const) : ('/sidebar/conversations' as const))
-export const renamePath = (id: string) => `/sidebar/rename/${id}` as const
 export const sidebarPath = (current?: string) => (current ? (`/sidebar?current=${current}` as const) : ('/sidebar' as const))
 export const sidebarDepth = (names: string[]) => names.length - 1 - names.findLastIndex((n) => !n.startsWith('sidebar/'))

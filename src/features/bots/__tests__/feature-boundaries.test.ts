@@ -19,6 +19,7 @@ describe('features are imported through their index', () => {
     ['src/mock/x.ts', '../features/bots/api/hooks'],
     ['src/mock/__tests__/x.test.ts', '@/features/materials/api/schemas'],
     ['src/screens/chat/conversation-screen.tsx', '@/features/bots/types'],
+    ['src/screens/chat/conversation-screen.tsx', '@/features/chat/utils/follow-scroll'],
   ])('rejects %s importing %s', async (file, spec) => {
     expect(await deepImports(file, spec)).toBe(1)
   })
@@ -33,8 +34,6 @@ describe('features are imported through their index', () => {
     ['src/mock/x.ts', '../features/chat/utils/links'],
     ['src/mock/__tests__/x.test.ts', '@/features/materials/utils/material-row'],
     ['src/features/my/x.test.ts', '@/features/chat/error-text'],
-    // develop's own deep imports into the chat feature, kept until the chat lane removes them.
-    ['src/screens/chat/conversation-screen.tsx', '@/features/chat/utils/follow-scroll'],
   ])('allows %s importing %s', async (file, spec) => {
     expect(await deepImports(file, spec)).toBe(0)
   })

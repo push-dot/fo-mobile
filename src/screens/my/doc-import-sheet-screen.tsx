@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
+import { botChatPath } from '@/features/bots'
 import { PickRow, useDocImport } from '@/features/my'
 import { Sheet } from '@/shared/components'
 
@@ -19,7 +20,7 @@ const DocImportSheetScreen = () => (
         sub="대화하면서 이력서를 써요"
         onPress={() => {
           router.back()
-          router.push('/(app)/(stack)/(tabs)/(chat)/chat')
+          router.push(botChatPath('push'))
         }}
       />
     </View>

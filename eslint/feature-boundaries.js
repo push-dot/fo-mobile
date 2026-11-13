@@ -56,13 +56,10 @@ const RULE = 'feature-boundaries/no-deep-import'
 // react-native, so these may import the files of a feature that hold no component.
 const NODE_FILES = ['src/mock/**', 'src/**/__tests__/**', 'src/**/*.test.ts']
 const NODE_OPEN = ['constants', 'types', 'error-text', 'utils/']
-// The two files that reach into the chat feature on develop. The chat lane's next PR removes both and this list.
-const CHAT_LEGACY = ['src/app/(app)/(stack)/_layout.tsx', 'src/screens/chat/conversation-screen.tsx']
 const ALL = ['bots', 'materials', 'chat']
 
 module.exports = [
   { files: ['src/**/*.{ts,tsx}'], plugins: { 'feature-boundaries': plugin } },
-  { files: ['src/**/*.{ts,tsx}'], ignores: [...NODE_FILES, ...CHAT_LEGACY], rules: { [RULE]: ['error', { features: ALL }] } },
-  { files: CHAT_LEGACY, rules: { [RULE]: ['error', { features: ['bots', 'materials'] }] } },
+  { files: ['src/**/*.{ts,tsx}'], ignores: NODE_FILES, rules: { [RULE]: ['error', { features: ALL }] } },
   { files: NODE_FILES, rules: { [RULE]: ['error', { features: ALL, open: NODE_OPEN }] } },
 ]

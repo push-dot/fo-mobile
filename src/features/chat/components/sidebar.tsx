@@ -4,11 +4,9 @@ import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors, useShadow } from '@/theme'
 import { GlassButton, Icon, Text, type IconName } from '@/shared/components'
-import { useChatAccount, useMe, useRecentConversations } from '../api/hooks'
-import { statusBadge } from './conversations-modal'
+import { useChatAccount, useMe } from '../api/hooks'
 import Mark from './mark'
-import { useLeaveSidebar } from '../hooks'
-import { accountPath, ago, bookmarksPath, conversationsPath, docsPath, linksPath } from '../utils'
+import { accountPath, bookmarksPath, docsPath, linksPath } from '../utils'
 
 
 // Android draws the collapse button as a 48pt white disc with a 1pt ring outside it.
@@ -19,16 +17,10 @@ export const ChatSidebar = ({ currentId }: { currentId?: string }) => {
   const c = useColors()
   const shadow = useShadow()
   const insets = useSafeAreaInsets()
-  const leave = useLeaveSidebar()
   const me = useMe()
   const account = useChatAccount(true)
-  const recent = useRecentConversations(true)
 
   const onClose = () => router.back()
-  const open = (id: string) => {
-    if (id === currentId) return onClose()
-    leave(() => (currentId ? router.replace(`/chat/${id}`) : router.push(`/chat/${id}`)))
-  }
   const newChat = () => (currentId ? router.dismissTo('/chat') : onClose())
 
   const menu: { icon: IconName; label: string; onPress: () => void }[] = [
@@ -115,72 +107,6 @@ export const ChatSidebar = ({ currentId }: { currentId?: string }) => {
             </Pressable>
           ))}
         </View>
-        {recent.data?.data.length ? (
-          <>
-            <View
-              style={{ height: 1, backgroundColor: c.line, marginVertical: 10, marginHorizontal: 14 }}
-            />
-            <Text
-              v="c1"
-              weight="700"
-              color="t3"
-              style={{ paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}
-            >
-              최근 대화
-            </Text>
-            {recent.data.data.map((cv) => (
-              <Pressable
-                key={cv.id}
-                accessibilityRole="button"
-                onPress={() => open(cv.id)}
-                style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: spacing[3],
-                  paddingVertical: spacing[3],
-                  paddingHorizontal: spacing[4],
-                  borderRadius: radius.md,
-                  backgroundColor: pressed || cv.id === currentId ? c.fill : 'transparent',
-                })}
-              >
-                <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                    <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
-                      {cv.title}
-                    </Text>
-                    {statusBadge(cv.status)}
-                  </View>
-                  {cv.lastLine ? (
-                    <Text v="c1" color="t3" numberOfLines={1}>
-                      {cv.lastLine}
-                    </Text>
-                  ) : null}
-                </View>
-                <Text v="c2" color="t3">
-                  {ago(cv.updatedAt)}
-                </Text>
-              </Pressable>
-            ))}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="최근 대화 모두 보기"
-              onPress={() => router.push(conversationsPath(currentId))}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing[1],
-                paddingVertical: spacing[3],
-                paddingHorizontal: spacing[4],
-                minHeight: 44,
-              }}
-            >
-              <Text v="b2" weight="600" color="t2">
-                모두 보기
-              </Text>
-              <Icon name="chev" size={16} color="t2" />
-            </Pressable>
-          </>
-        ) : null}
       </ScrollView>
     </View>
   )

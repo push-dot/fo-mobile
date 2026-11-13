@@ -5,8 +5,12 @@ const api = vi.hoisted(() => ({
   conversations: { stream: vi.fn(), follow: vi.fn(), resolveApproval: vi.fn(), messages: vi.fn(), turns: vi.fn() },
   me: { updateSettings: vi.fn() },
 }))
+const botApi = vi.hoisted(() => ({
+  bots: { cancel: vi.fn(), send: vi.fn(), follow: vi.fn(), get: vi.fn(), transcript: vi.fn(), answer: vi.fn() },
+}))
 vi.mock('@/shared/infrastructure', () => ({
   api,
+  botApi,
   http: {},
   API_MOCK: false,
   hapticImpactLight: vi.fn(),
@@ -44,19 +48,20 @@ const pending = (id: string, optionIds?: string[]) =>
 beforeEach(() => {
   vi.clearAllMocks()
   usePrefs.setState({ accessMode: 'AUTO' })
-  api.conversations.stream.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
-  api.conversations.follow.mockImplementation(() => frames({ type: 'tool', name: 'send_mail', state: 'ok', summary: '메일 보내기' }, { type: 'done', operation: null }))
+  botApi.bots.send.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
+  botApi.bots.follow.mockImplementation(() => frames({ type: 'tool', name: 'send_mail', state: 'ok', summary: '메일 보내기' }, { type: 'done', operation: null }))
+  botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'approve' } })
 })
 
 describe('access mode', () => {
   it('defaults to AUTO and sends the current mode with every stream', async () => {
     send('c1', '안녕')
     await settled('c1')
-    expect(api.conversations.stream).toHaveBeenLastCalledWith('c1', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
+    expect(botApi.bots.send).toHaveBeenLastCalledWith('c1', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
     usePrefs.setState({ accessMode: 'BYPASS' })
     send('c1', '또')
     await settled('c1')
-    expect(api.conversations.stream).toHaveBeenLastCalledWith('c1', { text: '또', accessMode: 'BYPASS' }, expect.anything())
+    expect(botApi.bots.send).toHaveBeenLastCalledWith('c1', { text: '또', accessMode: 'BYPASS' }, expect.anything())
   })
 
   it('picking a mode updates local state first and saves it', async () => {
@@ -76,32 +81,32 @@ describe('access mode', () => {
 
 describe('server approvals', () => {
   it('answer resolves with the option id, then follows the resume job', async () => {
-    api.conversations.resolveApproval.mockResolvedValue({ id: 'ap1', status: 'APPROVED', optionId: 'approve', jobId: 'j1' })
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'approve' } })
     pending('c2', ['approve', 'reject'])
     answer('c2', '실행', 0)
     await settled('c2')
-    expect(api.conversations.resolveApproval).toHaveBeenCalledWith('c2', 'ap1', 'approve')
-    expect(api.conversations.follow).toHaveBeenCalledWith('c2', undefined, expect.anything())
-    expect(api.conversations.stream).not.toHaveBeenCalled()
+    expect(botApi.bots.answer).toHaveBeenCalledWith('c2', 'ap1', { optionId: 'approve' })
+    expect(botApi.bots.follow).toHaveBeenCalledWith('c2', undefined, expect.anything())
+    expect(botApi.bots.send).not.toHaveBeenCalled()
     expect(chat('c2').approval).toBeNull()
     expect(chat('c2').items).toMatchObject([{ type: 'user', text: '실행' }, { type: 'tool', state: 'ok' }, { type: 'worked' }])
   })
 
   it('shows an error line when the approval already expired', async () => {
-    api.conversations.resolveApproval.mockRejectedValue(new ApiError('gone', 'APPROVAL_EXPIRED', 410))
+    botApi.bots.answer.mockRejectedValue(new ApiError('gone', 'APPROVAL_EXPIRED', 410))
     pending('c3', ['approve', 'reject'])
     answer('c3', '취소', 1)
     await vi.waitFor(() => expect(chat('c3').items.at(-1)).toMatchObject({ type: 'error' }))
     expect(chat('c3').approval).toBeNull()
-    expect(api.conversations.follow).not.toHaveBeenCalled()
+    expect(botApi.bots.follow).not.toHaveBeenCalled()
   })
 
   it('free text while an approval waits goes out as a normal message', async () => {
     pending('c4', ['approve', 'reject'])
     send('c4', '제목만 바꿔 줘')
     await settled('c4')
-    expect(api.conversations.resolveApproval).not.toHaveBeenCalled()
-    expect(api.conversations.stream).toHaveBeenCalledWith('c4', { text: '제목만 바꿔 줘', accessMode: 'AUTO' }, expect.anything())
+    expect(botApi.bots.answer).not.toHaveBeenCalled()
+    expect(botApi.bots.send).toHaveBeenCalledWith('c4', { text: '제목만 바꿔 줘', accessMode: 'AUTO' }, expect.anything())
     expect(chat('c4').approval).toBeNull()
   })
 
@@ -110,7 +115,7 @@ describe('server approvals', () => {
     ['c-continue', 'start-document', '이어서 작성하기', ['continue', 'cancel'], 0, 'continue'],
     ['c-fit', 'analyze', '피드백만 받을게요', ['continue', 'feedback', 'score'], 1, 'feedback'],
   ])('answers %s with the server option id', async (id, approvalId, text, optionIds, index, optionId) => {
-    api.conversations.resolveApproval.mockResolvedValue({ id: approvalId, status: 'APPROVED', optionId, jobId: 'j1' })
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: approvalId, status: 'APPROVED', optionId } })
     useChatStore.setState({
       chats: {
         [id]: {
@@ -126,16 +131,16 @@ describe('server approvals', () => {
     })
     answer(id, text, index)
     await settled(id)
-    expect(api.conversations.resolveApproval).toHaveBeenCalledWith(id, approvalId, optionId)
-    expect(api.conversations.stream).not.toHaveBeenCalled()
+    expect(botApi.bots.answer).toHaveBeenCalledWith(id, approvalId, { optionId })
+    expect(botApi.bots.send).not.toHaveBeenCalled()
   })
 
   it('sends every picked id when the card allows several', async () => {
-    api.conversations.resolveApproval.mockResolvedValue({ id: 'ap1', status: 'APPROVED', optionId: 'resume', optionIds: ['resume', 'portfolio'], jobId: 'j1' })
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'resume' } })
     pending('c5', ['resume', 'portfolio', 'cover_letter', 'cancel'])
     answer('c5', '이력서, 포트폴리오', [0, 1])
     await settled('c5')
-    expect(api.conversations.resolveApproval).toHaveBeenCalledWith('c5', 'ap1', 'resume', ['resume', 'portfolio'])
-    expect(api.conversations.stream).not.toHaveBeenCalled()
+    expect(botApi.bots.answer).toHaveBeenCalledWith('c5', 'ap1', { optionId: 'resume', optionIds: ['resume', 'portfolio'] })
+    expect(botApi.bots.send).not.toHaveBeenCalled()
   })
 })

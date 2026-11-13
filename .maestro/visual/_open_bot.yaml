@@ -1,0 +1,8 @@
+appId: app.push.mobile
+tags:
+  - subflow
+---
+- openLink: push://bots/push
+- extendedWaitUntil:
+    visible: "메시지.*"
+    timeout: 10000

@@ -47,11 +47,12 @@ export type RunInput = {
   conversationId: string
   text?: string
   attachment?: string
-  answer?: { approvalId: string; choice: number }
   resolve?: { approvalId: string; optionId: string; optionIds?: string[] }
   interrupted?: boolean
-  /** Reattach to the conversation's running job and replay it from the start. */
+  /** Reattach to the bot's running turn after this seq. */
   follow?: boolean
+  after?: number
+  piece?: string
   intent?: ChatIntent
   context?: { documentId?: string; evidenceIds?: string[] }
 }

@@ -1,26 +1,18 @@
 import { create } from 'zustand'
-import { ApiError, QueueBusyError, type AccessMode, type ChatIntent } from '@push/api-client'
+import { ApiError, QueueBusyError, type AccessMode, type BotContract, type ChatIntent } from '@push/api-client'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
-import { api, API_MOCK, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
-import {
-  chatApi,
-  fetchConversationMessages,
-  fetchConversationTurns,
-  followConversation,
-  resolveConversationApproval,
-  streamConversation,
-  updateAiAccessMode,
-} from './api/fetchers'
+import { API_MOCK, botApi, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
+import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
 import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
-import { errorText, fromStream } from './utils/stream'
-import { restoreTurns } from './utils/turns'
+import { errorText, fromStream, type StreamEnd } from './utils/stream'
+import { openPieceId, restoreBotTurns } from './utils/turns'
 import type { ChatEvent, ChatState } from './types'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
@@ -53,7 +45,7 @@ const withUpload = async (input: Outgoing): Promise<RunInput | undefined> => {
   }
 }
 
-let pendingConsent: RunInput | null = null
+const pendingConsent = new Map<string, RunInput>()
 let pendingOpen: PendingOpen | null = null
 let openChat: ((p: PendingOpen) => void) | null = null
 
@@ -72,7 +64,7 @@ export const bindOpenChat = (fn: (p: PendingOpen) => void) => {
 }
 
 export const laterConsent = () => {
-  pendingConsent = null
+  pendingConsent.clear()
   pendingOpen = null
   useConsentPrompt.setState({ open: false, dismissed: true })
 }
@@ -81,12 +73,13 @@ export const consentTurnedOff = () => useConsentPrompt.setState({ dismissed: fal
 
 export const grantConsent = () => {
   useConsentPrompt.setState({ open: false, dismissed: true })
-  const next = pendingConsent
-  pendingConsent = null
+  const held = [...pendingConsent.values()]
+  pendingConsent.clear()
   const open = pendingOpen
   pendingOpen = null
-  if (next) void startRun(next)
-  else if (open) openChat?.(open)
+  if (held.length) {
+    for (const next of held) void startRun(next)
+  } else if (open) openChat?.(open)
 }
 
 export const pickAccessMode = async (mode: AccessMode) => {
@@ -102,6 +95,17 @@ export const pickAccessMode = async (mode: AccessMode) => {
 
 const get = (id: string) => useChatStore.getState().chats[id] ?? emptyChat
 const runs = new Map<string, AbortController>()
+
+type Held = { text: string; file?: PickedFile; attachment?: string; intent?: ChatIntent; context?: RunInput['context'] }
+const heldQueues = new Map<string, Held[]>()
+
+const botIntent = (intent?: ChatIntent): BotContract.Intent | undefined =>
+  intent && intent !== 'posting' && intent !== 'review' && intent !== 'interview' && intent !== 'general' ? intent : undefined
+
+const attachmentsOf = (input: RunInput): BotContract.AttachmentRef[] => [
+  ...(input.context?.documentId ? [{ kind: 'document' as const, id: input.context.documentId }] : []),
+  ...(input.context?.evidenceIds ?? []).map((id) => ({ kind: 'file' as const, id })),
+]
 
 const setChatEvent = (id: string, e: ChatEvent) => {
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: applyEvent(s.chats[id] ?? emptyChat, e) } }))
@@ -137,7 +141,7 @@ const sleep = (ms: number, signal: AbortSignal) =>
 
 // The mock answers a run with its frames at once and the app plays them on the clock, because RN cannot stream a synthetic body.
 // They go through the live stream's mapper, so a mock run draws what the server's frames would.
-const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> {
+const scripted = async function* (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> {
   const steps = await chatApi.run(input)
   const frames = async function* () {
     for (const step of steps) {
@@ -145,64 +149,82 @@ const scripted = async function* (input: RunInput, signal: AbortSignal): AsyncGe
       yield step.frame
     }
   }
-  yield* fromStream(frames(), async function* () {})
+  yield* fromStream(frames(), async function* () {}, end)
 }
 
-const streamed = (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> => {
-  const id = input.conversationId
-  const documentId = input.context?.documentId
-  const evidenceIds = input.context?.evidenceIds
-  const context = {
-    ...(documentId ? { documentId } : {}),
-    ...(evidenceIds?.length ? { evidenceIds } : {}),
-  }
-  const body = {
+const streamed = (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> => {
+  const intent = botIntent(input.intent)
+  const attachments = attachmentsOf(input)
+  const body: BotContract.SendBody = {
     text: input.text ?? '',
     accessMode: usePrefs.getState().accessMode,
-    ...(input.intent ? { intent: input.intent } : {}),
-    ...(documentId || evidenceIds?.length ? { context } : {}),
+    ...(intent ? { intent } : {}),
+    ...(attachments.length ? { attachments } : {}),
   }
-  return fromStream(streamConversation(id, body, signal), (after) => followConversation(id, after, signal))
+  return fromStream(botApi.bots.send(input.conversationId, body, signal), (after) => botApi.bots.follow(input.conversationId, after, signal), end)
 }
 
-const resolved = async function* (input: RunInput, signal: AbortSignal): AsyncGenerator<ChatEvent> {
-  const id = input.conversationId
+const followed = (input: RunInput, signal: AbortSignal, end?: StreamEnd) =>
+  fromStream(
+    botApi.bots.follow(input.conversationId, input.after, signal),
+    (after) => botApi.bots.follow(input.conversationId, after, signal),
+    end,
+    input.piece,
+  )
+
+const resolved = async function* (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> {
   const { approvalId, optionId, optionIds } = input.resolve!
-  const r = optionIds?.length
-    ? await resolveConversationApproval(id, approvalId, optionId, optionIds)
-    : await resolveConversationApproval(id, approvalId, optionId)
-  if (!r.jobId) return
-  yield* followed(input, signal)
+  const body = optionIds?.length ? { optionId, optionIds } : { optionId }
+  const { resumed } = await botApi.bots.answer(input.conversationId, approvalId, body)
+  if (!resumed) return
+  yield* followed(input, signal, end)
 }
 
-const followed = (input: RunInput, signal: AbortSignal) =>
-  fromStream(followConversation(input.conversationId, undefined, signal), (after) => followConversation(input.conversationId, after, signal))
+const clearWorking = (id: string) => {
+  useChatStore.setState((s) => {
+    const cur = s.chats[id]
+    if (!cur) return s
+    return { chats: { ...s.chats, [id]: { ...cur, working: null, runStartedAt: null } } }
+  })
+}
+
+const flush = (id: string) => {
+  const s = get(id)
+  const q = heldQueues.get(id)
+  if (!q?.length || s.working || s.approval) return
+  const next = q.shift()!
+  if (!q.length) heldQueues.delete(id)
+  dispatch(id, { type: 'dequeue' })
+  send(id, next.text, next.file ?? next.attachment, next.intent, next.context)
+}
 
 const startRun = async (input: Outgoing) => {
   const id = input.conversationId
   const ctrl = new AbortController()
   runs.set(id, ctrl)
   dispatch(id, { type: 'start', at: Date.now() })
+  const end: StreamEnd = { reason: 'no-seq' }
+  let release = false
   let run: RunInput | undefined
   try {
     run = await withUpload(input)
     if (!run) {
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
+      release = true
     } else {
-      for await (const e of (API_MOCK ? scripted : run.resolve ? resolved : run.follow ? followed : streamed)(run, ctrl.signal)) {
+      for await (const e of (API_MOCK ? scripted : run.resolve ? resolved : run.follow ? followed : streamed)(run, ctrl.signal, end)) {
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
-      if (get(id).working) dispatch(id, { type: 'done', at: Date.now() })
+      if (end.reason === 'reattach-empty') {
+        clearWorking(id)
+        release = true
+      } else if (end.reason === 'terminal') release = true
     }
   } catch (err) {
     if (ctrl.signal.aborted) return
     if (isConsentRequired(err)) {
-      pendingConsent = run ?? posted(input)
-      useChatStore.setState((s) => {
-        const cur = s.chats[id]
-        if (!cur) return s
-        return { chats: { ...s.chats, [id]: { ...cur, working: null, runStartedAt: null } } }
-      })
+      pendingConsent.set(id, run ?? posted(input))
+      clearWorking(id)
       askConsent(true)
       return
     }
@@ -210,16 +232,12 @@ const startRun = async (input: Outgoing) => {
     const retryAfter = err instanceof QueueBusyError ? err.retryAfterSec : apiError?.details?.retryAfterSec
     const text = errorText(apiError?.code, typeof retryAfter === 'number' ? retryAfter : undefined, apiError?.details?.reason)
     dispatch(id, { type: 'error', id: `err-${Date.now()}`, text, code: apiError?.code })
+    if (!apiError) return
+    release = true
   } finally {
     if (runs.get(id) === ctrl) runs.delete(id)
   }
-  // Messages sent while the agent worked go out one by one once it finishes.
-  const s = get(id)
-  if (!s.working && !s.approval && s.queue.length) {
-    const next = s.queue[0]!
-    dispatch(id, { type: 'dequeue' })
-    send(id, next.text, next.file)
-  }
+  if (release) flush(id)
 }
 
 const fileOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' || !attachment ? undefined : attachment)
@@ -230,6 +248,9 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
   const s = get(id)
   if (s.working) {
     const file = fileOf(attachment)
+    const q = heldQueues.get(id) ?? []
+    q.push({ text, file, attachment: nameOf(attachment), intent, context })
+    heldQueues.set(id, q)
     return dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })
   }
   if (s.approval?.optionIds) {
@@ -256,41 +277,36 @@ export const answer = (id: string, text: string, choice: number | number[]) => {
     const optionId = approval.optionIds?.[n]
     return optionId ? [optionId] : []
   })
-  if (approval.optionIds && !ids.length) return void startRun({ conversationId: id, text })
   const optionId = ids[0]
-  void startRun(
-    optionId
-      ? { conversationId: id, text, resolve: { approvalId: approval.id, optionId, ...(ids.length > 1 ? { optionIds: ids } : {}) } }
-      : { conversationId: id, text, answer: { approvalId: approval.id, choice: picks[0] ?? 0 } },
-  )
+  if (!optionId) return void startRun({ conversationId: id, text })
+  void startRun({ conversationId: id, text, resolve: { approvalId: approval.id, optionId, ...(ids.length > 1 ? { optionIds: ids } : {}) } })
 }
 
 const halting = new Set<string>()
 
-const finishStop = (id: string) => {
+const finishStop = (id: string, ctrl: AbortController | undefined) => {
   halting.delete(id)
-  runs.get(id)?.abort()
+  if (ctrl && runs.get(id) !== ctrl) return
+  ctrl?.abort()
   dispatch(id, { type: 'stop' })
 }
 
 const reportCancel = (id: string) => {
-  // A scripted mock run has no server job. Cancelling it only raises the failure toast.
+  const ctrl = runs.get(id)
   if (API_MOCK) {
-    finishStop(id)
+    finishStop(id, ctrl)
     return
   }
   if (halting.has(id)) return
   halting.add(id)
-  void api.conversations.cancel(id).then(
-    () => finishStop(id),
+  void botApi.bots.cancel(id).then(
+    () => finishStop(id, ctrl),
     (error: unknown) => {
-      // 409: the job already ended, which is what stop asked for.
       if (error instanceof ApiError && error.status === 409) {
-        finishStop(id)
+        finishStop(id, ctrl)
         return
       }
       halting.delete(id)
-      // Leave the run on screen so a retryable failure can be pressed again. 403 cannot succeed on retry.
       showToast({ message: error instanceof ApiError && error.status === 403 ? CHAT_STOP_FORBIDDEN : CHAT_STOP_FAILED })
     },
   )
@@ -301,25 +317,16 @@ export const stop = (id: string) => {
   reportCancel(id)
 }
 
-const busy = (id: string) => get(id).items.length > 0 || runs.has(id)
+const busy = (id: string) => runs.has(id) || !!get(id).working || get(id).items.length > 0
 
-export const hydrate = async (id: string) => {
-  if (busy(id)) return
-  const [res, turns] = await Promise.all([fetchConversationMessages(id), fetchConversationTurns(id).catch(() => null)])
-  if (busy(id)) return
-  const [newest, ...older] = turns?.data ?? []
-  if (newest) {
-    // Joined tokens keep their first seq, so a running job is replayed whole instead of resumed after it.
-    const active = newest.status === 'RUNNING' || newest.status === 'PENDING'
-    const chat = restoreTurns([active ? { ...newest, events: [] } : newest, ...older], res.data)
-    useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: chat } }))
-    if (active && !API_MOCK) void startRun({ conversationId: id, follow: true })
-    return
-  }
-  // push-be pages newest first; the transcript reads oldest first.
-  for (const m of [...res.data].reverse()) {
-    dispatch(id, m.role === 'USER' ? { type: 'user', id: m.id, text: m.text } : { type: 'agentText', id: m.id, text: m.text })
-  }
+export const openBot = async (address: string) => {
+  const id = address === 'push' ? (await botApi.bots.get(address)).id : address
+  if (busy(id)) return id
+  const page = await botApi.bots.transcript(id)
+  if (busy(id)) return id
+  useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: restoreBotTurns(page.data, page.live) } }))
+  if (page.live && !API_MOCK) void startRun({ conversationId: id, follow: true, after: page.live.lastSeq, piece: openPieceId(page.data, page.live) })
+  return id
 }
 
 export const forget = (id: string) =>

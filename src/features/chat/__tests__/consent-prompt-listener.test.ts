@@ -61,8 +61,9 @@ describe('ConsentPromptListener', () => {
     expect(pushed).not.toHaveBeenCalled()
   })
 
-  it('avoids heavy chat and my barrel imports on startup paths', () => {
-    expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat['"]/)
+  it('imports chat through its index and keeps my off the chat startup path', () => {
+    expect(stackLayoutSource).toMatch(/from ['"]@\/features\/chat['"]/)
+    expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat\//)
     expect(storesSource).not.toMatch(/from ['"]@\/features\/my['"]/)
     expect(fetchersSource).not.toMatch(/from ['"]@\/features\/my['"]/)
     expect(storesSource).toContain("@/features/my/api/fetchers")

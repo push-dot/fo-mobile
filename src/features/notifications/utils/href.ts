@@ -1,5 +1,6 @@
 import type { Href } from 'expo-router'
 import type { AppNotification } from '@push/api-client'
+import { botHomePath } from '@/features/bots'
 import { MY_TAB_PATH } from '../constants'
 
 export const notificationHref = ({ target }: Pick<AppNotification, 'target'>): Href | null => {
@@ -11,7 +12,7 @@ export const notificationHref = ({ target }: Pick<AppNotification, 'target'>): H
     case 'post':
       return `/posts/${target.id}`
     case 'conversation':
-      return `/chat/${target.id}`
+      return botHomePath
     case 'calendar':
       return { pathname: MY_TAB_PATH, params: { tab: 'activity', sub: 'calendar' } }
     case 'activity':
