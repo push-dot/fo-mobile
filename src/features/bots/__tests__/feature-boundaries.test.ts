@@ -1,9 +1,15 @@
 import { join } from 'node:path'
 import { ESLint } from 'eslint'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 // Lints snippets through the app's own eslint.config.js, so the test covers the rule and how the config applies it.
-const eslint = new ESLint({ cwd: join(__dirname, '../../../..') })
+// The first lint loads the config and its plugins, which takes longer than a test's 5 s on a CI runner, so it runs once in beforeAll.
+let eslint: ESLint
+
+beforeAll(async () => {
+  eslint = new ESLint({ cwd: join(__dirname, '../../../..') })
+  await eslint.lintText('export {}\n', { filePath: 'src/screens/bots/x.tsx' })
+}, 60_000)
 
 const deepImports = async (file: string, spec: string) => {
   const [result] = await eslint.lintText(`export * from '${spec}'\n`, { filePath: file })
