@@ -1,0 +1,37 @@
+appId: app.push.mobile
+name: diag queued send repeat
+---
+- runFlow: _login.yaml
+- runFlow: _dismiss_logbox.yaml
+- runFlow:
+    file: _tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "(동의하고 시작하기|공고 링크로 맞추기)"
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 10000
+- tapOn: "메시지.*"
+- inputText: "tailor hold"
+- hideKeyboard:
+    optional: true
+- tapOn: "보내기"
+- extendedWaitUntil:
+    visible: ".*기술 스택을 비교하는 중.*"
+    timeout: 40000
+- tapOn: "메시지.*"
+- repeat:
+    times: 15
+    commands:
+      - inputText: "use numbers"
+      - takeScreenshot: diag-before-send
+      - tapOn: "보내기"
+      - extendedWaitUntil:
+          notVisible: "보내기"
+          timeout: 4000
+          optional: true

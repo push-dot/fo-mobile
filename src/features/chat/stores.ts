@@ -228,6 +228,7 @@ const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'str
 
 export const send = (id: string, text: string, attachment?: string | PickedFile, intent?: ChatIntent, context?: RunInput['context']) => {
   const s = get(id)
+  console.log('D1DIAG send', Date.now(), id, JSON.stringify(text), !!s.working, !!s.approval, s.queue.length)
   if (s.working) {
     const file = fileOf(attachment)
     return dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })

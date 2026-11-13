@@ -28,6 +28,7 @@ export type ComposerProps = {
 
 /** Text line on top (17px), control row below: + 첨부 · @ 언급 … mic · send/stop. Shared by both platforms. */
 export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
+  console.log('D1DIAG renderBody', Date.now(), JSON.stringify(p.value), !!p.working)
   const c = useColors()
   const { fontScale } = useWindowDimensions()
   const typed = p.value.trim()
@@ -102,7 +103,10 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
               accessibilityLabel="보내기"
               accessibilityState={{ disabled: !canSend }}
               disabled={!canSend}
-              onPress={p.onSend}
+              onPressIn={(e) => console.log('D1DIAG pressIn', Date.now(), e.nativeEvent.timestamp, e.nativeEvent.pageX, e.nativeEvent.pageY)}
+              onPressOut={(e) => console.log('D1DIAG pressOut', Date.now(), e.nativeEvent.timestamp)}
+              onLayout={(e) => console.log('D1DIAG sendLayout', Date.now(), JSON.stringify(e.nativeEvent.layout))}
+              onPress={(e) => (console.log('D1DIAG press', Date.now(), e.nativeEvent.timestamp), p.onSend())}
               hitSlop={hitSlopTo(40, 40)}
               style={[round, { backgroundColor: canSend ? c.ac : c.fill2 }]}
             >

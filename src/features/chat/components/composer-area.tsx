@@ -43,10 +43,12 @@ export const ComposerArea = ({ placeholder, onSend, working, onStop, onTyping, a
   const access = useAccessMode()
 
   const change = (t: string) => {
+    console.log('D1DIAG change', Date.now(), JSON.stringify(t))
     setText(t)
     onTyping?.(t.length > 0)
   }
   const submit = () => {
+    console.log('D1DIAG submit', Date.now(), JSON.stringify(text))
     if (!text.trim()) return
     onSend(text.trim(), file)
     change('')

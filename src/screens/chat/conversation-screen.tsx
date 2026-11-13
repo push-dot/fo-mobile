@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type ScrollViewInstance, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors } from '@/theme'
 import { askConfirm, Button, Glass, GlassButton, Icon, Mascot, Menu, Text, useKeyboardHeight, useReduceMotion, type MenuAction } from '@/shared/components'
@@ -139,8 +139,21 @@ const ConversationScreen = ({ id }: { id: string }) => {
       .catch(() => setFailedHydrateId(id))
   }, [id])
 
+  useEffect(() => {
+    const subs = (['keyboardWillShow', 'keyboardDidShow', 'keyboardWillHide', 'keyboardDidHide', 'keyboardWillChangeFrame', 'keyboardDidChangeFrame'] as const).map((n) =>
+      Keyboard.addListener(n, (e) => console.log('D1DIAG kb', n, Date.now(), JSON.stringify(e?.endCoordinates), e?.duration)),
+    )
+    return () => subs.forEach((x) => x.remove())
+  }, [])
+  console.log('D1DIAG renderScreen', Date.now(), id, !!chat.working, chat.queue.length, keyboard, bottomH)
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View
+      style={{ flex: 1, backgroundColor: c.bg }}
+      onTouchStart={(e) => console.log('D1DIAG touchStart', Date.now(), e.nativeEvent.timestamp, e.nativeEvent.target, e.nativeEvent.pageX, e.nativeEvent.pageY)}
+      onTouchEnd={(e) => console.log('D1DIAG touchEnd', Date.now(), e.nativeEvent.timestamp, e.nativeEvent.target)}
+      onTouchCancel={(e) => console.log('D1DIAG touchCancel', Date.now(), e.nativeEvent.timestamp, e.nativeEvent.target)}
+      onStartShouldSetResponderCapture={(e) => (console.log('D1DIAG startCapture', Date.now(), e.nativeEvent.target), false)}
+    >
       <ScrollView
         ref={scroll}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: insets.top + 64, paddingBottom: threadInset({ bottomH, keyboard, navBar: insets.bottom, approval: !!showPanel, android: Platform.OS === 'android', status: !!chat.working || !!chat.awaiting }) }}
