@@ -1,0 +1,39 @@
+appId: app.push.mobile
+name: 회사 봇 · 큰 글씨 · 채팅 헤더 · 상태 줄
+tags:
+  - visual
+---
+- runFlow:
+    file: ../_login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:thread"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: ".*경력 섹션 3줄을 고쳤어요.*"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeaderXL
+- runFlow:
+    file: ../_login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:empty,run:st-work"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: "메시지.*"
+    timeout: 15000
+- runFlow:
+    file: ../_say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-work"
+- extendedWaitUntil:
+    visible: ".*공고 요건을 읽는 중.*"
+    timeout: 20000
+- runFlow:
+    file: ../_chat_kbd_down.yaml
+    env:
+      TEXT: ".*공고 요건을 읽는 중.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusXL

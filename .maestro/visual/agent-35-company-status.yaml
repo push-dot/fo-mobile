@@ -1,0 +1,126 @@
+appId: app.push.mobile
+name: 회사 봇 · 상태 줄 (생각 중 · 작업 중 · 중지됨 · 순서 대기 · 긴 문장 · 도움 필요 · 승인 카드)
+tags:
+  - visual
+---
+# One empty 모아페이 chat. run:<token> (links.ts) makes the next message play that status board: st-think / st-work / st-queue / st-long hold
+# one status line until 중지 ends it, st-help and st-approve stop at a card. The tour types the board's own user line (Android types the token).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:empty,run:st-think"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: "적합도 보기"
+    timeout: 15000
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-think"
+- extendedWaitUntil:
+    visible: ".*생각 중.*"
+    timeout: 20000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*경력 섹션을 고쳐 주세요.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusThink
+- tapOn: "중지"
+- extendedWaitUntil:
+    notVisible: ".*생각 중.*"
+    timeout: 10000
+# 작업 중, then 중지 on it (nothing was edited yet, so the stop drops the work).
+- openLink: "push://bots/b-moa?mock=run:st-work"
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-work"
+- extendedWaitUntil:
+    visible: ".*공고 요건을 읽는 중.*"
+    timeout: 20000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*경력 섹션을 고쳐 주세요.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusWork
+- tapOn: "중지"
+# The stop line lands below the fold on Android; bring the thread to its end first.
+- runFlow: _chat_bottom.yaml
+- extendedWaitUntil:
+    visible: ".*고치던 내용은 반영하지 않았어요.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusStopped
+- openLink: "push://bots/b-moa?mock=run:st-queue"
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-queue"
+- extendedWaitUntil:
+    visible: ".*순서를 기다리는 중.*"
+    timeout: 20000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*경력 섹션을 고쳐 주세요.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusQueue
+- tapOn: "중지"
+- extendedWaitUntil:
+    notVisible: ".*순서를 기다리는 중.*"
+    timeout: 10000
+- openLink: "push://bots/b-moa?mock=run:st-long"
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "누리클라우드 공고 3개 비교해서 어디에 먼저 낼지 정리해 주세요"
+      EN: "st-long"
+- extendedWaitUntil:
+    visible: ".*공고 3개의 필수 요건과 우대 요건을.*"
+    timeout: 20000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*어디에 먼저 낼지 정리해 주세요.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusLong
+- tapOn: "중지"
+- extendedWaitUntil:
+    notVisible: ".*공고 3개의 필수 요건과 우대 요건을.*"
+    timeout: 10000
+# 선택 카드: the run waits for an answer.
+- openLink: "push://bots/b-moa?mock=run:st-help"
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-help"
+- extendedWaitUntil:
+    visible: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusHelp
+# Answering plays the generic reply and frees the composer for the approval card.
+- runFlow:
+    file: _pick.yaml
+    env:
+      PICK: "제품 관점"
+      ASK: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
+      NEXT: ".*메시지.*"
+- openLink: "push://bots/b-moa?mock=run:st-approve"
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
+      EN: "st-approve"
+- extendedWaitUntil:
+    visible: "모아페이 채용 페이지를 열어도 될까요?"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusApprove

@@ -8325,6 +8325,168 @@ card {"id":"ph4-quality","question":"추천 수정도 반영할까요?","section
 "
 `;
 
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token read-off 1`] = `
+"
+{"text":"read-off","type":"user"}
+{"text":"내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.","type":"readOff"}
+{"seconds":1,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-approve > st-approve: pick 0 1`] = `
+"
+{"text":"st-approve","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"한 번 허용","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"한 번 허용","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-approve > st-approve: pick 1 1`] = `
+"
+{"text":"st-approve","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"항상 허용","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"항상 허용","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-approve > st-approve: pick 2 1`] = `
+"
+{"text":"st-approve","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"거절","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"거절","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-approve > st-approve: say 이렇게 해 주세요 1`] = `
+"
+{"text":"st-approve","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"이렇게 해 주세요","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"이렇게 해 주세요","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-approve 1`] = `
+"
+{"text":"st-approve","type":"user"}
+{"seconds":1,"type":"worked"}
+card {"confirm":true,"detail":"careers.moapay.co.kr · 공고 1개를 읽어요","foot":"10분 동안 답이 없으면 이 요청은 만료돼요","id":"st-approve","question":"모아페이 채용 페이지를 열어도 될까요?","sections":[{"items":[{"label":"한 번 허용"},{"desc":"이 봇이 이 사이트를 읽을 때 다시 묻지 않아요","label":"항상 허용"},{"label":"거절"}],"kind":"choices","selected":[]}]}
+{"awaiting":"approval","interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help > st-help: pick 0 1`] = `
+"
+{"text":"st-help","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"제품 관점","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"제품 관점","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help > st-help: pick 1 1`] = `
+"
+{"text":"st-help","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"데이터 관점","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"데이터 관점","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help > st-help: say 이렇게 해 주세요 1`] = `
+"
+{"text":"st-help","type":"user"}
+{"seconds":1,"type":"worked"}
+{"text":"이렇게 해 주세요","type":"user"}
+{"text":"알겠어요. 필요한 자료부터 살펴볼게요.","type":"agentText"}
+{"action":"요청 정리","result":"할 일 3개로 나눴어요","state":"ok","target":"이렇게 해 주세요","type":"tool"}
+{"text":"정리했어요. 더 필요한 게 있으면 말해 주세요.","type":"agentText"}
+{"seconds":4,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-help 1`] = `
+"
+{"text":"st-help","type":"user"}
+{"seconds":1,"type":"worked"}
+card {"foot":"답할 때까지 이 봇은 기다려요","id":"st-help","question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"}],"kind":"choices","selected":[0]}]}
+{"awaiting":"approval","interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-long 1`] = `
+"
+{"text":"st-long","type":"user"}
+{"seconds":150,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-queue 1`] = `
+"
+{"text":"st-queue","type":"user"}
+{"seconds":150,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-think 1`] = `
+"
+{"text":"st-think","type":"user"}
+{"seconds":150,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-work 1`] = `
+"
+{"text":"st-work","type":"user"}
+{"seconds":150,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token states-apply 1`] = `
 "
 {"text":"states-apply","type":"user"}
