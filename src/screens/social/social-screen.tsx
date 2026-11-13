@@ -54,6 +54,8 @@ const SocialScreen = () => {
         refreshing={q.isRefetching && !q.isFetchingNextPage}
         onRefresh={() => q.refetch()}
         contentContainerStyle={{ flexGrow: 1 }}
+        // SocialStates: the empty feed draws no scroll bar
+        showsVerticalScrollIndicator={posts.length > 0}
         ListEmptyComponent={
           q.isPending ? (
             <PostListSkeleton />

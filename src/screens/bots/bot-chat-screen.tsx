@@ -216,7 +216,8 @@ const Thread = ({ id }: { id: string }) => {
         windowSize={THREAD_WINDOW}
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
+        // The boards draw a short thread under the header: the list is inverted, so flex-end in its flipped space is the top.
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
         ListFooterComponent={<View style={{ height: headerH }} />}
         ListHeaderComponent={
           chat.queue.length || showPanel ? (

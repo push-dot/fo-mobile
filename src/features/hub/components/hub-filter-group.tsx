@@ -4,8 +4,8 @@ import { Text } from '../../../shared/components'
 import { spacing } from '../../../theme'
 
 const HubFilterGroup = ({ title, children }: { title: string; children: ReactNode }) => (
-  <View style={{ gap: spacing[3] }}>
-    <Text v="b2" weight="700">
+  <View style={{ gap: spacing[2] }}>
+    <Text v="c1" color="t3">
       {title}
     </Text>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing[2] }}>{children}</View>

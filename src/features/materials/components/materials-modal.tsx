@@ -27,8 +27,11 @@ const runAdd = (action: AddAction) => {
 
 /** RN has no `text-wrap: balance`; this width rebuilds the three lines MaterialsEmpty draws for its body. */
 const NOTE_BODY_WIDTH = 252
-/** The boards centre the note in the body, a little above the middle (the search field sits under it). */
-const NOTE_RESERVE = 40
+/**
+ * The boards draw the note's title at about a third of the sheet, not the middle of the list area: the block's centre sits 134pt above
+ * the area's centre (measured on MaterialsEmpty, iOS 131 / Android 137), and centring in a box with this much bottom padding lifts it half of it.
+ */
+const NOTE_RESERVE = 268
 
 /** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. */
 const Note = ({ title, body, action, alert }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean }) => (

@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Glass, Icon, useKeyboardHeight } from '@/shared/components'
+import { Icon, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '@/theme'
 import { SEARCH_PLACEHOLDER } from '../constants'
@@ -28,7 +28,6 @@ export const useGlassTint = () => {
 /** `.msearch`: the search field floats at the bottom over a fade of the background, and rides up with the keyboard as the chat composer does. */
 export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: (q: string) => void }) => {
   const c = useColors()
-  const tint = useGlassTint()
   const { field: size } = useListSize()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
@@ -75,13 +74,8 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
           end={{ x: 0, y: 0 }}
           style={{ position: 'absolute', inset: 0 }}
         />
-        {Platform.OS === 'ios' ? (
-          <Glass tint={tint} style={{ borderRadius: size.borderRadius }}>
-            {field}
-          </Glass>
-        ) : (
-          <View style={{ borderRadius: size.borderRadius, backgroundColor: c.fill }}>{field}</View>
-        )}
+        {/* The boards draw the field as a flat fill on both platforms (no glass, no shadow). */}
+        <View style={{ borderRadius: size.borderRadius, backgroundColor: c.fill }}>{field}</View>
       </View>
     </KeyboardAvoidingView>
   )

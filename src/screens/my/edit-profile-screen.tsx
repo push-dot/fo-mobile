@@ -62,7 +62,8 @@ import { pickImage } from '@/shared/infrastructure'
 import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
-const BORDER = 1.5
+/** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
+const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
 
@@ -91,7 +92,6 @@ const Input = ({
   placeholder,
   multiline,
   keyboardType,
-  invalid,
 }: {
   value: string
   onChangeText: (t: string) => void
@@ -99,7 +99,6 @@ const Input = ({
   placeholder?: string
   multiline?: boolean
   keyboardType?: 'numbers-and-punctuation'
-  invalid?: boolean
 }) => {
   const c = useColors()
   const font = multiline ? type.b2 : type.b1
@@ -117,12 +116,10 @@ const Input = ({
           ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
-          backgroundColor: c.bg,
-          borderWidth: BORDER,
-          borderColor: invalid ? c.red : 'transparent',
-          // the 1.5 border is inside the box; the board's field has none, so its 16 / 12 insets shrink by it
-          paddingHorizontal: spacing[4] - BORDER,
-          paddingTop: multiline ? spacing[3] - BORDER : 0,
+          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box; neither has a red border (the error is the line of text below)
+          backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
+          paddingHorizontal: spacing[4],
+          paddingTop: multiline ? spacing[3] : 0,
           fontSize: font.fontSize,
           lineHeight: font.lineHeight,
           letterSpacing: font.letterSpacing,
@@ -492,13 +489,11 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Input
                     label="회사"
                     value={it.company}
-                    invalid={tried && !valid && !it.company.trim()}
                     onChangeText={(t) => set(i, { company: t })}
                   />
                   <Input
                     label="직무"
                     value={it.role}
-                    invalid={tried && !valid && !it.role.trim()}
                     onChangeText={(t) => set(i, { role: t })}
                   />
                   <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
@@ -506,14 +501,14 @@ const EditCareer = ({ p }: { p: Profile }) => {
                       <DatePicker
                         label="시작"
                         mode="month"
-                        surface="bg"
+                        surface={FIELD_SURFACE}
                         value={ymToDate(it.start)}
                         max={new Date()}
                         onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
                     {/* padding on a flex:1 item widens it past the 50/50 split, so it lives on the inner row */}
-                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: c.bg }}>
+                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : c.bg }}>
                       <View
                         style={{
                           minHeight: 48,
@@ -537,7 +532,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     <DatePicker
                       label="종료 (2024.02)"
                       mode="month"
-                      surface="bg"
+                      surface={FIELD_SURFACE}
                       value={ymToDate(it.end)}
                       min={ymToDate(it.start) ?? undefined}
                       max={new Date()}
@@ -584,7 +579,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
         })}
         <Button
           label="경력 추가"
-          icon="plus"
           variant="secondary"
           size="md"
           onPress={() => {
@@ -674,7 +668,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
                   <Icon name="plus" size={16} />
                   <Text v="b1" weight={n === 0 ? '700' : undefined}>
                     {item.slice(0, a)}
-                    <Text v="b1" weight="700" color="acText">
+                    <Text v="b1" weight="700">
                       {item.slice(a, b)}
                     </Text>
                     {item.slice(b)}
