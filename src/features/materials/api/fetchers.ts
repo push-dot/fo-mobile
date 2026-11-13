@@ -1,6 +1,6 @@
 import { botApi } from '@/shared/infrastructure'
 import type { MaterialKind, MaterialsFilter } from '../types'
-import { toMaterial, toMaterialDetail, toMaterialsPage } from './schemas'
+import { toMaterialDetail, toMaterialsPage } from './schemas'
 
 /** `next` pages the one section of a single tab. 전체 is a preview and has none. */
 export const fetchMaterials = async ({ tab, q, bot }: MaterialsFilter, cursor?: string) => {
@@ -14,4 +14,4 @@ export const fetchMaterial = async (kind: MaterialKind, id: string) => toMateria
 export const deleteMaterial = (kind: MaterialKind, id: string) => botApi.materials.remove(kind, id)
 
 /** The server keeps a deleted material 30 days, so the delete toast can undo it. */
-export const restoreMaterial = async (kind: MaterialKind, id: string) => toMaterial(await botApi.materials.restore(kind, id))
+export const restoreMaterial = async (kind: MaterialKind, id: string) => void (await botApi.materials.restore(kind, id))

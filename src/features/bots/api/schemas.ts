@@ -1,22 +1,10 @@
 import type { BotContract } from '@push/api-client'
-import { BOT_COLORS } from '../constants'
-import type { Bot, BotActivity, BotColor, BotId, BotProfile, BotRef, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
+import type { Bot, BotActivity, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
+import { colorOf, dateOf, dayOf, toBotRef } from '../utils/wire'
 
-// The only place that reads bot wire field names. Wire types stop here.
+// With utils/wire, the only place that reads bot wire field names. Wire types stop here.
 
-const dateOf = (iso: string): Date | null => {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? null : d
-}
-
-/** A posting deadline is a calendar day ("2026-11-20"). Read as local midnight, so the day does not shift with the zone. */
-export const dayOf = (value: string | null): Date | null => {
-  if (value === null) return null
-  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
-  return day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : dateOf(value)
-}
-
-const colorOf = (color: BotColor | null): BotColor => (color !== null && (BOT_COLORS as readonly string[]).includes(color) ? color : 'gray')
+export { dayOf }
 
 /** Null when a date does not parse. */
 const activityOf = (a: BotContract.BotActivity | null): BotActivity | null => {
@@ -70,13 +58,6 @@ export const toCompanyBot = (dto: BotContract.Bot): CompanyBot => {
 }
 
 export const toOneBot = (dto: BotContract.Bot): Bot => must(toBot(dto), 'bot')
-
-export const toBotRef = (ref: BotContract.BotRef): BotRef => ({
-  id: ref.id as BotId,
-  kind: ref.kind,
-  name: ref.displayName,
-  color: ref.kind === 'push' ? null : colorOf(ref.color),
-})
 
 export const toBotProfile = (dto: BotContract.BotDetail): BotProfile => ({
   bot: toOneBot(dto),

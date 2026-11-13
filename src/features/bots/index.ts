@@ -1,5 +1,6 @@
 export * from './types'
 export * from './constants'
+export { dateOf, dayOf, toBotRef } from './utils/wire'
 export { botErrorCopy, botErrorKind } from './api/errors'
 export { checkLink, findBotForPosting } from './api/fetchers'
 export * from './api/hooks'

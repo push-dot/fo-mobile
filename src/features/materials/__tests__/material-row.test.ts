@@ -1,9 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { BotContract } from '@push/api-client'
 import type { BotId } from '@/features/bots'
 import type { Material, MaterialsPage } from '../types'
-import { toMaterial, toMaterialDetail } from '../api/schemas'
+import { toMaterial, toMaterialDetail, toMaterialsPage } from '../api/schemas'
 import { materialRow, toAttachment, totalCount, withoutMaterial } from '../utils/material-row'
+
+// The bots index re-exports hooks that reach react-native, which vitest cannot load. Its wire readers are all the schemas use.
+vi.mock('@/features/bots', () => import('@/features/bots/utils/wire'))
 
 // The boards are drawn on 2026-11-09: 마감 11월 12일 is D-3 there.
 const now = new Date(2026, 10, 9, 15, 0)
@@ -64,6 +67,23 @@ describe('reading the wire', () => {
 
   it.each([['', 'other'], ['notlinkedin.com', 'blog'], ['linkedin.com.example.org', 'portfolio']] as const)('keeps the stored kind for host %j', (host, kind) => {
     expect(toMaterialDetail(wireLink(host, kind)).material).toMatchObject({ linkKind: kind })
+  })
+
+  const wireFile = (updatedAt: string, createdBy: BotContract.BotRef | null = null): BotContract.Material => ({
+    kind: 'file', id: 'f1', title: 'a.pdf', mimeType: 'application/pdf', size: 1, pageCount: null, origin: createdBy ? 'AI' : 'UPLOAD', createdBy, updatedAt,
+  })
+
+  it('drops a row whose date does not parse, as the bot list does, and refuses it as a detail', () => {
+    const page = toMaterialsPage({ counts: { doc: 2, bookmark: 0, link: 0 }, sections: [{ section: 'doc', items: [wireFile('not a date'), wireFile('2026-11-02T06:14:00Z')], nextCursor: null }] })
+    expect(page.sections[0]?.items).toHaveLength(1)
+    expect(() => toMaterialDetail({ ...wireFile('2026-13-45'), usedBy: [] })).toThrow('unreadable material')
+    expect(toMaterial({ ...wireLink('github.com', 'github'), lastCheckedAt: 'yesterday' } as BotContract.Material)).toBeNull()
+  })
+
+  it('reads a bot reference the way the bot list does: a colour the app has no swatch for is gray, the Push Bot has none', () => {
+    const odd = { id: 'b9', kind: 'company', displayName: '새회사', color: 'neon' } as unknown as BotContract.BotRef
+    expect(toMaterial(wireFile('2026-11-02T06:14:00Z', odd))).toMatchObject({ madeBy: { by: 'bot', bot: { name: '새회사', color: 'gray' } } })
+    expect(toMaterial(wireFile('2026-11-02T06:14:00Z', { id: 'b-push', kind: 'push', displayName: 'Push Bot', color: 'teal' }))).toMatchObject({ madeBy: { bot: { color: null } } })
   })
 })
 

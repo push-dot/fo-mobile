@@ -1,0 +1,79 @@
+appId: app.push.mobile
+name: 자료 · 로딩 · 오류 · 탭별 없음 · 없음 · 긴 글
+tags:
+  - visual
+---
+# Each board is drawn from the modal's first answer for its tab, so every state opens on a launch or a tab nothing has
+# fetched yet. The modal asks again each time it opens, which is what the later switches rely on.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=hang:GET:materials"
+      READY: "새로 올라온 공고"
+- openLink: push://materials
+- extendedWaitUntil:
+    visible: "자료를 불러오는 중이에요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsLoading
+
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=fail:GET:materials"
+      READY: "새로 올라온 공고"
+- openLink: push://materials
+- extendedWaitUntil:
+    visible: "자료를 불러오지 못했어요"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsError
+
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=materials:doc:none"
+      READY: "새로 올라온 공고"
+- openLink: push://materials
+- tapOn: "서류"
+- extendedWaitUntil:
+    visible: "아직 서류가 없어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsEmptyDocs
+- tapOn: "닫기"
+- openLink: push://materials?mock=reset,materials:bookmark:none
+- tapOn: "북마크"
+- extendedWaitUntil:
+    visible: "북마크한 공고가 없어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsEmptyBookmarks
+- tapOn: "닫기"
+- openLink: push://materials?mock=reset,materials:link:none
+- tapOn: "링크"
+- extendedWaitUntil:
+    visible: "저장한 링크가 없어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsEmptyLinks
+- tapOn: "닫기"
+- openLink: push://materials?mock=reset,materials:none
+- extendedWaitUntil:
+    visible: "아직 자료가 없어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsEmpty
+- tapOn: "닫기"
+- openLink: push://materials?mock=reset,materials:long
+- extendedWaitUntil:
+    visible: "careers.nuricloud.co.kr.* 자세히"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialsLong
+- tapOn: "careers.nuricloud.co.kr.* 자세히"
+- extendedWaitUntil:
+    visible: "바로가기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialDetailLong
