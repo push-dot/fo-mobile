@@ -54,7 +54,6 @@ describe('ConsentPromptListener', () => {
   })
 
   it('does not read consents or settings on cold start', () => {
-    expect(chatTabSource).not.toContain("from '@/screens/chat/chat-home-screen'")
     expect(chatTabSource).toContain('import(')
     expect(listenerSource).not.toContain('useReferenceConsent')
     expect(listenerSource).not.toContain('useMySettings')

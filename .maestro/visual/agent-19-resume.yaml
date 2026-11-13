@@ -5,11 +5,7 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _agent_tab.yaml
-- tapOn: "대화 목록 열기"
-- extendedWaitUntil:
-    visible: ".*도토리증권 공고 갭 분석.*"
-    timeout: 10000
-- tapOn: ".*도토리증권 공고 갭 분석.*"
+- openLink: push://bots/b-dotori
 - extendedWaitUntil:
     visible: "메시지.*"
     timeout: 10000

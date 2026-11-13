@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, KeyboardAvoidingView, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
-import { materialPickerPath as botMaterialPath, useBot, useBotProfile, type BotId } from '@/features/bots'
+import { accountPath, materialPickerPath as botMaterialPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
   AWAITING_TEXT,
   ApprovalPanel,
@@ -22,7 +22,6 @@ import {
   THREAD_BATCH,
   THREAD_INITIAL_RENDER,
   THREAD_WINDOW,
-  accountPath,
   answer,
   closeApproval,
   composerPlaceholder,

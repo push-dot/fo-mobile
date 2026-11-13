@@ -36,12 +36,6 @@ const SignedInStack = () => {
       <Stack.Screen name="activity/follows" />
       <Stack.Screen name="activity/posts" />
       <Stack.Screen name="activity/applications/[id]" />
-      <Stack.Screen name="sidebar/index" options={{ animation: 'slide_from_left' }} />
-      <Stack.Screen name="sidebar/account" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/docs" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/links" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/bookmarks" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="access-mode" options={sheetOptions(c)} />
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
