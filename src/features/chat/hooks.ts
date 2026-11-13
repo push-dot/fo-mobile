@@ -1,22 +1,6 @@
-import { router, useNavigation } from 'expo-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Animated, Easing } from 'react-native'
 import { useReduceMotion } from '@/shared/components'
-import { sidebarDepth } from './utils'
-
-/** Leaves a sidebar page for another screen: the page sits over the sidebar, so pop both first and back returns to the chat. */
-export const useLeaveSidebar = () => {
-  const navigation = useNavigation()
-  return useCallback(
-    (go: () => void) => {
-      const routes = navigation.getState()?.routes ?? []
-      const depth = Math.min(sidebarDepth(routes.map((r) => r.name)), routes.length - 1)
-      if (depth > 0) router.dismiss(depth)
-      go()
-    },
-    [navigation],
-  )
-}
 
 export const usePulse = (active: boolean, period = 1000, low = 0.25) => {
   const reduce = useReduceMotion()

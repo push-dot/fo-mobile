@@ -8,7 +8,6 @@ import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/fe
 import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
 import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
-import { useLeaveSidebar } from '../hooks'
 import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE, PLAN_FOOTER, PLAN_HEADER } from '../constants'
 import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import { Appear } from './motion'
@@ -101,8 +100,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
   const save = useUpdateSettings()
   const access = useAccessMode()
   const mode = ACCESS_MODES.find((m) => m.key === access.mode)!
-  const leave = useLeaveSidebar()
-  const toMy = () => leave(() => router.navigate('/my'))
+  const toMy = () => router.navigate('/my')
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
   const usage = usagePercent(account?.credits)
 

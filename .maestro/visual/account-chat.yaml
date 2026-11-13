@@ -3,7 +3,7 @@ name: ChatAccount
 tags:
   - visual
 ---
-# Bot home avatar opens /account (ChatAccount). The old sidebar account route stays until A20.
+# Bot home avatar opens /account (ChatAccount).
 - runFlow:
     file: _login_mock.yaml
     env:
