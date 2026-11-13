@@ -1,0 +1,42 @@
+appId: app.push.mobile
+name: 이미 가입된 번호 · Google · Apple · 여러 개
+tags:
+  - visual
+---
+# The mock reads the code's tail (mock/home.ts): 482444 the number belongs to a Google account, 482555 an Apple one,
+# 482666 a Google and a GitHub one. Boards: iOS 라이트 Google (.1), iOS 다크 Apple (.2), Android 여러 개 (.3).
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - runFlow: _phone_code.yaml
+      - inputText: "482444"
+      - runFlow: _hide_kbd.yaml
+      - tapOn: "확인"
+      - extendedWaitUntil:
+          visible: "이미 가입된 번호예요"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: AuthPhoneTaken.1
+      - runFlow: _phone_code.yaml
+      - inputText: "482555"
+      - runFlow: _hide_kbd.yaml
+      - tapOn: "확인"
+      - extendedWaitUntil:
+          visible: "이미 가입된 번호예요"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: AuthPhoneTaken.2
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow: _phone_code.yaml
+      - inputText: "482666"
+      - runFlow: _hide_kbd.yaml
+      - tapOn: "확인"
+      - extendedWaitUntil:
+          visible: "이미 가입된 번호예요"
+          timeout: 10000
+      - waitForAnimationToEnd
+      - takeScreenshot: AuthPhoneTaken.3

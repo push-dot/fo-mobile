@@ -1,0 +1,13 @@
+appId: app.push.mobile
+name: 봇 프로필 · 큰 글씨
+tags:
+  - visual
+---
+# Run with the system text size raised (xl/ is a separate run).
+- runFlow: ../../flows/_login.yaml
+- openLink: push://bots/b-moa/profile
+- extendedWaitUntil:
+    visible: "백엔드 엔지니어"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotProfileXL

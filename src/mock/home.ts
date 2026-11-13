@@ -3,6 +3,7 @@ import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
 import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
+import { usePhoneAuth } from '../features/auth/stores'
 import { MOCK_USER_ID, mock, page } from './server'
 
 // Search-only samples; hub/social own their full fixtures.
@@ -139,15 +140,25 @@ mock('POST', 'me/notifications/read', ({ body }) => {
   if (b.all) notifications.splice(0, notifications.length, ...notifications.filter((n) => n.createdAt < new Date(startOfToday).toISOString()))
 })
 
+/** PhoneInput: a Google sign-in that handed back a pending token, so the phone screen shows the account pill (links.ts `phone-social`). */
+export const pendingSocialPhone = () => {
+  const claims = btoa(JSON.stringify({ email: 'seojun.kim@gmail.com' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  usePhoneAuth.getState().beginSocial(`${claims}.mock`, 'seojun.kim@gmail.com', 'google')
+}
+
 // Phone sign-in. The code's tail picks the outcome so the boards' error states can be reached: 482111 wrong, 482222 expired,
-// 482333 too many tries, anything else signs in a new user (who then lands on the terms screen).
-const authError = (status: number, code: string, message: string) => ({ status, body: { error: { code, message } } })
+// 482333 too many tries, 482444 / 482555 / 482666 the number already belongs to a Google / Apple / Google+GitHub account (AuthPhoneTaken),
+// anything else signs in a new user (who then lands on the terms screen).
+const authError = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
+const REGISTERED_BY: Record<string, string[]> = { '482444': ['google'], '482555': ['apple'], '482666': ['google', 'github'] }
 mock('POST', 'auth/phone/send', () => ({ data: { cooldownSeconds: 170, expiresAt: new Date(Date.now() + 180_000).toISOString() } }))
 mock('POST', 'auth/phone/verify', ({ body }) => {
   const code = (body as { code?: string } | undefined)?.code
   if (code === '482111') return authError(400, 'PHONE_CODE_INVALID', 'invalid code')
   if (code === '482222') return authError(400, 'PHONE_CODE_EXPIRED', 'expired code')
   if (code === '482333') return authError(429, 'RATE_LIMITED', 'too many attempts')
+  const registered = code && REGISTERED_BY[code]
+  if (registered) return authError(409, 'PHONE_ALREADY_REGISTERED', 'phone already registered', { existingProviders: registered })
   forgetRequiredTerms()
   return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: true } }
 })
