@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Mascot, Text } from '@/shared/components'
+import { spacing } from '../../../theme'
 import { lineFromWorking, statusLineView, type LiveLine, type StatusLine as StatusLineModel, type StatusLineView } from '../utils/status-line'
 
 const TONE_COLOR = { neutral: 't2', quiet: 't3', help: 'orange', danger: 'red' } as const
@@ -13,14 +14,16 @@ const StatusLineRow = ({ view }: { view: StatusLineView }) => (
     style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40, alignSelf: 'stretch' }}
   >
     <Mascot size={24} state={view.mascot} color="push" motion={view.mascot === 'idle' ? { mode: 'still' } : { mode: 'animate' }} />
-    <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={1} style={{ flexShrink: 1 }}>
-      {view.text}
-    </Text>
-    {view.tail ? (
-      <Text v="c1" color="t3" style={{ fontVariant: ['tabular-nums'] }}>
-        {view.tail}
+    <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
+      <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={1} style={{ flexShrink: 1 }}>
+        {view.text}
       </Text>
-    ) : null}
+      {view.tail ? (
+        <Text v="c1" color="t3" style={{ fontVariant: ['tabular-nums'] }}>
+          {view.tail}
+        </Text>
+      ) : null}
+    </View>
   </View>
 )
 
