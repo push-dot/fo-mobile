@@ -11,7 +11,7 @@ tags:
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "careers.moapay.co.kr/jobs/1042"
 - extendedWaitUntil:
-    visible: "링크에서 찾은 공고"
+    visible: "careers.moapay.co.kr"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLinkOk

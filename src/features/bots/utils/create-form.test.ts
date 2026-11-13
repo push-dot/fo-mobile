@@ -109,13 +109,12 @@ describe('create form', () => {
   it('reads the limit table from the server limit', () => {
     expect(limitCopy(limit)).toEqual({
       title: 'Bot을 3개까지 만들 수 있어요',
-      body: '지금은 FREE 플랜이라 Bot 3개를 모두 쓰고 있어요. 플랜을 올리거나 쓰지 않는 Bot을 삭제하면 새로 만들 수 있어요.',
+      body: '지금 플랜의 Bot 3개를 모두 쓰고 있어요.',
       rows: [
         { plan: 'FREE', value: '3개', current: true },
         { plan: 'PRO', value: '20개', current: false },
         { plan: 'ULTRA', value: '무제한', current: false },
       ],
-      note: 'Push Bot은 개수에 들어가지 않아요.',
     })
   })
 

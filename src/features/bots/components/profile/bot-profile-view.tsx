@@ -17,7 +17,7 @@ import {
   RETRY_LABEL,
   REVOKE_LABEL,
   allowedSheetTitle,
-  grantIntro,
+  GRANT_INTRO,
   grantMeta,
   profileGroups,
   revokeA11y,
@@ -264,7 +264,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
       {sheet === 'allowed' ? (
         <SheetCard label={ALLOWED_SHEET_LABEL} title={allowedSheetTitle(grants.length)} onClose={() => setSheet(null)}>
           <Text v="b2" color="t2">
-            {grantIntro(bot)}
+            {GRANT_INTRO}
           </Text>
           <View style={{ marginTop: spacing[2] }}>
             {grants.map((grant) => (
@@ -292,7 +292,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
                   accessibilityLabel={revokeA11y(grant.host)}
                   disabled={revoke.isPending}
                   onPress={() => void onRevoke(grant.host)}
-                  glass
+                  glass={false}
                   fill="fill"
                   style={{ minHeight: 40, borderRadius: platformTheme.buttonSmRadius }}
                   contentStyle={{ paddingHorizontal: 14 }}

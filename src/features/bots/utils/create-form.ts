@@ -1,7 +1,6 @@
 import { BOT_COLORS } from '../constants'
 import type { BotColor, BotLimit } from '../types'
 
-const LIMIT_NOTE = 'Push Bot은 개수에 들어가지 않아요.'
 const PLAN_ORDER = ['FREE', 'PRO', 'ULTRA'] as const
 const EN_DASH = '–'
 
@@ -30,7 +29,6 @@ export type LimitCopy = {
   title: string
   body: string
   rows: { plan: (typeof PLAN_ORDER)[number]; value: string; current: boolean }[]
-  note: string
 }
 
 type PostingFacts = {
@@ -127,16 +125,12 @@ const countLabel = (max: number | null): string => (max === null ? '무제한' :
 
 export const limitCopy = (limit: BotLimit): LimitCopy => ({
   title: limit.max === null ? 'Bot을 무제한으로 만들 수 있어요' : `Bot을 ${limit.max}개까지 만들 수 있어요`,
-  body:
-    limit.max === null
-      ? `지금은 ${limit.plan} 플랜이라 Bot 수에 제한이 없어요. 플랜을 올리거나 쓰지 않는 Bot을 삭제하면 새로 만들 수 있어요.`
-      : `지금은 ${limit.plan} 플랜이라 Bot ${limit.max}개를 모두 쓰고 있어요. 플랜을 올리거나 쓰지 않는 Bot을 삭제하면 새로 만들 수 있어요.`,
+  body: limit.max === null ? '지금 플랜은 Bot 수에 제한이 없어요.' : `지금 플랜의 Bot ${limit.max}개를 모두 쓰고 있어요.`,
   rows: PLAN_ORDER.map((plan) => ({
     plan,
     value: countLabel(limit.table[plan]),
     current: plan === limit.plan,
   })),
-  note: LIMIT_NOTE,
 })
 
 const deadlineLine = (deadline: Date | null): string => {
