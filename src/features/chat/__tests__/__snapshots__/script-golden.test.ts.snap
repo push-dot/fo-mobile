@@ -8405,7 +8405,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"st-approve","type":"user"}
 {"seconds":1,"type":"worked"}
-card {"confirm":true,"detail":"careers.moapay.co.kr · 공고 1개를 읽어요","foot":"10분 동안 답이 없으면 이 요청은 만료돼요","id":"st-approve","question":"모아페이 채용 페이지를 열어도 될까요?","sections":[{"items":[{"label":"한 번 허용"},{"desc":"이 봇이 이 사이트를 읽을 때 다시 묻지 않아요","label":"항상 허용"},{"label":"거절"}],"kind":"choices","selected":[]}]}
+card {"confirm":true,"detail":"careers.moapay.co.kr · 공고 1개를 읽어요","foot":"10분 동안 답이 없으면 이 요청은 만료돼요","id":"st-approve","question":"모아페이 채용 페이지를 열어도 될까요?","sections":[{"items":[{"label":"한 번 허용"},{"desc":"이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요","label":"항상 허용"},{"label":"거절"}],"kind":"choices","selected":[]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8456,7 +8456,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"st-help","type":"user"}
 {"seconds":1,"type":"worked"}
-card {"foot":"답할 때까지 이 봇은 기다려요","id":"st-help","question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"}],"kind":"choices","selected":[0]}]}
+card {"foot":"답할 때까지 이 Bot은 기다려요","id":"st-help","question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
