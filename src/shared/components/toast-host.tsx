@@ -1,36 +1,29 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { AccessibilityInfo, Animated, Platform, View, type ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { cssShadow, onAccent, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
+import { cssShadow, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP, TOAST_SHEET_GAP } from './constants'
 import Glass from './glass'
 import GlassPressable from './glass-pressable'
-import Icon from './icon'
 import Text from './text'
-import { hideToast, toastDuration, topSheet, useHostedToast, useToastStore, type ToastTone } from './toast-store'
+import { hideToast, toastDuration, topSheet, useHostedToast, useToastStore } from './toast-store'
 import { useReduceMotion } from './use-reduce-motion'
 
 const TOAST_HEIGHT = 52
 const ACTION_HEIGHT = 44
-const ALERT_ICON = 20
-const SHAPE = {
-  plain: { inset: spacing[4], radius: radius.md, shadow: cssShadow.toast },
-  tone: { inset: spacing[5], radius: 18, shadow: cssShadow.toneToast },
-}
+// v412 boards: iOS shows a top notification banner (app tile + one line), Android the Material snackbar (8pt side margin, 4pt corners).
+const SHAPE = Platform.OS === 'ios'
+  ? { inset: spacing[4], radius: 22, shadow: cssShadow.toast }
+  : { inset: spacing[2], radius: 4, shadow: cssShadow.toast }
+const APP_TILE = 32
 
-const ToneIcon = ({ tone }: { tone: ToastTone }) => {
+const AppTile = () => {
   const c = useColors()
   return (
-    <View
-      style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: tone === 'success' ? c.green : c.red, alignItems: 'center', justifyContent: 'center' }}
-    >
-      {tone === 'success' ? (
-        <Icon name="check" size={13} color={onAccent} />
-      ) : (
-        <Text v="c1" weight="800" style={{ color: onAccent }}>
-          !
-        </Text>
-      )}
+    <View style={{ width: APP_TILE, height: APP_TILE, borderRadius: radius.sm, backgroundColor: c.t1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text v="c1" weight="800" style={{ color: c.bg }}>
+        P.
+      </Text>
     </View>
   )
 }
@@ -49,6 +42,7 @@ const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow
 }
 
 const ToastHost = () => {
+  const ios = Platform.OS === 'ios'
   const toast = useHostedToast()
   const sheet = useToastStore(topSheet)
   const insets = useSafeAreaInsets()
@@ -77,8 +71,8 @@ const ToastHost = () => {
     }
   }, [toast, shown])
   if (!toast) return null
-  const translateY = shown.interpolate({ inputRange: [0, 1], outputRange: [still ? 0 : 24, 0] })
-  const shape = SHAPE[toast.tone ? 'tone' : 'plain']
+  const translateY = shown.interpolate({ inputRange: [0, 1], outputRange: [still ? 0 : ios ? -24 : 24, 0] })
+  const shape = SHAPE
   return (
     <Animated.View
       accessibilityLiveRegion="polite"
@@ -87,7 +81,7 @@ const ToastHost = () => {
         position: 'absolute',
         left: shape.inset,
         right: shape.inset,
-        bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP),
+        ...(ios ? { top: insets.top + spacing[1] } : { bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP) }),
         // UIKit drops a glass effect that installs under a nearly transparent ancestor, so the iOS card only slides in.
         opacity: Platform.OS === 'ios' ? 1 : shown,
         transform: [{ translateY }],
@@ -95,8 +89,7 @@ const ToastHost = () => {
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
-          {toast.tone ? <ToneIcon tone={toast.tone} /> : null}
-          {toast.alert ? <Icon name="alert" size={ALERT_ICON} color="red" /> : null}
+          {ios ? <AppTile /> : null}
           <Text v="b2" weight="600" style={{ flex: 1, color: ink.text }}>
             {toast.message}
           </Text>

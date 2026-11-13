@@ -113,7 +113,7 @@ export const stageFlow = (stage: string) => {
   return { step: 0, headline: '지원함', labels: STAGE_LABELS }
 }
 
-export const INTERVIEW_PREP = 'Push Bot으로 면접 준비'
+export const INTERVIEW_PREP = 'Bot한테 보내서 면접 준비'
 export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
 export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
@@ -136,15 +136,15 @@ export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | '
   { key: 'notifyDeadline', label: '마감 임박 공고' },
   { key: 'notifyOffer', label: '제안 받음' },
   { key: 'notifyComment', label: '댓글과 답글' },
-  { key: 'notifyAiDone', label: '봇 작업 완료' },
+  { key: 'notifyAiDone', label: 'Bot 작업 완료' },
   { key: 'notifyApplicationStage', label: '지원 상태 변경' },
 ]
 
-export const AGENT_TITLE = '봇'
-export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 봇이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
+export const AGENT_TITLE = 'Bot'
+export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 Bot이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
 export const READ_FILES_ROW: { key: keyof Pick<Settings, 'allowAiReadMyFiles'>; label: string } = { key: 'allowAiReadMyFiles', label: '내 자료 읽기 허용' }
 export const REFERENCE_LABEL = '참고 데이터 제공'
-export const REFERENCE_SUB = '봇을 쓰려면 켜 두어야 해요'
+export const REFERENCE_SUB = 'Bot을 쓰려면 켜 두어야 해요'
 
 export { THEME_CHOICES, themeMode, type ThemeChoice } from '../../../theme/mode'
 

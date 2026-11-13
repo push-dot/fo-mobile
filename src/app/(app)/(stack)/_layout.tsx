@@ -26,7 +26,6 @@ const SignedInStack = () => {
       <Stack.Screen name="offers/[id]" />
       <Stack.Screen name="offers/[id]/messages" />
       <Stack.Screen name="settings/index" />
-      <Stack.Screen name="settings/visibility" />
       <Stack.Screen name="settings/blocked" />
       <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
@@ -62,6 +61,7 @@ const SignedInStack = () => {
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
+      <Stack.Screen name="activity/calendar" options={sheetOptions(c)} />
       <Stack.Screen name="settings/pick" options={sheetOptions(c)} />
       <Stack.Screen name="docs/[id]/to-profile" options={sheetOptions(c)} />
       <Stack.Screen name="docs/[id]/rename" options={sheetOptions(c)} />

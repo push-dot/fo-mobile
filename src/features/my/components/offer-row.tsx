@@ -27,7 +27,7 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
       }
     >
       {who.kind === 'COMPANY' ? (
-        <Logo name={who.companyName ?? who.displayName} />
+        <Logo name={who.companyName ?? who.displayName} mono />
       ) : (
         <Avatar name={who.displayName} url={who.avatarUrl} />
       )}

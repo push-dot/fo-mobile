@@ -18,15 +18,14 @@ tags:
 # SettingsMarketing is the same list with the 혜택·이벤트 알림 row (off by default in the mock) in the 알림 group.
 - takeScreenshot: SettingsMarketing
 
-# The language picker is a JS popover today and a native menu after the redesign.
-- tapOn: "언어 선택.*|한국어"
+# v412: the language row shows only the value; the choice is a wheel in a modal (iOS) or a radio dialog (Android) with 취소 first.
+- tapOn: "언어.*"
 - extendedWaitUntil:
-    visible: "English"
+    visible: "취소"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: SettingsLanguage
-- tapOn:
-    point: "10%,50%"
+- tapOn: "취소"
 - waitForAnimationToEnd
 
 # 혜택·이벤트 알림 stays in the list (the consent row is legally required) and pushes 커리어 상태 below the fold.
@@ -35,8 +34,9 @@ tags:
     direction: DOWN
     centerElement: true
 - tapOn: "커리어 상태.*"
+# The 커리어 상태 picker carries the 숨기기 switch.
 - extendedWaitUntil:
-    visible: ".*커리어 상태를 누가 볼 수 있는지.*"
+    visible: ".*사람에게 숨기기.*"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: SettingsVisibility

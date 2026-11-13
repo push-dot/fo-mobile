@@ -1,8 +1,7 @@
-import { brandColor } from '@push/shared'
 import { Image } from 'expo-image'
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
-import { onAccent } from '../../../theme'
+import { useColors } from '../../../theme'
 import { assetUrl } from '@/shared/utility'
 import { avatarTextSize, givenName } from '../utils'
 
@@ -15,6 +14,7 @@ const Avatar = ({
   url?: string | null
   size?: number
 }) => {
+  const c = useColors()
   return url ? (
     <Image
       source={{ uri: assetUrl(url) }}
@@ -28,7 +28,7 @@ const Avatar = ({
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: brandColor(name),
+        backgroundColor: c.t1,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -36,7 +36,7 @@ const Avatar = ({
       <Text
         weight="700"
         style={{
-          color: onAccent,
+          color: c.bg,
           fontSize: avatarTextSize(size),
           lineHeight: Math.round(size * 0.4),
         }}

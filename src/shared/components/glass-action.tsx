@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { onAccent, radius, useColors, type Colors } from '../../theme'
+import { radius, useColors, type Colors } from '../../theme'
 import { PRESS_SCALE } from './constants'
 import Icon from './icon'
 import Menu from './menu'
@@ -37,13 +37,13 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
             height: 18,
             paddingHorizontal: 5,
             borderRadius: radius.pill,
-            backgroundColor: c.red,
+            backgroundColor: c.t1,
             boxShadow: `0 0 0 2px ${c.bg}`,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Text v="tab" weight="800" style={{ color: onAccent }}>
+          <Text v="tab" weight="800" style={{ color: c.bg }}>
             {a.badge > 99 ? '99+' : a.badge}
           </Text>
         </View>
