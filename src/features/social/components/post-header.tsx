@@ -10,7 +10,7 @@ const PostHeader = ({ post }: { post: Post }) => {
   return (
     <View style={{ gap: spacing[4], paddingTop: spacing[1], paddingBottom: spacing[4] }}>
       <AuthorRow post={post} size={40} showViews />
-      <Text v="h1">
+      <Text v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
         {post.title}
       </Text>
       {post.body.split(/\n{2,}/).map((paragraph, i) => (

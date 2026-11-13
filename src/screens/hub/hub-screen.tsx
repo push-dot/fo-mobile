@@ -20,6 +20,9 @@ import { radius, spacing, useColors } from '@/theme'
 const SearchPill = Platform.OS === 'ios' ? Glass : View
 const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
 
+// Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
+const HEADER_GAP = Platform.OS === 'ios' ? 14 : 6
+
 const HubScreen = () => {
   const c = useColors()
   const category = useHubFilterStore((s) => s.category)
@@ -76,7 +79,7 @@ const HubScreen = () => {
           </Text>
         }
         right={
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP }}>
             {viewerId ? (
               <Button label="내 프로필" variant="secondary" size="sm" onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}

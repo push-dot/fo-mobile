@@ -121,7 +121,7 @@ const ComposeScreen = () => {
           ))}
           {images.length < MAX_IMAGES ? (
             <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
-              <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.bg2, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+              <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                 <Icon name="plus" size={22} color="acText" />
                 <Text v="c2" weight="700" color="acText">
                   {images.length}/{MAX_IMAGES}

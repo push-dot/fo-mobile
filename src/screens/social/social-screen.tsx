@@ -40,7 +40,7 @@ const SocialScreen = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: 6 }}
+          contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[2] }}
         >
           {POST_CATEGORIES.map((cat) => (
             <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
