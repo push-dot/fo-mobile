@@ -18,4 +18,11 @@ export {
 } from './platform'
 export { shareMessage } from './platform'
 export { shareBytes } from './share-file'
-export { readNotificationPermission } from './notification-permission'
+export {
+  readNotificationPermission,
+  requestNotificationPermission,
+  readPushToken,
+  pushPlatform,
+  readLastPushOpen,
+  subscribePushOpens,
+} from './notification-permission'

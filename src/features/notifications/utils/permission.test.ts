@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { showNotificationSettings } from './permission'
+import { pushPermissionOf, showNotificationSettings } from './permission'
 
 const snap = (status: 'granted' | 'denied' | 'undetermined', iosStatus?: number) => ({
   status,
@@ -23,5 +23,16 @@ describe('notification settings button', () => {
     expect(showNotificationSettings(snap('denied', 2))).toBe(false)
     expect(showNotificationSettings(snap('denied', 3))).toBe(false)
     expect(showNotificationSettings(snap('denied', 4))).toBe(false)
+  })
+})
+
+describe('push permission', () => {
+  it('registers only when the permission is on', () => {
+    expect(pushPermissionOf(snap('granted'))).toBe('granted')
+    expect(pushPermissionOf(snap('denied'))).toBe('denied')
+    expect(pushPermissionOf(snap('undetermined'))).toBe('undetermined')
+    expect(pushPermissionOf(snap('denied', 2))).toBe('granted')
+    expect(pushPermissionOf(snap('granted', 0))).toBe('undetermined')
+    expect(pushPermissionOf(snap('granted', 1))).toBe('denied')
   })
 })

@@ -895,3 +895,20 @@ mock('PATCH', 'me/settings', ({ body }) => {
   settings = { ...settings, ...(body as Partial<Settings>) }
   return { data: settings }
 })
+
+const devices = new Map<string, 'ios' | 'android'>()
+
+mock('POST', 'me/devices', ({ body }) => {
+  const row = body as { token?: unknown; platform?: unknown }
+  const token = row.token
+  const platform = row.platform
+  if (typeof token !== 'string' || token.length === 0 || (platform !== 'ios' && platform !== 'android')) {
+    return { status: 422, body: { error: { code: 'UNPROCESSABLE', message: 'mock: bad device' } } }
+  }
+  devices.set(token, platform)
+  return { status: 201, body: { data: { token, platform } } }
+})
+
+mock('DELETE', 'me/devices/:id', ({ params }) => {
+  devices.delete(params.id ?? '')
+})
