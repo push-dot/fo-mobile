@@ -6,7 +6,7 @@ import { ERROR_BODY, ERROR_NOTE, ERROR_TITLE, RETRY_LABEL } from './copy'
 const BotHomeError = ({ onRetry }: { onRetry: () => void }) => {
   const wrap = { paddingTop: 48, paddingHorizontal: 36, gap: spacing[2], alignItems: 'center' as const }
   const copy = { textAlign: 'center' as const }
-  const button = { alignSelf: 'center' as const }
+  const button = { alignSelf: 'center' as const, marginTop: spacing[3] }
   return (
     <View accessibilityRole="alert" style={wrap}>
       <Text v="h3" weight="700" style={copy}>

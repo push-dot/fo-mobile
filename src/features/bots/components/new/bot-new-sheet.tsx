@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Button, GlassButton, GlassPressable, Icon, Mascot, Skeleton, Spinner, Text } from '@/shared/components'
+import { Button, Glass, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { botErrorKind } from '../../api/errors'
@@ -79,6 +79,9 @@ type Props = {
 const SWATCH = 46
 const DOT = 34
 const PREVIEW = 120
+const PREVIEW_SUB = 14
+const PREVIEW_SUB_LINE = 20
+const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
@@ -154,27 +157,25 @@ const Cta = ({ label, onPress, busy, enabled, xl, icon }: { label: string; onPre
   )
 }
 
+const RING = DOT + 10
+
 const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (next: BotColor) => void }) => {
   const c = useColors()
+  const ring = { width: RING, height: RING, borderRadius: RING / 2, borderWidth: on ? 2 : 0, borderColor: c.t1, alignItems: 'center' as const, justifyContent: 'center' as const }
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={name} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={{ width: SWATCH, height: SWATCH, borderRadius: SWATCH / 2, alignItems: 'center', justifyContent: 'center', borderWidth: on ? 3 : 0, borderColor: c.t1 }}>
-      <View style={{ width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: MASCOT_PALETTES[name].body }} />
+    <Pressable accessibilityRole="button" accessibilityLabel={name} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={{ width: SWATCH, height: SWATCH, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={ring}>
+        <View style={{ width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: MASCOT_PALETTES[name].body }} />
+      </View>
     </Pressable>
   )
 }
 
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View style={{ alignItems: 'center', gap: spacing[2] }}>
-    <View style={{ flexDirection: 'row', gap: spacing[1] }}>
-      {BOT_COLORS.slice(0, 7).map((name) => (
-        <Swatch key={name} name={name} on={name === color} onPick={onPick} />
-      ))}
-    </View>
-    <View style={{ flexDirection: 'row', gap: spacing[1] }}>
-      {BOT_COLORS.slice(7).map((name) => (
-        <Swatch key={name} name={name} on={name === color} onPick={onPick} />
-      ))}
-    </View>
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
+    {BOT_COLORS.map((name) => (
+      <Swatch key={name} name={name} on={name === color} onPick={onPick} />
+    ))}
   </View>
 )
 
@@ -260,6 +261,7 @@ const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree
 const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const keyboard = useKeyboardHeight()
   const xl = useWindowDimensions().fontScale >= XL_FONT_SCALE
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])
@@ -400,184 +402,218 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   const name = posting?.company
   const linkWait = phase.kind === 'linkChecking' || phase.kind === 'linkFinding'
+  const control = xl ? FIELD_XL : FIELD
+  const fieldFont = xl ? 19 : type.b1.fontSize
+  const ios = Platform.OS === 'ios'
+  const fieldBox = { height: control, borderRadius: control / 2 }
+  const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
+  const shell = (children: ReactNode, style?: object) =>
+    ios ? (
+      <Glass style={[fieldBox, style]}>
+        <View style={fieldRow}>{children}</View>
+      </Glass>
+    ) : (
+      <View style={[fieldBox, { backgroundColor: c.fill }, style]}>
+        <View style={fieldRow}>{children}</View>
+      </View>
+    )
+  const searchIcon = <Icon name="search" size={20} color="t3" />
+  const closeButton = <GlassButton iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
+  const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
+  const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
+  const section = { paddingTop: 14, paddingBottom: spacing[1], paddingHorizontal: spacing[5], fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }
+  const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
+  const keepTop = showRows || linkWait || phase.kind === 'linkOk'
+
+  const header = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: insets.top + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+      {searching ? (
+        <View style={{ width: control, height: control }} />
+      ) : (
+        <GlassButton iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
+      )}
+      <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
+        {SHEET_TITLE}
+      </Text>
+      <View style={{ width: control, height: control }} />
+    </View>
+  )
+
+  const preview = (
+    <View style={{ marginTop: 'auto', alignItems: 'center', gap: spacing[2], paddingTop: 2, paddingHorizontal: spacing[6] }}>
+      <Mascot size={PREVIEW} color={form.color} state={phase.kind === 'creating' ? 'work' : 'idle'} motion={{ mode: 'still' }} />
+      <Text weight={name ? '800' : '700'} color={name ? 't1' : 't3'} numberOfLines={2} style={{ fontSize: 24, lineHeight: 32, textAlign: 'center', maxWidth: 320 }}>
+        {name ?? NAME_PLACEHOLDER}
+      </Text>
+      {posting ? (
+        <Text color="t3" style={{ fontSize: xl ? type.h3.fontSize : PREVIEW_SUB, lineHeight: xl ? type.h3.lineHeight : PREVIEW_SUB_LINE, textAlign: 'center' }}>
+          {posting.title}
+        </Text>
+      ) : null}
+    </View>
+  )
+
+  const mainField =
+    phase.kind === 'idle'
+      ? shell(
+          <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+            {searchIcon}
+            <Text color="t3" style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+              {SEARCH_PLACEHOLDER}
+            </Text>
+          </Pressable>,
+          { marginHorizontal: spacing[4] },
+        )
+      : shell(
+          <>
+            {searchIcon}
+            <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting!)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
+              <Text numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+                {pickedLine(posting!)}
+              </Text>
+            </Pressable>
+            {phase.kind === 'creating' ? null : (
+              <Pressable accessibilityRole="button" accessibilityLabel="지우기" onPress={() => setForm(clearPosting)} style={{ width: 44, height: 44, marginRight: -14, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: c.fill2, alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="x" size={12} color="t2" />
+                </View>
+              </Pressable>
+            )}
+          </>,
+          { marginHorizontal: spacing[4] },
+        )
+
+  const searchBody = (
+    <>
+      <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: keepTop ? 'flex-start' : 'flex-end' }}>
+        {phase.kind === 'searching' && !query ? <Text color="t3" style={note}>{SEARCH_HINT}</Text> : null}
+        {phase.kind === 'searching' && query && !asLink(query) && !loading && rows.length === 0 ? <Text color="t3" style={note}>{SEARCH_EMPTY}</Text> : null}
+        {showRows
+          ? rows.map((row, i) => (
+              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, i > 0 ? { borderTopWidth: 1, borderTopColor: c.line } : null]}>
+                <Highlight text={pickedLine(row)} query={query} />
+                <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
+                  {row.meta}
+                </Text>
+              </Pressable>
+            ))
+          : null}
+        {linkWait ? (
+          <>
+            <Text weight="700" color="t3" style={section}>
+              {LINK_SECTION}
+            </Text>
+            <View style={{ gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[5], paddingBottom: BAR }}>
+              <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
+              <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
+            </View>
+            <Text color="t3" style={[note, { paddingTop: spacing[2] }]}>
+              {linkStatus(form)}
+            </Text>
+          </>
+        ) : null}
+        {phase.kind === 'linkBad' ? <Text style={[note, { color: c.red }]}>{LINK_BAD}</Text> : null}
+        {phase.kind === 'linkRetry' ? <Text color="t3" style={note}>{ERROR_BODY}</Text> : null}
+        {phase.kind === 'linkOk' ? (
+          <>
+            <Text weight="700" color="t3" style={section}>
+              {LINK_FOUND_SECTION}
+            </Text>
+            <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={rowTitle}>
+              <Text weight="600" style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
+                {pickedLine(phase.posting)}
+              </Text>
+              <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
+                {phase.meta}
+              </Text>
+              <Text color="t3" numberOfLines={1} style={{ fontSize: type.c2.fontSize, lineHeight: type.c2.lineHeight }}>
+                {phase.host}
+              </Text>
+            </Pressable>
+          </>
+        ) : null}
+      </ScrollView>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: spacing[2], paddingHorizontal: spacing[4], paddingBottom: 10 + (keyboard > 0 ? 0 : insets.bottom) }}>
+        {shell(
+          linkWait ? (
+            <>
+              <Icon name="link" size={20} color="t3" />
+              <Text numberOfLines={1} style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+                {linkLabel(linkUrl ?? '')}
+              </Text>
+              <Spinner size={18} color="t3" />
+            </>
+          ) : (
+            <>
+              {searchIcon}
+              <TextInput
+                autoFocus
+                value={fieldValue(form)}
+                onChangeText={onType}
+                placeholder={SEARCH_PLACEHOLDER}
+                placeholderTextColor={c.t3}
+                accessibilityLabel={SEARCH_PLACEHOLDER}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="search"
+                style={[{ flex: 1, color: c.t1, fontSize: fieldFont, paddingVertical: 0 }, fontFor('400')]}
+              />
+            </>
+          ),
+          { flex: 1 },
+        )}
+        {closeButton}
+      </View>
+    </>
+  )
+
+  const retry = phase.kind === 'error'
+  const footer = (
+    <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
+      {retry ? (
+        <View accessibilityRole="alert" style={{ backgroundColor: c.redSoft, borderRadius: radius.md, paddingVertical: spacing[3], paddingHorizontal: 14, flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+          <Icon name="alert" size={18} color="red" />
+          <Text color="red" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
+            <Text weight="700" color="red" style={{ fontSize: 14, lineHeight: 20 }}>
+              {ERROR_TITLE}
+            </Text>{' '}
+            {ERROR_BODY}
+          </Text>
+        </View>
+      ) : null}
+      <Cta
+        xl={xl}
+        enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
+        busy={phase.kind === 'creating'}
+        icon={retry ? 'retry' : undefined}
+        label={phase.kind === 'creating' ? CREATING_LABEL : retry ? RETRY_LABEL : CREATE_LABEL}
+        onPress={retry ? () => void run(form) : onCreate}
+      />
+    </View>
+  )
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + spacing[3], paddingBottom: insets.bottom + spacing[4], paddingHorizontal: spacing[4], gap: spacing[5] }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {linkWait ? (
-              <View style={{ width: 44 }} />
-            ) : (
-              <GlassButton actions={[{ icon: 'x', label: searching ? SEARCH_CLOSE : CLOSE_LABEL, onPress: searching ? () => setForm(closeSearch) : onClose }]} />
-            )}
-            <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
-              {SHEET_TITLE}
-            </Text>
-            <View style={{ width: 44 }} />
-          </View>
-          {phase.kind === 'limit' ? (
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={ios ? 'padding' : undefined}>
+        {header}
+        {phase.kind === 'limit' ? (
+          <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: spacing[4], paddingBottom: insets.bottom + spacing[4], paddingHorizontal: spacing[4] }}>
             <LimitBody limit={bots.limit} onUpgrade={onUpgrade} onClose={onClose} />
-          ) : (
-            <View style={{ gap: spacing[5], flexGrow: 1 }}>
-              {searching ? null : (
-                <View style={{ alignItems: 'center', gap: spacing[2] }}>
-                  <Mascot size={PREVIEW} color={form.color} state={phase.kind === 'creating' ? 'work' : 'idle'} motion={{ mode: 'still' }} />
-                  <Text weight={name ? '800' : '700'} color={name ? 't1' : 't3'} numberOfLines={2} style={{ fontSize: 24, lineHeight: 32, textAlign: 'center' }}>
-                    {name ?? NAME_PLACEHOLDER}
-                  </Text>
-                  {posting ? (
-                    <Text v="b2" color="t2" numberOfLines={2} style={{ textAlign: 'center' }}>
-                      {posting.title}
-                    </Text>
-                  ) : null}
-                  <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
-                </View>
-              )}
-              {phase.kind === 'idle' ? (
-                <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)}>
-                  <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                    <Icon name="search" size={18} color="t3" />
-                    <Text v="b1" color="t3" style={{ flex: 1 }}>
-                      {SEARCH_PLACEHOLDER}
-                    </Text>
-                  </View>
-                </Pressable>
-              ) : null}
-              {linkWait ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                  <View style={{ flex: 1, minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                    <Icon name="link" size={18} color="t3" />
-                    <Text v="b1" numberOfLines={1} style={{ flex: 1, fontSize: xl ? 19 : undefined }}>
-                      {linkLabel(linkUrl ?? '')}
-                    </Text>
-                    <Spinner size={16} color="t3" />
-                  </View>
-                  <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_CLOSE} onPress={() => setForm(closeSearch)} hitSlop={8}>
-                    <Icon name="x" size={18} color="t1" />
-                  </Pressable>
-                </View>
-              ) : null}
-              {searching && !linkWait ? (
-                <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                  <Icon name="search" size={18} color="t3" />
-                  <TextInput
-                    autoFocus
-                    value={fieldValue(form)}
-                    onChangeText={onType}
-                    placeholder={SEARCH_PLACEHOLDER}
-                    placeholderTextColor={c.t4}
-                    accessibilityLabel={SEARCH_PLACEHOLDER}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType="search"
-                    style={[{ flex: 1, color: c.t1, fontSize: xl ? 19 : type.b1.fontSize, paddingVertical: 0 }, fontFor('400')]}
-                  />
-                </View>
-              ) : null}
-              {!searching && phase.kind !== 'idle' ? (
-                <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                  <Icon name="search" size={18} color="t3" />
-                  <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting!)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-                    <Text v="b1" numberOfLines={1} style={{ fontSize: xl ? 19 : undefined }}>
-                      {pickedLine(posting!)}
-                    </Text>
-                  </Pressable>
-                  {phase.kind === 'creating' ? null : (
-                    <Pressable accessibilityLabel="지우기" onPress={() => setForm(clearPosting)} hitSlop={8}>
-                      <Icon name="x" size={16} color="t3" />
-                    </Pressable>
-                  )}
-                </View>
-              ) : null}
-              {phase.kind === 'searching' && !query ? (
-                <Text v="b2" color="t3" style={{ textAlign: 'center', paddingHorizontal: spacing[5] }}>
-                  {SEARCH_HINT}
-                </Text>
-              ) : null}
-              {phase.kind === 'searching' && query && !asLink(query) && !loading && rows.length === 0 ? (
-                <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-                  {SEARCH_EMPTY}
-                </Text>
-              ) : null}
-              {phase.kind === 'searching' && query && !asLink(query)
-                ? rows.map((row) => (
-                    <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={{ minHeight: 60, justifyContent: 'center', gap: 2, borderBottomWidth: 1, borderBottomColor: c.line }}>
-                      <Highlight text={pickedLine(row)} query={query} />
-                      <Text v="c1" color="t3">
-                        {row.meta}
-                      </Text>
-                    </Pressable>
-                  ))
-                : null}
-              {linkWait ? (
-                <View style={{ gap: spacing[2] }}>
-                  <Text v="c1" weight="700" color="t3">
-                    {LINK_SECTION}
-                  </Text>
-                  <Text v="b2" color="t2">
-                    {linkStatus(form)}
-                  </Text>
-                  <Skeleton width="70%" height={12} radius={6} />
-                  <Skeleton width="45%" height={12} radius={6} />
-                </View>
-              ) : null}
-              {phase.kind === 'linkBad' ? (
-                <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
-                  {LINK_BAD}
-                </Text>
-              ) : null}
-              {phase.kind === 'linkRetry' ? (
-                <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
-                  {ERROR_BODY}
-                </Text>
-              ) : null}
-              {phase.kind === 'linkOk' ? (
-                <View style={{ gap: spacing[2] }}>
-                  <Text v="c1" weight="700" color="t3">
-                    {LINK_FOUND_SECTION}
-                  </Text>
-                  <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={{ minHeight: 60, justifyContent: 'center', gap: 2 }}>
-                    <Text v="b1" weight="600">
-                      {pickedLine(phase.posting)}
-                    </Text>
-                    <Text v="c1" color="t3">
-                      {phase.meta}
-                    </Text>
-                    <Text v="c2" color="t3" numberOfLines={1}>
-                      {phase.host}
-                    </Text>
-                  </Pressable>
-                </View>
-              ) : null}
-              {phase.kind === 'error' ? (
-                <View style={{ backgroundColor: c.redSoft, borderRadius: radius.md, paddingVertical: spacing[3], paddingHorizontal: 14, flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
-                  <Icon name="alert" size={18} color="red" />
-                  <View style={{ flex: 1, gap: spacing[1] }}>
-                    <Text weight="700" color="red" style={{ fontSize: 14, lineHeight: 20 }}>
-                      {ERROR_TITLE}
-                    </Text>
-                    <Text color="red" style={{ fontSize: 14, lineHeight: 20 }}>
-                      {ERROR_BODY}
-                    </Text>
-                  </View>
-                </View>
-              ) : null}
-              {searching ? null : (
-                <View style={{ marginTop: 'auto' }}>
-                  <Cta
-                    xl={xl}
-                    enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
-                    busy={phase.kind === 'creating'}
-                    icon={phase.kind === 'error' ? 'retry' : undefined}
-                    label={phase.kind === 'creating' ? CREATING_LABEL : phase.kind === 'error' ? RETRY_LABEL : CREATE_LABEL}
-                    onPress={phase.kind === 'error' ? () => void run(form) : onCreate}
-                  />
-                </View>
-              )}
-            </View>
-          )}
-        </ScrollView>
+          </ScrollView>
+        ) : searching ? (
+          searchBody
+        ) : (
+          <>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[1] }}>
+              {preview}
+              <View style={{ marginBottom: 'auto' }}>
+                <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
+              </View>
+              {mainField}
+            </ScrollView>
+            {footer}
+          </>
+        )}
       </KeyboardAvoidingView>
       {form.consent ? (
         <ConsentOverlay

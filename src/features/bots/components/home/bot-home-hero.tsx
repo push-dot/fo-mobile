@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native'
 import { Mascot, Text } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { useColors } from '../../../../theme'
 import type { MascotState } from '../../types'
 import { heroLabel, type HomeMotion } from '../../utils/home-rows'
 import { HERO_NAME } from './copy'
@@ -21,7 +21,7 @@ const BotHomeHero = ({
 }) => {
   const c = useColors()
   const wrap = { alignItems: 'center' as const, paddingTop: 2, paddingHorizontal: 32, paddingBottom: 14 }
-  const nameRow = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6, marginTop: spacing[1] }
+  const nameRow = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6, marginTop: 10 }
   const name = { fontSize: chrome.heroNameSize, lineHeight: chrome.heroNameLine }
   const dot = { width: 8, height: 8, borderRadius: 4, backgroundColor: c.ac }
   return (

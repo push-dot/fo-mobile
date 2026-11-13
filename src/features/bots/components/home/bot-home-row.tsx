@@ -25,21 +25,24 @@ const BotHomeRow = ({
 }) => {
   const box = {
     flexDirection: 'row' as const,
-    alignItems: chrome.nameLines > 1 ? ('flex-start' as const) : ('center' as const),
+    alignItems: chrome.rowAlign,
     gap: chrome.rowGap,
     paddingVertical: chrome.rowPadV,
     paddingHorizontal: chrome.rowPadH,
     minHeight: 76,
   }
-  const body = { flex: 1, minWidth: 0, gap: 2 }
-  const top = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2] }
+  const mascot = { marginTop: chrome.mascotTop }
+  const body = { flex: 1, minWidth: 0, gap: 3 }
+  const top = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: spacing[2] }
   const name = { flex: 1, fontSize: chrome.nameSize, lineHeight: chrome.nameLine }
   const time = { fontSize: chrome.timeSize, lineHeight: chrome.timeLine }
   const line = { fontSize: chrome.msgSize, lineHeight: chrome.msgLine }
   const q = query ?? ''
   const content = (
     <View accessible={false} importantForAccessibility="no-hide-descendants" style={box}>
-      <Mascot size={chrome.rowMascot} state={row.mascot} color={row.color} unread={row.unreadDot} motion={rowMotion(row.mascot, index, held)} />
+      <View style={mascot}>
+        <Mascot size={chrome.rowMascot} state={row.mascot} color={row.color} unread={row.unreadDot} motion={rowMotion(row.mascot, index, held)} />
+      </View>
       <View style={body}>
         <View style={top}>
           <Text weight="700" numberOfLines={chrome.nameLines} style={name}>

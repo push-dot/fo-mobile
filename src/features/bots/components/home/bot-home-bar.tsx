@@ -34,7 +34,7 @@ const BotHomeBar = ({
     zIndex: 5,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: 10,
+    gap: chrome.barGap,
   }
   const face = {
     width: chrome.control,
@@ -49,7 +49,7 @@ const BotHomeBar = ({
     height: chrome.control,
     borderRadius: radius,
     paddingLeft: spacing[4],
-    paddingRight: spacing[3],
+    paddingRight: 6,
     justifyContent: 'center' as const,
     backgroundColor: Platform.OS === 'ios' ? 'transparent' : c.fill,
   }
