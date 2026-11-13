@@ -44,6 +44,13 @@ export const careerDeleteCopy = {
   undo: '되돌리기',
 } as const
 
+/** Puts a deleted row back at its old place, clamped when the list got shorter meanwhile. */
+export const restoreAt = <T>(list: readonly T[], index: number, item: T): T[] => {
+  const next = [...list]
+  next.splice(Math.min(Math.max(index, 0), next.length), 0, item)
+  return next
+}
+
 export const careerDeleteBody = (career: { company: string; role: string }) => {
   const name = [career.company.trim(), career.role.trim()].filter(Boolean).join(' · ')
   return `${name || '이'} 경력을 프로필에서 지워요.`

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profileQuery, proposalSubtitle, tenureOf } from './filters'
+import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profileQuery, proposalSubtitle, TENURE_CHIPS, tenureChipOn, tenureOf, toggleTenureChip } from './filters'
 
 describe('hub filters', () => {
   it('buckets tenure years', () => {
@@ -46,5 +46,26 @@ describe('hub filters', () => {
       tenure: ['0', '1-2', '10+'],
       status: ['seeking'],
     })
+  })
+})
+
+describe('tenure chips', () => {
+  const first = TENURE_CHIPS[0]!
+
+  it('draws the four board chips', () => {
+    expect(TENURE_CHIPS.map((c) => c.label)).toEqual(['0–2년', '3–5년', '6–9년', '10년+'])
+  })
+
+  it('0–2년 sends both 0 and 1-2, and clears both', () => {
+    const on = toggleTenureChip(['3-5'], first)
+    expect(on).toEqual(['3-5', '0', '1-2'])
+    expect(tenureChipOn(on, first)).toBe(true)
+    expect(toggleTenureChip(on, first)).toEqual(['3-5'])
+  })
+
+  it('counts one chip once and a half-picked chip as picked', () => {
+    expect(appliedCount({ ...EMPTY_SHEET, tenure: ['0', '1-2'] })).toBe(1)
+    expect(filterSummary({ ...EMPTY_SHEET, tenure: ['1-2'] })).toBe('0–2년')
+    expect(tenureChipOn(['1-2'], first)).toBe(false)
   })
 })

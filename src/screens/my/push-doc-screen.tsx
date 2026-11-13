@@ -287,7 +287,7 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
             label="봇으로 고치기"
             icon="spark"
             variant="secondary"
-            onPress={() => void start(FIX_DOC, FIX_DOC, undefined, undefined, undefined, { documentId: id })}
+            onPress={() => void start(FIX_DOC, FIX_DOC, doc.data?.data.title, undefined, undefined, { documentId: id })}
           />
           <Button
             label={applied ? '지원 완료' : '이 공고에 지원'}

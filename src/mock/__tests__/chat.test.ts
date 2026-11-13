@@ -152,6 +152,14 @@ describe('chat mock', () => {
     expect(types(await run('t-spent', { text: 'ph1-free' }))).toContain('fit')
   })
 
+  it('payments-closed answers paymentsEnabled false and leaves it out otherwise', async () => {
+    expect((await call('GET', 'chat/account')).data).not.toHaveProperty('paymentsEnabled')
+    setAccount({ closed: true })
+    expect((await call('GET', 'chat/account')).data).toMatchObject({ paymentsEnabled: false })
+    setAccount({ closed: false })
+    expect((await call('GET', 'chat/account')).data).not.toHaveProperty('paymentsEnabled')
+  })
+
   it('draws ChatStates.4 in one conversation: file card, apply record, then QUEUE_BUSY with a 12s wait', async () => {
     const file = await run('t-states', { text: 'states-file' })
     expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [] })

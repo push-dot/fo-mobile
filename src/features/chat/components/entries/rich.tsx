@@ -1,4 +1,4 @@
-import { type ComponentProps } from 'react'
+import { Fragment, type ComponentProps } from 'react'
 import { Text } from '@/shared/components'
 import { Marked } from '../header/highlight'
 
@@ -14,7 +14,7 @@ const Rich = ({ text, markId, ...rest }: { text: string; markId?: string } & Com
             {show(part)}
           </Text>
         ) : (
-          show(part)
+          <Fragment key={index}>{show(part)}</Fragment>
         ),
       )}
     </Text>

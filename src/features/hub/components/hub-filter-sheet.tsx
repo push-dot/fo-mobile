@@ -1,8 +1,8 @@
 import { Pressable, View } from 'react-native'
-import { CAREER_STATUSES, TENURES } from '@push/api-client'
+import { CAREER_STATUSES } from '@push/api-client'
 import { Chip, Text } from '../../../shared/components'
 import { hitSlopTo, type } from '../../../theme'
-import { EMPTY_SHEET, toggle, type Explore, type SheetFilters } from '../utils'
+import { EMPTY_SHEET, TENURE_CHIPS, tenureChipOn, toggle, toggleTenureChip, type Explore, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
 
 type Props = {
@@ -28,8 +28,8 @@ const HubFilterSheet = ({ draft, sent, onChange }: Props) => (
       </Pressable>
     </View>
     <HubFilterGroup title="재직 기간">
-      {TENURES.map((t) => (
-        <Chip key={t.key} label={t.label} check on={draft.tenure.includes(t.key)} onPress={() => onChange({ ...draft, tenure: toggle(draft.tenure, t.key) })} />
+      {TENURE_CHIPS.map((t) => (
+        <Chip key={t.label} label={t.label} check on={tenureChipOn(draft.tenure, t)} onPress={() => onChange({ ...draft, tenure: toggleTenureChip(draft.tenure, t) })} />
       ))}
     </HubFilterGroup>
     <HubFilterGroup title="커리어 상태">

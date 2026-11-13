@@ -10,7 +10,7 @@ tags:
     timeout: 20000
 - tapOn: "만들기"
 - extendedWaitUntil:
-    visible: "봇을 쓰려면"
+    visible: ".*봇을 쓰려면.*"
     timeout: 20000
 - extendedWaitUntil:
     visible: "동의하고 시작하기"

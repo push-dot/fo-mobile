@@ -42,7 +42,7 @@ type PostingFacts = {
   location?: string | null
 }
 
-const postingOf = (phase: CreatePhase): PostingPick | null => ('posting' in phase ? phase.posting : null)
+export const postingOf = (phase: CreatePhase): PostingPick | null => ('posting' in phase ? phase.posting : null)
 
 export const initialForm = (): CreateForm => ({
   phase: { kind: 'idle' },

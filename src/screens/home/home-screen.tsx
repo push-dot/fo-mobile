@@ -15,20 +15,12 @@ const HomeScreen = () => {
   const toggleBookmark = useToggleBookmark()
   const kinds: SectionKind[] = useHomeSections()
   const [scrolled, setScrolled] = useState(false)
+  const [barHeight, setBarHeight] = useState(0)
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar
-        left={<Wordmark size={scrolled ? 20 : 24} />}
-        right={
-          <>
-            <GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />
-            <GlassButton
-              actions={[{ icon: 'bell', label: unread ? `알림 ${unread}개` : '알림', badge: unread, onPress: () => router.push('/notifications') }]}
-            />
-          </>
-        }
-      />
+      {/* The scroll view must be the screen's first child: the native tab bar only minimizes on scroll for the first scroll view in the first-child chain. */}
       <ScrollView
+        style={{ marginTop: barHeight }}
         contentInsetAdjustmentBehavior="automatic"
         scrollEventThrottle={64}
         onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
@@ -43,6 +35,19 @@ const HomeScreen = () => {
           <Section key={kind} kind={kind} title={SECTIONS[kind].title} skeleton={index < HOME_SKELETON_SECTIONS} onBookmark={toggleBookmark} />
         ))}
       </ScrollView>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 }} onLayout={(e) => setBarHeight(e.nativeEvent.layout.height)}>
+        <TopBar
+          left={<Wordmark size={scrolled ? 20 : 24} />}
+          right={
+            <>
+              <GlassButton actions={[{ icon: 'search', label: '검색', onPress: () => router.push('/search') }]} />
+              <GlassButton
+                actions={[{ icon: 'bell', label: unread ? `알림 ${unread}개` : '알림', badge: unread, onPress: () => router.push('/notifications') }]}
+              />
+            </>
+          }
+        />
+      </View>
     </View>
   )
 }
