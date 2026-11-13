@@ -27,11 +27,11 @@ export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
 export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
-export const PICK_HINT = '번호를 누르거나 바로 말해도 돼요'
+export const PICK_HINT = '답할 때까지 이 봇은 기다려요'
 export const HINTLESS_GATES = ['validate_cap']
 
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
-export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '선택을 기다리고 있어요' } as const
+export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
 
 export const FIT_ROWS = [
   { key: 'techStack', label: '기술 스택' },
