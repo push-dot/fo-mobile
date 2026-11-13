@@ -1,8 +1,9 @@
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { Platform, Pressable, View } from 'react-native'
-import { docMeta, postingMeta, requestMaterialFile, submitMaterialText, useChatDocs } from '@/features/chat'
-import { useBookmarkList } from '@/features/my'
+import { Alert, Platform, Pressable, View } from 'react-native'
+import { CHAT_ATTACHMENT_OPTIONS, LOCAL_DRAFT, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
+import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
+import { pickDocument } from '@/shared/infrastructure'
 import { Button, Chip, GlassButton, Icon, Sheet, SheetScroll, Text, TextField, useSheetScrollMax, type IconName } from '@/shared/components'
 import { onAccent, selectedRing, spacing, type, useColors } from '@/theme'
 
@@ -15,6 +16,11 @@ const MaterialPickerScreen = () => {
   const c = useColors()
   const ring = selectedRing(c)
   const bound = useSheetScrollMax(0.6)
+  const rawBot = useLocalSearchParams<{ bot?: string | string[] }>().bot
+  const [target] = useState(() => {
+    const id = Array.isArray(rawBot) ? rawBot[0] : rawBot
+    return id || LOCAL_DRAFT
+  })
   const [kind, setKind] = useState<'github' | 'posting' | null>(null)
   const [text, setText] = useState('')
   const [picks, setPicks] = useState<string[]>([])
@@ -26,13 +32,24 @@ const MaterialPickerScreen = () => {
   ]
   const toggle = (id: string) => setPicks((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))
   const done = (value: string) => {
-    submitMaterialText(value)
+    appendDraftText(target, value)
     router.back()
   }
   const add = () => done(sections.flatMap((s) => s.rows).filter((r) => picks.includes(r.id)).map((r) => r.title).join(', '))
   const submit = () => text.trim() && done(text.trim())
+  const pickFile = async () => {
+    const picked = await pickDocument(CHAT_ATTACHMENT_OPTIONS)
+    const asset = picked.canceled ? undefined : picked.assets[0]
+    if (!asset) return
+    if ((asset.size ?? 0) > MAX_BYTES) {
+      Alert.alert(SIZE_LIMIT.title, SIZE_LIMIT.body)
+      return
+    }
+    attachDraftFile(target, { uri: asset.uri, name: asset.name, mimeType: asset.mimeType, size: asset.size })
+    router.back()
+  }
   const others: [string, IconName, () => void][] = [
-    ['파일', 'pdf', () => (requestMaterialFile(), router.back())],
+    ['파일', 'pdf', () => void pickFile()],
     ['GitHub 링크', 'at', () => setKind('github')],
     ['공고 붙여넣기', 'doc', () => setKind('posting')],
   ]
