@@ -94,7 +94,7 @@ describe('mapEvent of a page-read approval', () => {
     foot: '10분 동안 답이 없으면 이 요청은 만료돼요',
     options: [
       { id: 'approve', label: '한 번 허용' },
-      { id: 'approve_always', label: '항상 허용', desc: '이 봇이 이 사이트를 읽을 때 다시 묻지 않아요' },
+      { id: 'approve_always', label: '항상 허용', desc: '이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요' },
       { id: 'reject', label: '거절' },
     ],
     expiresAt: '2026-11-13T01:10:00.007Z',

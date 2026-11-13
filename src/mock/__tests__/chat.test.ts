@@ -33,7 +33,7 @@ describe('chat mock', () => {
     expect((await call('GET', 'conversations/c-dotori')).data).toMatchObject({ company: '모아페이' })
   })
 
-  it('starts 봇으로 고치기 by reading the file, with no todo yet', async () => {
+  it('starts Bot으로 고치기 by reading the file, with no todo yet', async () => {
     const events = await run('t-fixdoc', { text: '이 서류를 고쳐 줘' })
     expect(types(events).slice(0, 2)).toEqual(['status', 'tool'])
     expect(events.some((e) => e.type === 'todo')).toBe(false)

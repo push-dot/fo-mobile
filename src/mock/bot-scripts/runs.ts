@@ -72,7 +72,7 @@ const tailorRead: Step[] = [
   s(1500, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
 ]
 
-// 마이 › 서류 › 봇으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
+// 마이 › 서류 › Bot으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
 const fixDocRun: Step[] = [
   s(200, status('서류를 읽는 중')),
   s(300, tool('resume', '이력서 읽기', RESUME, 'run', '서류를 읽는 중')),
