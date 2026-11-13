@@ -17,7 +17,7 @@ describe('headerLightOf', () => {
 describe('creditBanner', () => {
   const refillAt = new Date(2026, 11, 1)
 
-  it('says nothing before the account loads', () => {
+  it('shows the line without a button before the account loads', () => {
     expect(creditBanner({ plan: undefined, refillAt, paymentsEnabled: true })).toEqual({ lines: ['이번 달 사용량을 모두 썼어요.'], action: null })
   })
 
