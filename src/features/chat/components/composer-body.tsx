@@ -60,6 +60,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           placeholder={p.placeholder}
           placeholderTextColor={c.t4}
           multiline
+          lineBreakStrategyIOS="hangul-word"
           maxLength={p.maxLength}
           accessibilityLabel={p.label ?? '메시지'}
           style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor(hasText ? '600' : '400')]}
@@ -94,18 +95,25 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           <Icon name="x" size={12} color="t3" />
         </Pressable>
       ) : null}
-      <TextInput
-        ref={inputRef}
-        value={p.value}
-        onChangeText={p.onChangeText}
-        placeholder={p.placeholder}
-        placeholderTextColor={c.t4}
-        multiline
-        editable={!p.disabled}
-        accessibilityLabel={p.label ?? '메시지'}
-        maxLength={p.maxLength}
-        style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
-      />
+      {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
+      <View>
+        {p.value ? null : (
+          <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+            {p.placeholder}
+          </Text>
+        )}
+        <TextInput
+          ref={inputRef}
+          value={p.value}
+          onChangeText={p.onChangeText}
+          multiline
+          lineBreakStrategyIOS="hangul-word"
+          editable={!p.disabled}
+          accessibilityLabel={p.label ?? '메시지'}
+          maxLength={p.maxLength}
+          style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
+        />
+      </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         {showTools ? (
           <>

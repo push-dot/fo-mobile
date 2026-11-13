@@ -7,7 +7,7 @@ import { botChatPath, type BotId } from '@/features/bots'
 import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
-import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, MENTION_SHORTCUT_KEYS, QUICK_STARTS, docAiSub, linkMentionSub } from '../constants'
+import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
 import { LINK_KIND_LABEL } from '../utils/links'
 import { cacheName } from '../utils/cache-name'
@@ -215,7 +215,6 @@ export const useMentionGroups = (): MentionGroup[] => {
         title: '내 링크',
         items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
       },
-      { title: '바로가기', items: QUICK_STARTS.filter((q) => (MENTION_SHORTCUT_KEYS as readonly string[]).includes(q.key)).map((q) => ({ id: q.key, kind: 'shortcut' as const, title: q.label, sub: '' })) },
     ],
     [bookmarks.data, docs.data, links.data],
   )

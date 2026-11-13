@@ -8,6 +8,7 @@ import {
   AWAITING_TEXT,
   ApprovalPanel,
   AwaitingRow,
+  ChatBotColor,
   ComposerArea,
   ConsentSheet,
   CreditBanner,
@@ -198,6 +199,7 @@ const Thread = ({ id }: { id: string }) => {
         <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
       ) : (
       <View style={{ flex: 1 }}>
+      <ChatBotColor.Provider value={color}>
       <FindHighlight.Provider value={find.highlight}>
       <FlatList
         ref={list}
@@ -216,7 +218,8 @@ const Thread = ({ id }: { id: string }) => {
         windowSize={THREAD_WINDOW}
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
+        // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
         ListFooterComponent={<View style={{ height: headerH }} />}
         ListHeaderComponent={
           chat.queue.length || showPanel ? (
@@ -230,6 +233,7 @@ const Thread = ({ id }: { id: string }) => {
         }
       />
       </FindHighlight.Provider>
+      </ChatBotColor.Provider>
       {unseen > 0 && followScroll(atBottom, !!chat.working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
       </View>
       )}
@@ -256,7 +260,6 @@ const Thread = ({ id }: { id: string }) => {
             disabled={!!limit.banner}
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
-            onShortcut={(qs) => router.push(quickStartPath(qs.key))}
             above={
               chat.working ? (
                 <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} color={color} />

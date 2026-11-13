@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Glass, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
+import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { botErrorKind } from '../../api/errors'
@@ -114,27 +114,6 @@ const fieldValue = (form: CreateForm) => {
     return linkLabel(form.phase.url)
   if ('posting' in form.phase) return pickedLine(form.phase.posting)
   return ''
-}
-
-const Highlight = ({ text, query }: { text: string; query: string }) => {
-  const needle = query.trim()
-  const at = needle ? text.toLowerCase().indexOf(needle.toLowerCase()) : -1
-  if (at < 0) {
-    return (
-      <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
-        {text}
-      </Text>
-    )
-  }
-  return (
-    <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
-      {text.slice(0, at)}
-      <Text v="b1" weight="700" style={{ lineHeight: type.b2.lineHeight }}>
-        {text.slice(at, at + needle.length)}
-      </Text>
-      {text.slice(at + needle.length)}
-    </Text>
-  )
 }
 
 const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean }) => {
@@ -517,7 +496,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {showRows
           ? rows.map((row) => (
               <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
-                <Highlight text={pickedLine(row)} query={query} />
+                <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
+                  <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
+                </Text>
                 <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
                   {row.meta}
                 </Text>

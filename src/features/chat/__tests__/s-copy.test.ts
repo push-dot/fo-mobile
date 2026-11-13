@@ -10,11 +10,9 @@ import {
   LINK_DELETED_TOAST,
   LINK_EMPTY,
   LINK_UNDO,
-  MENTION_SHORTCUT_KEYS,
   PLAN_NOTICES,
   PLAN_HEADER,
   docAiSub,
-  QUICK_STARTS,
   linkDeleteBody,
   linkMentionSub,
 } from '../constants'
@@ -47,9 +45,7 @@ describe('agent s copy', () => {
     expect(BOOKMARK_EMPTY).toBe('북마크한 공고가 없어요.')
   })
 
-  it('mention shortcuts are three', () => {
-    const labels = QUICK_STARTS.filter((q) => (MENTION_SHORTCUT_KEYS as readonly string[]).includes(q.key)).map((q) => q.label)
-    expect(labels).toEqual(['공고 링크로 맞추기', '부족한 점 찾기', '적합도 보기'])
+  it('mention rows read the way the boards draw them', () => {
     expect(docAiSub('방금')).toBe('Bot으로 만듦 · 방금')
     expect(linkMentionSub('공고', 'https://careers.moapay.kr/jobs/1182')).toBe('공고 · careers.moapay.kr/jobs/1182')
   })

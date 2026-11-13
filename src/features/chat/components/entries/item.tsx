@@ -644,16 +644,8 @@ const ItemComponent = ({
 
 export const Item = memo(ItemComponent)
 
-const ErrorLine = ({ text }: { text: string }) => (
-  <Appear style={{ flexDirection: 'row', gap: spacing[2] }}>
-    <Text v="c1" weight="800" color="red">
-      !
-    </Text>
-    <Text v="c1" color="red" style={{ flex: 1 }}>
-      {text}
-    </Text>
-  </Appear>
-)
+// ChatErrUnavailable: the Bot's own mascot and a red line, drawn like the status lines.
+const ErrorLine = ({ text }: { text: string }) => <Notice notice={{ kind: 'failed', text }} />
 
 // Read at render: payments can close or the account can load after the error arrived.
 const PlanRequired = () => {

@@ -32,9 +32,9 @@ describe('quickStartFrom (real mode)', () => {
       ({ id: status, status, sender: { id: 's', displayName: '오지현' }, message: '커피챗 어떠세요?', posting: null, createdAt: '2026-10-21T08:00:00' }) as unknown as Offer
     const reply = quickStartFrom('reply', { offers: [offer('SENT'), offer('ACCEPTED')] }, now)
     expect(reply.items).toMatchObject([{ id: 'SENT', title: '오지현', body: '커피챗 어떠세요?', badge: { label: '새 제안' } }])
-    // People take the board palette and overrides like company tiles (ProposalDetailMenu 지현 #E8590C).
+    // QsReply / QsCoffee: a person's avatar is a black circle, whatever the brand colour table says.
     registerMockBrandColors()
-    expect(quickStartFrom('reply', { offers: [offer('SENT')] }, now).items[0]!.avatar!.color).toBe('#E8590C')
+    expect(quickStartFrom('reply', { offers: [offer('SENT')] }, now).items[0]!.avatar!.color).toBe('#16191D')
   })
 
   it('leaves AI-suggested sheets empty', () => {

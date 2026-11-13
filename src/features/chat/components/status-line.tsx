@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { Mascot, Text } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { largeType, spacing } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { lineFromWorking, statusLineView, type LiveLine, type StatusLine as StatusLineModel, type StatusLineView } from '../utils/status-line'
+
+/** The Bot whose room this is: its mascot draws every status line and error row (ChatBotStatusStopped, ChatErrUnavailable). */
+export const ChatBotColor = createContext<MascotColor>('push')
 
 const TONE_COLOR = { neutral: 't2', quiet: 't3', help: 'orange', danger: 'red' } as const
 
@@ -20,7 +23,7 @@ const StatusLineRow = ({ view, color }: { view: StatusLineView; color: MascotCol
     >
       <Mascot size={xl ? 28 : 24} state={view.mascot} color={color} motion={view.mascot === 'idle' ? { mode: 'still' } : { mode: 'animate' }} />
       <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', flexWrap: xl ? 'wrap' : 'nowrap', alignItems: 'baseline', columnGap: spacing[2] }}>
-        <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={xl ? undefined : 1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, big?.b2]}>
+        <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={xl || view.tone === 'danger' ? undefined : 1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, big?.b2]}>
           {view.text}
         </Text>
         {view.tail ? (
@@ -33,7 +36,8 @@ const StatusLineRow = ({ view, color }: { view: StatusLineView; color: MascotCol
   )
 }
 
-const StatusLine = ({ line, color = 'push' }: { line: StatusLineModel; color?: MascotColor }) => {
+const StatusLine = ({ line, color }: { line: StatusLineModel; color?: MascotColor }) => {
+  const room = useContext(ChatBotColor)
   const ticking = line.kind === 'run' || line.kind === 'waiting'
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
@@ -41,7 +45,7 @@ const StatusLine = ({ line, color = 'push' }: { line: StatusLineModel; color?: M
     const timer = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(timer)
   }, [ticking])
-  return <StatusLineRow view={statusLineView(line, ticking ? now : new Date())} color={color} />
+  return <StatusLineRow view={statusLineView(line, ticking ? now : new Date())} color={color ?? room} />
 }
 
 export default StatusLine

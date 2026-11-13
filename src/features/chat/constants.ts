@@ -81,7 +81,6 @@ export const PLAN_NOTICE_LINK = '구독 안내'
 export const PLAN_NOTICE_FOOT = '결제와 환불은 서비스 이용약관 제6조를 따라요.'
 export const ACCOUNT_REFERENCE_TITLE = 'Bot이 참고하는 내 정보'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'
-export const MENTION_SHORTCUT_KEYS = ['link', 'gap', 'fit'] as const
 export const docAiSub = (ago: string) => `Bot으로 만듦 · ${ago}`
 export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
 export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크에서 지워요.`

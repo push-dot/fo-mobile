@@ -24,6 +24,7 @@ const PhoneField = ({ value, onChange }: { value: string; onChange: (next: strin
         style={{ flex: 1, height: 56, paddingHorizontal: 14, borderRadius: FIELD_RADIUS, backgroundColor: c.bg2, borderWidth: 2, borderColor: focused ? c.ac : 'transparent', justifyContent: 'center' }}
       >
         <TextInput
+          autoFocus
           accessibilityLabel="휴대폰 번호"
           value={value}
           onChangeText={onChange}

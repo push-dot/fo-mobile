@@ -8,9 +8,8 @@ import { useAccessMode } from '../api/hooks'
 import { Composer } from './composer'
 import { insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import MentionPopover from './mention-popover'
-import { QUICK_STARTS, type QuickStart } from '../constants'
 import { LOCAL_DRAFT, clearDraft, detachDraft, setDraftText, useDraftStore } from '../stores'
-import { materialPickerPath, quickStartPath } from '../utils/sheet-routes'
+import { materialPickerPath } from '../utils/sheet-routes'
 
 type Props = {
   botId?: string
@@ -18,8 +17,6 @@ type Props = {
   onSend: (text: string, attachment?: PickedFile | string) => void
   working?: boolean
   onStop?: () => void
-  /** Picked a 바로가기 from the @ list. */
-  onShortcut: (qs: QuickStart) => void
   /** Reports typing so the first screen can hide its quick-start pills. */
   onTyping?: (typing: boolean) => void
   /** Floats above the box (StatusRow). */
@@ -52,12 +49,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
     clearDraft(id)
   }
   const pick = (m: MentionItem) => {
-    if (m.kind === 'shortcut') {
-      change(text.replace(/@([^\s@]*)$/, ''))
-      const qs = QUICK_STARTS.find((q) => q.key === m.id)
-      if (qs) router.push(quickStartPath(qs.key))
-      return
-    }
     change(insertMention(text, m.title))
   }
 
