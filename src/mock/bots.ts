@@ -18,6 +18,8 @@ export type MockMessage = {
   at: When
   attachments?: BotContract.Attachment[]
   sources?: BotContract.Attachment[]
+  /** The bot's whole turn is a notice (ChatBotReadOff), not text. */
+  notice?: true
 }
 
 /** `answer` is a choice the user picks, `confirm` an approval. `expiresAt` null never expires. */
@@ -48,6 +50,8 @@ export type BotFixture = {
   messages: MockMessage[]
   cards: MockCard[]
   job: MockJob | null
+  /** When the bot's newest run failed. A run, message or card after it replaces the outcome. */
+  failedAt?: When
 }
 
 const newest = <T>(items: T[], time: (item: T) => number) => items.reduce<T | undefined>((a, b) => (a === undefined || time(b) >= time(a) ? b : a), undefined)
@@ -76,7 +80,22 @@ export const botDtoOf = (f: BotFixture, now: Date, all: readonly BotFixture[] = 
     lastMessage: last ? { preview: last.text.slice(0, 140), at: iso(last.at), fromBot: last.role === 'ASSISTANT' } : null,
     unread: Number.isFinite(said) && (f.readAt === null || said > time(f.readAt)),
     activity: activityOf(f, now, all),
+    outcome: outcomeOf(f, now),
   }
+}
+
+/** The server's bot_outcome rule: nothing runs, no card is open, and the newest ending is not older than the newest thing said or asked. */
+const outcomeOf = (f: BotFixture, now: Date): BotContract.BotOutcome | null => {
+  if (f.job || openCardOf(f, now)) return null
+  const time = (w: When) => atOf(w, now).getTime()
+  const ended: { kind: 'expired' | 'failed'; at: number }[] = [
+    ...f.cards.filter((c) => c.status === 'PENDING' && c.expiresAt !== null).map((c) => ({ kind: 'expired' as const, at: time(c.expiresAt!) })),
+    ...(f.failedAt === undefined ? [] : [{ kind: 'failed' as const, at: time(f.failedAt) }]),
+  ]
+  const outcome = newest(ended, (e) => e.at)
+  if (!outcome) return null
+  const later = [...f.messages.map((m) => m.at), ...f.cards.map((c) => c.at)].some((w) => time(w) > outcome.at)
+  return later ? null : { kind: outcome.kind, at: new Date(outcome.at).toISOString() }
 }
 
 const activityOf = (f: BotFixture, now: Date, all: readonly BotFixture[]): BotContract.BotActivity | null => {
@@ -203,6 +222,17 @@ const home = (): BotFixture[] => [
   ),
 ]
 
+/** AgentHomeRowExpiredFailed: AgentHome with 모아페이 asking a card that ran out and 도토리증권 ending a run in failure. */
+const homeOutcome = (): BotFixture[] => {
+  const [push, ...rest] = home()
+  const moa = rest.find((f) => f.bot.id === 'b-moa')!
+  const dotori = rest.find((f) => f.bot.id === 'b-dotori')!
+  moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', at: 20, expiresAt: 10 }]
+  dotori.job = null
+  dotori.failedAt = 60
+  return [push!, ...rest]
+}
+
 /** AgentHomeLong, row for row. Also the long names of BotProfileLong and ChatBotHeaderLong. */
 const homeLong = (): BotFixture[] => [
   pushBot(),
@@ -274,8 +304,8 @@ let grants = grantSeed()
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 /** Tour switches (links.ts). */
-export const setBots = (set: 'home' | 'none' | 'long') => {
-  fixtures = set === 'long' ? homeLong() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
+export const setBots = (set: 'home' | 'none' | 'long' | 'outcome') => {
+  fixtures = set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
 }
 export const setBotPlan = (next: Plan) => {
   plan = next

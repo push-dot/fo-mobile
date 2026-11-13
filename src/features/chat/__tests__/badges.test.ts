@@ -5,11 +5,9 @@ const src = (path: string) => readFileSync(new URL(`../../../${path}`, import.me
 
 const files = [
   'features/chat/components/entries/item.tsx',
-  'features/chat/components/docs-modal.tsx',
   'features/chat/components/composer-area.tsx',
   'features/chat/components/quick-start-sheet.tsx',
   'features/chat/components/card/approval-panel.tsx',
-  'features/chat/components/links-modal.tsx',
   'features/my/components/docs-tab.tsx',
   'features/my/components/index.ts',
   'features/jobs/components/doc-row.tsx',

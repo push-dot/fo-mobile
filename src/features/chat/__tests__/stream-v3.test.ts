@@ -85,7 +85,7 @@ describe('stream v3', () => {
     expect(multi?.foot).toBe('여러 개 고를 수 있어요')
   })
 
-  it('a sectioned multi card carries the multi foot; toggle rows put sub on the second line; templates get a layout', () => {
+  it('a sectioned multi card draws no foot (ChatPh0Input); toggle rows put sub on the second line; templates get a layout', () => {
     const [ev] = mapEvent({
       type: 'choice',
       id: 'g',
@@ -97,7 +97,7 @@ describe('stream v3', () => {
       ],
     })
     const a = ev?.type === 'approval' ? ev.approval : undefined
-    expect(a?.foot).toBe('여러 개 고를 수 있어요')
+    expect(a?.foot).toBeUndefined()
     expect(a?.sections[1]).toMatchObject({ items: [{ label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }] })
     expect(a?.sections[2]).toMatchObject({ items: [{ layout: 'modern' }, { layout: 'ats' }, { layout: 'compact' }, { layout: 'classic' }] })
   })

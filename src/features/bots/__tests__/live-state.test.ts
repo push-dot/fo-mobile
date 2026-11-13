@@ -27,6 +27,7 @@ const bot = (over: Partial<CompanyBot> = {}): CompanyBot => ({
   lastMessage: { preview: '지원 동기 문단을 줄였어요', fromBot: true },
   unread: false,
   activity: { phase: 'idle' },
+  outcome: null,
   ...over,
 })
 
@@ -46,7 +47,7 @@ describe('mascotStateOf', () => {
   ]
 
   it.each(expected)('%s with unread %s shows %s', (phase, unread, state) => {
-    expect(mascotStateOf({ activity: ACTIVITY[phase], unread })).toBe(state)
+    expect(mascotStateOf({ activity: ACTIVITY[phase], unread, outcome: null })).toBe(state)
   })
 })
 
@@ -129,5 +130,30 @@ describe('botRow', () => {
   it('follows this session over the list: a stream in progress and a chat open at its bottom', () => {
     const row = botRow(bot({ unread: true }), { streaming: ACTIVITY.working, reading: true }, now)
     expect(row).toMatchObject({ mascot: 'work', line: '경력 섹션 고치는 중', unreadDot: false })
+  })
+})
+
+describe('botRow outcome (AgentHomeRowExpiredFailed)', () => {
+  const ended = (kind: 'expired' | 'failed') => bot({ outcome: { kind, at: minAgo(10) } })
+
+  it('draws an expired card as an idle row with its line and no state word', () => {
+    expect(botRow(ended('expired'), undefined, now)).toMatchObject({
+      mascot: 'idle',
+      line: '승인 요청이 만료됐어요',
+      accessibilityLabel: '모아페이 봇, 승인 요청이 만료됐어요, 10분 전',
+    })
+  })
+
+  it('draws a failed run as 확인 필요 with its retry line', () => {
+    expect(botRow(ended('failed'), undefined, now)).toMatchObject({
+      mascot: 'help',
+      line: '작업을 끝내지 못했어요. 다시 시도해 주세요.',
+      accessibilityLabel: '모아페이 봇, 확인 필요, 작업을 끝내지 못했어요. 다시 시도해 주세요., 10분 전',
+    })
+  })
+
+  it('lets this session\'s stream replace the outcome until the next fetch', () => {
+    const row = botRow(ended('failed'), { streaming: ACTIVITY.working, reading: false }, now)
+    expect(row).toMatchObject({ mascot: 'work', line: '경력 섹션 고치는 중' })
   })
 })

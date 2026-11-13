@@ -1,9 +1,9 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import { Appear } from '../motion'
-import Glyph, { Dot } from './glyph'
+import Glyph from './glyph'
 import Rich from './rich'
 
 const AUTO_PICK = /^자동으로 골랐어요/
@@ -20,9 +20,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       </Appear>
     )
   return (
-    <Appear style={{ flexDirection: 'row', gap: 10 }}>
-      <Dot color={c.ac} />
-      <View style={{ flex: 1, gap: 6 }}>
+    <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth: '88%' }}>
+      <View style={{ gap: 6, paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         <Rich v="b1" text={item.text} markId={item.id} />
         {item.bullets?.length ? (
           <Text v="b2" color="t2">

@@ -6,6 +6,8 @@ import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, ty
 import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
 import { hasReferenceConsent } from './chat'
 import { findMaterial } from './materials'
+import { READ_OFF_TEXT as READ_OFF } from '../features/chat/constants'
+import { readsMyFiles } from './me'
 import { postings } from './postings'
 import { mock } from './server'
 
@@ -15,6 +17,8 @@ type Unstamped = TurnEvent extends infer E ? (E extends unknown ? Omit<E, 'seq' 
 type Frame = BotContract.StreamEvent
 
 const REPLY = '정리했어요. 더 필요한 게 있으면 말해 주세요.'
+/** With 내 자료 읽기 허용 off, a request about the user's own documents that attaches none is refused (S13). */
+const readRefused = (text: string, attached: number) => !readsMyFiles() && attached === 0 && /이력서|서류/.test(text)
 const error = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 
 const cardEvent = (c: MockCard, now: Date): Unstamped => {
@@ -44,7 +48,7 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
         else if (s.phase) events.push(stamp({ type: 'status', text: s.text, phase: s.phase, since }, job.at))
       }
     }
-    if (bot) events.push(stamp({ type: 'token', text: bot.text }, bot.at))
+    if (bot) events.push(stamp(bot.notice ? { type: 'notice', text: bot.text } : { type: 'token', text: bot.text }, bot.at))
     // A finished turn keeps its waiting statuses, so an answered card still has the one it asked with.
     for (const c of cards) {
       const text = c.for === 'answer' ? '답을 기다리고 있어요' : '확인을 기다리고 있어요'
@@ -59,7 +63,7 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
       user: user ? { messageId: user.id, text: user.text, attachments: user.attachments ?? [] } : null,
       answer: null,
       events,
-      assistant: bot ? { messageId: bot.id, text: bot.text, sources: bot.sources ?? [] } : null,
+      assistant: bot && !bot.notice ? { messageId: bot.id, text: bot.text, sources: bot.sources ?? [] } : null,
     }
   })
 }
@@ -138,10 +142,15 @@ mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
     f.cards.push(card)
     return sse(pageReadFrames(card, turn, when, 0))
   }
-  f.messages.push({ id: nextId('m'), turn, role: 'ASSISTANT', text: REPLY, at: now })
+  const refused = readRefused(text, attachments.length)
+  f.messages.push({ id: nextId('m'), turn, role: 'ASSISTANT', text: refused ? READ_OFF : REPLY, at: now, ...(refused ? { notice: true as const } : {}) })
   let seq = 0
   const stamp = { turn, at: now }
-  const frames: Frame[] = [
+  const frames: Frame[] = refused ? [
+    { type: 'status', text: '대기 중', phase: 'queued', since: now, ahead: 0, seq: ++seq, ...stamp },
+    { type: 'notice', text: READ_OFF, seq: ++seq, ...stamp },
+    { type: 'done', operation: null, seq: ++seq, ...stamp },
+  ] : [
     { type: 'status', text: '대기 중', phase: 'queued', since: now, ahead: 0, seq: ++seq, ...stamp },
     { type: 'status', text: '생각 중', phase: 'thinking', since: now, seq: ++seq, ...stamp },
     { type: 'status', text: '요청을 살펴보는 중', phase: 'working', since: now, seq: ++seq, ...stamp },

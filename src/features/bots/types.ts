@@ -35,6 +35,9 @@ export type BotActivity =
   | { phase: 'working'; since: Date; label: string }
   | { phase: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: CardId; cardTitle: string; expiresAt: Date | null }
 
+/** How the last run ended while nothing runs and no card is open. The server clears it when something newer happens. */
+export type BotOutcome = { kind: 'expired' | 'failed'; at: Date }
+
 type BotCommon = {
   id: BotId
   /** "Push Bot" or the company name, or the user's rename. */
@@ -49,6 +52,7 @@ type BotCommon = {
   /** The bot said something (a message or a card) after the user last read it. */
   unread: boolean
   activity: BotActivity
+  outcome: BotOutcome | null
 }
 
 /** Push Bot has no colour and no posting and cannot be deleted, so those fields do not exist on it. */

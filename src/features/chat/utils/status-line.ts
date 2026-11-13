@@ -13,7 +13,7 @@ export type StatusLine = LiveLine | Notice
 
 export type StatusLineView = {
   mascot: 'think' | 'work' | 'help' | 'idle'
-  tone: 'neutral' | 'help' | 'danger'
+  tone: 'neutral' | 'quiet' | 'help' | 'danger'
   text: string
   tail: string | null
   accessibilityLabel: string
@@ -68,7 +68,7 @@ export const statusLineView = (line: StatusLine, now: Date): StatusLineView => {
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now), 'status')
   if (line.kind === 'run' && line.phase === 'working') return view('work', 'neutral', line.text, elapsedText(line.since, now), 'status')
   if (line.kind === 'waiting') return view('help', 'help', line.text, elapsedText(line.since, now), 'status')
-  if (line.kind === 'stopped') return view('idle', 'neutral', line.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT, null, 'status')
+  if (line.kind === 'stopped') return view('idle', 'quiet', line.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT, null, 'status')
   if (line.kind === 'failed') return view('idle', 'danger', line.text, null, 'status')
   return view('idle', 'danger', ERROR_SENTENCE, line.reason, 'alert')
 }

@@ -876,6 +876,7 @@ let settings: Settings = {
   defaultEffort: 'MEDIUM',
   confirmBeforeEdit: true,
 }
+export const readsMyFiles = () => settings.allowAiReadMyFiles
 mock('DELETE', 'me', () => null)
 mock('GET', 'auth/me', () => ({
   data: {

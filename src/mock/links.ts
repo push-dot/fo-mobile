@@ -34,6 +34,7 @@ export const listenMockLinks = () =>
     }
     if (specs.includes('bots:none')) setBots('none')
     if (specs.includes('bots:long')) setBots('long')
+    if (specs.includes('bots:outcome')) setBots('outcome')
     if (specs.includes('bots:limit')) setBotPlan('FREE')
     for (const s of specs) {
       const muted = /^bot:(.+):muted$/.exec(s)

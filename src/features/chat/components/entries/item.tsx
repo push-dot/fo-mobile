@@ -3,6 +3,8 @@ import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from
 import BotText from './bot'
 import { Dot } from './glyph'
 import Rich from './rich'
+import Notice from './notice'
+import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
@@ -613,6 +615,7 @@ const ItemComponent = ({
   onUsage,
   onConvert,
   onView,
+  onReadOff,
   resultPending,
   resultAwaiting,
 }: {
@@ -621,6 +624,7 @@ const ItemComponent = ({
   onUsage?: (action: 'plan' | 'credits') => void
   onConvert?: (item: Of<'result'>) => void
   onView?: (item: Of<'result'>) => void
+  onReadOff?: (action: ReadOffAction) => void
   resultPending?: boolean
   resultAwaiting?: boolean
 }) => {
@@ -629,6 +633,10 @@ const ItemComponent = ({
       return <UserBubble item={item} />
     case 'agentText':
       return <BotText item={item} />
+    case 'notice':
+      return <Notice notice={item.notice} />
+    case 'readOff':
+      return <ReadOff item={item} onAction={onReadOff} />
     case 'think':
     case 'tool':
       return null

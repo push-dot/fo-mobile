@@ -1,6 +1,5 @@
 import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
-import { MULTI_PICK_FOOT } from '../constants'
 import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
 /** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
@@ -106,11 +105,9 @@ export const approvalFromSections = (ev: Extract<StreamEvent, { type: 'choice' }
   const submit: ChoiceSubmit | undefined = ev.submit
   const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
   const cancel = ev.options.find((o) => o.id === 'cancel')
-  const multi = sections.some((s) => (s.kind === 'chips' || s.kind === 'choices') && s.multi)
   return {
     id: ev.id,
     question: ev.title ?? '',
-    ...(multi ? { foot: MULTI_PICK_FOOT } : {}),
     sections,
     optionIds: ['submit', ...answerableIds(sections), ...(cancel ? ['cancel'] : [])],
     ...(cancel ? { secondary: cancel.label } : {}),

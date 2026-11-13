@@ -412,26 +412,27 @@ export const retryApproval = async (id: string) => {
 
 const halting = new Set<string>()
 
-const finishStop = (id: string, ctrl: AbortController | undefined) => {
+const finishStop = (id: string, ctrl: AbortController | undefined, resumable: boolean) => {
   halting.delete(id)
   if (ctrl && runs.get(id) !== ctrl) return
   if (API_MOCK) ctrl?.abort()
-  dispatch(id, { type: 'stop' })
+  dispatch(id, { type: 'stop', resumable })
 }
 
 const reportCancel = (id: string) => {
   const ctrl = runs.get(id)
   if (API_MOCK) {
-    finishStop(id, ctrl)
+    // The mock has no server to say whether a document flow is active: a flow that drew its to-do list is.
+    finishStop(id, ctrl, get(id).items.some((item) => item.type === 'todo'))
     return
   }
   if (halting.has(id)) return
   halting.add(id)
   void botApi.bots.cancel(id).then(
-    () => finishStop(id, ctrl),
+    (result) => finishStop(id, ctrl, result.resumable),
     (error: unknown) => {
       if (error instanceof ApiError && error.status === 409) {
-        finishStop(id, ctrl)
+        finishStop(id, ctrl, false)
         return
       }
       halting.delete(id)
