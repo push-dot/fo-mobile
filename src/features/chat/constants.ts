@@ -27,6 +27,7 @@ export const MULTI_PICK_FOOT = '여러 개 고를 수 있어요'
 export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
 export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
+export const EDIT_FOOT = '번호를 누르거나 바로 말해도 돼요'
 export const PICK_HINT = '답할 때까지 이 봇은 기다려요'
 export const HINTLESS_GATES = ['validate_cap']
 
