@@ -1,24 +1,23 @@
 import { View } from 'react-native'
 import { Button, Text } from '@/shared/components'
-import { spacing, type } from '../../../../theme'
+import { spacing } from '../../../../theme'
 import { ERROR_BODY, ERROR_NOTE, ERROR_TITLE, RETRY_LABEL } from './copy'
 
 const BotHomeError = ({ onRetry }: { onRetry: () => void }) => {
-  const wrap = { paddingHorizontal: 32, paddingTop: 28, gap: spacing[2] }
-  const title = { fontSize: type.h3.fontSize, lineHeight: type.h3.lineHeight }
-  const body = { fontSize: 14, lineHeight: 20 }
+  const wrap = { paddingTop: 48, paddingHorizontal: 36, gap: spacing[2], alignItems: 'center' as const }
+  const copy = { textAlign: 'center' as const }
+  const button = { alignSelf: 'center' as const }
   return (
-    <View style={wrap}>
-      <Text weight="700" style={title}>
+    <View accessibilityRole="alert" style={wrap}>
+      <Text v="h3" weight="700" style={copy}>
         {ERROR_TITLE}
       </Text>
-      <Text color="t3" style={body}>
+      <Text v="b2" color="t3" style={copy}>
         {ERROR_BODY}
-      </Text>
-      <Text color="t3" style={body}>
+        {'\n'}
         {ERROR_NOTE}
       </Text>
-      <Button label={RETRY_LABEL} size="md" onPress={onRetry} />
+      <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={button} />
     </View>
   )
 }

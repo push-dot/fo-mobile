@@ -1,21 +1,21 @@
 import { View } from 'react-native'
 import { Button, Text } from '@/shared/components'
-import { spacing, type } from '../../../../theme'
+import { radius, spacing } from '../../../../theme'
 import { EMPTY_ACTION, EMPTY_BODY, EMPTY_TITLE } from './copy'
 
 const BotHomeEmpty = ({ onCreate }: { onCreate: () => void }) => {
-  const wrap = { paddingHorizontal: 32, paddingTop: 28, gap: spacing[2] }
-  const title = { fontSize: type.h3.fontSize, lineHeight: type.h3.lineHeight }
-  const body = { fontSize: 14, lineHeight: 20 }
+  const wrap = { paddingTop: 56, paddingHorizontal: 32, gap: spacing[2], alignItems: 'center' as const }
+  const copy = { textAlign: 'center' as const }
+  const button = { alignSelf: 'center' as const, borderRadius: radius.confirmPanelTop }
   return (
     <View style={wrap}>
-      <Text weight="700" style={title}>
+      <Text v="b1" weight="700" style={copy}>
         {EMPTY_TITLE}
       </Text>
-      <Text color="t3" style={body}>
+      <Text v="c1" color="t3" style={copy}>
         {EMPTY_BODY}
       </Text>
-      <Button label={EMPTY_ACTION} size="md" onPress={onCreate} />
+      <Button label={EMPTY_ACTION} variant="primary" size="md" onPress={onCreate} style={button} />
     </View>
   )
 }
