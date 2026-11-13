@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWi
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Button, Glass, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
+import { Badge, Button, Glass, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { botErrorKind } from '../../api/errors'
@@ -181,75 +181,78 @@ const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor)
 
 const LIMIT_MASCOTS = ['teal', 'amber', 'pink'] as const
 const PLAN_ROW = 56
+const LIMIT_MASCOT = 64
+const LIMIT_OVERLAP = -14
 
-const LimitBody = ({ limit, onUpgrade, onClose }: { limit: BotLimit | undefined; onUpgrade: () => void; onClose: () => void }) => {
+const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
   const c = useColors()
   const copy = limit ? limitCopy(limit) : null
+  if (!copy) return null
   return (
-    <View style={{ gap: spacing[5] }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing[2] }}>
-        {LIMIT_MASCOTS.map((color) => (
-          <Mascot key={color} size={48} color={color} motion={{ mode: 'still' }} />
-        ))}
-      </View>
-      {copy ? (
-        <View style={{ gap: spacing[2] }}>
-          <Text v="h2" accessibilityRole="header">
-            {copy.title}
-          </Text>
-          <Text v="b2" color="t3">
-            {copy.body}
-          </Text>
-        </View>
-      ) : null}
-      {copy ? (
-        <View style={{ backgroundColor: c.fill, borderRadius: radius.lg, overflow: 'hidden' }}>
-          {copy.rows.map((row) => (
-            <View key={row.plan} style={{ minHeight: PLAN_ROW, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[4], borderBottomWidth: 1, borderBottomColor: c.line }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                <Text weight="700">{row.plan}</Text>
-                {row.current ? (
-                  <View style={{ backgroundColor: c.acSoft, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
-                    <Text v="c2" weight="700" color="acText">
-                      {CURRENT_PLAN}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text weight="700">{row.value}</Text>
+    <View>
+      <View style={{ alignItems: 'center', gap: 10, paddingTop: 28, paddingHorizontal: 36 }}>
+        <View style={{ flexDirection: 'row', marginBottom: 6 }}>
+          {LIMIT_MASCOTS.map((color, i) => (
+            <View key={color} style={{ marginLeft: i > 0 ? LIMIT_OVERLAP : 0 }}>
+              <Mascot size={LIMIT_MASCOT} color={color} motion={{ mode: 'still' }} />
             </View>
           ))}
         </View>
-      ) : null}
-      {copy ? (
-        <Text v="c2" color="t3">
-          {copy.note}
+        <Text v="h2" accessibilityRole="header" style={{ textAlign: 'center' }}>
+          {copy.title}
         </Text>
-      ) : null}
-      <View style={{ gap: spacing[2], marginTop: 'auto' }}>
-        <Button label={UPGRADE_LABEL} onPress={onUpgrade} />
-        <Button label={ORGANIZE_LABEL} variant="secondary" onPress={onClose} />
+        <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+          {copy.body}
+        </Text>
       </View>
+      <View style={{ marginTop: spacing[5], backgroundColor: c.bg2, borderRadius: radius.lg, paddingHorizontal: spacing[4] }}>
+        {copy.rows.map((row, i) => (
+          <View key={row.plan} style={{ minHeight: PLAN_ROW, flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: c.line }}>
+            <Text v="b1" weight="700">
+              {row.plan}
+            </Text>
+            {row.current ? <Badge label={CURRENT_PLAN} tone="grey" /> : null}
+            <Text v="b1" weight="700" color="t2" style={{ marginLeft: 'auto' }}>
+              {row.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+      <Text color="t3" style={{ paddingHorizontal: spacing[6], fontSize: type.c2.fontSize, lineHeight: 17 }}>
+        {copy.note}
+      </Text>
     </View>
   )
 }
 
+const FLOAT_RADIUS = 40
+
 const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => {
   const c = useColors()
+  const insets = useSafeAreaInsets()
+  const ios = Platform.OS === 'ios'
+  const card = ios
+    ? { margin: spacing[2], borderRadius: FLOAT_RADIUS, paddingHorizontal: spacing[4], paddingTop: spacing[3], paddingBottom: spacing[5] }
+    : { borderTopLeftRadius: radius.sheetTop, borderTopRightRadius: radius.sheetTop, paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: insets.bottom + spacing[3] }
   return (
-    <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end', padding: spacing[4] }}>
-      <View style={{ backgroundColor: c.bg, borderRadius: radius.xl, padding: spacing[5], gap: spacing[3] }}>
-        <Text v="h2" accessibilityRole="header">
+    <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end' }}>
+      <View style={[{ backgroundColor: c.bg, gap: spacing[3] }, card]}>
+        <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
+        <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {CONSENT_TITLE}
         </Text>
         <Text v="b2" color="t2">
           {CONSENT_BODY}
         </Text>
-        <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
-          {CONSENT_MORE}
-        </Text>
-        <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
-        <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
+        <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
+          <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+            {CONSENT_MORE}
+          </Text>
+        </View>
+        <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
+          <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
+          <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
+        </View>
         <Text v="c1" color="t3" style={{ textAlign: 'center' }}>
           {CONSENT_FOOT}
         </Text>
@@ -597,9 +600,15 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={ios ? 'padding' : undefined}>
         {header}
         {phase.kind === 'limit' ? (
-          <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: spacing[4], paddingBottom: insets.bottom + spacing[4], paddingHorizontal: spacing[4] }}>
-            <LimitBody limit={bots.limit} onUpgrade={onUpgrade} onClose={onClose} />
-          </ScrollView>
+          <>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
+              <LimitBody limit={bots.limit} />
+            </ScrollView>
+            <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
+              <Button label={UPGRADE_LABEL} onPress={onUpgrade} />
+              <Button label={ORGANIZE_LABEL} variant="secondary" onPress={onClose} />
+            </View>
+          </>
         ) : searching ? (
           searchBody
         ) : (

@@ -4,7 +4,7 @@ import { spacing } from '../../../../theme'
 import { LOADING_LABEL } from './copy'
 import type { HomeChrome } from './metrics'
 
-const ROWS: ReadonlyArray<readonly [number, number?]> = [[96, 210], [120, 180], [80, 230], [110, 160], [90, 200], [130]]
+const ROWS: readonly (readonly [number, number?])[] = [[96, 210], [120, 180], [80, 230], [110, 160], [90, 200], [130]]
 
 const BotHomeLoading = ({ chrome, top }: { chrome: HomeChrome; top: number }) => {
   const wrap = { paddingTop: top }
