@@ -1,20 +1,24 @@
 appId: app.push.mobile
 tags:
   - subflow
-# Enter the 봇 tab and accept the reference-data consent (the mock starts with it off).
+# Enter the 봇 tab, accept the reference-data consent when it is up, then open Push Bot's chat.
 ---
-# The first tab tap after login is sometimes dropped (screen stays on 홈); tap until the consent shows.
 - retry:
     maxRetries: 3
     commands:
       - tapOn: "봇"
       - extendedWaitUntil:
-          visible: "동의하고 시작하기"
+          visible: "(동의하고 시작하기|새 회사 봇 만들기|Push Bot)"
           timeout: 6000
-- tapOn: "동의하고 시작하기"
-- extendedWaitUntil:
-    notVisible: "동의하고 시작하기"
-    timeout: 10000
+- runFlow:
+    when:
+      visible: "동의하고 시작하기"
+    commands:
+      - tapOn: "동의하고 시작하기"
+      - extendedWaitUntil:
+          notVisible: "동의하고 시작하기"
+          timeout: 10000
+- openLink: push://bots/push
 - extendedWaitUntil:
     visible: "공고 링크로 맞추기"
     timeout: 10000

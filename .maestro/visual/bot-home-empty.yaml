@@ -1,0 +1,20 @@
+appId: app.push.mobile
+name: BotHomeEmpty
+tags:
+  - visual
+---
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bots:none"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "봇"
+      READY: "회사 봇을 만들면 여기에 모여요"
+- extendedWaitUntil:
+    visible: "봇 만들기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: BotHomeEmpty

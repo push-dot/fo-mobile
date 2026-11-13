@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
+import { botHomePath } from '@/features/bots'
 import { deleteDocCopy, deleteWithUndo, usePendingDelete } from '@/features/my'
 import { Button, GlassButton, Icon, Menu, Text, askConfirm } from '@/shared/components'
 import { spacing } from '../../../theme'
@@ -35,7 +36,7 @@ export const DocsModal = () => {
           </Text>
           <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
             <Button label="파일 등록" size="pill" variant="secondary" onPress={() => upload.mutate()} />
-            <Button label="봇으로 만들기" size="pill" variant="secondary" onPress={() => leave(() => router.dismissTo('/chat'))} />
+            <Button label="봇으로 만들기" size="pill" variant="secondary" onPress={() => leave(() => router.dismissTo(botHomePath))} />
           </View>
         </PageEmpty>
       ) : null}

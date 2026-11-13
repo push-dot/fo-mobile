@@ -11,7 +11,7 @@ describe('notificationHref', () => {
     expect(notificationHref({ target: { kind: 'posting', id: 'p1' } })).toBe('/postings/p1')
     expect(notificationHref({ target: { kind: 'offer', id: 'o1' } })).toBe('/offers/o1')
     expect(notificationHref({ target: { kind: 'post', id: 'po1' } })).toBe('/posts/po1')
-    expect(notificationHref({ target: { kind: 'conversation', id: 'c1' } })).toBe('/(app)/(stack)/(tabs)/(chat)/chat')
+    expect(notificationHref({ target: { kind: 'conversation', id: 'c1' } })).toBe('/(app)/(stack)/(tabs)/(bots)/bots')
   })
 
   it('opens my activity for calendar reminders and application stages', () => {

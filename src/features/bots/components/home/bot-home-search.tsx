@@ -1,0 +1,120 @@
+import { Pressable, ScrollView, View } from 'react-native'
+import { Mascot, Text } from '@/shared/components'
+import { spacing, type } from '../../../../theme'
+import type { Bot, BotSearch, LocalActivity } from '../../types'
+import { botRow } from '../../utils/live-state'
+import { rowTime } from '../../utils/row-time'
+import { searchSections } from '../../utils/home-rows'
+import { LIST_BOTTOM, SEARCH_EMPTY, SEARCH_HINT } from './copy'
+import BotHomeRow from './bot-home-row'
+import Highlight from './highlight'
+import type { HomeChrome } from './metrics'
+
+const BotHomeSearch = ({
+  query,
+  data,
+  pending,
+  local,
+  now,
+  chrome,
+  top,
+  onOpenBot,
+  onOpenMessage,
+}: {
+  query: string
+  data: BotSearch | undefined
+  pending: boolean
+  local: Readonly<Record<string, LocalActivity | undefined>>
+  now: Date
+  chrome: HomeChrome
+  top: number
+  onOpenBot: (bot: Bot) => void
+  onOpenMessage: (botId: string, messageId: string) => void
+}) => {
+  const trimmed = query.trim()
+  const hint = trimmed === ''
+  const empty = !hint && !pending && !!data && data.bots.length === 0 && data.messages.length === 0
+  const titles = data && !hint ? searchSections(data.bots.length > 0 ? data.botTotal : 0, data.messages.length > 0 ? data.messageTotal : 0) : []
+  const botTitle = titles.find((title) => title.startsWith('봇'))
+  const messageTitle = titles.find((title) => title.startsWith('대화'))
+  const pad = {
+    paddingTop: top,
+    paddingBottom: LIST_BOTTOM,
+    flexGrow: hint || empty ? 1 : 0,
+    justifyContent: hint || empty ? ('center' as const) : ('flex-start' as const),
+  }
+  const center = { textAlign: 'center' as const, fontSize: type.b1.fontSize, lineHeight: type.b1.lineHeight, paddingHorizontal: 32 }
+  const sect = { fontSize: chrome.sectSize, lineHeight: chrome.sectLine, paddingTop: 6, paddingBottom: spacing[1], paddingHorizontal: spacing[5] }
+  const hit = {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: chrome.rowGap,
+    paddingVertical: chrome.rowPadV,
+    paddingHorizontal: chrome.rowPadH,
+    minHeight: 76,
+  }
+  const body = { flex: 1, minWidth: 0, gap: 2 }
+  const topRow = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2] }
+  const name = { flex: 1, fontSize: chrome.nameSize, lineHeight: chrome.nameLine }
+  const time = { fontSize: chrome.timeSize, lineHeight: chrome.timeLine }
+  const line = { fontSize: chrome.msgSize, lineHeight: chrome.msgLine }
+  return (
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={pad}>
+      {hint ? (
+        <Text color="t3" style={center}>
+          {SEARCH_HINT}
+        </Text>
+      ) : null}
+      {empty ? (
+        <Text color="t3" style={center}>
+          {SEARCH_EMPTY}
+        </Text>
+      ) : null}
+      {botTitle ? (
+        <Text weight="700" color="t3" style={sect}>
+          {botTitle}
+        </Text>
+      ) : null}
+      {data && !hint
+        ? data.bots.map(({ bot, line: match }) => {
+            const row = botRow(bot, local[bot.id], now)
+            const shown = match ? { ...row, line: match } : row
+            return <BotHomeRow key={bot.id} row={shown} chrome={chrome} index={0} held={false} query={trimmed} actions={[]} onPress={() => onOpenBot(bot)} />
+          })
+        : null}
+      {messageTitle ? (
+        <Text weight="700" color="t3" style={sect}>
+          {messageTitle}
+        </Text>
+      ) : null}
+      {data && !hint
+        ? data.messages.map((message) => {
+            const when = rowTime(message.at, now)
+            const label = `${message.bot.name} 봇, ${message.snippet}, ${when}`
+            return (
+              <Pressable key={message.messageId} accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
+                <View style={hit}>
+                  <Mascot size={chrome.rowMascot} state="idle" color={message.bot.color ?? 'push'} motion={{ mode: 'still' }} />
+                  <View style={body}>
+                    <View style={topRow}>
+                      <Text weight="700" numberOfLines={chrome.nameLines} style={name}>
+                        <Highlight text={message.bot.name} q={trimmed} />
+                      </Text>
+                      <Text color="t3" style={time}>
+                        {when}
+                      </Text>
+                    </View>
+                    <Text color="t3" numberOfLines={chrome.msgLines} style={line}>
+                      <Highlight text={message.snippet} q={trimmed} />
+                    </Text>
+                  </View>
+                </View>
+              </Pressable>
+            )
+          })
+        : null}
+    </ScrollView>
+  )
+}
+
+export default BotHomeSearch

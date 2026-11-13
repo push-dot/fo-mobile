@@ -3,8 +3,7 @@ import type { Attachment, AttachmentKind, BotAddress, BotId } from '../types'
 // The only place bot and material route strings are written. Every builder returns a literal type on every
 // branch, so typed routes check each one: a bare template string widens to `string` and stops compiling.
 
-/** The bot tab's root. The tab still lives in its `(chat)` group until the bot home replaces it. */
-export const botHomePath = '/(app)/(stack)/(tabs)/(chat)/chat' as const
+export const botHomePath = '/(app)/(stack)/(tabs)/(bots)/bots' as const
 export const botChatPath = (bot: BotAddress) => `/bots/${bot}` as const
 /** Opens the chat at one message (a search hit). */
 export const botChatAtPath = (id: BotId, messageId: string) => `/bots/${id}?at=${messageId}` as const

@@ -1,5 +1,6 @@
 import { LIVE_POLL_MS, MASCOT_LABEL } from '../constants'
 import type { Bot, BotActivity, BotRow, LocalActivity, MascotState } from '../types'
+import { homeRowLabel } from './home-rows'
 import { rowTime } from './row-time'
 
 type Facts = { activity: BotActivity; unread: boolean }
@@ -41,15 +42,17 @@ const lineOf = (activity: BotActivity, bot: Bot): string => {
 export const botRow = (bot: Bot, local: LocalActivity | undefined, now: Date): BotRow => {
   const facts = mergeFacts(bot, local, now)
   const mascot = mascotStateOf(facts)
+  const line = lineOf(facts.activity, bot)
+  const time = rowTime(bot.lastActivityAt, now)
   return {
     id: bot.id,
     name: bot.name,
     color: bot.kind === 'push' ? 'push' : bot.color,
     mascot,
     unreadDot: mascot === 'done',
-    line: lineOf(facts.activity, bot),
-    time: rowTime(bot.lastActivityAt, now),
-    accessibilityLabel: `${bot.name}, ${MASCOT_LABEL[mascot]}`,
+    line,
+    time,
+    accessibilityLabel: bot.kind === 'push' ? `${bot.name}, ${MASCOT_LABEL[mascot]}` : homeRowLabel({ name: bot.name, mascot, line, time }),
   }
 }
 
