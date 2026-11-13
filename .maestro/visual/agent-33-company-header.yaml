@@ -1,0 +1,33 @@
+appId: app.push.mobile
+name: 회사 봇 · 채팅 헤더 (기본 · … 메뉴 · 채팅에서 찾기)
+tags:
+  - visual
+---
+# bot:b-moa:thread stores the finished 모아페이 chat with its 출처 row and no open card, so the header sits over a full thread.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:thread"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: ".*경력 섹션 3줄을 고쳤어요.*"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeader
+- tapOn: "더 보기"
+- extendedWaitUntil:
+    visible: "프로필 보기"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeaderMenu
+- tapOn: "채팅에서 찾기"
+- waitForAnimationToEnd
+# The find field takes the focus when the bar opens; a tap makes sure it does (the menu item is gone by now).
+- tapOn: "채팅에서 찾기"
+- inputText: "PDF"
+- extendedWaitUntil:
+    visible: ".*[0-9]/[0-9].*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeaderFind

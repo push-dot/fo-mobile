@@ -307,18 +307,6 @@ export const nextId = (prefix: string) => `${prefix}-${++seq}`
 export const setBots = (set: 'home' | 'none' | 'long' | 'outcome') => {
   fixtures = set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
 }
-/** `push:fresh`: the Push Bot has no history, so its chat opens on the onboarding chips as the board draws it. */
-export const freshPushBot = () => {
-  const f = fixtureOf('push')
-  if (f) {
-    f.messages = []
-    f.readAt = null
-  }
-}
-/** `card:none`: no bot waits on an answer, so every chat shows its composer (the 자료 보내기 boards draw the attached file in it). */
-export const clearCards = () => {
-  for (const f of fixtures) f.cards = []
-}
 export const setBotPlan = (next: Plan) => {
   plan = next
 }
@@ -337,6 +325,39 @@ export const expireCard = () => {
       options: [{ id: 'approve', label: '한 번 허용' }, { id: 'approve_always', label: '항상 허용', desc: '이 봇이 이 사이트를 읽을 때 다시 묻지 않아요' }, { id: 'reject', label: '거절' }],
     },
   ]
+}
+/** `bot:<id>:empty`: a bot that has not said a word, so its chat opens on the greeting (ChatBotOnboard, ChatConsentCompany). Clear chat does the same. */
+export const emptyBot = (id: string) => {
+  const f = fixtureOf(id)
+  if (f) Object.assign(f, { messages: [], cards: [], job: null })
+}
+const DESIGN_ASK = '모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요'
+const DESIGN_SOURCES: BotContract.Attachment[] = [
+  { kind: 'posting', id: 'p1', title: '모아페이 채용 공고' },
+  { kind: 'document', id: 'd1', title: '김서준_백엔드_이력서.pdf' },
+]
+/**
+ * `bot:<id>:thread` is ChatBotHeader's finished chat, `bot:<id>:done` the single request of ChatBotStatusDone. Only a stored turn
+ * draws the 출처 row under an answer, so a tour cannot send its way here. No open card, so the composer is there.
+ */
+export const seedThread = (id: string, set: 'thread' | 'done') => {
+  const f = fixtureOf(id)
+  if (!f) return
+  const said = (turn: string, role: MockMessage['role'], text: string, at: number, sources?: BotContract.Attachment[]): MockMessage => ({
+    id: `m-${turn}-${role}`, turn, role, text, at, ...(sources ? { sources } : {}),
+  })
+  const answer = said('t-ask', 'ASSISTANT', '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.', 8, DESIGN_SOURCES)
+  const first = [
+    said('t-req', 'ASSISTANT', '모아페이 백엔드 엔지니어 공고 요건을 정리했어요. 필수 5개 중 4개는 이력서에 이미 드러나 있고, **대용량 트래픽 처리 경험**만 근거가 약해요.', 14),
+    said('t-ask', 'USER', '좋아요. 첫 번째부터 고쳐서 PDF로 보여 주세요', 10),
+    answer,
+  ]
+  Object.assign(f, {
+    messages: set === 'thread' ? first : [said('t-ask', 'USER', DESIGN_ASK, 10), answer],
+    cards: [],
+    job: null,
+    readAt: 0,
+  })
 }
 export const resetBots = () => {
   setBots('home')
@@ -543,7 +564,7 @@ mock('POST', 'bots/:id/read', ({ params }) => {
 mock('DELETE', 'bots/:id/transcript', ({ params }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
-  Object.assign(f, { messages: [], cards: [], job: null })
+  emptyBot(params.id!)
   return undefined
 })
 
