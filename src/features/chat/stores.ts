@@ -8,7 +8,7 @@ import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
@@ -329,7 +329,7 @@ const startRun = async (input: Outgoing) => {
         void startRun({ conversationId: id, follow: true, after: seen.seq, piece: input.piece, reattach: true })
         return
       }
-      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: errorText() })
+      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: errorText(), reason: DISCONNECT_REASON })
       return
     }
     const retryAfter = err instanceof QueueBusyError ? err.retryAfterSec : apiError.details?.retryAfterSec

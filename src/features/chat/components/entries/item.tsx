@@ -672,6 +672,8 @@ const ItemComponent = ({
       // The credit banner above the composer says it; the refused turn leaves no line of its own.
       return isUsageExhausted(item.code) ? null : item.code === 'PLAN_REQUIRED' ? (
         <PlanRequired />
+      ) : item.reason ? (
+        <Notice notice={{ kind: 'error', code: item.code, reason: item.reason }} />
       ) : (
         <ErrorLine text={item.text} />
       )

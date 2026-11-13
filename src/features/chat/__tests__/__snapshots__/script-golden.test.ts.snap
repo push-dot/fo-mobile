@@ -5866,6 +5866,15 @@ card null
 "
 `;
 
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token err-disconnect 1`] = `
+"
+{"text":"err-disconnect","type":"user"}
+{"code":"DISCONNECTED","reason":"연결 끊김","text":"작업을 이어가지 못했어요. 다시 보내 주세요.","type":"error"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token err-other 1`] = `
 "
 {"text":"err-other","type":"user"}

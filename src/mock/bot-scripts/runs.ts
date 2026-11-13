@@ -586,6 +586,8 @@ const statusApprove: Step[] = [
 // Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
 export const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('NOT_CONFIGURED'),
+  // ChatBotStatusError: the run broke with a reason the app has no sentence for, so the status line carries it.
+  'err-disconnect': fail('DISCONNECTED', { reason: '연결 끊김' }),
   'err-credit': fail('INSUFFICIENT_CREDITS'),
   'err-other': [s(300, agent('좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('UNKNOWN')],
   'ext-done': ext({}),

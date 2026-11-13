@@ -21,6 +21,10 @@ import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
 
+/** A code with no sentence of its own, sent with a reason, is drawn as the status line's 작업 중 문제가 생겼어요 · {reason}. */
+export const errorReason = (code: string | undefined, reason: unknown) =>
+  code !== 'QUEUE_BUSY' && !(code && ERROR_TEXT[code]) && typeof reason === 'string' && reason ? reason : undefined
+
 export const errorText = (code?: string, retryAfterSec?: number, reason?: unknown) =>
   code === 'QUEUE_BUSY' ? queueBusyMessage(retryAfterSec, reason) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
@@ -203,7 +207,8 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       const details = detailRecord(ev.error.details)
       const retry = details?.retryAfterSec
       const sec = typeof retry === 'number' ? retry : undefined
-      return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code, sec, details?.reason), code: ev.error.code }]
+      const reason = errorReason(ev.error.code, details?.reason)
+      return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code, sec, details?.reason), code: ev.error.code, ...(reason ? { reason } : {}) }]
     }
     case 'cancelled':
       return [{ type: 'stop', resumable: (ev as { resumable?: boolean }).resumable === true, ...(turn ? { turn } : {}) }]
