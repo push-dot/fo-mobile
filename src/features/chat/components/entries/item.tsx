@@ -1,100 +1,28 @@
 import { memo, useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../theme'
+import BotText from './bot'
+import { Dot } from './glyph'
+import Rich from './rich'
+import UserBubble, { useBubbleMax } from './user'
+import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
 import { Badge, Button, GlassButton, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
-import { useChatAccount, useOpenArtifact, useShareFile } from '../api/hooks'
-import { usePop, usePulse } from '../hooks'
-import { isUsageExhausted, planRequired } from '../utils/usage'
-import { formatElapsed } from '../utils/reducer'
-import { isVerdictPlan } from '../utils/stream-v3'
-import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../utils/result-card'
-import { LOCKED_KEYWORDS, fitChrome } from '../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../constants'
-import { Appear } from './motion'
-import Mark from './mark'
-import { UsageExhausted } from './usage-exhausted'
-import type { ChatItem, ToolState } from '../types'
+import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
+import { usePop, usePulse } from '../../hooks'
+import { isUsageExhausted, planRequired } from '../../utils/usage'
+import { isVerdictPlan } from '../../utils/stream-v3'
+import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultChrome, resultMeta, resultTitle, type ResultActionId } from '../../utils/result-card'
+import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
+import { FIT_LOCKED, FIT_LOCKED_CLOSED, FIT_LOCKED_PCT, STALE_GATE, fitProjected } from '../../constants'
+import { Appear } from '../motion'
+import Mark from '../mark'
+import { UsageExhausted } from '../usage-exhausted'
+import type { ChatItem, ToolState } from '../../types'
 
 
 type Of<K extends ChatItem['type']> = Extract<ChatItem, { type: K }>
-
-/** Renders **bold** spans inside a Text. */
-export const Rich = ({ text, ...rest }: { text: string } & React.ComponentProps<typeof Text>) => {
-  const parts = text.split(/\*\*(.+?)\*\*/g)
-  return (
-    <Text {...rest}>
-      {parts.map((p, i) =>
-        i % 2 ? (
-          <Text key={i} {...rest} weight="700">
-            {p}
-          </Text>
-        ) : (
-          p
-        ),
-      )}
-    </Text>
-  )
-}
-
-const Dot = ({ color, size = 8, top = 8 }: { color: string; size?: number; top?: number }) => (
-  <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, marginTop: top }} />
-)
-
-// The design's max-width: 82% sizes the content box, so the bubble's padding and border come on top of it.
-const useBubbleMax = (chrome: number) => (useWindowDimensions().width - spacing[5] * 2) * 0.82 + chrome
-
-const UserBubble = ({ item }: { item: Of<'user'> }) => {
-  const c = useColors()
-  const maxWidth = useBubbleMax(30)
-  return (
-    <Appear kind="bubble" style={{ alignSelf: 'flex-end', maxWidth }}>
-      <View style={{ paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomRightRadius: radius.xs, backgroundColor: c.fill }}>
-        <Text v="b1" style={{ lineHeight: 23 }}>
-          {item.text}
-        </Text>
-        {item.attachment ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: spacing[2], paddingVertical: spacing[2], paddingHorizontal: 10, borderRadius: radius.sm, backgroundColor: c.bg }}>
-            <Icon name="paper" size={16} color="t2" />
-            <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
-              {item.attachment}
-            </Text>
-          </View>
-        ) : null}
-      </View>
-    </Appear>
-  )
-}
-
-const AUTO_PICK = /^자동으로 골랐어요/
-
-const AgentText = ({ item }: { item: Of<'agentText'> }) => {
-  const c = useColors()
-  if (AUTO_PICK.test(item.text))
-    return (
-      <Appear style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-        <Glyph still size={14} color={c.acText} />
-        <Text v="c1" color="t3">
-          {item.text}
-        </Text>
-      </Appear>
-    )
-  return (
-    <Appear style={{ flexDirection: 'row', gap: 10 }}>
-      <Dot color={c.ac} />
-      <View style={{ flex: 1, gap: 6 }}>
-        <Rich v="b1" text={item.text} />
-        {item.bullets?.length ? (
-          <Text v="b2" color="t2">
-            {item.bullets.map((b) => `• ${b}`).join('\n')}
-          </Text>
-        ) : null}
-      </View>
-    </Appear>
-  )
-}
 
 const dotColor = (c: Colors, s: ToolState) => ({ run: c.t3, ok: c.green, err: c.red, wait: c.orange })[s]
 
@@ -527,7 +455,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
           </>
         ) : null}
       </Appear>
-      {view.summary ? <AgentText item={{ type: 'agentText', id: `${item.id}-summary`, text: view.summary }} /> : null}
+      {view.summary ? <BotText item={{ type: 'agentText', id: `${item.id}-summary`, text: view.summary }} /> : null}
       {view.teaser ? (
         <Pressable
           accessibilityRole="button"
@@ -679,24 +607,6 @@ const Paper = ({ item }: { item: Of<'paper'> }) => {
   )
 }
 
-export const Glyph = ({ still, size = 17, color }: { still?: boolean; size?: number; color?: string }) => {
-  const c = useColors()
-  const reduce = useReduceMotion()
-  const frames = ['·', '✢', '✳', '✶', '✻', '✽']
-  const [i, setI] = useState(4)
-  useEffect(() => {
-    if (still || reduce) return
-    // 6 frames per 1.1s, stepped.
-    const t = setInterval(() => setI((n) => (n + 1) % frames.length), 1100 / frames.length)
-    return () => clearInterval(t)
-  }, [still, reduce, frames.length])
-  return (
-    <Text style={{ width: size + 1, textAlign: 'center', fontSize: size, lineHeight: 20, color: color ?? c.ac }} accessibilityElementsHidden>
-      {frames[still || reduce ? 4 : i]}
-    </Text>
-  )
-}
-
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
 const ItemComponent = ({
   item,
@@ -715,23 +625,14 @@ const ItemComponent = ({
   resultPending?: boolean
   resultAwaiting?: boolean
 }) => {
-  const c = useColors()
   switch (item.type) {
     case 'user':
       return <UserBubble item={item} />
     case 'agentText':
-      return <AgentText item={item} />
+      return <BotText item={item} />
     case 'think':
-      return (
-        <Appear style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Icon name="down" size={14} color="t3" />
-          <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
-            생각함 · {item.seconds}초
-          </Text>
-        </Appear>
-      )
     case 'tool':
-      return <ToolLine item={item} />
+      return null
     case 'todo':
       return <TodoList item={item} />
     case 'stale':
@@ -758,14 +659,7 @@ const ItemComponent = ({
         />
       )
     case 'worked':
-      return (
-        <Appear kind="fade" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-          <Glyph still size={14} color={c.t3} />
-          <Text v="c1" color="t3">
-            {formatElapsed(item.seconds)} 동안 작업했어요
-          </Text>
-        </Appear>
-      )
+      return null
     case 'error':
       return isUsageExhausted(item.code) && onUsage ? (
         <UsageExhausted onPlan={() => onUsage('plan')} onCredits={() => onUsage('credits')} />
@@ -812,3 +706,6 @@ export const Queued = ({ text }: { text: string }) => {
     </Appear>
   )
 }
+
+export { default as Rich } from './rich'
+export { default as Glyph } from './glyph'
