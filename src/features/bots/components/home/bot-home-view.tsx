@@ -83,7 +83,7 @@ const BotHomeView = ({
   }, [])
 
   const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
-  const openMaterials = () => router.push(push ? materialsPath(push.id) : materialsPath())
+  const openMaterials = () => router.push(materialsPath())
 
   const run = (key: HomeMenuKey, bot: CompanyBot) => {
     if (key === 'profile') router.push(botProfilePath(bot.id))
