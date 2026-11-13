@@ -17,13 +17,13 @@ export const botErrorCopy = (e: unknown): { title: string; body: string } => {
     const plan = e.details?.plan != null ? String(e.details.plan) : ''
     if (Number.isInteger(limit) && plan) {
       return {
-        title: '봇을 더 만들 수 없어요',
-        body: `${plan}에서는 회사 봇을 ${limit}개까지 만들 수 있어요.`,
+        title: 'Bot을 더 만들 수 없어요',
+        body: `${plan}에서는 회사 Bot을 ${limit}개까지 만들 수 있어요.`,
       }
     }
     return {
-      title: '봇을 더 만들 수 없어요',
-      body: '플랜에서 만들 수 있는 회사 봇 수에 도달했어요.',
+      title: 'Bot을 더 만들 수 없어요',
+      body: '플랜에서 만들 수 있는 회사 Bot 수에 도달했어요.',
     }
   }
   if (kind === 'protected') {

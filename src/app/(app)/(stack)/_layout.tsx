@@ -44,6 +44,7 @@ const SignedInStack = () => {
       <Stack.Screen name="material-picker" options={sheetOptions(c)} />
       <Stack.Screen name="bots/[botId]/index" />
       <Stack.Screen name="bots/[botId]/profile" />
+      <Stack.Screen name="bots/[botId]/companies" />
       <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
       <Stack.Screen name="bots/new" options={{ presentation: 'modal' }} />
       <Stack.Screen name="bots/pick" options={sheetOptions(c)} />

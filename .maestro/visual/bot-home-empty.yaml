@@ -12,9 +12,9 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "봇"
-      READY: "회사 봇을 만들면 여기에 모여요"
+      READY: "Push Bot"
 - extendedWaitUntil:
-    visible: "봇 만들기"
+    visible: "Push Bot"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotHomeEmpty

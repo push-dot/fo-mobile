@@ -12,7 +12,7 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      READY: "새 회사 Bot 만들기"
 - extendedWaitUntil:
     visible: ".*Push Bot.*"
     timeout: 10000

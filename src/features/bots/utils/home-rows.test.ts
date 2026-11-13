@@ -42,13 +42,13 @@ describe('splitHome', () => {
 describe('homeRowLabel', () => {
   it('speaks the company row the way the board does, including the line and the time', () => {
     expect(homeRowLabel({ name: '모아페이', mascot: 'help', line: '이 변경을 이력서에 반영할까요?', time: '10분 전' })).toBe(
-      '모아페이 봇, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전',
+      '모아페이 Bot, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전',
     )
   })
 
   it('splits 완료 and 안 읽음 into two spoken parts', () => {
     expect(homeRowLabel({ name: '누리클라우드', mascot: 'done', line: '자기소개서 초안 v2를 만들었어요', time: '어제' })).toBe(
-      '누리클라우드 봇, 완료, 안 읽음, 자기소개서 초안 v2를 만들었어요, 어제',
+      '누리클라우드 Bot, 완료, 안 읽음, 자기소개서 초안 v2를 만들었어요, 어제',
     )
   })
 })
@@ -63,7 +63,7 @@ describe('heroLabel', () => {
 describe('companyMenu', () => {
   it('lists the board actions and never offers delete on Push Bot', () => {
     expect(companyMenu('company').map((a) => a.key)).toEqual(['profile', 'find', 'read', 'mute', 'delete'])
-    expect(companyMenu('company').map((a) => a.label)).toEqual(['봇 프로필 보기', '채팅에서 찾기', '읽음으로 표시', '알림 끄기', '삭제'])
+    expect(companyMenu('company').map((a) => a.label)).toEqual(['Bot 프로필 보기', '채팅에서 찾기', '읽음으로 표시', '알림 끄기', '삭제'])
     expect(companyMenu('push')).toEqual([])
   })
 
@@ -91,7 +91,7 @@ describe('rowMotion', () => {
 
 describe('searchSections', () => {
   it('names a section only when that side has hits', () => {
-    expect(searchSections(1, 2)).toEqual(['봇 1', '대화 2'])
+    expect(searchSections(1, 2)).toEqual(['Bot 1', '대화 2'])
     expect(searchSections(0, 0)).toEqual([])
   })
 })

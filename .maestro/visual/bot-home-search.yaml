@@ -12,10 +12,10 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "봇"
-      READY: "새 회사 봇 만들기"
+      READY: "새 회사 Bot 만들기"
 - tapOn: "검색"
 - extendedWaitUntil:
-    visible: "봇 이름이나 대화 내용으로 찾아보세요"
+    visible: "Bot 이름이나 대화 내용으로 찾아보세요"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotHomeSearch

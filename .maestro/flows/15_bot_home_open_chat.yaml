@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 봇 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준다
+name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준다
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
@@ -7,16 +7,16 @@ name: 봇 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
     file: _tap_tab.yaml
     env:
       TAB: "봇"
-      READY: "(동의하고 시작하기|새 회사 봇 만들기)"
+      READY: "(동의하고 시작하기|새 회사 Bot 만들기)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"
     commands:
       - tapOn: "동의하고 시작하기"
 - extendedWaitUntil:
-    visible: ".*모아페이 봇.*"
+    visible: ".*모아페이 Bot.*"
     timeout: 10000
-- tapOn: ".*모아페이 봇.*"
+- tapOn: ".*모아페이 Bot.*"
 - extendedWaitUntil:
     visible: "메시지.*"
     timeout: 15000

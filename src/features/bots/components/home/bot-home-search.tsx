@@ -35,7 +35,7 @@ const BotHomeSearch = ({
   const hint = trimmed === ''
   const empty = !hint && !pending && !!data && data.bots.length === 0 && data.messages.length === 0
   const titles = data && !hint ? searchSections(data.bots.length > 0 ? data.botTotal : 0, data.messages.length > 0 ? data.messageTotal : 0) : []
-  const botTitle = titles.find((title) => title.startsWith('봇'))
+  const botTitle = titles.find((title) => title.startsWith('Bot'))
   const messageTitle = titles.find((title) => title.startsWith('대화'))
   const pad = {
     paddingTop: top,
@@ -90,7 +90,7 @@ const BotHomeSearch = ({
       {data && !hint
         ? data.messages.map((message) => {
             const when = rowTime(message.at, now)
-            const label = `${message.bot.name} 봇, ${message.snippet}, ${when}`
+            const label = `${message.bot.name} Bot, ${message.snippet}, ${when}`
             return (
               <Pressable key={message.messageId} accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
                 <View style={hit}>

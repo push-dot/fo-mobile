@@ -124,7 +124,7 @@ describe('botRow', () => {
   it('draws the Push Bot body and says the state that has no visible label', () => {
     const push: Bot = { ...bot({ unread: true }), kind: 'push', name: 'Push Bot' }
     expect(botRow(push, undefined, now)).toMatchObject({ color: 'push', accessibilityLabel: 'Push Bot, 완료 안 읽음' })
-    expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now).accessibilityLabel).toBe('모아페이 봇, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전')
+    expect(botRow(bot({ activity: ACTIVITY.waiting }), undefined, now).accessibilityLabel).toBe('모아페이 Bot, 확인 필요, 이 변경을 이력서에 반영할까요?, 10분 전')
   })
 
   it('follows this session over the list: a stream in progress and a chat open at its bottom', () => {
@@ -140,7 +140,7 @@ describe('botRow outcome (AgentHomeRowExpiredFailed)', () => {
     expect(botRow(ended('expired'), undefined, now)).toMatchObject({
       mascot: 'idle',
       line: '승인 요청이 만료됐어요',
-      accessibilityLabel: '모아페이 봇, 승인 요청이 만료됐어요, 10분 전',
+      accessibilityLabel: '모아페이 Bot, 승인 요청이 만료됐어요, 10분 전',
     })
   })
 
@@ -148,7 +148,7 @@ describe('botRow outcome (AgentHomeRowExpiredFailed)', () => {
     expect(botRow(ended('failed'), undefined, now)).toMatchObject({
       mascot: 'help',
       line: '작업을 끝내지 못했어요. 다시 시도해 주세요.',
-      accessibilityLabel: '모아페이 봇, 확인 필요, 작업을 끝내지 못했어요. 다시 시도해 주세요., 10분 전',
+      accessibilityLabel: '모아페이 Bot, 확인 필요, 작업을 끝내지 못했어요. 다시 시도해 주세요., 10분 전',
     })
   })
 
