@@ -18,7 +18,7 @@ describe('creditBanner', () => {
   const refillAt = new Date(2026, 11, 1)
 
   it('says nothing before the account loads', () => {
-    expect(creditBanner({ plan: undefined, refillAt, paymentsEnabled: true })).toBeNull()
+    expect(creditBanner({ plan: undefined, refillAt, paymentsEnabled: true })).toEqual({ lines: ['이번 달 사용량을 모두 썼어요.'], action: null })
   })
 
   it('tells FREE and PRO when the allowance returns and offers the plan page', () => {
@@ -53,8 +53,20 @@ describe('unseenBotMessages', () => {
   ]
 
   it('counts only bot lines after the last time the reader was at the bottom', () => {
-    expect(unseenBotMessages(items, 4)).toBe(0)
-    expect(unseenBotMessages(items, 2)).toBe(1)
-    expect(unseenBotMessages(items, 0)).toBe(2)
+    expect(unseenBotMessages(items, 'a2')).toBe(0)
+    expect(unseenBotMessages(items, 'a1')).toBe(1)
+    expect(unseenBotMessages(items, undefined)).toBe(2)
+  })
+
+  it('does not count older turns paged in at the front', () => {
+    const older: ChatItem[] = [
+      { type: 'user', id: 'u0', text: '전에' },
+      { type: 'agentText', id: 'a0', text: '그때' },
+    ]
+    expect(unseenBotMessages([...older, ...items], 'a2')).toBe(0)
+  })
+
+  it('counts nothing when the seen line is gone', () => {
+    expect(unseenBotMessages(items, 'gone')).toBe(0)
   })
 })
