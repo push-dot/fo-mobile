@@ -1,4 +1,9 @@
-// Scaffold: the route is registered and not linked from any screen yet. The PR that owns this screen replaces the body.
-const AccountScreen = () => null
+import { useLocalSearchParams } from 'expo-router'
+import { AccountModal } from '@/features/chat'
+
+const AccountScreen = () => {
+  const { page } = useLocalSearchParams<{ page?: 'plan' }>()
+  return <AccountModal initialPage={page === 'plan' ? 'plan' : 'account'} />
+}
 
 export default AccountScreen
