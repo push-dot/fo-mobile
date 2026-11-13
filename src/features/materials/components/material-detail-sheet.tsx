@@ -81,7 +81,7 @@ export const MaterialDetailSheet = ({ kind, id, forBot }: { kind: MaterialKind; 
     <>
       <Sheet gap={14}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <GlassButton actions={[{ icon: 'delete', label: DELETE_LABEL, color: 'red', onPress: () => setConfirm('asking') }]} />
+          <GlassButton iconSize={21} actions={[{ icon: 'delete', label: DELETE_LABEL, color: 'red', onPress: () => setConfirm('asking') }]} />
         </View>
         <Text v="h3" accessibilityRole="header">
           {detailTitle(m)}

@@ -160,7 +160,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: ios ? 14 : sheetHeaderTop(Platform.OS, true, insets.top, HEADER_ROW), paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
+        <GlassButton iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {MATERIALS_TITLE}
         </Text>
