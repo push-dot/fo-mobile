@@ -34,3 +34,10 @@ describe('Text tracking', () => {
     expect(tracking({ v: 'b2', style: { fontSize: 22, letterSpacing: 1 } })).toBe(1)
   })
 })
+
+describe('Text Korean line breaks', () => {
+  it('keeps words whole on iOS (rule 5), and lets a caller override', () => {
+    expect(Text({})!.props.lineBreakStrategyIOS).toBe('hangul-word')
+    expect(Text({ lineBreakStrategyIOS: 'none' })!.props.lineBreakStrategyIOS).toBe('none')
+  })
+})
