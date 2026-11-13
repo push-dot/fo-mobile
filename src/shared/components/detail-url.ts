@@ -1,8 +1,19 @@
-/** WebView query: theme always, mock only when the mock API is on. No other params. */
-export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', mock: boolean) => {
+/** Which list opened the page: the same fo-web route draws a different board for each. */
+export type DetailFrom = 'following' | 'bookmark'
+
+const FROMS: readonly string[] = ['following', 'bookmark']
+
+export const detailFrom = (value: string | string[] | undefined): DetailFrom | undefined => {
+  const v = Array.isArray(value) ? value[0] : value
+  return v && FROMS.includes(v) ? (v as DetailFrom) : undefined
+}
+
+/** WebView query: theme always, mock only when the mock API is on, from only when a list opened the page. */
+export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', mock: boolean, from?: DetailFrom) => {
   const query = new URLSearchParams()
   query.set('theme', theme)
   if (mock) query.set('mock', '1')
+  if (from) query.set('from', from)
   return `${base}${path}?${query.toString()}`
 }
 
