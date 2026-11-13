@@ -126,6 +126,7 @@ export const MaterialDetailSheet = ({
     <Sheet gap={14}>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <GlassButton
+          circle
           iconSize={21}
           actions={[
             {

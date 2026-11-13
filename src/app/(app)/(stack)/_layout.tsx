@@ -2,7 +2,7 @@ import { Stack } from 'expo-router'
 import { View } from 'react-native'
 import { ConsentPromptListener } from '@/features/chat'
 import { FULL_SHEET_KIND } from '@/features/jobs'
-import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
+import { fullSheetOptions, modalOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
@@ -45,12 +45,12 @@ const SignedInStack = () => {
       <Stack.Screen name="bots/[botId]/profile" />
       <Stack.Screen name="bots/[botId]/companies" />
       <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
-      <Stack.Screen name="bots/new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="bots/new" options={modalOptions(c)} />
       <Stack.Screen name="bots/pick" options={sheetOptions(c)} />
-      <Stack.Screen name="materials/index" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="materials/index" options={modalOptions(c)} />
       <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
       <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
-      <Stack.Screen name="account" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="plan" />
       <Stack.Screen name="plan-notice" />
       <Stack.Screen

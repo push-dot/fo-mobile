@@ -39,11 +39,9 @@ export const stubs = {
     'fixedSize',
   ]),
   compose: {
-    Switch: 'CSwitch',
+    Switch: compound('CSwitch', ['ThumbContent']),
     Text: 'CText',
     Box: 'CBox',
-    SingleChoiceSegmentedButtonRow: 'SegmentedRow',
-    SegmentedButton: compound('SegmentedButton', ['Label']),
     DropdownMenu: compound('DropdownMenu', ['Trigger', 'Items']),
     DropdownMenuItem: compound('DropdownMenuItem', ['Text', 'LeadingIcon', 'TrailingIcon']),
     HorizontalDivider: 'CDivider',

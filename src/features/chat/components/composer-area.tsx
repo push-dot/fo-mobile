@@ -76,8 +76,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         onAttach={() => router.push(botId ? botMaterialPath(botId as BotId) : materialPickerPath())}
         // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
-        // shortcut: no speech dependency; the keyboard's dictation key handles voice for now.
-        onMic={() => ref.current?.focus()}
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}
         accessMode={access.mode}

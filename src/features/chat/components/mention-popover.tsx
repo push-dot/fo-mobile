@@ -3,6 +3,7 @@ import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { radius, spacing, useColors, useShadow, useThemeMode } from '../../../theme'
 import { Chip, Icon, Text, useKeyboardHeight, type IconName } from '@/shared/components'
+import { toBoxShadow } from '@/shared/utility'
 import { useMentionGroups } from '../api/hooks'
 import { MENTION_SHORTCUT_KEYS } from '../constants'
 import { filterMentions, mentionMaxHeight, type MentionItem } from '../utils/mentions'
@@ -24,7 +25,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
   const firstId = query ? groups.find((g) => g.items[0]?.kind !== 'shortcut')?.items[0]?.id : undefined
   return (
     <Appear duration={250} style={{ marginBottom: spacing[2] }}>
-      <View style={[shadow.pop, { borderRadius: ios ? 26 : radius.lg, backgroundColor: ios ? c.bg : c.card, borderWidth: 1, borderColor: c.line, elevation: 8, overflow: 'hidden' }]}>
+      <View style={[ios ? shadow.pop : { boxShadow: toBoxShadow(shadow.pop) }, { borderRadius: ios ? 26 : radius.lg, backgroundColor: ios ? c.bg : c.card, borderWidth: 1, borderColor: c.line, overflow: 'hidden' }]}>
         <ScrollView style={{ maxHeight }} contentContainerStyle={{ padding: spacing[2] }} keyboardShouldPersistTaps="always">
           {groups.length === 0 ? (
             <Text v="b2" color="t3" style={{ padding: 10 }}>

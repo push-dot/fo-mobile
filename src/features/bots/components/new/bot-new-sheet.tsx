@@ -66,6 +66,8 @@ import {
   UPGRADE_LABEL,
   XL_FONT_SCALE,
 } from './copy'
+import { GRABBER } from '@/shared/components/constants'
+import { useHardwareBack } from '@/shared/utility'
 import { loadPosting, searchPostings, type PostingRow } from './posting-search'
 
 type Props = {
@@ -235,7 +237,7 @@ const ConsentOverlay = ({ saving, onAgree, onLater }: { saving: boolean; onAgree
   return (
     <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: c.scrim, justifyContent: 'flex-end' }}>
       <View style={[{ backgroundColor: c.bg, gap: spacing[3] }, card]}>
-        <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: c.deco, alignSelf: 'center' }} />
+        <View style={{ ...(ios ? GRABBER.ios : GRABBER.android), backgroundColor: c.deco, alignSelf: 'center' }} />
         <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {CONSENT_TITLE}
         </Text>
@@ -276,6 +278,8 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   useEffect(() => {
     openRef.current = onOpenBot
   }, [onOpenBot])
+  // The consent overlay is a View, not a Modal: back closes it rather than the whole sheet.
+  useHardwareBack(form.consent ? () => setForm(dismissConsent) : null)
   const phase = form.phase
   const searching = searchPhase(form)
   const posting = postingOf(phase)
@@ -421,7 +425,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       </View>
     )
   const searchIcon = <Icon name="search" size={20} color="t3" />
-  const closeButton = <GlassButton iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
+  const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const section = { paddingTop: 14, paddingBottom: spacing[1], paddingHorizontal: spacing[5], fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }
@@ -433,7 +437,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       {searching ? (
         <View style={{ width: control, height: control }} />
       ) : (
-        <GlassButton iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
+        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
       )}
       <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
         {SHEET_TITLE}
@@ -593,7 +597,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       {/* The modal ends at the screen's bottom, so the keyboard offset is the sheet's top edge; without it the search field stays under the keyboard. */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={ios ? 'padding' : undefined}
+        behavior="padding"
         keyboardVerticalOffset={ios ? window.height - sheetBottom : 0}
         onLayout={(e) => setSheetBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
       >

@@ -1,7 +1,6 @@
 import { router } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
@@ -17,7 +16,6 @@ import { MaterialItem, SectionTitle } from './material-item'
 import { MaterialsTabs } from './materials-tabs'
 import { MaterialsSearch, useSearchRoom } from './materials-search'
 
-const HEADER_ROW = 44
 const ios = Platform.OS === 'ios'
 
 /** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
@@ -81,7 +79,6 @@ const Loading = () => (
  */
 export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const [tab, setTab] = useState<MaterialTab>('all')
   const { text, q, setText } = useSearchQuery()
   const bot = forBot as BotId | undefined
@@ -141,12 +138,12 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: ios ? 14 : sheetHeaderTop(Platform.OS, true, insets.top, HEADER_ROW), paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <GlassButton iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {MATERIALS_TITLE}
         </Text>
-        <GlassButton actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
+        <GlassButton circle actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
       </View>
       <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
         <MaterialsTabs value={tab} onChange={setTab} />

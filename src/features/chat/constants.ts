@@ -113,6 +113,9 @@ export const CHAT_DOC_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ]
 export const CHAT_ATTACHMENT_OPTIONS = { type: CHAT_ATTACHMENT_TYPES, copyToCacheDirectory: true }
+// Android's document picker has no MIME for .md and greys it out, so it also lists any text and untyped file; `isChatAttachment` then filters by extension.
+export const CHAT_ATTACHMENT_OPTIONS_ANDROID = { type: [...CHAT_ATTACHMENT_TYPES, 'text/*', 'application/octet-stream'], copyToCacheDirectory: true }
+export const isChatAttachment = (name: string) => /\.(pdf|docx|txt|md)$/i.test(name)
 export const CHAT_DOC_OPTIONS = { type: CHAT_DOC_TYPES, copyToCacheDirectory: true }
 
 export type QsLayout = 'link' | 'match' | 'pick' | 'deadline' | 'status' | 'calendar' | 'cards' | 'reply'

@@ -4,6 +4,7 @@ import { Platform, View, type ViewProps } from 'react-native'
 import { initialWindowMetrics, SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
+import { GRABBER } from './constants'
 import { SheetSurface } from './glass'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
@@ -27,7 +28,6 @@ type Props = {
   full?: boolean
 }
 
-const GRAB = { width: 36, height: 5, radius: 3 }
 const SHEET_GAP = 14
 const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
@@ -59,14 +59,14 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
       }}
       style={{
         flex: full ? 1 : undefined,
-        paddingTop: android ? spacing[3] : spacing[3] + GRAB.height + gap,
+        paddingTop: android ? spacing[3] : spacing[3] + GRABBER.ios.height + gap,
         paddingHorizontal: android || full ? spacing[5] : spacing[4],
         paddingBottom: android ? insets.bottom + spacing[3] : full ? homeInset + spacing[3] : insets.bottom || (homeInset ? 0 : spacing[5]),
         gap,
       }}
     >
       {android ? (
-        <View style={{ width: GRAB.width, height: GRAB.height, borderRadius: GRAB.radius, backgroundColor: c.deco, alignSelf: 'center' }} />
+        <View style={{ ...GRABBER.android, backgroundColor: c.deco, alignSelf: 'center' }} />
       ) : null}
       {title || close ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>

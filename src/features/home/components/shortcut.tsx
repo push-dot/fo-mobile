@@ -1,9 +1,14 @@
 import { router } from 'expo-router'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg'
 import { Icon3D, Text } from '../../../shared/components'
 import { type, useColors, useShadow } from '../../../theme'
 import { SHORTCUTS } from '../constants'
+
+// Android ignores `shadow*`; the icon is not a rectangle, so it takes a drop shadow of its own pixels rather than a box shadow.
+const androidIconShadow = ({ shadowOpacity, shadowRadius, shadowOffset }: ReturnType<typeof useShadow>['icon']) => ({
+  filter: [{ dropShadow: { offsetX: shadowOffset.width, offsetY: shadowOffset.height, standardDeviation: shadowRadius, color: `rgba(0,0,0,${shadowOpacity})` } }],
+})
 
 const Shortcut = ({ label, icon, glow, opacity, href }: (typeof SHORTCUTS)[number]) => {
   const c = useColors()
@@ -33,7 +38,7 @@ const Shortcut = ({ label, icon, glow, opacity, href }: (typeof SHORTCUTS)[numbe
           right: 6,
           bottom: 4,
           transform: [{ rotate: '-8deg' }],
-          ...shadow.icon,
+          ...(Platform.OS === 'ios' ? shadow.icon : androidIconShadow(shadow.icon)),
         }}
       >
         <Icon3D name={icon} size={52} />

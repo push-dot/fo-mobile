@@ -57,13 +57,13 @@ describe('bot and material routes', () => {
     [botChatPath(id), 'bots/[botId]/index', null],
     [botProfilePath(id), 'bots/[botId]/profile', null],
     [botColorPath(id), 'bots/[botId]/color', '{sheetOptions(c)}'],
-    [botNewPath('p1'), 'bots/new', "{{ presentation: 'modal' }}"],
+    [botNewPath('p1'), 'bots/new', '{modalOptions(c)}'],
     [botPickPath({ kind: 'file', id: 'f1' }), 'bots/pick', '{sheetOptions(c)}'],
-    [materialsPath(id), 'materials/index', "{{ presentation: 'modal' }}"],
+    [materialsPath(id), 'materials/index', '{modalOptions(c)}'],
     [materialDetailPath('posting', 'p1'), 'materials/[kind]/[id]', '{sheetOptions(c)}'],
     [materialLinkAddPath(), 'materials/link-add', '{sheetOptions(c)}'],
     [materialPickerPath(id), 'material-picker', '{sheetOptions(c)}'],
-    [accountPath(), 'account', "{{ presentation: 'modal' }}"],
+    [accountPath(), 'account', '{modalOptions(c)}'],
     [accountPath('plan'), 'plan', null],
   ])('%s opens %s', (_href, route, options) => {
     expect(existsSync(join(STACK, `${route}.tsx`))).toBe(true)
