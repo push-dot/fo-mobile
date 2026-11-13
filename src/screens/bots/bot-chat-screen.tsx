@@ -36,6 +36,7 @@ import {
   useCardState,
   useChat,
   useChatLimit,
+  useDraftStore,
   useFind,
   useUnseen,
   WaitingLine,
@@ -118,7 +119,8 @@ const Thread = ({ id }: { id: string }) => {
   const saying = !!chat.approval && sayingFor === chat.approval.id
   const showPanel = chat.approval && !saying
   const cardIs = useCardState(chat.approval)
-  const placeholder = composerPlaceholder(chat, name)
+  const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
+  const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const lastResultId = chat.items.findLast((i) => i.type === 'result')?.id
   const greeting: ChatItem[] =

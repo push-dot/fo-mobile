@@ -69,6 +69,14 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 봇에게 물어보기')
   })
 
+  it('asks what to do with the attached material, by its kind, over the bot name', () => {
+    const chat = { items: [], working: null }
+    expect(composerPlaceholder(chat, '모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, '모아페이', 'document')).toBe('이 서류로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, '모아페이', 'posting')).toBe('이 공고로 무엇을 할까요?')
+    expect(composerPlaceholder(chat, 'Push Bot', 'link')).toBe('이 링크로 무엇을 할까요?')
+  })
+
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
     expect(planRequired('FREE', true)).toBe('플랜을 올리면 쓸 수 있어요.')
     expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')

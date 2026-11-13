@@ -406,11 +406,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + spacing[3], paddingBottom: insets.bottom + spacing[4], paddingHorizontal: spacing[4], gap: spacing[5] }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {linkWait ? (
-              <View style={{ width: 44 }} />
-            ) : (
-              <GlassButton actions={[{ icon: 'x', label: searching ? SEARCH_CLOSE : CLOSE_LABEL, onPress: searching ? () => setForm(closeSearch) : onClose }]} />
-            )}
+            {searching ? <View style={{ width: 44 }} /> : <GlassButton actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />}
             <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
               {SHEET_TITLE}
             </Text>
@@ -443,37 +439,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                     </Text>
                   </View>
                 </Pressable>
-              ) : null}
-              {linkWait ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                  <View style={{ flex: 1, minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                    <Icon name="link" size={18} color="t3" />
-                    <Text v="b1" numberOfLines={1} style={{ flex: 1, fontSize: xl ? 19 : undefined }}>
-                      {linkLabel(linkUrl ?? '')}
-                    </Text>
-                    <Spinner size={16} color="t3" />
-                  </View>
-                  <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_CLOSE} onPress={() => setForm(closeSearch)} hitSlop={8}>
-                    <Icon name="x" size={18} color="t1" />
-                  </Pressable>
-                </View>
-              ) : null}
-              {searching && !linkWait ? (
-                <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                  <Icon name="search" size={18} color="t3" />
-                  <TextInput
-                    autoFocus
-                    value={fieldValue(form)}
-                    onChangeText={onType}
-                    placeholder={SEARCH_PLACEHOLDER}
-                    placeholderTextColor={c.t4}
-                    accessibilityLabel={SEARCH_PLACEHOLDER}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType="search"
-                    style={[{ flex: 1, color: c.t1, fontSize: xl ? 19 : type.b1.fontSize, paddingVertical: 0 }, fontFor('400')]}
-                  />
-                </View>
               ) : null}
               {!searching && phase.kind !== 'idle' ? (
                 <View style={{ minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
@@ -561,6 +526,36 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                       {ERROR_BODY}
                     </Text>
                   </View>
+                </View>
+              ) : null}
+              {searching ? (
+                <View style={{ marginTop: 'auto', flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                  {linkWait ? (
+                    <View style={{ flex: 1, minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                      <Icon name="link" size={18} color="t3" />
+                      <Text v="b1" numberOfLines={1} style={{ flex: 1, fontSize: xl ? 19 : undefined }}>
+                        {linkLabel(linkUrl ?? '')}
+                      </Text>
+                      <Spinner size={16} color="t3" />
+                    </View>
+                  ) : (
+                    <View style={{ flex: 1, minHeight: xl ? FIELD_XL : FIELD, borderRadius: xl ? 26 : 22, backgroundColor: c.fill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                      <Icon name="search" size={18} color="t3" />
+                      <TextInput
+                        autoFocus
+                        value={fieldValue(form)}
+                        onChangeText={onType}
+                        placeholder={SEARCH_PLACEHOLDER}
+                        placeholderTextColor={c.t4}
+                        accessibilityLabel={SEARCH_PLACEHOLDER}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="search"
+                        style={[{ flex: 1, color: c.t1, fontSize: xl ? 19 : type.b1.fontSize, paddingVertical: 0 }, fontFor('400')]}
+                      />
+                    </View>
+                  )}
+                  <GlassButton actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
                 </View>
               ) : null}
               {searching ? null : (
