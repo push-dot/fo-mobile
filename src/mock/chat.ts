@@ -357,7 +357,8 @@ export const setAccount = (next: Partial<typeof account>) => {
 mock('GET', 'chat/account', () => {
   const total = account.ultra ? 20_000 : 5000
   const used = account.spent ? total : account.ultra ? 12_800 : 3200
-  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total } } }
+  const now = new Date()
+  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
 })
 
 // ---------- quick-start ingredients ----------

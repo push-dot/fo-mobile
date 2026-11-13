@@ -14,6 +14,7 @@ import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream, type StreamEnd } from './utils/stream'
 import { openPieceId, restoreBotTurns } from './utils/turns'
+import { prependOlder } from './utils/find'
 import { withMaterial } from './utils/usage'
 import type { ChatEvent, ChatState } from './types'
 
@@ -418,6 +419,23 @@ export const stop = (id: string) => {
   reportCancel(id)
 }
 
+// Where the next older page of a reopened thread starts. Null once the oldest turn is loaded.
+const olderCursor = new Map<string, string | null>()
+
+export const hasOlder = (id: string) => !!olderCursor.get(id)
+
+export const loadOlder = async (id: string) => {
+  const cursor = olderCursor.get(id)
+  if (!cursor) return
+  const page = await botApi.bots.transcript(id, { cursor })
+  olderCursor.set(id, page.page.nextCursor)
+  const older = restoreBotTurns(page.data).items
+  useChatStore.setState((s) => {
+    const current = s.chats[id] ?? emptyChat
+    return { chats: { ...s.chats, [id]: { ...current, items: prependOlder(current.items, older) } } }
+  })
+}
+
 const busy = (id: string) => runs.has(id) || !!get(id).working || get(id).items.length > 0
 
 export const openBot = async (address: string) => {
@@ -425,16 +443,19 @@ export const openBot = async (address: string) => {
   if (busy(id)) return id
   const page = await botApi.bots.transcript(id)
   if (busy(id)) return id
+  olderCursor.set(id, page.page.nextCursor)
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: restoreBotTurns(page.data, page.live) } }))
   if (page.live && !API_MOCK) void startRun({ conversationId: id, follow: true, after: page.live.lastSeq, piece: openPieceId(page.data, page.live) })
   return id
 }
 
-export const forget = (id: string) =>
+export const forget = (id: string) => {
+  olderCursor.delete(id)
   useChatStore.setState((s) => {
     const { [id]: _, ...rest } = s.chats
     return { chats: rest }
   })
+}
 
 const dropRun = (id: string) => {
   runs.get(id)?.abort()
@@ -446,6 +467,7 @@ const dropRun = (id: string) => {
 export const clearPushChat = async (id: string, kind: 'push' | 'company') => {
   if (kind !== 'push') return false
   await botApi.bots.clearChat(id)
+  olderCursor.delete(id)
   dropRun(id)
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: emptyChat } }))
   clearDraft(id)

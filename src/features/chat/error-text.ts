@@ -1,6 +1,6 @@
-import { planRequired, usageExhausted } from './utils/usage'
+import { planRequired } from './utils/usage'
 
-const USAGE_BODY = usageExhausted('FREE').body
+const USAGE_BODY = '이번 달 사용량을 모두 썼어요.'
 
 export const ERROR_TEXT: Record<string, string> = {
   FEATURE_DISABLED: USAGE_BODY,

@@ -1,9 +1,11 @@
 import { router } from 'expo-router'
-import { Platform, Pressable } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { botProfilePath, type BotId } from '@/features/bots'
 import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
 import { spacing, useColors } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
+import { HeaderLamp } from './header/header-lamp'
+import type { HeaderLight } from './header/state'
 import { clearPushChat, deleteCompanyBot } from '../stores'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'
 
@@ -14,16 +16,20 @@ const HeaderPill = ({
   name,
   kind,
   color = 'push',
+  light = 'none',
+  onFind,
 }: {
   botId?: string
   name?: string
   kind?: 'push' | 'company'
   color?: MascotColor
+  light?: HeaderLight
+  onFind?: () => void
 }) => {
   const run = (id: HeaderMenuId) => {
     if (!botId || !kind || !name) return
     if (id === 'profile') openProfile(botId)
-    if (id === 'find') return
+    if (id === 'find') onFind?.()
     if (id === 'clear') {
       const copy = clearChatConfirm()
       askConfirm({ ...copy, danger: true, onConfirm: () => void clearPushChat(botId, kind) })
@@ -52,7 +58,10 @@ const HeaderPill = ({
         onPress={() => openProfile(botId)}
         style={{ alignSelf: 'flex-start', maxWidth: '100%', height: 44, borderRadius: 22, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: spacing[3], backgroundColor: ios ? 'transparent' : c.fill }}
       >
-        <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
+        <View style={{ width: 32, height: 32 }}>
+          <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
+          <HeaderLamp light={light} />
+        </View>
         <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
           {name}
         </Text>

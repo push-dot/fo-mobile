@@ -23,7 +23,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
     <Appear style={{ flexDirection: 'row', gap: 10 }}>
       <Dot color={c.ac} />
       <View style={{ flex: 1, gap: 6 }}>
-        <Rich v="b1" text={item.text} />
+        <Rich v="b1" text={item.text} markId={item.id} />
         {item.bullets?.length ? (
           <Text v="b2" color="t2">
             {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}
