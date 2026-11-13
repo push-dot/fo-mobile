@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../../theme'
 import { READ_OFF_ACTIONS } from '../../constants'
@@ -20,7 +20,7 @@ const ReadOff = ({ item, onAction }: { item: Extract<ChatItem, { type: 'readOff'
               key={action}
               accessibilityRole="button"
               onPress={() => onAction?.(action)}
-              style={{ height: 36, paddingHorizontal: 14, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: c.bg }}
+              style={{ height: 40, paddingHorizontal: 14, borderRadius: Platform.OS === 'ios' ? radius.buttonSmIos : radius.buttonSmAndroid, alignItems: 'center', justifyContent: 'center', backgroundColor: c.bg }}
             >
               <Text v="c1" weight="700" style={{ fontSize: 14 }}>
                 {READ_OFF_ACTIONS[action]}

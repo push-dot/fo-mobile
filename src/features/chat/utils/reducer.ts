@@ -34,7 +34,10 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       return { ...s, queue: [...s.queue, { text: e.text, ...(e.file ? { file: e.file } : {}) }] }
     case 'dequeue':
       return { ...s, queue: s.queue.slice(1) }
-    case 'stop':
+    case 'stop': {
+      // The cancel POST and the server's `cancelled` frame both report one stop.
+      const last = s.items[s.items.length - 1]
+      const items = last?.type === 'notice' && last.notice.kind === 'stopped' ? s.items.slice(0, -1) : s.items
       return {
         ...s,
         working: null,
@@ -42,8 +45,9 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
         awaiting: null,
         interrupted: true,
         runStartedAt: null,
-        items: upsert(s.items, { type: 'notice', id: `stopped-${e.turn ?? s.items.length}`, notice: { kind: 'stopped', resumable: e.resumable === true } }),
+        items: upsert(items, { type: 'notice', id: `stopped-${e.turn ?? items.length}`, notice: { kind: 'stopped', resumable: e.resumable === true } }),
       }
+    }
     case 'done': {
       const seconds = s.runStartedAt === null ? 0 : Math.max(1, Math.round((e.at - s.runStartedAt) / 1000))
       return {

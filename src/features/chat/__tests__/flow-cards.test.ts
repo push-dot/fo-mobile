@@ -80,6 +80,8 @@ describe('ChatInterrupt', () => {
     const next = applyEvent(run, stop!)
     expect(next.items).toEqual([{ type: 'notice', id: 'stopped-t1', notice: { kind: 'stopped', resumable: true } }])
     expect(applyEvent(next, stop!).items).toHaveLength(1)
+    const afterCancelPost = applyEvent(run, { type: 'stop', resumable: true })
+    expect(applyEvent(afterCancelPost, stop!).items).toEqual(next.items)
     expect(statusLineView({ kind: 'stopped', resumable: true }, new Date())).toMatchObject({ text: '작업을 중지했어요 · 어떻게 할지 알려 주세요', tone: 'quiet' })
   })
 })
