@@ -1,0 +1,23 @@
+appId: app.push.mobile
+name: 공고에서 회사 봇 만들기 → 그 채팅
+---
+- runFlow: _login.yaml
+- runFlow: _dismiss_logbox.yaml
+- openLink: push://bots/new?mock=consent-on
+- extendedWaitUntil:
+    visible: "봇 만들기"
+    timeout: 20000
+- tapOn: "회사, 공고, 링크로 찾아보세요"
+- inputText: "새벽"
+- extendedWaitUntil:
+    visible: ".*ML 엔지니어.*"
+    timeout: 20000
+- tapOn: ".*ML 엔지니어.*"
+- extendedWaitUntil:
+    visible: "만들기"
+    timeout: 10000
+- tapOn: "만들기"
+- extendedWaitUntil:
+    visible: "공고 링크를 붙여넣어 보세요"
+    timeout: 20000
+- assertVisible: "새벽마켓"

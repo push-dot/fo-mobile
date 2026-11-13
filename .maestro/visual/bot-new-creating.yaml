@@ -1,0 +1,17 @@
+appId: app.push.mobile
+name: BotNewCreating
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15&mock=consent-on,hang:POST:bots$
+- extendedWaitUntil:
+    visible: "만들기"
+    timeout: 20000
+- tapOn: "만들기"
+- extendedWaitUntil:
+    visible: "만드는 중"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewCreating
+- openLink: push://?mock=reset

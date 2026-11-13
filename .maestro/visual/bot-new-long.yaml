@@ -1,0 +1,13 @@
+appId: app.push.mobile
+name: BotNewLong
+tags:
+  - visual
+---
+# Fixture companies are short. The name clamps at two lines when a company name is long.
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15
+- extendedWaitUntil:
+    visible: "바다물류"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewLong

@@ -1,0 +1,16 @@
+appId: app.push.mobile
+name: BotNewLimit
+tags:
+  - visual
+---
+- runFlow: ../flows/_login.yaml
+- openLink: push://bots/new?posting=p15&mock=consent-on,bots:limit
+- extendedWaitUntil:
+    visible: "만들기"
+    timeout: 20000
+- tapOn: "만들기"
+- extendedWaitUntil:
+    visible: "봇을 3개까지 만들 수 있어요"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: BotNewLimit
