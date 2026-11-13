@@ -9,7 +9,7 @@ const { patchBotMutation } = await import('../api/hooks')
 
 const moapay: CompanyBot = {
   id: 'b1' as BotId, kind: 'company', name: '모아페이', color: 'teal', postingId: 'p1', muted: false, revision: 3,
-  lastActivityAt: new Date(2026, 10, 9), lastMessage: null, unread: false, activity: { phase: 'idle' },
+  lastActivityAt: new Date(2026, 10, 9), lastMessage: null, unread: false, activity: { phase: 'idle' }, outcome: null,
 }
 const LIST = ['bots', 'list']
 const DETAIL = ['bots', 'detail', 'b1']

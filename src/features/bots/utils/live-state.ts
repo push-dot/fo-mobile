@@ -1,15 +1,16 @@
-import { LIVE_POLL_MS, MASCOT_LABEL } from '../constants'
-import type { Bot, BotActivity, BotRow, LocalActivity, MascotState } from '../types'
+import { LIVE_POLL_MS, MASCOT_LABEL, OUTCOME_LINE } from '../constants'
+import type { Bot, BotActivity, BotOutcome, BotRow, LocalActivity, MascotState } from '../types'
 import { homeRowLabel } from './home-rows'
 import { rowTime } from './row-time'
 
-type Facts = { activity: BotActivity; unread: boolean }
+type Facts = { activity: BotActivity; unread: boolean; outcome: BotOutcome | null }
 
 /** AgentHomeMascot: "확인 필요 → 완료 안 읽음 → 작업 중 → 생각 중 → 대기 순으로 하나만 보여 줘요." The order is the rule. */
 export const MASCOT_PRIORITY = ['help', 'done', 'work', 'think', 'idle'] as const satisfies readonly MascotState[]
 
 const SHOWS: Record<MascotState, (f: Facts) => boolean> = {
-  help: (f) => f.activity.phase === 'waiting',
+  // A failed run asks the user to retry, so it reads like a card waiting. An expired card needs nothing from the user.
+  help: (f) => f.activity.phase === 'waiting' || f.outcome?.kind === 'failed',
   done: (f) => f.unread,
   work: (f) => f.activity.phase === 'working',
   // A queued run shows as thinking: the bot took the request and has not started a step.
@@ -30,19 +31,25 @@ export const expiredAt = (activity: BotActivity, now: Date): BotActivity =>
 export const mergeFacts = (bot: Bot, local: LocalActivity | undefined, now: Date): Facts => ({
   activity: local?.streaming ?? expiredAt(bot.activity, now),
   unread: local?.reading ? false : bot.unread,
+  // The server clears the outcome when something newer happens; this session's stream is that newer thing until the next fetch.
+  outcome: local?.streaming ? null : bot.outcome,
 })
 
-const lineOf = (activity: BotActivity, bot: Bot): string => {
+const lineOf = ({ activity, outcome }: Facts, bot: Bot): string => {
   if (activity.phase === 'waiting') return activity.cardTitle
   if (activity.phase === 'working') return activity.label
   if (activity.phase === 'thinking' && activity.label) return activity.label
+  if (activity.phase === 'idle' && outcome) return OUTCOME_LINE[outcome.kind]
   return bot.lastMessage?.preview ?? ''
 }
+
+/** AgentHomeRowExpiredFailed: the expired row is read without a state word, the failed one as 확인 필요. */
+const spokenOf = (mascot: MascotState, facts: Facts) => (mascot === 'idle' && facts.outcome?.kind === 'expired' && facts.activity.phase === 'idle' ? '' : undefined)
 
 export const botRow = (bot: Bot, local: LocalActivity | undefined, now: Date): BotRow => {
   const facts = mergeFacts(bot, local, now)
   const mascot = mascotStateOf(facts)
-  const line = lineOf(facts.activity, bot)
+  const line = lineOf(facts, bot)
   const time = rowTime(bot.lastActivityAt, now)
   return {
     id: bot.id,
@@ -52,7 +59,7 @@ export const botRow = (bot: Bot, local: LocalActivity | undefined, now: Date): B
     unreadDot: mascot === 'done',
     line,
     time,
-    accessibilityLabel: bot.kind === 'push' ? `${bot.name}, ${MASCOT_LABEL[mascot]}` : homeRowLabel({ name: bot.name, mascot, line, time }),
+    accessibilityLabel: bot.kind === 'push' ? `${bot.name}, ${MASCOT_LABEL[mascot]}` : homeRowLabel({ name: bot.name, mascot, line, time, spoken: spokenOf(mascot, facts) }),
   }
 }
 

@@ -16,10 +16,16 @@ const dto = (over: Partial<BotContract.Bot> = {}): BotContract.Bot => ({
   lastMessage: { preview: '반영했어요', at: '2026-11-09T05:50:00Z', fromBot: true },
   unread: true,
   activity: null,
+  outcome: null,
   ...over,
 })
 
 describe('toBot', () => {
+  it('reads the outcome of a bot whose card ran out or whose run failed, and drops a row whose outcome date is unreadable', () => {
+    expect(toBot(dto({ outcome: { kind: 'failed', at: '2026-11-09T05:00:00Z' } }))?.outcome).toEqual({ kind: 'failed', at: new Date('2026-11-09T05:00:00Z') })
+    expect(toBot(dto({ outcome: { kind: 'expired', at: 'x' } }))).toBeNull()
+  })
+
   it('reads a company bot with its colour, posting, and no run as idle', () => {
     expect(toBot(dto())).toEqual({
       id: 'b1',
@@ -33,6 +39,7 @@ describe('toBot', () => {
       lastMessage: { preview: '반영했어요', fromBot: true },
       unread: true,
       activity: { phase: 'idle' },
+      outcome: null,
     })
   })
 

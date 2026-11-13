@@ -14,6 +14,7 @@ const company = (id: string, name: string, at: string): CompanyBot => ({
   lastMessage: null,
   unread: false,
   activity: { phase: 'idle' },
+  outcome: null,
 })
 
 const push = (at: string): Bot => ({
@@ -26,6 +27,7 @@ const push = (at: string): Bot => ({
   lastMessage: null,
   unread: true,
   activity: { phase: 'idle' },
+  outcome: null,
 })
 
 describe('splitHome', () => {
