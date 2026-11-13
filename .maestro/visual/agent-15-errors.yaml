@@ -17,7 +17,7 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - openLink: push://chat?mock=run:err-other
 - runFlow:
     file: _say.yaml
@@ -29,7 +29,7 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrOther
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - openLink: push://chat?mock=run:err-credit
 - runFlow:
     file: _say.yaml
@@ -41,7 +41,7 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderLimit
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - openLink: push://chat?mock=reset
 - runFlow:
     file: _say.yaml

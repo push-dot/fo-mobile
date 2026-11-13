@@ -616,7 +616,8 @@ export const pick = (text: string, interrupted: boolean, attachment?: string, in
   // `run:<token>` (links.ts) plays that scenario for any text, so a tour can type the design's own user line (ChatErrUnavailable, ChatErrOther).
   const token = TOKENS[run ?? t]
   if (token) return { steps: token }
-  if (attachment) return { steps: fileRun() }
+  // 서류 보기 › 봇으로 고치기 sends the file name as its attachment; that is the read-then-fix run below, not an external file.
+  if (attachment && t !== '이 서류를 고쳐 줘') return { steps: fileRun() }
   if (intent === 'fit') return { steps: ph1 }
   if (intent === 'boost') return { steps: ph3Boost }
   if (intent === 'experience') return { steps: ph2xApproach }

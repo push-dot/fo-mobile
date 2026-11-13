@@ -19,7 +19,7 @@ tags:
           timeout: 30000
       - waitForAnimationToEnd
       - takeScreenshot: ChatStates.1
-      - runFlow: _back_home.yaml
+      - runFlow: _fresh_chat.yaml
       - runFlow:
           file: _say.yaml
           env:

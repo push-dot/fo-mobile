@@ -29,7 +29,7 @@ tags:
     timeout: 5000
 - tapOn: "허용한 사이트.*"
 - extendedWaitUntil:
-    visible: "careers.moapay.co.kr"
+    visible: "careers.moapay.co.kr 허용 해제"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileAllowed

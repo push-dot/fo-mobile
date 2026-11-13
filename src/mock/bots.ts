@@ -307,6 +307,18 @@ export const nextId = (prefix: string) => `${prefix}-${++seq}`
 export const setBots = (set: 'home' | 'none' | 'long' | 'outcome') => {
   fixtures = set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
 }
+/** `push:fresh`: the Push Bot has no history, so its chat opens on the onboarding chips as the board draws it. */
+export const freshPushBot = () => {
+  const f = fixtureOf('push')
+  if (f) {
+    f.messages = []
+    f.readAt = null
+  }
+}
+/** `card:none`: no bot waits on an answer, so every chat shows its composer (the 자료 보내기 boards draw the attached file in it). */
+export const clearCards = () => {
+  for (const f of fixtures) f.cards = []
+}
 export const setBotPlan = (next: Plan) => {
   plan = next
 }

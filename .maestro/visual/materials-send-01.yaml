@@ -6,7 +6,7 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=consent-on"
+      MOCK: "push://sign-in?mock=consent-on,card:none"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml

@@ -8,7 +8,7 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on"
+      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on,push:fresh"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml

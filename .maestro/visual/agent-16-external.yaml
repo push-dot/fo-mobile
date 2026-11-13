@@ -22,7 +22,7 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatMore
 - runFlow: _agent-dismiss-menu.yaml
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -33,7 +33,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneNoJob
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -44,7 +44,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatDoneSaveFail
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
@@ -55,7 +55,7 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6ResultFile
-- runFlow: _back_home.yaml
+- runFlow: _fresh_chat.yaml
 - runFlow:
     file: _say.yaml
     env:
