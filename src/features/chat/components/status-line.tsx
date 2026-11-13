@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { Mascot, Text } from '@/shared/components'
 import { lineFromWorking, statusLineView, type LiveLine, type StatusLine as StatusLineModel, type StatusLineView } from '../utils/status-line'
 
-const TONE_COLOR = { neutral: 't2', help: 'orange', danger: 'red' } as const
+const TONE_COLOR = { neutral: 't2', quiet: 't3', help: 'orange', danger: 'red' } as const
 
 const StatusLineRow = ({ view }: { view: StatusLineView }) => (
   <View

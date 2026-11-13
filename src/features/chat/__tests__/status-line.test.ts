@@ -46,14 +46,14 @@ describe('statusLineView', () => {
   it('keeps both stop notices grey', () => {
     expect(run({ kind: 'stopped', resumable: true })).toMatchObject({
       mascot: 'idle',
-      tone: 'neutral',
+      tone: 'quiet',
       text: '작업을 중지했어요 · 어떻게 할지 알려 주세요',
       tail: null,
       role: 'status',
     })
     expect(run({ kind: 'stopped', resumable: false })).toMatchObject({
       mascot: 'idle',
-      tone: 'neutral',
+      tone: 'quiet',
       text: '중지했어요. 고치던 내용은 반영하지 않았어요.',
       tail: null,
     })

@@ -96,7 +96,7 @@ export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: stri
       }
       if (ev.type === 'status') continue
       piece = null
-      for (const e of mapEvent(ev as StreamEvent)) put(e)
+      for (const e of mapEvent(ev as StreamEvent, t.id)) put(e)
     }
   }
   return { ...s, working: null, runStartedAt: null }

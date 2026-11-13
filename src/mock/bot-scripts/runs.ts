@@ -1,7 +1,7 @@
 // Scripted runs of the chat mock, written as the frames push-be streams (StreamEvent of @push/api-client).
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 // Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
-import type { StreamEvent, StreamHunk } from '@push/api-client'
+import type { StreamEvent } from '@push/api-client'
 import { HINTLESS_GATES } from '../../features/chat/constants'
 import type { Step } from '../../features/chat/types'
 
@@ -43,8 +43,6 @@ const done = s(200, { type: 'done', operation: null })
 const awaitingDone = s(200, { type: 'done', operation: null, awaiting: 'approval' })
 // The document every scripted edit and draft changes (마이 › 서류 d1).
 const DOC = 'd1'
-// shortcut: ChatPh3Review draws a "~" (moved) line, which push-be's hunk sign does not have. A8 settles it with the contract.
-const MOVED = '~' as StreamHunk['sign']
 
 export const RESUME = '김서준_백엔드_이력서_2026.pdf'
 export const MOA = '모아페이 · 백엔드 엔지니어'
@@ -351,7 +349,9 @@ const ph3Rest = (wait: number): Step[] => [
     hunks: [
       { line: null, sign: '+', text: '승인 API 성과를 숫자로 강조' },
       { line: null, sign: '+', text: '프로젝트 payment-retry-lab 추가' },
-      { line: null, sign: MOVED, text: 'Kafka를 기술 스택 맨 앞으로' },
+      // push-be has no moved sign: a line removed and added back with the same text is the board's "~" line.
+      { line: null, sign: '-', text: 'Kafka를 기술 스택 맨 앞으로' },
+      { line: null, sign: '+', text: 'Kafka를 기술 스택 맨 앞으로' },
       { line: null, sign: '-', text: '사내 동아리 활동 세부 내용' },
     ],
   }),

@@ -18,6 +18,8 @@ export type MockMessage = {
   at: When
   attachments?: BotContract.Attachment[]
   sources?: BotContract.Attachment[]
+  /** The bot's whole turn is a notice (ChatBotReadOff), not text. */
+  notice?: true
 }
 
 /** `answer` is a choice the user picks, `confirm` an approval. `expiresAt` null never expires. */

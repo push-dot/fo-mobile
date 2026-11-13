@@ -48,7 +48,7 @@ describe('applyEvent', () => {
     expect(s.items[1]).toMatchObject({ type: 'agentText', text: '안녕' })
   })
 
-  it('stop marks running tools interrupted and remembers it for the next message', () => {
+  it('stop ends the run with one notice line and remembers it for the next message', () => {
     const s = run([
       { type: 'start', at: 0 },
       { type: 'tool', id: 'ok', action: '공고 읽기', state: 'ok' },
@@ -57,8 +57,7 @@ describe('applyEvent', () => {
     ])
     expect(s.working).toBeNull()
     expect(s.interrupted).toBe(true)
-    expect(s.items[0]).toMatchObject({ state: 'ok' })
-    expect(s.items[1]).toMatchObject({ state: 'err', error: '중단됨 · 어떻게 할지 알려 주세요', result: undefined })
+    expect(s.items.at(-1)).toMatchObject({ type: 'notice', notice: { kind: 'stopped', resumable: false } })
     expect(applyEvent(s, { type: 'start', at: 5 }).interrupted).toBe(false)
   })
 

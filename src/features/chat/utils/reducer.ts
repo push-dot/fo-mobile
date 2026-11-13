@@ -42,11 +42,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
         awaiting: null,
         interrupted: true,
         runStartedAt: null,
-        items: s.items.map((it) =>
-          it.type === 'tool' && it.state === 'run'
-            ? { ...it, state: 'err', result: undefined, error: '중단됨 · 어떻게 할지 알려 주세요' }
-            : it,
-        ),
+        items: upsert(s.items, { type: 'notice', id: `stopped-${e.turn ?? s.items.length}`, notice: { kind: 'stopped', resumable: e.resumable === true } }),
       }
     case 'done': {
       const seconds = s.runStartedAt === null ? 0 : Math.max(1, Math.round((e.at - s.runStartedAt) / 1000))

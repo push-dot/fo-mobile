@@ -1,6 +1,7 @@
 import type { ResultAction, StreamEvent } from '@push/api-client'
 import type { PickedFile } from '@/features/my'
 import type { BadgeTone } from '@/shared/components'
+import type { Notice } from './utils/status-line'
 
 // Transcript model (feature-spec 15.2). Items render in order; control events change run state.
 
@@ -11,6 +12,10 @@ export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
   | { type: 'agentText'; id: string; text: string; bullets?: string[] }
+  /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
+  | { type: 'readOff'; id: string; text: string }
+  /** How a run ended badly, drawn as a status line (ChatInterrupt, ChatVerifyFail). */
+  | { type: 'notice'; id: string; notice: Notice }
   | { type: 'think'; id: string; seconds: number }
   /** `error` replaces the ⎿ result in red (failed or interrupted). `extra` collapses as "+N줄". */
   /** `name` (server tool) lets a later event for the same tool update this line while it runs or waits. */
@@ -112,7 +117,7 @@ export type ChatEvent =
   | { type: 'answer'; text: string }
   | { type: 'queue'; text: string; file?: PickedFile }
   | { type: 'dequeue' }
-  | { type: 'stop' }
+  | { type: 'stop'; resumable?: boolean; turn?: string }
   | { type: 'done'; at: number; awaiting?: Awaiting }
 
 export type ChatState = {

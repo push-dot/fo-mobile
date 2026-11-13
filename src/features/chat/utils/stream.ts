@@ -12,6 +12,8 @@ import {
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
 import { resultTask } from './result-card'
+import { diffLines } from './diff-lines'
+import { noticeOf } from './notices'
 import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
@@ -63,7 +65,7 @@ const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] =>
     ...(apply ? { submit: apply.label } : {}),
     ...(keep ? { secondary: keep.label } : {}),
   }
-  const diff: ChatItem[] = ev.hunks?.length ? [{ type: 'diff', id: `diff-${ev.id}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }] : []
+  const diff: ChatItem[] = ev.hunks?.length ? [{ type: 'diff', id: `diff-${ev.id}`, lines: diffLines(ev.hunks) }] : []
   return [...diff, { type: 'approval', approval }]
 }
 
@@ -112,7 +114,7 @@ const resultOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem => {
 }
 
 /** One server frame → transcript events (an edit card or a result can add a line before itself). */
-export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
+export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
   switch (ev.type) {
     case 'token':
       return [{ type: 'token', text: ev.text }]
@@ -163,7 +165,7 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
     case 'todo':
       return [{ type: 'todo', id: ev.id ? `todo-${ev.id}` : 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state, ...(i.added ? { added: true } : {}) })) }]
     case 'diff':
-      return [{ type: 'diff', id: `diff-${ev.revisionId}`, lines: ev.hunks.map((h) => ({ n: h.line ?? undefined, sign: h.sign, text: h.text })) }]
+      return [{ type: 'diff', id: `diff-${ev.revisionId}`, lines: diffLines(ev.hunks) }]
     case 'fit':
       return [fitOf(ev)]
     case 'error': {
@@ -173,12 +175,14 @@ export const mapEvent = (ev: StreamEvent): ChatEvent[] => {
       return [{ type: 'error', id: `err-${ev.seq ?? Date.now()}`, text: errorText(ev.error.code, sec, details?.reason), code: ev.error.code }]
     }
     case 'cancelled':
-      return [{ type: 'stop' }]
+      return [{ type: 'stop', resumable: (ev as { resumable?: boolean }).resumable === true, ...(turn ? { turn } : {}) }]
     case 'done':
       return [{ type: 'done', at: 0, awaiting: ev.awaiting }]
-    default:
+    default: {
       // push-be #224: a type this build does not know must not stop the stream.
-      return []
+      const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; code?: string; seq?: number }, turn) : null
+      return notice ? [notice] : []
+    }
   }
 }
 
@@ -212,7 +216,7 @@ export const fromStream = async function* (
         } else yield { type: 'token', text: ev.text }
       } else {
         if (ev.type !== 'status') piece = null
-        yield* mapEvent(ev as StreamEvent)
+        yield* mapEvent(ev as StreamEvent, turn)
       }
       if (ev.type === 'done' || ev.type === 'error' || ev.type === 'cancelled') {
         mark('terminal')

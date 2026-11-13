@@ -120,6 +120,10 @@ const Thread = ({ id }: { id: string }) => {
   const onView = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
     router.push(`/docs/push/${card.documentId}`)
   }, [])
+  const onReadOff = useCallback(
+    (action: 'attach' | 'settings') => router.push(action === 'attach' ? botMaterialPath(id as BotId) : '/settings'),
+    [id],
+  )
   const onUsage = useCallback((action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
@@ -134,9 +138,10 @@ const Thread = ({ id }: { id: string }) => {
         resultPending={item.type === 'result' && item.id === lastResultId && convert.isPending}
         resultAwaiting={item.type === 'result' && item.id === lastResultId && !!chat.approval}
         onUsage={onUsage}
+        onReadOff={onReadOff}
       />
     ),
-    [onAction, onConvert, onView, onUsage, lastResultId, convert.isPending, chat.approval],
+    [onAction, onConvert, onView, onUsage, onReadOff, lastResultId, convert.isPending, chat.approval],
   )
 
   return (

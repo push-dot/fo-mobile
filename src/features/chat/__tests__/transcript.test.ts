@@ -76,7 +76,7 @@ describe('applyTranscript', () => {
     expect(stopped.entries.filter((entry) => entry.type === 'status')).toHaveLength(0)
     expect(statusLineView(noticeOf(stopped), new Date(0)).text).toBe('작업을 중지했어요 · 어떻게 할지 알려 주세요')
     const dropped = applyTranscript(open, { type: 'end', outcome: 'stopped', resumable: false })
-    expect(statusLineView(noticeOf(dropped), new Date(0)).tone).toBe('neutral')
+    expect(statusLineView(noticeOf(dropped), new Date(0)).tone).toBe('quiet')
     const failed = applyTranscript(open, { type: 'end', outcome: 'error', code: 'DISCONNECTED', reason: '연결 끊김' })
     expect(statusLineView(noticeOf(failed), new Date(0))).toMatchObject({
       text: '작업 중 문제가 생겼어요',

@@ -17,7 +17,7 @@ tags:
 # The stop line lands below the fold on Android; bring the thread to its end first.
 - runFlow: _chat_bottom.yaml
 - extendedWaitUntil:
-    visible: ".*중단됨.*"
+    visible: ".*작업을 중지했어요.*"
     timeout: 5000
 - runFlow:
     file: _say.yaml
