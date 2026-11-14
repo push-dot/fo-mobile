@@ -34,9 +34,10 @@ const JobFilterSheetScreen = () => {
 
   return (
     <Sheet
-      // Chip sheets: the board's head starts 17 under the sheet top and the chips right under it; its CTA sits 20 under the chips
-      // and the sheet ends 26 under it. Ours ends 20 under a 56 CTA (the board's is 52), so 26 above it keeps the sheet 247 high.
+      // iOS chip sheets: the head starts 17 under the sheet top, the CTA (52 high, slimAction) sits 20 under the chips and the sheet
+      // ends 26 under it, so FilterRole is 247 high with the CTA centre at 814.
       gap={compact || isheet ? 0 : undefined}
+      slimAction={isheet}
       actionGap={isheet ? IOS_FILTER_ACTION_GAP : compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}
       onLayout={bound.onSheetLayout}
       action={{

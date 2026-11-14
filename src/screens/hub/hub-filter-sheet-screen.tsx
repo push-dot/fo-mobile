@@ -14,6 +14,7 @@ const HubFilterSheetScreen = () => {
     <Sheet
       // iOS (HubFilter): the .inav starts 17 under the sheet top and the CTA sits 20 under the last chips.
       gap={Platform.OS === 'ios' ? 0 : undefined}
+      slimAction={Platform.OS === 'ios'}
       actionGap={Platform.OS === 'ios' ? IOS_FILTER_ACTION_GAP : SHEET_ACTION_GAP.filter}
       action={{
         label: total === undefined ? '프로필 보기' : `프로필 ${total}개 보기`,
