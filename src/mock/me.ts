@@ -193,7 +193,7 @@ const draft: ResumeDraft = {
         description: '',
       },
     ],
-    skills: ['Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'Redis', 'Java'],
+    skills: ['Kotlin', 'Java', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'Redis'],
   },
 }
 mock('GET', 'sources/:id/profile-draft', () => ({ data: draft }))

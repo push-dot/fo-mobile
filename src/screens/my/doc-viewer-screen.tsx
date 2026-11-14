@@ -43,7 +43,8 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       accessibilityLabel={`${p.displayName} 서류 미리보기`}
       style={{
         width: '100%',
-        minHeight: (width - PAGE_PAD * 2) * 1.414,
+        // DocViewer board: WebKit resolves `aspect-ratio: 1 / 1.414` against the 402pt screen width (card 330 x 568), not the 330pt card.
+        minHeight: width * 1.414,
         backgroundColor: sheet.paper,
         borderRadius: radius.xs,
         borderWidth: 1,
