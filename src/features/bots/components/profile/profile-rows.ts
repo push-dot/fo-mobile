@@ -2,7 +2,7 @@ import { monthDay } from '@push/shared'
 
 export const PROFILE_LOADING_LABEL = 'Bot 프로필을 불러오는 중이에요'
 export const PROFILE_ERROR_TITLE = 'Bot 정보를 불러오지 못했어요'
-export const PROFILE_ERROR_BODY = '인터넷 연결을 확인하고 다시 시도해 주세요. 채팅은 그대로 이어서 할 수 있어요.'
+export const PROFILE_ERROR_BODY = '인터넷 연결을 확인하고 다시 시도해 주세요.'
 export const RETRY_LABEL = '다시 시도'
 export const COLOR_TITLE = 'Bot 색'
 export const COLOR_ROW = '색'
