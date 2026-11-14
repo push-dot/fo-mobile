@@ -1,9 +1,10 @@
-import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors, useShadow } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
+import { RISE_MS, riseOnMount } from './approval-rise'
 import { expiredNote } from '../../utils/card'
 import type { Approval, ApprovalSection, Choice } from '../../types'
 import { isStop, multiPick } from '../../utils/multi-pick'
@@ -31,8 +32,6 @@ const PANEL_GAP = 6
 const FOOT_TOP = 6
 // The board pads 그만하기 22pt per side; the Button gives 20.
 const STOP_PAD = { paddingHorizontal: 2 }
-// The panel slides up in this long; a rise that has not landed by then is set to its end.
-const RISE_MS = 420
 
 const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 /** Replaces the composer until answered (design_system ApprovalPanel). */
@@ -43,6 +42,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
   const ios = Platform.OS === 'ios'
   const reduce = useReduceMotion()
   const rise = useState(() => new Animated.Value(0))[0]
+  // Once the rise is over the panel uses a static style, whatever the native animation did (see riseOnMount).
+  const [landed, setLanded] = useState(false)
   const [sel, setSel] = useState(() => approval.sections.map((s) => ('selected' in s ? s.selected : [])))
   const numbered = !approval.submit && approval.sections.length === 1 && approval.sections[0]!.kind === 'choices' && !approval.sections[0]!.multi
   // push-be #224 section card (10-02, 10-21, 10-22): answered with submit + picked ids; cancel is its own button or chip.
@@ -56,18 +57,11 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
   const multi = multiPick(approval, sel)
   const submitRow = !sectioned && !!approval.submit
 
-  // The slide starts once the view has a native frame (onLayout), not at mount: a card that arrives while the keyboard comes down mounts
-  // in a busy layout pass, and a native animation started from the mount effect could go missing and leave the panel below the screen
-  // (blank hierarchy, ChatPh0Input half-risen). The timer lands the end state if the animation never reports.
-  const started = useRef(false)
-  const settle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const startRise = () => {
-    if (started.current) return
-    started.current = true
-    Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: true }).start()
-    settle.current = setTimeout(() => rise.setValue(1), RISE_MS + 300)
-  }
-  useEffect(() => () => clearTimeout(settle.current), [])
+  // The rise starts at mount and the end state is forced after RISE_MS + RISE_SLACK_MS (see riseOnMount): the panel must open every time.
+  useEffect(
+    () => riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: false }).start(), () => setLanded(true)),
+    [rise],
+  )
 
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))
@@ -267,15 +261,17 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
     </View>
   )
 
-  const motion = reduce
-    ? { opacity: rise }
-    : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
+  // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
+  const motion = landed
+    ? { opacity: 1, transform: [{ translateY: 0 }] }
+    : reduce
+      ? { opacity: rise }
+      : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
   return (
     <Animated.View
       accessibilityViewIsModal
       accessibilityLabel={expired ? '만료된 요청' : '확인 요청'}
-      onLayout={startRise}
       style={[
         ios
           ? { marginHorizontal: spacing[2], marginBottom: spacing[2], backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
