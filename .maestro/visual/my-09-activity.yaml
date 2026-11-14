@@ -44,10 +44,21 @@ tags:
     visible: ".*일정 .*개.*"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: MyCalendarModal
-# The board selects 10월 21일 (the day after its "today").
+# The board selects 10월 21일 (the day after its "today"): picking it closes the sheet and the list shows that day.
 - tapOn:
     text: ".*10월 21일.*"
-    optional: true
 - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Google 캘린더 연결됨"
+    timeout: 10000
 - takeScreenshot: MyCalendar
+# MyCalendarModal draws the month with 21 selected behind the day list: the sheet opens on the picked day's month.
+- tapOn: ".*달력 열기.*"
+- extendedWaitUntil:
+    visible: "이전 달"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: ".*일정 .*개.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MyCalendarModal

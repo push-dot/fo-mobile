@@ -481,6 +481,10 @@ mock('GET', 'calendar/events', ({ query }) => {
   return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
+  // MyCalendar lists a fourth row on the 21st, the 마감 of 파도AI; the board's date and D-2 follow its own "today" (G43).
+  ev('e16', 'DEADLINE', '파도AI 데이터 분석가', on(10, 21, 23, 59), {
+    notes: '서류 확정이 필요해요',
+  }),
 mock('POST', 'calendar/events', ({ body }) => {
   const e = ev(
     `e${Date.now()}`,
