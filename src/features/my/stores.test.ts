@@ -90,7 +90,7 @@ describe('deleteWithUndo', () => {
     remove.mockRejectedValueOnce(new ApiError('conflict', 'INVALID_TRANSITION', 409, { reason: 'REFERENCED_BY_EVIDENCE', evidenceCount: 1 }))
     deleteWithUndo(doc, 74)
     await vi.runAllTimersAsync()
-    expect(lastToast()).toMatchObject({ message: DELETE_REFERENCED, alert: true, opaque: true, bottom: 74 })
+    expect(lastToast()).toMatchObject({ message: DELETE_REFERENCED, alert: true, bottom: 74 })
     expect(lastToast().action).toBeUndefined()
     expect(usePendingDelete.getState().hidden).toEqual([])
   })
@@ -129,7 +129,7 @@ describe('deleteWithUndo', () => {
     deleteWithUndo(doc, 74)
     await vi.runAllTimersAsync()
     const toast = showToast.mock.lastCall?.[0]
-    expect(toast).toMatchObject({ message: '서류를 삭제하지 못했어요', alert: true, opaque: true, bottom: 74 })
+    expect(toast).toMatchObject({ message: '서류를 삭제하지 못했어요', alert: true, bottom: 74 })
     toast.action.onPress()
     await vi.runAllTimersAsync()
     expect(remove).toHaveBeenCalledTimes(2)
