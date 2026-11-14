@@ -343,7 +343,9 @@ const PH3 = ['요약', '경력', '프로젝트', '기술 스택', '학력']
 const ph3Open: Step[] = [
   s(200, status('끄적이는 중…')),
   s(200, todo('todo3', PH3, 1)),
-  s(200, tool('draft', '초안 쓰기', '이력서 v1 · 경력', 'run', '경력 섹션을 쓰는 중')),
+  // ChatPh3 draws this as the working line (status frame), as ph1 does for 필수·우대 스택을 뽑는 중.
+  s(100, status('경력 섹션을 쓰는 중')),
+  s(100, tool('draft', '초안 쓰기', '이력서 v1 · 경력', 'run', '경력 섹션을 쓰는 중')),
 ]
 const paper = s(300, {
   type: 'paper', id: 'paper', label: '이력서 초안 v1', heading: '김서준 · 백엔드 개발자',

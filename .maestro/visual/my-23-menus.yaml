@@ -116,10 +116,13 @@ tags:
 # After the failed delete the document stays open and 뒤로 does nothing (an app defect, see STEP2-REMAINDER-DEFECTS), so the list is reached through
 # the tab link: the mock rules stay, and the 서류 tab shows the uploaded files.
 - openLink: push://my
-- extendedWaitUntil:
-    visible: "김서준"
-    timeout: 10000
-- tapOn: "서류"
+- waitForAnimationToEnd
+# The link opens 마이 on the tab it was left on (서류); tap the tab only when the file list is not there.
+- runFlow:
+    when:
+      notVisible: "올린 파일"
+    commands:
+      - tapOn: "서류"
 - extendedWaitUntil:
     visible: "올린 파일"
     timeout: 10000
