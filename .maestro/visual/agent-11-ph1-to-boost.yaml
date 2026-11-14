@@ -47,7 +47,7 @@ tags:
 - waitForAnimationToEnd
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Boost
-# ChatPh3BoostStop draws two stops under the same boost line: all five rounds used (한 번 더 올리기 answers the card), and the score stuck early
+# ChatPh3BoostStop draws two stops under the same boost line (panel 1 and 2 are the first on iOS light and dark, panel 3 the second on Android, so the shots are .1 and .3): all five rounds used (한 번 더 올리기 answers the card), and the score stuck early
 # (the boost-stuck run, played through run: for the board's own user line). The quality card hides the chat from accessibility, so the mock holds it back
 # for 20 s after the stop line and the shot is taken first.
 - runFlow:
@@ -57,7 +57,7 @@ tags:
       PICK: ".*한 번 더 올리기"
       NEXT: ".*최대 5번까지 올렸어요.*"
 - waitForAnimationToEnd
-- takeScreenshot: ChatPh3BoostStop
+- takeScreenshot: ChatPh3BoostStop.1
 # The run is still going (the quality card follows after the hold): let it reach its card before the chat is reset, or the next line queues behind it.
 # optional: the card sometimes opens blank (the hierarchy holds nothing, an app defect in STEP2-REMAINDER-DEFECTS), and the tour goes on.
 - extendedWaitUntil:
@@ -76,7 +76,7 @@ tags:
     visible: ".*더 올리기 어려워서 여기서 멈출게요.*"
     timeout: 40000
 - waitForAnimationToEnd
-- takeScreenshot: ChatPh3BoostStop.2
+- takeScreenshot: ChatPh3BoostStop.3
 - extendedWaitUntil:
     visible: "추천 수정도 반영할까요?"
     timeout: 40000
