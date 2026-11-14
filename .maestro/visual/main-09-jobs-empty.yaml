@@ -38,8 +38,8 @@ tags:
       platform: iOS
     commands:
       - swipe:
-          start: "10%,23%"
-          end: "90%,23%"
+          start: "10%,16%"
+          end: "90%,16%"
           duration: 300
 - waitForAnimationToEnd
 - takeScreenshot: JobListEmpty.1

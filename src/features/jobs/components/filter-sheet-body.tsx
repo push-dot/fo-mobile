@@ -15,10 +15,12 @@ type Props = {
   onChange: (filters: Filters) => void
   /** iOS draws a glass close button left of the centred title (the boards' native sheet header). */
   onClose: () => void
+  /** A header over one chip group: the native sheet's 52pt header with the chips right under it. */
+  compact?: boolean
   scroll?: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
-const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, scroll }: Props) => {
+const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, compact, scroll }: Props) => {
   const ios = Platform.OS === 'ios'
   const set = (list: Filters[FilterKey]) => onChange({ ...draft, [kind]: list })
   const options =
@@ -31,11 +33,11 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, scroll }: P
     ) : kind === 'skills' ? (
       <FilterSkills selected={draft.skills} trending={trending} onToggle={(s) => set(toggle(draft.skills, s))} />
     ) : (
-      <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} />
+      <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} maxHeight={scroll?.maxHeight} onLayout={scroll?.onLayout} />
     )
   return (
-    <View style={{ gap: 14, flexGrow: 1 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+    <View style={{ gap: compact ? 0 : 14, flexGrow: 1 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: compact ? 52 : undefined }}>
         {ios ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null}
         <Text v={ios ? 'h3' : 'h2'} accessibilityRole="header" style={ios ? { flex: 1, textAlign: 'center' } : undefined}>
           {FILTER_TITLES[kind]}
@@ -46,7 +48,7 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, scroll }: P
           </Text>
         </Pressable>
       </View>
-      {scroll ? (
+      {scroll && kind !== 'location' ? (
         <SheetScroll keyboardShouldPersistTaps="handled" style={{ maxHeight: scroll.maxHeight }} onLayout={scroll.onLayout} contentContainerStyle={{ gap: 14 }}>
           {options}
         </SheetScroll>
