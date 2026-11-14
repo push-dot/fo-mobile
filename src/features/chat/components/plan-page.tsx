@@ -125,7 +125,6 @@ export const PlanPage = () => {
 
 // The board's rows: 10 between the dot and the line, 16 between rows, 24pt lines; the foot sits 8 lower than a row gap.
 const NOTICE_LINE = 24
-const DOT_WIDTH = 4
 
 /** 구독 안내 (PlanNotice): the long notice, one page. */
 export const PlanNoticePage = () => (
@@ -133,12 +132,10 @@ export const PlanNoticePage = () => (
     <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[4] }}>
       {PLAN_NOTICES.map((line) => (
         <View key={line} style={{ flexDirection: 'row', gap: 10 }}>
-          {/* The shared font draws a Korean "·" 5pt wider than the board's, so the dot sits in a fixed box and the text starts where the board's does. */}
-          <View style={{ width: DOT_WIDTH, alignItems: 'center' }}>
-            <Text v="b2" color="t3" numberOfLines={1} style={{ width: 20, textAlign: 'center' }}>
-              ·
-            </Text>
-          </View>
+          {/* The dot is its own glyph, 8.09 pt at 15px (board 8.1): the line starts at x42.1 and its column is 335.9, so "해지해도 남은" (338.1) wraps and "철회할 수 있어요." (335.7) holds. */}
+          <Text v="b2" color="t3">
+            ·
+          </Text>
           <Text v="b2" color="t2" style={{ flex: 1, lineHeight: NOTICE_LINE }}>
             {line}
           </Text>
