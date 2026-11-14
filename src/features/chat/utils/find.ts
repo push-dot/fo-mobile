@@ -40,6 +40,9 @@ export const prependOlder = (current: readonly ChatItem[], older: readonly ChatI
   return [...fresh, ...current]
 }
 
+/** The thread from its first line of `type`: what came before counts as older turns. */
+export const fromFirst = (items: readonly ChatItem[], type: ChatItem['type']) => items.slice(Math.max(0, items.findIndex((item) => item.type === type)))
+
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 export type Mark = { text: string; hit: boolean }

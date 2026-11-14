@@ -25,8 +25,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
   if (AUTO_PICK.test(item.text))
     return (
       <Appear style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-        {/* ChatStates.1 and rule 3: the auto-select star is grey (board #545B66, the closest token is t2), not the accent. */}
-        <Glyph still size={14} color={c.t2} />
+        <Glyph still color={c.t3} />
         <Text v="c1" color="t3">
           {item.text}
         </Text>

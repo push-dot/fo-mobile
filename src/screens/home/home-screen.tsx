@@ -27,7 +27,7 @@ const HomeScreen = () => {
         scrollEventThrottle={64}
         onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
         // `automatic` already adds the status-bar inset; the bar's measured height counts it too, so take it off once.
-        contentContainerStyle={{ paddingTop: Math.max(barHeight - top, 0), paddingBottom: 32 }}
+        contentContainerStyle={{ paddingTop: Math.max(barHeight - top, 0), paddingBottom: 21 }}
       >
         <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2] }}>
           {SHORTCUTS.map((s) => (

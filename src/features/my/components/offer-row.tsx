@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
 import type { Offer } from '@push/api-client'
-import { Badge, Text } from '@/shared/components'
+import { Badge, Text, WordClampText } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { counterpart, OFFER_ARCHIVED_BADGE, offerBadge, personLine, timeAgo } from '../utils'
 import Avatar from './avatar'
@@ -46,9 +46,9 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
             {personLine(who)}
           </Text>
         ) : null}
-        <Text v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} numberOfLines={2}>
+        <WordClampText ellipsis="hang" v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} lines={2}>
           {o.message}
-        </Text>
+        </WordClampText>
       </View>
       {unread ? (
         <View style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac }} />

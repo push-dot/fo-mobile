@@ -1,9 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { AccessibilityInfo, Animated, Platform, PlatformColor, View, type ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { cssShadow, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
+import { cssShadow, iosMaterial, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP, TOAST_SHEET_GAP } from './constants'
-import Glass from './glass'
 import GlassPressable from './glass-pressable'
 import Text from './text'
 import { hideToast, toastDuration, topSheet, useHostedToast, useToastStore } from './toast-store'
@@ -18,17 +17,11 @@ const SHAPE = Platform.OS === 'ios'
   : { inset: spacing[2], radius: 4, shadow: cssShadow.toast, minHeight: 52, top: 0 }
 
 // Not the Material snackbar: @expo/ui's Snackbar has a fixed shape (no 16pt radius or 52pt height) and no dismiss API.
-const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow: string; opaque?: boolean; children: ReactNode }) => {
+const Surface = ({ shape, shadow, children }: { shape: ViewStyle; shadow: string; children: ReactNode }) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
-  if (Platform.OS === 'ios' && !opaque)
-    return (
-      <Glass tint={dark ? c.glass : undefined} style={[shape, { boxShadow: shadow }]}>
-        {children}
-      </Glass>
-    )
   return (
-    <View pointerEvents="box-none" style={[shape, { backgroundColor: Platform.OS === 'ios' ? c.paper : c.t1, boxShadow: shadow }]}>
+    <View pointerEvents="box-none" style={[shape, { backgroundColor: Platform.OS === 'ios' ? iosMaterial[dark ? 'dark' : 'light'] : c.t1, boxShadow: shadow }]}>
       {children}
     </View>
   )
@@ -77,12 +70,12 @@ const ToastHost = () => {
         left: shape.inset,
         right: shape.inset,
         ...(ios ? { top: insets.top + shape.top } : { bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP) }),
-        // UIKit drops a glass effect that installs under a nearly transparent ancestor, so the iOS card only slides in.
+        // The iOS banner only slides in; Android fades.
         opacity: Platform.OS === 'ios' ? 1 : shown,
         transform: [{ translateY }],
       }}
     >
-      <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
+      <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow}>
         <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: shape.minHeight, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action && !ios ? spacing[2] : spacing[4], paddingVertical: ios ? TOAST_IOS_PAD : 0 }}>
           <Text v="b2" weight="600" pointerEvents="none" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
             {toast.message}

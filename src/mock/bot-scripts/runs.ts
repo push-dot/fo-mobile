@@ -551,7 +551,7 @@ const statesFile: Step[] = [
     documentId: 'src-upload',
     company: '모아페이',
     actions: [],
-    ...closing('다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.'),
+    ...closing('다 됐어요! 적합도를 6.9 → 8.1로 올렸어요.'),
   }),
   done,
 ]

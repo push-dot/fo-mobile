@@ -3145,7 +3145,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > states in one conversation 1`] = `
 "
 {"text":"states-file","type":"user"}
-{"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
+{"text":"다 됐어요! 적합도를 6.9 → 8.1로 올렸어요.","type":"agentText"}
 {"actions":[],"cardMeta":"A4 1쪽 · 186KB","checklist":["이력서 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","PDF로 만들기"],"company":"모아페이","documentId":"src-upload","fileName":"김서준_모아페이_백엔드.pdf","pageLine":"A4 1쪽 · 186KB","source":"external","type":"result"}
 {"seconds":1,"type":"worked"}
 {"text":"states-apply","type":"user"}
@@ -8479,7 +8479,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token states-file 1`] = `
 "
 {"text":"states-file","type":"user"}
-{"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
+{"text":"다 됐어요! 적합도를 6.9 → 8.1로 올렸어요.","type":"agentText"}
 {"actions":[],"cardMeta":"A4 1쪽 · 186KB","checklist":["이력서 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","PDF로 만들기"],"company":"모아페이","documentId":"src-upload","fileName":"김서준_모아페이_백엔드.pdf","pageLine":"A4 1쪽 · 186KB","source":"external","type":"result"}
 {"seconds":1,"type":"worked"}
 card null

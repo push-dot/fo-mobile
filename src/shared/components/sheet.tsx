@@ -1,6 +1,6 @@
 import { useNavigation } from 'expo-router'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
-import { Platform, View, type ViewProps } from 'react-native'
+import { Platform, useWindowDimensions, View, type ViewProps } from 'react-native'
 import { initialWindowMetrics, SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
@@ -28,6 +28,11 @@ type Props = {
   onLayout?: ViewProps['onLayout']
   /** Drawn to the top of the screen (route with fullSheetOptions): fills the sheet and keeps the CTA at the bottom. */
   full?: boolean
+  /**
+   * iOS: a sheet as tall as the screen allows. UIKit attaches it full width and does not shrink its content, so it takes no float scale;
+   * the board's floating sheet insets its 16 of padding by 8, which the 24 here puts back (FilterRegion). The content is a screen tall so the sheet always reaches that height.
+   */
+  attached?: boolean
 }
 
 const SHEET_GAP = 14
@@ -38,7 +43,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, actionGap, slimAction, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, actionGap, slimAction, onLayout, full, attached, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -65,7 +70,7 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
       style={{
         flex: full ? 1 : undefined,
         paddingTop: android ? spacing[3] : spacing[3] + GRABBER.ios.height + gap,
-        paddingHorizontal: android || full ? spacing[5] : spacing[4],
+        paddingHorizontal: android || full ? spacing[5] : attached ? spacing[6] : spacing[4],
         paddingBottom: android
           ? insets.bottom + spacing[3]
           : full
@@ -107,7 +112,8 @@ const IosSheet = (props: Props) => {
   const frame = useSafeAreaFrame()
   const [height, setHeight] = useState(0)
   const keyboardUp = useKeyboardHeight() > 0
-  const float = props.full ? null : floatingSheet(frame.width, Platform.Version, HOME_INSET, keyboardUp)
+  const screenHeight = useWindowDimensions().height
+  const float = props.full || props.attached ? null : floatingSheet(frame.width, Platform.Version, HOME_INSET, keyboardUp)
   return (
     <SafeAreaProvider initialMetrics={{ frame, insets: NO_INSETS }} style={{ flex: props.full ? 1 : 0 }}>
       <View
@@ -121,7 +127,7 @@ const IosSheet = (props: Props) => {
                 transform: [{ scale: float.scale }],
                 marginBottom: height ? float.marginBottom(height) : 0,
               }
-            : { flex: props.full ? 1 : undefined }
+            : { flex: props.full ? 1 : undefined, minHeight: props.attached ? screenHeight : undefined }
         }
       >
         <SheetSurface.Provider value={!props.full}>
