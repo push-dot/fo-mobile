@@ -14,7 +14,8 @@ const REF = '#FF0000'
 const FILL = 'rgba(0,0,255,0.55)'
 const LEFT = 20
 const CELL = 44
-const DONE_MS = 1800
+const DONE_MS = 4500
+const SLOW_MS = 3000
 
 const APPROVAL: Approval = {
   id: 'motion-check',
@@ -102,6 +103,18 @@ const Rows = ({ nonce }: { nonce: number }) => {
           <Blue />
         </Appear>
       </Cell>
+      <Cell name="slow-up">
+        <Ref name="slow-up" width={300} />
+        <Appear duration={SLOW_MS} style={box(300)}>
+          <Blue />
+        </Appear>
+      </Cell>
+      <Cell name="slow-bubble">
+        <Ref name="slow-bubble" width={240} left={142} />
+        <Appear kind="bubble" duration={SLOW_MS} style={box(240, 142)}>
+          <Blue />
+        </Appear>
+      </Cell>
       <Cell name="pop">
         <Ref name="pop" width={120} />
         <Animated.View style={[box(120), { transform: [{ scale: pop }] }]}>
@@ -131,6 +144,7 @@ const MotionCheckScreen = () => {
   const [nonce, setNonce] = useState(1)
   const [done, setDone] = useState(0)
   const [mode, setMode] = useState<'cells' | 'panel'>('cells')
+  const [toastRef, setToastRef] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const settle = () => {
     clearTimeout(timer.current)
@@ -146,11 +160,11 @@ const MotionCheckScreen = () => {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: LEFT, height: 44 }}>
         <RNText testID="motion-rm" style={{ fontSize: 13 }}>{`RM ${reduce ? 'on' : 'off'}`}</RNText>
         <RNText testID="motion-done" style={{ fontSize: 13 }}>{`done ${done}`}</RNText>
-        <Btn id="motion-replay" label="재생" onPress={() => (setMode('cells'), setNonce((n) => n + 1))} />
-        <Btn id="motion-toast" label="토스트" onPress={() => showToast({ message: '모션 확인 토스트예요' })} />
+        <Btn id="motion-replay" label="재생" onPress={() => (setMode('cells'), setToastRef(false), setNonce((n) => n + 1))} />
+        <Btn id="motion-toast" label="토스트" onPress={() => (setToastRef(true), showToast({ message: '모션 확인 토스트예요' }))} />
         <Btn id="motion-panel" label="패널" onPress={() => (setMode('panel'), setNonce((n) => n + 1))} />
       </View>
-      {mode === 'cells' ? <View testID="ref-toast" pointerEvents="none" style={{ position: 'absolute', left: 5, right: 5, top: insets.top + 2 - 3, height: 70, borderWidth: 1, borderColor: REF, borderRadius: 29, zIndex: 9 }} /> : null}
+      {mode === 'cells' && toastRef ? <View testID="ref-toast" pointerEvents="none" style={{ position: 'absolute', left: 5, right: 5, top: insets.top + 2 - 3, height: 70, borderWidth: 1, borderColor: REF, borderRadius: 29, zIndex: 9 }} /> : null}
       {mode === 'cells' ? (
         <View key={nonce}>
           <Rows nonce={nonce} />

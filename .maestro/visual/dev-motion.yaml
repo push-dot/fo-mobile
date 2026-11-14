@@ -6,7 +6,7 @@ tags:
 # Dev-only diagnostic (mock build): every entry motion beside the rect it must end on, once with Reduce Motion off and once on.
 # The device setting is flipped through the run's own listener (coverage/motion-check/motion-run.sh) and the app relaunches, so
 # the app reads the new value at launch like a real user who changed it in Settings.
-- evalScript: ${http.get('http://127.0.0.1:8123/rm/NO')}
+- evalScript: ${http.get('http://127.0.0.1:8123/rm/OFF')}
 - runFlow: ../flows/_login.yaml
 - openLink: push://dev/motion
 - extendedWaitUntil:
@@ -14,14 +14,16 @@ tags:
     timeout: 20000
 - extendedWaitUntil:
     visible: "done 1"
-    timeout: 20000
+    timeout: 30000
 - takeScreenshot: Motion.1
+# Replay: the first shot is taken right after the tap (the 3 s rows are still moving), the second once the page says done.
 - tapOn:
     id: motion-replay
+- takeScreenshot: Motion.2
 - extendedWaitUntil:
     visible: "done 2"
-    timeout: 20000
-- takeScreenshot: Motion.2
+    timeout: 30000
+- takeScreenshot: Motion.3
 - tapOn:
     id: motion-toast
 - extendedWaitUntil:
@@ -29,7 +31,7 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 700
-- takeScreenshot: Motion.3
+- takeScreenshot: Motion.4
 - tapOn:
     id: motion-panel
 # The open panel is an accessibility modal and its rows are not found by text, so wait for the screen to stop changing (the panel lands within 720 ms).
@@ -38,9 +40,9 @@ tags:
     commands:
       - waitForAnimationToEnd:
           timeout: 3000
-- takeScreenshot: Motion.4
+- takeScreenshot: Motion.5
 
-- evalScript: ${http.get('http://127.0.0.1:8123/rm/YES')}
+- evalScript: ${http.get('http://127.0.0.1:8123/rm/ON')}
 - runFlow: ../flows/_login.yaml
 - openLink: push://dev/motion
 - extendedWaitUntil:
@@ -48,14 +50,16 @@ tags:
     timeout: 20000
 - extendedWaitUntil:
     visible: "done 1"
-    timeout: 20000
-- takeScreenshot: Motion.5
+    timeout: 30000
+- takeScreenshot: Motion.6
+# Replay: the first shot is taken right after the tap (the 3 s rows are still moving), the second once the page says done.
 - tapOn:
     id: motion-replay
+- takeScreenshot: Motion.7
 - extendedWaitUntil:
     visible: "done 2"
-    timeout: 20000
-- takeScreenshot: Motion.6
+    timeout: 30000
+- takeScreenshot: Motion.8
 - tapOn:
     id: motion-toast
 - extendedWaitUntil:
@@ -63,7 +67,7 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 700
-- takeScreenshot: Motion.7
+- takeScreenshot: Motion.9
 - tapOn:
     id: motion-panel
 # The open panel is an accessibility modal and its rows are not found by text, so wait for the screen to stop changing (the panel lands within 720 ms).
@@ -72,4 +76,4 @@ tags:
     commands:
       - waitForAnimationToEnd:
           timeout: 3000
-- takeScreenshot: Motion.8
+- takeScreenshot: Motion.10
