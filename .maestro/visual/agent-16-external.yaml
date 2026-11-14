@@ -72,9 +72,13 @@ tags:
       BOT: "push"
       KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "Make this resume better"
+# The finished run asks ChatDoneNext at once and the action sheet hides the thread from the accessibility tree: wait for either, then close it.
 - extendedWaitUntil:
-    visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
+    visible: "(다음으로 무엇을 할까요\\?|.*김서준_백엔드_이력서_수정본.pdf.*)"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow: _dismiss_next.yaml
+- extendedWaitUntil:
+    visible: ".*김서준_백엔드_이력서_수정본.pdf.*"
+    timeout: 10000
 - takeScreenshot: ChatDoneNoJob
