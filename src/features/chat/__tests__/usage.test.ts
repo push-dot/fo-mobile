@@ -180,9 +180,14 @@ describe('threadRows', () => {
     expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'running', 'p'])
   })
 
-  it('keeps the line out of the list when no draft is being written (ChatBotStatusWork, Think, Approve)', () => {
-    expect(ids(threadRows([user], true))).toEqual(['u'])
-    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo'])
+  it('draws the line under the last line when no draft is being written (ChatBotStatusWork, Think, Queue)', () => {
+    expect(ids(threadRows([user], true))).toEqual(['u', 'running'])
+    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo', 'running'])
+    expect(ids(threadRows([user, todo, tool], true))).toEqual(['u', 'todo', 'running'])
+  })
+
+  it('draws no line when the run is not working', () => {
+    expect(ids(threadRows([user], false))).toEqual(['u'])
   })
 
   it('draws a finished draft as it is, with no line', () => {

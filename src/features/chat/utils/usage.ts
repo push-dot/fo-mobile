@@ -89,20 +89,22 @@ export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' |
 export const isDrawn = (item: ChatItem) =>
   item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
 
-/** The running line drawn inside the list (ChatPh3), not above the composer. */
+/** The running line, drawn inside the list under the last line (the boards draw it in the thread, not above the composer). */
 export type RunningRow = { type: 'running'; id: 'running' }
 export type ThreadRow = ChatItem | RunningRow
 
 /**
- * The list in order, drawn lines only. A draft card that is still being written (the last line while the run works) is what the
- * running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running line, draft card).
- * Every other working state keeps the line above the composer (ChatBotStatusWork, Think, Approve, Steps).
+ * The list in order, drawn lines only, and while the run works its running line under the last line (ChatBotStatusThink, Work, Long,
+ * Queue, XL, DocAgentNew: the line right under the user's line). A draft card that is still being written (the last line while the
+ * run works) is what the running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running
+ * line, draft card).
  */
 export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
   const drawn = items.filter(isDrawn)
+  if (!working) return drawn
+  const running: RunningRow = { type: 'running', id: 'running' }
   const last = drawn.at(-1)
-  if (!working || last?.type !== 'paper') return drawn
-  return [...drawn.slice(0, -1), { type: 'running', id: 'running' }, last]
+  return last?.type === 'paper' ? [...drawn.slice(0, -1), running, last] : [...drawn, running]
 }
 
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
@@ -115,7 +117,8 @@ const endsInResult = (items: ChatItem[]) => items.findLast((i) => i.type !== 'wo
 // The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
 // the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.
 const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'])
-export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type))
+// A file sent with the first line starts the flow too: DocAgentNew draws 작업 중에도 말할 수 있어요 right under the file chip, before any card.
+export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type) || (i.type === 'user' && !!i.attachment))
 
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
