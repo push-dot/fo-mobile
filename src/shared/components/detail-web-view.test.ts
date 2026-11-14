@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detailFrom, detailUrl, textSizeScript } from './detail-url'
+import { detailFrom, detailUrl, HOLD_FIT_SCRIPT, textSizeScript } from './detail-url'
 
 describe('detail url', () => {
   it('url carries theme and mock', () => {
@@ -24,5 +24,24 @@ describe('detail url', () => {
 
   it('text size rule is important so it beats the page body rule', () => {
     expect(textSizeScript(130)).toContain('html,body{-webkit-text-size-adjust:130%!important}')
+  })
+})
+
+describe('mock fit hold script (JobFit)', () => {
+  const delays: number[] = []
+  const win = { setTimeout: (_f: unknown, ms: number) => void delays.push(ms) }
+  new Function('window', HOLD_FIT_SCRIPT)(win)
+
+  it('waits 60 s for a zero-delay timer whose callback is a promise resolve', () => {
+    delays.length = 0
+    new Promise((resolve) => win.setTimeout(resolve, 0))
+    expect(delays).toEqual([60000])
+  })
+
+  it('leaves other timers alone', () => {
+    delays.length = 0
+    win.setTimeout(() => undefined, 0)
+    win.setTimeout(Math.max, 250)
+    expect(delays).toEqual([0, 250])
   })
 })

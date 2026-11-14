@@ -20,3 +20,7 @@ export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', m
 /** fo-web sets text-size-adjust on body, so an inline value on html never reached the text. */
 export const textSizeScript = (percent: number) =>
   `(function(){var s=document.getElementById('push-text-size');if(!s){s=document.createElement('style');s.id='push-text-size';document.documentElement.appendChild(s)}s.textContent='html,body{-webkit-text-size-adjust:${percent}%!important}'})();true;`
+
+/** Mock only (JobFit): fo-web waits on `new Promise((r) => setTimeout(r, 0))` before it answers the fit in a WebView, so zero-delay timers whose callback is a native function (a promise's resolve) wait 60 s. */
+export const HOLD_FIT_SCRIPT =
+  "(function(){var st=window.setTimeout;window.setTimeout=function(f,ms){var rest=Array.prototype.slice.call(arguments,2);return st.apply(window,[f,ms===0&&/\\[native code\\]/.test(Function.prototype.toString.call(f))?60000:ms].concat(rest))}})();"

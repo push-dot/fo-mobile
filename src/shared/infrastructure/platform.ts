@@ -31,6 +31,13 @@ export const failMockUploads = (on: boolean) => {
 }
 export const mockUploadFailing = () => mockUploadFails
 
+/** Mock tours (`mock=fit-comparing`): fo-web's WebView mock answers the fit at once, so JobFit's 비교하는 중 card is never on screen. The WebView is told to wait. */
+let mockFitHeld = false
+export const holdMockFit = (on: boolean) => {
+  mockFitHeld = on
+}
+export const mockFitHolding = () => mockFitHeld
+
 let stubbedPick: ImagePicker.ImagePickerAsset[] | null = null
 
 /** Mock tours (`mock=two-photos`): the next pickImage returns these assets instead of opening the system picker, whose labels the app does not set. */

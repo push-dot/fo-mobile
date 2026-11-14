@@ -15,6 +15,8 @@ export {
   stubPickDocument,
   failMockUploads,
   mockUploadFailing,
+  holdMockFit,
+  mockFitHolding,
   hapticImpactLight,
   hapticNotify,
   readClipboard,

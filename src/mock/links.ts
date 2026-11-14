@@ -1,7 +1,4 @@
 import { Image, Linking } from 'react-native'
-import { emptyChat, forget, useChatStore } from '@/features/chat'
-import { queryClient } from '@/providers/query-client'
-import { copyText, failMockUploads, stubPickDocument, stubPickImage } from '@/shared/infrastructure'
 import { DESIGN_SOURCES, emptyBot, expireCard, fixtureOf, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
 import { grantReference, setAccount } from './chat'
 import { pendingSocialPhone, unreadDeadline } from './home'
@@ -10,6 +7,14 @@ import { setMaterials } from './materials'
 import { closeMoapay, fewBookmarks } from './postings'
 import { setRules, type Rule } from './server'
 import { emptyFeed } from './social'
+
+/* eslint-disable @typescript-eslint/no-require-imports */
+// Loaded when a link arrives, not when this file loads: api-client requires this file while @/shared/infrastructure is still being
+// set up, and these modules import it back. A top-level import here left `http` undefined and crashed every launch of a mock build.
+const chat = () => require('../features/chat') as typeof import('../features/chat')
+const infra = () => require('../shared/infrastructure') as typeof import('../shared/infrastructure')
+const queryClient = () => (require('../providers/query-client') as typeof import('../providers/query-client')).queryClient
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 // `kind:METHOD:path-regex`, e.g. fail:GET:postings or hang:POST:postings/.*/apply; `reset` drops every rule.
 const toRule = (spec: string): Rule | null => {
@@ -32,16 +37,17 @@ const RESUME_FILE = { uri: 'file:///mock/김서준_백엔드_이력서_2026.pdf'
 const lateAnswer = (botId: string) => {
   const id = fixtureOf(botId)?.bot.id ?? botId
   const text = '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.'
+  const { emptyChat, useChatStore } = chat()
   useChatStore.setState((s) => {
-    const chat = s.chats[id] ?? emptyChat
-    return { chats: { ...s.chats, [id]: { ...chat, items: [...chat.items, { type: 'agentText', id: `late-${chat.items.length}`, text, sources: DESIGN_SOURCES }] } } }
+    const current = s.chats[id] ?? emptyChat
+    return { chats: { ...s.chats, [id]: { ...current, items: [...current.items, { type: 'agentText', id: `late-${current.items.length}`, text, sources: DESIGN_SOURCES }] } } }
   })
 }
 
 const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
-// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), upload-fail (the next file pick in 자료 고르기 returns the resume PDF and sending it fails to upload, ChatErrUpload), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
+// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), pick-file (the next file pick returns the resume PDF, Uploading with `hang:POST:sources`), fit-comparing (a job's fit card stays on 비교하는 중, JobFit), upload-fail (the next file pick in 자료 고르기 returns the resume PDF and sending it fails to upload, ChatErrUpload), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
 // Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request), bot:<id>:late (a bot answer lands in the open chat, ChatBotHeaderNew),
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
@@ -49,15 +55,18 @@ export const listenMockLinks = () =>
     const specs = decodeURIComponent(/[?&]mock=([^&#]*)/.exec(url)?.[1] ?? '').split(',').filter(Boolean)
     if (specs.includes('empty-feed')) emptyFeed()
     // The app writes its own pasteboard, so iOS shows no paste prompt when the link sheet reads it (Maestro setClipboard never reaches it).
-    if (specs.includes('clipboard-link')) void copyText('https://careers.moapay.co.kr/jobs/1042')
+    if (specs.includes('clipboard-link')) void infra().copyText('https://careers.moapay.co.kr/jobs/1042')
     if (specs.includes('two-photos'))
-      stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
+      infra().stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
+    if (specs.includes('pick-file')) infra().stubPickDocument([RESUME_FILE])
     if (specs.includes('upload-fail')) {
-      stubPickDocument([RESUME_FILE])
-      failMockUploads(true)
+      infra().stubPickDocument([RESUME_FILE])
+      infra().failMockUploads(true)
     }
+    if (specs.includes('fit-comparing')) infra().holdMockFit(true)
     if (specs.includes('reset')) {
-      failMockUploads(false)
+      infra().failMockUploads(false)
+      infra().holdMockFit(false)
       setRules([])
       setAccount({ ultra: false, spent: false, closed: false, run: undefined })
       setBlockedByThem(false)
@@ -75,7 +84,7 @@ export const listenMockLinks = () =>
       if (empty) {
         // A company chat has no clear-chat menu, so the open chat's client copy goes too: the next message draws on a bare thread.
         emptyBot(empty[1]!)
-        forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
+        chat().forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
       }
       const late = /^bot:(.+):late$/.exec(s)
       if (late) lateAnswer(late[1]!)
@@ -90,7 +99,7 @@ export const listenMockLinks = () =>
     if (specs.includes('blocked-by-them')) setBlockedByThem(true)
     if (specs.includes('long-intro')) {
       longIntro()
-      void queryClient.invalidateQueries({ queryKey: ['me', 'profile'] })
+      void queryClient().invalidateQueries({ queryKey: ['me', 'profile'] })
     }
     if (specs.includes('close-moapay')) closeMoapay()
     if (specs.includes('consent-on')) grantReference()

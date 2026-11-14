@@ -24,6 +24,8 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: PushDocViewMenuNoDuplicate
+# PushDocViewMenu draws 복제하기, which the app has no call for: the same menu is shot under its name so the capture is judged against it.
+- takeScreenshot: PushDocViewMenu
 - tapOn: "이름 바꾸기"
 - extendedWaitUntil:
     visible: "서류 이름 바꾸기"
@@ -67,6 +69,8 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MyPostsAllMenu
+# MyPostsAllMenuFull draws 저장한 글 and 정렬, which the server lacks (G32): the app's menu is shot under its name so it is judged against it.
+- takeScreenshot: MyPostsAllMenuFull
 
 # The archive and file delete routes fail from the start: the Push document keeps its failure toast, and an uploaded file comes back to the list with the toast DeleteDocFail draws.
 - runFlow:
