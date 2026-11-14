@@ -26,7 +26,11 @@ const Surface = ({ shape, shadow, opaque, children }: { shape: ViewStyle; shadow
         {children}
       </Glass>
     )
-  return <View style={[shape, { backgroundColor: Platform.OS === 'ios' ? c.paper : c.t1, boxShadow: shadow }]}>{children}</View>
+  return (
+    <View pointerEvents="box-none" style={[shape, { backgroundColor: Platform.OS === 'ios' ? c.paper : c.t1, boxShadow: shadow }]}>
+      {children}
+    </View>
+  )
 }
 
 const ToastHost = () => {
@@ -64,7 +68,8 @@ const ToastHost = () => {
   return (
     <Animated.View
       accessibilityLiveRegion="polite"
-      pointerEvents="box-none"
+      // A banner over the header must not eat the back button's touch: only its action takes touches (a failed delete left 뒤로 dead for 5 s).
+      pointerEvents={toast.action ? 'box-none' : 'none'}
       style={{
         position: 'absolute',
         left: shape.inset,
@@ -76,7 +81,7 @@ const ToastHost = () => {
       }}
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
+        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: TOAST_HEIGHT, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action ? spacing[2] : spacing[4] }}>
           <Text v="b2" weight="600" style={{ flex: 1, color: ink.text }}>
             {toast.message}
           </Text>
