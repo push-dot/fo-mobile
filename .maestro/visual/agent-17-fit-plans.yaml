@@ -11,7 +11,7 @@ tags:
       RUN: "ph1-free"
       BOT: "b-moa"
       KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
-      EN: "ph1-free"
+      EN: "How well does my resume fit this job"
 # The open gate is a modal panel that hides the chat text from accessibility, so wait on its question; the card is on screen above it.
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
@@ -25,7 +25,7 @@ tags:
       RUN: "ph1-ultra"
       BOT: "b-moa"
       KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
-      EN: "ph1-ultra"
+      EN: "How well does my resume fit this job"
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
     timeout: 20000
@@ -39,7 +39,7 @@ tags:
       RUN: "ph1-ultra-open"
       BOT: "b-moa"
       KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
-      EN: "ph1-ultra-open"
+      EN: "How well does my resume fit this job"
 - extendedWaitUntil:
     visible: "이렇게 고치면 8점대"
     timeout: 20000

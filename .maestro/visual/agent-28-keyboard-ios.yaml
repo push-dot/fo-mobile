@@ -15,7 +15,7 @@ tags:
             RUN: "ext-done"
             BOT: "b-moa"
             KO: "이 이력서 더 좋게 고쳐 줘"
-            EN: "ext-done"
+            EN: "Make this resume better"
       - extendedWaitUntil:
           visible: "프로필로 전환"
           timeout: 30000

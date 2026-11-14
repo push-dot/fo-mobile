@@ -17,7 +17,7 @@ tags:
       RUN: "ph1-free"
       BOT: "push"
       KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
-      EN: "ph1-free"
+      EN: "How well does my resume fit this job"
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
     timeout: 20000
