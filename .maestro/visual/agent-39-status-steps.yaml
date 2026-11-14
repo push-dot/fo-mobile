@@ -1,0 +1,77 @@
+appId: app.push.mobile
+name: 회사 봇 · 상태 줄 13단계 (ChatBotStatusSteps)
+tags:
+  - visual
+---
+# run:st-steps plays the 13 working lines one after the other, each held 7 s (STATUS_STEPS in status-line.ts). The board draws all 13 in one
+# list; the app draws one line at a time, so each line gets its own shot: ChatBotStatusSteps is line 01, ChatBotStatusSteps-NN the others.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:empty,run:st-steps"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: "적합도 보기"
+    timeout: 15000
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 공고에 맞춰 이력서 고쳐 주세요"
+      EN: "st-steps"
+- extendedWaitUntil:
+    visible: ".*서류를 읽는 중.*"
+    timeout: 30000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*공고에 맞춰 이력서 고쳐 주세요.*"
+- takeScreenshot: ChatBotStatusSteps
+- extendedWaitUntil:
+    visible: ".*공고 요건을 읽는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-02
+- extendedWaitUntil:
+    visible: ".*필수·우대 스택을 뽑는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-03
+- extendedWaitUntil:
+    visible: ".*기술 스택을 비교하는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-04
+- extendedWaitUntil:
+    visible: ".*경력 수준을 비교하는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-05
+- extendedWaitUntil:
+    visible: ".*적합도를 계산하는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-06
+- extendedWaitUntil:
+    visible: ".*고칠 곳을 고르는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-07
+- extendedWaitUntil:
+    visible: ".*경력 섹션을 쓰는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-08
+- extendedWaitUntil:
+    visible: ".*자기소개서를 쓰는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-09
+- extendedWaitUntil:
+    visible: ".*서류 양식을 고르는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-10
+- extendedWaitUntil:
+    visible: ".*PDF로 만드는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-11
+- extendedWaitUntil:
+    visible: ".*결과를 검토하는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-12
+- extendedWaitUntil:
+    visible: ".*내 서류에 저장하는 중.*"
+    timeout: 30000
+- takeScreenshot: ChatBotStatusSteps-13

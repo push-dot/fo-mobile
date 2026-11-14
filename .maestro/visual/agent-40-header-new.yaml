@@ -1,0 +1,26 @@
+appId: app.push.mobile
+name: 회사 봇 · 새 메시지 알림 (ChatBotHeaderNew)
+tags:
+  - visual
+---
+# The reader scrolls up in a finished chat, then a bot answer lands (bot:b-moa:late): the header avatar gets the green dot and the
+# thread shows the 새 메시지 1개 pill (ChatBotHeaderNew).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:thread"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: ".*PDF는 내 서류에 저장했어요.*"
+    timeout: 20000
+- swipe:
+    direction: DOWN
+    duration: 400
+- waitForAnimationToEnd
+- openLink: push://bots/b-moa?mock=bot:b-moa:late
+- extendedWaitUntil:
+    visible: "새 메시지 1개"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotHeaderNew

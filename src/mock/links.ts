@@ -1,8 +1,8 @@
 import { Image, Linking } from 'react-native'
-import { forget } from '@/features/chat'
+import { emptyChat, forget, useChatStore } from '@/features/chat'
 import { queryClient } from '@/providers/query-client'
-import { copyText, stubPickImage } from '@/shared/infrastructure'
-import { emptyBot, expireCard, fixtureOf, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
+import { copyText, failMockUploads, stubPickDocument, stubPickImage } from '@/shared/infrastructure'
+import { DESIGN_SOURCES, emptyBot, expireCard, fixtureOf, muteBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
 import { grantReference, setAccount } from './chat'
 import { pendingSocialPhone, unreadDeadline } from './home'
 import { longIntro, setBlockedByThem } from './me'
@@ -25,11 +25,24 @@ const photo = (module: number, fileName: string) => {
   return { uri: source.uri, fileName, mimeType: 'image/png', fileSize: 100_000, width: source.width ?? 1024, height: source.height ?? 1024 }
 }
 
+// ChatErrUpload: the file the next 자료 고르기 › 파일에서 고르기 returns. The mock API skips uploads, so `upload-fail` also makes the send fail.
+const RESUME_FILE = { uri: 'file:///mock/김서준_백엔드_이력서_2026.pdf', name: '김서준_백엔드_이력서_2026.pdf', mimeType: 'application/pdf', size: 2_400_000, lastModified: 0 }
+
+// ChatBotHeaderNew: a bot line lands while the reader is scrolled up, so the thread keeps its place and shows 새 메시지 1개 and the green dot.
+const lateAnswer = (botId: string) => {
+  const id = fixtureOf(botId)?.bot.id ?? botId
+  const text = '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.'
+  useChatStore.setState((s) => {
+    const chat = s.chats[id] ?? emptyChat
+    return { chats: { ...s.chats, [id]: { ...chat, items: [...chat.items, { type: 'agentText', id: `late-${chat.items.length}`, text, sources: DESIGN_SOURCES }] } } }
+  })
+}
+
 const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
-// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
-// Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request),
+// `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), upload-fail (the next file pick in 자료 고르기 returns the resume PDF and sending it fails to upload, ChatErrUpload), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
+// Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request), bot:<id>:late (a bot answer lands in the open chat, ChatBotHeaderNew),
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
   Linking.addEventListener('url', ({ url }) => {
@@ -39,7 +52,12 @@ export const listenMockLinks = () =>
     if (specs.includes('clipboard-link')) void copyText('https://careers.moapay.co.kr/jobs/1042')
     if (specs.includes('two-photos'))
       stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
+    if (specs.includes('upload-fail')) {
+      stubPickDocument([RESUME_FILE])
+      failMockUploads(true)
+    }
     if (specs.includes('reset')) {
+      failMockUploads(false)
       setRules([])
       setAccount({ ultra: false, spent: false, closed: false, run: undefined })
       setBlockedByThem(false)
@@ -59,6 +77,8 @@ export const listenMockLinks = () =>
         emptyBot(empty[1]!)
         forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
       }
+      const late = /^bot:(.+):late$/.exec(s)
+      if (late) lateAnswer(late[1]!)
       const seeded = /^bot:(.+):(thread|done)$/.exec(s)
       if (seeded) seedThread(seeded[1]!, seeded[2] as 'thread' | 'done')
       const materials = MATERIAL_SET.exec(s)

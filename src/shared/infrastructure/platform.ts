@@ -11,9 +11,25 @@ export const openBrowser = (url: string) => WebBrowser.openBrowserAsync(url)
 export const openAuthSession = (url: string, redirectUri: string) =>
   WebBrowser.openAuthSessionAsync(url, redirectUri)
 
-export const pickDocument = (
-  options: DocumentPicker.DocumentPickerOptions,
-) => DocumentPicker.getDocumentAsync(options)
+let stubbedDocument: DocumentPicker.DocumentPickerAsset[] | null = null
+
+/** Mock tours (`mock=upload-fail`): the next pickDocument returns these assets instead of opening the system file picker, which a tour cannot drive. */
+export const stubPickDocument = (assets: DocumentPicker.DocumentPickerAsset[]) => {
+  stubbedDocument = assets
+}
+
+export const pickDocument = (options: DocumentPicker.DocumentPickerOptions): Promise<DocumentPicker.DocumentPickerResult> => {
+  const assets = stubbedDocument
+  stubbedDocument = null
+  return assets ? Promise.resolve({ canceled: false, assets }) : DocumentPicker.getDocumentAsync(options)
+}
+
+/** Mock tours (`mock=upload-fail`): the mock API skips the upload, so this makes it fail the way a dropped connection does (ChatErrUpload). */
+let mockUploadFails = false
+export const failMockUploads = (on: boolean) => {
+  mockUploadFails = on
+}
+export const mockUploadFailing = () => mockUploadFails
 
 let stubbedPick: ImagePicker.ImagePickerAsset[] | null = null
 

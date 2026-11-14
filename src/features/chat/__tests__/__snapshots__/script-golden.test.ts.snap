@@ -8538,6 +8538,15 @@ card null
 "
 `;
 
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-steps 1`] = `
+"
+{"text":"st-steps","type":"user"}
+{"seconds":85,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token st-think 1`] = `
 "
 {"text":"st-think","type":"user"}

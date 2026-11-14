@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createBotApi, createClient } from '@push/api-client'
 import { READ_OFF_TEXT } from '../../features/chat/constants'
+import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import { pick } from '../bot-scripts/runs'
 import { emptyBot, resetBots, seedThread } from '../bots'
 import { grantReference } from '../chat'
@@ -24,6 +25,13 @@ describe('company-bot status board tokens', () => {
     const [line, end] = pick(token, false)!.steps
     expect(line!.frame).toMatchObject({ type: 'status', text })
     expect(end!.wait).toBeGreaterThan(60_000)
+  })
+
+  it('st-steps plays the 13 working lines of ChatBotStatusSteps, one after the other, then ends', () => {
+    const steps = pick('st-steps', false)!.steps
+    expect(steps.slice(0, -1).map((step) => step.frame)).toEqual(STATUS_STEPS.map((text) => ({ type: 'status', text })))
+    expect(steps.at(-1)!.frame).toMatchObject({ type: 'done' })
+    expect(steps.slice(1, -1).every((step) => step.wait >= 5_000)).toBe(true)
   })
 
   it('stops at a card that waits for an answer', () => {

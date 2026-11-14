@@ -5,7 +5,7 @@ import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
-import { API_MOCK, botApi, hapticImpactLight, hapticNotify } from '@/shared/infrastructure'
+import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
 import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, UPLOAD_ERROR_TEXT } from './constants'
@@ -98,7 +98,8 @@ type Outgoing = RunInput & { file?: PickedFile; reattach?: boolean }
 const posted = ({ file: _, ...rest }: Outgoing): RunInput => rest
 
 const withUpload = async (input: Outgoing): Promise<RunInput | undefined> => {
-  if (!input.file || API_MOCK) return posted(input)
+  if (!input.file) return posted(input)
+  if (API_MOCK) return mockUploadFailing() ? undefined : posted(input)
   try {
     const source = await myApi.upload(input.file)
     void queryClient.invalidateQueries({ queryKey: ['me', 'sources'] })

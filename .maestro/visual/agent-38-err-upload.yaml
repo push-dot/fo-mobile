@@ -1,0 +1,38 @@
+appId: app.push.mobile
+name: 회사 봇 · 파일 올리기 실패 (ChatErrUpload)
+tags:
+  - visual
+---
+# mock=upload-fail: the next 파일에서 고르기 returns the resume PDF (the system file picker cannot be driven) and the send fails to upload,
+# so the chat draws the file chip under the user line and the red 파일을 올리지 못했어요 line (ChatErrUpload).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:empty,upload-fail"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
+- extendedWaitUntil:
+    visible: "적합도 보기"
+    timeout: 15000
+- tapOn: "첨부"
+- extendedWaitUntil:
+    visible: "자료 고르기"
+    timeout: 10000
+- tapOn: "파일에서 고르기"
+- extendedWaitUntil:
+    visible: ".*김서준_백엔드_이력서_2026.pdf.*"
+    timeout: 10000
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
+      EN: "fix resume"
+- extendedWaitUntil:
+    visible: ".*파일을 올리지 못했어요.*"
+    timeout: 20000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*파일을 올리지 못했어요.*"
+- waitForAnimationToEnd
+- takeScreenshot: ChatErrUpload
