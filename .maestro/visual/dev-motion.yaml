@@ -10,7 +10,7 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - evalScript: ${http.get('http://127.0.0.1:8123/rm/OFF')}
+      - evalScript: ${http.get('http://127.0.0.1:8123/rm/NO')}
       - runFlow: ../flows/_login.yaml
       - openLink: push://dev/motion
       - extendedWaitUntil:
@@ -50,7 +50,7 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - evalScript: ${http.get('http://127.0.0.1:8123/rm/ON')}
+      - evalScript: ${http.get('http://127.0.0.1:8123/rm/YES')}
       - runFlow: ../flows/_login.yaml
       - openLink: push://dev/motion
       - extendedWaitUntil:
