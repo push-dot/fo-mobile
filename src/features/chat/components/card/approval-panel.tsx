@@ -57,10 +57,15 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
   const submitRow = !sectioned && !!approval.submit
 
   // The rise starts at mount and the end state is forced after RISE_MS + RISE_SLACK_MS (see riseOnMount): the panel must open every time.
-  useEffect(
-    () => riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: false }).start(), () => setLanded(true)),
-    [rise],
-  )
+  // Reduce Motion lands it at once (the static style below); it reaches the hook after mount, so the rise may already be running: stop it.
+  useEffect(() => {
+    if (reduce) {
+      rise.stopAnimation()
+      return
+    }
+    const stop = riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: false }).start(), () => setLanded(true))
+    return () => (stop(), rise.stopAnimation())
+  }, [rise, reduce])
 
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))
@@ -258,11 +263,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
   )
 
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
-  const motion = landed
-    ? { opacity: 1, transform: [{ translateY: 0 }] }
-    : reduce
-      ? { opacity: rise }
-      : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
+  const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
   return (
     <Animated.View
