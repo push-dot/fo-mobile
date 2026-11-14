@@ -19,6 +19,7 @@ import {
   unarchiveOffer,
   declineOffer,
   deleteLink,
+  duplicateDocument,
   restoreLink,
   fetchAuthMe,
   fetchBookmarkList,
@@ -155,6 +156,8 @@ export const useRenameDocument = (doc: { id: string; revision: number } | undefi
 
 export const useArchiveDocument = (doc: { id: string; revision: number } | undefined) =>
   useDocumentWrite(() => archiveDocument(doc!.id, doc!.revision))
+
+export const useDuplicateDocument = () => useDocumentWrite((id: string) => duplicateDocument(id))
 
 export const useIngestJob = (jobId: string | undefined, enabled = true) =>
   useQuery({ ...ingestJobQuery(jobId), enabled: ingestEnabled(jobId, enabled) })

@@ -48,6 +48,8 @@ export type HubDocument = {
   applicationId: string | null
   title: string
   kind: string
+  template?: string
+  language?: string
   status: string
   latestVersionId: string | null
   updatedAt: string

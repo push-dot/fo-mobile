@@ -331,6 +331,22 @@ mock('PATCH', 'documents/:id', ({ params, body }) => {
   Object.assign(doc!, { revision: doc!.revision + 1, updatedAt: new Date().toISOString() })
   return { data: doc }
 })
+// POST documents (a copy's new draft) and its first version, like push-be: the posting must exist, title 1-300.
+mock('POST', 'documents', ({ body }) => {
+  const b = (body ?? {}) as Record<string, unknown>
+  if (typeof b.applicationId !== 'string' || typeof b.title !== 'string' || !b.title) return docInvalid('title')
+  const doc: HubDocument = { ...pushDoc(`d-copy-${documents.length + 1}`, b.applicationId, b.title, new Date().toISOString()), latestVersionId: null }
+  documents = [doc, ...documents]
+  return { status: 201, body: { data: doc } }
+})
+mock('POST', 'documents/:id/versions', ({ params, body }) => {
+  const b = body as Record<string, unknown> | undefined
+  if (!b || !Number.isInteger(b.expectedRevision) || b.content == null) return docInvalid()
+  const { doc, fail } = docTarget(params.id, b.expectedRevision)
+  if (fail) return fail
+  Object.assign(doc, { revision: doc.revision + 1, latestVersionId: 'v1', updatedAt: new Date().toISOString() })
+  return { status: 201, body: { data: { id: 'v1', blocks: b.blocks ?? [], content: b.content } } }
+})
 mock('POST', 'documents/:id/archive', ({ params, body }) => {
   const b = body as Record<string, unknown> | undefined
   if (!b || typeof b !== 'object' || Object.keys(b).some((k) => k !== 'expectedRevision') || !Number.isInteger(b.expectedRevision)) return docInvalid()
@@ -465,6 +481,10 @@ const events: CalendarEvent[] = [
     notes: '받은 제안을 수락해서 잡힌 일정이에요',
   }),
   ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
+  // MyCalendar lists a fourth row on the 21st, the 마감 of 파도AI; the board's date and D-2 follow its own "today" (G43).
+  ev('e16', 'DEADLINE', '파도AI 데이터 분석가', on(10, 21, 23, 59), {
+    notes: '서류 확정이 필요해요',
+  }),
 ]
 // The board lists the 면접 once on the calendar and once on the application, so this one is only
 // served to the application's next-event query. shortcut: told apart by `from`, which is the
@@ -481,10 +501,6 @@ mock('GET', 'calendar/events', ({ query }) => {
   return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
-  // MyCalendar lists a fourth row on the 21st, the 마감 of 파도AI; the board's date and D-2 follow its own "today" (G43).
-  ev('e16', 'DEADLINE', '파도AI 데이터 분석가', on(10, 21, 23, 59), {
-    notes: '서류 확정이 필요해요',
-  }),
 mock('POST', 'calendar/events', ({ body }) => {
   const e = ev(
     `e${Date.now()}`,
