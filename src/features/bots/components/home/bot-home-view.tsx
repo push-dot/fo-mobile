@@ -7,7 +7,7 @@ import { useKeyboardHeight, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
-import { XL_FONT_SCALE } from '../new/copy'
+import { isXlScale } from '@/shared/components/xl-chrome'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
@@ -63,7 +63,7 @@ const BotHomeView = ({
   const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
-  const xl = useWindowDimensions().fontScale >= XL_FONT_SCALE
+  const xl = isXlScale(useWindowDimensions().fontScale)
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)

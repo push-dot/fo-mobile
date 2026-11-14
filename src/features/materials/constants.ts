@@ -31,7 +31,7 @@ export const EMPTY: Record<MaterialTab, { title: string; body: string; action: A
     action: 'upload',
   },
   doc: { title: '아직 서류가 없어요', body: '이력서나 경력기술서를 올리면 모든 Bot이\n함께 써요. Bot이 고친 서류도 여기에 저장돼요.', action: 'upload' },
-  bookmark: { title: '북마크한 공고가 없어요', body: '채용공고에서 북마크하면 여기 모여요. Bot한테 공고를 바로 보낼 수 있어요.', action: 'browse' },
+  bookmark: { title: '북마크한 공고가 없어요', body: '채용공고에서 북마크하면 여기 모여요.\nBot한테 공고를 바로 보낼 수 있어요.', action: 'browse' },
   link: { title: '저장한 링크가 없어요', body: 'GitHub, 블로그, 포트폴리오 주소를 저장해\n두면 Bot이 서류를 고칠 때 참고해요.', action: 'link' },
 }
 

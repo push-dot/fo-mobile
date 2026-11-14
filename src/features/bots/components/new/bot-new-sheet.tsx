@@ -6,6 +6,7 @@ import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
+import { isXlScale } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -67,7 +68,6 @@ import {
   SEARCH_PLACEHOLDER,
   SHEET_TITLE,
   UPGRADE_LABEL,
-  XL_FONT_SCALE,
 } from './copy'
 import { loadPosting, searchPostings, type PostingRow } from './posting-search'
 
@@ -234,7 +234,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
   const window = useWindowDimensions()
-  const xl = window.fontScale >= XL_FONT_SCALE
+  const xl = isXlScale(window.fontScale)
   const [sheetBottom, setSheetBottom] = useState(window.height)
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])
@@ -405,7 +405,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const name = posting?.company
   const linkWait = phase.kind === 'linkChecking' || phase.kind === 'linkFinding'
   const control = xl ? FIELD_XL : FIELD
+  // Board .xl: the field text is a fixed 19/29, like the name and sub (the system scale must not grow it again).
   const fieldFont = xl ? 19 : type.b1.fontSize
+  const fieldLine = xl ? 29 : type.b1.lineHeight
   const ios = Platform.OS === 'ios'
   const fieldBox = { height: control, borderRadius: control / 2 }
   const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
@@ -466,7 +468,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       ? shell(
           <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
             {searchIcon}
-            <Text color="t3" style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+            <Text color="t3" allowFontScaling={!xl} style={{ flex: 1, fontSize: fieldFont, lineHeight: fieldLine }}>
               {SEARCH_PLACEHOLDER}
             </Text>
           </Pressable>,
@@ -476,7 +478,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <>
             {searchIcon}
             <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <Text numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+              <Text numberOfLines={1} allowFontScaling={!xl} style={{ fontSize: fieldFont, lineHeight: fieldLine }}>
                 {pickedLine(posting)}
               </Text>
             </Pressable>
@@ -546,6 +548,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="search"
+              allowFontScaling={!xl}
               // The board's input inherits the page's -0.02em (`input{letter-spacing:inherit}`): the 31-glyph link is 228.7 pt tracked, 238.6 untracked,
               // and the field's text box is 230 (316 - 32 padding - icon 20 - spinner 18 - 2 gaps of 8), so untracked it scrolled its first letter away.
               style={[{ flex: 1, color: c.t1, fontSize: fieldFont, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fieldFont, paddingVertical: 0 }, fontFor('400')]}

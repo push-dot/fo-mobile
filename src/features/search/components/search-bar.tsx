@@ -39,7 +39,8 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
     </View>
   )
   const closeLabel = (
-    <Text v="b2" weight="700">
+    // The board draws 닫기 at 16px/700 (28.8pt wide): b1, so the button is 28.8 + 2 * 18 = 64.8 and the field 305.2.
+    <Text v="b1" weight="700">
       닫기
     </Text>
   )

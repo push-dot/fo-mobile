@@ -19,7 +19,6 @@ export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사
 export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
-export const XL_FONT_SCALE = 1.5
 export const SEARCH_DEBOUNCE_MS = 300
 export const LINK_FINDING_AFTER_MS = 1200
 export const CANCEL_LABEL = '취소'

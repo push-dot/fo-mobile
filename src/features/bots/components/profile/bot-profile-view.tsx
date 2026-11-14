@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, showToast } from '@/shared/components'
+import { isXlScale } from '@/shared/components/xl-chrome'
 import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
@@ -32,7 +33,6 @@ import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 // BotProfile boards: `.pnav` is 60 high with 16pt edges, the chat header's measure. Android keeps its own bar.
 const IOS = Platform.OS === 'ios'
 const HEADER_MASCOT = 104
-const XL_SCALE = 1.5
 const COLOR_DOT = 22
 
 const LOADING_GROUPS: readonly (readonly number[])[] = [[60, 80], [60], [40, 60], [80]]
@@ -91,7 +91,7 @@ const Loading = () => {
 }
 
 const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typeof Mascot>[0]['color']; sub?: string }) => {
-  const xl = useWindowDimensions().fontScale >= XL_SCALE
+  const xl = isXlScale(useWindowDimensions().fontScale)
   const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
   return (
     <View
