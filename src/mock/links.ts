@@ -56,7 +56,7 @@ export const listenMockLinks = () =>
     const specs = decodeURIComponent(/[?&]mock=([^&#]*)/.exec(url)?.[1] ?? '').split(',').filter(Boolean)
     if (specs.includes('empty-feed')) emptyFeed()
     // The app writes its own pasteboard, so iOS shows no paste prompt when the link sheet reads it (Maestro setClipboard never reaches it).
-    if (specs.includes('clipboard-link')) void infra().copyText('https://careers.moapay.co.kr/jobs/1042')
+    if (specs.includes('clipboard-link')) void infra().copyText('https://careers.moapay.kr/jobs/1182')
     if (specs.includes('two-photos'))
       infra().stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
     if (specs.includes('step-next')) chat().nextMockStep()

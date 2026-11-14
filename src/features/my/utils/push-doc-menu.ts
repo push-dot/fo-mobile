@@ -15,8 +15,9 @@ const GROUPS: { key: string; actions: PushDocAction[] }[] = [
   { key: 'danger', actions: ['delete'] },
 ]
 
+// 공고 보기 and 복제하기 need a posting: push-be POST documents requires the applicationId, so a document with none cannot be copied.
 export const pushDocMenu = (doc: { hasPosting: boolean }, on: Record<PushDocAction, () => void>): MenuSection[] =>
   GROUPS.map(({ key, actions }) => ({
     key,
-    actions: actions.filter((a) => a !== 'posting' || doc.hasPosting).map((a) => ({ key: a, ...ITEMS[a], onPress: on[a] })),
+    actions: actions.filter((a) => (a !== 'posting' && a !== 'duplicate') || doc.hasPosting).map((a) => ({ key: a, ...ITEMS[a], onPress: on[a] })),
   }))
