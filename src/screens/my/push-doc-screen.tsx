@@ -112,7 +112,6 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
         showToast({
           message: deleteCopy.failed,
           alert: true,
-          opaque: true,
           bottom: TOAST_ABOVE.tabs,
           action: { label: RETRY_LABEL, onPress: removeDoc },
         }),
@@ -128,14 +127,14 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           title: DOC_RENAME_COPY.title,
           current: item?.title ?? '',
           max: DOC_TITLE_MAX,
-          onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true, opaque: true }) }),
+          onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true }) }),
           fallback: () => router.push(`/docs/push/${id}/rename`),
         }),
       duplicate: () => {
         if (duplicate.isPending) return
         duplicate.mutate(id, {
           onSuccess: () => showToast({ message: DOC_COPY_COPY.done }),
-          onError: () => showToast({ message: DOC_COPY_COPY.failed, alert: true, opaque: true }),
+          onError: () => showToast({ message: DOC_COPY_COPY.failed, alert: true }),
         })
       },
       delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, removeDoc)),

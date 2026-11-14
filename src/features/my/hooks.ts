@@ -96,7 +96,7 @@ export const useFileMenu = (file: { id: string; fileName: string } | undefined) 
               title: DOC_RENAME_COPY.fileTitle,
               current: file.fileName,
               max: SOURCE_NAME_MAX,
-              onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true, opaque: true }) }),
+              onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true }) }),
               fallback: () => router.push(`/docs/${file.id}/rename`),
             }),
         },
