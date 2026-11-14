@@ -14,7 +14,7 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileLong
-- openLink: "push://bots/b-moa/profile?mock=reset,bot:b-moa:muted"
+- openLink: "push://bots/b-moa/profile?mock=reset,bot:b-moa:muted,grants:none"
 - extendedWaitUntil:
     visible: "백엔드 엔지니어"
     timeout: 10000

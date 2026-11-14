@@ -1,5 +1,5 @@
 import { Image, Linking } from 'react-native'
-import { DESIGN_SOURCES, emptyBot, expireCard, fixtureOf, muteBot, readBot, resetBots, seedThread, setBotPlan, setBots } from './bots'
+import { DESIGN_SOURCES, emptyBot, expireCard, fixtureOf, muteBot, readBot, resetBots, seedThread, setBotPlan, setBots, setGrants } from './bots'
 import { grantReference, setAccount } from './chat'
 import { pendingSocialPhone, unreadDeadline } from './home'
 import { longIntro, setBlockedByThem } from './me'
@@ -49,7 +49,7 @@ const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
 // `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-free (a FREE account's job fit card is locked, JobDetail.1), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), pick-file (the next file pick returns the resume PDF, Uploading with `hang:POST:sources`), fit-comparing (a job's fit card stays on 비교하는 중, JobFit), fit-soon (a job's fit card says 적합도는 곧 볼 수 있어요, JobDetailStates.1), apple-fail (the Apple sign-in attempt fails, SignInErrors.4; Google and GitHub fail with a `fail:GET:auth/.*/start` rule), upload-fail (the next file pick in 자료 고르기 returns the resume PDF and sending it fails to upload, ChatErrUpload), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token> (every next message) / run1:<chat token> (the next message only), reset, or a rule (see toRule).
-// Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit, with the three bots BotNewLimitDelete lists), bot:<id>:muted, bot:<id>:read (no unread dot on its row, AgentHomeError), bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done / bot:<id>:resume (ChatBotHeader's finished chat / ChatBotStatusDone's one request / ChatResume's lapsed review card and the resume offer), step-next (the next line of run:st-steps, ChatBotStatusSteps), bot:<id>:late (a bot answer lands in the open chat, ChatBotHeaderNew),
+// Bot and material switches: bots:none (only the Push Bot), grants:none / grants:seed (the 허용한 사이트 of 모아페이 and the Push Bot: none, or the seed; BotProfile has no such row, BotProfileAllowed has it), bots:long (AgentHomeLong), bots:limit (FREE at its limit, with the three bots BotNewLimitDelete lists), bot:<id>:muted, bot:<id>:read (no unread dot on its row, AgentHomeError), bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done / bot:<id>:resume (ChatBotHeader's finished chat / ChatBotStatusDone's one request / ChatResume's lapsed review card and the resume offer), step-next (the next line of run:st-steps, ChatBotStatusSteps), bot:<id>:late (a bot answer lands in the open chat, ChatBotHeaderNew),
 // card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), upload-toast (the 올렸어요 toast of a finished upload while the next file is still going up, Uploading), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
   Linking.addEventListener('url', ({ url }) => {
@@ -85,6 +85,12 @@ export const listenMockLinks = () =>
       setBlockedByThem(false)
       resetBots()
       setMaterials('default')
+    }
+    for (const set of ['none', 'seed'] as const) {
+      if (!specs.includes(`grants:${set}`)) continue
+      setGrants(set)
+      // The open profile keeps its cached grants, so its 허용한 사이트 row follows the switch without a reopen.
+      void queryClient().invalidateQueries({ queryKey: ['bots', 'site-grants'] })
     }
     if (specs.includes('bots:none')) setBots('none')
     if (specs.includes('bots:long')) setBots('long')
