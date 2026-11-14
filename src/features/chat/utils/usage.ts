@@ -96,10 +96,15 @@ const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' 
 
 const endsInResult = (items: ChatItem[]) => items.findLast((i) => i.type !== 'worked')?.type === 'result'
 
+// The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
+// the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.
+const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'])
+export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type))
+
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
-  // ChatPh1/ChatPh3/ChatInterrupt: while a document flow's to-do card is on screen the box says the run takes input too; a plain turn asks the named bot (ChatBotStatusWork).
-  if (chat.working && chat.items.some((i) => i.type === 'todo')) return COMPOSER_PLACEHOLDER.working
+  // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
+  if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
   if (name) return endsInResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp
