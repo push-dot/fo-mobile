@@ -48,21 +48,14 @@ tags:
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Boost
 # ChatPh3BoostStop draws two stops under the same boost line: all five rounds used (한 번 더 올리기 answers the card), and the score stuck early
-# (the boost-stuck run, played through run: for the board's own user line). The quality check streams in right after the stop line, so wait it out and scroll back up to the line.
+# (the boost-stuck run, played through run: for the board's own user line). The quality card hides the chat from accessibility, so the mock holds it back
+# for 20 s after the stop line and the shot is taken first.
 - runFlow:
     file: _pick.yaml
     env:
       ASK: "점수를 한 번 더 올릴까요?"
       PICK: ".*한 번 더 올리기"
       NEXT: ".*최대 5번까지 올렸어요.*"
-- extendedWaitUntil:
-    visible: "추천 수정도 반영할까요?"
-    timeout: 30000
-- waitForAnimationToEnd
-- scrollUntilVisible:
-    element: ".*최대 5번까지 올렸어요.*"
-    direction: UP
-    timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3BoostStop
 - runFlow: _fresh_company.yaml
@@ -74,13 +67,8 @@ tags:
       KO: "좋아요, 계속해 주세요"
       EN: "ok, continue"
 - extendedWaitUntil:
-    visible: "추천 수정도 반영할까요?"
+    visible: ".*더 올리기 어려워서 여기서 멈출게요.*"
     timeout: 40000
-- waitForAnimationToEnd
-- scrollUntilVisible:
-    element: ".*더 올리기 어려워서 여기서 멈출게요.*"
-    direction: UP
-    timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3BoostStop.2
 # The writing state holds for a minute (to-do 1/5, the draft card streaming), so this one goes last.

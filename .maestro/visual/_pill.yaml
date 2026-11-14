@@ -16,12 +16,12 @@ tags:
           times: 12
           commands:
             - swipe:
-                start: 85%,74%
-                end: 30%,74%
+                start: 85%,80%
+                end: 30%,80%
                 duration: 400
       - swipe:
-          start: 70%,74%
-          end: 55%,74%
+          start: 70%,80%
+          end: 55%,80%
           duration: 300
 - runFlow:
     when:
@@ -33,11 +33,11 @@ tags:
           times: 12
           commands:
             - swipe:
-                start: 15%,74%
-                end: 85%,74%
+                start: 15%,80%
+                end: 85%,80%
                 duration: 400
       - swipe:
-          start: 55%,74%
-          end: 70%,74%
+          start: 55%,80%
+          end: 70%,80%
           duration: 300
 - waitForAnimationToEnd
