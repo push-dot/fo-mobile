@@ -2,7 +2,8 @@
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 // Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
-import { HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
+import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
+import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
 import { PAGE_READ_FOOT, PAGE_READ_OPTIONS } from './cards'
 
@@ -559,6 +560,9 @@ export const fail = (code: string, details?: Record<string, unknown>): Step[] =>
 
 // The company-bot status boards (ChatBotStatus*, ChatBotReadOff): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
+// ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
+// so no line depends on how long Maestro takes to read the screen (its waits end early or late).
+const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
 const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
   ask({
@@ -630,6 +634,7 @@ export const TOKENS: Record<string, Step[]> = {
   // The company-bot boards (ChatBotStatus*): hold one status line (중지 on it is ChatBotStatusStopped), or stop at a card.
   'st-think': held('생각 중'),
   'st-work': held('공고 요건을 읽는 중'),
+  'st-steps': statusSteps,
   'st-queue': held('순서를 기다리는 중 · 앞에 작업 1개'),
   'st-long': held('누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사 공고 3개의 필수 요건과 우대 요건을 서로 비교하는 중'),
   'st-help': statusHelp,

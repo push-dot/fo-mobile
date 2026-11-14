@@ -161,8 +161,10 @@ const todoOf = (s: ChatState) => {
 }
 
 // A run waits on fake timers and on module loading, which is real I/O, so both get their turn until the run is over.
-const settle = async (running: () => boolean) => {
+// A gated step (GATED_STEP, st-steps) waits for a tour's `step-next` link, so each turn also sends it.
+const settle = async (running: () => boolean, nextStep: () => void) => {
   for (let i = 0; i < 3 || (running() && i < 100); i++) {
+    nextStep()
     await vi.runAllTimersAsync()
     await new Promise((resolve) => setImmediate(resolve))
   }
@@ -222,7 +224,7 @@ const play = async (path: Path) => {
         mock.setAccount(act.set)
         continue
     }
-    await settle(() => !!store.useChatStore.getState().chats[id]?.working)
+    await settle(() => !!store.useChatStore.getState().chats[id]?.working, store.nextMockStep)
   }
   return store.useChatStore.getState().chats[id] ?? emptyChat
 }

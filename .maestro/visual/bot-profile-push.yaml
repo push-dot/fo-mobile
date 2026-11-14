@@ -19,6 +19,7 @@ tags:
 - assertNotVisible: "Bot 색 바꾸기"
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileChief
+- takeScreenshot: BotProfilePush
 - tapOn: "허용한 사이트.*"
 - extendedWaitUntil:
     visible: "Bot이 묻지 않고 읽는 사이트예요.*"

@@ -335,7 +335,7 @@ export const emptyBot = (id: string) => {
   forgetRun(id)
 }
 const DESIGN_ASK = '모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요'
-const DESIGN_SOURCES: BotContract.Attachment[] = [
+export const DESIGN_SOURCES: BotContract.Attachment[] = [
   { kind: 'posting', id: 'p1', title: '모아페이 채용 공고' },
   { kind: 'document', id: 'd1', title: '김서준_백엔드_이력서.pdf' },
 ]

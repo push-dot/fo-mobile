@@ -16,3 +16,5 @@ tags:
     optional: true
 - waitForAnimationToEnd
 - takeScreenshot: ProfileDetailMe
+# ProfileDetailMePdf draws PDF로 내보내기, which has no endpoint (G33): the same screen is shot under its name so it is judged against it.
+- takeScreenshot: ProfileDetailMePdf
