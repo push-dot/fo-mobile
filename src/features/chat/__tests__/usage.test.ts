@@ -9,6 +9,7 @@ import {
   deleteBotConfirm,
   headerAction,
   isDrawn,
+  threadRows,
   isUsageExhausted,
   onboardingGreeting,
   threadGreeting,
@@ -165,5 +166,26 @@ describe('isDrawn', () => {
       { type: 'agentText', id: 'a', text: '좋아요' },
     ]
     expect(items.filter(isDrawn).map((i) => i.id)).toEqual(['u', 'e2', 'a'])
+  })
+})
+
+describe('threadRows', () => {
+  const user: ChatItem = { type: 'user', id: 'u', text: '네, 써 주세요' }
+  const todo: ChatItem = { type: 'todo', id: 'todo', items: [{ label: '요약', state: 'now' }] }
+  const tool: ChatItem = { type: 'tool', id: 'tool', action: '이력서 쓰기', state: 'run' }
+  const paper: ChatItem = { type: 'paper', id: 'p', label: '이력서 초안 v1', heading: '김서준', lines: [] }
+  const ids = (rows: { id: string }[]) => rows.map((r) => r.id)
+
+  it('puts the running line between the cards and the draft being written (ChatPh3)', () => {
+    expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'running', 'p'])
+  })
+
+  it('keeps the line out of the list when no draft is being written (ChatBotStatusWork, Think, Approve)', () => {
+    expect(ids(threadRows([user], true))).toEqual(['u'])
+    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo'])
+  })
+
+  it('draws a finished draft as it is, with no line', () => {
+    expect(ids(threadRows([user, todo, paper], false))).toEqual(['u', 'todo', 'p'])
   })
 })

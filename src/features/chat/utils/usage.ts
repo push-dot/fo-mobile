@@ -89,6 +89,22 @@ export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' |
 export const isDrawn = (item: ChatItem) =>
   item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
 
+/** The running line drawn inside the list (ChatPh3), not above the composer. */
+export type RunningRow = { type: 'running'; id: 'running' }
+export type ThreadRow = ChatItem | RunningRow
+
+/**
+ * The list in order, drawn lines only. A draft card that is still being written (the last line while the run works) is what the
+ * running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running line, draft card).
+ * Every other working state keeps the line above the composer (ChatBotStatusWork, Think, Approve, Steps).
+ */
+export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
+  const drawn = items.filter(isDrawn)
+  const last = drawn.at(-1)
+  if (!working || last?.type !== 'paper') return drawn
+  return [...drawn.slice(0, -1), { type: 'running', id: 'running' }, last]
+}
+
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 
 // A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
