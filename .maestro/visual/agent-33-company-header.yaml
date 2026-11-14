@@ -29,5 +29,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*[0-9]/[0-9].*"
     timeout: 10000
+# The board draws the result with the keyboard down (the field has a search return key, so Return lowers it).
+- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderFind

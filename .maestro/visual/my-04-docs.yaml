@@ -33,7 +33,8 @@ tags:
 - waitForAnimationToEnd:
     timeout: 3000
 
-# The remaining boards are iOS only.
+# The remaining boards are iOS only. v415 boards pair an iOS and an Android panel per state (MyResumeStates.1/.2 the ⋯ menu,
+# DeleteDoc.1/.2 the delete alert), so the iOS run shoots each state twice; the rename alert and the 되돌리기 toast are no panels.
 - runFlow:
     when:
       platform: iOS
@@ -46,13 +47,14 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: MyResumeStates.1
-      # 이름 변경 asks in the system alert with a text field (MyResumeStates.2).
+      - takeScreenshot: MyResumeStates.2
+      # 이름 변경 asks in the system alert with a text field.
       - tapOn: "이름 변경"
       - extendedWaitUntil:
           visible: "서류 이름 바꾸기"
           timeout: 5000
       - waitForAnimationToEnd
-      - takeScreenshot: MyResumeStates.2
+      - takeScreenshot: MyResumeRename
       - tapOn: "취소"
       - tapOn:
           point: "90%,56%"
@@ -65,13 +67,14 @@ tags:
           timeout: 10000
       - waitForAnimationToEnd
       - takeScreenshot: DeleteDoc.1
+      - takeScreenshot: DeleteDoc.2
       - tapOn: "삭제"
       - extendedWaitUntil:
           visible: "서류를 삭제했어요"
           timeout: 10000
       - waitForAnimationToEnd:
           timeout: 3000
-      - takeScreenshot: DeleteDoc.2
+      - takeScreenshot: DeleteDocToast
 # ToastSheetAndroid: the delete toast, then a confirm sheet opened while it shows (the toast must go).
 - runFlow:
     when:

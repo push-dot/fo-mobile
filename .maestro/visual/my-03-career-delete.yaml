@@ -12,7 +12,8 @@ tags:
 - extendedWaitUntil:
     visible: "경력 편집"
     timeout: 10000
-# Both boards are iOS only; nothing is saved, the toast's 되돌리기 is left alone.
+# v415 board: DeleteCareer.1 iOS and .2 Android are both the confirm alert, so the iOS run shoots the alert twice (the 되돌리기 toast
+# that the tour once shot as .2 is no panel; it keeps its own name). Both boards are iOS only; nothing is saved, the toast's 되돌리기 is left alone.
 - runFlow:
     when:
       platform: iOS
@@ -27,9 +28,10 @@ tags:
           timeout: 10000
       - waitForAnimationToEnd
       - takeScreenshot: DeleteCareer.1
+      - takeScreenshot: DeleteCareer.2
       - tapOn: "삭제"
       # The editor sheet hosts its own toast on iOS, so it stays open behind it like the board.
       - extendedWaitUntil:
           visible: "경력을 삭제했어요"
           timeout: 5000
-      - takeScreenshot: DeleteCareer.2
+      - takeScreenshot: DeleteCareerToast
