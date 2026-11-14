@@ -1,0 +1,15 @@
+appId: app.push.mobile
+tags:
+  - subflow
+# Types a natural line (${KO} on iOS, the token ${EN} on Android) and plays the mock token ${RUN} for that one message (run1:), so a capture never
+# shows an internal token as the user's line. ${BOT} is the Bot room: b-moa (company) or push. The link reopens the open room, no thread is emptied.
+---
+- openLink: push://bots/${BOT}?mock=run1:${RUN}
+- extendedWaitUntil:
+    visible: "메시지.*"
+    timeout: 15000
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: ${KO}
+      EN: ${EN}

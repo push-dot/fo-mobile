@@ -69,6 +69,15 @@ describe('chat mock', () => {
     expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval, 'open')).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
   })
 
+  it('plays a run1 token for one natural line only, then the normal route', async () => {
+    setAccount({ run: 'ext-done', once: true })
+    const first = await run('t-once', { text: '이 이력서 더 좋게 고쳐 줘' })
+    expect(first.some((e) => e.type === 'result')).toBe(true)
+    const second = await run('t-once-2', { text: '모아페이에 바로 지원해 줘' })
+    expect(second.some((e) => e.type === 'result')).toBe(false)
+    expect(second.some((e) => e.type === 'approval')).toBe(true)
+  })
+
   it('maps quick-start intents to their scenario', async () => {
     const boost = await run('t-boost', { text: '점수를 올려 주세요', intent: 'boost' })
     expect(boost.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)

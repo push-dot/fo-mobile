@@ -6,9 +6,11 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _company_tab.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-done"
+      RUN: "ext-done"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-done"
 - extendedWaitUntil:
     visible: "프로필로 전환"
@@ -19,9 +21,11 @@ tags:
 - takeScreenshot: ChatDone
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-nosave"
+      RUN: "ext-nosave"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-nosave"
 - extendedWaitUntil:
     visible: "모아페이에 바로 지원하기"
@@ -31,9 +35,11 @@ tags:
 - takeScreenshot: ChatDoneSaveFail
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-ok"
+      RUN: "ext-ok"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-ok"
 - extendedWaitUntil:
     visible: "내 서류에 저장했어요. 결과를 확인할까요?"
@@ -42,9 +48,11 @@ tags:
 - takeScreenshot: ChatPh6ResultFile
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-fail"
+      RUN: "ext-fail"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-fail"
 - extendedWaitUntil:
     visible: "내 서류에 저장하지 못했어요. 결과를 확인할까요?"
@@ -58,9 +66,11 @@ tags:
     timeout: 15000
 - waitForAnimationToEnd
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-nojob"
+      RUN: "ext-nojob"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-nojob"
 - extendedWaitUntil:
     visible: ".*김서준_백엔드_이력서_수정본.pdf.*"

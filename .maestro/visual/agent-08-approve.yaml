@@ -24,9 +24,11 @@ tags:
 # (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-done"
+      RUN: "ext-done"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
       EN: "ext-done"
 # The closing summary streams in below the fold and can stop the follow-the-end scroll (새 내용 pill).
 - retry:
@@ -48,9 +50,11 @@ tags:
 # ChatDoneProfile: the finished card with the sheet closed.
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "profile-done"
+      RUN: "profile-done"
+      BOT: "b-moa"
+      KO: "프로필 더 좋게 고쳐 줘"
       EN: "profile-done"
 - extendedWaitUntil:
     visible: "다음으로 무엇을 할까요?"
@@ -60,9 +64,11 @@ tags:
 # ChatPh6Result draws only the closing line and the card under the open gate, so it jumps there in a fresh conversation (mock token).
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "profile-gate"
+      RUN: "profile-gate"
+      BOT: "b-moa"
+      KO: "프로필 더 좋게 고쳐 줘"
       EN: "profile-gate"
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
