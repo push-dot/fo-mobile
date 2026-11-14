@@ -32,14 +32,12 @@ tags:
 - takeScreenshot: Motion.3
 - tapOn:
     id: motion-panel
-# The open panel is an accessibility modal: the page's own labels are hidden from the tree, so wait on the panel and let it settle.
-- extendedWaitUntil:
-    visible: "첫 번째"
-    timeout: 20000
-- waitForAnimationToEnd:
-    timeout: 3000
-- waitForAnimationToEnd:
-    timeout: 3000
+# The open panel is an accessibility modal and its rows are not found by text, so wait for the screen to stop changing (the panel lands within 720 ms).
+- repeat:
+    times: 4
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 3000
 - takeScreenshot: Motion.4
 
 - evalScript: ${http.get('http://127.0.0.1:8123/rm/YES')}
@@ -68,12 +66,10 @@ tags:
 - takeScreenshot: Motion.7
 - tapOn:
     id: motion-panel
-# The open panel is an accessibility modal: the page's own labels are hidden from the tree, so wait on the panel and let it settle.
-- extendedWaitUntil:
-    visible: "첫 번째"
-    timeout: 20000
-- waitForAnimationToEnd:
-    timeout: 3000
-- waitForAnimationToEnd:
-    timeout: 3000
+# The open panel is an accessibility modal and its rows are not found by text, so wait for the screen to stop changing (the panel lands within 720 ms).
+- repeat:
+    times: 4
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 3000
 - takeScreenshot: Motion.8
