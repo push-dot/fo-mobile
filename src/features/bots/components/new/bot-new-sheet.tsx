@@ -6,7 +6,7 @@ import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
-import { isXlBoardText } from '@/shared/components/xl-chrome'
+import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -623,4 +623,10 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 }
 
-export default BotNewSheet
+const BotNewSheetWithXlChrome = (props: Props) => (
+  <XlBoardChrome>
+    <BotNewSheet {...props} />
+  </XlBoardChrome>
+)
+
+export default BotNewSheetWithXlChrome

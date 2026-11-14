@@ -52,6 +52,7 @@ import {
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
+import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
@@ -297,4 +298,10 @@ const Thread = ({ id }: { id: string }) => {
   )
 }
 
-export default BotChatScreen
+const BotChatScreenWithXlChrome = () => (
+  <XlBoardChrome>
+    <BotChatScreen />
+  </XlBoardChrome>
+)
+
+export default BotChatScreenWithXlChrome

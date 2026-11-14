@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { isXlBoardText, isXlScale, XL_BOARD_TEXT_SCALE, XL_TEXT_SCALE, xlChrome } from './xl-chrome'
+import { isXlBoardText, isXlScale, XL_BOARD_TEXT_SCALE, XL_TEXT_SCALE, XlBoardChrome, xlChrome } from './xl-chrome'
 
 vi.mock('react-native', () => ({ useWindowDimensions: () => ({ fontScale: 1 }) }))
 
@@ -30,5 +30,12 @@ describe('xlChrome', () => {
   it('draws the boards 52pt header buttons and 68pt rows under .xl, 44 and 56 otherwise', () => {
     expect(xlChrome(true)).toEqual({ button: 52, row: 68 })
     expect(xlChrome(false)).toEqual({ button: 44, row: 56 })
+  })
+})
+
+describe('XlBoardChrome', () => {
+  it('is a provider element: the chat room and the Bot-create sheet read the 1.2 gate for their header and buttons', () => {
+    const el = XlBoardChrome({ children: null })
+    expect((el.props as { value: string }).value).toBe('board')
   })
 })

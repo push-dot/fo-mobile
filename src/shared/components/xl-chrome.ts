@@ -1,3 +1,4 @@
+import { createContext, createElement, useContext, type ReactNode } from 'react'
 import { useWindowDimensions } from 'react-native'
 
 /** The system text size at which the boards draw their "큰 글씨" (.xl) chrome: 52 pt header buttons, 68 pt rows, the XL Home/Profile/Materials boxes. */
@@ -16,7 +17,14 @@ export const useXlBoardText = () => isXlBoardText(useWindowDimensions().fontScal
 /** Under `.xl` the boards grow every round header button from 44 to 52 and the header row from 56 to 68. */
 export const xlChrome = (xl: boolean) => ({ button: xl ? 52 : 44, row: xl ? 68 : 56 })
 
+const XlGate = createContext<'chrome' | 'board'>('chrome')
+
+/** The chat room and the Bot-create sheet draw their XL chrome (header 68, buttons 52) at the harness XL size; every other screen keeps 1.5. */
+export const XlBoardChrome = ({ children }: { children: ReactNode }) => createElement(XlGate.Provider, { value: 'board' }, children)
+
 export const useXlChrome = () => {
-  const xl = isXlScale(useWindowDimensions().fontScale)
+  const gate = useContext(XlGate)
+  const fontScale = useWindowDimensions().fontScale
+  const xl = gate === 'board' ? isXlBoardText(fontScale) : isXlScale(fontScale)
   return { xl, ...xlChrome(xl) }
 }
