@@ -3,8 +3,8 @@ name: 공고 상세 → ULTRA 계정의 적합도 카드
 tags:
   - visual
 ---
-# plan-ultra makes the account ULTRA. The detail body is the fo-web WebView, whose mock serves one finished fit card for every plan,
-# so JobDetail.7 (iOS light) and .8 (iOS dark) are taken from that card once its bars settle.
+# plan-ultra makes the account ULTRA and tells the fo-web WebView mock, which then adds the `이렇게 고치면 8점대` row under the card.
+# JobDetail.7 (iOS light), .8 (iOS dark) and .9 (Android) are taken once the card's bars settle.
 - runFlow:
     file: _login_mock.yaml
     env:
@@ -21,9 +21,8 @@ tags:
     visible: "지원하기"
     timeout: 20000
 - extendedWaitUntil:
-    visible: ".*조금만 고치면 8점대예요.*"
+    visible: ".*이렇게 고치면 8점대.*"
     timeout: 30000
-    optional: true
 - waitForAnimationToEnd
 - waitForAnimationToEnd:
     timeout: 5000
@@ -33,4 +32,9 @@ tags:
     commands:
       - takeScreenshot: JobDetail.7
       - takeScreenshot: JobDetail.8
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - takeScreenshot: JobDetail.9
 - openLink: push://?mock=reset
