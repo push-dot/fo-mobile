@@ -1,6 +1,5 @@
 import { Pressable, View } from 'react-native'
 import { Highlight, Mascot, Text, type MenuAction } from '@/shared/components'
-import { spacing } from '../../../../theme'
 import type { BotRow } from '../../types'
 import { rowMotion } from '../../utils/home-rows'
 import BotRowMenu from './bot-row-menu'
@@ -33,7 +32,7 @@ const BotHomeRow = ({
   }
   const mascot = { marginTop: chrome.mascotTop }
   const body = { flex: 1, minWidth: 0, gap: 3 }
-  const top = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: spacing[2] }
+  const top = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: chrome.nameGap }
   const name = { flex: 1, fontSize: chrome.nameSize, lineHeight: chrome.nameLine }
   const time = { fontSize: chrome.timeSize, lineHeight: chrome.timeLine }
   const line = { fontSize: chrome.msgSize, lineHeight: chrome.msgLine }

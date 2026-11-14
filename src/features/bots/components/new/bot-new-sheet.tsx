@@ -56,6 +56,7 @@ import {
   ERROR_BODY,
   ERROR_TITLE,
   LINK_BAD,
+  LINK_CHECKING_LABEL,
   LINK_FINDING_AFTER_MS,
   NAME_PLACEHOLDER,
   ORGANIZE_LABEL,
@@ -428,8 +429,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
 
+  // The iOS modal starts under the status bar, so its header sits 14pt from the sheet's own top: the board's 36pt to the title centre. Android's full sheet reaches under the status bar.
   const header = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: insets.top + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: (ios ? 0 : insets.top) + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
       {searching ? (
         <View style={{ width: control, height: control }} />
       ) : organizing ? (
@@ -506,7 +508,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
             ))
           : null}
         {linkWait ? (
-          <View style={{ gap: spacing[2], paddingTop: spacing[4], paddingHorizontal: spacing[5], paddingBottom: BAR }}>
+          <View style={{ gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[5], paddingBottom: BAR }}>
             <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
             <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
           </View>
@@ -529,31 +531,24 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       </ScrollView>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: spacing[2], paddingHorizontal: spacing[4], paddingBottom: 10 + (keyboard > 0 ? 0 : insets.bottom) }}>
         {shell(
-          linkWait ? (
-            <>
-              {searchIcon}
-              <Text numberOfLines={1} style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
-                {linkLabel(linkUrl ?? '')}
-              </Text>
-              <Spinner size={18} color="t3" />
-            </>
-          ) : (
-            <>
-              {searchIcon}
-              <TextInput
-                autoFocus
-                value={fieldValue(form)}
-                onChangeText={onType}
-                placeholder={SEARCH_PLACEHOLDER}
-                placeholderTextColor={c.t3}
-                accessibilityLabel={SEARCH_PLACEHOLDER}
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="search"
-                style={[{ flex: 1, color: c.t1, fontSize: fieldFont, paddingVertical: 0 }, fontFor('400')]}
-              />
-            </>
-          ),
+          <>
+            {searchIcon}
+            {/* Stays mounted while the link is checked: unmounting it drops the focus and the keyboard (BotNewLinkChecking draws both). */}
+            <TextInput
+              autoFocus
+              value={fieldValue(form)}
+              onChangeText={linkWait ? undefined : onType}
+              caretHidden={linkWait}
+              placeholder={linkWait ? undefined : SEARCH_PLACEHOLDER}
+              placeholderTextColor={c.t3}
+              accessibilityLabel={linkWait ? LINK_CHECKING_LABEL : SEARCH_PLACEHOLDER}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="search"
+              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, paddingVertical: 0 }, fontFor('400')]}
+            />
+            {linkWait ? <Spinner size={18} color="t3" /> : null}
+          </>,
           { flex: 1 },
         )}
         {closeButton}
