@@ -22,6 +22,9 @@ export const unseenBotMessages = (items: readonly ChatItem[], seenId: string | u
 
 export type CreditBanner = { lines: string[]; action: 'plan' | 'credits' | null }
 
+/** One sentence per line, as the boards draw it: a date never breaks inside a sentence that wraps (rule 5; ChatBotHeaderLimit breaks after 썼어요.). */
+export const bannerText = (banner: CreditBanner) => banner.lines.join('\n')
+
 const monthDay = (at: Date) => `${at.getMonth() + 1}월 ${at.getDate()}일`
 
 /** Under the header once the monthly allowance is spent (ChatBotHeaderLimit, ChatBotHeaderLimitUltra). */

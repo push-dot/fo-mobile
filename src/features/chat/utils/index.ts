@@ -1,6 +1,7 @@
 export * from './account-menus'
 export * from './ago'
 export * from './cache-name'
+export * from './card'
 export * from './consent'
 export * from './conversation-menu'
 export * from './fit-card'

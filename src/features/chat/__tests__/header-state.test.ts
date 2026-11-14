@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { UPLOAD_ERROR_CODE } from '../constants'
-import { creditBanner, endsInError, headerLightOf, unseenBotMessages } from '../components/header/state'
+import { bannerText, creditBanner, endsInError, headerLightOf, unseenBotMessages } from '../components/header/state'
 import type { ChatItem } from '../types'
 
 describe('headerLightOf', () => {
@@ -49,6 +49,10 @@ describe('creditBanner', () => {
       lines: ['이번 달 사용량을 모두 썼어요.', '크레딧을 사면 바로 이어서 쓸 수 있어요.'],
       action: 'credits',
     })
+  })
+
+  it('puts each sentence on its own line so the date never breaks', () => {
+    expect(bannerText(creditBanner({ plan: 'FREE', refillAt, paymentsEnabled: true })!)).toBe('이번 달 사용량을 모두 썼어요.\n12월 1일에 다시 채워져요.')
   })
 
   it('offers no button while payments are closed', () => {

@@ -6,6 +6,8 @@ tags:
 # The tap lands on nothing when the line has scrolled out of the keyboard-high thread (a tour once ended with the keyboard up
 # where the board has none), so when a key is still on screen a drag down over the keyboard dismisses it (the thread list is
 # keyboardDismissMode "interactive"). The boards have no keyboard, so no tour may leave one up.
+# The key test names a key of the Korean layout (ㅂ, ㅁ, ㅋ, 123) as well as the space bar: ChatPh1 and ChatInterrupt kept their keyboard up in the
+# step-5 run because the Korean space bar is not labelled "space" and so no key was found.
 ---
 - runFlow:
     when:
@@ -17,7 +19,7 @@ tags:
       - waitForAnimationToEnd
       - runFlow:
           when:
-            visible: "(스페이스|space)"
+            visible: "(스페이스|space|Space|123|ㅂ|ㅁ|ㅋ|q|a|z|return|Return|리턴)"
           commands:
             - swipe:
                 start: "50%,35%"
