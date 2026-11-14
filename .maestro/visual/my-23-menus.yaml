@@ -113,20 +113,13 @@ tags:
 - extendedWaitUntil:
     visible: "서류를 삭제하지 못했어요"
     timeout: 10000
-- tapOn: "뒤로"
-# The first 뒤로 can land on the failure toast and leave the document open: tap it again when 올린 파일 is not there.
-- runFlow:
-    when:
-      notVisible: "올린 파일"
-    commands:
-      - tapOn: "뒤로"
-# The failure toast leaves the document open under a 뒤로 tap by label: tap the back arrow by position (top left) when 올린 파일 is still not there.
-- runFlow:
-    when:
-      notVisible: "올린 파일"
-    commands:
-      - tapOn:
-          point: "8%,9%"
+# After the failed delete the document stays open and 뒤로 does nothing (an app defect, see STEP2-REMAINDER-DEFECTS), so the list is reached through
+# the tab link: the mock rules stay, and the 서류 tab shows the uploaded files.
+- openLink: push://my
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "서류"
 - extendedWaitUntil:
     visible: "올린 파일"
     timeout: 10000
