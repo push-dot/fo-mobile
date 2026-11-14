@@ -31,10 +31,11 @@ describe('mock fit hold script (JobFit)', () => {
   const delays: number[] = []
   const win = { setTimeout: (_f: unknown, ms: number) => void delays.push(ms) }
   new Function('window', HOLD_FIT_SCRIPT)(win)
+  const loadMockFit = () => new Promise((resolve) => win.setTimeout(resolve, 0))
 
-  it('waits 60 s for a zero-delay timer whose callback is a promise resolve', () => {
+  it('waits 60 s for the zero-delay timer set inside loadMockFit', () => {
     delays.length = 0
-    new Promise((resolve) => win.setTimeout(resolve, 0))
+    void loadMockFit()
     expect(delays).toEqual([60000])
   })
 

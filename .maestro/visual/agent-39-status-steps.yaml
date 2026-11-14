@@ -3,7 +3,7 @@ name: 회사 봇 · 상태 줄 13단계 (ChatBotStatusSteps)
 tags:
   - visual
 ---
-# run:st-steps plays the 13 working lines one after the other, each held 7 s (STATUS_STEPS in status-line.ts). The board draws all 13 in one
+# run:st-steps plays the 13 working lines one after the other, each held 20 s (STATUS_STEPS in status-line.ts). The board draws all 13 in one
 # list; the app draws one line at a time, so each line gets its own shot: ChatBotStatusSteps is line 01, ChatBotStatusSteps-NN the others.
 - runFlow:
     file: _login_mock.yaml

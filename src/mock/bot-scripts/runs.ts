@@ -560,8 +560,8 @@ export const fail = (code: string, details?: Record<string, unknown>): Step[] =>
 
 // The company-bot status boards (ChatBotStatus*, ChatBotReadOff): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
-// ChatBotStatusSteps: the 13 status lines one after the other, each held long enough for a tour to read it and take its shot.
-const STEP_HOLD = 7000
+// ChatBotStatusSteps: the 13 status lines one after the other, each held 20 s: _say and the keyboard flow take several seconds of a tour before it can read the first line, and each shot takes a few more.
+const STEP_HOLD = 20_000
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? STEP_HOLD : 200, status(text))), done]
 const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
