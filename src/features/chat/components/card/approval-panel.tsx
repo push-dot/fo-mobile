@@ -59,7 +59,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
 
   // The rise starts at mount and the end state is forced after RISE_MS + RISE_SLACK_MS (see riseOnMount): the panel must open every time.
   useEffect(
-    () => riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: true }).start(), () => setLanded(true)),
+    () => riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: false }).start(), () => setLanded(true)),
     [rise],
   )
 
@@ -261,8 +261,9 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
     </View>
   )
 
+  // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed
-    ? undefined
+    ? { opacity: 1, transform: [{ translateY: 0 }] }
     : reduce
       ? { opacity: rise }
       : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
