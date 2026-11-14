@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { UPLOAD_ERROR_CODE } from '../constants'
 import { creditBanner, endsInError, headerLightOf, unseenBotMessages } from '../components/header/state'
 import type { ChatItem } from '../types'
 
@@ -15,6 +16,8 @@ describe('headerLightOf', () => {
     expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x' }])).toBe(true)
     expect(endsInError([{ type: 'error', id: 'e', text: 'x' }, { type: 'user', id: 'u', text: 'x' }])).toBe(false)
     expect(endsInError([])).toBe(false)
+    // ChatErrUpload: the line says the file did not go up; no run failed, so no red lamp.
+    expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x', code: UPLOAD_ERROR_CODE }])).toBe(false)
   })
 
   it('lets red win over green', () => {

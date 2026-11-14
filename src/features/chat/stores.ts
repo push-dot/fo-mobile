@@ -8,7 +8,7 @@ import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
@@ -311,7 +311,7 @@ const startRun = async (input: Outgoing) => {
   try {
     run = await withUpload(input)
     if (!run) {
-      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT })
+      dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT, code: UPLOAD_ERROR_CODE })
       release = true
     } else {
       const events = API_MOCK
