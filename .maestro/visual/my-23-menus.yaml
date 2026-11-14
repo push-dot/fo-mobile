@@ -114,6 +114,12 @@ tags:
     visible: "서류를 삭제하지 못했어요"
     timeout: 10000
 - tapOn: "뒤로"
+# The first 뒤로 can land on the failure toast and leave the document open: tap it again when 올린 파일 is not there.
+- runFlow:
+    when:
+      notVisible: "올린 파일"
+    commands:
+      - tapOn: "뒤로"
 - extendedWaitUntil:
     visible: "올린 파일"
     timeout: 10000

@@ -2,15 +2,15 @@ appId: app.push.mobile
 tags:
   - subflow
 # The 채용공고 filter chip row scrolls sideways: 지역 is clipped and 고용형태 is off screen until it is swiped left.
-# The row sits at 14% of the height on Android (17% misses it) and lower on iOS.
+# The row sits at 14% of the height on Android and at 23% on iOS (17% before the design 415 header).
 ---
 - runFlow:
     when:
       platform: iOS
     commands:
       - swipe:
-          start: "90%,17%"
-          end: "10%,17%"
+          start: "90%,23%"
+          end: "10%,23%"
           duration: 300
 - runFlow:
     when:

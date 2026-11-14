@@ -58,6 +58,10 @@ export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도
 const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
+const JD_RUN_HOLD = 20_000
+// The stop lines of ChatPh3BoostStop stay alone this long before the quality check opens its card, which hides the chat from accessibility.
+const BEFORE_QUALITY = 20_000
+const after = (steps: Step[], ms: number): Step[] => steps.map((st, i) => (i === 0 ? { ...st, wait: ms } : st))
 // Android taps wait up to 10s for a running line's spinner to settle, so a tour that acts while one runs needs far more than DWELL.
 const HOLD = 150_000
 export const JD_LINES = ['필수 · Kotlin 또는 Java 4년 이상', '필수 · Spring Boot 운영', '필수 · RDBMS 설계와 튜닝', '필수 · 대용량 트래픽 처리', '필수 · 결제·정산 도메인 이해', '우대 · Kafka · 장애 대응 · MSA']
@@ -282,7 +286,8 @@ const ph1: Step[] = [
   s(300, agent('이력서에 없는 저장소 **payment-retry-lab**을 찾았어요. 경험으로 넣을지 분석이 끝나면 여쭤볼게요.')),
   s(200, todo('todo1', PH1, 2)),
   s(200, tool('jd', '공고 읽기', MOA, 'run', '필수·우대 스택을 뽑는 중')),
-  s(DWELL, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
+  // The running line is what ChatPh1 draws; a tour needs a few seconds after its own steps to find it below the fold.
+  s(JD_RUN_HOLD, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
   s(200, todo('todo1', PH1, 3)),
   s(200, status('맞춰보는 중…')),
   s(200, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'run', '항목별 점수를 내는 중')),
@@ -497,7 +502,7 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
   'ph3-review': (c) => (c === 0 ? ph3Boost : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-boost': (c) =>
     c === 0
-      ? [s(400, agent('최대 5번까지 올렸어요.')), ...ph4Quality]
+      ? [s(400, agent('최대 5번까지 올렸어요.')), ...after(ph4Quality, BEFORE_QUALITY)]
       : c === 1
         ? ph4Quality
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
@@ -649,7 +654,7 @@ export const TOKENS: Record<string, Step[]> = {
   analyze: ph1,
   boost: ph3Boost,
   // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
-  'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), ...ph4Quality],
+  'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), ...after(ph4Quality, BEFORE_QUALITY)],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
   quality: ph4Quality,
   '품질 검사로 넘어가기': ph4Quality,

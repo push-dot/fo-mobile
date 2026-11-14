@@ -11,6 +11,11 @@ tags:
     env:
       KO: "품질 검사로 넘어가기"
       EN: "quality"
+# The approval card opens blank when it comes up while the keyboard is still raised (the hierarchy then holds nothing), so lower it first.
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*품질 검사로 넘어가기.*"
 - extendedWaitUntil:
     visible: "추천 수정도 반영할까요?"
     timeout: 30000
