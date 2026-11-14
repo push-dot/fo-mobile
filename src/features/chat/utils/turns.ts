@@ -76,12 +76,20 @@ export const openPieceId = (turns: BotContract.Turn[], live?: { turnId: string; 
   return open ? piece : undefined
 }
 
+/** A card nobody answered in time: the server says EXPIRED, or its own expiresAt has gone by. */
+const lapsed = (ev: Card, now: number) => {
+  const expiresAt = (ev as { expiresAt?: string | null }).expiresAt
+  return ev.resolution?.status === 'EXPIRED' || (ev.resolution?.status === 'PENDING' && !!expiresAt && Date.parse(expiresAt) <= now)
+}
+
 export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: string; lastSeq: number } | null): ChatState => {
   let s = emptyChat
   const put = (e: ChatEvent) => {
     s = applyEvent(s, e)
   }
-  for (const t of [...turns].reverse()) {
+  const now = Date.now()
+  const ordered = [...turns].reverse()
+  for (const [i, t] of ordered.entries()) {
     s = { ...s, approval: null, awaiting: null }
     if (t.user?.text) put({ type: 'user', id: t.user.messageId, text: t.user.text })
     let piece: string | null = null
@@ -96,7 +104,17 @@ export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: stri
       }
       if (ev.type === 'status') continue
       piece = null
-      for (const e of mapEvent(ev as StreamEvent, t.id)) put(e)
+      const card = ev.type === 'approval' || ev.type === 'choice' ? (ev as Card) : undefined
+      // An earlier turn's card that ran out is a 확인 대기 중 · 멈춤 line, not an open panel (ChatResume); only the newest turn can still be waiting.
+      if (card && i < ordered.length - 1 && lapsed(card, now)) {
+        const question = mapEvent(card).find((e) => e.type === 'approval')
+        if (question?.type === 'approval') put({ type: 'stale', id: `stale-${card.id}`, text: question.approval.question })
+        continue
+      }
+      for (const e of mapEvent(ev as StreamEvent, t.id)) {
+        // A reopened chat has no run on screen, so a card that was asked in an earlier visit draws no live waiting line (ChatResume); a reattached run does.
+        put(e.type === 'approval' && ev.type === 'choice' && t.id !== live?.turnId ? { ...e, approval: { ...e.approval, openedAt: undefined } } : e)
+      }
     }
     if (t.assistant?.sources.length) put({ type: 'sources', sources: t.assistant.sources })
   }

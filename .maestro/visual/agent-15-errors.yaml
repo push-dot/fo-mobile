@@ -4,9 +4,10 @@ tags:
   - visual
 ---
 - runFlow: ../flows/_login.yaml
-- runFlow: _agent_tab.yaml
+# ChatErrUnavailable is the 모아페이 Bot room (teal mascot, no lamp), so it runs in the company chat; the other error boards run in Push Bot below.
+- runFlow: _company_tab.yaml
 # The boards draw the user's own request above each error; run:<token> makes the mock answer it with that error (Android types the ASCII alias).
-- openLink: push://bots/push?mock=run:err-unavailable
+- openLink: push://bots/b-moa?mock=run:err-unavailable
 - runFlow:
     file: _say.yaml
     env:
@@ -22,8 +23,12 @@ tags:
       TEXT: ".*이력서 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUnavailable
-- runFlow: _fresh_chat.yaml
-- openLink: push://bots/push?mock=run:err-other
+# The rest are Push Bot boards: bot:push:empty clears its chat (the fixture has an older one) and run:err-other plays the next error.
+- openLink: push://bots/push?mock=consent-on,bot:push:empty,run:err-other
+- extendedWaitUntil:
+    visible: "공고 링크로 맞추기"
+    timeout: 15000
+- waitForAnimationToEnd
 - runFlow:
     file: _say.yaml
     env:

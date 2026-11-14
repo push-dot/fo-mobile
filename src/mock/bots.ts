@@ -369,9 +369,25 @@ export const DESIGN_SOURCES: BotContract.Attachment[] = [
  * `bot:<id>:thread` is ChatBotHeader's finished chat, `bot:<id>:done` the single request of ChatBotStatusDone. Only a stored turn
  * draws the 출처 row under an answer, so a tour cannot send its way here. No open card, so the composer is there.
  */
-export const seedThread = (id: string, set: 'thread' | 'done') => {
+export const seedThread = (id: string, set: 'thread' | 'done' | 'resume') => {
   const f = fixtureOf(id)
   if (!f) return
+  if (set === 'resume') {
+    // ChatResume: the draft's review card ran out an hour ago (a 확인 대기 중 · 멈춤 line), then the user asks for a new resume and the bot offers the draft.
+    Object.assign(f, {
+      messages: [
+        { id: 'm-resume-user', turn: 't-resume', role: 'USER', text: '새 이력서 만들어 줘', at: 5 },
+        { id: 'm-resume-bot', turn: 't-resume', role: 'ASSISTANT', text: '작성 중인 이력서 초안(v1)이 있어요.', at: 4 },
+      ],
+      cards: [
+        { id: 'card-draft-review', turn: 't-draft', for: 'answer', title: '첫 번째 초안(v1)이에요. 이대로 검토할까요?', status: 'PENDING', at: 60, expiresAt: 50, options: [{ id: 'review', label: '검토할게요' }, { id: 'stop', label: '그만하기' }] },
+        { id: 'card-resume', turn: 't-resume', for: 'answer', title: '이어서 작성할까요?', status: 'PENDING', at: 4, expiresAt: null, options: [{ id: '0', label: '이어서 작성하기' }, { id: '1', label: '그만하기' }] },
+      ],
+      job: null,
+      readAt: 0,
+    })
+    return
+  }
   const said = (turn: string, role: MockMessage['role'], text: string, at: number, sources?: BotContract.Attachment[]): MockMessage => ({
     id: `m-${turn}-${role}`, turn, role, text, at, ...(sources ? { sources } : {}),
   })

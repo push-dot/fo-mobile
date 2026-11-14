@@ -6,7 +6,26 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _company_tab.yaml
 # run:tailor hold plays the held run for the typed line, so the working line stays up for the screenshot on iOS too.
-- openLink: push://bots/b-moa?mock=run:tailor%20hold
+# pick-file makes 파일에서 고르기 return the resume PDF: ChatStates.3 draws it as the file chip inside the first user bubble (iOS).
+- openLink: push://bots/b-moa?mock=run:tailor%20hold,pick-file
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "첨부"
+      - extendedWaitUntil:
+          visible: "자료 고르기"
+          timeout: 10000
+      # The sheet lists the documents first; 파일에서 고르기 is the last row, below the fold.
+      - scrollUntilVisible:
+          element: "파일에서 고르기"
+          direction: DOWN
+          timeout: 20000
+      - tapOn: "파일에서 고르기"
+      - extendedWaitUntil:
+          notVisible: "자료 고르기"
+          timeout: 10000
+      - waitForAnimationToEnd
 - runFlow:
     file: _say.yaml
     env:
