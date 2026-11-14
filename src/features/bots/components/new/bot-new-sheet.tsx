@@ -80,6 +80,7 @@ type Props = {
 
 const SWATCH = 46
 const DOT = 34
+const ROW_TITLE = 17
 const PREVIEW = 120
 const PREVIEW_SUB = 14
 const PREVIEW_SUB_LINE = 20
@@ -417,7 +418,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     )
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
-  const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
+  // Board `.smod .rr` (r4p): padding 14px 16px, no min-height, title 17/22.
+  const rowTitle = { justifyContent: 'center' as const, gap: 2, paddingVertical: 14, paddingHorizontal: spacing[4] }
+  const rowTitleText = { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight }
   const card = { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
@@ -492,7 +495,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {showRows
           ? rows.map((row) => (
               <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
-                <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
+                <Text v="b1" weight="600" style={rowTitleText}>
                   <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
                 </Text>
                 <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
@@ -511,7 +514,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
           <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, card]}>
-            <Text weight="700" numberOfLines={2} style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
+            <Text weight="600" numberOfLines={2} style={rowTitleText}>
               {pickedLine(phase.posting)}
             </Text>
             <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
