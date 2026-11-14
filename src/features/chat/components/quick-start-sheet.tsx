@@ -481,7 +481,7 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
               <Text v="c2" weight="600" color="t3">
                 {e.date?.dow}
               </Text>
-              <Text v="b1" weight="800">
+              <Text v="b1" weight="400">
                 {e.date?.day}
               </Text>
             </View>

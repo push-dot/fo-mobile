@@ -25,21 +25,15 @@ const runAdd = (action: AddAction) => {
   router.push('/jobs')
 }
 
-/** RN has no `text-wrap: balance`; this width rebuilds the three lines MaterialsEmpty draws for its body. */
-const NOTE_BODY_WIDTH = 252
-/**
- * The boards draw the note's title at about a third of the sheet, not the middle of the list area: the block's centre sits 134pt above
- * the area's centre (measured on MaterialsEmpty, iOS 131 / Android 137), and centring in a box with this much bottom padding lifts it half of it.
- */
-const NOTE_RESERVE = 268
+/** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. The boards top-align the block (`padding-top: 120px`), they do not centre it. */
+const NOTE_TOP = 120
 
-/** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. */
 const Note = ({ title, body, action, alert }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean }) => (
-  <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: NOTE_RESERVE }}>
+  <View accessibilityRole={alert ? 'alert' : undefined} style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: 36, paddingTop: NOTE_TOP }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
       {title}
     </Text>
-    <Text v="b2" color="t3" style={{ textAlign: 'center', maxWidth: NOTE_BODY_WIDTH }}>
+    <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
       {body}
     </Text>
     {action ? <Button label={action.label} variant="secondary" size="sm" onPress={action.onPress} style={{ marginTop: spacing[3] }} /> : null}
