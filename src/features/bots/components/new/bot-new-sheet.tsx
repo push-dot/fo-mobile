@@ -546,7 +546,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="search"
-              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, paddingVertical: 0 }, fontFor('400')]}
+              // The board's input inherits the page's -0.02em (`input{letter-spacing:inherit}`): the 31-glyph link is 228.7 pt tracked, 238.6 untracked,
+              // and the field's text box is 230 (316 - 32 padding - icon 20 - spinner 18 - 2 gaps of 8), so untracked it scrolled its first letter away.
+              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fieldFont, paddingVertical: 0 }, fontFor('400')]}
             />
             {linkWait ? <Spinner size={18} color="t3" /> : null}
           </>,
