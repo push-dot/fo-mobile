@@ -50,8 +50,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
           block.kind === 'paragraph' ? (
             <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
           ) : (
-            // The bubble's own gap is 6; the board puts 4 between the paragraph and its list.
-            <View key={i} style={{ gap: spacing[1], marginTop: -2 }}>
+            // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
+            <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
               {block.items.map((line) => (
                 <Rich key={line} v="b1" text={line} markId={item.id} {...big} />
               ))}
