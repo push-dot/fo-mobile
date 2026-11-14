@@ -59,8 +59,6 @@ const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 �
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
 const JD_RUN_HOLD = 20_000
-// The stop lines of ChatPh3BoostStop stay alone this long before the quality check opens its card, which hides the chat from accessibility.
-const BEFORE_QUALITY = 20_000
 // ChatPh4Quality: the card opens after the tour has typed the line and lowered the keyboard (a card that opens over the raised keyboard comes up blank).
 const QUALITY_LATER = 15_000
 const after = (steps: Step[], ms: number): Step[] => steps.map((st, i) => (i === 0 ? { ...st, wait: ms } : st))
@@ -508,7 +506,7 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
   'ph3-review': (c) => (c === 0 ? ph3Boost : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-boost': (c) =>
     c === 0
-      ? [s(400, agent('최대 5번까지 올렸어요.')), ...after(ph4Quality, BEFORE_QUALITY)]
+      ? [s(400, agent('최대 5번까지 올렸어요.')), done]
       : c === 1
         ? ph4Quality
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
@@ -660,7 +658,7 @@ export const TOKENS: Record<string, Step[]> = {
   analyze: ph1,
   boost: ph3Boost,
   // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
-  'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), ...after(ph4Quality, BEFORE_QUALITY)],
+  'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), done],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
   quality: after(ph4Quality, QUALITY_LATER),
   '품질 검사로 넘어가기': after(ph4Quality, QUALITY_LATER),
