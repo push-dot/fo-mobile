@@ -21,7 +21,15 @@ tags:
     file: ../flows/_tap_sheet_button.yaml
     env:
       TEXT: "공고 214개 보기"
-- tapOn: "전체"
+# 전체 resets the filters; the list total proves it did (1,284 with no filter), so the next sheet starts from an empty draft. A skill
+# still set would turn the three-district total into the fixture count (공고 2개) instead of the board's 398.
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: "전체"
+      - extendedWaitUntil:
+          visible: "공고 1,284개"
+          timeout: 5000
 - waitForAnimationToEnd
 # iOS merges a row's label and count into one element, Android keeps them apart.
 - tapOn: "지역"
@@ -37,7 +45,15 @@ tags:
     file: ../flows/_tap_sheet_button.yaml
     env:
       TEXT: "공고 398개 보기"
-- tapOn: "전체"
+# 전체 resets the filters; the list total proves it did (1,284 with no filter), so the next sheet starts from an empty draft. A skill
+# still set would turn the three-district total into the fixture count (공고 2개) instead of the board's 398.
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: "전체"
+      - extendedWaitUntil:
+          visible: "공고 1,284개"
+          timeout: 5000
 - waitForAnimationToEnd
 # 고용형태 is off the chip row's screen, and scrolling the row would leave it scrolled behind the sheet. FilterType draws the row at
 # its start, so the sheet opens by its own route over the list instead.

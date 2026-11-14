@@ -10,5 +10,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*플랫폼엔지니어링코리아.*"
     timeout: 20000
+# The board selects the pink swatch (5th).
+- tapOn: "pink"
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLong

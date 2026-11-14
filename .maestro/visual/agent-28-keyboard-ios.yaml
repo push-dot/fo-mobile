@@ -22,10 +22,14 @@ tags:
       - waitForAnimationToEnd
       - runFlow: _dismiss_next.yaml
       - tapOn: "메시지.*"
-      - inputText: "Tailor it for Nuri Cloud too"
+      # The boards type Korean on iOS (ChatKeyboardIOS.1 one line, .2 two lines, .3 five lines).
+      - inputText: "누리클라우드 공고에도 맞춰 줘"
       - waitForAnimationToEnd
       - takeScreenshot: ChatKeyboardIOS.1
-      - takeScreenshot: ChatKeyboardIOS.3
-      - inputText: " but leave my career statement as it is and only fix the resume, please"
+      - eraseText: 30
+      - inputText: "모아페이 말고 누리클라우드 백엔드 공고에도 맞춰 줘. 경력기술서는 그대로 두고 이력서만 고쳐 줘"
       - waitForAnimationToEnd
       - takeScreenshot: ChatKeyboardIOS.2
+      - inputText: ". 승인 API 개선 성과는 맨 앞에 두고, Kafka 경험은 한 줄로 줄여 줘. 동아리 활동은 빼도 돼. 자기소개서는 다음에 따로 부탁할게"
+      - waitForAnimationToEnd
+      - takeScreenshot: ChatKeyboardIOS.3

@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import { Icon, Text } from '@/shared/components'
 import { spacing, useColors } from '../../../../theme'
-import type { CreditBanner as Banner } from './state'
+import { bannerText, type CreditBanner as Banner } from './state'
 
 const LABEL = { plan: '플랜 업그레이드', credits: '크레딧 구매' } as const
 
@@ -21,7 +21,7 @@ export const CreditBanner = ({ banner, onAction }: { banner: Banner; onAction: (
     >
       <Icon name="alert" size={20} color="t2" />
       <Text v="c1" style={{ flex: 1, ...LINE }}>
-        {banner.lines.join(' ')}
+        {bannerText(banner)}
       </Text>
       {banner.action ? (
         <Pressable

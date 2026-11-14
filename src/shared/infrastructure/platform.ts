@@ -52,6 +52,13 @@ export const setMockWebPlan = (plan: 'FREE' | 'ULTRA' | undefined) => {
 }
 export const mockWebPlanOf = () => mockWebPlan
 
+/** Mock tours (`mock=fit-three`): the Applied and ApplySheet boards draw the fit card with three parts (기술 스택, 경험 연관성, 키워드); JobDetail draws all five. */
+let mockFitThree = false
+export const setMockFitThree = (on: boolean) => {
+  mockFitThree = on
+}
+export const mockFitThreeOn = () => mockFitThree
+
 /** Mock tours (`mock=apple-fail`): the Apple sign-in sheet cannot be driven or made to fail in a tour, so the attempt reports a failure instead of opening it (SignInErrors.4). */
 let mockAppleFails = false
 export const failMockApple = (on: boolean) => {

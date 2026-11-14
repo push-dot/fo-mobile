@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, type StyleProp, type ViewStyle } from 'react-native'
 import { BUBBLE } from '../constants'
+import { appearFrom, appearMoves, appearMs, playAppear, type AppearKind } from './appear'
 import { useReduceMotion } from '@/shared/components'
 
 /**
@@ -15,7 +16,7 @@ type AppearProps = {
   children: ReactNode
   style?: StyleProp<ViewStyle>
   /** 'up' = fade + rise 10px (300ms), 'bubble' = rise 18px + scale .94 from the bottom-right (400ms). */
-  kind?: 'up' | 'bubble' | 'fade'
+  kind?: AppearKind
   delay?: number
   duration?: number
 }
@@ -29,27 +30,29 @@ export const Appear = ({ children, style, kind = 'up', delay = 0, duration }: Ap
   const v = useState(() => new Animated.Value(still ? 1 : 0))[0]
   useEffect(() => {
     if (rowKey) played.add(rowKey)
-    if (still) return
-    Animated.timing(v, {
-      toValue: 1,
-      delay,
-      duration: duration ?? (kind === 'bubble' ? 400 : kind === 'fade' ? 250 : 300),
-      easing: kind === 'bubble' ? Easing.bezier(...BUBBLE) : Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start()
-  }, [v, delay, duration, kind, still, rowKey])
-  const move = !reduce && kind !== 'fade' && !still
-  const dy = kind === 'bubble' ? 18 : 10
+    return playAppear(v, { still, reduce }, () => {
+      const timing = Animated.timing(v, {
+        toValue: 1,
+        delay,
+        duration: appearMs(kind, duration),
+        easing: kind === 'bubble' ? Easing.bezier(...BUBBLE) : Easing.out(Easing.ease),
+        useNativeDriver: true,
+      })
+      timing.start()
+      return timing
+    })
+  }, [v, delay, duration, kind, still, rowKey, reduce])
+  const from = appearFrom(kind)
   return (
     <Animated.View
       style={[
         style,
         {
           opacity: v,
-          transform: move
+          transform: appearMoves(kind, still)
             ? [
-                { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [dy, 0] }) },
-                ...(kind === 'bubble' ? [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) }] : []),
+                { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [from.dy, 0] }) },
+                ...(kind === 'bubble' ? [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [from.scale, 1] }) }] : []),
               ]
             : [],
           transformOrigin: kind === 'bubble' ? 'right bottom' : undefined,

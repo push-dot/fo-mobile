@@ -82,17 +82,22 @@ export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
+const isFailedStep = (item: Extract<ChatItem, { type: 'tool' }>) => item.state === 'err' && !!item.error
+
 /**
  * Whether the room draws a line for this item. The tool, think and worked lines and a refused turn's error are replaced by the status
  * line and the credit banner (entries/item.tsx returns null for them). A list cell that draws nothing still takes its 18 gap,
  * so one hidden line made a 36 gap and two made 54 (ChatPh2, ChatPh3Boost, ChatPh3Review): the room never lists them.
+ * The one tool line that is drawn is a failed step that says why: the red line of ChatErrors.
  */
 export const isDrawn = (item: ChatItem) =>
-  item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
+  item.type !== 'think' && item.type !== 'worked' && !(item.type === 'tool' && !isFailedStep(item)) && !(item.type === 'error' && isUsageExhausted(item.code))
 
 /** The running line, drawn inside the list under the last line (the boards draw it in the thread, not above the composer). */
 export type RunningRow = { type: 'running'; id: 'running' }
-export type ThreadRow = ChatItem | RunningRow
+/** The orange 확인을 기다리는 중 line of an open edit card, drawn above the diff it asks about (ChatApprove: the line, then the diff card). */
+export type WaitingRow = { type: 'waiting'; id: 'waiting' }
+export type ThreadRow = ChatItem | RunningRow | WaitingRow
 
 /**
  * The list in order, drawn lines only, and while the run works its running line under the last line (ChatBotStatusThink, Work, Long,
@@ -100,8 +105,10 @@ export type ThreadRow = ChatItem | RunningRow
  * run works) is what the running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running
  * line, draft card).
  */
-export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
-  const drawn = foldBubbleCards(items.filter(isDrawn))
+export const threadRows = (items: readonly ChatItem[], working: boolean, waiting = false): ThreadRow[] => {
+  const folded = foldBubbleCards(items.filter(isDrawn))
+  // An edit card that waits for an answer: its tool line (the waiting line) comes before the diff it shows, not after it. Other cards keep the line at the end.
+  const drawn: ThreadRow[] = waiting && folded.at(-1)?.type === 'diff' ? [...folded.slice(0, -1), { type: 'waiting', id: 'waiting' }, folded.at(-1)!] : folded
   if (!working) return drawn
   const running: RunningRow = { type: 'running', id: 'running' }
   const last = drawn.at(-1)

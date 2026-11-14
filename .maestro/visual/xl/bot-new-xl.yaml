@@ -4,13 +4,14 @@ tags:
   - visual
 ---
 # Run with the system text size raised (xl/ is a separate run): the sheet's XL sizes apply at a font scale of 1.5 and up, which the
-# normal run never reaches. bots:none leaves 모아페이 without a Bot, so its posting fills the sheet instead of opening that Bot.
+# normal run never reaches. bots:none leaves 모아페이 without a Bot, so its posting fills the sheet instead of opening that Bot; p-moa-short
+# is the posting with the board's short title 백엔드 엔지니어 (p1 adds the stack, which the field then cuts).
 - runFlow:
     file: ../_login_mock.yaml
     env:
       MOCK: "push://sign-in?mock=bots:none,consent-on"
       READY: "새로 올라온 공고"
-- openLink: push://bots/new?posting=p1
+- openLink: push://bots/new?posting=p-moa-short
 - extendedWaitUntil:
     visible: ".*모아페이.*"
     timeout: 20000

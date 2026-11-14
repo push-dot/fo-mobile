@@ -3,10 +3,15 @@ name: 봇 · 작업 중이던 대화를 열어 이어서 작성
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
-- runFlow: _company_tab.yaml
-# bot:b-moa:resume seeds the stored thread the board draws: the draft's review card that ran out (확인 대기 중 · 멈춤), then 새 이력서 만들어 줘, the bot's line and the resume offer.
-- openLink: push://bots/b-moa?mock=bot:b-moa:resume
+# A stored chat is read once per launch (agent-36): opening the empty 모아페이 chat first left the greeting in place when the seed came after it,
+# so the seed is set on the sign-in link, before any chat is read. bot:b-moa:resume stores the thread the board draws: the draft's review card
+# that ran out (확인 대기 중 · 멈춤), then 새 이력서 만들어 줘, the bot's line and the resume offer.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:resume"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/b-moa
 - extendedWaitUntil:
     visible: "이어서 작성할까요?"
     timeout: 30000

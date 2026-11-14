@@ -170,6 +170,12 @@ describe('isDrawn', () => {
     ]
     expect(items.filter(isDrawn).map((i) => i.id)).toEqual(['u', 'e2', 'a'])
   })
+
+  it('lists a failed step that says why, the red line under the user line (ChatErrors)', () => {
+    const failed: ChatItem = { type: 'tool', id: 'jd', action: '공고 읽기', state: 'err', error: '“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요' }
+    const silent: ChatItem = { type: 'tool', id: 'x', action: '공고 읽기', state: 'err' }
+    expect([failed, silent].filter(isDrawn).map((i) => i.id)).toEqual(['jd'])
+  })
 })
 
 describe('threadRows', () => {
@@ -195,5 +201,13 @@ describe('threadRows', () => {
 
   it('draws a finished draft as it is, with no line', () => {
     expect(ids(threadRows([user, todo, paper], false))).toEqual(['u', 'todo', 'p'])
+  })
+
+  it('puts the waiting line above the diff of an open edit card, and leaves other cards alone (ChatApprove)', () => {
+    const say: ChatItem = { type: 'agentText', id: 'a', text: '경력 섹션부터 고쳐 볼게요.' }
+    const diff: ChatItem = { type: 'diff', id: 'd', lines: [{ n: 13, sign: '+', text: '재설계' }] }
+    expect(ids(threadRows([user, say, diff], false, true))).toEqual(['u', 'a', 'waiting', 'd'])
+    expect(ids(threadRows([user, say, diff], false))).toEqual(['u', 'a', 'd'])
+    expect(ids(threadRows([user, say], false, true))).toEqual(['u', 'a'])
   })
 })

@@ -4,11 +4,12 @@ tags:
   - visual
 ---
 # The rules are set on the signed-out screen: GET postings feeds the home sections and the 채용공고 list,
-# GET search the result lists only (search$ leaves search/counts answering, so the chips keep the 공고 24 · 사람 8 · 게시글 13 the board draws), GET me/notifications the inbox and the bell badge.
+# GET search the result lists only (search$ leaves search/counts answering, so the chips keep the 공고 24 · 사람 8 · 게시글 13 the board draws).
+# The bell badge (3) is drawn while the home loads (HomeLoading.1), so GET me/notifications answers for the home and search boards and is held back only for the inbox board (HomeLoading.3).
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:search$,hang:GET:me/notifications"
+      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:search$"
       READY: "채용공고"
 - assertNotVisible: "마감 임박 공고"
 - waitForAnimationToEnd
@@ -33,6 +34,12 @@ tags:
       - waitForAnimationToEnd
       - takeScreenshot: HomeLoading.2
       - tapOn: "닫기"
+# A new sign-in, so the inbox is unfetched and shows its skeleton (a fetched one would keep its rows).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=hang:GET:postings,hang:GET:me/notifications"
+      READY: "채용공고"
 - tapOn: "알림.*"
 - extendedWaitUntil:
     visible: "모두 읽음"

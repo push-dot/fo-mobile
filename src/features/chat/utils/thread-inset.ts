@@ -25,3 +25,6 @@ export const threadInset = ({ bottomH, keyboard, navBar, approval, android, stat
   const platform = android ? 'android' : 'ios'
   return bottomH + lift + extraGap(approval, keyboard, status, platform)
 }
+
+/** Last thread line to the composer in the room: 8 with the keyboard up (ChatKeyboardIOS), 16 at rest. */
+export const threadBottomGap = (keyboard: number) => (keyboard ? KEYBOARD_GAP : THREAD_GAP)

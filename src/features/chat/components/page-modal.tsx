@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Platform, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassButton, Text, ToastHost } from '@/shared/components'
+import { headerInset } from './header-inset'
 import { sheetHeaderTop } from '@/shared/navigation'
 import { spacing, useColors } from '@/theme'
 
@@ -14,6 +15,7 @@ const PageModal = ({
   title,
   right,
   left,
+  nav,
   children,
   footer,
   tight,
@@ -24,6 +26,8 @@ const PageModal = ({
   title: string
   right?: ReactNode
   left?: ReactNode
+  /** The header is the boards' `.topbar.nav` (PlanUltra, PlanUltraNotice): 12 on iOS. A `left` alone (usage, ChatAccountUsage: padding 20) keeps 20. */
+  nav?: boolean
   children: ReactNode
   footer?: ReactNode
   tight?: boolean
@@ -36,7 +40,7 @@ const PageModal = ({
   const ios = Platform.OS === 'ios'
   return (
     <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingBottom: tight ? 0 : spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: headerInset(ios, !!nav), paddingBottom: tight ? 0 : spacing[2] }}>
         {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}

@@ -51,6 +51,8 @@ export const postings: Posting[] = [
   base({ id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', location: '서울 강남구', careerMin: 5, deadline: inDays(21), createdAt: '2026-10-02T09:00:00Z' }),
   // BotNewLong's long company name. Its deadline is past, so no list shows it; only `bots/new?posting=p-nuri-long` and GET postings/:id reach it.
   base({ id: 'p-nuri-long', company: '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', title: '플랫폼 엔지니어', location: '경기 성남시', careerMin: 3, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
+  // BotNewLinkPicked and BotNewXL draw 모아페이 with the short title 백엔드 엔지니어; p1 carries the full one (Kotlin·Spring). Hidden like p-nuri-long: only `bots/new?posting=p-moa-short` reaches it.
+  base({ id: 'p-moa-short', company: '모아페이', title: '백엔드 엔지니어', location: '서울 강남구', careerMin: 4, careerMax: 6, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
 ]
 
 // Tour switch (links.ts): the 마감 임박 공고 board lists 모아페이 백엔드 as its sixth tile, so it closes in 7 days there (D-13 everywhere else).
