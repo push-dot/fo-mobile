@@ -20,6 +20,8 @@ export type MockMessage = {
   sources?: BotContract.Attachment[]
   /** The bot's whole turn is a notice (ChatBotReadOff), not text. */
   notice?: true
+  /** What a search hit shows for this message, when a board draws a cut push-be's snippet rule (30 characters before the hit) would not give. */
+  snippet?: string
 }
 
 /** `answer` is a choice the user picks, `confirm` an approval. `expiresAt` null never expires. */
@@ -177,7 +179,8 @@ const home = (): BotFixture[] => [
       detail: { posting: { id: 'p3', title: '서버 개발자', deadlineIn: 3, closed: false }, fit: { score: 7.2 }, materialCount: 5 },
       readAt: 60,
       messages: [
-        said('m-dotori-1', 't-dotori-1', '도토리증권 서버 개발자 공고 요건을 읽고, 그동안의 모아페이 경력과 겹치는 부분을 정리했어요', 61),
+        // AgentHomeSearch cuts this hit right before 모아페이, where push-be's snippet rule would keep 30 characters before it.
+        { ...said('m-dotori-1', 't-dotori-1', '도토리증권 서버 개발자 공고 요건을 읽고, 그동안의 모아페이 경력과 겹치는 부분을 정리했어요', 61), snippet: '…모아페이 경력과 겹치는 부분을 정리했어요' },
         said('m-dotori-2', 't-dotori-2', '경력 섹션도 공고에 맞게 고쳐 줘', 60, 'USER'),
       ],
       job: { turn: 't-dotori-2', at: 60, status: 'RUNNING', statuses: [{ phase: 'queued', text: '대기 중' }, { phase: 'thinking', text: '생각 중' }, { phase: 'working', text: '경력 섹션 고치는 중' }] },
@@ -227,7 +230,10 @@ const homeOutcome = (): BotFixture[] => {
   const [push, ...rest] = home()
   const moa = rest.find((f) => f.bot.id === 'b-moa')!
   const dotori = rest.find((f) => f.bot.id === 'b-dotori')!
-  moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', at: 20, expiresAt: 10 }]
+  // The user read the thread after the card was asked, so the row is 대기 with no unread dot (G19: an expired card needs nothing from the user).
+  moa.messages = [said('m-moa-1', 't-moa-2', '좋아요. 첫 번째부터 고쳐서 PDF로 보여 주세요', 10, 'USER')]
+  moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', at: 10, expiresAt: 1 }]
+  moa.readAt = 5
   dotori.job = null
   dotori.failedAt = 60
   return [push!, ...rest]
@@ -280,6 +286,25 @@ const homeLong = (): BotFixture[] => [
   ),
 ]
 
+/** BotNewLimitDelete: the three company bots of a FREE plan at its limit, each with the role it was made from. */
+const homeLimit = (): BotFixture[] => {
+  const made = (id: string, name: string, color: BotContract.BotColor, title: string, at: When): BotFixture =>
+    company(
+      { id, name, color, postingId: `p-${id}` },
+      {
+        detail: { posting: { id: `p-${id}`, title, deadlineIn: null, closed: false }, fit: null, materialCount: 0 },
+        readAt: 0,
+        messages: [said(`m-${id}-1`, `t-${id}-1`, '공고 요건을 정리했어요', at)],
+      },
+    )
+  return [
+    pushBot(),
+    made('b-moa', '모아페이', 'teal', '백엔드 엔지니어', DAY_MIN + 10),
+    made('b-nuri', '누리클라우드', 'pink', '프론트엔드 개발자', DAY_MIN + 30),
+    made('b-hanbit', '한빛모빌리티', 'coral', '서버 개발자', '2026-10-28T05:00:00Z'),
+  ]
+}
+
 type Plan = BotContract.BotLimit['plan']
 const LIMITS: BotContract.BotLimit['table'] = { FREE: 3, PRO: 20, ULTRA: null }
 
@@ -304,8 +329,9 @@ let grants = grantSeed()
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 /** Tour switches (links.ts). */
-export const setBots = (set: 'home' | 'none' | 'long' | 'outcome') => {
-  fixtures = set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
+export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit') => {
+  fixtures =
+    set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
 }
 export const setBotPlan = (next: Plan) => {
   plan = next
@@ -499,9 +525,12 @@ mock('GET', 'bots/search', ({ query }) => {
   const bots = inListOrder(now)
     .filter((f) => has(f.bot.displayName) || has(f.bot.companyName) || has(f.detail.posting?.title ?? ''))
     .map((f) => ({ ...dto(f, now), line: f.detail.posting ? `${f.bot.companyName} · ${f.detail.posting.title}` : f.bot.displayName }))
+  // shortcut: AgentHomeSearch lists the Push Bot's hit (어제) above 도토리증권's (1시간 전), so the Push Bot comes first and the rest newest first;
+  // push-be orders by time alone. Drop the rank when the board is redrawn in time order.
+  const rank = (f: BotFixture) => (f.bot.kind === 'push' ? 0 : 1)
   const hits = fixtures
     .flatMap((f) => f.messages.filter((m) => has(m.text)).map((m) => ({ f, m, at: atOf(m.at, now) })))
-    .sort((a, b) => b.at.getTime() - a.at.getTime())
+    .sort((a, b) => rank(a.f) - rank(b.f) || b.at.getTime() - a.at.getTime())
   const limit = Math.min(Number(query.get('limit') ?? 20), 50)
   const start = Number(query.get('cursor') ?? 0)
   const pageHits = hits.slice(start, start + limit)
@@ -514,7 +543,7 @@ mock('GET', 'bots/search', ({ query }) => {
       messageId: m.id,
       at: at.toISOString(),
       role: m.role,
-      snippet: snippetOf(m.text, q),
+      snippet: m.snippet?.toLowerCase().includes(q.toLowerCase()) ? m.snippet : snippetOf(m.text, q),
     })),
     messageTotal: hits.length,
   }

@@ -19,7 +19,8 @@ import BotHomeHero from './bot-home-hero'
 import BotHomeLoading from './bot-home-loading'
 import BotHomeRow from './bot-home-row'
 import BotHomeSearch from './bot-home-search'
-import { FIRST_SCREEN, LIST_BOTTOM, TAB_CLEARANCE } from './copy'
+import { FIRST_SCREEN, LIST_BOTTOM } from './copy'
+import { barLift } from './bar-lift'
 import { homeChrome } from './metrics'
 
 const VIEWABILITY = { itemVisiblePercentThreshold: 60 }
@@ -74,8 +75,7 @@ const BotHomeView = ({
   const home = splitHome(bots ?? [])
   const push = home.push ?? (fallbackPush?.kind === 'push' ? fallbackPush : undefined)
   const top = insets.top + chrome.header
-  // The iOS tab bar floats over this view, so the bar rests above it; Android's tab bar takes its own space.
-  const lift = keyboard > 0 ? Math.max(0, keyboard - TAB_CLEARANCE) : Platform.OS === 'ios' ? TAB_CLEARANCE + 8 : 8
+  const lift = barLift(keyboard, ios)
   const screen = { flex: 1, backgroundColor: c.bg }
   const fade = {
     position: 'absolute' as const,
@@ -146,6 +146,8 @@ const BotHomeView = ({
           now={now}
           chrome={chrome}
           top={insets.top + 8}
+          bottom={lift + chrome.control}
+          bots={bots ?? []}
           onOpenBot={openChat}
           onOpenMessage={(id, messageId) => router.push(botChatAtPath(id as Bot['id'], messageId))}
         />

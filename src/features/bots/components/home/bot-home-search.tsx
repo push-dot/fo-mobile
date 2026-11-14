@@ -5,7 +5,7 @@ import type { Bot, BotSearch, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { rowTime } from '../../utils/row-time'
 import { searchSections } from '../../utils/home-rows'
-import { LIST_BOTTOM, SEARCH_EMPTY, SEARCH_HINT } from './copy'
+import { LIST_BOTTOM, SEARCH_EMPTY, SEARCH_HINT, SEARCH_MESSAGE_GAP } from './copy'
 import BotHomeRow from './bot-home-row'
 import type { HomeChrome } from './metrics'
 
@@ -17,6 +17,8 @@ const BotHomeSearch = ({
   now,
   chrome,
   top,
+  bottom,
+  bots,
   onOpenBot,
   onOpenMessage,
 }: {
@@ -27,6 +29,9 @@ const BotHomeSearch = ({
   now: Date
   chrome: HomeChrome
   top: number
+  /** Where the search bar's top edge is: the hint and the empty line centre between `top` and this. */
+  bottom: number
+  bots: readonly Bot[]
   onOpenBot: (bot: Bot) => void
   onOpenMessage: (botId: string, messageId: string) => void
 }) => {
@@ -36,11 +41,13 @@ const BotHomeSearch = ({
   const titles = data && !hint ? searchSections(data.bots.length > 0 ? data.botTotal : 0, data.messages.length > 0 ? data.messageTotal : 0) : []
   const botTitle = titles.find((title) => title.startsWith('Bot'))
   const messageTitle = titles.find((title) => title.startsWith('대화'))
+  const centred = hint || empty
   const pad = {
-    paddingTop: top,
-    paddingBottom: LIST_BOTTOM,
-    flexGrow: hint || empty ? 1 : 0,
-    justifyContent: hint || empty ? ('center' as const) : ('flex-start' as const),
+    // AgentHomeSearchEmpty: the line centres between the status bar and the search bar, 16pt above it.
+    paddingTop: centred ? top - spacing[2] : top,
+    paddingBottom: centred ? bottom + SEARCH_MESSAGE_GAP : Math.max(LIST_BOTTOM, bottom + SEARCH_MESSAGE_GAP),
+    flexGrow: centred ? 1 : 0,
+    justifyContent: centred ? ('center' as const) : ('flex-start' as const),
   }
   const center = { textAlign: 'center' as const, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight, paddingHorizontal: spacing[6] }
   const sect = { fontSize: chrome.sectSize, lineHeight: chrome.sectLine, paddingTop: 6, paddingBottom: spacing[1], paddingHorizontal: spacing[5] }
@@ -53,7 +60,7 @@ const BotHomeSearch = ({
     minHeight: 76,
   }
   const body = { flex: 1, minWidth: 0, gap: 3 }
-  const topRow = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: spacing[2] }
+  const topRow = { flexDirection: 'row' as const, alignItems: chrome.rowAlign, gap: chrome.nameGap }
   const name = { flex: 1, fontSize: chrome.nameSize, lineHeight: chrome.nameLine }
   const time = { fontSize: chrome.timeSize, lineHeight: chrome.timeLine }
   const line = { fontSize: chrome.msgSize, lineHeight: chrome.msgLine }
@@ -89,11 +96,14 @@ const BotHomeSearch = ({
         ? data.messages.map((message) => {
             const when = rowTime(message.at, now)
             const label = `${message.bot.name} Bot, ${message.snippet}, ${when}`
+            // AgentHomeSearch draws the Push Bot hit with the sparkles of its unread 완료; a bot still running shows no state here.
+            const found = bots.find((bot) => bot.id === message.bot.id)
+            const done = found ? botRow(found, local[found.id], now).mascot === 'done' : false
             return (
               <Pressable key={message.messageId} accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
                 <View style={hit}>
                   <View style={{ marginTop: chrome.mascotTop }}>
-                    <Mascot size={chrome.rowMascot} state="idle" color={message.bot.color ?? 'push'} motion={{ mode: 'still' }} />
+                    <Mascot size={chrome.rowMascot} state={done ? 'done' : 'idle'} color={message.bot.color ?? 'push'} motion={{ mode: done ? 'frame3' : 'still' }} />
                   </View>
                   <View style={body}>
                     <View style={topRow}>

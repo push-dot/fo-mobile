@@ -20,6 +20,8 @@ export const homeChrome = (xl: boolean) => ({
   rowAlign: xl ? ('flex-start' as const) : ('center' as const),
   mascotTop: xl ? 2 : 0,
   rowGap: xl ? spacing[3] : 14,
+  // The board's 8pt gap would clip the title one glyph early: iOS widens a Korean space to 0.28em, so 한빛모빌리티 자율주행 데이터플랫폼팀 needs ~3pt more than the board's render.
+  nameGap: xl ? spacing[2] : 4,
   rowPadH: xl ? 16 : 20,
   rowPadV: xl ? 12 : 10,
   sectSize: xl ? 17 : 13,
