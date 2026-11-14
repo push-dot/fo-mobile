@@ -33,6 +33,7 @@ import {
   followScroll,
   headerLightOf,
   openBot,
+  threadBottomGap,
   threadRows,
   type ThreadRow,
   threadGreeting,
@@ -240,7 +241,8 @@ const Thread = ({ id }: { id: string }) => {
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
+        // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
           chat.queue.length || showPanel ? (

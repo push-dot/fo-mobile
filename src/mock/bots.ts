@@ -398,7 +398,12 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume') => {
   const said = (turn: string, role: MockMessage['role'], text: string, at: number, sources?: BotContract.Attachment[]): MockMessage => ({
     id: `m-${turn}-${role}`, turn, role, text, at, ...(sources ? { sources } : {}),
   })
-  const answer = said('t-ask', 'ASSISTANT', '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.', 8, DESIGN_SOURCES)
+  // ChatBotStatusDone draws the long answer (paragraph, two "- " items, the PDF sentence); ChatBotHeader's finished chat draws the short one.
+  const answerText =
+    set === 'done'
+      ? '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두고, 정산 지연 개선은 장애 대응 사례로 옮겼어요.\n- 대용량 트래픽 처리: 결제 승인 API 재설계로 근거 보강\n- Kafka 경험은 우대 요건이라 한 줄로 줄임\nPDF는 내 서류에 저장했어요.'
+      : '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.'
+  const answer = said('t-ask', 'ASSISTANT', answerText, 8, DESIGN_SOURCES)
   const first = [
     said('t-req', 'ASSISTANT', '모아페이 백엔드 엔지니어 공고 요건을 정리했어요. 필수 5개 중 4개는 이력서에 이미 드러나 있고, **대용량 트래픽 처리 경험**만 근거가 약해요.\n- 결제 승인 API 재설계 경험을 처리량 수치와 함께 쓰기\n- 정산 배치 개선을 장애 대응 사례로 옮기기\n- Kafka 경험은 우대 요건이라 한 줄로 줄이기', 14),
     said('t-ask', 'USER', '좋아요. 첫 번째부터 고쳐서 PDF로 보여 주세요', 10),

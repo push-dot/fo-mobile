@@ -82,13 +82,16 @@ export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
+const isFailedStep = (item: Extract<ChatItem, { type: 'tool' }>) => item.state === 'err' && !!item.error
+
 /**
  * Whether the room draws a line for this item. The tool, think and worked lines and a refused turn's error are replaced by the status
  * line and the credit banner (entries/item.tsx returns null for them). A list cell that draws nothing still takes its 18 gap,
  * so one hidden line made a 36 gap and two made 54 (ChatPh2, ChatPh3Boost, ChatPh3Review): the room never lists them.
+ * The one tool line that is drawn is a failed step that says why: the red line of ChatErrors.
  */
 export const isDrawn = (item: ChatItem) =>
-  item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
+  item.type !== 'think' && item.type !== 'worked' && !(item.type === 'tool' && !isFailedStep(item)) && !(item.type === 'error' && isUsageExhausted(item.code))
 
 /** The running line, drawn inside the list under the last line (the boards draw it in the thread, not above the composer). */
 export type RunningRow = { type: 'running'; id: 'running' }

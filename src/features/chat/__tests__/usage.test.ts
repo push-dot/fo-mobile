@@ -170,6 +170,12 @@ describe('isDrawn', () => {
     ]
     expect(items.filter(isDrawn).map((i) => i.id)).toEqual(['u', 'e2', 'a'])
   })
+
+  it('lists a failed step that says why, the red line under the user line (ChatErrors)', () => {
+    const failed: ChatItem = { type: 'tool', id: 'jd', action: '공고 읽기', state: 'err', error: '“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요' }
+    const silent: ChatItem = { type: 'tool', id: 'x', action: '공고 읽기', state: 'err' }
+    expect([failed, silent].filter(isDrawn).map((i) => i.id)).toEqual(['jd'])
+  })
 })
 
 describe('threadRows', () => {
