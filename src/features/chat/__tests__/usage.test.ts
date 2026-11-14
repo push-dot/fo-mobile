@@ -72,6 +72,15 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
+  it('says the run takes input too while a document flow with a to-do card works, named bot or not', () => {
+    const todo: ChatItem = { type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'now' }] }
+    const working = { verbs: [], startedAt: 0 }
+    expect(composerPlaceholder({ items: [user, todo], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
+    expect(composerPlaceholder({ items: [user, todo], working }, 'Push Bot')).toBe('작업 중에도 말할 수 있어요')
+    // Idle again: the bot's own line.
+    expect(composerPlaceholder({ items: [user, todo], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+  })
+
   it('asks what to do with the attached material, by its kind, over the bot name', () => {
     const chat = { items: [], working: null }
     expect(composerPlaceholder(chat, '모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')

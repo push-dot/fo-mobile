@@ -122,6 +122,7 @@ const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<ty
   )
 }
 
+// ChatPh1: the current item is black (owner rule 3: the accent stays on the main button and the selected state).
 const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
   const c = useColors()
   const done = item.state === 'done'
@@ -135,7 +136,7 @@ const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
           height: 18,
           borderRadius: 5,
           borderWidth: now ? 2 : 1.5,
-          borderColor: done ? c.t3 : now ? c.ac : c.deco,
+          borderColor: done ? c.t3 : now ? c.t1 : c.deco,
           backgroundColor: done ? c.t3 : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
@@ -143,7 +144,7 @@ const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
         }}
       >
         {done ? <Icon name="check" size={12} color={onAccent} /> : null}
-        {now ? <View style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: c.ac }} /> : null}
+        {now ? <View style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: c.t1 }} /> : null}
       </Animated.View>
       <StruckLabel on={done} v="b2" color={done ? 't3' : 't1'} weight={now ? '700' : '400'}>
         {item.label}

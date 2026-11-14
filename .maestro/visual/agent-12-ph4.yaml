@@ -35,6 +35,11 @@ tags:
     env:
       KO: "클래식으로 만들기"
       EN: "ph5"
+# ChatPh5 draws the running save with the keyboard down.
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*클래식으로 만들기.*"
 - extendedWaitUntil:
     visible: ".*Push 프로필에 저장하는 중.*"
     timeout: 30000

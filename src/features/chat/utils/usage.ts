@@ -90,6 +90,8 @@ const endsInResult = (items: ChatItem[]) => items.findLast((i) => i.type !== 'wo
 
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
+  // ChatPh1/ChatPh3/ChatInterrupt: while a document flow's to-do card is on screen the box says the run takes input too; a plain turn asks the named bot (ChatBotStatusWork).
+  if (chat.working && chat.items.some((i) => i.type === 'todo')) return COMPOSER_PLACEHOLDER.working
   if (name) return endsInResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp
