@@ -147,11 +147,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
             <Sub label={s.title} />
             {s.items.map((r) => (
               <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
-                {r.tag === 'link' ? (
-                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="at" size={16} color="t2" />
-                  </View>
-                ) : r.tag.length === 1 ? (
+                {/* ChatPh0Input: a link row has no icon (owner rule 3, no needless icons); its text starts at the row's left edge. */}
+                {r.tag === 'link' ? null : r.tag.length === 1 ? (
                   <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.ac, alignItems: 'center', justifyContent: 'center' }}>
                     <Text v="c1" weight="800" style={{ color: onAccent }}>
                       {r.tag}
@@ -400,7 +397,7 @@ const TemplateChip = ({ label, recommended, on, onPress }: { label: string; reco
       accessibilityLabel={recommended ? `${label}, 추천` : label}
       onPress={onPress}
       hitSlop={hitSlopTo(40)}
-      style={{ height: 40, paddingHorizontal: 16, borderRadius: 20, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
+      style={{ height: 40, paddingHorizontal: spacing[4], borderRadius: radius.lg, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
     >
       <Text v="b2" style={{ color: on ? c.bg : c.t1 }}>
         {label}

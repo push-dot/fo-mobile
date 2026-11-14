@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Platform } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { hitSlopTo, radius, spacing, useColors } from '../../theme'
+import { hitSlopTo, radius, spacing, type, useColors } from '../../theme'
 import GlassPressable from './glass-pressable'
 import Icon from './icon'
 import Text from './text'
@@ -47,7 +47,7 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, i
       {lead}
       {icon ? <Icon name={icon} size={16} color={fg} /> : null}
       {check === true && on ? <Icon name="check" size={ich ? 16 : 14} color={fg} /> : null}
-      <Text v="c1" weight={ich ? '400' : '600'} style={{ fontSize: ich ? 15 : 14, color: fg, flexShrink: 1 }} numberOfLines={1}>
+      <Text v="c1" weight={ich ? '400' : '600'} style={{ fontSize: ich ? type.b2.fontSize : 14, color: fg, flexShrink: 1 }} numberOfLines={1}>
         {label}
       </Text>
       {check === 'end' && on ? <Icon name="check" size={14} color={fg} /> : null}

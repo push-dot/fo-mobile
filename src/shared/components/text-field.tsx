@@ -41,7 +41,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
           lineBreakStrategyIOS="hangul-word"
           maxLength={max}
           placeholderTextColor={c.t4}
-          style={[{ flex: 1, fontSize: slim ? 17 : type.b1.fontSize, letterSpacing: slim ? type.b1.letterSpacing * (17 / type.b1.fontSize) : type.b1.letterSpacing, color: c.t1, ...inputMetrics(multiline, fontScale), textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), multiline && iosLineBox(StyleSheet.flatten(style)?.lineHeight ?? type.b1.lineHeight, type.b1.fontSize, fontScale), style]}
+          style={[{ flex: 1, fontSize: slim ? type.h3.fontSize : type.b1.fontSize, letterSpacing: slim ? type.b1.letterSpacing * (type.h3.fontSize / type.b1.fontSize) : type.b1.letterSpacing, color: c.t1, ...inputMetrics(multiline, fontScale), textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), multiline && iosLineBox(StyleSheet.flatten(style)?.lineHeight ?? type.b1.lineHeight, type.b1.fontSize, fontScale), style]}
           {...rest}
         />
         {trailing}

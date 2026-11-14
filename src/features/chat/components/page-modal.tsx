@@ -17,6 +17,7 @@ const PageModal = ({
   children,
   footer,
   tight,
+  page,
   scroll = true,
 }: {
   onClose?: () => void
@@ -26,13 +27,15 @@ const PageModal = ({
   children: ReactNode
   footer?: ReactNode
   tight?: boolean
+  /** A full page (the plan route, owner rule 8), not a sheet: the header sits 6 under the status bar inset (PlanUltra: back button y68). */
+  page?: boolean
   scroll?: boolean
 }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: ios ? spacing[4] : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
+    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingBottom: tight ? 0 : spacing[2] }}>
         {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>

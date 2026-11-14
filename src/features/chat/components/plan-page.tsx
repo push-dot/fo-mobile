@@ -37,7 +37,7 @@ const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[n
       <View style={{ gap: spacing[1] }}>
         {plan.features.map((f) => (
           <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-            <Icon name="check" size={14} color="acText" />
+            <Icon name="check" size={14} color="t1" />
             <Text v="c1" color="t2">
               {f}
             </Text>
@@ -54,7 +54,7 @@ const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => 
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={{ minHeight: 56, marginTop: spacing[2], marginHorizontal: spacing[5], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
+      style={{ minHeight: 56, marginTop: spacing[3], marginHorizontal: spacing[5], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
     >
       <Text v="b2" weight="700" style={{ flex: 1 }}>
         {label}
@@ -79,6 +79,7 @@ export const PlanPage = () => {
     <PageModal
       title="플랜"
       tight
+      page
       left={<GlassButton actions={[...back]} />}
       footer={
         account?.plan === 'ULTRA' ? (
@@ -90,7 +91,8 @@ export const PlanPage = () => {
     >
       {account ? (
         <Appear kind="fade">
-          <Text v="h2" style={{ paddingTop: spacing[1], paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
+          {/* PlanUltra: the h2 block starts 8 under the 6pt gap below the header and the scroll's 4: 10 in all. */}
+          <Text v="h2" style={{ paddingTop: 10, paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
             {PLAN_HEADER}
           </Text>
           <View style={{ paddingHorizontal: spacing[5], gap: spacing[2] }}>
@@ -105,7 +107,7 @@ export const PlanPage = () => {
             ))}
           </View>
           <LinkRow label="크레딧 구매" onPress={pay(() => purchase.buyCredits())} />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: spacing[3], paddingHorizontal: spacing[6] }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: 14, paddingHorizontal: spacing[6] }}>
             <Text v="c1" color="t3">
               {PLAN_FOOT}
             </Text>
