@@ -30,7 +30,7 @@ tags:
             KO: "경력 섹션을 공고에 맞게 고쳐 줘"
             EN: "await"
       - extendedWaitUntil:
-          visible: "확인을 기다리고 있어요"
+          visible: ".*Kafka 경험을 맨 앞으로 옮겨요.*"
           timeout: 30000
       - runFlow:
           file: _chat_kbd_down.yaml

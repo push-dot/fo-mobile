@@ -93,7 +93,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"경력 섹션을 이렇게 바꿀게요. 승인 API 성과를 숫자로 보여 주고, Kafka 경험을 맨 앞으로 옮겨요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
-{"awaiting":"approval","interrupted":false,"queue":[],"working":null}
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
 

@@ -562,10 +562,11 @@ const appliedRecord: Step[] = [
   s(300, agent('지원했어요 · 마이 › 내 활동에 기록했어요')),
   done,
 ]
+// ChatStates.2 draws the answer as a plain finished reply (3 lines, no 확인을 기다리고 있어요 line, no sheet): the run ends with `done`, not `awaiting`.
 const awaitReply: Step[] = [
   s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건')),
   s(400, agent('경력 섹션을 이렇게 바꿀게요. 승인 API 성과를 숫자로 보여 주고, Kafka 경험을 맨 앞으로 옮겨요.')),
-  awaitingDone,
+  done,
 ]
 export const fail = (code: string, details?: Record<string, unknown>): Step[] => [s(300, { type: 'error', error: { code, message: code, ...(details ? { details } : {}) } })]
 
