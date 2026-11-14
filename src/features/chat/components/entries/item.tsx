@@ -610,8 +610,10 @@ const ItemComponent = ({
       return <Notice notice={item.notice} />
     case 'readOff':
       return <ReadOff item={item} onAction={onReadOff} />
-    case 'think':
     case 'tool':
+      // Tool lines are not drawn, except a failed step that says why: the red line of ChatErrors ("자격 요건"을 읽지 못했어요 · …).
+      return item.state === 'err' && item.error ? <ErrorLine text={item.error} /> : null
+    case 'think':
       return null
     case 'todo':
       return <TodoList item={item} />
@@ -654,16 +656,16 @@ const PlanRequired = () => {
   return <ErrorLine text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
-/** Dashed "대기 중" chip for messages sent while the agent works. */
+/** Grey "대기 중" chip for messages sent while the agent works (ChatStates.3: filled, no border; the board's audit layer drops the dashed line). */
 export const Queued = ({ text }: { text: string }) => {
   const c = useColors()
   const maxWidth = useBubbleMax(27)
   return (
     <Appear
       kind="bubble"
-      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.deco }}
+      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, backgroundColor: c.fill }}
     >
-      <Icon name="clock" size={14} color="t2" />
+      <Icon name="clock" size={16} color="t2" />
       <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>
         대기 중 · {text}
       </Text>

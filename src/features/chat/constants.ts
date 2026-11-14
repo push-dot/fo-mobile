@@ -31,6 +31,8 @@ export const HINTLESS_GATES = ['validate_cap']
 
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
+/** The edit card's waiting line names the edit it waits on, then this (ChatApprove). */
+export const EDIT_WAIT = { subject: '이력서 수정', tail: '확인을 기다리는 중' } as const
 
 export const FIT_ROWS = [
   { key: 'techStack', label: '기술 스택' },

@@ -574,6 +574,9 @@ const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'd
 // ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
 // so no line depends on how long Maestro takes to read the screen (its waits end early or late).
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
+/** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
+export const WAITING_CHOICES = new Set(['st-help'])
+export const WAITING_SINCE_MS = 72_000
 const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
   ask({
@@ -661,6 +664,8 @@ export const TOKENS: Record<string, Step[]> = {
   boost: ph3Boost,
   // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
   'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), done],
+  // ChatPh3BoostStop, first state: the board has the user line, the score card and the stop line, with no 한 번 더 올리기 answer between, so the run ends here by itself.
+  'boost-max': [...ph3Boost.slice(0, -1), s(400, agent('최대 5번까지 올렸어요.')), done],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
   quality: after(ph4Quality, QUALITY_LATER),
   '품질 검사로 넘어가기': after(ph4Quality, QUALITY_LATER),

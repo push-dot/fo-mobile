@@ -4,7 +4,7 @@ import type { ConversationTurn, LinkKind, Message, UserLink } from '@push/api-cl
 import type { ChatDoc, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
-import { fail, generic, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail } from './bot-scripts/runs'
+import { fail, generic, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail, WAITING_CHOICES, WAITING_SINCE_MS } from './bot-scripts/runs'
 import { mock, page } from './server'
 import { LEGAL_VERSION } from '@push/shared'
 
@@ -167,9 +167,11 @@ const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
   let seq = lastSeq.get(id) ?? 0
   // A tool card carries the time it was asked, as the server's frame does (`at`), so the room draws 확인을 기다리고 있어요 under the thread (ChatBotStatusApprove).
   const at = new Date().toISOString()
+  const backdated = new Date(Date.now() - WAITING_SINCE_MS).toISOString()
   const out: Step[] = steps.map((st) => {
     const frame = prefix ? scoped(st.frame, prefix) : st.frame
-    return { ...st, frame: { ...frame, ...(frame.type === 'approval' ? { at } : {}), seq: ++seq } }
+    const asked = frame.type === 'approval' ? at : frame.type === 'choice' && WAITING_CHOICES.has(frame.id) ? backdated : undefined
+    return { ...st, frame: { ...frame, ...(asked ? { at: asked } : {}), seq: ++seq } }
   })
   lastSeq.set(id, seq)
   const card = out.map((st) => st.frame).findLast(isCard)

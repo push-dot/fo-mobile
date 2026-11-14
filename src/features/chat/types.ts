@@ -111,6 +111,8 @@ export type Approval = {
   /** Server times in ms. A card with no `expiresAt` waits until answered. 다시 요청 replaces both. */
   openedAt?: number
   expiresAt?: number
+  /** The waiting line's own words, for a card whose line names the work ("이력서 수정 · 확인을 기다리는 중", ChatApprove). */
+  waitText?: string
 }
 
 export type Awaiting = 'approval' | 'choice'

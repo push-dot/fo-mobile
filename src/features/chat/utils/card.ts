@@ -33,12 +33,13 @@ export const expiredNote = ({ openedAt, expiresAt }: Times) =>
 /** The waiting line under the thread while a card is open. An expired card has none (ChatBotStatusExpired). */
 export const waitingLine = (card: Approval | null, state: CardState): Extract<LiveLine, { kind: 'waiting' }> | null => {
   if (!card || card.openedAt === undefined || state === 'expired') return null
-  const confirm = !!card.confirm
+  const confirm = !!card.confirm || card.waitText !== undefined
   return {
     kind: 'waiting',
     since: new Date(card.openedAt),
     for: confirm ? 'confirm' : 'answer',
     cardId: card.id,
-    text: confirm ? AWAITING_TEXT.approval : AWAITING_TEXT.choice,
+    text: card.waitText ?? (confirm ? AWAITING_TEXT.approval : AWAITING_TEXT.choice),
+    ...(card.waitText === undefined ? {} : { named: true as const }),
   }
 }
