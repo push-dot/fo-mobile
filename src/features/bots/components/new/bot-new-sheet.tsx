@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
+import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
@@ -454,9 +454,17 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const preview = (
     <View style={{ marginTop: 'auto', alignItems: 'center', gap: spacing[2], paddingTop: 2, paddingHorizontal: spacing[6] }}>
       <Mascot size={PREVIEW} color={form.color} state={phase.kind === 'creating' ? 'work' : 'idle'} motion={{ mode: 'still' }} />
-      <Text weight={name ? '800' : '700'} color={name ? 't1' : 't3'} numberOfLines={2} allowFontScaling={!xl} style={{ fontSize: 24, lineHeight: 32, textAlign: 'center', maxWidth: 320 }}>
+      <WordClampText
+        lines={2}
+        ellipsis="hang"
+        weight={name ? '800' : '700'}
+        color={name ? 't1' : 't3'}
+        allowFontScaling={!xl}
+        wrapperStyle={{ width: '100%', maxWidth: 320, alignItems: 'center' }}
+        style={{ fontSize: 24, lineHeight: 32, textAlign: 'center' }}
+      >
         {name ?? NAME_PLACEHOLDER}
-      </Text>
+      </WordClampText>
       {posting ? (
         <Text color="t3" allowFontScaling={!xl} style={{ fontSize: PREVIEW_SUB, lineHeight: PREVIEW_SUB_LINE, textAlign: 'center' }}>
           {posting.title}
@@ -481,9 +489,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <>
             {searchIcon}
             <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <Text numberOfLines={1} allowFontScaling={!xl} style={{ fontSize: fieldFont, lineHeight: fieldLine }}>
+              <WordClampText lines={1} ellipsis="inline" allowFontScaling={!xl} style={{ fontSize: fieldFont, lineHeight: fieldLine }}>
                 {pickedLine(posting)}
-              </Text>
+              </WordClampText>
             </Pressable>
             {phase.kind === 'creating' ? null : (
               <Pressable accessibilityRole="button" accessibilityLabel="지우기" onPress={() => setForm(clearPosting)} style={{ width: 44, height: 44, marginRight: -14, alignItems: 'center', justifyContent: 'center' }}>
