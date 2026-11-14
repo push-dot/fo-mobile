@@ -1,5 +1,5 @@
 appId: app.push.mobile
-name: 마이 설정 → 연락처·말투 시트 → 로그아웃·탈퇴 확인 (취소)
+name: 마이 설정 → 로그아웃·탈퇴 확인 (취소)
 tags:
   - visual
 ---
@@ -13,7 +13,9 @@ tags:
 - extendedWaitUntil:
     visible: "김서준"
     timeout: 10000
-# All four boards are iOS only. Neither alert is confirmed: logging out or deleting would end the session.
+# v415 board: 1 and 2 = the 로그아웃 alert (pair), 3 and 4 = the 회원 탈퇴 alert (pair); the iOS render of .2 / .4 equals .1 / .3, so each is a second shot of the same state. The contact and tone
+# sheets are not panels of this board (an earlier tour shot them as .3/.4, which put a sheet where the 탈퇴 alert belongs).
+# Neither alert is confirmed: logging out or deleting would end the session.
 - runFlow:
     when:
       platform: iOS
@@ -22,36 +24,9 @@ tags:
       - extendedWaitUntil:
           visible: ".*Google 계정으로 로그인.*"
           timeout: 10000
-      # The boards show the list scrolled to its end, backed off ~30pt (허브 공개 header under the title).
-      - runFlow: _settings_end.yaml
-      - tapOn: "연락처는.*"
-      - extendedWaitUntil:
-          visible: "누구에게 연락처를 보여 줄까요?"
-          timeout: 5000
-      - waitForAnimationToEnd
-      - takeScreenshot: SettingsStates.3
-      # These sheets have no 닫기 button of their own (iOS only labels the scrim 팝업 닫기).
-      - runFlow:
-          file: _close_sheet.yaml
-          env:
-            TITLE: "누구에게 연락처를 보여 줄까요?"
-      - extendedWaitUntil:
-          notVisible: "누구에게 연락처를 보여 줄까요?"
-          timeout: 5000
-      - runFlow: _settings_end.yaml
-      - tapOn: "말투.*"
-      - extendedWaitUntil:
-          visible: "Bot이 어떤 말투로 쓸까요?"
-          timeout: 5000
-      - waitForAnimationToEnd
-      - takeScreenshot: SettingsStates.4
-      - runFlow:
-          file: _close_sheet.yaml
-          env:
-            TITLE: "Bot이 어떤 말투로 쓸까요?"
-      - extendedWaitUntil:
-          notVisible: "Bot이 어떤 말투로 쓸까요?"
-          timeout: 5000
+      # The boards' list starts at 허브 공개 (3 rows, no 차단한 사람 row) and ends at 4 기타 rows; the app has two more rows (차단한
+      # 사람, 구매 복원), so 허브 공개 and 회원 탈퇴 cannot both be on screen. The list is scrolled to its end (the rows to tap),
+      # backed off ~30pt.
       - runFlow: _settings_end.yaml
       - tapOn: "로그아웃"
       # Retap if the alert did not open (dropped first tap, see flows/05_my_settings_logout.yaml).
@@ -65,6 +40,8 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.1
+      # v415 .2 is the board's twin of .1 (same 로그아웃 alert: the render text.json of .1 and .2 is identical).
+      - takeScreenshot: SettingsStates.2
       - tapOn: "취소"
       - waitForAnimationToEnd
       - tapOn: "회원 탈퇴"
@@ -72,5 +49,7 @@ tags:
           visible: "회원 탈퇴할까요?"
           timeout: 5000
       - waitForAnimationToEnd
-      - takeScreenshot: SettingsStates.2
+      - takeScreenshot: SettingsStates.3
+      # .4 is the twin of .3 (the same 회원 탈퇴 alert).
+      - takeScreenshot: SettingsStates.4
       - tapOn: "취소"

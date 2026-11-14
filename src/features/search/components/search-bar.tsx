@@ -5,7 +5,8 @@ import { Glass, Icon, Text } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '../../../theme'
 
-const CLOSE_SHAPE = { height: 44, borderRadius: 22, paddingHorizontal: spacing[4], justifyContent: 'center' } as const
+// Board `button.search`: padding 0 18px (the 64pt close button, field 305).
+const CLOSE_SHAPE = { height: 44, borderRadius: 22, paddingHorizontal: 18, justifyContent: 'center' } as const
 
 const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v: string) => void; onSubmit: () => void }) => {
   const c = useColors()
@@ -38,7 +39,8 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
     </View>
   )
   const closeLabel = (
-    <Text v="b2" weight="700">
+    // The board draws 닫기 at 16px/700 (28.8pt wide): b1, so the button is 28.8 + 2 * 18 = 64.8 and the field 305.2.
+    <Text v="b1" weight="700">
       닫기
     </Text>
   )

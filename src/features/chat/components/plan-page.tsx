@@ -37,7 +37,7 @@ const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[n
       <View style={{ gap: spacing[1] }}>
         {plan.features.map((f) => (
           <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-            <Icon name="check" size={14} color="acText" />
+            <Icon name="check" size={14} color="t1" />
             <Text v="c1" color="t2">
               {f}
             </Text>
@@ -54,7 +54,7 @@ const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => 
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={{ minHeight: 56, marginTop: spacing[2], marginHorizontal: spacing[5], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
+      style={{ minHeight: 56, marginTop: spacing[3], marginHorizontal: spacing[5], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
     >
       <Text v="b2" weight="700" style={{ flex: 1 }}>
         {label}
@@ -79,6 +79,7 @@ export const PlanPage = () => {
     <PageModal
       title="플랜"
       tight
+      page
       left={<GlassButton actions={[...back]} />}
       footer={
         account?.plan === 'ULTRA' ? (
@@ -90,7 +91,8 @@ export const PlanPage = () => {
     >
       {account ? (
         <Appear kind="fade">
-          <Text v="h2" style={{ paddingTop: spacing[1], paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
+          {/* PlanUltra: the h2 block starts 8 under the 6pt gap below the header and the scroll's 4: 10 in all. */}
+          <Text v="h2" style={{ paddingTop: 10, paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
             {PLAN_HEADER}
           </Text>
           <View style={{ paddingHorizontal: spacing[5], gap: spacing[2] }}>
@@ -105,7 +107,7 @@ export const PlanPage = () => {
             ))}
           </View>
           <LinkRow label="크레딧 구매" onPress={pay(() => purchase.buyCredits())} />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: spacing[3], paddingHorizontal: spacing[6] }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: 14, paddingHorizontal: spacing[6] }}>
             <Text v="c1" color="t3">
               {PLAN_FOOT}
             </Text>
@@ -123,7 +125,6 @@ export const PlanPage = () => {
 
 // The board's rows: 10 between the dot and the line, 16 between rows, 24pt lines; the foot sits 8 lower than a row gap.
 const NOTICE_LINE = 24
-const DOT_WIDTH = 4
 
 /** 구독 안내 (PlanNotice): the long notice, one page. */
 export const PlanNoticePage = () => (
@@ -131,12 +132,11 @@ export const PlanNoticePage = () => (
     <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[4] }}>
       {PLAN_NOTICES.map((line) => (
         <View key={line} style={{ flexDirection: 'row', gap: 10 }}>
-          {/* The shared font draws a Korean "·" 5pt wider than the board's, so the dot sits in a fixed box and the text starts where the board's does. */}
-          <View style={{ width: DOT_WIDTH, alignItems: 'center' }}>
-            <Text v="b2" color="t3" numberOfLines={1} style={{ width: 20, textAlign: 'center' }}>
-              ·
-            </Text>
-          </View>
+          {/* The dot is its own glyph, 8.09 pt at 15px (board 8.1): the line starts at x42.1 and its column is 335.9, so "해지해도 남은" (338.1) wraps and "철회할 수 있어요." (335.7) holds. */}
+          {/* Fixed at the glyph's 8.1: the measured box rounds up to 8.33 on the pixel grid and the column would lose 0.25 pt of the 0.1 pt the third item has. */}
+          <Text v="b2" color="t3" style={{ width: 8.1 }}>
+            ·
+          </Text>
           <Text v="b2" color="t2" style={{ flex: 1, lineHeight: NOTICE_LINE }}>
             {line}
           </Text>

@@ -72,6 +72,9 @@ describe('composerPlaceholder', () => {
     const result: ChatItem = { type: 'result', id: 'r', source: 'external', checklist: [], actions: [], documentId: 'd', fileName: 'a.pdf', pageLine: 'A4 1쪽' }
     expect(composerPlaceholder({ items: [user, result, { type: 'worked', id: 'w', seconds: 3 }], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
     expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+    // ChatStates.4: the lines after the result (apply record, busy error) keep the talking box.
+    const later: ChatItem[] = [user, result, { type: 'agentText', id: 'rec', text: '지원했어요 · 마이 › 내 활동에 기록했어요' }, user, { type: 'error', id: 'e', text: '지금 요청이 많아요.', code: 'QUEUE_BUSY' }]
+    expect(composerPlaceholder({ items: later, working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
   })
 
   it('says the run takes input too while a document flow with a to-do card works, named bot or not', () => {
@@ -180,9 +183,14 @@ describe('threadRows', () => {
     expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'running', 'p'])
   })
 
-  it('keeps the line out of the list when no draft is being written (ChatBotStatusWork, Think, Approve)', () => {
-    expect(ids(threadRows([user], true))).toEqual(['u'])
-    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo'])
+  it('draws the line under the last line when no draft is being written (ChatBotStatusWork, Think, Queue)', () => {
+    expect(ids(threadRows([user], true))).toEqual(['u', 'running'])
+    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo', 'running'])
+    expect(ids(threadRows([user, todo, tool], true))).toEqual(['u', 'todo', 'running'])
+  })
+
+  it('draws no line when the run is not working', () => {
+    expect(ids(threadRows([user], false))).toEqual(['u'])
   })
 
   it('draws a finished draft as it is, with no line', () => {

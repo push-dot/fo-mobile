@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { ConsentPromptListener } from '@/features/chat'
-import { modalOptions, sheetOptions } from '@/shared/navigation'
+import { fullPageOptions, modalOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
@@ -52,8 +52,9 @@ const SignedInStack = () => {
       <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="account-usage" />
-      <Stack.Screen name="plan" />
-      <Stack.Screen name="plan-notice" />
+      {/* PlanUltra: the plan is a full page; 구독 안내 opened from it is a page sheet again, like the account. */}
+      <Stack.Screen name="plan" options={fullPageOptions()} />
+      <Stack.Screen name="plan-notice" options={Platform.OS === 'ios' ? { presentation: 'modal' } : undefined} />
       <Stack.Screen name="job-filter" options={sheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />

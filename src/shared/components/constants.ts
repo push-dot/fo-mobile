@@ -9,3 +9,5 @@ export const GRABBER = { ios: { width: 36, height: 5, borderRadius: 3 }, android
 export const PRESS_SCALE = 0.97
 export const DISABLED_OPACITY = 0.4
 export const SHEET_ACTION_GAP = { filter: 6, quickStart: 4 } as const
+/** iOS filter sheets (.ifoot): the CTA sits 20 under the last chips. */
+export const IOS_FILTER_ACTION_GAP = 20

@@ -26,8 +26,16 @@ tags:
 # The find field takes the focus when the bar opens; a tap makes sure it does (the menu item is gone by now).
 - tapOn: "채팅에서 찾기"
 - inputText: "PDF"
+# Three hits, newest first: the source line "…pdf" (1/3), the answer's "PDF는" (2/3), the user's "PDF로" (3/3).
+# The board's find bar sits on 2/3, the answer's own PDF, so step once to the older hit.
 - extendedWaitUntil:
-    visible: ".*[0-9]/[0-9].*"
+    visible: ".*1/3.*"
     timeout: 10000
+- tapOn: "이전 결과"
+- extendedWaitUntil:
+    visible: ".*2/3.*"
+    timeout: 10000
+# The board draws the result with the keyboard down (the field has a search return key, so Return lowers it).
+- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderFind

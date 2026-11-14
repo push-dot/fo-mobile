@@ -10,18 +10,22 @@ tags:
     env:
       MOCK: "push://sign-in?mock=consent-on"
       READY: "새로 올라온 공고"
-- tapOn: "마이"
-- extendedWaitUntil:
-    visible: "김서준"
-    timeout: 10000
-- tapOn: "설정"
+# The board is the entry state (the 차단한 사람 row bold on acSoft, route param entry=blocked), which a tap on 설정 never sets.
+- openLink: push://settings?entry=blocked
 - extendedWaitUntil:
     visible: ".*Google 계정으로 로그인.*"
     timeout: 10000
-# The board shows the 허브 공개 group with the 차단한 사람 row in the middle of the screen.
+# The board shows the list scrolled so that 댓글과 답글 is the first row under the title and the 차단한 사람 row sits at y≈533. scrollUntilVisible + centerElement stops with the row at
+# y≈503.7 (measured on the step-4 capture of this flow, ink 496.7-510.7), so the list goes down ~29pt: a slow swipe moves the list ~0.86 of its
+# travel (the 4% back-off in _settings_end.yaml is 35pt of travel = 30pt of list): 4% of 874 = 35pt -> 30pt -> row centre ~533.8 (board 533).
 - scrollUntilVisible:
     element: "차단한 사람.*"
     centerElement: true
+- waitForAnimationToEnd
+- swipe:
+    start: "50%,45%"
+    end: "50%,49%"
+    duration: 1000
 - waitForAnimationToEnd
 - takeScreenshot: SettingsBlockedEntry
 - tapOn: "차단한 사람.*"

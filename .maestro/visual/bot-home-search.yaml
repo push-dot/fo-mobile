@@ -18,6 +18,15 @@ tags:
     visible: "Bot 이름이나 대화 내용으로 찾아보세요"
     timeout: 10000
 - waitForAnimationToEnd
+# The board draws the empty field with the keyboard up. The field takes focus (caret) but iOS shows its keyboard only once a key is typed
+# (the step-4 capture had the caret and no keyboard, the tab bar still in view), so type one character and erase it.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - inputText: "a"
+      - eraseText: 1
+      - waitForAnimationToEnd
 - takeScreenshot: AgentHomeSearchStart
 # inputText is ASCII-only on Android; the boards are iOS shots, so the Korean queries run on iOS only.
 - runFlow:

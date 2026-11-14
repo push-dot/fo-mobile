@@ -2,7 +2,8 @@ export type LiveLine =
   | { kind: 'run'; phase: 'queued'; since: Date; ahead: number }
   | { kind: 'run'; phase: 'thinking'; since: Date; text: string }
   | { kind: 'run'; phase: 'working'; since: Date; text: string }
-  | { kind: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: string; text: string }
+  /** A line that names its work ends there: no elapsed time (ChatApprove). */
+  | { kind: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: string; text: string; named?: true }
 
 export type Notice =
   | { kind: 'stopped'; resumable: boolean }
@@ -67,7 +68,7 @@ export const statusLineView = (line: StatusLine, now: Date): StatusLineView => {
   }
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now), 'status')
   if (line.kind === 'run' && line.phase === 'working') return view('work', 'neutral', line.text, elapsedText(line.since, now), 'status')
-  if (line.kind === 'waiting') return view('help', 'help', line.text, elapsedText(line.since, now), 'status')
+  if (line.kind === 'waiting') return view('help', 'help', line.text, line.named ? null : elapsedText(line.since, now), 'status')
   if (line.kind === 'stopped') return view('idle', 'quiet', line.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT, null, 'status')
   if (line.kind === 'failed') return view('idle', 'danger', line.text, null, 'status')
   return view('idle', 'danger', ERROR_SENTENCE, line.reason, 'alert')

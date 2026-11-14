@@ -15,9 +15,9 @@ const SettingsBlockedScreen = () => {
       {isPending ? (
         <ActivityIndicator style={{ marginTop: spacing[6] }} />
       ) : !rows ? (
-        <StatusNote lines={[OFFER_MENU_COPY.failed]} action={{ label: RETRY_LABEL, onPress: () => void refetch() }} style={emptyNoteStyle(140)} />
+        <StatusNote lines={[OFFER_MENU_COPY.failed]} action={{ label: RETRY_LABEL, onPress: () => void refetch() }} style={emptyNoteStyle(140, false)} />
       ) : rows.length === 0 ? (
-        <StatusNote lines={[BLOCKED_COPY.empty]} style={emptyNoteStyle(140)} />
+        <StatusNote lines={[BLOCKED_COPY.empty]} style={emptyNoteStyle(140, false)} />
       ) : (
         <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: HIT_TARGET }}>
           <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[1], paddingBottom: spacing[4] }}>

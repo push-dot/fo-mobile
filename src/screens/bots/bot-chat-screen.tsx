@@ -20,6 +20,7 @@ import {
   Onboarding,
   Queued,
   QuickStartRow,
+  RowMotion,
   StatusRow,
   THREAD_BATCH,
   THREAD_INITIAL_RENDER,
@@ -51,11 +52,18 @@ import {
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
+import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
 // An inverted list sits at the bottom while its offset is near zero.
 const AT_BOTTOM = 40
+const OPEN_REST_MS = 800
+// The list's own gap (18) sits between its footer and the first line, so the footer is shorter than the header by that much.
+const LIST_GAP = 18
+// The boards start a company Bot's thread (greeting) 16pt under the header (.cthread) and a thread with no greeting 4pt over its bottom edge (.thread, top + 56 vs the header's 60).
+const GREETING_TOP = spacing[4]
+const PLAIN_TOP = -4
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
@@ -132,13 +140,18 @@ const Thread = ({ id }: { id: string }) => {
   const greeting: ChatItem[] =
     !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
   const rows = threadRows(chat.items, !!chat.working)
-  const running = rows.some((r) => r.type === 'running')
   const data: ThreadRow[] = [...rows].reverse().concat(greeting)
 
   const find = useFind(id)
   const limit = useChatLimit(chat.items)
   const [headerH, setHeaderH] = useState(0)
   const [atBottom, setAtBottom] = useState(true)
+  // Lines that are on screen when the room opens show at rest; only a line that arrives afterwards pops in (RowMotion).
+  const [live, setLive] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setLive(true), OPEN_REST_MS)
+    return () => clearTimeout(timer)
+  }, [])
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
   const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
@@ -179,13 +192,16 @@ const Thread = ({ id }: { id: string }) => {
   })
   const working = chat.working
   const renderItem = useCallback(
-    ({ item }: { item: ThreadRow }) =>
-      item.type === 'running' ? (
-        working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
-      ) : (
-        <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
-      ),
-    [onView, onUsage, onReadOff, working, id, color],
+    ({ item }: { item: ThreadRow }) => (
+      <RowMotion.Provider value={{ key: `${id}/${item.id}`, live }}>
+        {item.type === 'running' ? (
+          working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
+        ) : (
+          <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
+        )}
+      </RowMotion.Provider>
+    ),
+    [onView, onUsage, onReadOff, working, id, color, live],
   )
 
   return (
@@ -199,7 +215,9 @@ const Thread = ({ id }: { id: string }) => {
       </View>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {empty && kind && name ? (
-        <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
+        <RowMotion.Provider value={{ key: `${id}/onboarding`, live }}>
+          <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
+        </RowMotion.Provider>
       ) : (
       <View style={{ flex: 1 }}>
       <ChatBotColor.Provider value={color}>
@@ -223,7 +241,7 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingVertical: spacing[4] }}
-        ListFooterComponent={<View style={{ height: headerH }} />}
+        ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
           chat.queue.length || showPanel ? (
             <View style={{ gap: 18 }}>
@@ -264,9 +282,7 @@ const Thread = ({ id }: { id: string }) => {
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
             above={
-              chat.working && !running ? (
-                <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} color={color} />
-              ) : chat.awaiting ? (
+              chat.awaiting ? (
                 <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
               ) : empty && kind ? (
                 <QuickStartRow kind={kind} onChip={(key) => router.push(quickStartPath(key))} />
@@ -282,4 +298,10 @@ const Thread = ({ id }: { id: string }) => {
   )
 }
 
-export default BotChatScreen
+const BotChatScreenWithXlChrome = () => (
+  <XlBoardChrome>
+    <BotChatScreen />
+  </XlBoardChrome>
+)
+
+export default BotChatScreenWithXlChrome

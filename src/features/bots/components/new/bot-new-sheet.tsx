@@ -6,6 +6,7 @@ import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
+import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -67,7 +68,6 @@ import {
   SEARCH_PLACEHOLDER,
   SHEET_TITLE,
   UPGRADE_LABEL,
-  XL_FONT_SCALE,
 } from './copy'
 import { loadPosting, searchPostings, type PostingRow } from './posting-search'
 
@@ -80,6 +80,7 @@ type Props = {
 
 const SWATCH = 46
 const DOT = 34
+const ROW_TITLE = 17
 const PREVIEW = 120
 const PREVIEW_SUB = 14
 const PREVIEW_SUB_LINE = 20
@@ -87,7 +88,9 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
-const CREATING_DIM = 0.7
+// Board: `.field.dis{opacity:.55}` on the picked-posting field and `opacity:.75` on the busy CTA.
+const CREATING_DIM = 0.75
+const FIELD_DIS = 0.55
 const CTA_XL = 64
 const CTA_FONT_XL = 21
 
@@ -152,17 +155,11 @@ const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (ne
   )
 }
 
-const SWATCH_ROW = 6
-
-// BotNew board: 6 + 5, centered, whatever the screen's width.
+// Board `.cpick`: centred, wrapping, gap 4px 8px, padding 0 16px. 46pt swatches fill a 370pt row with 7 and leave 4 for the second row.
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View style={{ alignItems: 'center', rowGap: spacing[1] }}>
-    {[BOT_COLORS.slice(0, SWATCH_ROW), BOT_COLORS.slice(SWATCH_ROW)].map((names, i) => (
-      <View key={i} style={{ flexDirection: 'row', columnGap: spacing[2] }}>
-        {names.map((name) => (
-          <Swatch key={name} name={name} on={name === color} onPick={onPick} />
-        ))}
-      </View>
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
+    {BOT_COLORS.map((name) => (
+      <Swatch key={name} name={name} on={name === color} onPick={onPick} />
     ))}
   </View>
 )
@@ -212,7 +209,7 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
 
 // BotNewConsent is the platform's own sheet: the floating iOS sheet, the Android bottom sheet. Back and the scrim close it.
 const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => (
-  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} onClose={onLater}>
+  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} gap={12} onClose={onLater}>
     <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
       {CONSENT_TITLE}
     </Text>
@@ -220,7 +217,8 @@ const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: 
       {CONSENT_BODY}
     </Text>
     <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
-      <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+      {/* Owner rule 3: the link is black (the board's t1); the accent stays on the main button. */}
+      <Text v="c1" weight="600" style={{ textDecorationLine: 'underline' }}>
         {CONSENT_MORE}
       </Text>
     </View>
@@ -236,7 +234,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
   const window = useWindowDimensions()
-  const xl = window.fontScale >= XL_FONT_SCALE
+  const xl = isXlBoardText(window.fontScale)
   const [sheetBottom, setSheetBottom] = useState(window.height)
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])
@@ -407,7 +405,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const name = posting?.company
   const linkWait = phase.kind === 'linkChecking' || phase.kind === 'linkFinding'
   const control = xl ? FIELD_XL : FIELD
+  // Board .xl: the field text is a fixed 19/29, like the name and sub (the system scale must not grow it again).
   const fieldFont = xl ? 19 : type.b1.fontSize
+  const fieldLine = xl ? 29 : type.b1.lineHeight
   const ios = Platform.OS === 'ios'
   const fieldBox = { height: control, borderRadius: control / 2 }
   const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
@@ -423,7 +423,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     )
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
-  const rowTitle = { minHeight: 60, justifyContent: 'center' as const, gap: 2, paddingVertical: spacing[2] + 2, paddingHorizontal: spacing[5] }
+  // Board `.smod .rr` (r4p): padding 14px 16px, no min-height, title 17/22.
+  const rowTitle = { justifyContent: 'center' as const, gap: 2, paddingVertical: 14, paddingHorizontal: spacing[4] }
+  const rowTitleText = { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight }
   const card = { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
@@ -449,11 +451,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const preview = (
     <View style={{ marginTop: 'auto', alignItems: 'center', gap: spacing[2], paddingTop: 2, paddingHorizontal: spacing[6] }}>
       <Mascot size={PREVIEW} color={form.color} state={phase.kind === 'creating' ? 'work' : 'idle'} motion={{ mode: 'still' }} />
-      <Text weight={name ? '800' : '700'} color={name ? 't1' : 't3'} numberOfLines={2} style={{ fontSize: 24, lineHeight: 32, textAlign: 'center', maxWidth: 320 }}>
+      <Text weight={name ? '800' : '700'} color={name ? 't1' : 't3'} numberOfLines={2} allowFontScaling={!xl} style={{ fontSize: 24, lineHeight: 32, textAlign: 'center', maxWidth: 320 }}>
         {name ?? NAME_PLACEHOLDER}
       </Text>
       {posting ? (
-        <Text color="t3" style={{ fontSize: xl ? type.h3.fontSize : PREVIEW_SUB, lineHeight: xl ? type.h3.lineHeight : PREVIEW_SUB_LINE, textAlign: 'center' }}>
+        <Text color="t3" allowFontScaling={!xl} style={{ fontSize: PREVIEW_SUB, lineHeight: PREVIEW_SUB_LINE, textAlign: 'center' }}>
           {posting.title}
         </Text>
       ) : null}
@@ -461,12 +463,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 
   // Only a phase that carries a posting has a line to show; searching, link and limit phases have none.
-  const mainField =
+  const fieldShell =
     !posting
       ? shell(
           <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
             {searchIcon}
-            <Text color="t3" style={{ flex: 1, fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+            <Text color="t3" allowFontScaling={!xl} style={{ flex: 1, fontSize: fieldFont, lineHeight: fieldLine }}>
               {SEARCH_PLACEHOLDER}
             </Text>
           </Pressable>,
@@ -476,7 +478,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <>
             {searchIcon}
             <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <Text color={phase.kind === 'creating' ? 't3' : 't1'} numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+              <Text numberOfLines={1} allowFontScaling={!xl} style={{ fontSize: fieldFont, lineHeight: fieldLine }}>
                 {pickedLine(posting)}
               </Text>
             </Pressable>
@@ -490,6 +492,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           </>,
           { marginHorizontal: spacing[4] },
         )
+  const mainField = phase.kind === 'creating' ? <View style={{ opacity: FIELD_DIS }}>{fieldShell}</View> : fieldShell
 
   const searchBody = (
     <>
@@ -498,7 +501,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {showRows
           ? rows.map((row) => (
               <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
-                <Text v="b1" weight="600" style={{ lineHeight: type.b2.lineHeight }}>
+                <Text v="b1" weight="600" style={rowTitleText}>
                   <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
                 </Text>
                 <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
@@ -517,7 +520,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
           <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, card]}>
-            <Text weight="700" numberOfLines={2} style={{ fontSize: type.b1.fontSize, lineHeight: type.b2.lineHeight }}>
+            <Text weight="600" numberOfLines={2} style={rowTitleText}>
               {pickedLine(phase.posting)}
             </Text>
             <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
@@ -545,7 +548,10 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="search"
-              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, paddingVertical: 0 }, fontFor('400')]}
+              allowFontScaling={!xl}
+              // The board's input inherits the page's -0.02em (`input{letter-spacing:inherit}`): the 31-glyph link is 228.7 pt tracked, 238.6 untracked,
+              // and the field's text box is 230 (316 - 32 padding - icon 20 - spinner 18 - 2 gaps of 8), so untracked it scrolled its first letter away.
+              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fieldFont, paddingVertical: 0 }, fontFor('400')]}
             />
             {linkWait ? <Spinner size={18} color="t3" /> : null}
           </>,
@@ -582,7 +588,8 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <BotLimitDelete bots={companyBots} onDelete={onDeleteBot} />
         ) : phase.kind === 'limit' ? (
           <>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
+            {/* Board `.bsh-b`: padding 4px 0 24px. */}
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
               <LimitBody limit={bots.limit} />
             </ScrollView>
             <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
@@ -616,4 +623,10 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 }
 
-export default BotNewSheet
+const BotNewSheetWithXlChrome = (props: Props) => (
+  <XlBoardChrome>
+    <BotNewSheet {...props} />
+  </XlBoardChrome>
+)
+
+export default BotNewSheetWithXlChrome

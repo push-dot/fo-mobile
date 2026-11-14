@@ -43,6 +43,7 @@ const link = (id: string, url: string, linkKind: LinkKind, addedAt: string, titl
 const yesterday = () => new Date(Date.now() - DAY).toISOString()
 
 const docs = (): Material[] => [
+  pdf('f0', '모아페이_지원동기_초안.pdf', '2026-11-05T02:00:00Z', MOA),
   pdf('f1', '김서준_백엔드_이력서.pdf', '2026-11-02T06:14:00Z', MOA, 312 * KB, 2),
   pdf('f2', '경력기술서_2026.pdf', '2026-10-28T02:00:00Z', null),
   pdf('f3', '파도AI_자기소개서_초안.pdf', '2026-10-16T02:00:00Z', PUSH),
@@ -77,7 +78,7 @@ const links = (): Material[] => [
 
 /** MaterialsLong: the newest row of each section has the longest text the boards draw. */
 const longSections = (): Record<Section, Material[]> => ({
-  doc: [pdf('f1', '김서준_모아페이_백엔드엔지니어_지원서류_최종_진짜최종_v7_수정본.pdf', '2026-11-02T06:14:00Z', NURI_LONG, 312 * KB, 2), ...docs().slice(1)],
+  doc: [pdf('f1', '김서준_모아페이_백엔드엔지니어_지원서류_최종_진짜최종_v7_수정본.pdf', '2026-11-02T06:14:00Z', NURI_LONG, 312 * KB, 2), ...docs().filter((m) => m.id !== 'f1')],
   bookmark: [bookmark('p-nuri-senior', '누리클라우드 플랫폼엔지니어링본부', '시니어 백엔드 엔지니어(결제·정산 플랫폼)', 21, '2026-11-01T02:00:00Z'), ...bookmarks().slice(1)],
   link: [
     link('l0', 'https://careers.nuricloud.co.kr/jobs/platform-engineering/backend-senior-2026-recruit?utm_source=push&utm_medium=app', 'job', '2026-11-01T02:00:00Z', '누리클라우드 시니어 백엔드 엔지니어(결제·정산 플랫폼) 채용 페이지', yesterday()),
@@ -115,6 +116,13 @@ const usedBy = (m: Material): BotContract.BotRef[] => {
   const chats = (ATTACHED_IN[keyOf(m)] ?? []).filter((b) => live(b) && b.id !== maker?.id)
   return maker ? [maker, ...chats] : chats
 }
+
+/**
+ * MaterialsFromProfile draws 모아페이's own list as 서류 4: 모아페이_지원동기_초안.pdf (11월 5일), 김서준_백엔드_이력서, 경력기술서_2026, 포트폴리오_결제시스템.
+ * The 서류 board (MaterialsDocs) has no 지원동기 draft and lists 면접_예상질문_모아페이 as made by 모아페이 Bot, so the first is shown only in a bot's list and the second only outside it.
+ */
+const ONLY_IN_BOT_LIST = new Set(['file:f0'])
+const NOT_IN_BOT_LIST = new Set(['file:f5'])
 
 let sections = defaults()
 /** Deleted materials the server still keeps for 30 days: they leave every list until a restore. */
@@ -157,7 +165,7 @@ mock('GET', 'materials', ({ query }) => {
   const bot = address === null ? null : fixtureOf(address)?.bot.id
   if (bot === undefined) return notFound()
   const of = (s: Section) =>
-    sections[s].filter((m) => !kept.has(keyOf(m)) && (!q || textOf(m).includes(q)) && (!bot || usedBy(m).some((b) => b.id === bot))).map(listed)
+    sections[s].filter((m) => !kept.has(keyOf(m)) && (!q || textOf(m).includes(q)) && (bot ? !NOT_IN_BOT_LIST.has(keyOf(m)) && usedBy(m).some((b) => b.id === bot) : !ONLY_IN_BOT_LIST.has(keyOf(m)))).map(listed)
   const counts = { doc: of('doc').length, bookmark: of('bookmark').length, link: of('link').length }
   if (tab === 'all') {
     const all: BotContract.MaterialsPage = { counts, sections: (['doc', 'bookmark', 'link'] as const).map((s) => ({ section: s, items: of(s).slice(0, PREVIEW[s]), nextCursor: null })) }

@@ -228,8 +228,8 @@ const DocsTab = () => {
         <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <Button
             label="파일 등록"
-            disabled={!!upload}
-            onPress={showImportMenu}
+            // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
+            onPress={() => !upload && showImportMenu()}
           />
         </View>
         <Text v="c1" color="t3" style={{ textAlign: 'center', paddingTop: spacing[3] }}>

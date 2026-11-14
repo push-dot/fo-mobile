@@ -3,8 +3,10 @@ name: 소셜 → 글쓰기 시트
 tags:
   - visual
 ---
-# The board draws the filled sheet: 커리어, a title and a body (게시 on), and two photos (2/4). mock=two-photos makes the next photo pick return
-# two images instead of the system picker (whose labels the app does not set); the pick is the last step, and it lowers the keyboard for the shot.
+# The board draws 커리어 with the title and body still on their placeholders (제목을 입력해 주세요 / 나누고 싶은 이야기를 적어 주세요),
+# no keyboard, and two photos (2/4); an earlier tour typed both fields, which no panel shows. (The board's 게시 is on although both
+# fields are empty; the app keeps it off until a title and a body exist.) mock=two-photos makes the next photo pick return
+# two images instead of the system picker (whose labels the app does not set); the pick is the last step.
 - runFlow: ../flows/_login.yaml
 - runFlow: ../flows/_dismiss_logbox.yaml
 - openLink: push://?mock=two-photos
@@ -18,17 +20,6 @@ tags:
     timeout: 10000
 - tapOn: "카테고리.*"
 - tapOn: "커리어"
-- waitForAnimationToEnd
-- tapOn:
-    id: "compose-title"
-- inputText: "결제 도메인으로 이직한 후기"
-- tapOn:
-    id: "compose-body"
-- inputText: "정산 배치를 맡으며 배운 것을 정리했어요"
-# The keyboard covers the photo button (a tap at its centre lands on a QuickType candidate and types ㅈ): scroll the form up first, as a user does.
-- swipe:
-    start: 50%, 48%
-    end: 50%, 22%
 - waitForAnimationToEnd
 - tapOn: "사진 추가.*"
 - extendedWaitUntil:

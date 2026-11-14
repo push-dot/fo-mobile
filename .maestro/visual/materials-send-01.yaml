@@ -39,6 +39,10 @@ tags:
 - extendedWaitUntil:
     visible: "김서준_백엔드_이력서.pdf 보내기"
     timeout: 20000
+# The 자료를 붙였어요 toast of the attach above is still up when the profile route opens; the board has none, so wait it out.
+- extendedWaitUntil:
+    notVisible: "자료를 붙였어요.*"
+    timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsFromProfile
 - tapOn: "김서준_백엔드_이력서.pdf 보내기"

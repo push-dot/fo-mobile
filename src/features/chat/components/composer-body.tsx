@@ -5,6 +5,7 @@ import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../th
 import { Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import ModePicker from './mode-picker'
+import { composerWeight } from '../utils/composer-weight'
 
 
 /** The box stops growing at five lines and scrolls inside (ChatKeyboardIOS). */
@@ -63,7 +64,7 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           lineBreakStrategyIOS="hangul-word"
           maxLength={p.maxLength}
           accessibilityLabel={p.label ?? '메시지'}
-          style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor(hasText ? '600' : '400')]}
+          style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor('400')]}
         />
         <Pressable
           accessibilityRole="button"
@@ -111,7 +112,8 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
           editable={!p.disabled}
           accessibilityLabel={p.label ?? '메시지'}
           maxLength={p.maxLength}
-          style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(hasText ? '600' : '400')]}
+          // The board's typed line inherits the page's -0.02em ("@모아" 47.1 pt tracked, 48.1 without) and is 600 only while a mention is being typed.
+          style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
         />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>

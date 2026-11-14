@@ -2,7 +2,8 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { CHIP_FILTER_KINDS, FILTER_KEYS, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
-import { Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
+import { Platform } from 'react-native'
+import { IOS_FILTER_ACTION_GAP, Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
 
 const kindOf = (value: string | string[] | undefined) => {
   const kind = Array.isArray(value) ? value[0] : value
@@ -28,13 +29,16 @@ const JobFilterSheetScreen = () => {
 
   if (!kind) return null
   const compact = CHIP_FILTER_KINDS.includes(kind)
+  // iOS chip and skill sheets (.isheet): the .inav starts 17 under the sheet top, the CTA 20 under the last chips.
+  const isheet = Platform.OS === 'ios' && kind !== 'location'
 
   return (
     <Sheet
-      // Chip sheets: the board's head starts 17 under the sheet top and the chips right under it; its CTA sits 20 under the chips
-      // and the sheet ends 26 under it. Ours ends 20 under a 56 CTA (the board's is 52), so 26 above it keeps the sheet 247 high.
-      gap={compact ? 0 : undefined}
-      actionGap={compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}
+      // iOS chip sheets: the head starts 17 under the sheet top, the CTA (52 high, slimAction) sits 20 under the chips and the sheet
+      // ends 26 under it, so FilterRole is 247 high with the CTA centre at 814.
+      gap={compact || isheet ? 0 : undefined}
+      slimAction={isheet}
+      actionGap={isheet ? IOS_FILTER_ACTION_GAP : compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}
       onLayout={bound.onSheetLayout}
       action={{
         label: total === undefined ? '공고 보기' : `공고 ${formatCount(total)}개 보기`,

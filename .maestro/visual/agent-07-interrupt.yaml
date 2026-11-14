@@ -27,12 +27,15 @@ tags:
     env:
       KO: "잠깐, 자기소개서도 같이 써 줘"
       EN: "wait also write cover letter"
-- extendedWaitUntil:
-    visible: ".*경력 수준을 비교하는 중.*"
-    timeout: 20000
-# A tap on a bot line opens the Bot's profile, so the keyboard goes down on the user's own bubble.
+# The keyboard goes down first, while the sent line is still on screen: the working lines that stream in afterwards push it above
+# the fold of a keyboard-high thread, and a tap on an off-screen line leaves the keyboard up (the board has none).
+# A tap on a bot line opens the Bot's profile, so it lands on the user's own bubble.
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
       TEXT: ".*자기소개서도 같이 써 줘.*"
+- extendedWaitUntil:
+    visible: ".*경력 수준을 비교하는 중.*"
+    timeout: 20000
+- waitForAnimationToEnd
 - takeScreenshot: ChatInterrupt

@@ -1,18 +1,24 @@
 import type { Settings } from '@push/api-client'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, PlatformColor, Pressable, View } from 'react-native'
 import { RadioRow, SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
 import { Sheet, Text, WheelPicker } from '@/shared/components'
 import { spacing, useColors, useThemePreference, type ThemeChoice } from '@/theme'
 
 const ANDROID = Platform.OS === 'android'
 
+// iOS (.inav .nb): 17 system blue, min 56 wide; 완료 is 600 and sits right, 취소 is 400. Android keeps the accent text button.
 const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; onPress: () => void }) => {
   const c = useColors()
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={8} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing[1] }}>
-      <Text v="b1" weight={bold ? '700' : '500'} style={{ color: c.acText }}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      hitSlop={8}
+      style={{ minHeight: 44, justifyContent: 'center', ...(ANDROID ? { paddingHorizontal: spacing[1] } : { minWidth: 56, alignItems: bold ? 'flex-end' : 'flex-start' }) }}
+    >
+      <Text v={ANDROID ? 'b1' : 'h3'} weight={ANDROID ? (bold ? '700' : '500') : bold ? '600' : '400'} style={{ color: ANDROID ? c.acText : PlatformColor('systemBlue') }}>
         {label}
       </Text>
     </Pressable>
@@ -70,17 +76,21 @@ const SettingsPickSheetScreen = () => {
     router.back()
   }
   return (
-    <Sheet title={ANDROID ? pick.title : undefined}>
+    // iOS SettingsLanguage: the 52pt .inav starts 17 under the sheet top; the wheel follows 6 under it.
+    <Sheet title={ANDROID ? pick.title : undefined} gap={ANDROID ? undefined : 0}>
       {ANDROID ? null : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
           <TextAction label="취소" onPress={() => router.back()} />
-          <Text v="h3" accessibilityRole="header">
+          <Text v="h3" weight="600" accessibilityRole="header">
             {pick.title}
           </Text>
           <TextAction label="완료" bold onPress={confirm} />
         </View>
       )}
-      <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
+      {/* .wheels.short: 6 above, 14 below and the sheet's 26 under it (the sheet gives 20), so the sheet is 17+52+6+120+14+26 = 235. */}
+      <View style={ANDROID ? undefined : { marginTop: 6, marginBottom: spacing[5] }}>
+        <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
+      </View>
       {ANDROID ? (
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: spacing[2] }}>
           <TextAction label="취소" onPress={() => router.back()} />

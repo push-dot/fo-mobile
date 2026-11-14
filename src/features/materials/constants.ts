@@ -23,20 +23,20 @@ export type AddAction = 'link' | 'upload' | 'browse'
 export const UPLOADED = '이력서 파일을 올렸어요'
 export const ADD_LABEL: Record<AddAction, string> = { link: '링크 추가', upload: '서류 올리기', browse: '공고 둘러보기' }
 
-/** MaterialsEmpty, MaterialsEmptyDocs, MaterialsEmptyBookmarks, MaterialsEmptyLinks. */
+/** MaterialsEmpty, MaterialsEmptyDocs, MaterialsEmptyBookmarks, MaterialsEmptyLinks. `\n` is where the boards' balanced body breaks (RN has no `text-wrap: balance`). */
 export const EMPTY: Record<MaterialTab, { title: string; body: string; action: AddAction }> = {
   all: {
     title: '아직 자료가 없어요',
-    body: '서류를 올리거나 공고를 북마크하고, 링크를 추가하면 여기 모여요. Bot이 만든 서류도 자동으로 들어와요.',
+    body: '서류를 올리거나 공고를 북마크하고, 링크를 추가하면\n여기 모여요. Bot이 만든 서류도 자동으로 들어와요.',
     action: 'upload',
   },
-  doc: { title: '아직 서류가 없어요', body: '이력서나 경력기술서를 올리면 모든 Bot이 함께 써요. Bot이 고친 서류도 여기에 저장돼요.', action: 'upload' },
-  bookmark: { title: '북마크한 공고가 없어요', body: '채용공고에서 북마크하면 여기 모여요. Bot한테 공고를 바로 보낼 수 있어요.', action: 'browse' },
-  link: { title: '저장한 링크가 없어요', body: 'GitHub, 블로그, 포트폴리오 주소를 저장해 두면 Bot이 서류를 고칠 때 참고해요.', action: 'link' },
+  doc: { title: '아직 서류가 없어요', body: '이력서나 경력기술서를 올리면 모든 Bot이\n함께 써요. Bot이 고친 서류도 여기에 저장돼요.', action: 'upload' },
+  bookmark: { title: '북마크한 공고가 없어요', body: '채용공고에서 북마크하면 여기 모여요.\nBot한테 공고를 바로 보낼 수 있어요.', action: 'browse' },
+  link: { title: '저장한 링크가 없어요', body: 'GitHub, 블로그, 포트폴리오 주소를 저장해\n두면 Bot이 서류를 고칠 때 참고해요.', action: 'link' },
 }
 
 /** MaterialsSearchEmpty. The title names the query (see searchEmptyTitle). */
-export const SEARCH_EMPTY_BODY = '자료 이름, 회사 이름, 링크 주소로 찾아요. 다른 단어로 다시 검색해 보세요.'
+export const SEARCH_EMPTY_BODY = '자료 이름, 회사 이름, 링크 주소로\n찾아요. 다른 단어로 다시 검색해 보세요.'
 
 /** MaterialsLoading, MaterialsError. */
 export const LIST_LOADING = '자료를 불러오는 중이에요'

@@ -64,7 +64,7 @@ describe('bot and material routes', () => {
     [materialLinkAddPath(), 'materials/link-add', '{sheetOptions(c)}'],
     [materialPickerPath(id), 'material-picker', '{sheetOptions(c)}'],
     [accountPath(), 'account', '{modalOptions(c)}'],
-    [accountPath('plan'), 'plan', null],
+    [accountPath('plan'), 'plan', '{fullPageOptions()}'],
   ])('%s opens %s', (_href, route, options) => {
     expect(existsSync(join(STACK, `${route}.tsx`))).toBe(true)
     expect(layout).toContain(options ? `name="${route}" options=${options}` : `name="${route}" />`)

@@ -6,6 +6,7 @@ import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
 import { JOBS_EMPTY_LINES, RESET_FILTERS_LABEL } from '../constants'
 import { spacing } from '../../../theme'
+import { gridCardWidth, gridFillWidth } from '../utils/grid'
 import PostingGridSkeleton from './posting-grid-skeleton'
 
 type Props = {
@@ -26,7 +27,7 @@ const MemoGridCard = memo(GridCard)
 
 const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props) => {
   const { width } = useWindowDimensions()
-  const cardWidth = Math.floor((width - spacing[5] * 2 - spacing[3]) / 2)
+  const cardWidth = gridCardWidth(width)
   const q = usePostingPages(filters)
   const toggleBookmark = useToggleBookmark()
   const items = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
@@ -49,7 +50,7 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       onEndReachedThreshold={0.5}
       ListEmptyComponent={
         q.isPending ? (
-          <PostingGridSkeleton cardWidth={cardWidth} />
+          <PostingGridSkeleton cardWidth={gridFillWidth(width)} />
         ) : q.isError ? (
           <StatusNote lines={['공고를 불러오지 못했어요.', '잠시 후 다시 열어 주세요.']} style={emptyNoteStyle(160)} />
         ) : (

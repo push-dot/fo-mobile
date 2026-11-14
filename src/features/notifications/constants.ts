@@ -7,7 +7,7 @@ export const MY_TAB_PATH = '/(app)/(stack)/(tabs)/(my)/my'
 
 export const NOTIFICATION_SKELETON: SkeletonRowsShape = {
   count: 6,
-  lead: { size: 40, radius: 12 },
+  lead: { size: 44, radius: 15 },
   lines: [
     { width: '35%', height: 12 },
     { width: '90%', height: 16 },

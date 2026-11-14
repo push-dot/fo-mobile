@@ -36,6 +36,10 @@ export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows
 export const cssShadow = {
   segment: '0 2px 8px rgba(0,0,0,.08)',
   approvalSheet: '0 -10px 40px rgba(0,0,0,.12)',
+  /** `.ios .panel` (ChatApprove): the confirm panel's lift; the 1px ring is added in place. */
+  iosPanel: '0 -4px 30px rgba(0,0,0,.12)',
   toast: '0 8px 24px rgba(0,0,0,.16)',
+  /** .ibanner: the iOS toast. */
+  banner: '0 10px 30px rgba(0,0,0,.14)',
   toneToast: '0 10px 30px rgba(0,0,0,.18)',
 } as const
