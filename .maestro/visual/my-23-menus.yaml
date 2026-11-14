@@ -120,6 +120,13 @@ tags:
       notVisible: "올린 파일"
     commands:
       - tapOn: "뒤로"
+# The failure toast leaves the document open under a 뒤로 tap by label: tap the back arrow by position (top left) when 올린 파일 is still not there.
+- runFlow:
+    when:
+      notVisible: "올린 파일"
+    commands:
+      - tapOn:
+          point: "8%,9%"
 - extendedWaitUntil:
     visible: "올린 파일"
     timeout: 10000

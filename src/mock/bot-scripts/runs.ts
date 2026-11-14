@@ -61,6 +61,8 @@ const DWELL = 8000
 const JD_RUN_HOLD = 20_000
 // The stop lines of ChatPh3BoostStop stay alone this long before the quality check opens its card, which hides the chat from accessibility.
 const BEFORE_QUALITY = 20_000
+// ChatPh4Quality: the card opens after the tour has typed the line and lowered the keyboard (a card that opens over the raised keyboard comes up blank).
+const QUALITY_LATER = 15_000
 const after = (steps: Step[], ms: number): Step[] => steps.map((st, i) => (i === 0 ? { ...st, wait: ms } : st))
 // Android taps wait up to 10s for a running line's spinner to settle, so a tour that acts while one runs needs far more than DWELL.
 const HOLD = 150_000
@@ -285,7 +287,9 @@ const ph1: Step[] = [
   s(1500, tool('gh', 'GitHub 살펴보기', 'seojun-kim', 'ok', '저장소 12개 중 공고 관련 3개', ['payment-retry-lab', 'settle-pipeline', 'kotlin-ledger'])),
   s(300, agent('이력서에 없는 저장소 **payment-retry-lab**을 찾았어요. 경험으로 넣을지 분석이 끝나면 여쭤볼게요.')),
   s(200, todo('todo1', PH1, 2)),
-  s(200, tool('jd', '공고 읽기', MOA, 'run', '필수·우대 스택을 뽑는 중')),
+  // ChatPh1 draws this as the working line (status frame), as the tailor run does for 기술 스택을 비교하는 중.
+  s(200, status('필수·우대 스택을 뽑는 중')),
+  s(100, tool('jd', '공고 읽기', MOA, 'run', '필수·우대 스택을 뽑는 중')),
   // The running line is what ChatPh1 draws; a tour needs a few seconds after its own steps to find it below the fold.
   s(JD_RUN_HOLD, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
   s(200, todo('todo1', PH1, 3)),
@@ -656,8 +660,8 @@ export const TOKENS: Record<string, Step[]> = {
   // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
   'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), ...after(ph4Quality, BEFORE_QUALITY)],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
-  quality: ph4Quality,
-  '품질 검사로 넘어가기': ph4Quality,
+  quality: after(ph4Quality, QUALITY_LATER),
+  '품질 검사로 넘어가기': after(ph4Quality, QUALITY_LATER),
   'ph2x': ph2xApproach,
   '네, 시작해 주세요': ph1,
   '피드백만 받을게요': feedbackOnly,
