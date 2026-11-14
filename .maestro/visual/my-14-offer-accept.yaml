@@ -34,7 +34,9 @@ tags:
     commands:
       - setClipboard: "제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요."
       - pasteText
-- tapOn: "수락하고 보내기"
+- tapOn:
+    text: "수락하고 보내기"
+    retryTapIfNoChange: true
 # The mock holds the accept for 3s so 보내는 중 is on screen; no waitForAnimationToEnd for this timing board.
 - runFlow:
     when:

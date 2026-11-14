@@ -34,6 +34,9 @@ tags:
     file: _chat_kbd_down.yaml
     env:
       TEXT: ".*자기소개서도 같이 써 줘.*"
+# The swipe that lowers the keyboard drags the thread up and the resumed run's working line falls below the fold, so the thread goes back to its end first.
+- runFlow:
+    file: _chat_bottom.yaml
 - extendedWaitUntil:
     visible: ".*경력 수준을 비교하는 중.*"
     timeout: 20000
