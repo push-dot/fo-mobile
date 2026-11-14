@@ -18,6 +18,8 @@ export {
   holdMockFit,
   mockFitHolding,
   setMockFitSoon,
+  setMockFitThree,
+  mockFitThreeOn,
   mockFitSoonOn,
   setMockWebPlan,
   mockWebPlanOf,

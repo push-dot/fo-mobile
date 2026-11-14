@@ -28,6 +28,8 @@ type Props = {
 const ios = Platform.OS === 'ios'
 const EDGE = ios ? spacing[3] : spacing[2]
 const CHAT_ROW = 60
+// The boards' `.topbar` gap 2 plus `.ios .topbar .iconbtn{margin-left:8}`: 10 between the right-hand buttons (Main: search x292, bell x346).
+const RIGHT_GAP = 10
 
 const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false, circleBack = false }: Props) => {
   const c = useColors()
@@ -61,7 +63,7 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
           </Text>
         ) : null}
         {!left && !title ? <View style={{ flex: 1 }} /> : null}
-        <View style={{ minWidth: onBack ? button : 0, flexDirection: 'row', justifyContent: 'flex-end', gap: ios ? spacing[2] : 2 }}>{right}</View>
+        <View style={{ minWidth: onBack ? button : 0, flexDirection: 'row', justifyContent: 'flex-end', gap: ios ? RIGHT_GAP : 2 }}>{right}</View>
       </View>
     </View>
   )
