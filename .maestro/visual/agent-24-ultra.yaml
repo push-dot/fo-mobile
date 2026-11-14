@@ -37,6 +37,8 @@ tags:
 - assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
 - takeScreenshot: PlanUltra
+# PlanUltraNotice is the old before-purchase board, now the same screen as PlanUltra.
+- takeScreenshot: PlanUltraNotice
 - tapOn: "뒤로"
 - tapOn: "닫기"
 - openLink: push://bots/push
