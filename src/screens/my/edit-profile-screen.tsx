@@ -722,8 +722,9 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
       >
         {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
       </KeyboardAvoidingView>
+      {/* The modal already starts under the status bar, so the toast sits 2 under the modal's top (DeleteCareer.2: y64), not under the inset again. */}
       {Platform.OS === 'ios' ? (
-        <SafeAreaInsetsContext.Provider value={insets}>
+        <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
           <ToastHost />
         </SafeAreaInsetsContext.Provider>
       ) : null}

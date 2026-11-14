@@ -20,8 +20,10 @@ const JobFilterSheetScreen = () => {
   const count = usePostingCount(draft)
   const total = count.data?.page.total
   const trending = useTrending().data?.skills.map((s) => s.id) ?? []
-  // The region list is drawn at its full 12 rows (FilterRegion), so its bound is the room on screen, not 60% of it.
-  const bound = useSheetScrollMax(kind === 'location' ? 1 : 0.6)
+  // The region list is drawn at its full 12 rows (FilterRegion), so its bound is the room on screen, not 60% of it. That sheet is as tall as the screen
+  // allows, so iOS attaches it full width at 1:1 (every capture: x0, top 62), where the float scale of a partial sheet drew each row 1.0415 times larger.
+  const attached = Platform.OS === 'ios' && kind === 'location'
+  const bound = useSheetScrollMax(kind === 'location' ? 1 : 0.6, attached)
 
   useEffect(() => {
     if (!kind) router.back()
@@ -34,6 +36,7 @@ const JobFilterSheetScreen = () => {
 
   return (
     <Sheet
+      attached={attached}
       // iOS chip sheets: the head starts 17 under the sheet top, the CTA (52 high, slimAction) sits 20 under the chips and the sheet
       // ends 26 under it, so FilterRole is 247 high with the CTA centre at 814.
       gap={compact || isheet ? 0 : undefined}
