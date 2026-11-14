@@ -31,6 +31,7 @@ import {
   composerPlaceholder,
   endsInError,
   followScroll,
+  hasOlder,
   headerLightOf,
   openBot,
   threadBottomGap,
@@ -140,8 +141,9 @@ const Thread = ({ id }: { id: string }) => {
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
+  // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
-    !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
+    !empty && !hasOlder(id) && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
   // The waiting line sits above a diff card it asks about, otherwise under the last line (ChatApprove, ChatBotStatusApprove).
   const waitsLine = !!showPanel && waitingLine(chat.approval!, cardIs) !== null
   const rows = threadRows(chat.items, !!chat.working, waitsLine)

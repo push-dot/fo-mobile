@@ -360,9 +360,10 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const open = paymentsOpen(useChatAccount(true).data)
   const onPlan = open ? planEntry : undefined
   const view = fitChrome(item, open)
-  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10 and 16 under, so the card follows the teaser's state.
+  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10, 16 between its rows and 16 under, so the card follows the teaser's state.
   const [projectedOpen, setProjectedOpen] = useState(false)
-  const compact = !view.locked && !item.note && item.from === undefined && !(view.projected && projectedOpen)
+  const opened = !!view.projected && projectedOpen
+  const compact = !view.locked && !item.note && item.from === undefined && !opened
   const drop = useFitDrop()
   const head = item.note ? (
     // 점수 올리기: before → after, one bar, the note. The row drops as one so the baselines stay shared.
@@ -400,7 +401,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
     </View>
   )
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View style={{ gap: opened ? spacing[4] : spacing[3] }}>
       <Appear style={compact ? { gap: spacing[2], padding: spacing[4], paddingBottom: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2 } : { gap: 10, padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
         {head}
         {view.locked ? (

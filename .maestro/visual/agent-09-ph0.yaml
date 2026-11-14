@@ -54,6 +54,8 @@ tags:
     file: _chat_kbd_down.yaml
     env:
       TEXT: ".*네, 시작해 주세요.*"
+# The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat.
+- openLink: push://bots/b-moa?mock=bot:b-moa:from:user
 # The list stops following the stream (a 새 내용 pill shows), so the running line sits below the fold until it is scrolled to.
 - scrollUntilVisible:
     element: ".*필수·우대 스택을 뽑는 중.*"

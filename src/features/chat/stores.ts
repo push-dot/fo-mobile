@@ -14,9 +14,9 @@ import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
 import { errorText, fromStream, type StreamEnd } from './utils/stream'
 import { openPieceId, restoreBotTurns } from './utils/turns'
-import { prependOlder } from './utils/find'
+import { fromFirst, prependOlder } from './utils/find'
 import { withMaterial } from './utils/usage'
-import type { ChatEvent, ChatState } from './types'
+import type { ChatEvent, ChatItem, ChatState } from './types'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
@@ -454,6 +454,8 @@ export const stop = (id: string) => {
 
 // Where the next older page of a reopened thread starts. Null once the oldest turn is loaded.
 const olderCursor = new Map<string, string | null>()
+// A page past the end of every mock thread: the mock transcript answers it with no turns and no further page.
+const MOCK_OLDER_CURSOR = '1000'
 
 export const hasOlder = (id: string) => !!olderCursor.get(id)
 
@@ -480,6 +482,15 @@ export const openBot = async (address: string) => {
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: restoreBotTurns(page.data, page.live) } }))
   if (page.live && !API_MOCK) void startRun({ conversationId: id, follow: true, after: page.live.lastSeq, piece: openPieceId(page.data, page.live) })
   return id
+}
+
+/** Mock tours: draws the thread from its first line of `type`, as one that is longer than the page. The older turns are not there, so no greeting. */
+export const showFrom = (id: string, type: ChatItem['type']) => {
+  olderCursor.set(id, MOCK_OLDER_CURSOR)
+  useChatStore.setState((s) => {
+    const current = s.chats[id] ?? emptyChat
+    return { chats: { ...s.chats, [id]: { ...current, items: fromFirst(current.items, type) } } }
+  })
 }
 
 export const forget = (id: string) => {
