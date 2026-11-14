@@ -286,7 +286,9 @@ const agentDoc: HubDocument = { ...pushDoc('src-upload', '', '김서준_모아�
 const draftDoc: HubDocument = { ...pushDoc('d-draft', '', '모아페이 맞춤 이력서', on(10, 21)), applicationId: null, kind: 'TAILORED' }
 // 내 서류's AI-made row (chat.ts d4) is a Push document too: deleting it archives it.
 const chatAiDoc: HubDocument = { ...pushDoc('d4', '', '모아페이_맞춤_이력서_v2', on(10, 22)), applicationId: null, kind: 'TAILORED' }
-const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc].find((d) => d.id === id)
+// The résumé behind the applied job a1 (its fit's documentId), outside 마이's list.
+const appliedDoc: HubDocument = pushDoc('d-a1', 'a1', '김서준_백엔드_이력서_2026', on(10, 14))
+const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc, appliedDoc].find((d) => d.id === id)
 // push-be exports a HUB_PROFILE's latest version before finalize; no mock document is finalized.
 const exportable = (d: HubDocument | undefined, versionId?: string) => d?.kind === 'HUB_PROFILE' && d.latestVersionId === versionId
 
