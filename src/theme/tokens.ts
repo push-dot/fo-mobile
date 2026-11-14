@@ -32,6 +32,9 @@ const nativeShadows = <T extends Record<string, string>>(theme: T) =>
 
 export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows(shadows.dark) }
 
+/** The boards' `--iFill` (iOS system fill): translucent, so a field greys whatever sheet it sits on (FilterSkill's `.isearch`, #E3E3E9 on the board). */
+export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' } as const
+
 /** CSS shadows the boards draw inline on one component, outside the design system's set. */
 export const cssShadow = {
   segment: '0 2px 8px rgba(0,0,0,.08)',

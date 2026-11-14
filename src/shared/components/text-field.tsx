@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { StyleSheet, TextInput, useWindowDimensions, View, type TextInputProps } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { fontFor, radius, spacing, type, useColors } from '../../theme'
+import { fontFor, iosSystemFill, radius, spacing, type, useColors, useThemeMode } from '../../theme'
 import Icon from './icon'
 import { inputMetrics, iosLineBox } from './text-field-metrics'
 import Text from './text'
@@ -15,11 +15,12 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
   const c = useColors()
   const { fontScale } = useWindowDimensions()
   const search = variant === 'search'
+  const dark = useThemeMode() === 'dark'
   return (
     <View
       style={{
         borderRadius: search || slim ? radius.pill : radius.md,
-        backgroundColor: c.fill,
+        backgroundColor: slim ? iosSystemFill[dark ? 'dark' : 'light'] : c.fill,
         paddingHorizontal: slim ? spacing[3] : spacing[4],
         paddingVertical: multiline || label ? spacing[4] : 0,
         minHeight: slim ? 40 : search || compact ? 48 : 56,
