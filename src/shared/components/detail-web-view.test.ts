@@ -29,20 +29,27 @@ describe('detail url', () => {
 
 describe('mock fit hold script (JobFit)', () => {
   const delays: number[] = []
+  let stack = ''
   const win = { setTimeout: (_f: unknown, ms: number) => void delays.push(ms) }
-  new Function('window', HOLD_FIT_SCRIPT)(win)
-  const loadMockFit = () => new Promise((resolve) => win.setTimeout(resolve, 0))
+  // The script reads the caller from the stack of an Error it creates, so the test supplies the stack.
+  const FakeError = function () {
+    return { stack }
+  } as unknown as ErrorConstructor
+  new Function('window', 'Error', HOLD_FIT_SCRIPT)(win, FakeError)
 
-  it('waits 60 s for the zero-delay timer set inside loadMockFit', () => {
+  it('waits 60 s for a zero-delay timer set from fit-card.tsx', () => {
     delays.length = 0
-    void loadMockFit()
+    stack = 'anonymous@\n@http://localhost:5174/src/pages/posting/fit-card.tsx:41:30\nloadMockFit@http://localhost:5174/src/pages/posting/fit-card.tsx:40:9'
+    win.setTimeout(() => undefined, 0)
     expect(delays).toEqual([60000])
   })
 
-  it('leaves other timers alone', () => {
+  it('leaves timers set by other files, or with a delay, alone', () => {
     delays.length = 0
+    stack = 'anonymous@\n@http://localhost:5174/src/shared/api/mock-loader.ts:9:5\nloadMock@http://localhost:5174/src/shared/api/mock-loader.ts:5:3\nloadMockFit@http://localhost:5174/src/pages/posting/fit-card.tsx:40:9'
     win.setTimeout(() => undefined, 0)
-    win.setTimeout(Math.max, 250)
+    stack = 'anonymous@\n@http://localhost:5174/src/pages/posting/fit-card.tsx:41:30'
+    win.setTimeout(() => undefined, 250)
     expect(delays).toEqual([0, 250])
   })
 })
