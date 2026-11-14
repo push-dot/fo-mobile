@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { threadInset } from '../utils/thread-inset'
+import { threadBottomGap, threadInset } from '../utils/thread-inset'
 
 const base = { bottomH: 160, keyboard: 0, navBar: 0, approval: false, android: false }
 
@@ -27,5 +27,12 @@ describe('threadInset', () => {
     expect(threadInset({ ...base, status: true })).toBe(174)
     expect(threadInset({ ...base, status: true, android: true })).toBe(182)
     expect(threadInset({ ...base, status: true, keyboard: 336 })).toBe(504)
+  })
+})
+
+describe('threadBottomGap', () => {
+  it('sits 8 above the composer with the keyboard up and 16 at rest', () => {
+    expect(threadBottomGap(336)).toBe(8)
+    expect(threadBottomGap(0)).toBe(16)
   })
 })

@@ -27,6 +27,19 @@ describe('mentions', () => {
     expect(out[1]!.items.map((i) => i.id)).toEqual(['d1'])
   })
 
+  it('keeps the order of the full list while filtering (ChatEmpty: 경력기술서 above 모아페이_맞춤_이력서)', () => {
+    const docs: MentionGroup[] = [
+      {
+        title: '마이 › 서류',
+        items: [
+          { id: 'a', kind: 'doc', title: '경력기술서_모아페이.docx', sub: '9월 28일 · 640KB' },
+          { id: 'b', kind: 'doc', title: '모아페이_맞춤_이력서_v2.pdf', sub: 'Bot으로 만듦 · 10분 전' },
+        ],
+      },
+    ]
+    expect(filterMentions(docs, '모아')[0]!.items.map((i) => i.id)).toEqual(['a', 'b'])
+  })
+
   it('matches choseong while typing', () => {
     expect(filterMentions(groups, 'ㅋㄹㄷ').map((g) => g.title)).toEqual(['내 링크'])
   })
