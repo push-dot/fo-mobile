@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native'
 import { Empty, OFFER_ARCHIVED_ROW, OFFER_EMPTY_ACTION, OfferRow, Row, useArchivedOffers, useOffers } from '@/features/my'
 import { Icon, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
-import { radius, spacing, useColors, type } from '@/theme'
+import { radius, spacing, useColors } from '@/theme'
 
 const OFFER_SKELETON: SkeletonRowsShape = {
   count: 5,
@@ -74,7 +74,7 @@ const OffersScreen = () => {
           <Text
             v="c2"
             color="t3"
-            style={{ paddingTop: box === 'received' ? 4 : spacing[5], paddingBottom: spacing[4], paddingHorizontal: box === 'received' ? spacing[5] : spacing[6], lineHeight: 17 }}
+            style={{ paddingTop: box === 'received' ? spacing[1] : spacing[5], paddingBottom: spacing[4], paddingHorizontal: box === 'received' ? spacing[5] : spacing[6], lineHeight: 17 }}
           >
             {box === 'received'
               ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
