@@ -75,6 +75,8 @@ const Bubble = ({
 const EMPTY_LIFT = 120
 const COMPOSER_HEIGHT = 52
 const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
+// ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
+const DAY_LABEL_LIFT = 2
 
 const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const c = useColors()
@@ -177,7 +179,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
                 v="c2"
                 weight="600"
                 color="t3"
-                style={{ textAlign: 'center', paddingTop: spacing[1] }}
+                style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}
               >
                 {m.day}
               </Text>
@@ -287,6 +289,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
                   paddingHorizontal: spacing[1],
                   fontSize: type.b1.fontSize,
                   lineHeight: type.b1.lineHeight,
+                  letterSpacing: type.b1.letterSpacing,
                   color: c.t1,
                   textAlignVertical: 'center',
                 },

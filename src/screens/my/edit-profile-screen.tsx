@@ -34,6 +34,7 @@ import {
   ymToDate,
   SheetHeader,
   SKILL_CATALOG,
+  skillSuggestions,
   tenureLabel,
   uploadAvatarImage,
   useMyProfile,
@@ -60,7 +61,6 @@ import {
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
-import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
 /** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
@@ -603,11 +603,10 @@ const EditSkills = ({ p }: { p: Profile }) => {
   const [q, setQ] = useState('')
   const has = (s: string) => skills.some((x) => x.toLowerCase() === s.toLowerCase())
   const hits = q.trim()
-    ? searchHangul(
+    ? skillSuggestions(
         SKILL_CATALOG.filter((s) => !has(s)),
         q,
-        (s) => [s],
-      ).slice(0, 5)
+      )
     : []
   const add = (s: string) => {
     const v = s.trim()

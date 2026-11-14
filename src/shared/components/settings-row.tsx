@@ -11,19 +11,16 @@ type RowProps = {
   onPress?: () => void
   right?: ReactNode
   danger?: boolean
-  /** The entry state (SettingsBlockedEntry): acSoft row with an acText, 700 label. */
+  /** The entry state (SettingsBlockedEntry): acSoft row with a t1, 700 label (owner rule 3: the accent is the fill only). */
   entry?: boolean
-  /** Accent label (acText, 700) without the row tint. Used for 차단한 사람. */
-  accent?: boolean
   /** Draws the chevron on a row that does not open anything (the board shows it before there is a posting). */
   chevron?: boolean
   /** A value row that opens a picker (v415 Settings): the label is the value itself; only the up-down selector sits on the right. */
   picker?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent, chevron, picker }: RowProps) => {
+const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, chevron, picker }: RowProps) => {
   const c = useColors()
-  const accented = entry || accent
   const body = (
     <View
       style={{
@@ -36,7 +33,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent,
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text v="b1" color={danger ? 'red' : accented ? 'acText' : 't1'} weight={accented ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
+        <Text v="b1" color={danger ? 'red' : 't1'} weight={entry ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
           {label}
         </Text>
         {sub ? (
@@ -55,7 +52,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, accent,
                 {value}
               </Text>
             ) : null}
-            <Icon name="chev" size={16} color={value ? 't3' : 't1'} />
+            <Icon name="chev" size={16} color="t3" />
           </View>
         ) : value ? (
           <Text v="b2" color="t3">
