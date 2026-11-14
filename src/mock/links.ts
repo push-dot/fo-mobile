@@ -106,9 +106,9 @@ export const listenMockLinks = () =>
       }
       const late = /^bot:(.+):late$/.exec(s)
       if (late) lateAnswer(late[1]!)
-      const seeded = /^bot:(.+):(thread|done|resume)$/.exec(s)
+      const seeded = /^bot:(.+):(thread|done|resume|sent)$/.exec(s)
       if (seeded) {
-        seedThread(seeded[1]!, seeded[2] as 'thread' | 'done' | 'resume')
+        seedThread(seeded[1]!, seeded[2] as 'thread' | 'done' | 'resume' | 'sent')
         // The open chat's client copy goes too, so the room reads the seeded turns on its next open (as for :empty).
         chat().forget(fixtureOf(seeded[1]!)?.bot.id ?? seeded[1]!)
       }

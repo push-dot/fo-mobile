@@ -3,10 +3,11 @@ name: 자료 보내기 · 봇 고르기 · 고른 봇 채팅 · 봇 프로필에
 tags:
   - visual
 ---
+# bot:b-moa:sent stores BotPickSent's thread: one answer (paragraph, two list lines, closing line, 출처) under the greeting.
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:thread"
+      MOCK: "push://sign-in?mock=consent-on,bot:b-moa:sent"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml

@@ -4,7 +4,7 @@ import { GATED_STEP, READ_OFF_TEXT } from '../../features/chat/constants'
 import { splitBotText } from '../../features/chat/utils/bot-text'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import { pick } from '../bot-scripts/runs'
-import { emptyBot, resetBots, seedThread } from '../bots'
+import { emptyBot, expireCard, resetBots, seedThread } from '../bots'
 import { grantReference } from '../chat'
 import { mockFetch } from '../index'
 
@@ -80,5 +80,24 @@ describe('bot:<id>:thread and :done', () => {
     seedThread('b-moa', 'done')
     const text = (await turns())[0]!.assistant!.text
     expect(splitBotText(text).map((b) => (b.kind === 'list' ? b.items.length : b.text.slice(0, 8)))).toEqual(['경력 섹션 3줄', 2, 'PDF는 내 서'])
+  })
+})
+
+describe('card:expired (ChatBotStatusExpired)', () => {
+  it('keeps the one request of the board above the expired card', async () => {
+    expireCard()
+    const all = (await api.bots.transcript('b-moa')).data
+    expect(all.map((t) => t.user?.text)).toEqual(['모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요'])
+  })
+})
+
+describe('bot:<id>:sent (BotPickSent)', () => {
+  it('stores one answer with a paragraph, a two-line list, a closing line and the 출처 row', async () => {
+    seedThread('b-moa', 'sent')
+    const all = (await api.bots.transcript('b-moa')).data
+    expect(all).toHaveLength(1)
+    expect(all[0]!.user).toBeNull()
+    expect(splitBotText(all[0]!.assistant!.text).map((b) => b.kind)).toEqual(['paragraph', 'list', 'paragraph'])
+    expect(all[0]!.assistant!.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서.pdf'])
   })
 })

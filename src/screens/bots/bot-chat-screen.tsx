@@ -42,6 +42,7 @@ import {
   send,
   stop,
   useCardState,
+  waitingLine,
   useDoneNext,
   useChat,
   useChatLimit,
@@ -140,7 +141,10 @@ const Thread = ({ id }: { id: string }) => {
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const greeting: ChatItem[] =
     !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
-  const rows = threadRows(chat.items, !!chat.working)
+  // The waiting line sits above a diff card it asks about, otherwise under the last line (ChatApprove, ChatBotStatusApprove).
+  const waitsLine = !!showPanel && waitingLine(chat.approval!, cardIs) !== null
+  const rows = threadRows(chat.items, !!chat.working, waitsLine)
+  const waitsAboveDiff = rows.some((r) => r.type === 'waiting')
   const data: ThreadRow[] = [...rows].reverse().concat(greeting)
 
   const find = useFind(id)
@@ -197,12 +201,14 @@ const Thread = ({ id }: { id: string }) => {
       <RowMotion.Provider value={{ key: `${id}/${item.id}`, live }}>
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
+        ) : item.type === 'waiting' ? (
+          chat.approval ? <WaitingLine approval={chat.approval} color={color} /> : null
         ) : (
           <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
         )}
       </RowMotion.Provider>
     ),
-    [onView, onUsage, onReadOff, working, id, color, live],
+    [onView, onUsage, onReadOff, working, id, color, live, chat.approval],
   )
 
   return (
@@ -245,9 +251,9 @@ const Thread = ({ id }: { id: string }) => {
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
-          chat.queue.length || showPanel ? (
+          chat.queue.length || (showPanel && !waitsAboveDiff) ? (
             <View style={{ gap: 18 }}>
-              {showPanel ? <WaitingLine approval={chat.approval!} color={color} /> : null}
+              {showPanel && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}
