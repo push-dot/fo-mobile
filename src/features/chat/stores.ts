@@ -8,7 +8,7 @@ import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
@@ -205,11 +205,24 @@ const sleep = (ms: number, signal: AbortSignal) =>
 
 // The mock answers a run with its frames at once and the app plays them on the clock, because RN cannot stream a synthetic body.
 // They go through the live stream's mapper, so a mock run draws what the server's frames would.
+// Mock only: a GATED_STEP waits here until a tour sends the mock link `step-next`.
+let openGate: (() => void) | null = null
+export const nextMockStep = () => openGate?.()
+const gated = (signal: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    openGate = () => {
+      openGate = null
+      resolve()
+    }
+    signal.addEventListener('abort', () => openGate?.(), { once: true })
+  })
+
 const scripted = async function* (input: RunInput, signal: AbortSignal, end?: StreamEnd): AsyncGenerator<ChatEvent> {
   const steps = await chatApi.run(input)
   const frames = async function* () {
     for (const step of steps) {
-      await sleep(step.wait, signal)
+      if (step.wait === GATED_STEP) await gated(signal)
+      else await sleep(step.wait, signal)
       yield step.frame
     }
   }

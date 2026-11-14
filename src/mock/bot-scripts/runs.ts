@@ -2,7 +2,7 @@
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 // Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
-import { HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
+import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
 import { PAGE_READ_FOOT, PAGE_READ_OPTIONS } from './cards'
@@ -560,9 +560,9 @@ export const fail = (code: string, details?: Record<string, unknown>): Step[] =>
 
 // The company-bot status boards (ChatBotStatus*, ChatBotReadOff): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
-// ChatBotStatusSteps: the 13 status lines one after the other, each held 20 s: _say and the keyboard flow take several seconds of a tour before it can read the first line, and each shot takes a few more.
-const STEP_HOLD = 20_000
-const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? STEP_HOLD : 200, status(text))), done]
+// ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
+// so no line depends on how long Maestro takes to read the screen (its waits end early or late).
+const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
 const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
   ask({
