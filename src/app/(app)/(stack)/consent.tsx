@@ -24,7 +24,7 @@ const ConsentScreen = () => {
         {CONSENT_BODY}
       </Text>
       <Pressable accessibilityRole="button" onPress={() => setMore((v) => !v)} style={{ alignSelf: 'flex-start', justifyContent: 'center', minHeight: 44, marginVertical: -spacing[2] }}>
-        <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+        <Text v="c1" weight="600" style={{ textDecorationLine: 'underline' }}>
           {CONSENT_MORE}
         </Text>
       </Pressable>

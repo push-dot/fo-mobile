@@ -296,10 +296,11 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
                   onPress={() => void onRevoke(grant.host)}
                   glass={false}
                   fill="fill"
-                  style={{ minHeight: 40, borderRadius: platformTheme.buttonSmRadius }}
+                  // BotProfileAllowedRevoke: 81x42 (text 14/700 = 53 + 14 each side).
+                  style={{ minHeight: 42, borderRadius: platformTheme.buttonSmRadius }}
                   contentStyle={{ paddingHorizontal: 14 }}
                 >
-                  <Text v="c1" weight="700">
+                  <Text v="c1" weight="700" style={{ fontSize: 14 }}>
                     {REVOKE_LABEL}
                   </Text>
                 </GlassPressable>

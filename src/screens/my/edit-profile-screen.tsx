@@ -159,7 +159,8 @@ const SelectField = ({
           }}
         >
           <Text v="b1">{value}</Text>
-          <Icon name="down" size={16} color="t3" />
+          {/* EditProfileBasic: the select chevron is the field's own black (currentColor), not the muted grey. */}
+          <Icon name="down" size={16} color="t1" />
         </View>
       </Menu>
     </View>

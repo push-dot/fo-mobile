@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { overwriteWarning, profilePatch, profileSections, replacedLabels } from './index'
+import { introSummary } from './profile-sections'
 
 const draft = {
   displayName: '김서준',
@@ -48,5 +49,12 @@ describe('profile sections from a resume', () => {
     expect(overwriteWarning(replacedLabels(draft, { ...current, careers: [draft.careers[0]!] }, ['basic', 'intro', 'career']))).toBe(
       '지금 프로필의 소개와 경력은 이 내용으로 바뀌어요.',
     )
+  })
+})
+
+describe('intro summary', () => {
+  it('keeps a one-sentence intro whole and cuts a longer one to its first sentence', () => {
+    expect(introSummary('결제 시스템을 만드는 4년차 백엔드 개발자예요.')).toBe('결제 시스템을 만드는 4년차 백엔드 개발자예요.')
+    expect(introSummary('결제 시스템을 만드는 4년차 백엔드 개발자예요. 트래픽이 몰리는 기간에도 멈추지 않는 결제를 만들어요.')).toBe('결제 시스템을 만드는 4년차 백엔드 개발자예요…')
   })
 })

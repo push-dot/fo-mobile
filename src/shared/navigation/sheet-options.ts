@@ -22,3 +22,6 @@ export const fullSheetOptions = (c: Colors): NativeStackNavigationOptions => ({ 
 
 /** A full-screen modal: iOS keeps the system `modal`; Android's `modal` is a plain full-screen slide, so it takes the boards' full sheet (radius 28, the screen behind shows above it). */
 export const modalOptions = (c: Colors): NativeStackNavigationOptions => (Platform.OS === 'android' ? fullSheetOptions(c) : { presentation: 'modal' })
+
+/** A full page opened from inside a page-sheet modal (the plan, owner rule 8): a plain push stays inside that sheet on iOS (10pt gap, header 20pt low), so iOS presents it full screen. */
+export const fullPageOptions = (): NativeStackNavigationOptions => (Platform.OS === 'ios' ? { presentation: 'fullScreenModal' } : {})

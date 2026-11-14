@@ -66,11 +66,12 @@ const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void 
       <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
         {COLOR_TITLE}
       </Text>
-      <View accessibilityRole="radiogroup" accessibilityLabel={COLOR_TITLE} style={{ gap: 2, paddingVertical: spacing[2] }}>
+      <View accessibilityRole="radiogroup" accessibilityLabel={COLOR_TITLE} style={{ gap: 2 }}>
         {row(BOT_COLORS.slice(0, 6), 0)}
         {row(BOT_COLORS.slice(6), 6)}
       </View>
-      <Button label={DONE_LABEL} onPress={() => void apply()} />
+      {/* BotProfileColor: swatches 16 under the title, CTA 16 + 4 under the swatches (.csw rows 44 + 2 + 44, no extra padding). */}
+      <Button label={DONE_LABEL} onPress={() => void apply()} style={{ marginTop: spacing[1] }} />
     </Sheet>
   )
 }

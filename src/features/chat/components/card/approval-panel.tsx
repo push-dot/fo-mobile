@@ -147,11 +147,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
             <Sub label={s.title} />
             {s.items.map((r) => (
               <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
-                {r.tag === 'link' ? (
-                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="at" size={16} color="t2" />
-                  </View>
-                ) : r.tag.length === 1 ? (
+                {/* ChatPh0Input: a link row has no icon (owner rule 3, no needless icons); its text starts at the row's left edge. */}
+                {r.tag === 'link' ? null : r.tag.length === 1 ? (
                   <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.ac, alignItems: 'center', justifyContent: 'center' }}>
                     <Text v="c1" weight="800" style={{ color: onAccent }}>
                       {r.tag}
@@ -173,14 +170,14 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
         )
       case 'templates':
         return (
-          <View key={si} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingHorizontal: spacing[1], paddingBottom: spacing[1] }}>
+          <View key={si} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingTop: 6, paddingBottom: spacing[1] }}>
             {s.items.map((t, i) => (
               <TemplateChip key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} onPress={() => toggle(si, i)} />
             ))}
           </View>
         )
       case 'toggle':
-        return s.items.map((ch, i) => <ChoiceRow key={`${si}-${i}`} choice={ch} on={sel[si]!.includes(i)} square onPress={() => toggle(si, i, true)} />)
+        return s.items.map((ch, i) => <ChoiceRow key={`${si}-${i}`} choice={ch} on={sel[si]!.includes(i)} square tall={approval.sections.some((x) => x.kind === 'templates')} onPress={() => toggle(si, i, true)} />)
     }
   }
 
@@ -210,7 +207,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
           </View>
         </View>
       ) : sectioned ? (
-        <View style={{ gap: spacing[2], marginTop: spacing[1] }}>
+        <View style={{ gap: PANEL_GAP, marginTop: spacing[1] }}>
           {sectionSubmit ? <Button label={sectionSubmit} onPress={() => sendSections(sel)} /> : null}
           {approval.secondary && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
         </View>
@@ -305,10 +302,11 @@ const Sub = ({ label }: { label: string }) => (
   </Text>
 )
 
-const ChoiceRow = ({ n, choice, on, square, bare, center, disabled, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; disabled?: boolean; onPress: () => void }) => {
+/** `tall`: the row is `.ch.two` (64 high, top aligned) although it has no description (ChatPh4Design's 프로필 사진 넣기). */
+const ChoiceRow = ({ n, choice, on, square, bare, center, disabled, tall, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; disabled?: boolean; tall?: boolean; onPress: () => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
-  const two = !!choice.desc
+  const two = !!choice.desc || !!tall
   const paleNumber = Platform.OS === 'ios' && !square
   return (
     <Pressable
@@ -389,7 +387,7 @@ const MiniChip = ({ label, on, onPress }: { label: string; on?: boolean; onPress
   )
 }
 
-/** A template is a word, not a drawing (ChatPh4Design): one chip row, the recommended one carries "· 추천". */
+/** A template is a word, not a drawing (ChatPh4Design `.tpo`): 40 high, 15 regular, the recommended one carries a 13 "· 추천". */
 const TemplateChip = ({ label, recommended, on, onPress }: { label: string; recommended?: boolean; on: boolean; onPress: () => void }) => {
   const c = useColors()
   return (
@@ -398,12 +396,12 @@ const TemplateChip = ({ label, recommended, on, onPress }: { label: string; reco
       accessibilityState={{ selected: on }}
       accessibilityLabel={recommended ? `${label}, 추천` : label}
       onPress={onPress}
-      hitSlop={hitSlopTo(34)}
-      style={{ height: 34, paddingHorizontal: 14, borderRadius: radius.chip, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
+      hitSlop={hitSlopTo(40)}
+      style={{ height: 40, paddingHorizontal: spacing[4], borderRadius: radius.lg, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
     >
-      <Text v="c1" weight="600" style={{ fontSize: 14, color: on ? c.bg : c.t1 }}>
+      <Text v="b2" style={{ color: on ? c.bg : c.t1 }}>
         {label}
-        {recommended ? <Text v="c1" style={{ fontSize: 14, color: on ? c.bg : c.t3, opacity: on ? 0.7 : 1 }}>{` · 추천`}</Text> : null}
+        {recommended ? <Text v="c1" style={{ opacity: on ? 0.7 : 1, color: on ? c.bg : c.t3 }}>{` · 추천`}</Text> : null}
       </Text>
     </Pressable>
   )
