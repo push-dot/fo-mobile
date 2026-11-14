@@ -579,7 +579,8 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <BotLimitDelete bots={companyBots} onDelete={onDeleteBot} />
         ) : phase.kind === 'limit' ? (
           <>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
+            {/* Board `.bsh-b`: padding 4px 0 24px. */}
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
               <LimitBody limit={bots.limit} />
             </ScrollView>
             <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
