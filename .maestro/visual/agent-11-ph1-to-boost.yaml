@@ -47,14 +47,19 @@ tags:
 - waitForAnimationToEnd
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Boost
-# ChatPh3BoostStop draws two stops under the same boost line (panel 1 and 2 are the first on iOS light and dark, panel 3 the second on Android, so the shots are .1 and .3): all five rounds used (한 번 더 올리기 answers the card), and the score stuck early
-# (the boost-stuck run, played through run: for the board's own user line). Both runs end on the stop line, so nothing runs or waits under it.
+# ChatPh3BoostStop draws two stops under the same boost line (panel 1 and 2 are the first on iOS light and dark, panel 3 the second on Android, so the shots are .1 and .3): all five rounds used,
+# and the score stuck early. Each is played through run: for the board's own user line, so no 한 번 더 올리기 answer sits between the card and the stop line.
+# Both runs end on the stop line, so nothing runs or waits under it.
+- runFlow: _fresh_company.yaml
+- openLink: push://bots/b-moa?mock=run:boost-max
 - runFlow:
-    file: _pick.yaml
+    file: _say.yaml
     env:
-      ASK: "점수를 한 번 더 올릴까요?"
-      PICK: ".*한 번 더 올리기"
-      NEXT: ".*최대 5번까지 올렸어요.*"
+      KO: "좋아요, 계속해 주세요"
+      EN: "ok, continue"
+- extendedWaitUntil:
+    visible: ".*최대 5번까지 올렸어요.*"
+    timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3BoostStop.1
 - runFlow: _fresh_company.yaml

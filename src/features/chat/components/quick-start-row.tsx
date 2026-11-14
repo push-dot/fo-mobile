@@ -22,8 +22,8 @@ const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (ke
       showsHorizontalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       accessibilityLabel="빠른 시작"
-      // The composer's side padding is 12; the board's row starts 16 from the screen edge.
-      style={{ flexGrow: 0, marginHorizontal: -spacing[3] }}
+      // The composer's side padding is 12; the board's row starts 16 from the screen edge. The board's chips end 18 above the box, the area's own gap is 8.
+      style={{ flexGrow: 0, marginHorizontal: -spacing[3], marginBottom: spacing[2] + 2 }}
       contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[4], paddingTop: spacing[2] }}
     >
       {quickStartsFor(kind).map((item) => (

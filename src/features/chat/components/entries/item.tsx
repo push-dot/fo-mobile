@@ -4,6 +4,7 @@ import BotText from './bot'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
+import { PlanRows } from './plan-card'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
@@ -15,7 +16,6 @@ import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
 import { usePop, usePulse } from '../../hooks'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
-import { isVerdictPlan } from '../../utils/stream-v3'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
 import { FIT_LOCKED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
@@ -101,9 +101,6 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
     </Appear>
   )
 }
-
-// The board's index chip is width 24 plus 2x7 padding.
-const INDEX_CHIP = 38
 
 // shortcut: Android does not draw the decoration on a label that turns done (probed: native-driver pop off strikes one of two rows, constant weight none), so it draws the board's rule itself: 1.5pt at 55% of each line box. Retry the native line on an RN upgrade.
 const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<typeof Text>) => {
@@ -198,40 +195,9 @@ const StaleGate = ({ item }: { item: Of<'stale'> }) => (
 
 const Plan = ({ item }: { item: Of<'plan'> }) => {
   const titled = !!item.title
-  const verdict = isVerdictPlan(item.rows)
   const card = (
     <Card gap={titled ? spacing[3] : 14} padding={titled ? undefined : spacing[4]}>
-      {titled ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text v="c1" weight="700" color="t3">
-            {item.title}
-          </Text>
-          <Text v="c1" weight="700" color="t3">
-            {item.meta}
-          </Text>
-        </View>
-      ) : null}
-      {item.rows.map((r, i) => (
-        <View key={r.label} style={{ flexDirection: 'row', gap: spacing[3], alignItems: 'flex-start' }}>
-          {verdict ? <Badge label={String(i + 1)} minWidth={INDEX_CHIP} /> : <Badge label={r.tag} tone={r.tone} minWidth={titled ? 52 : 58} />}
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text v="b2" weight="700">
-              {r.label}
-            </Text>
-            <Text v="c1" color="t3">
-              {r.note}
-            </Text>
-          </View>
-          {verdict ? <Badge label={r.tag} tone={r.tone} /> : null}
-        </View>
-      ))}
-      {titled && item.keywords.length ? (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-          {item.keywords.map((k) => (
-            <Badge key={k} label={`+ ${k}`} tone="ac" />
-          ))}
-        </View>
-      ) : null}
+      <PlanRows item={item} />
     </Card>
   )
   return titled ? card : <View style={{ paddingLeft: 18, marginTop: -spacing[2] }}>{card}</View>
@@ -340,12 +306,11 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
   )
 }
 
-const Projected = ({ label, bullets }: { label: string; bullets: string[] }) => {
+const Projected = ({ label, bullets, open, onToggle }: { label: string; bullets: string[]; open: boolean; onToggle: () => void }) => {
   const c = useColors()
-  const [open, setOpen] = useState(false)
   return (
     <Appear style={{ gap: spacing[2], paddingHorizontal: spacing[4], paddingVertical: open ? spacing[4] : 11, borderRadius: radius.card, backgroundColor: c.bg2 }}>
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={onToggle} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         <Text v="b2" weight="700" style={{ flex: 1 }}>
           {fitProjected(label)}
         </Text>
@@ -392,7 +357,9 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const open = paymentsOpen(useChatAccount(true).data)
   const onPlan = open ? planEntry : undefined
   const view = fitChrome(item, open)
-  const compact = !view.locked && !item.note && item.from === undefined
+  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10 and 16 under, so the card follows the teaser's state.
+  const [projectedOpen, setProjectedOpen] = useState(false)
+  const compact = !view.locked && !item.note && item.from === undefined && !(view.projected && projectedOpen)
   const drop = useFitDrop()
   const head = item.note ? (
     // 점수 올리기: before → after, one bar, the note. The row drops as one so the baselines stay shared.
@@ -471,7 +438,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
           </Text>
         </Pressable>
       ) : null}
-      {view.projected ? <Projected label={view.projected.label} bullets={view.projected.bullets} /> : null}
+      {view.projected ? <Projected label={view.projected.label} bullets={view.projected.bullets} open={projectedOpen} onToggle={() => setProjectedOpen((v) => !v)} /> : null}
     </View>
   )
 }
@@ -610,8 +577,10 @@ const ItemComponent = ({
       return <Notice notice={item.notice} />
     case 'readOff':
       return <ReadOff item={item} onAction={onReadOff} />
-    case 'think':
     case 'tool':
+      // Tool lines are not drawn, except a failed step that says why: the red line of ChatErrors ("자격 요건"을 읽지 못했어요 · …).
+      return item.state === 'err' && item.error ? <ErrorLine text={item.error} /> : null
+    case 'think':
       return null
     case 'todo':
       return <TodoList item={item} />
@@ -654,16 +623,16 @@ const PlanRequired = () => {
   return <ErrorLine text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
-/** Dashed "대기 중" chip for messages sent while the agent works. */
+/** Grey "대기 중" chip for messages sent while the agent works (ChatStates.3: filled, no border; the board's audit layer drops the dashed line). */
 export const Queued = ({ text }: { text: string }) => {
   const c = useColors()
   const maxWidth = useBubbleMax(27)
   return (
     <Appear
       kind="bubble"
-      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.deco }}
+      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, backgroundColor: c.fill }}
     >
-      <Icon name="clock" size={14} color="t2" />
+      <Icon name="clock" size={16} color="t2" />
       <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>
         대기 중 · {text}
       </Text>
