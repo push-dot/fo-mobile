@@ -167,6 +167,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label={toneRowLabel(TONES.find((t) => t.key === s.defaultTone)?.label ?? '')}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
+          mutedChevron
         />
         <SettingsRow label={READ_FILES_ROW.label} right={sw(READ_FILES_ROW.key, READ_FILES_ROW.label)} />
         <SettingsRow
