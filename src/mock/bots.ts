@@ -54,6 +54,8 @@ export type BotFixture = {
   job: MockJob | null
   /** When the bot's newest run failed. A run, message or card after it replaces the outcome. */
   failedAt?: When
+  /** A bot that has said nothing yet but is shown unread, as AgentHomeNoBots draws the Push Bot's first-run dot. Reading it clears this. */
+  unread?: boolean
 }
 
 const newest = <T>(items: T[], time: (item: T) => number) => items.reduce<T | undefined>((a, b) => (a === undefined || time(b) >= time(a) ? b : a), undefined)
@@ -80,7 +82,7 @@ export const botDtoOf = (f: BotFixture, now: Date, all: readonly BotFixture[] = 
     createdAt: iso(f.bot.createdAt),
     lastActivityAt: new Date(Math.max(time(f.bot.createdAt), last ? time(last.at) : -Infinity, card ? time(card.at) : -Infinity)).toISOString(),
     lastMessage: last ? { preview: last.text.slice(0, 140), at: iso(last.at), fromBot: last.role === 'ASSISTANT' } : null,
-    unread: Number.isFinite(said) && (f.readAt === null || said > time(f.readAt)),
+    unread: f.unread ?? (Number.isFinite(said) && (f.readAt === null || said > time(f.readAt))),
     activity: activityOf(f, now, all),
     outcome: outcomeOf(f, now),
   }
@@ -331,10 +333,15 @@ export const nextId = (prefix: string) => `${prefix}-${++seq}`
 /** Tour switches (links.ts). */
 export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit') => {
   fixtures =
-    set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null })] : home()
+    set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null, unread: true })] : home()
 }
 export const setBotPlan = (next: Plan) => {
   plan = next
+}
+/** `bot:<id>:read`: the bot's newest line is read, so its row has no unread dot (AgentHomeError draws the Push Bot without one). */
+export const readBot = (id: string) => {
+  const f = fixtureOf(id)
+  if (f) Object.assign(f, { readAt: 0, unread: undefined })
 }
 export const muteBot = (id: string) => {
   const f = fixtureOf(id)
@@ -377,7 +384,7 @@ export const seedThread = (id: string, set: 'thread' | 'done') => {
   })
   const answer = said('t-ask', 'ASSISTANT', '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.', 8, DESIGN_SOURCES)
   const first = [
-    said('t-req', 'ASSISTANT', '모아페이 백엔드 엔지니어 공고 요건을 정리했어요. 필수 5개 중 4개는 이력서에 이미 드러나 있고, **대용량 트래픽 처리 경험**만 근거가 약해요.', 14),
+    said('t-req', 'ASSISTANT', '모아페이 백엔드 엔지니어 공고 요건을 정리했어요. 필수 5개 중 4개는 이력서에 이미 드러나 있고, **대용량 트래픽 처리 경험**만 근거가 약해요.\n- 결제 승인 API 재설계 경험을 처리량 수치와 함께 쓰기\n- 정산 배치 개선을 장애 대응 사례로 옮기기\n- Kafka 경험은 우대 요건이라 한 줄로 줄이기', 14),
     said('t-ask', 'USER', '좋아요. 첫 번째부터 고쳐서 PDF로 보여 주세요', 10),
     answer,
   ]
@@ -589,6 +596,7 @@ mock('POST', 'bots/:id/read', ({ params }) => {
   if (!f) return notFound()
   const readAt = new Date().toISOString()
   f.readAt = readAt
+  f.unread = undefined
   return { data: { readAt } }
 })
 

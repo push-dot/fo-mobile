@@ -4,17 +4,28 @@ tags:
   - visual
 ---
 # bots:long names 누리클라우드 after the 판교캠퍼스 branch (AgentHomeLong), so its header pill shows the long name.
+# ChatBotHeaderLong draws the finished thread of ChatBotHeader with the green lamp and the 새 메시지 1개 pill, so the chat is the seeded
+# thread (bot:b-nuri:thread) and a late answer lands while the reader is scrolled up, as in agent-40-header-new.
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=bots:long,consent-on"
+      MOCK: "push://sign-in?mock=bots:long,consent-on,bot:b-nuri:thread"
       READY: "새로 올라온 공고"
 - openLink: push://bots/b-nuri
 - extendedWaitUntil:
-    visible: ".*누리클라우드 플랫폼엔지니어링코리아.*"
-    timeout: 15000
+    visible: ".*PDF는 내 서류에 저장했어요.*"
+    timeout: 20000
+# The seeded thread is shorter than the screen, so a first late answer makes it longer and the chat follows it to the bottom.
+# Then the reader scrolls up, and the second late answer lands while the thread is away from the bottom.
+- openLink: push://bots/b-nuri?mock=bot:b-nuri:late
+- waitForAnimationToEnd
+- swipe:
+    direction: DOWN
+    duration: 400
+- waitForAnimationToEnd
+- openLink: push://bots/b-nuri?mock=bot:b-nuri:late
 - extendedWaitUntil:
-    visible: "메시지.*"
+    visible: "새 메시지 1개"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderLong

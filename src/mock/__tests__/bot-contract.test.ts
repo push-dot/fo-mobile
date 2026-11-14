@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createBotApi, createClient, type BotApi, type BotContract } from '@push/api-client'
 import { mockFetch } from '../index'
-import { expireCard, resetBots, setBotPlan, setBots } from '../bots'
+import { expireCard, readBot, resetBots, seedThread, setBotPlan, setBots } from '../bots'
 import { grantReference } from '../chat'
 import { setMaterials } from '../materials'
 
@@ -115,6 +115,28 @@ describe('bots', () => {
     expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeGreaterThan(9.9 * 60_000)
     expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeLessThan(10.5 * 60_000)
     expect(data.find((b) => b.id === 'b-dotori')).toMatchObject({ unread: false, activity: null, outcome: { kind: 'failed' } })
+  })
+
+  it('shows the Push Bot of AgentHomeNoBots unread with no line said, and AgentHomeError read (bot:push:read)', async () => {
+    setBots('none')
+    expect(await api.bots.get('push')).toMatchObject({ unread: true, lastMessage: null })
+    await api.bots.markRead('push')
+    expect((await api.bots.get('push')).unread).toBe(false)
+    setBots('none')
+    expect((await api.bots.get('push')).unread).toBe(true)
+    readBot('push')
+    expect((await api.bots.get('push')).unread).toBe(false)
+    resetBots()
+    expect((await api.bots.get('push')).unread).toBe(true)
+    readBot('push')
+    expect((await api.bots.get('push')).unread).toBe(false)
+  })
+
+  it('gives the first line of ChatBotHeader its three list lines', async () => {
+    seedThread('b-moa', 'thread')
+    const { data } = await api.bots.transcript('b-moa')
+    const first = data.at(-1)!.assistant!.text
+    expect(first.split('\n').slice(1)).toEqual(['- 결제 승인 API 재설계 경험을 처리량 수치와 함께 쓰기', '- 정산 배치 개선을 장애 대응 사례로 옮기기', '- Kafka 경험은 우대 요건이라 한 줄로 줄이기'])
   })
 
   it('lists the three bots of BotNewLimitDelete at the FREE limit, each with the role it was made from', async () => {
