@@ -4,11 +4,12 @@ tags:
   - visual
 ---
 # plan-ultra makes GET chat/account an ULTRA account. The plan page opens from the bot home account button.
-# credits-out spends every credit, so Push Bot's chat shows the credit banner under the header (ChatBotHeaderLimitUltra).
+# credits-out spends every credit, so the chat shows the credit banner under the header. ChatBotHeaderLimitUltra draws the 모아페이 chat
+# with its finished thread (bot:b-moa:thread), not the empty Push Bot chat.
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on,bot:push:empty"
+      MOCK: "push://sign-in?mock=plan-ultra,credits-out,consent-on,bot:push:empty,bot:b-moa:thread"
       READY: "새로 올라온 공고"
 - runFlow:
     file: ../flows/_tap_tab.yaml
@@ -41,10 +42,10 @@ tags:
 - takeScreenshot: PlanUltraNotice
 - tapOn: "뒤로"
 - tapOn: "닫기"
-- openLink: push://bots/push
+- openLink: push://bots/b-moa
 - extendedWaitUntil:
-    visible: "공고 링크로 맞추기"
-    timeout: 10000
+    visible: "경력 섹션 3줄을 고쳤어요.*"
+    timeout: 15000
 - extendedWaitUntil:
     visible: "이번 달 사용량을 모두 썼어요.*"
     timeout: 20000

@@ -165,7 +165,12 @@ const scoped = (f: Frame, prefix: string): Frame => {
 /** Stamps each frame with the conversation's next seq and remembers the card the run leaves open. */
 const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
   let seq = lastSeq.get(id) ?? 0
-  const out: Step[] = steps.map((st) => ({ ...st, frame: { ...(prefix ? scoped(st.frame, prefix) : st.frame), seq: ++seq } }))
+  // A tool card carries the time it was asked, as the server's frame does (`at`), so the room draws 확인을 기다리고 있어요 under the thread (ChatBotStatusApprove).
+  const at = new Date().toISOString()
+  const out: Step[] = steps.map((st) => {
+    const frame = prefix ? scoped(st.frame, prefix) : st.frame
+    return { ...st, frame: { ...frame, ...(frame.type === 'approval' ? { at } : {}), seq: ++seq } }
+  })
   lastSeq.set(id, seq)
   const card = out.map((st) => st.frame).findLast(isCard)
   if (card) waiting.set(id, card)
@@ -364,11 +369,19 @@ let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; ru
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }
 }
+// ChatAccountUsage 'Bot별': the board splits 64% as 28 / 18 / 10 / 8 of the allowance.
+const BOT_SHARES = [
+  { id: 'moapay', name: '모아페이', share: 28 },
+  { id: 'push', name: 'Push Bot', share: 18 },
+  { id: 'dotori', name: '도토리증권', share: 10 },
+  { id: 'pado', name: '파도AI', share: 8 },
+]
+const botUsage = (used: number) => BOT_SHARES.map((b) => ({ id: b.id, name: b.name, used: Math.round((used * b.share) / 64) }))
 mock('GET', 'chat/account', () => {
   const total = account.ultra ? 20_000 : 5000
   const used = account.spent ? total : account.ultra ? 12_800 : 3200
   const now = new Date()
-  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
+  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, usageByBot: botUsage(used), ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
 })
 
 // ---------- quick-start ingredients ----------

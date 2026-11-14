@@ -20,13 +20,14 @@ tags:
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 60000
-# ChatDoneProfile draws the finished run alone (one elapsed line, no 적용 / 확인했어요 bubbles), so it takes its own run (mock token).
+# ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드.pdf card) with the three-button sheet
+# (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
 - runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml
     env:
-      KO: "profile-done"
-      EN: "profile-done"
+      KO: "ext-done"
+      EN: "ext-done"
 # The closing summary streams in below the fold and can stop the follow-the-end scroll (새 내용 pill).
 - retry:
     maxRetries: 3

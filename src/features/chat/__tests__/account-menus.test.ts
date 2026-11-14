@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
+import { accessMenu, botUsageRows, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 
 vi.mock('@/features/my', async () => ({ TONES: (await import('../../my/constants')).TONES }))
 
@@ -32,6 +32,21 @@ describe('account inline menus', () => {
     expect(usagePercent({ used: 1, total: 3 })).toBe(33)
     expect(usagePercent({ used: 0, total: 0 })).toBeNull()
     expect(usagePercent(null)).toBeNull()
+  })
+
+  it('lists each Bot share of the allowance, biggest first, and hides without a split', () => {
+    const credits = { used: 3200, total: 5000 }
+    const usageByBot = [
+      { id: 'b', name: 'Push Bot', used: 900 },
+      { id: 'a', name: '모아페이', used: 1400 },
+    ]
+    expect(botUsageRows({ credits, usageByBot })).toEqual([
+      { id: 'a', name: '모아페이', percent: 28, used: 1400 },
+      { id: 'b', name: 'Push Bot', percent: 18, used: 900 },
+    ])
+    expect(botUsageRows({ credits })).toEqual([])
+    expect(botUsageRows({ credits: null, usageByBot })).toEqual([])
+    expect(botUsageRows(undefined)).toEqual([])
   })
 
   it('names the tone row 그대로 for the default tone and "<tone> 말투" otherwise', () => {

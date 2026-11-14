@@ -81,6 +81,14 @@ export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
+/**
+ * Whether the room draws a line for this item. The tool, think and worked lines and a refused turn's error are replaced by the status
+ * line and the credit banner (entries/item.tsx returns null for them). A list cell that draws nothing still takes its 18 gap,
+ * so one hidden line made a 36 gap and two made 54 (ChatPh2, ChatPh3Boost, ChatPh3Review): the room never lists them.
+ */
+export const isDrawn = (item: ChatItem) =>
+  item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
+
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 
 // A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.

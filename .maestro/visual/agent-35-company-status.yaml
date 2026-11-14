@@ -113,6 +113,11 @@ tags:
       PICK: ".*제품 관점.*"
       ASK: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
       NEXT: ".*메시지.*"
+# The generic reply to that answer streams for a few seconds; the empty link below must come after its last line, or the line lands in the emptied thread (ChatBotStatusApprove draws the greeting and one request only).
+- extendedWaitUntil:
+    visible: "정리했어요. 더 필요한 게 있으면 말해 주세요."
+    timeout: 30000
+- waitForAnimationToEnd
 - openLink: "push://bots/b-moa?mock=run:st-approve,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml

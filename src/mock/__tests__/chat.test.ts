@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatEvent, Step } from '@/features/chat'
 import { applyEvent, emptyChat } from '../../features/chat/utils/reducer'
+import { waitingLine } from '../../features/chat/utils/card'
 import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
 import '../bots'
@@ -54,6 +55,18 @@ describe('chat mock', () => {
     const second = await answer('t-verify', 'ph2x-level', '1')
     expect(first.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
     expect(types(second)).toContain('plan')
+  })
+
+  it('draws the failed check of the first 병목 강도 pick as a red line under the user line (ChatVerifyFail)', async () => {
+    const events = await run('t-verify-notice', { text: 'verify-fail' })
+    expect(events.find((e) => e.type === 'notice')).toMatchObject({ notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요' } })
+  })
+
+  it('stamps a tool card with the time it was asked, so the room draws the waiting line (ChatBotStatusApprove)', async () => {
+    const events = await run('t-approve-stamp', { text: 'st-approve' })
+    const approval = events.find((e) => e.type === 'approval')
+    expect(approval).toMatchObject({ approval: { confirm: true } })
+    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval, 'open')).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
   })
 
   it('maps quick-start intents to their scenario', async () => {
