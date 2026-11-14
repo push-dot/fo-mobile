@@ -1,11 +1,13 @@
 import { searchHangul } from '@push/shared'
 import { useState } from 'react'
+import { Platform, View } from 'react-native'
 import { Chip, Text, TextField } from '../../../shared/components'
 import { useProfile } from '../api/hooks'
 import { POPULAR_SKILL_COUNT, SKILL_CATALOG } from '../constants'
 import FilterGroup from './filter-group'
 
 const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; trending: string[]; onToggle: (s: string) => void }) => {
+  const ios = Platform.OS === 'ios'
   const [q, setQ] = useState('')
   const profile = useProfile()
   const mine = (profile.data?.skills ?? []).filter((s) => !selected.includes(s))
@@ -13,11 +15,14 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
   const found = q.trim() ? searchHangul(SKILL_CATALOG, q, (s) => [s]).map((r) => r.item) : []
   return (
     <>
-      <TextField compact icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
+      {/* iOS .isearch: 40 high, 8 above the first group title. */}
+      <View style={{ marginBottom: ios ? 8 : 0 }}>
+        <TextField compact slim={ios} icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
+      </View>
       {q.trim() ? (
         <FilterGroup title="검색 결과">
           {found.length ? (
-            found.map((s) => <Chip key={s} label={s} check on={selected.includes(s)} onPress={() => onToggle(s)} />)
+            found.map((s) => <Chip sheet key={s} label={s} check on={selected.includes(s)} onPress={() => onToggle(s)} />)
           ) : (
             <Text v="b2" color="t3">
               맞는 기술이 없어요. 다른 이름으로 찾아보세요.
@@ -28,21 +33,21 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
       {selected.length ? (
         <FilterGroup title="선택한 기술">
           {selected.map((s) => (
-            <Chip key={s} label={s} on check onPress={() => onToggle(s)} />
+            <Chip sheet key={s} label={s} on check onPress={() => onToggle(s)} />
           ))}
         </FilterGroup>
       ) : null}
       {mine.length ? (
         <FilterGroup title="내 프로필 기술">
           {mine.map((s) => (
-            <Chip key={s} label={s} onPress={() => onToggle(s)} />
+            <Chip sheet key={s} label={s} onPress={() => onToggle(s)} />
           ))}
         </FilterGroup>
       ) : null}
       {popular.length ? (
         <FilterGroup title="많이 찾는 기술">
           {popular.map((s) => (
-            <Chip key={s} label={s} onPress={() => onToggle(s)} />
+            <Chip sheet key={s} label={s} onPress={() => onToggle(s)} />
           ))}
         </FilterGroup>
       ) : null}

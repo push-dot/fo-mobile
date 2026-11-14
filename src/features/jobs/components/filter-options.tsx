@@ -12,7 +12,7 @@ const FilterOptions = <K extends string>({
 }) => (
   <FilterGroup>
     {options.map((o) => (
-      <Chip key={o.key} label={o.label} check on={selected.includes(o.key)} onPress={() => onToggle(o.key)} />
+      <Chip sheet key={o.key} label={o.label} check on={selected.includes(o.key)} onPress={() => onToggle(o.key)} />
     ))}
   </FilterGroup>
 )
