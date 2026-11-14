@@ -1,8 +1,7 @@
 import { Stack } from 'expo-router'
 import { View } from 'react-native'
 import { ConsentPromptListener } from '@/features/chat'
-import { FULL_SHEET_KIND } from '@/features/jobs'
-import { fullSheetOptions, modalOptions, sheetOptions } from '@/shared/navigation'
+import { modalOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
@@ -55,10 +54,7 @@ const SignedInStack = () => {
       <Stack.Screen name="account-usage" />
       <Stack.Screen name="plan" />
       <Stack.Screen name="plan-notice" />
-      <Stack.Screen
-        name="job-filter"
-        options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}
-      />
+      <Stack.Screen name="job-filter" options={sheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />

@@ -39,8 +39,12 @@ tags:
       TEXT: "공고 398개 보기"
 - tapOn: "전체"
 - waitForAnimationToEnd
-- runFlow: _scroll_chips.yaml
-- tapOn: "고용형태"
+# 고용형태 is off the chip row's screen, and scrolling the row would leave it scrolled behind the sheet. FilterType draws the row at
+# its start, so the sheet opens by its own route over the list instead.
+- openLink: push://job-filter?kind=employmentType
+- extendedWaitUntil:
+    visible: "정규직"
+    timeout: 10000
 - tapOn: "정규직"
 - extendedWaitUntil:
     visible: "공고 1,021개 보기"

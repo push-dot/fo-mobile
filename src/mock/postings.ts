@@ -137,10 +137,12 @@ mock('GET', 'postings', ({ query }) => {
   return { ...out, page: { ...out.page, total: shownTotal(query, list.length) } }
 })
 
-// Per-district counts for the 지역 sheet (the design's 서울 842 = 214 + 96 + 88 + 71 + 64 + 중구 309).
+// Per-district counts for the 지역 sheet: FilterRegion draws 서울 전체 842 over eleven districts (761); the other 81 are postings
+// that name only 서울, which the sheet counts into 서울 전체 and does not list.
 // shortcut: fixed table, ignores the other filters; the fixtures are too few to give these numbers.
 const LOCATION_COUNTS: [string, number][] = [
-  ['서울 강남구', 214], ['서울 서초구', 96], ['서울 마포구', 88], ['서울 영등포구', 71], ['서울 송파구', 64], ['서울 중구', 309],
+  ['서울 강남구', 214], ['서울 서초구', 96], ['서울 마포구', 88], ['서울 영등포구', 71], ['서울 송파구', 64], ['서울 성동구', 58],
+  ['서울 용산구', 41], ['서울 중구', 39], ['서울 종로구', 33], ['서울 강서구', 30], ['서울 구로구', 27], ['서울', 81],
   ['경기 성남시', 132], ['경기 수원시', 58], ['인천 중구', 47], ['부산 해운대구', 39], ['대전 유성구', 28], ['원격', 63],
   ['대구 수성구', 31], ['광주 북구', 22], ['울산 남구', 19], ['세종 세종시', 14], ['강원 춘천시', 17], ['제주 제주시', 24],
 ]

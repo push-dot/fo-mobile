@@ -36,7 +36,8 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       data={items}
       keyExtractor={(p) => p.id}
       numColumns={2}
-      contentInsetAdjustmentBehavior="automatic"
+      // The screen's ScreenBar floats over the list and passes its own height as topInset; an automatic inset would add the status bar on top of it (61pt after a sheet was dismissed).
+      contentInsetAdjustmentBehavior="never"
       ListHeaderComponent={header}
       columnWrapperStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}
       contentContainerStyle={{ flexGrow: 1, paddingTop: topInset, paddingBottom: 32 }}
