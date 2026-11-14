@@ -13,6 +13,19 @@ tags:
     visible: ".*경력 섹션 3줄을 고쳤어요.*"
     timeout: 15000
 - waitForAnimationToEnd
+# ChatBotHeaderXL draws the header with the green dot (a bot answer landed while the reader is above it), as ChatBotHeaderNew does:
+# a first late answer makes the thread follow to its end, the reader scrolls up, and the second one lands away from the bottom.
+- openLink: push://bots/b-moa?mock=bot:b-moa:late
+- waitForAnimationToEnd
+- swipe:
+    direction: DOWN
+    duration: 400
+- waitForAnimationToEnd
+- openLink: push://bots/b-moa?mock=bot:b-moa:late
+- extendedWaitUntil:
+    visible: "새 메시지 1개"
+    timeout: 10000
+- waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderXL
 - runFlow:
     file: ../_login_mock.yaml
@@ -31,9 +44,10 @@ tags:
 - extendedWaitUntil:
     visible: ".*공고 요건을 읽는 중.*"
     timeout: 20000
+# The running line is not in the thread list, so the keyboard comes down on the user line (a tap on the line does nothing).
 - runFlow:
     file: ../_chat_kbd_down.yaml
     env:
-      TEXT: ".*공고 요건을 읽는 중.*"
+      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusXL

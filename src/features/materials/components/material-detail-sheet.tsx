@@ -12,7 +12,7 @@ import {
   showToast,
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { radius, spacing, useColors } from '@/theme'
+import { spacing } from '@/theme'
 import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
 import {
   CITED,
@@ -26,8 +26,12 @@ import {
 } from '../constants'
 import type { Material, MaterialKind } from '../types'
 import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
+import MaterialFacts from './material-facts'
 import { sendMaterial } from './send-material'
 import { useSearchRoom } from './materials-search'
+
+// `.dhead` sets the title 10 below the head's top, which centres its line on the 44pt delete button.
+const TITLE_TOP = 10
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
@@ -58,7 +62,6 @@ export const MaterialDetailSheet = ({
   id: string
   forBot?: string
 }) => {
-  const c = useColors()
   const detail = useMaterialDetail(kind, id)
   const remove = useDeleteMaterial()
   const restore = useRestoreMaterial()
@@ -123,7 +126,7 @@ export const MaterialDetailSheet = ({
   return (
     <Sheet gap={14}>
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3] }}>
-        <Text v="h3" accessibilityRole="header" style={{ flex: 1, minWidth: 0, paddingTop: spacing[1] }}>
+        <Text v="h3" accessibilityRole="header" style={{ flex: 1, minWidth: 0, paddingTop: TITLE_TOP }}>
           {detailTitle(m)}
         </Text>
         <GlassButton
@@ -146,26 +149,7 @@ export const MaterialDetailSheet = ({
           ]}
         />
       </View>
-      <View
-        style={{
-          gap: spacing[2],
-          paddingVertical: 14,
-          paddingHorizontal: spacing[4],
-          borderRadius: radius.card,
-          backgroundColor: c.bg2,
-        }}
-      >
-        {facts.map((f) => (
-          <View key={f.label} style={{ flexDirection: 'row', gap: spacing[3] }}>
-            <Text v="c1" color="t3" style={{ width: 72, fontSize: 14, lineHeight: 20 }}>
-              {f.label}
-            </Text>
-            <Text v="c1" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
-              {f.value}
-            </Text>
-          </View>
-        ))}
-      </View>
+      <MaterialFacts facts={facts} />
       <View style={{ gap: spacing[2], marginTop: spacing[1] }}>
         <Button
           label={SEND_LABEL}

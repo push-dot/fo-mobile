@@ -34,10 +34,12 @@ tags:
     timeout: 15000
 - runFlow: _agent_tab.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ext-done"
-      EN: "ext-done"
+      RUN: "ext-done"
+      BOT: "push"
+      KO: "이 이력서 더 좋게 고쳐 줘"
+      EN: "Make this resume better"
 - extendedWaitUntil:
     visible: "프로필로 전환"
     timeout: 30000

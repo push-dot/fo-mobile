@@ -15,6 +15,15 @@ export const accessMenu = (current: AccessMode, onPick: (mode: AccessMode) => vo
 export const usagePercent = (credits: Account['credits'] | undefined) =>
   credits && credits.total > 0 ? Math.min(100, Math.max(0, Math.round((credits.used / credits.total) * 100))) : null
 
+/** ChatAccountUsage 'Bot별': each Bot's share of the month's allowance as a whole percent, biggest first. Empty when the server sends no split. */
+export const botUsageRows = (account: Pick<Account, 'credits' | 'usageByBot'> | undefined) => {
+  const total = account?.credits?.total ?? 0
+  if (!account?.usageByBot || total <= 0) return []
+  return account.usageByBot
+    .map((b) => ({ id: b.id, name: b.name, percent: Math.min(100, Math.max(0, Math.round((b.used / total) * 100))), used: b.used }))
+    .sort((a, b) => b.used - a.used)
+}
+
 export const toneLabel = (tone?: { key: Tone; label: string }) => (tone && tone.key !== 'as_is' ? `${tone.label} 말투` : '그대로')
 
 export const currentRole = (profile?: { headline: string; careers: { role: string; endedOn?: string | null }[] }) =>

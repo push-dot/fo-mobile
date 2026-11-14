@@ -20,13 +20,16 @@ tags:
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 60000
-# ChatDoneProfile draws the finished run alone (one elapsed line, no 적용 / 확인했어요 bubbles), so it takes its own run (mock token).
+# ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드.pdf card) with the three-button sheet
+# (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "profile-done"
-      EN: "profile-done"
+      RUN: "ext-done"
+      BOT: "b-moa"
+      KO: "이 이력서 더 좋게 고쳐 줘"
+      EN: "Make this resume better"
 # The closing summary streams in below the fold and can stop the follow-the-end scroll (새 내용 pill).
 - retry:
     maxRetries: 3
@@ -47,10 +50,12 @@ tags:
 # ChatDoneProfile: the finished card with the sheet closed.
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "profile-done"
-      EN: "profile-done"
+      RUN: "profile-done"
+      BOT: "b-moa"
+      KO: "프로필 더 좋게 고쳐 줘"
+      EN: "Make my profile better"
 - extendedWaitUntil:
     visible: "다음으로 무엇을 할까요?"
     timeout: 20000
@@ -59,10 +64,12 @@ tags:
 # ChatPh6Result draws only the closing line and the card under the open gate, so it jumps there in a fresh conversation (mock token).
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "profile-gate"
-      EN: "profile-gate"
+      RUN: "profile-gate"
+      BOT: "b-moa"
+      KO: "프로필 더 좋게 고쳐 줘"
+      EN: "Make my profile better"
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
     timeout: 20000

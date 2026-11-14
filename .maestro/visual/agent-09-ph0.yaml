@@ -26,6 +26,10 @@ tags:
 - extendedWaitUntil:
     visible: "어떤 산출물을 만들까요?"
     timeout: 30000
+# The sheet's second block (자료 rows) is off screen until the panel has risen, so it is the sign that the slide is done.
+- extendedWaitUntil:
+    visible: "가져올 자료"
+    timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh0Input
 - runFlow: _fresh_company.yaml
@@ -45,6 +49,11 @@ tags:
     env:
       KO: "네, 시작해 주세요"
       EN: "analyze"
+# ChatPh1 draws the run with the keyboard down: lower it on the user line while it is still on screen (the running line is not in the list).
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*네, 시작해 주세요.*"
 # The list stops following the stream (a 새 내용 pill shows), so the running line sits below the fold until it is scrolled to.
 - scrollUntilVisible:
     element: ".*필수·우대 스택을 뽑는 중.*"

@@ -99,11 +99,31 @@ describe('bots', () => {
     await expect(api.bots.update('push', { expectedRevision: 1, color: 'red' })).rejects.toMatchObject({ status: 400 })
   })
 
-  it('finds bots by name or posting and messages by text, newest first', async () => {
+  it('finds bots by name or posting and messages by text, the Push Bot first and the rest newest first', async () => {
     const { data } = await api.bots.search('모아')
     expect(data.bots.map((b) => [b.displayName, b.line])).toEqual([['모아페이', '모아페이 · 백엔드 엔지니어']])
-    // Newest first, as push-be orders them. AgentHomeSearch draws the Push Bot hit (어제) above 도토리증권 (1시간 전).
-    expect(data.messages.map((m) => [m.bot.displayName, m.role])).toEqual([['도토리증권', 'ASSISTANT'], ['Push Bot', 'ASSISTANT']])
+    // AgentHomeSearch draws the Push Bot hit (어제) above 도토리증권 (1시간 전), and cuts 도토리증권's right before the hit.
+    expect(data.messages.map((m) => [m.bot.displayName, m.role])).toEqual([['Push Bot', 'ASSISTANT'], ['도토리증권', 'ASSISTANT']])
+    expect(data.messages.map((m) => m.snippet)).toEqual(['모아페이 공고 마감이 이번 주 금요일이에요', '…모아페이 경력과 겹치는 부분을 정리했어요'])
+  })
+
+  it('reads the expired card of AgentHomeRowExpiredFailed as 대기 with no unread dot, ten minutes old', async () => {
+    setBots('outcome')
+    const { data } = await api.bots.list()
+    const moa = data.find((b) => b.id === 'b-moa')!
+    expect(moa).toMatchObject({ unread: false, activity: null, outcome: { kind: 'expired' } })
+    expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeGreaterThan(9.9 * 60_000)
+    expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeLessThan(10.5 * 60_000)
+    expect(data.find((b) => b.id === 'b-dotori')).toMatchObject({ unread: false, activity: null, outcome: { kind: 'failed' } })
+  })
+
+  it('lists the three bots of BotNewLimitDelete at the FREE limit, each with the role it was made from', async () => {
+    setBots('limit')
+    setBotPlan('FREE')
+    const { data, limit } = await api.bots.list()
+    expect(data.filter((b) => b.kind === 'company').map((b) => b.displayName)).toEqual(['모아페이', '누리클라우드', '한빛모빌리티'])
+    expect(limit).toMatchObject({ plan: 'FREE', max: 3, used: 3 })
+    expect((await api.bots.get('b-nuri')).posting?.title).toBe('프론트엔드 개발자')
   })
 
   it('resolves the posting link of BotNewLinkOk, and nothing else', async () => {

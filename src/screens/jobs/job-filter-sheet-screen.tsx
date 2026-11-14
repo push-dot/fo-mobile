@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { FILTER_KEYS, FULL_SHEET_KIND, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
+import { CHIP_FILTER_KINDS, FILTER_KEYS, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
 import { Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
 
@@ -8,6 +8,8 @@ const kindOf = (value: string | string[] | undefined) => {
   const kind = Array.isArray(value) ? value[0] : value
   return FILTER_KEYS.includes(kind as FilterKey) ? (kind as FilterKey) : null
 }
+
+const CHIP_SHEET_ACTION_GAP = 26
 
 const JobFilterSheetScreen = () => {
   const params = useLocalSearchParams<{ kind?: string }>()
@@ -17,19 +19,22 @@ const JobFilterSheetScreen = () => {
   const count = usePostingCount(draft)
   const total = count.data?.page.total
   const trending = useTrending().data?.skills.map((s) => s.id) ?? []
-  const bound = useSheetScrollMax(0.6)
+  // The region list is drawn at its full 12 rows (FilterRegion), so its bound is the room on screen, not 60% of it.
+  const bound = useSheetScrollMax(kind === 'location' ? 1 : 0.6)
 
   useEffect(() => {
     if (!kind) router.back()
   }, [kind])
 
   if (!kind) return null
-  const full = kind === FULL_SHEET_KIND
+  const compact = CHIP_FILTER_KINDS.includes(kind)
 
   return (
     <Sheet
-      full={full}
-      actionGap={SHEET_ACTION_GAP.filter}
+      // Chip sheets: the board's head starts 17 under the sheet top and the chips right under it; its CTA sits 20 under the chips
+      // and the sheet ends 26 under it. Ours ends 20 under a 56 CTA (the board's is 52), so 26 above it keeps the sheet 247 high.
+      gap={compact ? 0 : undefined}
+      actionGap={compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}
       onLayout={bound.onSheetLayout}
       action={{
         label: total === undefined ? '공고 보기' : `공고 ${formatCount(total)}개 보기`,
@@ -45,7 +50,8 @@ const JobFilterSheetScreen = () => {
         trending={trending}
         onChange={setDraft}
         onClose={() => router.back()}
-        scroll={LONG_FILTER_KINDS.includes(kind) && !full ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
+        compact={compact}
+        scroll={LONG_FILTER_KINDS.includes(kind) ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
       />
     </Sheet>
   )

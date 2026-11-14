@@ -6,10 +6,12 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _company_tab.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ph1-free"
-      EN: "ph1-free"
+      RUN: "ph1-free"
+      BOT: "b-moa"
+      KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
+      EN: "How well does my resume fit this job"
 # The open gate is a modal panel that hides the chat text from accessibility, so wait on its question; the card is on screen above it.
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
@@ -18,10 +20,12 @@ tags:
 - takeScreenshot: ChatPh1FitFree
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ph1-ultra"
-      EN: "ph1-ultra"
+      RUN: "ph1-ultra"
+      BOT: "b-moa"
+      KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
+      EN: "How well does my resume fit this job"
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
     timeout: 20000
@@ -30,10 +34,12 @@ tags:
 # The card cannot be tapped once the gate is up, so a second run holds the gate back (mock token) until the card is open.
 - runFlow: _fresh_company.yaml
 - runFlow:
-    file: _say.yaml
+    file: _say_run.yaml
     env:
-      KO: "ph1-ultra-open"
-      EN: "ph1-ultra-open"
+      RUN: "ph1-ultra-open"
+      BOT: "b-moa"
+      KO: "이 공고에 내 이력서가 얼마나 맞는지 봐 줘"
+      EN: "How well does my resume fit this job"
 - extendedWaitUntil:
     visible: "이렇게 고치면 8점대"
     timeout: 20000

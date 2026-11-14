@@ -10,7 +10,7 @@ import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
 import Pick from './pick'
 import { CALENDAR_TASKS, type QuickStart } from '../constants'
-import { initialPicks } from '../utils/quick-start-data'
+import { initialPicks, startLink } from '../utils/quick-start-data'
 
 
 /** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. */
@@ -28,6 +28,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const [seg, setSeg] = useState(0)
   const [sel, setSel] = useState<string[]>([])
   const [url, setUrl] = useState('')
+  const clip = useCopiedLink(qs.layout === 'link')
   const [chips, setChips] = useState<string[]>([])
   const [adding, setAdding] = useState<string | null>(null)
   const [option, setOption] = useState(true)
@@ -50,7 +51,8 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   // 지원 현황 lists an active application under both tabs; pick it once.
   const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
   const documentId = docs.data?.find((x) => x.fileName === doc)?.id
-  const input = { picked, url, chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
+  // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
+  const input = { picked, url: startLink(url, clip), chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
@@ -95,7 +97,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
           </Text>
         ) : (
           <>
-            {qs.layout === 'link' ? <LinkInput url={url} setUrl={setUrl} /> : null}
+            {qs.layout === 'link' ? <LinkInput url={url} setUrl={setUrl} clip={clip} /> : null}
 
             {qs.layout === 'match' ? (
               <>
@@ -212,12 +214,17 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   )
 }
 
-const LinkInput = ({ url, setUrl }: { url: string; setUrl: (v: string) => void }) => {
-  const c = useColors()
+/** The link on the clipboard, or '' (read once when the link sheet opens). */
+const useCopiedLink = (on: boolean) => {
   const [clip, setClip] = useState('')
   useEffect(() => {
-    void readClipboard().then((text) => setClip(/^https?:\/\/\S+$/.test(text.trim()) ? text.trim() : ''))
-  }, [])
+    if (on) void readClipboard().then((text) => setClip(/^https?:\/\/\S+$/.test(text.trim()) ? text.trim() : ''))
+  }, [on])
+  return clip
+}
+
+const LinkInput = ({ url, setUrl, clip }: { url: string; setUrl: (v: string) => void; clip: string }) => {
+  const c = useColors()
   return (
     <>
       <LinkField value={url} onChangeText={setUrl} />

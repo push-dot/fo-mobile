@@ -23,6 +23,17 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsBookmarks
+# MaterialDetailBookmark draws the list behind it on the 북마크 tab, so the posting opens from here, not from 전체.
+- tapOn: "모아페이 · 백엔드 엔지니어 자세히"
+- extendedWaitUntil:
+    visible: "공고로 이동"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: MaterialDetailBookmark
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "공고로 이동"
 - tapOn: "링크"
 - extendedWaitUntil:
     visible: "github.com 자세히"
@@ -44,16 +55,6 @@ tags:
 - extendedWaitUntil:
     visible: "김서준_백엔드_이력서.pdf 자세히"
     timeout: 10000
-- tapOn: "모아페이 · 백엔드 엔지니어 자세히"
-- extendedWaitUntil:
-    visible: "공고로 이동"
-    timeout: 10000
-- waitForAnimationToEnd
-- takeScreenshot: MaterialDetailBookmark
-- runFlow:
-    file: _close_sheet.yaml
-    env:
-      TITLE: "공고로 이동"
 - tapOn: "김서준_백엔드_이력서.pdf 자세히"
 - extendedWaitUntil:
     visible: "서류로 들어가기"

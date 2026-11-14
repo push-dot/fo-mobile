@@ -2,7 +2,7 @@ import type { Application, Offer, Posting, Profile } from '@push/api-client'
 import { brandColor } from '@push/shared'
 import { registerMockBrandColors } from '@push/shared/mock-brand'
 import { describe, expect, it, vi } from 'vitest'
-import { docMeta, initialPicks, postingMeta, quickStartFrom } from '../utils/quick-start-data'
+import { docMeta, initialPicks, postingMeta, quickStartFrom, startLink } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils')
@@ -95,5 +95,14 @@ describe('quickStartFrom (real mode)', () => {
     expect(docMeta({ fileName: '경력.docx', size: 640_000, createdAt: '2026-09-28T09:00:00' })).toBe('DOCX · 640KB · 9월 28일')
     expect(postingMeta(posting('a', '2026-11-03'), new Date('2026-10-21T09:00:00'))).toBe('서울 강남구 · 경력 4–6년 · D-13')
     expect(postingMeta(posting('a', null, { careerMin: 0, careerMax: null }))).toBe('서울 강남구 · 신입')
+  })
+})
+
+describe('startLink', () => {
+  it('uses the copied link only while the field is empty', () => {
+    expect(startLink('', 'https://careers.moapay.kr/jobs/1')).toBe('https://careers.moapay.kr/jobs/1')
+    expect(startLink('  ', 'https://careers.moapay.kr/jobs/1')).toBe('https://careers.moapay.kr/jobs/1')
+    expect(startLink('https://a.co/1', 'https://careers.moapay.kr/jobs/1')).toBe('https://a.co/1')
+    expect(startLink('', '')).toBe('')
   })
 })

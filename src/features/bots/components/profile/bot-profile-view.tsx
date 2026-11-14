@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
+import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
 import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, showToast } from '@/shared/components'
 import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
@@ -29,6 +29,8 @@ import { confirmDeleteBot } from './confirm-delete-bot'
 import { SheetCard } from './sheet-card'
 import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 
+// BotProfile boards: `.pnav` is 60 high with 16pt edges, the chat header's measure. Android keeps its own bar.
+const IOS = Platform.OS === 'ios'
 const HEADER_MASCOT = 104
 const XL_SCALE = 1.5
 const COLOR_DOT = 22
@@ -40,7 +42,7 @@ const Loading = () => {
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
-      <TopBar circleBack onBack={() => router.back()} />
+      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       <View
         style={{
           alignItems: 'center',
@@ -129,7 +131,7 @@ const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void })
   const c = useColors()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar circleBack onBack={() => router.back()} />
+      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
       <View
         accessibilityRole="alert"
@@ -252,7 +254,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   }
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar circleBack onBack={() => router.back()} />
+      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
         <ProfileHead name={bot.name} color={color} sub={posting?.title} />
         {groups.map((group, index) => (

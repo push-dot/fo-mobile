@@ -8,6 +8,8 @@ import {
   composerPlaceholder,
   deleteBotConfirm,
   headerAction,
+  isDrawn,
+  threadRows,
   isUsageExhausted,
   onboardingGreeting,
   threadGreeting,
@@ -72,6 +74,25 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
+  it('says the run takes input too while a document flow with a to-do card works, named bot or not', () => {
+    const todo: ChatItem = { type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'now' }] }
+    const working = { verbs: [], startedAt: 0 }
+    expect(composerPlaceholder({ items: [user, todo], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
+    expect(composerPlaceholder({ items: [user, todo], working }, 'Push Bot')).toBe('작업 중에도 말할 수 있어요')
+    // Any card only a document flow leaves counts, so a later phase (draft, review, save) says it too.
+    for (const card of [
+      { type: 'plan', id: 'p', title: '수정 전략', meta: '', rows: [], keywords: [] },
+      { type: 'paper', id: 'pp', label: '초안', heading: '', lines: [] },
+      { type: 'diff', id: 'd', lines: [] },
+    ] as ChatItem[])
+      expect(composerPlaceholder({ items: [user, card], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
+    // A plain run with tool lines only (ChatBotStatusWork) asks the bot.
+    const tool: ChatItem = { type: 'tool', id: 'tl', action: '공고 읽기', state: 'run' }
+    expect(composerPlaceholder({ items: [user, tool], working }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+    // Idle again: the bot's own line.
+    expect(composerPlaceholder({ items: [user, todo], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+  })
+
   it('asks what to do with the attached material, by its kind, over the bot name', () => {
     const chat = { items: [], working: null }
     expect(composerPlaceholder(chat, '모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')
@@ -130,5 +151,41 @@ describe('bot header and onboarding', () => {
     expect(next.a).toEqual({ text: '안녕 공고', chip: '이력서' })
     expect(next.b).toEqual({ text: '다른 Bot' })
     expect(withMaterial({}, 'b', '링크', { text: '' }).b.text).toBe('링크')
+  })
+})
+
+describe('isDrawn', () => {
+  it('lists only the lines the room draws, so no hidden cell adds an 18 gap (ChatPh2, ChatPh3Boost, ChatPh3Review)', () => {
+    const items: ChatItem[] = [
+      { type: 'user', id: 'u', text: '네' },
+      { type: 'think', id: 't', seconds: 2 },
+      { type: 'tool', id: 'tool', action: '공고 읽기', state: 'ok' },
+      { type: 'worked', id: 'w', seconds: 3 },
+      { type: 'error', id: 'e1', text: '사용량', code: 'INSUFFICIENT_CREDITS' },
+      { type: 'error', id: 'e2', text: '실패', code: 'UNKNOWN' },
+      { type: 'agentText', id: 'a', text: '좋아요' },
+    ]
+    expect(items.filter(isDrawn).map((i) => i.id)).toEqual(['u', 'e2', 'a'])
+  })
+})
+
+describe('threadRows', () => {
+  const user: ChatItem = { type: 'user', id: 'u', text: '네, 써 주세요' }
+  const todo: ChatItem = { type: 'todo', id: 'todo', items: [{ label: '요약', state: 'now' }] }
+  const tool: ChatItem = { type: 'tool', id: 'tool', action: '이력서 쓰기', state: 'run' }
+  const paper: ChatItem = { type: 'paper', id: 'p', label: '이력서 초안 v1', heading: '김서준', lines: [] }
+  const ids = (rows: { id: string }[]) => rows.map((r) => r.id)
+
+  it('puts the running line between the cards and the draft being written (ChatPh3)', () => {
+    expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'running', 'p'])
+  })
+
+  it('keeps the line out of the list when no draft is being written (ChatBotStatusWork, Think, Approve)', () => {
+    expect(ids(threadRows([user], true))).toEqual(['u'])
+    expect(ids(threadRows([user, todo], true))).toEqual(['u', 'todo'])
+  })
+
+  it('draws a finished draft as it is, with no line', () => {
+    expect(ids(threadRows([user, todo, paper], false))).toEqual(['u', 'todo', 'p'])
   })
 })

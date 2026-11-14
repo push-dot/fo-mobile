@@ -1,3 +1,4 @@
+import { UPLOAD_ERROR_CODE } from '../../constants'
 import type { ChatItem } from '../../types'
 
 export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
@@ -6,8 +7,11 @@ export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
 export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean }): HeaderLight =>
   input.creditsOut ? 'limit' : input.failed ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
 
-/** The thread ends on a failed run; the next message clears it. */
-export const endsInError = (items: readonly ChatItem[]) => items.at(-1)?.type === 'error'
+/** The thread ends on a failed run; the next message clears it. A failed upload is no run, so it does not count. */
+export const endsInError = (items: readonly ChatItem[]) => {
+  const last = items.at(-1)
+  return last?.type === 'error' && last.code !== UPLOAD_ERROR_CODE
+}
 
 /** Bot lines after the newest line the reader saw at the bottom. Identity, not a count: paging older turns in at the front must not look like news. */
 export const unseenBotMessages = (items: readonly ChatItem[], seenId: string | undefined) => {

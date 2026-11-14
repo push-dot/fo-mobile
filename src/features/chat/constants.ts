@@ -61,6 +61,8 @@ export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 �
 /** A scripted mock step with this wait does not run on a timer: it waits for the mock link `step-next` (ChatBotStatusSteps). */
 export const GATED_STEP = -1
 
+/** The error line of a failed attachment upload carries this code: no run started, so the header lamp stays off (ChatErrUpload). */
+export const UPLOAD_ERROR_CODE = 'UPLOAD_FAILED'
 export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
 export const CHAT_STOP_FORBIDDEN = '다른 담당자가 시작한 작업이라 멈출 수 없어요'
 export const CHAT_STOP_FAILED = '멈추지 못했어요. 한 번 더 눌러 주세요'

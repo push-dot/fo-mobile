@@ -1,7 +1,7 @@
 import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
 import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
-import { profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
+import { copyBody, copyVersionBody, profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
 
 const c = http
 
@@ -163,6 +163,22 @@ export const archiveDocument = (id: string, expectedRevision: number) =>
 
 export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })
+
+/** push-be has no copy route: a new document under the same posting, then the source's latest version saved into it. */
+export const duplicateDocument = async (id: string) => {
+  const source = (await fetchDocument(id)).data
+  const version = (await fetchDocumentVersions(id)).data[0]
+  const made = (await c.post<DataEnvelope<HubDocument>>('documents', { body: copyBody(source) })).data
+  if (!version?.content) return made
+  try {
+    await c.post(`documents/${made.id}/versions`, { body: copyVersionBody(made.revision, version) })
+  } catch (error) {
+    // A copy without its content is worse than none: drop the empty draft, then report the failure.
+    await archiveDocument(made.id, made.revision).catch(() => undefined)
+    throw error
+  }
+  return made
+}
 
 export const convertDocumentProfile = async (id: string) =>
   (await c.post<DataEnvelope<{ documentId: string; jobId?: string }>>(`documents/${id}/profile`, { body: profileConvertBody() })).data

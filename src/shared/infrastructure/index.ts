@@ -19,6 +19,8 @@ export {
   mockFitHolding,
   setMockFitSoon,
   mockFitSoonOn,
+  setMockWebPlan,
+  mockWebPlanOf,
   failMockApple,
   mockAppleFailing,
   hapticImpactLight,

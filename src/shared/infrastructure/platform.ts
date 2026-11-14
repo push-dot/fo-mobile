@@ -45,6 +45,13 @@ export const setMockFitSoon = (on: boolean) => {
 }
 export const mockFitSoonOn = () => mockFitSoon
 
+/** Mock tours (`mock=plan-free`, `plan-ultra`): the WebView mock cannot read the account, so the job page's fit card is told the plan (PRO when none is set): FREE draws the locked card, ULTRA the `이렇게 고치면 N점대` row. */
+let mockWebPlan: 'FREE' | 'ULTRA' | undefined
+export const setMockWebPlan = (plan: 'FREE' | 'ULTRA' | undefined) => {
+  mockWebPlan = plan
+}
+export const mockWebPlanOf = () => mockWebPlan
+
 /** Mock tours (`mock=apple-fail`): the Apple sign-in sheet cannot be driven or made to fail in a tour, so the attempt reports a failure instead of opening it (SignInErrors.4). */
 let mockAppleFails = false
 export const failMockApple = (on: boolean) => {

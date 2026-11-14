@@ -81,6 +81,30 @@ export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
+/**
+ * Whether the room draws a line for this item. The tool, think and worked lines and a refused turn's error are replaced by the status
+ * line and the credit banner (entries/item.tsx returns null for them). A list cell that draws nothing still takes its 18 gap,
+ * so one hidden line made a 36 gap and two made 54 (ChatPh2, ChatPh3Boost, ChatPh3Review): the room never lists them.
+ */
+export const isDrawn = (item: ChatItem) =>
+  item.type !== 'think' && item.type !== 'tool' && item.type !== 'worked' && !(item.type === 'error' && isUsageExhausted(item.code))
+
+/** The running line drawn inside the list (ChatPh3), not above the composer. */
+export type RunningRow = { type: 'running'; id: 'running' }
+export type ThreadRow = ChatItem | RunningRow
+
+/**
+ * The list in order, drawn lines only. A draft card that is still being written (the last line while the run works) is what the
+ * running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running line, draft card).
+ * Every other working state keeps the line above the composer (ChatBotStatusWork, Think, Approve, Steps).
+ */
+export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
+  const drawn = items.filter(isDrawn)
+  const last = drawn.at(-1)
+  if (!working || last?.type !== 'paper') return drawn
+  return [...drawn.slice(0, -1), { type: 'running', id: 'running' }, last]
+}
+
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 
 // A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
@@ -88,8 +112,15 @@ const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' 
 
 const endsInResult = (items: ChatItem[]) => items.findLast((i) => i.type !== 'worked')?.type === 'result'
 
+// The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
+// the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.
+const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'])
+export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type))
+
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
+  // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
+  if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
   if (name) return endsInResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp

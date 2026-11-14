@@ -12,3 +12,4 @@ export const HERO_NAME = 'Push Bot'
 export const FIRST_SCREEN = 8
 export const LIST_BOTTOM = 150
 export const TAB_CLEARANCE = 84
+export const SEARCH_MESSAGE_GAP = 16

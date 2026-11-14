@@ -11,19 +11,23 @@ tags:
     commands:
       - runFlow: _company_tab.yaml
       - runFlow:
-          file: _say.yaml
+          file: _say_run.yaml
           env:
-            KO: "states-file"
-            EN: "states-file"
+            RUN: "states-file"
+            BOT: "b-moa"
+            KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
+            EN: "Fix this file for the Moapay job"
       - extendedWaitUntil:
           visible: ".*김서준_모아페이_백엔드.pdf.*"
           timeout: 30000
       - waitForAnimationToEnd
       - runFlow:
-          file: _say.yaml
+          file: _say_run.yaml
           env:
-            KO: "states-apply"
-            EN: "states-apply"
+            RUN: "states-apply"
+            BOT: "b-moa"
+            KO: "모아페이에 바로 지원해 줘"
+            EN: "Apply to Moapay now"
       - extendedWaitUntil:
           visible: ".*지원했어요 · 마이 › 내 활동에 기록했어요.*"
           timeout: 20000

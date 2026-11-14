@@ -3,7 +3,8 @@ name: 공고 상세 → 지원 서류 → 지원 완료
 tags:
   - visual
 ---
-# The detail body is the fo-web page in a WebView; its mock fit card is the PRO state.
+# The detail body is the fo-web page in a WebView; with no plan switch its mock fit card is the PRO state.
+# FREE (JobDetail.1/.2/.3) is main-10b-job-detail-free.yaml, ULTRA (.7/.8/.9) is main-29-job-detail-ultra.yaml.
 - runFlow: ../flows/_login.yaml
 - runFlow: _open_jobs.yaml
 - extendedWaitUntil:
@@ -29,9 +30,6 @@ tags:
     commands:
       - takeScreenshot: JobDetail.4
       - takeScreenshot: JobDetail.5
-      # FREE panels (JobDetail.1/.2): plan is server state and the fo-web mock only serves this PRO card, so they take the same screen.
-      - takeScreenshot: JobDetail.1
-      - takeScreenshot: JobDetail.2
 - runFlow:
     when:
       platform: Android

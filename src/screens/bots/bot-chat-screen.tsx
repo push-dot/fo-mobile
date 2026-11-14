@@ -32,6 +32,8 @@ import {
   followScroll,
   headerLightOf,
   openBot,
+  threadRows,
+  type ThreadRow,
   threadGreeting,
   retryApproval,
   quickStartPath,
@@ -129,7 +131,9 @@ const Thread = ({ id }: { id: string }) => {
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const greeting: ChatItem[] =
     !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
-  const data = [...chat.items].reverse().concat(greeting)
+  const rows = threadRows(chat.items, !!chat.working)
+  const running = rows.some((r) => r.type === 'running')
+  const data: ThreadRow[] = [...rows].reverse().concat(greeting)
 
   const find = useFind(id)
   const limit = useChatLimit(chat.items)
@@ -138,18 +142,18 @@ const Thread = ({ id }: { id: string }) => {
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
   const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
-  const list = useRef<FlatList<ChatItem>>(null)
-  const itemsRef = useRef(chat.items)
+  const list = useRef<FlatList<ThreadRow>>(null)
+  const dataRef = useRef(data)
   useEffect(() => {
-    itemsRef.current = chat.items
+    dataRef.current = data
   })
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => setAtBottom(e.nativeEvent.contentOffset.y < AT_BOTTOM), [])
   const toBottom = () => list.current?.scrollToOffset({ offset: 0, animated: !reduceMotion })
   const currentId = find.currentId
   useEffect(() => {
     if (!currentId) return
-    const at = itemsRef.current.length - 1 - itemsRef.current.findIndex((i) => i.id === currentId)
-    if (at < itemsRef.current.length) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
+    const at = dataRef.current.findIndex((i) => i.id === currentId)
+    if (at >= 0) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
   const convertRef = useRef(convert.mutate)
@@ -173,16 +177,15 @@ const Thread = ({ id }: { id: string }) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
   })
+  const working = chat.working
   const renderItem = useCallback(
-    ({ item }: { item: ChatItem }) => (
-      <Item
-        item={item}
-        onView={onView}
-        onUsage={onUsage}
-        onReadOff={onReadOff}
-      />
-    ),
-    [onView, onUsage, onReadOff],
+    ({ item }: { item: ThreadRow }) =>
+      item.type === 'running' ? (
+        working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
+      ) : (
+        <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
+      ),
+    [onView, onUsage, onReadOff, working, id, color],
   )
 
   return (
@@ -261,7 +264,7 @@ const Thread = ({ id }: { id: string }) => {
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
             above={
-              chat.working ? (
+              chat.working && !running ? (
                 <StatusRow verbs={chat.working.verbs} startedAt={chat.working.startedAt} onStop={() => stop(id)} color={color} />
               ) : chat.awaiting ? (
                 <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />

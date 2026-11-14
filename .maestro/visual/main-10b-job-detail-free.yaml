@@ -1,0 +1,40 @@
+appId: app.push.mobile
+name: 공고 상세 → FREE 계정의 잠긴 적합도 카드
+tags:
+  - visual
+---
+# plan-free tells the fo-web WebView mock that the account is FREE, so the fit card is the locked one: score ring, blurred bars and
+# the PRO pill (JobDetail.1 iOS light, .2 iOS dark, .3 Android). The pill text waits for billing to load, so it is awaited before the shot.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=plan-free"
+      READY: "새로 올라온 공고"
+- runFlow: _open_jobs.yaml
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 15000
+- tapOn:
+    text: ".*모아페이.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "지원하기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: ".*PRO로 올리면 항목별 점수와 약점을 볼 수 있어요.*"
+    timeout: 30000
+- waitForAnimationToEnd
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: JobDetail.1
+      - takeScreenshot: JobDetail.2
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - takeScreenshot: JobDetail.3
+- openLink: push://?mock=reset

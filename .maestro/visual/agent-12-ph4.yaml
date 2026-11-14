@@ -28,13 +28,10 @@ tags:
 - waitForAnimationToEnd
 - tapOn: "프로필 사진 넣기"
 - takeScreenshot: ChatPh4Design
-# ChatPh5 draws the running save under the 클래식으로 만들기 line alone, so it jumps there in a fresh conversation (the run holds for a minute).
-- runFlow: _fresh_company.yaml
-- runFlow:
-    file: _say.yaml
-    env:
-      KO: "클래식으로 만들기"
-      EN: "ph5"
+# ChatPh5 runs in the thread that came here through the review and the design card: the composer says 작업 중에도 말할 수 있어요 only
+# while a document flow works, and that is known from the flow's cards above the line, so the card's own button answers (its answer
+# line is 클래식으로 만들기, as the board's). No keyboard is up (nothing was typed).
+- tapOn: "클래식으로 만들기"
 - extendedWaitUntil:
     visible: ".*Push 프로필에 저장하는 중.*"
     timeout: 30000

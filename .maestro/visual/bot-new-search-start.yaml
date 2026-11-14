@@ -13,5 +13,9 @@ tags:
 - extendedWaitUntil:
     visible: "검색 닫기"
     timeout: 10000
+# The simulator shows no software keyboard for a field that only took focus; typing one character brings it up, and erasing it
+# leaves the empty field the board draws above the keyboard.
+- inputText: "a"
+- eraseText: 1
 - waitForAnimationToEnd
 - takeScreenshot: BotNewSearchStart
