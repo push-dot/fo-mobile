@@ -3,11 +3,25 @@ tags:
   - subflow
 # Lowers the chat keyboard after _say. iOS hideKeyboard fails and Return would send, so a tap on the static thread text ${TEXT}
 # does it (the thread scroll view dismisses the keyboard on a tap outside the composer); Android does nothing (see below).
+# The tap lands on nothing when the line has scrolled out of the keyboard-high thread (a tour once ended with the keyboard up
+# where the board has none), so when a key is still on screen a drag down over the keyboard dismisses it (the thread list is
+# keyboardDismissMode "interactive"). The boards have no keyboard, so no tour may leave one up.
 ---
 - runFlow:
     when:
       platform: iOS
     commands:
-      - tapOn: ${TEXT}
+      - tapOn:
+          text: ${TEXT}
+          optional: true
+      - waitForAnimationToEnd
+      - runFlow:
+          when:
+            visible: "(스페이스|space)"
+          commands:
+            - swipe:
+                start: "50%,35%"
+                end: "50%,92%"
+                duration: 400
 # Android: _say already lowered the keyboard (hideKeyboard presses back when none is up and would leave the chat), so nothing to do.
 - waitForAnimationToEnd

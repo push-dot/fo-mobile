@@ -26,7 +26,7 @@ const SettingsCareerScreen = () => {
                   accessibilityRole="radio"
                   accessibilityState={{ checked: on }}
                   onPress={() => set({ careerStatusVisibility: v.key })}
-                  style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2] }}
+                  style={{ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2] }}
                 >
                   <View style={{ flex: 1 }}>
                     <Text v="b1">{v.label}</Text>

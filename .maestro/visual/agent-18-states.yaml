@@ -17,7 +17,11 @@ tags:
       - extendedWaitUntil:
           visible: ".*자동으로 골랐어요: 경력 섹션부터 고치기.*"
           timeout: 30000
-      - waitForAnimationToEnd
+      # The boards have no keyboard: a tap on the user's own bubble lowers it (a tap on a bot line opens the Bot's profile).
+      - runFlow:
+          file: _chat_kbd_down.yaml
+          env:
+            TEXT: ".*PDF로 만들어 줘.*"
       - takeScreenshot: ChatStates.1
       - runFlow: _fresh_company.yaml
       - runFlow:
@@ -28,5 +32,8 @@ tags:
       - extendedWaitUntil:
           visible: "확인을 기다리고 있어요"
           timeout: 30000
-      - waitForAnimationToEnd
+      - runFlow:
+          file: _chat_kbd_down.yaml
+          env:
+            TEXT: ".*경력 섹션을 공고에 맞게 고쳐 줘.*"
       - takeScreenshot: ChatStates.2

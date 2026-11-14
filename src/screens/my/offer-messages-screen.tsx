@@ -26,7 +26,7 @@ import {
   useOfferMessages,
   type FailedSend,
 } from '@/features/my'
-import { Glass, GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
@@ -121,7 +121,6 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     })
   const canSend = !!text.trim()
   const ios = Platform.OS === 'ios'
-  const Composer = ios ? Glass : View
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
   const closed = composerClosed(failed, o.canSend)
 
@@ -260,14 +259,15 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             </Text>
           </View>
         ) : (
-          <Composer
+          <View
             style={{
               borderRadius: COMPOSER_RADIUS,
               flexDirection: 'row',
               alignItems: 'flex-end',
               padding: 6,
               gap: spacing[2],
-              backgroundColor: ios ? undefined : c.fill,
+              // Flat on both platforms (ProposalChat board, rule 18: glass is for header buttons); iOS bg2 as the chat composer.
+              backgroundColor: ios ? c.bg2 : c.fill,
             }}
           >
             <TextInput
@@ -313,7 +313,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             >
               <Icon name="up" size={20} color={canSend ? onAccent : c.t3} />
             </Pressable>
-          </Composer>
+          </View>
         )}
       </View>
     </KeyboardAvoidingView>

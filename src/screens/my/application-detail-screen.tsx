@@ -35,7 +35,8 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
-  const doc = docs.data?.data.find((d) => d.applicationId === id)
+  // The résumé of this application; a paged list may not hold it, so the stored fit's document is the fallback.
+  const docId = docs.data?.data.find((d) => d.applicationId === id)?.id ?? detail?.fit?.documentId
   const career = p ? careerLabel(p) : null
   const fit = appliedFit(item?.fitScore, detail?.fit)
 
@@ -117,7 +118,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       )}
       {item ? (
         <CtaBar>
-        <Button label="지원한 서류" variant="secondary" disabled={!doc} onPress={() => doc && router.push(`/docs/push/${doc.id}`)} />
+        <Button label="지원한 서류" variant="secondary" disabled={!docId} onPress={() => docId && router.push(`/docs/push/${docId}`)} />
         <Button label={INTERVIEW_PREP} onPress={() => router.push(botChatPath('push'))} style={{ flex: 1 }} />
         </CtaBar>
       ) : null}

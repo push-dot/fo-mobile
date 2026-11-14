@@ -22,6 +22,9 @@ const LOADING_ROWS = {
   ],
 } as const
 
+/** ProfileDetailMe: the header is a TopBar, not 마이's segmented control, and the board's avatar sits 17pt higher (y168; the page drew it at y185 with 24). */
+const DETAIL_TOP = spacing[6] - 17
+
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
 
 const Section = ({
@@ -64,7 +67,7 @@ const ProfileTab = ({ share = true }: { share?: boolean }) => {
   const status = CAREER_STATUSES.find((s) => s.key === p.careerStatus)?.label ?? ''
 
   return (
-    <View style={{ gap: spacing[6], paddingTop: spacing[6], paddingBottom: spacing[6] }}>
+    <View style={{ gap: spacing[6], paddingTop: share ? spacing[6] : DETAIL_TOP, paddingBottom: spacing[6] }}>
       <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
         <Avatar name={p.displayName} url={p.avatarUrl} size={84} />
         <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
