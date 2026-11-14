@@ -3,13 +3,17 @@ name: BotNewLinkPicked
 tags:
   - visual
 ---
-- runFlow: ../flows/_login.yaml
-- openLink: push://bots/new?posting=p15
+# The board picks 모아페이 · 백엔드 엔지니어 with the pink swatch. The 모아페이 Bot of the fixtures would open its chat instead of the form,
+# so bots:none removes it; p-moa-short is the posting with the board's short title (mock/postings.ts).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=bots:none"
+      READY: "새로 올라온 공고"
+- openLink: push://bots/new?posting=p-moa-short
 - extendedWaitUntil:
-    visible: "바다물류"
+    visible: "백엔드 엔지니어"
     timeout: 20000
-- extendedWaitUntil:
-    visible: "데이터 엔지니어"
-    timeout: 10000
+- tapOn: "pink"
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLinkPicked

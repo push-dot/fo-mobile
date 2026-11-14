@@ -328,6 +328,10 @@ const grantSeed = (): Record<string, SiteGrant[]> => ({
 })
 
 let grants = grantSeed()
+/** `grants:none` / `grants:seed` (links.ts): BotProfile, BotProfileColor and BotProfileMuted draw 모아페이 without the 허용한 사이트 row, BotProfileAllowed with it. */
+export const setGrants = (set: 'none' | 'seed') => {
+  grants = set === 'none' ? {} : grantSeed()
+}
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 /** Tour switches (links.ts). */

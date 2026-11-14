@@ -4,7 +4,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
-import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
+import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
+import { nativeShadow } from '@/theme/native-shadow'
+import { toBoxShadow } from '@/shared/utility'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
@@ -88,6 +90,8 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
+// The board's last `--glassShadow` (the audit layer after the DS one): `0 2px 8px` at .06, .35 in dark. The DS token is `0 6px 24px`, which draws far darker.
+const FIELD_SHADOW = { light: toBoxShadow(nativeShadow('0 2px 8px rgba(0,0,0,.06)')), dark: toBoxShadow(nativeShadow('0 2px 8px rgba(0,0,0,.35)')) }
 // Board: `.field.dis{opacity:.55}` on the picked-posting field and `opacity:.75` on the busy CTA.
 const CREATING_DIM = 0.75
 const FIELD_DIS = 0.55
@@ -232,6 +236,7 @@ const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: 
 const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const mode = useThemeMode()
   const keyboard = useKeyboardHeight()
   const window = useWindowDimensions()
   const xl = isXlBoardText(window.fontScale)
@@ -409,7 +414,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const fieldFont = xl ? 19 : type.b1.fontSize
   const fieldLine = xl ? 29 : type.b1.lineHeight
   const ios = Platform.OS === 'ios'
-  const fieldBox = { height: control, borderRadius: control / 2 }
+  const fieldBox = { height: control, borderRadius: control / 2, ...(ios ? { boxShadow: FIELD_SHADOW[mode] } : null) }
   const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
   const shell = (children: ReactNode, style?: object) =>
     ios ? (
@@ -601,13 +606,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           searchBody
         ) : (
           <>
-            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1], paddingBottom: spacing[3] }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1] }}>
               {preview}
               <View style={{ marginBottom: 'auto' }}>
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
               </View>
-              {mainField}
             </ScrollView>
+            {/* Outside the scroll view, whose clip cut the field's shadow into a line along its bottom edge (BotNew). */}
+            <View style={{ paddingTop: 28, paddingBottom: spacing[3] }}>{mainField}</View>
             {footer}
           </>
         )}
