@@ -25,7 +25,7 @@ const cardEvent = (c: MockCard, now: Date): Unstamped => {
   const resolution = { status: c.status, optionId: null }
   const times = { openedAt: atOf(c.at, now).toISOString(), expiresAt: c.expiresAt === null ? null : atOf(c.expiresAt, now).toISOString(), retryable: c.expiresAt !== null }
   return c.for === 'answer'
-    ? { type: 'choice', id: c.id, title: c.title, options: c.options, resolution, ...times }
+    ? { type: 'choice', id: c.id, title: c.title, options: c.options, ...(c.recommended ? { recommended: c.recommended } : {}), resolution, ...times }
     : { type: 'approval', id: c.id, kind: 'TOOL_ACTION', title: c.title, options: c.options, ...(c.summary ? { summary: c.summary } : {}), resolution, ...times }
 }
 
@@ -88,7 +88,7 @@ mock('GET', 'bots/:id/transcript', ({ params, query }) => {
   const newestFirst = [...turns].reverse()
   const limit = Math.min(Number(query.get('limit') ?? 30), 100)
   const start = Number(query.get('cursor') ?? 0)
-  const next = start + limit < newestFirst.length ? String(start + limit) : null
+  const next = start + limit < newestFirst.length ? String(start + limit) : f.older && start === 0 ? String(limit) : null
   const running = f.job && turns.find((t) => t.id === f.job?.turn)
   const live = start === 0 && running ? { turnId: running.id, lastSeq: running.events.at(-1)?.seq ?? 0 } : null
   const body: BotContract.Transcript = { data: newestFirst.slice(start, start + limit), page: { nextCursor: next, hasMore: next !== null }, live }

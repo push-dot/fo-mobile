@@ -35,4 +35,9 @@ describe('threadBottomGap', () => {
     expect(threadBottomGap(336)).toBe(8)
     expect(threadBottomGap(0)).toBe(16)
   })
+
+  it('adds the 2-line field growth with the keyboard up (ChatKeyboardIOS.2 draws 32), not at rest', () => {
+    expect(threadBottomGap(336, 24)).toBe(32)
+    expect(threadBottomGap(0, 24)).toBe(16)
+  })
 })

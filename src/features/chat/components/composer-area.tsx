@@ -25,10 +25,11 @@ type Props = {
   /** First screen only (see ComposerProps.roomy). */
   roomy?: boolean
   disabled?: boolean
+  onGrow?: (extra: number) => void
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy, disabled }: Props) => {
+export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy, disabled, onGrow }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
@@ -71,6 +72,7 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         onClearAttachment={() => detachDraft(id)}
         accessMode={access.mode}
         disabled={disabled}
+        onGrow={onGrow}
       />
     </View>
   )

@@ -5,7 +5,7 @@ tags:
 ---
 # The sign-in sheets of the three providers cannot run or fail on cue in a tour, so the mock makes each attempt fail:
 # Google and GitHub start with GET auth/<provider>/start (the rule answers 500), Apple through mock=apple-fail.
-# v415 board SignInErrors.5 is the Google failure alert over the sign-in screen; the board has no Apple or GitHub panel, so those shots keep their own names.
+# v415 board SignInErrors, iOS panels 3 Google, 4 Apple, 5 GitHub (dark) failure alert over the sign-in screen; 1 and 2 are the phone code (main-02).
 - clearKeychain
 - launchApp:
     clearState: true
@@ -25,7 +25,7 @@ tags:
     when:
       platform: iOS
     commands:
-      - takeScreenshot: SignInErrors.5
+      - takeScreenshot: SignInErrors.3
 - tapOn: "확인"
 - tapOn: "Apple로 시작하기"
 - extendedWaitUntil:
@@ -36,7 +36,7 @@ tags:
     when:
       platform: iOS
     commands:
-      - takeScreenshot: SignInErrorsApple
+      - takeScreenshot: SignInErrors.4
 - tapOn: "확인"
 - tapOn: "GitHub로 시작하기"
 - extendedWaitUntil:
@@ -47,6 +47,6 @@ tags:
     when:
       platform: iOS
     commands:
-      - takeScreenshot: SignInErrorsGitHub
+      - takeScreenshot: SignInErrors.5
 - tapOn: "확인"
 - openLink: push://?mock=reset

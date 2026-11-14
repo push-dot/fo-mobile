@@ -34,6 +34,8 @@ export type ComposerProps = {
   sending?: boolean
   /** Credit-out state: the box is drawn at half opacity and takes no input. */
   disabled?: boolean
+  /** Height the text field has grown past its first line, so the thread can lift with it (ChatKeyboardIOS.2). */
+  onGrow?: (extra: number) => void
 }
 
 /** Text line on top (17px), control row below: + 첨부 · @ 언급 … send/stop. Shared by both platforms. */
@@ -100,7 +102,12 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
         </Pressable>
       ) : null}
       {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
-      <View>
+      <View
+        onLayout={(e) => {
+          const line = textType.lineHeight * fontScale
+          p.onGrow?.((Math.max(1, Math.round(e.nativeEvent.layout.height / line)) - 1) * line)
+        }}
+      >
         {p.value ? null : (
           <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
             {p.placeholder}

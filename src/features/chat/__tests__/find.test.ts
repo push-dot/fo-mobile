@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch } from '../utils/find'
+import { fromFirst, matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch } from '../utils/find'
 import type { ChatItem } from '../types'
 
 const user = (id: string): ChatItem => ({ type: 'user', id, text: id })
@@ -73,6 +73,17 @@ describe('prependOlder', () => {
     const tool = (id: string): ChatItem => ({ type: 'tool', id, action: '찾기', state: 'ok' })
     const next = prependOlder([tool('tool-1'), user('m2')], [user('m1'), tool('tool-1')])
     expect(next.map((i) => i.id)).toEqual(['m1', 'older-tool-1', 'tool-1', 'm2'])
+  })
+})
+
+describe('fromFirst', () => {
+  const note = (id: string): ChatItem => ({ type: 'notice', id, notice: { kind: 'stopped', resumable: true } })
+  it('drops the lines before the first one of the type and keeps the rest', () => {
+    expect(fromFirst([user('m1'), note('n1'), user('m2'), note('n2')], 'notice').map((i) => i.id)).toEqual(['n1', 'm2', 'n2'])
+  })
+
+  it('keeps the whole thread when no line has the type', () => {
+    expect(fromFirst([user('m1'), user('m2')], 'todo').map((i) => i.id)).toEqual(['m1', 'm2'])
   })
 })
 

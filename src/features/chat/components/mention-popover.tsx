@@ -35,7 +35,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
           ) : (
             groups.map((g) => (
               <View key={g.title}>
-                <Text v="c2" weight="700" color="t3" style={{ paddingTop: spacing[2], paddingHorizontal: 10, paddingBottom: spacing[1] }}>
+                <Text v="c2" weight="700" color="t3" style={{ paddingTop: 9, paddingHorizontal: 10, paddingBottom: 5 }}>
                   {g.title}
                 </Text>
                 {g.items.map((m) => (

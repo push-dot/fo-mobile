@@ -28,7 +28,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
     if (!next) return router.back()
     rename.mutate(next, {
       onSuccess: () => router.back(),
-      onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true, opaque: true }),
+      onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true }),
     })
   }
   return (

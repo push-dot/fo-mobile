@@ -32,6 +32,9 @@ tags:
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow: _dismiss_next.yaml
+# The board's thread starts at the to-do card: the user line and the greeting are older turns.
+- openLink: push://bots/b-moa?mock=bot:b-moa:from:todo
+- waitForAnimationToEnd
 - takeScreenshot: ChatDoneSaveFail
 - runFlow: _fresh_company.yaml
 - runFlow:

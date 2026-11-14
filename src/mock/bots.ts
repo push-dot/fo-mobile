@@ -34,6 +34,8 @@ export type MockCard = {
   at: When
   expiresAt: When | null
   options: { id: string; label: string; desc?: string }[]
+  /** The option the server marks as the suggested one; a stored answer card without it opens with no pick. */
+  recommended?: string
   summary?: string
 }
 
@@ -52,6 +54,8 @@ export type BotFixture = {
   messages: MockMessage[]
   cards: MockCard[]
   job: MockJob | null
+  /** The stored turns are the newest page of a longer thread, so the room draws no greeting above them. */
+  older?: boolean
   /** When the bot's newest run failed. A run, message or card after it replaces the outcome. */
   failedAt?: When
   /** A bot that has said nothing yet but is shown unread, as AgentHomeNoBots draws the Push Bot's first-run dot. Reading it clears this. */
@@ -369,7 +373,7 @@ export const expireCard = () => {
 export const emptyBot = (id: string) => {
   const f = fixtureOf(id)
   if (!f) return
-  Object.assign(f, { messages: [], cards: [], job: null })
+  Object.assign(f, { messages: [], cards: [], job: null, older: false })
   forgetRun(f.bot.id)
   forgetRun(id)
 }
@@ -395,9 +399,10 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
       ],
       cards: [
         { id: 'card-draft-review', turn: 't-draft', for: 'answer', title: '첫 번째 초안(v1)이에요. 이대로 검토할까요?', status: 'PENDING', at: 60, expiresAt: 50, options: [{ id: 'review', label: '검토할게요' }, { id: 'stop', label: '그만하기' }] },
-        { id: 'card-resume', turn: 't-resume', for: 'answer', title: '이어서 작성할까요?', status: 'PENDING', at: 4, expiresAt: null, options: [{ id: '0', label: '이어서 작성하기' }, { id: '1', label: '그만하기' }] },
+        { id: 'card-resume', turn: 't-resume', for: 'answer', title: '이어서 작성할까요?', status: 'PENDING', at: 4, expiresAt: null, options: [{ id: '0', label: '이어서 작성하기' }, { id: '1', label: '그만하기' }], recommended: '0' },
       ],
       job: null,
+      older: true,
       readAt: 0,
     })
     return

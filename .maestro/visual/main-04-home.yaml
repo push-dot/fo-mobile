@@ -19,7 +19,8 @@ tags:
 - takeScreenshot: Main
 # About a third of the screen: the board scrolls past the shortcuts so 마감 임박 공고 sits near the top. A quick swipe, as a thumb
 # does: the tab bar folds into the home circle only on a real downward scroll, and the fold animation finishes before the shot.
-# 612 -> 335 pt on the 874 pt screen: 277 pt, 11 less than the old 70% -> 37% (288 pt), which scrolled the cards to y279 where the board has them at y290.
+# A quick swipe flings to the end of the content, whatever its length: the offset is the content's maximum (283 pt for 277 and 288 pt swipes alike), so the
+# board's 272 pt comes from the home's bottom padding (21 pt), not from the swipe.
 - swipe:
     start: 201, 612
     end: 201, 335

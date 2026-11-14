@@ -31,6 +31,7 @@ import {
   composerPlaceholder,
   endsInError,
   followScroll,
+  hasOlder,
   headerLightOf,
   openBot,
   threadBottomGap,
@@ -127,6 +128,7 @@ const Thread = ({ id }: { id: string }) => {
   const color = bot.data?.kind === 'company' ? bot.data.color : 'push'
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
+  const [grow, setGrow] = useState(0)
   const purchase = usePersonalPurchase()
   const convert = useConvertDocument((documentId) => {
     router.push(`/docs/push/${documentId}`)
@@ -139,8 +141,9 @@ const Thread = ({ id }: { id: string }) => {
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
+  // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
-    !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
+    !empty && !hasOlder(id) && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
   // The waiting line sits above a diff card it asks about, otherwise under the last line (ChatApprove, ChatBotStatusApprove).
   const waitsLine = !!showPanel && waitingLine(chat.approval!, cardIs) !== null
   const rows = threadRows(chat.items, !!chat.working, waitsLine)
@@ -248,7 +251,7 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
           chat.queue.length || (showPanel && !waitsAboveDiff) ? (
@@ -287,6 +290,7 @@ const Thread = ({ id }: { id: string }) => {
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
             working={!!chat.working}
             disabled={!!limit.banner}
+            onGrow={setGrow}
             onStop={() => stop(id)}
             onSend={(text, attachment) => send(id, text, attachment)}
             above={

@@ -58,6 +58,19 @@ describe('bot:<id>:empty', () => {
   })
 })
 
+describe('bot:<id>:resume', () => {
+  it('stores the newest page of a longer thread, with the resume offer suggested', async () => {
+    seedThread('b-moa', 'resume')
+    const page = await api.bots.transcript('b-moa')
+    expect(page.page.nextCursor).not.toBeNull()
+    expect((await api.bots.transcript('b-moa', { cursor: page.page.nextCursor! })).data).toEqual([])
+    const offer = page.data[0]!.events.find((e) => e.type === 'choice')
+    expect(offer).toMatchObject({ options: [{ label: '이어서 작성하기' }, { label: '그만하기' }], recommended: '0' })
+    emptyBot('b-moa')
+    expect((await api.bots.transcript('b-moa')).page.nextCursor).toBeNull()
+  })
+})
+
 describe('bot:<id>:thread and :done', () => {
   const turns = async () => (await api.bots.transcript('b-moa')).data.reverse()
 

@@ -21,7 +21,8 @@ tags:
 - extendedWaitUntil:
     visible: ".*작업을 중지했어요.*"
     timeout: 5000
-- openLink: "push://bots/b-moa?mock=run:"
+# The board's thread starts at the stop line: the first request and its card are older turns.
+- openLink: "push://bots/b-moa?mock=run:,bot:b-moa:from:notice"
 - runFlow:
     file: _say.yaml
     env:

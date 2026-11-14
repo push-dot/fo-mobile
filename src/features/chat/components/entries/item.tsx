@@ -331,6 +331,9 @@ const Projected = ({ label, bullets, open, onToggle }: { label: string; bullets:
 
 // iOS draws the 40pt numeral ~6pt higher in its 44pt line box than the board (card top to numeral 15.6 vs 21, '/ 10' 8pt low); the shift grows with the text size.
 const FIT_DROP = 6
+// The board's score row under .ph's tracking: the numbers keep the page's -0.32px instead of an em scale, and the 22pt number's normal line sits 2pt lower than the 44pt line (row 45.9).
+const NOTE_TRACKING = -0.32
+const NOTE_ROW_LEAD = 2
 
 const useFitDrop = () => {
   const { fontScale } = useWindowDimensions()
@@ -344,7 +347,7 @@ const FitNum = ({ size, color, children, rowDrop }: { size: 'mid' | 'big'; color
       v={size === 'big' ? 'h1' : 'h2'}
       weight="800"
       color={color}
-      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: rowDrop ? 0 : drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
+      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: rowDrop ? NOTE_TRACKING : -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: rowDrop ? 0 : drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'], ...(rowDrop ? { letterSpacing: NOTE_TRACKING } : null) }}
     >
       {children}
     </Text>
@@ -357,16 +360,17 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const open = paymentsOpen(useChatAccount(true).data)
   const onPlan = open ? planEntry : undefined
   const view = fitChrome(item, open)
-  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10 and 16 under, so the card follows the teaser's state.
+  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10, 16 between its rows and 16 under, so the card follows the teaser's state.
   const [projectedOpen, setProjectedOpen] = useState(false)
-  const compact = !view.locked && !item.note && item.from === undefined && !(view.projected && projectedOpen)
+  const opened = !!view.projected && projectedOpen
+  const compact = !view.locked && !item.note && item.from === undefined && !opened
   const drop = useFitDrop()
   const head = item.note ? (
     // 점수 올리기: before → after, one bar, the note. The row drops as one so the baselines stay shared.
-    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2], transform: [{ translateY: drop }] }}>
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2], paddingBottom: NOTE_ROW_LEAD, transform: [{ translateY: drop }] }}>
       {item.from !== undefined ? (
         <>
-          <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>
+          <FitNum size="mid" color="t3" rowDrop>{item.from.toFixed(1)}</FitNum>
           <Text color="t3">→</Text>
         </>
       ) : null}
@@ -397,7 +401,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
     </View>
   )
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View style={{ gap: opened ? spacing[4] : spacing[3] }}>
       <Appear style={compact ? { gap: spacing[2], padding: spacing[4], paddingBottom: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2 } : { gap: 10, padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
         {head}
         {view.locked ? (
