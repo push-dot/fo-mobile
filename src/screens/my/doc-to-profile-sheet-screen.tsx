@@ -96,14 +96,15 @@ const DocToProfileSheetScreen = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: spacing[2],
-            paddingVertical: spacing[3],
+            // DocToProfile: the note is one 18pt line, 14 (the sheet gap) from the rows and from the CTA, 6 between "!" and the text.
+            gap: 6,
+            paddingHorizontal: spacing[1],
           }}
         >
           <Text v="c1" weight="800" color="orange">
             !
           </Text>
-          <Text v="c1" style={{ flex: 1 }}>
+          <Text v="c1" color="t2" style={{ flex: 1 }}>
             {warning}
           </Text>
         </View>

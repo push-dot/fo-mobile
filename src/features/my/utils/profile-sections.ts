@@ -5,6 +5,12 @@ import { tenureLabel } from './tenure-label'
 type Draft = ResumeDraft['profile']
 type Current = Pick<Profile, keyof Draft>
 
+/** DocToProfile draws the intro's first sentence with an ellipsis for the rest ("…개발자예요…"), not the whole paragraph cut by the row's width. */
+export const introSummary = (intro: string) => {
+  const first = intro.split(/(?<=[.!?])\s+/)[0] ?? intro
+  return first.length < intro.trim().length ? `${first.replace(/[.!?]$/, '')}…` : intro
+}
+
 const SECTIONS = [
   {
     key: 'basic',
@@ -16,7 +22,7 @@ const SECTIONS = [
         .filter(Boolean)
         .join(' · '),
   },
-  { key: 'intro', label: '소개', on: true, fields: ['intro'], sub: (d: Draft) => d.intro },
+  { key: 'intro', label: '소개', on: true, fields: ['intro'], sub: (d: Draft) => introSummary(d.intro) },
   {
     key: 'career',
     label: '경력',

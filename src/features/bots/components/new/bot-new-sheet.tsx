@@ -212,7 +212,7 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
 
 // BotNewConsent is the platform's own sheet: the floating iOS sheet, the Android bottom sheet. Back and the scrim close it.
 const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => (
-  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} onClose={onLater}>
+  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} gap={12} onClose={onLater}>
     <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
       {CONSENT_TITLE}
     </Text>
@@ -220,7 +220,8 @@ const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: 
       {CONSENT_BODY}
     </Text>
     <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
-      <Text v="c1" weight="600" color="acText" style={{ textDecorationLine: 'underline' }}>
+      {/* Owner rule 3: the link is black (the board's t1); the accent stays on the main button. */}
+      <Text v="c1" weight="600" style={{ textDecorationLine: 'underline' }}>
         {CONSENT_MORE}
       </Text>
     </View>

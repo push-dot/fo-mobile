@@ -7,7 +7,8 @@ import { radius, spacing, useColors } from '../../../../theme'
 
 const FLOAT_RADIUS = 40
 
-export const SheetCard = ({ label, title, onClose, children }: { label: string; title?: string; onClose: () => void; children: ReactNode }) => {
+/** `gap` overrides the board's default between the sheet's rows (8 on iOS, 14 on Android); BotNewConsent draws 12 on both. */
+export const SheetCard = ({ label, title, gap, onClose, children }: { label: string; title?: string; gap?: number; onClose: () => void; children: ReactNode }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const float = Platform.OS === 'ios'
@@ -19,7 +20,7 @@ export const SheetCard = ({ label, title, onClose, children }: { label: string; 
         paddingHorizontal: spacing[4],
         paddingTop: spacing[3],
         paddingBottom: spacing[5],
-        gap: spacing[2],
+        gap: gap ?? spacing[2],
       }
     : {
         backgroundColor: c.bg,
@@ -28,7 +29,7 @@ export const SheetCard = ({ label, title, onClose, children }: { label: string; 
         paddingHorizontal: spacing[5],
         paddingTop: spacing[3],
         paddingBottom: insets.bottom + spacing[3],
-        gap: 14,
+        gap: gap ?? 14,
       }
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
