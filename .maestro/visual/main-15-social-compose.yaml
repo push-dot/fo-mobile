@@ -25,6 +25,11 @@ tags:
 - tapOn:
     id: "compose-body"
 - inputText: "정산 배치를 맡으며 배운 것을 정리했어요"
+# The keyboard covers the photo button (a tap at its centre lands on a QuickType candidate and types ㅈ): scroll the form up first, as a user does.
+- swipe:
+    start: 50%, 48%
+    end: 50%, 22%
+- waitForAnimationToEnd
 - tapOn: "사진 추가.*"
 - extendedWaitUntil:
     visible: "사진 추가, 2/4"
