@@ -7,7 +7,7 @@ import { isAppleCancel } from '../../features/auth/utils/auth-flow'
 import { api } from './api-client'
 import { AUTH_REDIRECT_URI } from './constants'
 import { createPkce } from './pkce'
-import { openAuthSession } from './platform'
+import { mockAppleFailing, openAuthSession } from './platform'
 import { useSession } from './session-store'
 
 export type SignInOutcome =
@@ -44,6 +44,7 @@ export const signIn = async (provider: 'google' | 'github'): Promise<SignInOutco
 }
 
 export const signInWithApple = async (): Promise<SignInOutcome> => {
+  if (mockAppleFailing()) return { kind: 'failed' }
   if (Platform.OS !== 'ios') return { kind: 'failed' }
   const AppleAuthentication = await import('expo-apple-authentication')
   const raw = bytesToBase64Url(Crypto.getRandomBytes(32))

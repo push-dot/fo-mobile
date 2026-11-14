@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { spacing, useColors, useThemeMode } from '../../theme'
-import { detailUrl, HOLD_FIT_SCRIPT, textSizeScript, type DetailFrom } from './detail-url'
-import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, openBrowser, useSession } from '../infrastructure'
+import { detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript, type DetailFrom } from './detail-url'
+import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, mockFitSoonOn, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import Text from './text'
 
@@ -22,7 +22,7 @@ const DetailWebView = ({ path, from, onBridge }: Props) => {
   const [failed, setFailed] = useState(false)
   const zoom = Math.round(useWindowDimensions().fontScale * 100)
   const applyZoom = Platform.OS === 'ios' ? textSizeScript(zoom) : undefined
-  const [boot] = useState(() => `window.__PUSH__=${JSON.stringify({ token, apiBaseUrl: API_BASE_URL, mock: API_MOCK, theme: mode })};${applyZoom ?? ''}${API_MOCK && mockFitHolding() ? HOLD_FIT_SCRIPT : ''}true;`)
+  const [boot] = useState(() => `window.__PUSH__=${JSON.stringify({ token, apiBaseUrl: API_BASE_URL, mock: API_MOCK, theme: mode })};${applyZoom ?? ''}${API_MOCK && mockFitHolding() ? HOLD_FIT_SCRIPT : ''}${API_MOCK && mockFitSoonOn() ? SOON_FIT_SCRIPT : ''}true;`)
 
   useEffect(() => {
     ref.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('push:token',{detail:{token:${JSON.stringify(token)}}}));true;`)

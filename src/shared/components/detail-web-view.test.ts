@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detailFrom, detailUrl, HOLD_FIT_SCRIPT, textSizeScript } from './detail-url'
+import { detailFrom, detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript } from './detail-url'
 
 describe('detail url', () => {
   it('url carries theme and mock', () => {
@@ -51,5 +51,21 @@ describe('mock fit hold script (JobFit)', () => {
     stack = 'anonymous@\n@http://localhost:5174/src/pages/posting/fit-card.tsx:41:30'
     win.setTimeout(() => undefined, 250)
     expect(delays).toEqual([0, 250])
+  })
+})
+
+describe('soon fit script', () => {
+  it('imports fo-web mock from the page origin and makes the fit score throw', async () => {
+    const mockFit = { score: 6.9 }
+    const imports: string[] = []
+    const win = { location: { origin: 'http://localhost:5174' } }
+    new Function('location', 'Object', 'importModule', SOON_FIT_SCRIPT.replace('import(', 'importModule('))(win.location, Object, (url: string) => {
+      imports.push(url)
+      return Promise.resolve({ mockFit })
+    })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(imports).toEqual(['http://localhost:5174/src/shared/api/mock.ts'])
+    expect(() => mockFit.score).toThrow('mock fit soon')
   })
 })

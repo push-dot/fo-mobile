@@ -1,0 +1,36 @@
+appId: app.push.mobile
+name: 공고 상세 → 적합도는 곧 볼 수 있어요
+tags:
+  - visual
+---
+# mock=fit-soon makes the fit request of the job page's WebView fail after the document is known, so the card stays on
+# 적합도는 곧 볼 수 있어요 with the document name and three dashes (JobDetailStates.1).
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=fit-soon"
+      READY: "새로 올라온 공고"
+- runFlow: _open_jobs.yaml
+- extendedWaitUntil:
+    visible: ".*모아페이.*"
+    timeout: 15000
+- tapOn:
+    text: ".*모아페이.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "지원하기"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: ".*적합도는 곧 볼 수 있어요.*"
+    timeout: 30000
+- extendedWaitUntil:
+    visible: "자격 요건"
+    timeout: 20000
+- waitForAnimationToEnd:
+    timeout: 4000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - takeScreenshot: JobDetailStates.1
+- openLink: push://?mock=reset
