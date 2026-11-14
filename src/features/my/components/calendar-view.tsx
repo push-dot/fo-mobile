@@ -30,17 +30,17 @@ const CalendarView = () => {
 
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: spacing[4], paddingHorizontal: spacing[5] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], paddingTop: spacing[3], paddingLeft: spacing[5], paddingRight: spacing[3] }}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${dayTitle(selected, today)}, 달력 열기`}
           onPress={() => router.push('/activity/calendar')}
-          style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}
+          style={{ flex: 1, minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}
         >
           <Text v="h2" accessibilityRole="header" numberOfLines={1} style={{ flexShrink: 1 }}>
             {dayTitle(selected, today)}
           </Text>
-          <Icon name="down" size={18} color="t1" />
+          <Icon name="down" size={20} color="t1" />
         </Pressable>
         <Pressable
           accessibilityRole="button"
@@ -48,13 +48,13 @@ const CalendarView = () => {
           onPress={() => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } })}
           style={{ height: 44, paddingHorizontal: spacing[1], justifyContent: 'center' }}
         >
-          <Text v="b1" weight="600" color="acText">
+          <Text v="h3" weight="600" color="acText">
             추가
           </Text>
         </Pressable>
       </View>
       {data ? (
-        <Text v="c1" color="t3" style={{ paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[5] }}>
+        <Text v="c1" color="t3" style={{ paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
           {data.google.connected ? 'Google 캘린더 연결됨' : 'Google 연결 안 됨'}
         </Text>
       ) : null}

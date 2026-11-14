@@ -13,6 +13,7 @@ import { emptyFeed } from './social'
 // set up, and these modules import it back. A top-level import here left `http` undefined and crashed every launch of a mock build.
 const chat = () => require('../features/chat') as typeof import('../features/chat')
 const infra = () => require('../shared/infrastructure') as typeof import('../shared/infrastructure')
+const components = () => require('../shared/components') as typeof import('../shared/components')
 const queryClient = () => (require('../providers/query-client') as typeof import('../providers/query-client')).queryClient
 /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -49,7 +50,7 @@ const MATERIAL_SET = /^materials:(?:(none|long)|(doc|bookmark|link):none)$/
 // Tours reach states the fixtures can't hold through a link like push://social?mock=empty-feed (the router still opens the path).
 // `mock=` takes comma-separated switches: empty-feed, unread-deadline (the 마감 임박 알림 arrives unread), phone-social (the phone screen opens as after a Google sign-in, PhoneInput), close-moapay (모아페이 백엔드 closes within a week), consent-on (참고 데이터 제공 already on), plan-ultra, credits-out (an ULTRA account / spent credits), payments-closed (chat/account says paymentsEnabled false: no buy button anywhere), few-materials (2 bookmarks, 2 documents, 1 link), pick-file (the next file pick returns the resume PDF, Uploading with `hang:POST:sources`), fit-comparing (a job's fit card stays on 비교하는 중, JobFit), fit-soon (a job's fit card says 적합도는 곧 볼 수 있어요, JobDetailStates.1), apple-fail (the Apple sign-in attempt fails, SignInErrors.4; Google and GitHub fail with a `fail:GET:auth/.*/start` rule), upload-fail (the next file pick in 자료 고르기 returns the resume PDF and sending it fails to upload, ChatErrUpload), two-photos (the next photo pick in 새 글 returns two images, ComposeSheet), clipboard-link (the pasteboard holds the 모아페이 posting link, QsLink), long-intro (the profile intro gets its second paragraph, EditIntro), blocked-by-them (오지현 and 최지우 blocked the viewer: their chats refuse messages, 최지우's hub offer sheet refuses), run:<chat token>, reset, or a rule (see toRule).
 // Bot and material switches: bots:none (only the Push Bot), bots:long (AgentHomeLong), bots:limit (FREE at its limit), bot:<id>:muted, bot:<id>:empty (no thread yet, so the chat opens on its greeting), bot:<id>:thread / bot:<id>:done (ChatBotHeader's finished chat / ChatBotStatusDone's one request), step-next (the next line of run:st-steps, ChatBotStatusSteps), bot:<id>:late (a bot answer lands in the open chat, ChatBotHeaderNew),
-// card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), materials:none, materials:long, materials:<doc|bookmark|link>:none.
+// card:expired (모아페이's page-read card ran out, ChatBotStatusExpired), upload-toast (the 올렸어요 toast of a finished upload while the next file is still going up, Uploading), materials:none, materials:long, materials:<doc|bookmark|link>:none.
 export const listenMockLinks = () =>
   Linking.addEventListener('url', ({ url }) => {
     const specs = decodeURIComponent(/[?&]mock=([^&#]*)/.exec(url)?.[1] ?? '').split(',').filter(Boolean)
@@ -60,6 +61,11 @@ export const listenMockLinks = () =>
       infra().stubPickImage([photo(require('../../assets/icon.png'), 'photo-1.png'), photo(require('../../assets/splash-icon.png'), 'photo-2.png')])
     if (specs.includes('step-next')) chat().nextMockStep()
     if (specs.includes('pick-file')) infra().stubPickDocument([RESUME_FILE])
+    // Uploading draws the toast of an earlier upload over a row still going up; the app holds one upload at a time, so the tour raises the toast itself.
+    if (specs.includes('upload-toast')) {
+      const { showToast, TOAST_ABOVE } = components()
+      showToast({ message: '이력서 파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs })
+    }
     if (specs.includes('upload-fail')) {
       infra().stubPickDocument([RESUME_FILE])
       infra().failMockUploads(true)

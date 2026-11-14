@@ -30,4 +30,10 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 3000
+# The board shows the toast of the earlier upload over the row that is still going up. The app holds one upload at a time, so the
+# link raises that toast (mock=upload-toast, shown 2.5 s) and the shot follows at once.
+- openLink: push://my?mock=upload-toast
+- extendedWaitUntil:
+    visible: "이력서 파일을 올렸어요"
+    timeout: 5000
 - takeScreenshot: Uploading

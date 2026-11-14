@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { GlassButton, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useCalendarEvents } from '../api/hooks'
 import { dayTitle, monthGrid, sameDay } from '../utils'
 
 const DAY_SIZE = 30
+// The iOS sheet pads its content 16; the board's month sits 8 from the sheet edge and pads the rows 12 itself.
+const SHEET_INSET = Platform.OS === 'ios' ? spacing[2] : 0
+const ROW_PAD = SHEET_INSET ? spacing[3] : 0
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
 /** The board's MyCalendarModal body: a month with prev/next, one grey dot per day that has events. */
@@ -19,22 +22,27 @@ const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date)
   const events = data?.data ?? []
   const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1))
   return (
-    <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], paddingBottom: spacing[2] }}>
+    <View style={{ marginHorizontal: -SHEET_INSET, gap: spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], paddingLeft: ROW_PAD, paddingRight: SHEET_INSET ? spacing[1] : 0 }}>
         <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
           {month.getFullYear()}년 {month.getMonth() + 1}월
         </Text>
-        <GlassButton actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
-        <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
+        {/* The 44pt buttons overlap the row by 4 above and below, so the row is the board's 36 high. */}
+        <View style={{ marginVertical: -spacing[1] }}>
+          <GlassButton actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
+        </View>
+        <View style={{ marginVertical: -spacing[1] }}>
+          <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
+        </View>
       </View>
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: 'row', paddingHorizontal: ROW_PAD }}>
         {WEEK.map((w) => (
           <Text key={w} v="c2" weight="700" color="t3" style={{ flex: 1, textAlign: 'center' }}>
             {w}
           </Text>
         ))}
       </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingTop: spacing[1] }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingTop: spacing[1], paddingBottom: SHEET_INSET, paddingHorizontal: ROW_PAD }}>
         {cells.map((d) => {
           const inMonth = d.getMonth() === month.getMonth()
           const isSel = sameDay(d, selected)

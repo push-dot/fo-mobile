@@ -9,6 +9,7 @@ import {
   askDocName,
   Avatar,
   careerPeriod,
+  DOC_COPY_COPY,
   DOC_RENAME_COPY,
   DOC_TITLE_MAX,
   deleteConfirm,
@@ -27,6 +28,7 @@ import {
   tenureLabel,
   useArchiveDocument,
   useDocument,
+  useDuplicateDocument,
   useDocumentVersions,
   useIngestJob,
   useMyApplications,
@@ -89,6 +91,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   const deleteCopy = deleteDocCopy(doc.data?.data.title ?? '')
   const archive = useArchiveDocument(doc.data?.data)
   const rename = useRenameDocument(doc.data?.data)
+  const duplicate = useDuplicateDocument()
   const [based, setBased] = useState(false)
   const setBase = useSetBaseProfile(() => {
     setBased(true)
@@ -128,6 +131,13 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           onSave: (name) => rename.mutate(name, { onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true, opaque: true }) }),
           fallback: () => router.push(`/docs/push/${id}/rename`),
         }),
+      duplicate: () => {
+        if (duplicate.isPending) return
+        duplicate.mutate(id, {
+          onSuccess: () => showToast({ message: DOC_COPY_COPY.done }),
+          onError: () => showToast({ message: DOC_COPY_COPY.failed, alert: true, opaque: true }),
+        })
+      },
       delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, removeDoc)),
     },
   )

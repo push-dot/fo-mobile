@@ -23,8 +23,7 @@ tags:
     visible: "PDF로 내보내기"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: PushDocViewMenuNoDuplicate
-# PushDocViewMenu draws 복제하기, which the app has no call for: the same menu is shot under its name so the capture is judged against it.
+# The menu has 복제하기 (a copy under the same posting), so it is PushDocViewMenu. PushDocViewMenuNoDuplicate draws the menu without it, a state the app no longer has.
 - takeScreenshot: PushDocViewMenu
 - tapOn: "이름 바꾸기"
 - extendedWaitUntil:
@@ -113,16 +112,9 @@ tags:
 - extendedWaitUntil:
     visible: "서류를 삭제하지 못했어요"
     timeout: 10000
-# After the failed delete the document stays open and 뒤로 does nothing (an app defect, see STEP2-REMAINDER-DEFECTS), so the list is reached through
-# the tab link: the mock rules stay, and the 서류 tab shows the uploaded files.
-- openLink: push://my
+# After the failed delete the document stays open under the failure toast; 뒤로 goes back to the 서류 tab (the toast takes no touches outside its action).
+- tapOn: "뒤로"
 - waitForAnimationToEnd
-# The link opens 마이 on the tab it was left on (서류); tap the tab only when the file list is not there.
-- runFlow:
-    when:
-      notVisible: "올린 파일"
-    commands:
-      - tapOn: "서류"
 - extendedWaitUntil:
     visible: "올린 파일"
     timeout: 10000

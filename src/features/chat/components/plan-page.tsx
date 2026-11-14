@@ -121,21 +121,28 @@ export const PlanPage = () => {
   )
 }
 
+// The board's rows: 10 between the dot and the line, 16 between rows, 24pt lines; the foot sits 8 lower than a row gap.
+const NOTICE_LINE = 24
+const DOT_WIDTH = 4
+
 /** 구독 안내 (PlanNotice): the long notice, one page. */
 export const PlanNoticePage = () => (
   <PageModal title="구독 안내" tight left={<GlassButton actions={[...back]} />}>
-    <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[3] }}>
+    <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[4] }}>
       {PLAN_NOTICES.map((line) => (
-        <View key={line} style={{ flexDirection: 'row', gap: spacing[2] }}>
-          <Text v="b2" color="t3">
-            ·
-          </Text>
-          <Text v="b2" color="t2" style={{ flex: 1 }}>
+        <View key={line} style={{ flexDirection: 'row', gap: 10 }}>
+          {/* The shared font draws a Korean "·" 5pt wider than the board's, so the dot sits in a fixed box and the text starts where the board's does. */}
+          <View style={{ width: DOT_WIDTH, alignItems: 'center' }}>
+            <Text v="b2" color="t3" numberOfLines={1} style={{ width: 20, textAlign: 'center' }}>
+              ·
+            </Text>
+          </View>
+          <Text v="b2" color="t2" style={{ flex: 1, lineHeight: NOTICE_LINE }}>
             {line}
           </Text>
         </View>
       ))}
-      <Text v="c1" color="t3" style={{ paddingTop: spacing[2] }}>
+      <Text v="c1" color="t3" style={{ marginTop: spacing[2] }}>
         {PLAN_NOTICE_FOOT}
       </Text>
     </View>
