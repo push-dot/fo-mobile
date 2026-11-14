@@ -15,6 +15,7 @@ const PageModal = ({
   title,
   right,
   left,
+  nav,
   children,
   footer,
   tight,
@@ -25,6 +26,8 @@ const PageModal = ({
   title: string
   right?: ReactNode
   left?: ReactNode
+  /** The header is the boards' `.topbar.nav` (PlanUltra, PlanUltraNotice): 12 on iOS. A `left` alone (usage, ChatAccountUsage: padding 20) keeps 20. */
+  nav?: boolean
   children: ReactNode
   footer?: ReactNode
   tight?: boolean
@@ -37,7 +40,7 @@ const PageModal = ({
   const ios = Platform.OS === 'ios'
   return (
     <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: headerInset(ios, left != null), paddingBottom: tight ? 0 : spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: headerInset(ios, !!nav), paddingBottom: tight ? 0 : spacing[2] }}>
         {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}

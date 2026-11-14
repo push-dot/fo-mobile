@@ -33,10 +33,12 @@ describe('SettingsRow', () => {
     expect(props?.weight).toBeUndefined()
   })
 
-  it('draws the chevron in t3 (the board .grp .it .v) with or without a value, also on the entry row', () => {
+  it('draws the chevron in t3 only for rows whose board value sits in .v, otherwise in the label colour t1', () => {
     const chevron = (props: Parameters<typeof SettingsRow>[0]) => findAll(SettingsRow(props), 'Icon')[0]?.props
-    expect(chevron({ label: '커리어 상태', value: '모두에게', onPress: vi.fn() })).toMatchObject({ name: 'chev', size: 16, color: 't3' })
-    expect(chevron({ label: '고객센터', onPress: vi.fn() })).toMatchObject({ name: 'chev', size: 16, color: 't3' })
-    expect(chevron({ label: '차단한 사람', entry: true, onPress: vi.fn() })).toMatchObject({ color: 't3' })
+    expect(chevron({ label: '커리어 상태', onPress: vi.fn(), mutedChevron: true })).toMatchObject({ name: 'chev', size: 16, color: 't3' })
+    expect(chevron({ label: '차단한 사람', entry: true, onPress: vi.fn(), mutedChevron: true })).toMatchObject({ color: 't3' })
+    expect(chevron({ label: '고객센터', onPress: vi.fn() })).toMatchObject({ color: 't1' })
+    expect(chevron({ label: '약관 및 정책', onPress: vi.fn() })).toMatchObject({ color: 't1' })
+    expect(chevron({ label: '이력서', value: '3개', onPress: vi.fn() })).toMatchObject({ color: 't3' })
   })
 })

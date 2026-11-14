@@ -80,6 +80,7 @@ export const PlanPage = () => {
       title="플랜"
       tight
       page
+      nav
       left={<GlassButton actions={[...back]} />}
       footer={
         account?.plan === 'ULTRA' ? (
@@ -128,7 +129,7 @@ const NOTICE_LINE = 24
 
 /** 구독 안내 (PlanNotice): the long notice, one page. */
 export const PlanNoticePage = () => (
-  <PageModal title="구독 안내" tight left={<GlassButton actions={[...back]} />}>
+  <PageModal title="구독 안내" tight nav left={<GlassButton actions={[...back]} />}>
     <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[4] }}>
       {PLAN_NOTICES.map((line) => (
         <View key={line} style={{ flexDirection: 'row', gap: 10 }}>

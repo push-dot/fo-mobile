@@ -61,11 +61,12 @@ tags:
     visible: ".*최대 5번까지 올렸어요.*"
     timeout: 40000
 - waitForAnimationToEnd
-# The board has no keyboard (the thread still holds the one _say left up): lower it before the shot.
+# The board has no keyboard (the thread still holds the one _say left up): lower it before the shot. The tap lands on the user's own line:
+# a tap on a bot line opens the Bot's profile (agent-07, agent-15).
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
-      TEXT: ".*최대 5번까지 올렸어요.*"
+      TEXT: ".*좋아요, 계속해 주세요.*"
 - takeScreenshot: ChatPh3BoostStop.1
 - runFlow: _fresh_company.yaml
 # run:boost-stuck plays the stuck run for the board's own user line, so no mock token shows in the bubble.
@@ -82,7 +83,7 @@ tags:
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
-      TEXT: ".*더 올리기 어려워서 여기서 멈출게요.*"
+      TEXT: ".*좋아요, 계속해 주세요.*"
 - takeScreenshot: ChatPh3BoostStop.3
 # The writing state holds for a minute (to-do 1/5, the draft card streaming), so this one goes last.
 - runFlow: _fresh_company.yaml
