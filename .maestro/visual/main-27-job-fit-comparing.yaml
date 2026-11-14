@@ -23,4 +23,9 @@ tags:
 - extendedWaitUntil:
     visible: ".*비교하는 중.*"
     timeout: 20000
+- extendedWaitUntil:
+    visible: "자격 요건"
+    timeout: 20000
+- waitForAnimationToEnd:
+    timeout: 4000
 - takeScreenshot: JobFit
