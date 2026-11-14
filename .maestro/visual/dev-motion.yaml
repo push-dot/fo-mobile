@@ -6,12 +6,16 @@ tags:
 # Dev-only diagnostic (mock build): every entry motion beside the rect it must end on, once with Reduce Motion off and once on.
 # The device setting is flipped through the run's own listener (coverage/motion-check/motion-run.sh) and the app relaunches, so
 # the app reads the new value at launch like a real user who changed it in Settings.
-- evalScript: ${http.get('http://127.0.0.1:8123/rm/OFF')}
-- runFlow: ../flows/_login.yaml
-- openLink: push://dev/motion
-- extendedWaitUntil:
-    visible: "RM off"
-    timeout: 20000
+# The simulator can take a moment to hand a new setting to a fresh app process, so the whole open is retried until the page reads RM off.
+- retry:
+    maxRetries: 3
+    commands:
+      - evalScript: ${http.get('http://127.0.0.1:8123/rm/OFF')}
+      - runFlow: ../flows/_login.yaml
+      - openLink: push://dev/motion
+      - extendedWaitUntil:
+          visible: "RM off"
+          timeout: 20000
 - extendedWaitUntil:
     visible: "done 1"
     timeout: 30000
@@ -42,12 +46,16 @@ tags:
           timeout: 3000
 - takeScreenshot: Motion.5
 
-- evalScript: ${http.get('http://127.0.0.1:8123/rm/ON')}
-- runFlow: ../flows/_login.yaml
-- openLink: push://dev/motion
-- extendedWaitUntil:
-    visible: "RM on"
-    timeout: 20000
+# The simulator can take a moment to hand a new setting to a fresh app process, so the whole open is retried until the page reads RM on.
+- retry:
+    maxRetries: 3
+    commands:
+      - evalScript: ${http.get('http://127.0.0.1:8123/rm/ON')}
+      - runFlow: ../flows/_login.yaml
+      - openLink: push://dev/motion
+      - extendedWaitUntil:
+          visible: "RM on"
+          timeout: 20000
 - extendedWaitUntil:
     visible: "done 1"
     timeout: 30000
