@@ -160,7 +160,7 @@ const ProfileTab = ({ share = true }: { share?: boolean }) => {
         )}
       </Section>
 
-      <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[2]}>
+      <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[3]}>
         {p.skills.length === 0 ? (
           <Text v="b2" color="t3">
             아직 등록한 기술이 없어요.

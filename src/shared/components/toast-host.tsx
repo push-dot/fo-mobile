@@ -10,6 +10,8 @@ import { hideToast, toastDuration, topSheet, useHostedToast, useToastStore } fro
 import { useReduceMotion } from './use-reduce-motion'
 
 const ACTION_HEIGHT = 44
+// iOS banner: the 44pt action sits in the 64pt board card, so the padding is (64 - 44) / 2 = 10 (12 made the card 68).
+const TOAST_IOS_PAD = 10
 // v415 boards: iOS shows a top notification banner (.ibanner: 8pt side margin, 26pt corners, min-height 64, one line, no app tile: rule 16), Android the Material snackbar (8pt side margin, 4pt corners).
 const SHAPE = Platform.OS === 'ios'
   ? { inset: spacing[2], radius: 26, shadow: cssShadow.banner, minHeight: 64, top: 2 }
@@ -81,8 +83,8 @@ const ToastHost = () => {
       }}
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
-        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: shape.minHeight, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action && !ios ? spacing[2] : spacing[4], paddingVertical: ios ? spacing[3] : 0 }}>
-          <Text v="b2" weight="600" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
+        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: shape.minHeight, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action && !ios ? spacing[2] : spacing[4], paddingVertical: ios ? TOAST_IOS_PAD : 0 }}>
+          <Text v="b2" weight="600" pointerEvents="none" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
             {toast.message}
           </Text>
           {toast.action ? (

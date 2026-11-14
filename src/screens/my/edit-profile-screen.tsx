@@ -34,6 +34,7 @@ import {
   ymToDate,
   SheetHeader,
   SKILL_CATALOG,
+  skillSuggestions,
   tenureLabel,
   uploadAvatarImage,
   useMyProfile,
@@ -60,11 +61,10 @@ import {
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
-import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
-/** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
-const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
+// v415 EditCareer / DeleteCareer: every field in a career card (회사, 직무, 시작, 재직 중, 종료, 한 줄 설명) is a `var(--bg)` box on the grey card, on iOS as on Android.
+const FIELD_SURFACE = 'bg'
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
 
@@ -117,8 +117,8 @@ const Input = ({
           ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
-          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box; neither has a red border (the error is the line of text below)
-          backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
+          // EditCareer: a white box on the grey card; no red border (the error is the line of text below)
+          backgroundColor: c.bg,
           paddingHorizontal: spacing[4],
           paddingTop: multiline ? spacing[3] : 0,
           fontSize: font.fontSize,
@@ -510,7 +510,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                       />
                     </View>
                     {/* padding on a flex:1 item widens it past the 50/50 split, so it lives on the inner row */}
-                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : c.bg }}>
+                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: c.bg }}>
                       <View
                         style={{
                           minHeight: 48,
@@ -603,11 +603,10 @@ const EditSkills = ({ p }: { p: Profile }) => {
   const [q, setQ] = useState('')
   const has = (s: string) => skills.some((x) => x.toLowerCase() === s.toLowerCase())
   const hits = q.trim()
-    ? searchHangul(
+    ? skillSuggestions(
         SKILL_CATALOG.filter((s) => !has(s)),
         q,
-        (s) => [s],
-      ).slice(0, 5)
+      )
     : []
   const add = (s: string) => {
     const v = s.trim()

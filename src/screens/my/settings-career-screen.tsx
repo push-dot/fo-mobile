@@ -16,7 +16,7 @@ const SettingsCareerScreen = () => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title="커리어 상태" onBack={() => router.back()} />
       {s ? (
-        <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}>
+        <ScrollView contentContainerStyle={{ paddingTop: 0, paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}>
           <SettingsGroup note={s.hideFromCurrentCompany ? '지금 다니는 회사 사람에게는 커리어 상태가 보이지 않아요.' : undefined}>
             {VISIBILITY.map((v) => {
               const on = v.key === s.careerStatusVisibility

@@ -83,17 +83,20 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, paddingTop: spacing[4], paddingRight: roomy ? spacing[3] : 10, paddingBottom: roomy ? spacing[3] : 10, paddingLeft: roomy ? spacing[5] : 18, gap: roomy ? spacing[4] : 14 }}>
       {p.attachment ? (
+        // MaterialsSendHere / BotPickSent (.achip): a white capsule with a 1px line ring, no file icon, 6pt padding, a 28pt round × on the right;
+        // margin-left -6 puts the chip at the composer's 12pt edge while the text keeps its own 18pt inset.
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${p.attachment} 첨부 빼기`}
           onPress={p.onClearAttachment ?? (() => undefined)}
-          style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, borderRadius: radius.sm, backgroundColor: c.fill, maxWidth: '90%' }}
+          style={{ alignSelf: 'flex-start', marginLeft: -6, flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: 6, borderRadius: 14, backgroundColor: c.bg, boxShadow: `0 0 0 1px ${c.line}`, maxWidth: 270 }}
         >
-          <Icon name="pdf" size={16} color="t2" />
           <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
             {p.attachment}
           </Text>
-          <Icon name="x" size={12} color="t3" />
+          <View style={{ width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="x" size={14} color="t3" />
+          </View>
         </Pressable>
       ) : null}
       {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
