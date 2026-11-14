@@ -54,7 +54,7 @@ tags:
       RUN: "fail"
       BOT: "push"
       KO: "이 채용 페이지 읽고 이력서 고쳐 줘"
-      EN: "Read this job page and fix my resume"
+      EN: "fail" # the mock reads ^fail$ as the failed read; run1:fail is not a TOKENS key, the typed text decides
 - extendedWaitUntil:
     visible: "어떻게 할까요?"
     timeout: 40000

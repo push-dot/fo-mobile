@@ -23,7 +23,7 @@ tags:
     visible: "PDF로 내보내기"
     timeout: 10000
 - waitForAnimationToEnd
-# The menu has 복제하기 (a copy under the same posting), so it is PushDocViewMenu. PushDocViewMenuNoDuplicate draws the menu without it, a state the app no longer has.
+# The menu has 복제하기 (a copy under the same posting), so it is PushDocViewMenu. PushDocViewMenuNoDuplicate draws the same document without it, which no product state gives (DESIGN-GAPS G50).
 - takeScreenshot: PushDocViewMenu
 - tapOn: "이름 바꾸기"
 - extendedWaitUntil:
