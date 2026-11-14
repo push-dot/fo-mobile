@@ -88,7 +88,9 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
-const CREATING_DIM = 0.7
+// Board: `.field.dis{opacity:.55}` on the picked-posting field and `opacity:.75` on the busy CTA.
+const CREATING_DIM = 0.75
+const FIELD_DIS = 0.55
 const CTA_XL = 64
 const CTA_FONT_XL = 21
 
@@ -458,7 +460,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 
   // Only a phase that carries a posting has a line to show; searching, link and limit phases have none.
-  const mainField =
+  const fieldShell =
     !posting
       ? shell(
           <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
@@ -473,7 +475,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <>
             {searchIcon}
             <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <Text color={phase.kind === 'creating' ? 't3' : 't1'} numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
+              <Text numberOfLines={1} style={{ fontSize: fieldFont, lineHeight: type.b1.lineHeight }}>
                 {pickedLine(posting)}
               </Text>
             </Pressable>
@@ -487,6 +489,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           </>,
           { marginHorizontal: spacing[4] },
         )
+  const mainField = phase.kind === 'creating' ? <View style={{ opacity: FIELD_DIS }}>{fieldShell}</View> : fieldShell
 
   const searchBody = (
     <>
