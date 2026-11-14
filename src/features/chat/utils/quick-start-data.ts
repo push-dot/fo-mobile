@@ -140,3 +140,6 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   reply: ['offers'],
   coffee: ['follows', 'recommended'],
 }
+
+/** The link a 공고 링크로 맞추기 starts with: the typed one, or the copied link on offer while the field is empty (QsLink). */
+export const startLink = (typed: string, copied: string) => (typed.trim() ? typed : copied)
