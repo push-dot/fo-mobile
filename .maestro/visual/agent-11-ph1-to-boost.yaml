@@ -79,12 +79,13 @@ tags:
       KO: "네, 써 주세요"
       EN: "ph3-write"
 # ChatPh3 draws the writing state with the keyboard down, so the 할 일 card above the draft is in view.
-- runFlow:
-    file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*네, 써 주세요.*"
+# The running line sits in the thread between the 할 일 card and the draft; the user line has scrolled above by now.
 - extendedWaitUntil:
     visible: ".*경력 섹션을 쓰는 중.*"
     timeout: 30000
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*경력 섹션을 쓰는 중.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3
