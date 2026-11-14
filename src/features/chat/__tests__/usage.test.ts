@@ -78,6 +78,16 @@ describe('composerPlaceholder', () => {
     const working = { verbs: [], startedAt: 0 }
     expect(composerPlaceholder({ items: [user, todo], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
     expect(composerPlaceholder({ items: [user, todo], working }, 'Push Bot')).toBe('작업 중에도 말할 수 있어요')
+    // Any card only a document flow leaves counts, so a later phase (draft, review, save) says it too.
+    for (const card of [
+      { type: 'plan', id: 'p', title: '수정 전략', meta: '', rows: [], keywords: [] },
+      { type: 'paper', id: 'pp', label: '초안', heading: '', lines: [] },
+      { type: 'diff', id: 'd', lines: [] },
+    ] as ChatItem[])
+      expect(composerPlaceholder({ items: [user, card], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
+    // A plain run with tool lines only (ChatBotStatusWork) asks the bot.
+    const tool: ChatItem = { type: 'tool', id: 'tl', action: '공고 읽기', state: 'run' }
+    expect(composerPlaceholder({ items: [user, tool], working }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     // Idle again: the bot's own line.
     expect(composerPlaceholder({ items: [user, todo], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
