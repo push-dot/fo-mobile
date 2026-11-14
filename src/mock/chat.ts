@@ -165,7 +165,12 @@ const scoped = (f: Frame, prefix: string): Frame => {
 /** Stamps each frame with the conversation's next seq and remembers the card the run leaves open. */
 const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
   let seq = lastSeq.get(id) ?? 0
-  const out: Step[] = steps.map((st) => ({ ...st, frame: { ...(prefix ? scoped(st.frame, prefix) : st.frame), seq: ++seq } }))
+  // A tool card carries the time it was asked, as the server's frame does (`at`), so the room draws 확인을 기다리고 있어요 under the thread (ChatBotStatusApprove).
+  const at = new Date().toISOString()
+  const out: Step[] = steps.map((st) => {
+    const frame = prefix ? scoped(st.frame, prefix) : st.frame
+    return { ...st, frame: { ...frame, ...(frame.type === 'approval' ? { at } : {}), seq: ++seq } }
+  })
   lastSeq.set(id, seq)
   const card = out.map((st) => st.frame).findLast(isCard)
   if (card) waiting.set(id, card)

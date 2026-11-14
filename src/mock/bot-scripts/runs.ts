@@ -530,6 +530,8 @@ export const verifyFail: Step[] = [
   s(200, status('검증하는 중…')),
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
+  // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
+  s(200, { type: 'notice', text: '방향 검증에서 문제가 생겼어요' } as unknown as Frame),
   ask({ ...numbered('ph2x-verify', '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', ['다시 고르기', '그만하기']), gate: HINTLESS_GATES[0] }),
 ]
 const autoPick: Step[] = [
