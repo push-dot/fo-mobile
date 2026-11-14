@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Text } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
@@ -13,10 +14,11 @@ export const useBubbleMax = (chrome: number) => (useWindowDimensions().width - s
 const UserBubble = ({ item }: { item: Extract<ChatItem, { type: 'user' }> }) => {
   const maxWidth = useBubbleMax(30)
   const { xl } = useXlChrome()
+  const [wrapped, setWrapped] = useState(false)
   return (
     <Appear kind="bubble" style={{ alignSelf: 'flex-end', maxWidth }}>
-      <UserBubbleView attachment={item.attachment}>
-        <Text v="b1" style={xl ? { fontSize: 21, lineHeight: 30 } : { lineHeight: 23 }} allowFontScaling={!xl}>
+      <UserBubbleView attachment={item.attachment} minWidth={wrapped ? maxWidth : undefined}>
+        <Text v="b1" style={xl ? { fontSize: 21, lineHeight: 30 } : { lineHeight: 23 }} allowFontScaling={!xl} onTextLayout={(e) => setWrapped(e.nativeEvent.lines.length > 1)}>
           <Marked text={item.text} itemId={item.id} />
         </Text>
       </UserBubbleView>

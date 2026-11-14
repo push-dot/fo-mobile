@@ -72,6 +72,9 @@ describe('composerPlaceholder', () => {
     const result: ChatItem = { type: 'result', id: 'r', source: 'external', checklist: [], actions: [], documentId: 'd', fileName: 'a.pdf', pageLine: 'A4 1쪽' }
     expect(composerPlaceholder({ items: [user, result, { type: 'worked', id: 'w', seconds: 3 }], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
     expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
+    // ChatStates.4: the lines after the result (apply record, busy error) keep the talking box.
+    const later: ChatItem[] = [user, result, { type: 'agentText', id: 'rec', text: '지원했어요 · 마이 › 내 활동에 기록했어요' }, user, { type: 'error', id: 'e', text: '지금 요청이 많아요.', code: 'QUEUE_BUSY' }]
+    expect(composerPlaceholder({ items: later, working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
   })
 
   it('says the run takes input too while a document flow with a to-do card works, named bot or not', () => {
