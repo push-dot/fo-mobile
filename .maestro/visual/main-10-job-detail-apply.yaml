@@ -36,8 +36,11 @@ tags:
     commands:
       - takeScreenshot: JobDetail.6
 # ApplySheet and Applied draw the fit card with three parts where JobDetail draws five, so the page is opened again under `fit-three`.
+# The link opens the home itself, so a 뒤로 on the page is only needed when the page is still up.
 - openLink: push://?mock=fit-three
-- tapOn: "뒤로"
+- tapOn:
+    text: "뒤로"
+    optional: true
 - extendedWaitUntil:
     visible: ".*모아페이.*"
     timeout: 15000
