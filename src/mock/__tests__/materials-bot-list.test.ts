@@ -15,7 +15,7 @@ describe('materials of a bot (MaterialsFromProfile)', () => {
 
   it('keeps the 서류 board as drawn: no 지원동기 draft, 면접_예상질문 still there', async () => {
     const data = await page('materials?tab=doc&limit=20')
-    expect(data.counts.doc).toBe(7)
+    expect(data.counts.doc).toBe(8) // f1-f7 and the d1 document, as before
     const titles = data.sections[0]!.items.map((m) => m.title)
     expect(titles).not.toContain('모아페이_지원동기_초안.pdf')
     expect(titles).toContain('면접_예상질문_모아페이.pdf')
