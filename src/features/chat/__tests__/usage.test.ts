@@ -8,6 +8,7 @@ import {
   composerPlaceholder,
   deleteBotConfirm,
   headerAction,
+  isDrawn,
   isUsageExhausted,
   onboardingGreeting,
   threadGreeting,
@@ -130,5 +131,20 @@ describe('bot header and onboarding', () => {
     expect(next.a).toEqual({ text: '안녕 공고', chip: '이력서' })
     expect(next.b).toEqual({ text: '다른 Bot' })
     expect(withMaterial({}, 'b', '링크', { text: '' }).b.text).toBe('링크')
+  })
+})
+
+describe('isDrawn', () => {
+  it('lists only the lines the room draws, so no hidden cell adds an 18 gap (ChatPh2, ChatPh3Boost, ChatPh3Review)', () => {
+    const items: ChatItem[] = [
+      { type: 'user', id: 'u', text: '네' },
+      { type: 'think', id: 't', seconds: 2 },
+      { type: 'tool', id: 'tool', action: '공고 읽기', state: 'ok' },
+      { type: 'worked', id: 'w', seconds: 3 },
+      { type: 'error', id: 'e1', text: '사용량', code: 'INSUFFICIENT_CREDITS' },
+      { type: 'error', id: 'e2', text: '실패', code: 'UNKNOWN' },
+      { type: 'agentText', id: 'a', text: '좋아요' },
+    ]
+    expect(items.filter(isDrawn).map((i) => i.id)).toEqual(['u', 'e2', 'a'])
   })
 })

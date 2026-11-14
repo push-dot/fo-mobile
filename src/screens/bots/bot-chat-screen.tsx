@@ -31,6 +31,7 @@ import {
   endsInError,
   followScroll,
   headerLightOf,
+  isDrawn,
   openBot,
   threadGreeting,
   retryApproval,
@@ -129,7 +130,7 @@ const Thread = ({ id }: { id: string }) => {
   const empty = chat.items.length === 0 && chat.queue.length === 0
   const greeting: ChatItem[] =
     !empty && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
-  const data = [...chat.items].reverse().concat(greeting)
+  const data = chat.items.filter(isDrawn).reverse().concat(greeting)
 
   const find = useFind(id)
   const limit = useChatLimit(chat.items)
@@ -139,17 +140,17 @@ const Thread = ({ id }: { id: string }) => {
   const reduceMotion = useReduceMotion()
   const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
   const list = useRef<FlatList<ChatItem>>(null)
-  const itemsRef = useRef(chat.items)
+  const dataRef = useRef(data)
   useEffect(() => {
-    itemsRef.current = chat.items
+    dataRef.current = data
   })
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => setAtBottom(e.nativeEvent.contentOffset.y < AT_BOTTOM), [])
   const toBottom = () => list.current?.scrollToOffset({ offset: 0, animated: !reduceMotion })
   const currentId = find.currentId
   useEffect(() => {
     if (!currentId) return
-    const at = itemsRef.current.length - 1 - itemsRef.current.findIndex((i) => i.id === currentId)
-    if (at < itemsRef.current.length) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
+    const at = dataRef.current.findIndex((i) => i.id === currentId)
+    if (at >= 0) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
   const convertRef = useRef(convert.mutate)
