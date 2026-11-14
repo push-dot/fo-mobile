@@ -150,6 +150,7 @@ const MotionCheckScreen = () => {
         <Btn id="motion-toast" label="토스트" onPress={() => showToast({ message: '모션 확인 토스트예요' })} />
         <Btn id="motion-panel" label="패널" onPress={() => (setMode('panel'), setNonce((n) => n + 1))} />
       </View>
+      {mode === 'cells' ? <View testID="ref-toast" pointerEvents="none" style={{ position: 'absolute', left: 5, right: 5, top: insets.top + 2 - 3, height: 70, borderWidth: 1, borderColor: REF, borderRadius: 29, zIndex: 9 }} /> : null}
       {mode === 'cells' ? (
         <View key={nonce}>
           <Rows nonce={nonce} />
