@@ -7,7 +7,7 @@ export const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1)
 /** The sheet grabber the boards draw: `.grab` 36x5 on iOS, `.and .sheet2 .grab` 32x4 on Android. */
 export const GRABBER = { ios: { width: 36, height: 5, borderRadius: 3 }, android: { width: 32, height: 4, borderRadius: 2 } } as const
 export const PRESS_SCALE = 0.97
-export const DISABLED_OPACITY = 0.4
+export const DISABLED_OPACITY = 0.45
 export const SHEET_ACTION_GAP = { filter: 6, quickStart: 4 } as const
 /** iOS filter sheets (.ifoot): the CTA sits 20 under the last chips. */
 export const IOS_FILTER_ACTION_GAP = 20
