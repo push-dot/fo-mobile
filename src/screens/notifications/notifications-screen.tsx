@@ -55,7 +55,7 @@ const NotificationsScreen = () => {
         <SectionList
           sections={sections}
           keyExtractor={(n) => n.id}
-          contentInsetAdjustmentBehavior="automatic"
+          contentInsetAdjustmentBehavior="never"
           stickySectionHeadersEnabled={false}
           contentContainerStyle={{ flexGrow: 1, paddingTop: topInset }}
             onScroll={onScroll}
