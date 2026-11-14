@@ -84,7 +84,7 @@ const ToastHost = () => {
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow} opaque={toast.opaque}>
         <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: shape.minHeight, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action && !ios ? spacing[2] : spacing[4], paddingVertical: ios ? TOAST_IOS_PAD : 0 }}>
-          <Text v="b2" weight="600" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
+          <Text v="b2" weight="600" pointerEvents="none" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
             {toast.message}
           </Text>
           {toast.action ? (

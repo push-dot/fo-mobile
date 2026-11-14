@@ -71,8 +71,11 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLong
-# The 링크 rows sit below the first screen (the hierarchy lists them, a tap there lands on the search bar), so scroll to them first.
-- scroll
+# MaterialDetailLong's list behind the sheet is the 링크 tab (링크 10), not 전체: switch to the tab, where the newest link is the first row and needs no scroll.
+- tapOn: "링크"
+- extendedWaitUntil:
+    visible: "careers.nuricloud.co.kr.* 자세히"
+    timeout: 10000
 - waitForAnimationToEnd
 - tapOn: "careers.nuricloud.co.kr.* 자세히"
 - extendedWaitUntil:

@@ -11,7 +11,7 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
-import { palette, radius, shadow, spacing, useColors } from '@/theme'
+import { palette, radius, spacing, useColors } from '@/theme'
 
 const PAGE_PAD = 36
 const TITLE_MAX_WIDTH = 168
@@ -19,6 +19,7 @@ const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
 
 const sheet = palette.light
+const PAPER_SHADOW = '0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.1)'
 
 const Bars = ({ widths }: { widths: readonly number[] }) =>
   widths.map((w) => (
@@ -26,7 +27,6 @@ const Bars = ({ widths }: { widths: readonly number[] }) =>
   ))
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
-  const sh = shadow.light
   const { width } = useWindowDimensions()
   const p = d.profile
   const head = (t: string) => (
@@ -47,12 +47,11 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         minHeight: width * 1.414,
         backgroundColor: sheet.paper,
         borderRadius: radius.xs,
-        borderWidth: 1,
-        borderColor: sheet.line,
         paddingVertical: spacing[6],
         paddingHorizontal: spacing[5],
         gap: spacing[2],
-        ...sh.pop,
+        // The board draws the hairline as a 0 0 0 1px shadow, which takes no layout: the text column is 290pt (a 1pt border made it 288 and dropped "왔어요." to a third line).
+        boxShadow: PAPER_SHADOW,
       }}
     >
       <Text v="h3" weight="800" style={{ color: sheet.t1 }}>
