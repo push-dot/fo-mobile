@@ -38,6 +38,20 @@ export const holdMockFit = (on: boolean) => {
 }
 export const mockFitHolding = () => mockFitHeld
 
+/** Mock tours (`mock=fit-soon`): the WebView mock always answers a finished fit, so JobDetailStates' 적합도는 곧 볼 수 있어요 card never shows. The fit request is made to fail. */
+let mockFitSoon = false
+export const setMockFitSoon = (on: boolean) => {
+  mockFitSoon = on
+}
+export const mockFitSoonOn = () => mockFitSoon
+
+/** Mock tours (`mock=apple-fail`): the Apple sign-in sheet cannot be driven or made to fail in a tour, so the attempt reports a failure instead of opening it (SignInErrors.4). */
+let mockAppleFails = false
+export const failMockApple = (on: boolean) => {
+  mockAppleFails = on
+}
+export const mockAppleFailing = () => mockAppleFails
+
 let stubbedPick: ImagePicker.ImagePickerAsset[] | null = null
 
 /** Mock tours (`mock=two-photos`): the next pickImage returns these assets instead of opening the system picker, whose labels the app does not set. */

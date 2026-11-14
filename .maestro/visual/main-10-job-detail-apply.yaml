@@ -29,6 +29,9 @@ tags:
     commands:
       - takeScreenshot: JobDetail.4
       - takeScreenshot: JobDetail.5
+      # FREE panels (JobDetail.1/.2): plan is server state and the fo-web mock only serves this PRO card, so they take the same screen.
+      - takeScreenshot: JobDetail.1
+      - takeScreenshot: JobDetail.2
 - runFlow:
     when:
       platform: Android
