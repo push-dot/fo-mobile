@@ -1,7 +1,7 @@
 import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors, useShadow } from '../../../../theme'
+import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
 import { RISE_MS, riseOnMount } from './approval-rise'
@@ -37,8 +37,7 @@ const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직�
 /** Replaces the composer until answered (design_system ApprovalPanel). */
 export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired = false, onClose, onRetry }: Props) => {
   const c = useColors()
-  const shadow = useShadow()
-  const insets = useSafeAreaInsets()
+    const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   const reduce = useReduceMotion()
   const rise = useState(() => new Animated.Value(0))[0]
@@ -218,7 +217,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
               {approval.foot}
             </Text>
           ) : null}
-          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: multi.at >= 0 ? spacing[1] : 2, paddingHorizontal: multi.at >= 0 ? 0 : spacing[1] }}>
+          <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: multi.at >= 0 ? spacing[1] : approval.sections.length ? 2 : 0, paddingHorizontal: multi.at >= 0 ? 0 : spacing[1] }}>
             {multi.stopLabel ? (
               <View style={multi.at >= 0 ? STOP_PAD : { flex: 1 }}>
                 <Button
@@ -271,7 +270,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
       accessibilityLabel={expired ? '만료된 요청' : '확인 요청'}
       style={[
         ios
-          ? { marginHorizontal: spacing[2], marginBottom: spacing[2], backgroundColor: c.bg, borderRadius: 40, borderWidth: 1, borderColor: c.line, ...shadow.pop, shadowOffset: { width: 0, height: -4 } }
+          ? // `.ios .panel`: the 1px ring is a spread shadow (`0 0 0 1px line`), not a border, so it adds nothing to the panel's height (ChatApprove: 136, a border made it 138).
+            { marginHorizontal: spacing[2], marginBottom: spacing[2], backgroundColor: c.bg, borderRadius: 40, boxShadow: `${cssShadow.iosPanel}, 0 0 0 1px ${c.line}` }
           : { backgroundColor: c.bg, borderTopLeftRadius: radius.confirmPanelTop, borderTopRightRadius: radius.confirmPanelTop, boxShadow: cssShadow.approvalSheet },
         motion,
       ]}

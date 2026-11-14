@@ -7,6 +7,7 @@ import { onAccent, radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
 import { Appear } from '../motion'
+import { Marked } from '../header/highlight'
 import Glyph from './glyph'
 import { BubbleCard } from './plan-card'
 import Rich from './rich'
@@ -50,8 +51,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
           block.kind === 'paragraph' ? (
             <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
           ) : (
-            // The bubble's own gap is 6; the board puts 4 between the paragraph and its list.
-            <View key={i} style={{ gap: spacing[1], marginTop: -2 }}>
+            // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
+            <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
               {block.items.map((line) => (
                 <Rich key={line} v="b1" text={line} markId={item.id} {...big} />
               ))}
@@ -72,7 +73,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
             {item.sources.map((source) => (
               <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
                 <Text v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
-                  {source.title}
+                  {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
+                  <Marked text={source.title} itemId={`${item.id}:source`} />
                 </Text>
               </Pressable>
             ))}

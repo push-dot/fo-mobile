@@ -269,7 +269,7 @@ describe('materials', () => {
   it("lists a bot's own materials, as many as its profile counts (MaterialsFromProfile)", async () => {
     const page = await api.materials.list({ bot: 'b-moa' })
     expect(page.counts).toEqual({ doc: 4, bookmark: 1, link: 3 })
-    expect(page.sections.map((s) => s.items.map((m) => m.id))).toEqual([['f1', 'f2', 'f4', 'f5'], ['p1'], ['l1', 'l2', 'l3']])
+    expect(page.sections.map((s) => s.items.map((m) => m.id))).toEqual([['f0', 'f1', 'f2', 'f4'], ['p1'], ['l1', 'l2', 'l3']])
     expect((await api.bots.get('b-moa')).materialCount).toBe(8)
     expect((await api.materials.list({ bot: 'push' })).counts).toEqual({ doc: 1, bookmark: 0, link: 0 })
     await expect(api.materials.list({ bot: 'b-gone' })).rejects.toMatchObject({ status: 404 })

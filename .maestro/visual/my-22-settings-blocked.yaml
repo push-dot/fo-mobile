@@ -16,14 +16,15 @@ tags:
     visible: ".*Google 계정으로 로그인.*"
     timeout: 10000
 # The board shows the list scrolled so that 댓글과 답글 is the first row under the title and 차단한 사람 sits at y≈533: centre the
-# row (y≈437), then scroll the list back ~96pt (a slow swipe moves the list ~0.86 of its travel, see _settings_end.yaml).
+# row (y≈437), then scroll the list back ~96pt. A slow swipe moves the list ~0.86 of its travel (the 4% back-off in _settings_end.yaml
+# is 35pt of travel = 30pt of list): 13% of 874 = 113.6pt of travel -> 97.7pt -> row centre 534.7 (the board's 533); 12% gave 527.2.
 - scrollUntilVisible:
     element: "차단한 사람.*"
     centerElement: true
 - waitForAnimationToEnd
 - swipe:
     start: "50%,45%"
-    end: "50%,57%"
+    end: "50%,58%"
     duration: 1500
 - waitForAnimationToEnd
 - takeScreenshot: SettingsBlockedEntry
