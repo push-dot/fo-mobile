@@ -3,6 +3,7 @@ import type { IconName } from '@push/design-system'
 import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
+import { foldBubbleCards } from './bubble-card'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
@@ -100,7 +101,7 @@ export type ThreadRow = ChatItem | RunningRow
  * line, draft card).
  */
 export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
-  const drawn = items.filter(isDrawn)
+  const drawn = foldBubbleCards(items.filter(isDrawn))
   if (!working) return drawn
   const running: RunningRow = { type: 'running', id: 'running' }
   const last = drawn.at(-1)
@@ -112,7 +113,8 @@ const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 // A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
 const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
 
-const endsInResult = (items: ChatItem[]) => items.findLast((i) => i.type !== 'worked')?.type === 'result'
+// ChatStates.4: a thread that holds a finished result keeps the talking box through the lines after it (apply record, busy error).
+const holdsResult = (items: ChatItem[]) => items.some((i) => i.type === 'result')
 
 // The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
 // the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.
@@ -124,7 +126,7 @@ export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, 
   if (chipKind) return chipPlaceholder(chipKind)
   // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
   if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
-  if (name) return endsInResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
+  if (name) return holdsResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
   if (chat.working) return COMPOSER_PLACEHOLDER.working
   if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp
   return COMPOSER_PLACEHOLDER.first

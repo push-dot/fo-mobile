@@ -7,10 +7,10 @@ export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
 export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean }): HeaderLight =>
   input.creditsOut ? 'limit' : input.failed ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
 
-/** The thread ends on a failed run; the next message clears it. A failed upload is no run, so it does not count. */
+/** The thread ends on a failed run; the next message clears it. A failed upload is no run, and a busy queue (QUEUE_BUSY, ChatStates.4) refused one before it started, so neither counts. */
 export const endsInError = (items: readonly ChatItem[]) => {
   const last = items.at(-1)
-  return last?.type === 'error' && last.code !== UPLOAD_ERROR_CODE
+  return last?.type === 'error' && last.code !== UPLOAD_ERROR_CODE && last.code !== 'QUEUE_BUSY'
 }
 
 /** Bot lines after the newest line the reader saw at the bottom. Identity, not a count: paging older turns in at the front must not look like news. */

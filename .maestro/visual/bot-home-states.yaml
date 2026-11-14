@@ -3,6 +3,7 @@ name: 봇 홈 · 로딩 · 오류 · 긴 이름 · 만료·실패 행
 tags:
   - visual
 ---
+# AgentHomeError draws the Push Bot without the unread dot, so bot:push:read marks its line read.
 # Each state is a cold start: the bot list is cached after its first answer, so a rule set later would not show.
 - runFlow:
     file: _login_mock.yaml
@@ -18,7 +19,7 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=consent-on,fail:GET:bots$"
+      MOCK: "push://sign-in?mock=consent-on,fail:GET:bots$,bot:push:read"
       READY: "새로 올라온 공고"
 - tapOn: "Bot"
 - extendedWaitUntil:

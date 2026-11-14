@@ -8,11 +8,14 @@ import type { Notice } from './utils/status-line'
 export type ToolState = 'run' | 'ok' | 'err' | 'wait'
 export type TodoState = 'todo' | 'now' | 'done'
 
+export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; tone: BadgeTone; label: string; note: string }[]; keywords: string[] }
+
 export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
-  | { type: 'agentText'; id: string; text: string; bullets?: string[]; sources?: BotContract.Attachment[] }
+  /** `card` is the untitled plan that came right after the text: the board draws it inside the same bubble (ChatPh1Feedback). */
+  | { type: 'agentText'; id: string; text: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
   /** How a run ended badly, drawn as a status line (ChatInterrupt, ChatVerifyFail). */
@@ -23,7 +26,7 @@ export type ChatItem =
   /** `warning` (retried once) turns the dot orange and leads the result line. */
   | { type: 'tool'; id: string; name?: string; action: string; target?: string; state: ToolState; result?: string; extra?: string[]; error?: string; warning?: string }
   | { type: 'todo'; id: string; title?: string; items: { label: string; state: TodoState; added?: boolean }[] }
-  | { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; tone: BadgeTone; label: string; note: string }[]; keywords: string[] }
+  | PlanItem
   | { type: 'diff'; id: string; lines: { n?: number; sign: '+' | '-' | '~' | ''; text: string }[] }
   | {
       type: 'fit'
