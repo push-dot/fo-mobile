@@ -152,17 +152,11 @@ const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (ne
   )
 }
 
-const SWATCH_ROW = 6
-
-// BotNew board: 6 + 5, centered, whatever the screen's width.
+// Board `.cpick`: centred, wrapping, gap 4px 8px, padding 0 16px. 46pt swatches fill a 370pt row with 7 and leave 4 for the second row.
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View style={{ alignItems: 'center', rowGap: spacing[1] }}>
-    {[BOT_COLORS.slice(0, SWATCH_ROW), BOT_COLORS.slice(SWATCH_ROW)].map((names, i) => (
-      <View key={i} style={{ flexDirection: 'row', columnGap: spacing[2] }}>
-        {names.map((name) => (
-          <Swatch key={name} name={name} on={name === color} onPick={onPick} />
-        ))}
-      </View>
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
+    {BOT_COLORS.map((name) => (
+      <Swatch key={name} name={name} on={name === color} onPick={onPick} />
     ))}
   </View>
 )
