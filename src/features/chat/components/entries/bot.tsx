@@ -7,6 +7,7 @@ import { onAccent, radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
 import { Appear } from '../motion'
+import { Marked } from '../header/highlight'
 import Glyph from './glyph'
 import { BubbleCard } from './plan-card'
 import Rich from './rich'
@@ -72,7 +73,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
             {item.sources.map((source) => (
               <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
                 <Text v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
-                  {source.title}
+                  {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
+                  <Marked text={source.title} itemId={`${item.id}:source`} />
                 </Text>
               </Pressable>
             ))}
