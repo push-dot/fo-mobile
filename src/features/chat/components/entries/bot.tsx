@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Icon, Text } from '@/shared/components'
-import { useXlChrome } from '@/shared/components/xl-chrome'
+import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { onAccent, radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
@@ -20,7 +20,7 @@ const XL_LINE = { fontSize: 21, lineHeight: 31 }
 
 const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
   const c = useColors()
-  const { xl } = useXlChrome()
+  const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
   if (AUTO_PICK.test(item.text))
     return (

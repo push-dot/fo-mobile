@@ -133,7 +133,8 @@ export const PlanNoticePage = () => (
       {PLAN_NOTICES.map((line) => (
         <View key={line} style={{ flexDirection: 'row', gap: 10 }}>
           {/* The dot is its own glyph, 8.09 pt at 15px (board 8.1): the line starts at x42.1 and its column is 335.9, so "해지해도 남은" (338.1) wraps and "철회할 수 있어요." (335.7) holds. */}
-          <Text v="b2" color="t3">
+          {/* Fixed at the glyph's 8.1: the measured box rounds up to 8.33 on the pixel grid and the column would lose 0.25 pt of the 0.1 pt the third item has. */}
+          <Text v="b2" color="t3" style={{ width: 8.1 }}>
             ·
           </Text>
           <Text v="b2" color="t2" style={{ flex: 1, lineHeight: NOTICE_LINE }}>

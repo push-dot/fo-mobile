@@ -6,7 +6,7 @@ import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, type } from '@/theme'
 import { MASCOT_PALETTES } from '@/theme/mascot'
-import { isXlScale } from '@/shared/components/xl-chrome'
+import { isXlBoardText } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -234,7 +234,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
   const window = useWindowDimensions()
-  const xl = isXlScale(window.fontScale)
+  const xl = isXlBoardText(window.fontScale)
   const [sheetBottom, setSheetBottom] = useState(window.height)
   const [form, setForm] = useState(initialForm)
   const [rows, setRows] = useState<PostingRow[]>([])

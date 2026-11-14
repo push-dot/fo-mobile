@@ -1,9 +1,8 @@
 import { useWindowDimensions } from 'react-native'
-import { isXlScale } from '@/shared/components/xl-chrome'
 import { radius, spacing } from '@/theme'
 
 /**
- * From the shared XL size (MaterialsXL) the list draws the large boxes. The boxes of `.mrow`, `.usep` and `.spill` as Materials draws them, and under `.xl` (MaterialsXL). The text in
+ * The boxes of `.mrow`, `.usep` and `.spill` as Materials draws them, and under `.xl` (MaterialsXL). The text in
  * them grows with the system size by itself.
  */
 const SIZES = {
@@ -23,4 +22,7 @@ const SIZES = {
   },
 } as const
 
-export const useListSize = () => SIZES[isXlScale(useWindowDimensions().fontScale) ? 'large' : 'normal']
+/** Past this system text size the list draws MaterialsXL. */
+const LARGE_TEXT_SCALE = 1.3
+
+export const useListSize = () => SIZES[useWindowDimensions().fontScale > LARGE_TEXT_SCALE ? 'large' : 'normal']
