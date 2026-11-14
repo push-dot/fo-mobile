@@ -58,6 +58,10 @@ tags:
       NEXT: ".*최대 5번까지 올렸어요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3BoostStop
+# The run is still going (the quality card follows after the hold): let it reach its card before the chat is reset, or the next line queues behind it.
+- extendedWaitUntil:
+    visible: "추천 수정도 반영할까요?"
+    timeout: 40000
 - runFlow: _fresh_company.yaml
 # run:boost-stuck plays the stuck run for the board's own user line, so no mock token shows in the bubble.
 - openLink: push://bots/b-moa?mock=run:boost-stuck
@@ -71,6 +75,9 @@ tags:
     timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh3BoostStop.2
+- extendedWaitUntil:
+    visible: "추천 수정도 반영할까요?"
+    timeout: 40000
 # The writing state holds for a minute (to-do 1/5, the draft card streaming), so this one goes last.
 - runFlow: _fresh_company.yaml
 - openLink: push://bots/b-moa?mock=run:ph3-write
