@@ -76,7 +76,7 @@ const SettingsPickSheetScreen = () => {
     router.back()
   }
   return (
-    // iOS SettingsLanguage: the 52pt .inav starts 17 under the sheet top and the wheel follows it with no gap.
+    // iOS SettingsLanguage: the 52pt .inav starts 17 under the sheet top; the wheel follows 6 under it.
     <Sheet title={ANDROID ? pick.title : undefined} gap={ANDROID ? undefined : 0}>
       {ANDROID ? null : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
@@ -87,7 +87,10 @@ const SettingsPickSheetScreen = () => {
           <TextAction label="완료" bold onPress={confirm} />
         </View>
       )}
-      <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
+      {/* .wheels.short: 6 above, 14 below and the sheet's 26 under it (the sheet gives 20), so the sheet is 17+52+6+120+14+26 = 235. */}
+      <View style={ANDROID ? undefined : { marginTop: 6, marginBottom: spacing[5] }}>
+        <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
+      </View>
       {ANDROID ? (
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: spacing[2] }}>
           <TextAction label="취소" onPress={() => router.back()} />
