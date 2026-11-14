@@ -3,10 +3,9 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Glass, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
+import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
-import { nativeShadow } from '@/theme/native-shadow'
-import { toBoxShadow } from '@/shared/utility'
+import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { botErrorKind } from '../../api/errors'
@@ -90,8 +89,12 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
-// The board's last `--glassShadow` (the audit layer after the DS one): `0 2px 8px` at .06, .35 in dark. The DS token is `0 6px 24px`, which draws far darker.
-const FIELD_SHADOW = { light: toBoxShadow(nativeShadow('0 2px 8px rgba(0,0,0,.06)')), dark: toBoxShadow(nativeShadow('0 2px 8px rgba(0,0,0,.35)')) }
+// The board's last `--glassShadow` (the audit layer after the DS one): drop, 0.5 ring, top highlight. Native glass keeps its own `0 6px 24px` shadow
+// under any style (BotNew.1 captured 235 at the bar's edge, the board 226 ring then 246), so the field is a plain view in the glass fill.
+const FIELD_SHADOW = {
+  light: '0 2px 8px rgba(0,0,0,.06), 0 0 0 .5px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.95)',
+  dark: '0 2px 8px rgba(0,0,0,.35), 0 0 0 .5px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.16)',
+}
 // Board: `.field.dis{opacity:.55}` on the picked-posting field and `opacity:.75` on the busy CTA.
 const CREATING_DIM = 0.75
 const FIELD_DIS = 0.55
@@ -416,16 +419,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const ios = Platform.OS === 'ios'
   const fieldBox = { height: control, borderRadius: control / 2, ...(ios ? { boxShadow: FIELD_SHADOW[mode] } : null) }
   const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
-  const shell = (children: ReactNode, style?: object) =>
-    ios ? (
-      <Glass style={[fieldBox, style]}>
-        <View style={fieldRow}>{children}</View>
-      </Glass>
-    ) : (
-      <View style={[fieldBox, { backgroundColor: c.fill }, style]}>
-        <View style={fieldRow}>{children}</View>
-      </View>
-    )
+  const shell = (children: ReactNode, style?: object) => (
+    <View style={[fieldBox, { backgroundColor: ios ? sheetGlassFill(true, mode === 'dark', c) : c.fill }, style]}>
+      <View style={fieldRow}>{children}</View>
+    </View>
+  )
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   // Board `.smod .rr` (r4p): padding 14px 16px, no min-height, title 17/22.
