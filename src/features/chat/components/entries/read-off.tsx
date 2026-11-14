@@ -12,7 +12,7 @@ const ReadOff = ({ item, onAction }: { item: Extract<ChatItem, { type: 'readOff'
   const c = useColors()
   return (
     <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth: '88%' }}>
-      <View style={{ paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
+      <View style={{ gap: 6, paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         <Text v="b1">{item.text}</Text>
         <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[3] }}>
           {(Object.keys(READ_OFF_ACTIONS) as ReadOffAction[]).map((action) => (
