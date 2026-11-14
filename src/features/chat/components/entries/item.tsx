@@ -331,6 +331,9 @@ const Projected = ({ label, bullets, open, onToggle }: { label: string; bullets:
 
 // iOS draws the 40pt numeral ~6pt higher in its 44pt line box than the board (card top to numeral 15.6 vs 21, '/ 10' 8pt low); the shift grows with the text size.
 const FIT_DROP = 6
+// The board's score row under .ph's tracking: the numbers keep the page's -0.32px instead of an em scale, and the 22pt number's normal line sits 2pt lower than the 44pt line (row 45.9).
+const NOTE_TRACKING = -0.32
+const NOTE_ROW_LEAD = 2
 
 const useFitDrop = () => {
   const { fontScale } = useWindowDimensions()
@@ -344,7 +347,7 @@ const FitNum = ({ size, color, children, rowDrop }: { size: 'mid' | 'big'; color
       v={size === 'big' ? 'h1' : 'h2'}
       weight="800"
       color={color}
-      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: rowDrop ? 0 : drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
+      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: rowDrop ? NOTE_TRACKING : -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: rowDrop ? 0 : drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'], ...(rowDrop ? { letterSpacing: NOTE_TRACKING } : null) }}
     >
       {children}
     </Text>
@@ -363,10 +366,10 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const drop = useFitDrop()
   const head = item.note ? (
     // 점수 올리기: before → after, one bar, the note. The row drops as one so the baselines stay shared.
-    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2], transform: [{ translateY: drop }] }}>
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2], paddingBottom: NOTE_ROW_LEAD, transform: [{ translateY: drop }] }}>
       {item.from !== undefined ? (
         <>
-          <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>
+          <FitNum size="mid" color="t3" rowDrop>{item.from.toFixed(1)}</FitNum>
           <Text color="t3">→</Text>
         </>
       ) : null}
