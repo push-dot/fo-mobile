@@ -538,6 +538,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoFocus
               value={fieldValue(form)}
               onChangeText={linkWait ? undefined : onType}
+              caretHidden={linkWait}
               placeholder={linkWait ? undefined : SEARCH_PLACEHOLDER}
               placeholderTextColor={c.t3}
               accessibilityLabel={linkWait ? LINK_CHECKING_LABEL : SEARCH_PLACEHOLDER}
