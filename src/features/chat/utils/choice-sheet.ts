@@ -2,7 +2,7 @@ import type { Approval, Choice } from '../types'
 
 export const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 
-export type ChoiceSheet = { title: string; message?: string; items: { index: number; label: string; destructive: boolean }[] }
+export type ChoiceSheet = { title: string; message?: string; items: { index: number; label: string }[] }
 
 /**
  * A card that is one single pick the bot has no suggestion for, or a permission (a help question, the page-read permission) is a regular modal (RULINGS 35, ChatBotStatusHelp and ChatBotStatusApprove):
@@ -11,7 +11,7 @@ export type ChoiceSheet = { title: string; message?: string; items: { index: num
 export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined
   if (approval.submit || section?.kind !== 'choices' || section.multi) return null
-  const items = section.items.flatMap((c, index) => (isSay(c) ? [] : [{ index, label: c.label, destructive: approval.optionIds[index] === 'reject' }]))
+  const items = section.items.flatMap((c, index) => (isSay(c) ? [] : [{ index, label: c.label }]))
   return { title: approval.question, ...(approval.detail ? { message: approval.detail } : {}), items }
 }
 
