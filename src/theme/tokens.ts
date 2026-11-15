@@ -38,6 +38,9 @@ export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,1
 /** The boards' `--iMat`: the iOS banner material (.ibanner). The board blurs what is behind it, RN cannot, so the fill is solid #F6F6F8: the header and the save button never show through. */
 export const iosMaterial = { light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' } as const
 
+/** The page counter pill over a document (DocViewer's `.num`): dark glass at .72 in both schemes. */
+export const counterPill = 'rgba(28,28,30,.72)'
+
 /** CSS shadows the boards draw inline on one component, outside the design system's set. */
 export const cssShadow = {
   segment: '0 2px 8px rgba(0,0,0,.08)',

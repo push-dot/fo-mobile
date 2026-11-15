@@ -4,7 +4,7 @@ import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { botChatPath } from '@/features/bots'
-import { Button, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { Button, Icon, Spinner, Text } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
@@ -127,7 +127,7 @@ const DocsTab = () => {
   const { data, isLoading } = useSources()
   const push = useDocuments()
   const hidden = useUndoRemove()
-  const { upload, start, cancel } = useUpload(() => showToast({ message: '파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs }))
+  const { upload, start, cancel } = useUpload()
   const pickFile = () => void pickResume().then((file) => file && start(file))
   useImportRequest(pickFile)
 

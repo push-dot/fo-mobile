@@ -52,14 +52,16 @@ tags:
 
 - tapOn: "기본 프로필로 설정"
 - extendedWaitUntil:
-    visible: "이 프로필을 기본 프로필로 설정할까요?"
+    visible: "허브에 보이는 내 프로필이 이 내용으로 바뀌어요."
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: DocProfileConfirm
 
-- tapOn: "설정"
+# The modal's CTA carries the same label as the button under it, so tap it by position (its centre is at 92% of the screen height).
+- tapOn:
+    point: "50%,92%"
 - extendedWaitUntil:
-    visible: ".*기본 프로필로 설정했어요.*"
+    notVisible: "기본 프로필로 설정"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: DocProfileDone

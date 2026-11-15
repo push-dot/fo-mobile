@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, useWindowDimensions, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile, useStartChat } from '@/features/chat'
 import {
   FIX_DOC,
@@ -11,13 +12,16 @@ import {
   useUndoRemove,
   type ResumeDraft,
 } from '@/features/my'
-import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
+import { CtaBar, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
-import { palette, spacing, type, useColors } from '@/theme'
+import { counterPill, onAccent, palette, spacing, type, useColors } from '@/theme'
 
 // The paper is drawn for a 330 wide column (the board's card) and zoomed to the screen width: file viewer mode (DocViewer, owner 2026-11-15).
 const PAPER_WIDTH = 330
 const TITLE_MAX_WIDTH = 168
+// The page counter floats over the paper, centred above the CTA bar (DocViewer: 28pt pill, 92pt over the home indicator).
+const COUNTER_BOTTOM = 92
+const COUNTER_HEIGHT = 28
 const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
 
@@ -119,6 +123,7 @@ const ZoomedPaper = ({ d }: { d: ResumeDraft }) => {
 
 const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
+  const insets = useSafeAreaInsets()
   const start = useStartChat()
   const doc = useSource(id)
   const share = useShareFile()
@@ -147,21 +152,35 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         }
       />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingVertical: spacing[1], paddingHorizontal: spacing[5] }}>
-          {d?.pageCount ? <Badge label={`1 / ${d.pageCount}`} tone="grey" /> : null}
-        </View>
-        <View style={{ paddingTop: spacing[1] }}>
-          {d ? (
-            <ZoomedPaper d={d} />
-          ) : draft.isPending ? (
-            <Skeleton width="100%" height={420} radius={0} />
-          ) : (
-            <Text v="b2" color="t3" style={{ marginTop: 60, textAlign: 'center' }}>
-              미리보기는 곧 볼 수 있어요
-            </Text>
-          )}
-        </View>
+        {d ? (
+          <ZoomedPaper d={d} />
+        ) : draft.isPending ? (
+          <Skeleton width="100%" height={420} radius={0} />
+        ) : (
+          <Text v="b2" color="t3" style={{ marginTop: 60, textAlign: 'center' }}>
+            미리보기는 곧 볼 수 있어요
+          </Text>
+        )}
       </ScrollView>
+      {d?.pageCount ? (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: insets.bottom + COUNTER_BOTTOM,
+            alignSelf: 'center',
+            height: COUNTER_HEIGHT,
+            paddingHorizontal: spacing[3],
+            borderRadius: COUNTER_HEIGHT / 2,
+            justifyContent: 'center',
+            backgroundColor: counterPill,
+            zIndex: 4,
+          }}
+        >
+          <Text v="c1" weight="600" style={{ color: onAccent }}>
+            {`1 / ${d.pageCount}`}
+          </Text>
+        </View>
+      ) : null}
       <CtaBar>
         <Button
           label="Bot한테 보내기"

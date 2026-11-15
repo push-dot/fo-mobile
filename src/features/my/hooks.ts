@@ -73,7 +73,6 @@ export const useFileMenu = (file: { id: string; fileName: string } | undefined) 
 export const showImportMenu = (fromModal = false) => {
   const request = {
     title: '서류 가져오기',
-    message: 'PDF, DOCX · 20MB까지 올릴 수 있어요',
     items: [
       { label: '파일에서 고르기', onPress: () => useDocImport.setState({ requested: true }) },
       { label: 'Bot 채팅에서 새로 만들기', onPress: () => router.push(botChatPath('push')) },

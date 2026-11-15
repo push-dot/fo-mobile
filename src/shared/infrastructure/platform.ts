@@ -31,6 +31,13 @@ export const failMockUploads = (on: boolean) => {
 }
 export const mockUploadFailing = () => mockUploadFails
 
+/** Mock tours (`mock=pick-career`): the upload row keeps this fraction (Uploading draws 1.1 of 1.8MB) instead of the progress that grows with the clock. */
+let mockUploadAt: number | undefined
+export const holdMockUpload = (fraction: number | undefined) => {
+  mockUploadAt = fraction
+}
+export const mockUploadHeldAt = () => mockUploadAt
+
 /** Mock tours (`mock=fit-comparing`): fo-web's WebView mock answers the fit at once, so JobFit's 비교하는 중 card is never on screen. The WebView is told to wait. */
 let mockFitHeld = false
 export const holdMockFit = (on: boolean) => {
