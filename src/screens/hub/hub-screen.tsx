@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
-import { useCallback, useMemo, type ReactNode } from 'react'
-import { ActivityIndicator, FlatList, Platform, Pressable, View, type StyleProp, type ViewStyle } from 'react-native'
+import { useCallback, useMemo } from 'react'
+import { ActivityIndicator, FlatList, Platform, Pressable, View } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -13,17 +13,9 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, ChipRow, Glass, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Badge, Button, Chip, ChipRow, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
-// The boards draw the search pill as glass on iOS and as a filled pill on Android.
-// Interactive glass draws no RN boxShadow, which the list's clip would cut just under the header.
-const InteractiveGlass = ({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) => (
-  <Glass interactive style={style}>
-    {children}
-  </Glass>
-)
-const SearchPill = Platform.OS === 'ios' ? InteractiveGlass : View
 const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
 
 // Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
@@ -46,18 +38,18 @@ const HubScreen = () => {
   const header = useMemo(
     () => (
     <View>
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
+      <View style={{ paddingHorizontal: spacing[5] }}>
         <Pressable
           accessibilityRole="search"
           accessibilityLabel="이름, 직무, 기술 검색"
           onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
         >
-          <SearchPill style={[SEARCH_PILL, Platform.OS === 'ios' ? null : { backgroundColor: c.fill }]}>
+          <View style={[SEARCH_PILL, { backgroundColor: c.fill }]}>
             <Icon name="search" size={20} color="t3" />
             <Text v="b1" color="t3">
               이름, 직무, 기술 검색
             </Text>
-          </SearchPill>
+          </View>
         </Pressable>
       </View>
       <ChipRow paddingTop={spacing[4]}>
