@@ -60,4 +60,5 @@ export const LINK_ADD = {
   submit: '추가하기',
 }
 
-export const SEND_PICK_TITLE = '어느 Bot한테 보낼까요?'
+export const SEND_PICK_TITLE = '보낼 Bot'
+export const SEND_PICK_HINT = '어느 Bot한테 보낼까요?'

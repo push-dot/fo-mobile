@@ -46,10 +46,11 @@ const SignedInStack = () => {
       <Stack.Screen name="bots/[botId]/companies" />
       <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
       <Stack.Screen name="bots/new" options={modalOptions(c)} />
-      <Stack.Screen name="bots/pick" options={sheetOptions(c)} />
       <Stack.Screen name="materials/index" options={modalOptions(c)} />
-      <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
-      <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
+      {/* Pages inside the 자료 modal: a plain push stays in the modal's own navigation on iOS (a modal never opens over a modal). */}
+      <Stack.Screen name="materials/[kind]/[id]" />
+      <Stack.Screen name="materials/link-add" />
+      <Stack.Screen name="materials/pick" />
       <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="account-usage" />
       {/* PlanUltra: the plan is a full page; 구독 안내 opened from it is a page sheet again, like the account. */}

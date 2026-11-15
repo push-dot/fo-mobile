@@ -99,7 +99,7 @@ export const detailFacts = (m: Material, usedBy: BotRef[], now: Date): Fact[] =>
 /** The sheet's title: a link shows its own name, every other kind its row title. */
 export const detailTitle = (m: Material) => (m.kind === 'link' ? m.title : materialTitle(m))
 
-const NOUN: Record<MaterialKind, string> = { file: '서류', document: '서류', posting: '북마크', link: '링크' }
+export const NOUN: Record<MaterialKind, string> = { file: '서류', document: '서류', posting: '북마크', link: '링크' }
 
 /** MaterialDetailDelete, and the DeleteDoc toast after it. The nouns all end without a final consonant, so 를 and 는 hold. */
 export const deleteCopy = (m: Material) => {

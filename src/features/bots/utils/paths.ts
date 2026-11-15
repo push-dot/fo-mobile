@@ -12,8 +12,8 @@ export const botCompaniesPath = (id: BotId) => `/bots/${id}/companies` as const
 export const botColorPath = (id: BotId) => `/bots/${id}/color` as const
 /** With a posting the sheet opens with it picked (BotNewLinkPicked). */
 export const botNewPath = (postingId?: string) => (postingId ? (`/bots/new?posting=${postingId}` as const) : ('/bots/new' as const))
-/** The pick sheet of BotPick. The title is read from the materials cache. */
-export const botPickPath = (a: Pick<Attachment, 'kind' | 'id'>) => `/bots/pick?kind=${a.kind}&id=${a.id}` as const
+/** BotPick, a page of the 자료 modal. The title is read from the materials cache. */
+export const botPickPath = (a: Pick<Attachment, 'kind' | 'id'>) => `/materials/pick?kind=${a.kind}&id=${a.id}` as const
 /** `forBot`: 보내기 attaches to that bot's composer instead of asking for a bot (MaterialsFromProfile, MaterialsSendHere). */
 export const materialsPath = (forBot?: BotId) => (forBot ? (`/materials?for=${forBot}` as const) : ('/materials' as const))
 export const materialDetailPath = (kind: AttachmentKind, id: string, forBot?: BotId) =>
