@@ -391,7 +391,7 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
   const f = fixtureOf(id)
   if (!f) return
   if (set === 'resume') {
-    // ChatResume: the draft's review card ran out an hour ago (a 확인 대기 중 · 멈춤 line), then the user asks for a new resume and the bot offers the draft.
+    // ChatResume: the draft's review card ran out an hour ago (the bot's earlier question as a bubble), then the user asks for a new resume and the bot offers the draft.
     Object.assign(f, {
       messages: [
         { id: 'm-resume-user', turn: 't-resume', role: 'USER', text: '새 이력서 만들어 줘', at: 5 },

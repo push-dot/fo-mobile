@@ -19,7 +19,7 @@ import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/b
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_PCT, KEYWORD_GLYPH, STALE_GATE, fitProjected } from '../../constants'
+import { FIT_LOCKED, FIT_LOCKED_PCT, KEYWORD_GLYPH, fitProjected } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -140,17 +140,9 @@ const TodoList = ({ item }: { item: Of<'todo'> }) => (
 )
 
 const StaleGate = ({ item }: { item: Of<'stale'> }) => (
-  <Card gap={8}>
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Text v="c1" weight="700" color="t3">
-        {STALE_GATE.title}
-      </Text>
-      <Badge label={STALE_GATE.badge} />
-    </View>
-    <Text v="b2" weight="600" color="t2">
-      {item.text}
-    </Text>
-  </Card>
+  <Bubble>
+    <Rich v="b1" text={item.text} markId={item.id} />
+  </Bubble>
 )
 
 const Plan = ({ item }: { item: Of<'plan'> }) => {

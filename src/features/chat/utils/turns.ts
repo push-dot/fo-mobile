@@ -76,18 +76,14 @@ export const openPieceId = (turns: BotContract.Turn[], live?: { turnId: string; 
   return open ? piece : undefined
 }
 
-/** A card nobody answered in time: the server says EXPIRED, or its own expiresAt has gone by. */
-const lapsed = (ev: Card, now: number) => {
-  const expiresAt = (ev as { expiresAt?: string | null }).expiresAt
-  return ev.resolution?.status === 'EXPIRED' || (ev.resolution?.status === 'PENDING' && !!expiresAt && Date.parse(expiresAt) <= now)
-}
+/** A card the server closed unanswered: it draws as the bot's earlier question, not as an open card. */
+const lapsed = (ev: Card) => ev.resolution?.status === 'EXPIRED'
 
 export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: string; lastSeq: number } | null): ChatState => {
   let s = emptyChat
   const put = (e: ChatEvent) => {
     s = applyEvent(s, e)
   }
-  const now = Date.now()
   const ordered = [...turns].reverse()
   for (const [i, t] of ordered.entries()) {
     s = { ...s, approval: null, awaiting: null }
@@ -105,8 +101,8 @@ export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: stri
       if (ev.type === 'status') continue
       piece = null
       const card = ev.type === 'approval' || ev.type === 'choice' ? (ev as Card) : undefined
-      // An earlier turn's card that ran out is a 확인 대기 중 · 멈춤 line, not an open panel (ChatResume); only the newest turn can still be waiting.
-      if (card && i < ordered.length - 1 && lapsed(card, now)) {
+      // An earlier turn's card that ran out is the bot's question as a bubble, not an open panel (ChatResume); only the newest turn can still be waiting.
+      if (card && i < ordered.length - 1 && lapsed(card)) {
         const question = mapEvent(card).find((e) => e.type === 'approval')
         if (question?.type === 'approval') put({ type: 'stale', id: `stale-${card.id}`, text: question.approval.question })
         continue

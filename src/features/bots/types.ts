@@ -33,10 +33,10 @@ export type BotActivity =
   /** `label` is the run's last working sentence, so a row keeps its line while the bot thinks again. */
   | { phase: 'thinking'; since: Date; label: string | null }
   | { phase: 'working'; since: Date; label: string }
-  | { phase: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: CardId; cardTitle: string; expiresAt: Date | null }
+  | { phase: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: CardId; cardTitle: string }
 
 /** How the last run ended while nothing runs and no card is open. The server clears it when something newer happens. */
-export type BotOutcome = { kind: 'expired' | 'failed'; at: Date }
+export type BotOutcome = { kind: 'failed'; at: Date }
 
 type BotCommon = {
   id: BotId
