@@ -73,7 +73,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Icon name="menu" size={20} color="t3" />
+        <Icon name="more" size={20} color="t3" />
       </Pressable>
     </Row>
   )

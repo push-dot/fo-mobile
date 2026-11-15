@@ -158,7 +158,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
             actions={[
               { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
               // DocProfile / DocProfileConfirm draw only share: the menu (공고 보기, 내보내기, 이름 변경, 삭제) belongs to a 지원 서류
-              ...(application ? [{ icon: 'menu' as const, label: '더 보기', menu }] : []),
+              ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
             ]}
           />
         }
