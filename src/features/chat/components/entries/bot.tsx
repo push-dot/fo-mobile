@@ -24,6 +24,10 @@ const XL_LINE = { fontSize: 21, lineHeight: 31 }
 /** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
 const BUBBLE_PAD_X = 15
+const BULLET_DOT = 6
+const BULLET_GAP = 10
+// The list's own indent, the dot and the gap before a bullet's text.
+const BULLET_LEAD = spacing[1] + BULLET_DOT + BULLET_GAP
 /** What a table can fill inside a bot bubble that is at its widest. */
 const useTableWidth = () => useBotBubbleMax() - BUBBLE_PAD_X * 2
 
@@ -44,12 +48,15 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
 /** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
 export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: string; hitsBefore?: number[] }) => {
   const c = useColors()
+  // A row's text is measured against the row's width before the dot and the gap are taken off, then shrunk without a re-wrap, so its lines ran into the bubble's padding:
+  // the number it may use is given to it.
+  const textMax = useBotBubbleMax() - BUBBLE_PAD_X * 2 - BULLET_LEAD
   return (
     <View style={{ gap: 2 }}>
       {items.map((line, i) => (
-        <View key={line} style={{ flexDirection: 'row', gap: 10, paddingLeft: spacing[1] }}>
-          <View style={{ width: 6, height: 6, borderRadius: 3, marginTop: 9, backgroundColor: c.t1 }} />
-          <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={{ flexShrink: 1 }} />
+        <View key={line} style={{ flexDirection: 'row', gap: BULLET_GAP, paddingLeft: spacing[1] }}>
+          <View style={{ width: BULLET_DOT, height: BULLET_DOT, borderRadius: BULLET_DOT / 2, marginTop: 9, backgroundColor: c.t1 }} />
+          <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={{ flexShrink: 1, maxWidth: textMax }} />
         </View>
       ))}
     </View>
