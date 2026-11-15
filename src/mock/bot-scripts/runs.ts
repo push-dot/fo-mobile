@@ -518,10 +518,10 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
   'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-level': (c) => (c === 3 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
   'ph2x-prevent': (c) => (c === 6 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
-  'ph2x-bp': (c) => (c === 0 ? say('기획서 4개를 내 서류에 저장했어요.') : say('알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph2x-bp': (c) => (c === 0 ? say('기획서 4개를 만들었어요.') : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   apply: (c) =>
     c === 0
-      ? [s(300, tool('apply', '지원하기', MOA, 'ok', '지원했어요 · 마이 › 내 활동에 기록했어요')), ...say('지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.')]
+      ? [s(300, tool('apply', '지원하기', MOA, 'ok', '지원했어요')), ...say('지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.')]
       : [s(300, tool('apply', '지원하기', MOA, 'ok', '지원하지 않았어요')), ...say('천천히 보고 말해 주세요.')],
 }
 
