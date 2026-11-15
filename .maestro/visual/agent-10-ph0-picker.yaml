@@ -18,7 +18,7 @@ tags:
 - waitForAnimationToEnd
 - tapOn: ".*이력서부터 쓸게요"
 - extendedWaitUntil:
-    visible: "어떤 산출물을 만들까요?"
+    visible: "새 작업"
     timeout: 30000
 - waitForAnimationToEnd
 - tapOn:

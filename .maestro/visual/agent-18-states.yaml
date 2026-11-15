@@ -17,11 +17,9 @@ tags:
       - extendedWaitUntil:
           visible: ".*자동으로 골랐어요: 경력 섹션부터 고치기.*"
           timeout: 30000
-      # The boards have no keyboard: a tap on the user's own bubble lowers it (a tap on a bot line opens the Bot's profile).
+      # The boards have no keyboard.
       - runFlow:
           file: _chat_kbd_down.yaml
-          env:
-            TEXT: ".*PDF로 만들어 줘.*"
       # The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat.
       - openLink: push://bots/b-moa?mock=bot:b-moa:from:user
       - waitForAnimationToEnd
@@ -37,6 +35,4 @@ tags:
           timeout: 30000
       - runFlow:
           file: _chat_kbd_down.yaml
-          env:
-            TEXT: ".*경력 섹션을 공고에 맞게 고쳐 줘.*"
       - takeScreenshot: ChatStates.2

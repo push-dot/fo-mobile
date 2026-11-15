@@ -38,7 +38,5 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*파일을 올리지 못했어요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatErrUpload

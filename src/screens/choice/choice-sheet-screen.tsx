@@ -43,7 +43,7 @@ const ChoiceSheetScreen = () => {
       {request.items ? (
         <View style={{ gap: 6 }}>
           {request.items.map((item, i) => (
-            <Pressable key={item.label} accessibilityRole="button" onPress={() => run(item.onPress)} style={row(i === request.items!.length - 1)}>
+            <Pressable key={item.label} accessibilityRole="button" accessibilityLabel={item.label} onPress={() => run(item.onPress)} style={row(i === request.items!.length - 1)}>
               <Text v="h3" weight="400" color={item.destructive ? 'red' : 't1'} style={{ flex: 1 }}>
                 {item.label}
               </Text>

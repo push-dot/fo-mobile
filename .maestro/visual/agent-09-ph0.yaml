@@ -16,8 +16,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*모아페이 백엔드 공고에 맞춰.*"
 - takeScreenshot: ChatPh0
 # Each board below draws one thread under its own user line, not the answers that led to it, so each takes a fresh run (mock tokens;
 # Android types the ASCII alias).
@@ -28,7 +26,7 @@ tags:
       KO: "1번, 지금 이력서로 할게요"
       EN: "ph0-input"
 - extendedWaitUntil:
-    visible: "어떤 산출물을 만들까요?"
+    visible: "새 작업"
     timeout: 30000
 # The sheet's second block (자료 rows) is off screen until the panel has risen, so it is the sign that the slide is done.
 - extendedWaitUntil:
@@ -48,8 +46,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*말투 그대로.*"
 - takeScreenshot: ChatPh0Start
 - runFlow: _fresh_company.yaml
 - runFlow:
@@ -57,11 +53,9 @@ tags:
     env:
       KO: "네, 시작해 주세요"
       EN: "analyze"
-# ChatPh1 draws the run with the keyboard down: lower it on the user line while it is still on screen (the running line is not in the list).
+# ChatPh1 draws the run with the keyboard down: lower it while the thread still holds the user line (the running line is not in the list).
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*네, 시작해 주세요.*"
 # The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat.
 - openLink: push://bots/b-moa?mock=bot:b-moa:from:user
 # The list stops following the stream (a 새 내용 pill shows), so the running line sits below the fold until it is scrolled to.

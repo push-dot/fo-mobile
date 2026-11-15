@@ -114,6 +114,7 @@ describe('bots', () => {
     expect(moa).toMatchObject({ unread: false, activity: null, outcome: { kind: 'expired' } })
     expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeGreaterThan(9.9 * 60_000)
     expect(Date.now() - Date.parse(moa.lastActivityAt)).toBeLessThan(10.5 * 60_000)
+    expect(moa.lastMessage).toMatchObject({ preview: '이 사이트를 열어도 될까요?', fromBot: true })
     expect(data.find((b) => b.id === 'b-dotori')).toMatchObject({ unread: false, activity: null, outcome: { kind: 'failed' } })
   })
 

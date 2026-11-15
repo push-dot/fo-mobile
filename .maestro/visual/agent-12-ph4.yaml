@@ -32,8 +32,6 @@ tags:
 # The keyboard comes down while the run still works (the first line follows after a pause).
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*품질 검사로 넘어가기.*"
 # The recommended fixes are applied without asking: the run says so, ends on 이제 디자인을 고를게요. and shows no status line after it.
 - extendedWaitUntil:
     visible: ".*이제 디자인을 고를게요.*"
@@ -48,8 +46,6 @@ tags:
       EN: "design"
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*2개 반영하고 디자인으로.*"
 - extendedWaitUntil:
     visible: "클래식으로 만들기"
     timeout: 40000
