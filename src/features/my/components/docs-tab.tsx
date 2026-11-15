@@ -11,7 +11,7 @@ import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } 
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
 import { pickResume, showImportMenu, useFileMenu, useImportRequest, useUndoRemove } from '../hooks'
 import type { HubDocument, MySource } from '../types'
-import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
+import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, UPLOADS_TITLE } from '../utils'
 import { TAB_EMPTY_LIFT } from './empty'
 import FitRing from './fit-ring'
 import ListTitle from './list-title'
@@ -72,7 +72,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         accessibilityRole="button"
         accessibilityLabel={`${displayName(doc.fileName)} 더 보기`}
         onPress={openMenu}
-        style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
+        style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
       >
         <Icon name="more" size={20} color="t3" />
       </Pressable>
@@ -233,9 +233,6 @@ const DocsTab = () => {
             onPress={() => !upload && showImportMenu()}
           />
         </View>
-        <Text v="c1" color="t3" style={{ textAlign: 'center', paddingTop: spacing[3] }}>
-          {SIZE_LIMIT.footnote}
-        </Text>
       </ScrollView>
     </View>
   )
