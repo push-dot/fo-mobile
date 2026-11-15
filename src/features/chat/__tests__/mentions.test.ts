@@ -53,8 +53,8 @@ describe('mentions', () => {
   })
 
   it('fills the space above the composer and shrinks for the keyboard', () => {
-    expect(mentionMaxHeight(874, 62, 100)).toBe(510)
-    expect(mentionMaxHeight(874, 62, 336)).toBe(274)
+    expect(mentionMaxHeight(874, 62, 100)).toBe(518)
+    expect(mentionMaxHeight(874, 62, 336)).toBe(282)
     expect(mentionMaxHeight(400, 62, 336)).toBe(160)
   })
 })
