@@ -21,7 +21,7 @@ tags:
     visible: "다음으로 무엇을 할까요?"
     timeout: 60000
 # ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드 card) with the three-button sheet
-# (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
+# (바로 지원하기 · 프로필로 전환 · 닫기), not the profile run, so it takes its own run (mock token ext-done).
 - runFlow: _fresh_company.yaml
 - runFlow:
     file: _say_run.yaml
@@ -43,7 +43,7 @@ tags:
 - takeScreenshot: ChatDoneNext
 - tapOn: "모아페이에 바로 지원하기"
 - extendedWaitUntil:
-    visible: "모아페이 · 백엔드 엔지니어.Kotlin·Spring.에 지원할까요?"
+    visible: "지원하기"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply

@@ -12,7 +12,7 @@ tags:
       READY: "새로 올라온 공고"
 - openLink: push://bots/b-moa
 - extendedWaitUntil:
-    visible: ".*PDF는 내 서류에 저장했어요.*"
+    visible: ".*경력 섹션 3줄을 고쳤어요.*"
     timeout: 20000
 # The seeded thread is shorter than the screen, so nothing can scroll yet: a first late answer makes it longer and the chat follows it
 # to the bottom. Then the reader scrolls up, and the second late answer lands while the thread is away from the bottom.
