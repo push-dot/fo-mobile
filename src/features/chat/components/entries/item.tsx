@@ -444,32 +444,25 @@ const ResultCard = ({ item, onView }: { item: Of<'result'>; onView: () => void }
   )
 }
 
+/** The draft as markdown inside the bot's bubble (rule 38): its label, the heading in bold, the lines as written, a caret on the last one while it is written. */
 const Paper = ({ item }: { item: Of<'paper'> }) => {
   const c = useColors()
   const caret = usePulse(true, 1000, 0)
   const [first, ...rest] = item.lines
   return (
-    <Appear style={{ borderRadius: radius.card, padding: spacing[4], gap: 6, backgroundColor: c.paper, borderWidth: 1, borderColor: c.line }}>
-      <Text v="c2" weight="700" color="t3">
+    <Bubble wide>
+      <Text v="c1" color="t3">
         {item.label}
       </Text>
-      <Text v="h3">{item.heading}</Text>
-      {first ? (
-        <Text v="c1" weight="700" style={{ marginTop: spacing[1] }}>
-          {first}
-        </Text>
-      ) : null}
+      <Rich v="b1" text={`**${item.heading}**`} />
+      {first ? <Rich v="b1" text={`**${first}**`} /> : null}
       {rest.map((l, i) => (
         <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-          <Text v="c1" color="t2" style={{ flexShrink: 1 }}>
-            {l}
-          </Text>
+          <Rich v="b2" color="t2" text={l} style={{ flexShrink: 1 }} />
           {i === rest.length - 1 ? <Animated.View style={{ width: 2, height: 15, marginLeft: 1, marginBottom: 2, backgroundColor: c.ac, opacity: caret }} /> : null}
         </View>
       ))}
-      <View style={{ height: 7, width: '78%', marginTop: spacing[1], borderRadius: spacing[1], backgroundColor: c.fill2 }} />
-      <View style={{ height: 7, width: '60%', borderRadius: spacing[1], backgroundColor: c.fill2 }} />
-    </Appear>
+    </Bubble>
   )
 }
 
