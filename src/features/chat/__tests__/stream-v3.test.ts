@@ -2,7 +2,7 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream, mapEvent } from '../utils/stream'
-import { isVerdictPlan, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
+import { chipSends, isVerdictPlan, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
 import type { Approval, ChatItem } from '../types'
 
 const profile = (): ChatItem => ({
@@ -261,3 +261,26 @@ describe('stream v3', () => {
     expect(ev.approval.pendingNote).toBeUndefined()
   })
 })
+
+describe('a form that ends on a single-pick chip row', () => {
+  const form = (submit?: string): Approval => ({
+    id: 'f',
+    question: '어떤 산출물을 만들까요?',
+    sections: [
+      { kind: 'rows', title: '가져올 자료', items: [{ tag: 'link', title: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요' }] },
+      { kind: 'chips', title: '말투', options: ['전문적으로', '원래 말투로'], selected: [1] },
+    ],
+    ...(submit ? { submit } : {}),
+    optionIds: [],
+  })
+
+  it('is sent by the chip without a button, and only picks when the card has its own button (시작하기)', () => {
+    expect(chipSends(form())).toBe(true)
+    expect(chipSends(form('시작하기'))).toBe(false)
+  })
+
+  it('answers with the summary of the picks either way', () => {
+    expect(sectionLabel(form('시작하기'), [[], [1]])).toBe('자료 1개 · 원래 말투로')
+  })
+})
+

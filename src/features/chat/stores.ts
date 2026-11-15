@@ -443,12 +443,15 @@ export const stop = (id: string) => {
   reportCancel(id)
 }
 
+const mockFrom = new Map<string, { type: ChatItem['type']; nth: number | 'last' }>()
+
 // Where the next older page of a reopened thread starts. Null once the oldest turn is loaded.
 const olderCursor = new Map<string, string | null>()
 // A page past the end of every mock thread: the mock transcript answers it with no turns and no further page.
 const MOCK_OLDER_CURSOR = '1000'
 
-export const hasOlder = (id: string) => !!olderCursor.get(id)
+// A tour that draws the thread from one of its lines (showFrom) has older turns above it, whatever page the transcript load reports.
+export const hasOlder = (id: string) => !!olderCursor.get(id) || mockFrom.has(id)
 
 export const loadOlder = async (id: string) => {
   const cursor = olderCursor.get(id)
@@ -475,17 +478,25 @@ export const openBot = async (address: string) => {
   return id
 }
 
-/** Mock tours: draws the thread from its first line of `type`, as one that is longer than the page. The older turns are not there, so no greeting. */
-export const showFrom = (id: string, type: ChatItem['type']) => {
+/** The thread as a mock tour draws it: from the first line of the type `showFrom` named, however many lines arrive after it. */
+export const shownItems = (id: string, items: ChatItem[]) => {
+  const from = mockFrom.get(id)
+  return from ? fromFirst(items, from.type, from.nth) : items
+}
+
+/** Mock tours: draws the thread from its `nth` line of `type`, as one that is longer than the page. The older turns are not there, so no greeting. */
+export const showFrom = (id: string, type: ChatItem['type'], nth: number | 'last' = 1) => {
   olderCursor.set(id, MOCK_OLDER_CURSOR)
+  mockFrom.set(id, { type, nth })
   useChatStore.setState((s) => {
     const current = s.chats[id] ?? emptyChat
-    return { chats: { ...s.chats, [id]: { ...current, items: fromFirst(current.items, type) } } }
+    return { chats: { ...s.chats, [id]: { ...current, items: fromFirst(current.items, type, nth) } } }
   })
 }
 
 export const forget = (id: string) => {
   olderCursor.delete(id)
+  mockFrom.delete(id)
   useChatStore.setState((s) => {
     const { [id]: _, ...rest } = s.chats
     return { chats: rest }

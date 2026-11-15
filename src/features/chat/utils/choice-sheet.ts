@@ -1,4 +1,5 @@
 import type { Approval, Choice } from '../types'
+import { sectionLabel, sectionPicks } from './stream-v3'
 
 export const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 
@@ -28,3 +29,24 @@ export const choiceMulti = (approval: Approval) => {
 /** What the bot asks as part of the flow (ChatPh2, ChatPh3Boost, ChatResume): a single pick with a suggested first option, drawn as the numbered bubble under the last line (v425). */
 export const choiceInThread = (approval: Approval) =>
   choiceMulti(approval) || (!approval.confirm && choiceSheet(approval) !== null && approval.sections[0]?.kind === 'choices' && approval.sections[0].selected.length > 0)
+
+/**
+ * The template card (ChatPh4Design) is a regular modal too: its question is the title, the templates are rows (the recommended one carries 추천), the toggle is a switch row,
+ * and the button names the pick ("클래식으로 만들기"). `answer` turns the pick and the switch into the card's answer.
+ */
+export const designModal = (approval: Approval) => {
+  const ti = approval.sections.findIndex((s) => s.kind === 'templates')
+  const tpl = approval.sections[ti]
+  if (tpl?.kind !== 'templates' || !approval.submit) return null
+  const gi = approval.sections.findIndex((s) => s.kind === 'toggle')
+  const toggle = approval.sections[gi]
+  const picks = (selected: number, on: boolean) => approval.sections.map((s, i) => (i === ti ? [selected] : i === gi ? (on ? [0] : []) : 'selected' in s ? s.selected : []))
+  return {
+    title: approval.question,
+    options: tpl.items.map((t) => ({ label: t.label, ...(t.recommended ? { sub: '추천' } : {}) })),
+    selected: tpl.selected[0] ?? 0,
+    ...(toggle?.kind === 'toggle' && toggle.items[0] ? { toggle: { label: toggle.items[0].label, on: toggle.selected.length > 0 } } : {}),
+    confirmLabel: (selected: number, on: boolean) => sectionLabel(approval, picks(selected, on)),
+    answer: (selected: number, on: boolean): [string, number[]] => [sectionLabel(approval, picks(selected, on)), sectionPicks(approval, picks(selected, on))],
+  }
+}

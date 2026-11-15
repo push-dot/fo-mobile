@@ -89,10 +89,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   const archive = useArchiveDocument(doc.data?.data)
   const duplicate = useDuplicateDocument()
   const [based, setBased] = useState(false)
-  const setBase = useSetBaseProfile(() => {
-    setBased(true)
-    showToast({ message: SET_BASE_COPY.toast })
-  })
+  const setBase = useSetBaseProfile(() => setBased(true))
   const item = doc.data?.data
   const application = apps.data?.data.find((a) => a.id === item?.applicationId) ?? null
   const posting = usePosting(application?.jobId ?? '')
@@ -217,7 +214,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
                 paddingX={18}
                 disabled={setBase.isPending}
                 onPress={() =>
-                  showChoiceModal({ title: SET_BASE_COPY.title, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.confirm, onPress: () => setBase.mutate(id) } })
+                  showChoiceModal({ title: SET_BASE_COPY.action, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.action, onPress: () => setBase.mutate(id) } })
                 }
                 style={{ marginTop: PROFILE_ACTIONS_TOP }}
               />

@@ -36,12 +36,24 @@ tags:
 - waitForAnimationToEnd:
     timeout: 3000
 
-# The remaining boards are iOS only. v415 boards pair an iOS and an Android panel per state (MyResumeStates.1/.2 the ⋯ menu,
-# DeleteDoc.1/.2 the delete alert), so the iOS run shoots each state twice; the rename alert and the 되돌리기 toast are no panels.
+# The remaining boards are iOS only: MyResumeStates.1 the ⋯ menu, .2 the rename modal, .3 the size toast; DeleteDoc.1 the delete alert, .2 the 되돌리기 toast.
 - runFlow:
     when:
       platform: iOS
     commands:
+      # MyResumeStates.3: a file over 20MB is refused with a toast (mock=pick-big hands the picker a 25MB PDF).
+      - openLink: push://my?mock=pick-big
+      - tapOn: "파일 등록"
+      - extendedWaitUntil:
+          visible: "서류 가져오기"
+          timeout: 10000
+      - tapOn: "파일에서 고르기"
+      - extendedWaitUntil:
+          visible: "20MB까지 올릴 수 있어요"
+          timeout: 10000
+      - takeScreenshot: MyResumeStates.3
+      - waitForAnimationToEnd:
+          timeout: 3000
       # The row's own accessibility label hides its ⋯ menu from iOS accessibility, so tap the ⋯ of the first file by position (its row spans 51-60% of the screen).
       - tapOn:
           point: "90%,56%"
@@ -50,13 +62,13 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: MyResumeStates.1
-      - takeScreenshot: MyResumeStates.2
       # 이름 변경 opens the regular rename modal (no 취소).
       - tapOn: "이름 변경"
       - extendedWaitUntil:
           visible: "서류 이름 바꾸기"
           timeout: 5000
       - waitForAnimationToEnd
+      - takeScreenshot: MyResumeStates.2
       - takeScreenshot: MyResumeRename
       - runFlow:
           file: _close_sheet.yaml
@@ -73,13 +85,13 @@ tags:
           timeout: 10000
       - waitForAnimationToEnd
       - takeScreenshot: DeleteDoc.1
-      - takeScreenshot: DeleteDoc.2
       - tapOn: "삭제"
       - extendedWaitUntil:
           visible: "서류를 삭제했어요"
           timeout: 10000
       - waitForAnimationToEnd:
           timeout: 3000
+      - takeScreenshot: DeleteDoc.2
       - takeScreenshot: DeleteDocToast
 # ToastSheetAndroid: the delete toast, then a confirm sheet opened while it shows (the toast must go).
 - runFlow:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { choiceInThread, choiceMulti, choiceSheet } from '../utils/choice-sheet'
+import { choiceInThread, choiceMulti, choiceSheet, designModal } from '../utils/choice-sheet'
 import { composerPlaceholder } from '../utils/usage'
 import type { Approval } from '../types'
 
@@ -77,5 +77,37 @@ describe('choiceMulti (ChatPh2XPrevent)', () => {
 
   it('leaves a multi card with other sections to the panel', () => {
     expect(choiceMulti({ ...prevent, sections: [...prevent.sections, { kind: 'chips', selected: [], options: ['a'] }] })).toBe(false)
+  })
+})
+
+describe('designModal', () => {
+  const design = card({
+    question: '디자인',
+    sections: [
+      { kind: 'templates', selected: [0], items: [{ id: 't0', label: '클래식', recommended: true }, { id: 't1', label: '모던' }] },
+      { kind: 'toggle', selected: [0], ids: ['photo'], items: [{ label: '프로필 사진 넣기' }] },
+    ],
+    submit: '클래식으로 만들기',
+    submitLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기' },
+    optionIds: ['submit', 't0', 't1', 'photo'],
+  })
+
+  it('draws the templates as rows with 추천 on the recommended one, the photo as a switch, and names the pick on the button', () => {
+    const modal = designModal(design)!
+    expect(modal.title).toBe('디자인')
+    expect(modal.options).toEqual([{ label: '클래식', sub: '추천' }, { label: '모던' }])
+    expect(modal.toggle).toEqual({ label: '프로필 사진 넣기', on: true })
+    expect(modal.confirmLabel(1, true)).toBe('모던으로 만들기')
+  })
+
+  it('answers with submit, the template and the switch', () => {
+    const [label, picks] = designModal(design)!.answer(1, true)
+    expect(label).toBe('모던으로 만들기')
+    expect(picks).toEqual([0, 2, 3])
+    expect(designModal(design)!.answer(0, false)[1]).toEqual([0, 1])
+  })
+
+  it('is not a template card without templates or a confirm button', () => {
+    expect(designModal(card({}))).toBeNull()
   })
 })

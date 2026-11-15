@@ -82,6 +82,13 @@ describe('bot:<id>:thread and :done', () => {
     expect((await api.bots.get('b-moa')).activity).toBeNull()
   })
 
+  it('is the newest page of a longer thread, so the room draws no greeting above it (ChatBotHeader boards)', async () => {
+    seedThread('b-moa', 'thread')
+    expect((await api.bots.transcript('b-moa')).page.nextCursor).not.toBeNull()
+    seedThread('b-moa', 'done')
+    expect((await api.bots.transcript('b-moa')).page.nextCursor).toBeNull()
+  })
+
   it('keeps only the one request of ChatBotStatusDone', async () => {
     seedThread('b-moa', 'done')
     const all = await turns()

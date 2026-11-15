@@ -36,7 +36,7 @@ describe('send a material to a bot', () => {
     expect(Object.keys(drafts.byBot)).toEqual(['b1'])
     expect(drafts.byBot.b1).toBe('a')
     expect(nav.dismissTo).toHaveBeenCalledWith('/bots/b1')
-    expect(toast).toHaveBeenCalledWith({ message: '자료를 붙였어요', tone: 'success' })
+    expect(toast).not.toHaveBeenCalled()
   })
 
   it('the picked company bot gets the chip and its chat opens over the home', () => {
@@ -44,7 +44,7 @@ describe('send a material to a bot', () => {
     expect(Object.keys(drafts.byBot)).toEqual(['b2'])
     expect(nav.dismissTo).toHaveBeenCalledWith('/(app)/(stack)/(tabs)/(bots)/bots')
     expect(nav.push).toHaveBeenCalledWith('/bots/b2')
-    expect(toast).toHaveBeenCalledWith({ message: '자료를 붙였어요', tone: 'success' })
+    expect(toast).not.toHaveBeenCalled()
   })
 
   it('the Push Bot opens by its address, the chip is under its id', () => {

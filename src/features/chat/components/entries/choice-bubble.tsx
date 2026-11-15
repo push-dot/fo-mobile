@@ -21,7 +21,7 @@ const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: strin
       onPress={onPress}
       style={{ flexDirection: 'row', gap: 10, paddingVertical: 9, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line }}
     >
-      <Text v="b1" color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
+      <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
         {mark ?? number}
       </Text>
       <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't1'} style={{ flexShrink: 1, lineHeight: ROW_LINE, paddingRight: spacing[1] }}>
@@ -31,13 +31,13 @@ const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: strin
   )
 }
 
-/** The bot's question with numbered options as one bubble under the last line (v425 `.mopts`); the first option is the suggested one. */
+/** The bot's question with numbered options as one bubble under the last line (v425 `.mopts`); the first option is the suggested one. The first row is 44 under the question: the bubble's gap 6 plus the list's margin 6. */
 const Numbered = ({ approval, onAnswer }: Props) => {
   const sheet = choiceSheet(approval)
   const section = approval.sections[0]
   if (!sheet || section?.kind !== 'choices') return null
   return (
-    <Bubble gap={0}>
+    <Bubble>
       <Text v="b1">{sheet.title}</Text>
       <View style={{ marginTop: 6 }}>
         {sheet.items.map((item, n) => (
@@ -45,7 +45,7 @@ const Numbered = ({ approval, onAnswer }: Props) => {
         ))}
       </View>
       {approval.warning ? (
-        <Text v="c1" color="t3" style={{ paddingTop: spacing[2] }}>
+        <Text v="c1" color="t3" style={{ paddingTop: 2 }}>
           {approval.warning}
         </Text>
       ) : null}
@@ -62,7 +62,7 @@ const Checklist = ({ approval, onAnswer }: Props) => {
   const toggle = (i: number) => setSel((cur) => (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]))
   const stop = () => (approval.secondary ? onAnswer(approval.secondary, 1) : onAnswer(multi.stopLabel!, multi.stopAt))
   return (
-    <Bubble gap={0}>
+    <Bubble>
       <Text v="b1">{approval.question}</Text>
       <View style={{ marginTop: 6 }}>
         {section.items.map((item, i) => (isStop(item) ? null : <Row key={item.label} mark={sel.includes(i) ? '☑' : '☐'} label={item.label} on={sel.includes(i)} onPress={() => toggle(i)} />))}
@@ -72,7 +72,7 @@ const Checklist = ({ approval, onAnswer }: Props) => {
         accessibilityRole="button"
         disabled={multi.disabled}
         onPress={() => onAnswer(sel.map((i) => multi.items[i]!.label).join(', '), sel)}
-        style={{ paddingTop: spacing[3] }}
+        style={{ paddingTop: 6 }}
       >
         <Text v="b1" weight="700" color={multi.disabled ? 't4' : 'acText'}>
           {multi.submitLabel} ›

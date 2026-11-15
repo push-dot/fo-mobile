@@ -99,6 +99,12 @@ tags:
 - takeScreenshot: ChatPh3BoostStop.3
 # The writing state holds for a minute (to-do 1/5, the draft card streaming), so this one goes last.
 - runFlow: _fresh_company.yaml
+# The board starts at the user's line: the greeting is an older turn.
+- runFlow:
+    file: _from.yaml
+    env:
+      BOT: "b-moa"
+      FROM: "user:last"
 - openLink: push://bots/b-moa?mock=run:ph3-write
 - runFlow:
     file: _say.yaml

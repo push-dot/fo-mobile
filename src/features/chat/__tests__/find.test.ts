@@ -82,6 +82,13 @@ describe('fromFirst', () => {
     expect(fromFirst([user('m1'), note('n1'), user('m2'), note('n2')], 'notice').map((i) => i.id)).toEqual(['n1', 'm2', 'n2'])
   })
 
+  it('starts at the nth line of the type, or the last one', () => {
+    const items = [user('m1'), bot('b1'), user('m2'), bot('b2'), user('m3')]
+    expect(fromFirst(items, 'agentText', 2).map((i) => i.id)).toEqual(['b2', 'm3'])
+    expect(fromFirst(items, 'user', 'last').map((i) => i.id)).toEqual(['m3'])
+    expect(fromFirst(items, 'user', 4).map((i) => i.id)).toEqual(['m1', 'b1', 'm2', 'b2', 'm3'])
+  })
+
   it('keeps the whole thread when no line has the type', () => {
     expect(fromFirst([user('m1'), user('m2')], 'todo').map((i) => i.id)).toEqual(['m1', 'm2'])
   })

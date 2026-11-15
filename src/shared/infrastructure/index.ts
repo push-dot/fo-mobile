@@ -15,6 +15,8 @@ export {
   stubPickDocument,
   failMockUploads,
   mockUploadFailing,
+  holdMockUpload,
+  mockUploadHeldAt,
   holdMockFit,
   mockFitHolding,
   setMockFitSoon,

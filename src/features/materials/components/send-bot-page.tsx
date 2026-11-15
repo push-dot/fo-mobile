@@ -32,13 +32,15 @@ export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) =>
   const material = useMaterialDetail(kind, id).data?.material
   const bots = useBots().data ?? []
   const attachment = material ? toAttachment(material) : null
+  const inModal = useInMaterialsModal()
   return (
     <PageModal
       title={SEND_PICK_TITLE}
       left={<GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => router.back() }]} />}
-      page={!useInMaterialsModal()}
+      page={!inModal}
+      mpage={inModal}
     >
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: 10 }}>
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: spacing[4] }}>
         <Text v="b2" color="t3">
           {SEND_PICK_HINT}
         </Text>

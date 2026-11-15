@@ -28,7 +28,7 @@ export const appliedFit = (listScore: number | null | undefined, fit: Applicatio
   const band = Math.floor(fit.reachable)
   return {
     score: fit.fitScore.toFixed(1),
-    title: fit.documentTitle ? `내 적합도 · ${fit.documentTitle}` : '내 적합도',
+    title: '내 적합도 · 허브 프로필 기준',
     headline: open && band > Math.floor(fit.fitScore) ? `조금만 고치면 ${band}점대예요` : null,
     parts: open
       ? PARTS.map(([key, label]) => ({ label, value: fit.parts[key].toFixed(1), pct: fit.parts[key] * 10, low: fit.parts[key] < 5 }))

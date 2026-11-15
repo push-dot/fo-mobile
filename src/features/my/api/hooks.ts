@@ -6,7 +6,7 @@ import { type LinkKind, type Offer, type Profile, type Settings } from '@push/ap
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
-import { useSession } from '@/shared/infrastructure'
+import { mockUploadHeldAt, useSession } from '@/shared/infrastructure'
 import { marketingResult, nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
 import {
   acceptOffer,
@@ -466,7 +466,7 @@ export const useOfferMessages = (offerId: string) => {
 
 type Upload = { name: string; size: number; progress: number }
 
-export const useUpload = (onDone: () => void) => {
+export const useUpload = (onDone?: () => void) => {
   const qc = useQueryClient()
   const [upload, setUpload] = useState<Upload | null>(null)
   const cancelled = useRef(false)
@@ -478,13 +478,13 @@ export const useUpload = (onDone: () => void) => {
     cancelled.current = false
     setUpload({ name: file.name, size, progress: 0.05 })
     timer.current = setInterval(
-      () => setUpload((u) => u && { ...u, progress: u.progress + (0.9 - u.progress) * 0.12 }),
+      () => setUpload((u) => u && { ...u, progress: mockUploadHeldAt() ?? u.progress + (0.9 - u.progress) * 0.12 }),
       200,
     )
     try {
       const s = await myApi.upload(file)
       if (cancelled.current) await myApi.remove(s.id).catch(() => undefined)
-      else onDone()
+      else onDone?.()
     } catch {
       if (!cancelled.current)
         Alert.alert('파일을 올리지 못했어요', '네트워크를 확인하고 다시 올려 주세요.')
