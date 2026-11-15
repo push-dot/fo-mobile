@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { STATUS_STEPS, canStop, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
+import { STATUS_STEPS, canStop, isStopping, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
 
 const at = (ms: number) => new Date(ms)
 const NOW = at(161_000)
 
 const run = (line: LiveLine) => statusLineView(line, NOW)
+
+describe('isStopping', () => {
+  it('is true only while the stop line is the run status (the composer then draws a grey send button)', () => {
+    expect(isStopping({ verbs: ['중지하는 중'] })).toBe(true)
+    expect(isStopping({ verbs: ['공고 읽는 중'] })).toBe(false)
+    expect(isStopping(null)).toBe(false)
+  })
+})
 
 describe('statusLineView', () => {
   it('draws the waiting state as the idle mascot alone (rule 29)', () => {

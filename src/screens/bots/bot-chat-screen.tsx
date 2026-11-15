@@ -37,6 +37,7 @@ import {
   turnFailed,
   followScroll,
   hasOlder,
+  isStopping,
   shownItems,
   headerLightOf,
   openBot,
@@ -287,7 +288,7 @@ const Thread = ({ id }: { id: string }) => {
             botId={id}
             inputRef={input}
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
-            working={!!chat.working}
+            working={!!chat.working && !isStopping(chat.working)}
             disabled={!!limit.banner}
             onGrow={setGrow}
             onStop={() => stop(id)}
