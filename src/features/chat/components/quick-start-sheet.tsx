@@ -54,7 +54,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
   const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
   // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
-  const input = { picked, url: startLink(url, clip), chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
+  const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)

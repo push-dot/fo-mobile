@@ -3,6 +3,7 @@ import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, PageModal, isChatAttachment, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
 import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
 import { pickDocument } from '@/shared/infrastructure'
+import { displayName } from '@/shared/utility/display-name'
 import { Button, Icon, Text, TextField } from '@/shared/components'
 import { onAccent, selectedRing, spacing, type, useColors } from '@/theme'
 
@@ -21,7 +22,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
   const docs = useChatDocs()
   const bookmarks = useBookmarkList(true)
   const sections: { title: string; rows: Row[] }[] = [
-    { title: '마이 › 서류', rows: (docs.data ?? []).map((d) => ({ id: d.id, title: d.fileName, meta: docMeta(d) })) },
+    { title: '마이 › 서류', rows: (docs.data ?? []).map((d) => ({ id: d.id, title: displayName(d.fileName), meta: docMeta(d) })) },
     { title: '홈 › 북마크 공고', rows: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, title: `${p.company} · ${p.title}`, meta: postingMeta(p) })) },
   ]
   const toggle = (id: string) => setPicks((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))

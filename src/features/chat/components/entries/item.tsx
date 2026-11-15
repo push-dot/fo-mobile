@@ -230,7 +230,7 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
       <Surface>
         <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
           <Text v="b2" weight="700" numberOfLines={1}>
-            {item.name}
+            {displayName(item.name)}
           </Text>
           {!done ? (
             <View style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}>
