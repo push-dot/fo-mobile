@@ -70,6 +70,12 @@ tags:
     timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh1
+# ChatPh1Fit starts at the fit sentence: the run above it is older turns.
+- runFlow:
+    file: _from.yaml
+    env:
+      BOT: "b-moa"
+      FROM: "fit"
 - extendedWaitUntil:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
     timeout: 40000

@@ -57,6 +57,8 @@ const FILE_PAGE = 'A4 1쪽 · 186KB'
 const FILE_SAVED = '저장됨'
 export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필 만들기']
 const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
+/** ChatPh6Result and ChatPh6ResultFile: the bullets are lines of the closing text (the bot's markdown list), not the structured summary of ChatDone. */
+const listed = (text: string) => `${text}\n${BULLETS.map((line) => `• ${line}`).join('\n')}`
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
 const JD_RUN_HOLD = 20_000
@@ -120,7 +122,7 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
 // What the mapper makes of the server's result frame: the task line, the summary, then the card.
 // The done boards draw the finished task line above the to-do card, so it comes first when the card is new to the thread.
 const TASK_RESULT = '반영했어요 · 2줄 추가, 1줄 삭제'
-const profileDone = (wait: number, score: string, josa: string, bullets?: string[]): Step[] => [
+const profileDone = (wait: number, score: string, josa: string, bullets?: string[], asList = false): Step[] => [
   s(wait + 200, {
     type: 'result',
     source: 'profile',
@@ -129,11 +131,12 @@ const profileDone = (wait: number, score: string, josa: string, bullets?: string
     name: '김서준',
     headline: '백엔드 엔지니어',
     title: '김서준 · 백엔드 엔지니어',
-    subtitle: 'Push 프로필 · 방금 수정',
+    // Without a subtitle the closing line is the link "Push 프로필 보기 ›" (ChatPh6Result).
+    subtitle: asList ? '' : 'Push 프로필 · 방금 수정',
     documentId: 'd1',
     company: '모아페이',
     actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }],
-    ...closing(`다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`, bullets),
+    ...closing((asList ? listed : (t: string) => t)(`다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`), bullets),
   }),
 ]
 const profileCard = (score: string, josa = '로'): Step[] => [
@@ -145,12 +148,12 @@ const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, j
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
 const EXT_FILE = '김서준_모아페이_백엔드.pdf'
-const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; bare?: boolean; josa?: string }): Step[] => {
+const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; bare?: boolean; josa?: string; asList?: boolean }): Step[] => {
   const labels = o.todo ?? FILE_TODO
   const job = o.job ?? true
   const saved = o.saved ?? true
   return [
-    // ChatPh6ResultFile and ChatPh6ResultFail draw only the closing line and the card, no task lines or bullets.
+    // ChatPh6ResultFile and ChatPh6ResultFail draw only the closing line and the card, no task lines.
     ...(o.bare
       ? []
       : [
@@ -164,7 +167,8 @@ const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boo
       taskLine: '',
       checklist: labels,
       fileName: o.fileName ?? EXT_FILE,
-      pageLine: FILE_PAGE,
+      // The bare boards name the pages only (ChatPh6ResultFile "· A4 1쪽"); the full run adds the size (ChatDone "· A4 1쪽 · 186KB").
+      pageLine: o.bare ? FILE_PAGE.split(' · ')[0]! : FILE_PAGE,
       ...(saved ? { savedLine: FILE_SAVED } : {}),
       cardMeta: FILE_PAGE,
       documentId: 'src-upload',
@@ -175,7 +179,7 @@ const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boo
             ...(job ? [{ id: 'apply', label: '모아페이에 바로 지원하기' }] : []),
             ...(saved ? [{ id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' }] : []),
           ],
-      ...closing(o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`, o.bare ? undefined : BULLETS),
+      ...closing((o.asList ? listed : (t: string) => t)(o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`), o.bare ? undefined : BULLETS),
     }),
     done,
   ]
@@ -226,20 +230,20 @@ const ph0Input: Step[] = [
     title: '어떤 산출물을 만들까요?',
     options: [{ id: 'cancel', label: '그만하기' }],
     sections: [
-      { kind: 'chips', id: 's0', multiple: true, options: [{ id: 's0.0', label: '이력서' }, { id: 's0.1', label: '포트폴리오' }, { id: 's0.2', label: '자기소개서' }], selected: ['s0.0'] },
+      { kind: 'chips', id: 's0', title: '만들 것', multiple: true, options: [{ id: 's0.0', label: '이력서' }, { id: 's0.1', label: '포트폴리오' }, { id: 's0.2', label: '자기소개서' }], selected: ['s0.0'] },
       {
         kind: 'rows',
         id: 's1',
         title: '가져올 자료',
         options: [
           { id: 's1.0', label: '허브 프로필', sub: '기본 서류' },
-          { id: 's1.1', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '홈 › 북마크 공고', badge: '모', action: 'change' },
+          { id: 's1.1', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 · 홈 › 북마크 공고', action: 'change' },
           { id: 'm_github', label: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요', action: 'change' },
         ],
       },
-      { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
+      { kind: 'chips', id: 's2', title: '말투', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
     ],
-    submit: { label: '이대로 진행' },
+    submit: { label: '시작하기' },
   }),
 ]
 const ph0Start: Step[] = [
@@ -379,22 +383,26 @@ const ph3Boost: Step[] = [
   }),
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
-// ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design (the card follows after the tour has shot the sentence).
+// ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.
 const QUALITY_HOLD = 10_000
+// The card's title is the modal's (ChatPh4Design); the sentence under the bot's line is its own bubble, which a tool frame keeps from merging into the one above.
+const DESIGN_ASK = ask({
+  type: 'choice',
+  id: 'ph4-design',
+  title: '디자인',
+  options: [{ id: 'cancel', label: '그만하기' }],
+  recommended: 't0',
+  sections: [
+    { kind: 'thumbnails', id: 's0', options: [{ id: 't0', label: '클래식' }, { id: 't1', label: '모던' }, { id: 't2', label: '컴팩트' }, { id: 't3', label: 'ATS' }], selected: ['t0'] },
+    { kind: 'toggle', id: 's1', options: [{ id: 'photo', label: '프로필 사진 넣기' }], selected: ['photo'] },
+  ],
+  submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
+})
 const ph4Design: Step[] = [
   s(QUALITY_HOLD, agent('템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
-  ask({
-    type: 'choice',
-    id: 'ph4-design',
-    title: '검증을 마쳤어요. 디자인을 골라 주세요.',
-    options: [{ id: 'cancel', label: '그만하기' }],
-    recommended: 't0',
-    sections: [
-      { kind: 'thumbnails', id: 's0', options: [{ id: 't0', label: '클래식' }, { id: 't1', label: '모던' }, { id: 't2', label: '컴팩트' }, { id: 't3', label: 'ATS' }], selected: ['t0'] },
-      { kind: 'toggle', id: 's1', options: [{ id: 'photo', label: '프로필 사진 넣기' }], selected: [] },
-    ],
-    submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
-  }),
+  s(100, tool('design', '디자인 고르기', undefined, 'ok')),
+  s(200, agent('검증을 마쳤어요. 디자인을 골라 주세요.')),
+  DESIGN_ASK,
 ]
 const QUALITY_MD = [
   '품질 검사를 마치고 추천 수정까지 반영했어요.',
@@ -404,15 +412,15 @@ const QUALITY_MD = [
   '• 경력 본문의 현재형 문장 2곳',
   '• 말투를 “~했습니다”로 통일',
 ].join('\n')
-const ph4Quality: Step[] = [
+const ph4Check: Step[] = [
   s(200, status('검사하는 중…')),
   s(300, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장을 하나씩 보는 중')),
   s(1200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
   s(300, agent(QUALITY_MD)),
   s(200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '추천 수정 3곳도 반영했어요')),
   s(300, agent('이제 디자인을 고를게요.')),
-  ...ph4Design,
 ]
+const ph4Quality: Step[] = [...ph4Check, ...ph4Design]
 const ph5: Step[] = [
   s(200, status('정리하는 중…')),
   s(300, tool('design', '디자인 적용', '모던', 'ok', 'A4 1쪽 · 여백과 줄 간격 맞춤')),
@@ -600,7 +608,7 @@ export const TOKENS: Record<string, Step[]> = {
   'ext-done': ext({}),
   'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'Push 프로필 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
   'ext-nosave': ext({ saved: false }),
-  'ext-ok': ext({ josa: '으로', bare: true }),
+  'ext-ok': ext({ josa: '으로', bare: true, asList: true }),
   'ext-fail': ext({ josa: '으로', saved: false, bare: true }),
   // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
@@ -619,8 +627,8 @@ export const TOKENS: Record<string, Step[]> = {
   ph5: [...ph5, ...finish('6.9 → 8.1', '으로')],
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
-  // ChatPh6Result: the closing line and the card, with no task lines or bullets above them.
-  'profile-result': [...profileDone(300, '6.9 → 8.1', '으로'), done],
+  // ChatPh6Result: the closing line with its list and the profile link, with no task lines above it.
+  'profile-result': [...profileDone(300, '6.9 → 8.1', '으로', undefined, true), done],
   'ph1-free': ph1Plan('FREE'),
   'ph1-ultra': ph1Plan('ULTRA'),
   // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.
@@ -653,8 +661,13 @@ export const TOKENS: Record<string, Step[]> = {
   // ChatPh3BoostStop, first state: the board has the user line, the score card and the stop line, with no 한 번 더 올리기 answer between, so the run ends here by itself.
   'boost-max': [...ph3Boost.slice(0, -1), s(400, agent('최대 5번까지 올렸어요.')), done],
   // ChatPh4Quality draws the quality check right under this line, without the boost card.
-  quality: after(ph4Quality, QUALITY_LATER),
-  '품질 검사로 넘어가기': after(ph4Quality, QUALITY_LATER),
+  // ChatPh4Quality ends at the sentence, with no status line; the design is the next run (ChatPh4Design's user line).
+  quality: after([...ph4Check, done], QUALITY_LATER),
+  '품질 검사로 넘어가기': after([...ph4Check, done], QUALITY_LATER),
+  design: ph4Design,
+  '2개 반영하고 디자인으로': ph4Design,
+  // An earlier turn of the same document flow: its to-do card is why the composer says 작업 중에도 말할 수 있어요 on the later boards (ChatPh5).
+  'flow-history': [s(200, todo('todo', TODO, TODO.length)), done],
   'ph2x': ph2xApproach,
   '네, 시작해 주세요': ph1,
   '피드백만 받을게요': feedbackOnly,

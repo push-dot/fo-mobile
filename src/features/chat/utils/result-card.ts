@@ -37,13 +37,18 @@ export const resultButtons = (card: Pick<ResultFields, 'actions'>) => resultActi
 export const doneNextActions = (card: Pick<ResultFields, 'actions'> & { pendingNote?: string }) =>
   resultActionsFor(card).filter((action) => action.id !== 'view')
 
+/** ChatDoneNext draws the title and the rows only: the sentence "다음으로 무엇을 할까요?" is the rows' own meaning. */
 export const doneNextCopy = (card: Pick<ResultFields, 'source'>) => ({
   title: card.source === 'profile' ? '프로필을 다 고쳤어요' : '이력서를 다 고쳤어요',
-  message: '다음으로 무엇을 할까요?',
 })
 
 /** The server sends savedLine with an external file it saved; no line means the save failed (ChatPh6ResultFail). */
 export const saveFailed = (card: Pick<ResultFields, 'source' | 'savedLine'>) => card.source === 'external' && !card.savedLine
+
+export const SAVE_FAIL_TITLE = '내 서류에 저장하지 못했어요'
+export const SAVE_FAIL_MESSAGE = '네트워크를 확인하고 다시 시도해 주세요.'
+/** What 다시 시도 sends: the bot saves the file it just made. */
+export const SAVE_RETRY_TEXT = '내 서류에 저장해 줘'
 
 export const PROFILE_SAVE_TITLE = 'Push 프로필에 저장했어요'
 

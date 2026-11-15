@@ -5,7 +5,15 @@ export type ChoiceModalRequest = {
   title: string
   message?: string
   /** A choice: one plain row per option; the modal closes first, then the option runs. */
-  items?: { label: string; destructive?: boolean; onPress: () => void }[]
+  items?: { label: string; destructive?: boolean; /** The row opens something next: a grey › at its right edge. */ chevron?: boolean; onPress: () => void }[]
+  /** One pick out of rows, an optional switch row, and a button that names the pick (ChatPh4Design). */
+  form?: {
+    options: { label: string; sub?: string }[]
+    selected: number
+    toggle?: { label: string; on: boolean }
+    confirmLabel: (selected: number, on: boolean) => string
+    onConfirm: (selected: number, on: boolean) => void
+  }
   /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
   confirm?: { label: string; onPress: () => void }
   /** The sheet was swiped away without a pick. */

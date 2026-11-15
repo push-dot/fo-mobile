@@ -5,12 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { showChoiceModal } from '@/shared/navigation'
-import { displayName } from '@/shared/utility/display-name'
-import { SPRING } from '../../constants'
+import { NEW_TASK_TITLE, SPRING } from '../../constants'
+import ApprovalForm from './approval-form'
 import ApprovalModal from './approval-modal'
 import { RISE_MS, riseOnMount } from './approval-rise'
 import type { Approval, ApprovalSection, Choice } from '../../types'
-import { choiceSheet, confirmModal } from '../../utils/choice-sheet'
+import { choiceSheet, confirmModal, designModal } from '../../utils/choice-sheet'
 import { approvalModalKind } from '../../utils/approval-modal'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
@@ -47,11 +47,11 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   // push-be #224 section card (10-02, 10-21, 10-22): answered with submit + picked ids; cancel is its own button or chip.
   const sectioned = approval.sections.some((s) => s.kind !== 'choices')
   const last = approval.sections.at(-1)
-  // ChatPh0Input has no confirm button: tapping the closing single-pick chip (말투) sends the card.
+  // A form that ends on a single-pick chip row and has no confirm button sends the card when that chip is tapped.
   const chipSends = sectioned && sendsOnChip(approval)
   const cancel = () => onAnswer(approval.secondary!, approval.optionIds?.indexOf('cancel') ?? -1)
   const sendSections = (picks: number[][]) => onAnswer(sectionLabel(approval, picks), sectionPicks(approval, picks))
-  const sectionSubmit = sectioned && approval.submit && !chipSends ? sectionLabel(approval, sel) : undefined
+  const sectionSubmit = sectioned && approval.submit && !chipSends ? (modal === 'page' ? approval.submit : sectionLabel(approval, sel)) : undefined
   const multi = multiPick(approval, sel)
   const submitRow = !sectioned && !!approval.submit
 
@@ -66,9 +66,10 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
     return () => (stop(), rise.stopAnimation())
   }, [rise, reduce])
 
-  // A single-pick card the bot has no suggestion for (a help question, a page permission) and an edit card are regular modals, so the panel draws nothing; swiping one away hands the floor to the composer.
+  // A single-pick card the bot has no suggestion for (a help question, a page permission), an edit card and the template card are regular modals, so the panel draws nothing; swiping one away hands the floor to the composer.
   const sheet = choiceSheet(approval)
   const confirm = confirmModal(approval)
+  const design = designModal(approval)
   // Opens once, and only while the chat is the focused screen: another sheet over it would make a modal on a modal.
   const focused = useIsFocused()
   const opened = useRef(false)
@@ -84,6 +85,12 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
       })
     } else if (confirm) {
       showChoiceModal({ title: confirm.title, message: confirm.message, confirm: { label: confirm.confirm, onPress: () => onAnswer(confirm.confirm, 0) }, onDismiss: onSay })
+    } else if (design) {
+      showChoiceModal({
+        title: design.title,
+        form: { options: design.options, selected: design.selected, toggle: design.toggle, confirmLabel: design.confirmLabel, onConfirm: (i, on) => onAnswer(...design.answer(i, on)) },
+        onDismiss: onSay,
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
   }, [focused])
@@ -155,43 +162,6 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
           </View>
         )
       }
-      case 'rows':
-        return (
-          <View key={si} style={{ gap: PANEL_GAP }}>
-            <Sub label={s.title} />
-            {s.items.map((r) => (
-              <View key={r.id ?? r.title} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[2], paddingHorizontal: spacing[1] }}>
-                {/* ChatPh0Input: a link row has no icon (owner rule 3, no needless icons); its text starts at the row's left edge. */}
-                {r.tag === 'link' ? null : r.tag.length === 1 ? (
-                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.ac, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text v="c1" weight="800" style={{ color: onAccent }}>
-                      {r.tag}
-                    </Text>
-                  </View>
-                ) : null}
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text v="b2" weight="700" numberOfLines={1}>
-                    {displayName(r.title)}
-                  </Text>
-                  <Text v="c2" weight={r.ac ? '700' : '400'} color={r.ac ? 't1' : 't3'}>
-                    {r.sub}
-                  </Text>
-                </View>
-                {r.action === 'change' ? <MiniChip label="변경" onPress={() => setPicking(true)} /> : null}
-              </View>
-            ))}
-          </View>
-        )
-      case 'templates':
-        return (
-          <View key={si} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], paddingTop: 6, paddingBottom: spacing[1] }}>
-            {s.items.map((t, i) => (
-              <TemplateChip key={t.label} label={t.label} recommended={t.recommended} on={sel[si]!.includes(i)} onPress={() => toggle(si, i)} />
-            ))}
-          </View>
-        )
-      case 'toggle':
-        return s.items.map((ch, i) => <ChoiceRow key={`${si}-${i}`} choice={ch} on={sel[si]!.includes(i)} tall={approval.sections.some((x) => x.kind === 'templates')} onPress={() => toggle(si, i, true)} />)
     }
   }
 
@@ -261,12 +231,17 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
-  if (sheet || confirm) return null
+  if (sheet || confirm || design) return null
 
-  if (modal !== 'none')
+  if (modal === 'page')
     return (
-      <ApprovalModal kind={modal} onClose={onSay} own={picking}>
-        {picking ? renderPicker(() => setPicking(false)) : body}
+      <ApprovalModal
+        title={NEW_TASK_TITLE}
+        onClose={onSay}
+        own={picking}
+        footer={sectionSubmit ? <Button label={sectionSubmit} onPress={() => sendSections(sel)} style={{ minHeight: 52, borderRadius: 26 }} /> : undefined}
+      >
+        {picking ? renderPicker(() => setPicking(false)) : <ApprovalForm approval={approval} sel={sel} onToggle={toggle} onChange={() => setPicking(true)} />}
       </ApprovalModal>
     )
 
@@ -302,17 +277,10 @@ const Question = ({ label }: { label: string }) => (
   </Text>
 )
 
-const Sub = ({ label }: { label: string }) => (
-  <Text v="c1" weight="700" color="t3" style={{ paddingTop: 10, paddingHorizontal: spacing[1], paddingBottom: 2 }}>
-    {label}
-  </Text>
-)
-
-/** `tall`: the row is `.ch.two` (64 high, top aligned) although it has no description (ChatPh4Design's 프로필 사진 넣기). */
-const ChoiceRow = ({ choice, on, bare, center, tall, onPress }: { choice: Choice; on: boolean; bare?: boolean; center?: boolean; tall?: boolean; onPress: () => void }) => {
+const ChoiceRow = ({ choice, on, bare, center, onPress }: { choice: Choice; on: boolean; bare?: boolean; center?: boolean; onPress: () => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
-  const two = !!choice.desc || !!tall
+  const two = !!choice.desc
   return (
     <Pressable
       accessibilityRole="checkbox"
@@ -379,26 +347,6 @@ const MiniChip = ({ label, on, onPress }: { label: string; on?: boolean; onPress
     >
       <Text v="c1" weight="600" style={{ color: on ? c.bg : c.t2 }}>
         {label}
-      </Text>
-    </Pressable>
-  )
-}
-
-/** A template is a word, not a drawing (ChatPh4Design `.tpo`): 40 high, 15 regular, the recommended one carries a 13 "· 추천". */
-const TemplateChip = ({ label, recommended, on, onPress }: { label: string; recommended?: boolean; on: boolean; onPress: () => void }) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected: on }}
-      accessibilityLabel={recommended ? `${label}, 추천` : label}
-      onPress={onPress}
-      hitSlop={hitSlopTo(40)}
-      style={{ height: 40, paddingHorizontal: spacing[4], borderRadius: radius.lg, justifyContent: 'center', backgroundColor: on ? c.t1 : c.fill }}
-    >
-      <Text v="b2" style={{ color: on ? c.bg : c.t1 }}>
-        {label}
-        {recommended ? <Text v="c1" style={{ opacity: on ? 0.7 : 1, color: on ? c.bg : c.t3 }}>{` · 추천`}</Text> : null}
       </Text>
     </Pressable>
   )

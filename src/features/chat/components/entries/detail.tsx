@@ -7,7 +7,7 @@ const Detail = ({ text, more }: { text: string; more?: string }) => {
   const [open, setOpen] = useState(false)
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((v) => !v)}>
-      <Text v="c1" color="t3" numberOfLines={open ? undefined : 1}>
+      <Text v="c1" color="t3" numberOfLines={open ? undefined : 1} style={{ fontSize: 14, lineHeight: 20 }}>
         {open ? (more ?? text) : text}
       </Text>
     </Pressable>

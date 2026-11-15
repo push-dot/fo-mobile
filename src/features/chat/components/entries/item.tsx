@@ -176,7 +176,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
         <Bubble>
           <Rich v="b1" text={first.text} markId={item.id} />
           <Pressable accessibilityRole={onPlan ? 'button' : 'text'} disabled={!onPlan} onPress={onPlan}>
-            <Text v="c1" color="t3">
+            <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
               {FIT_LOCKED}
             </Text>
           </Pressable>
