@@ -8,7 +8,7 @@ import { usePostingDetail } from '../api/hooks'
 import { dday } from '../utils'
 import Logo from './logo'
 
-const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact?: boolean }) => {
+const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
   const c = useColors()
   const { data: full } = usePostingDetail(posting.id)
   const career = full ? careerLabel(full) : null
@@ -22,7 +22,7 @@ const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact
       <View
         style={{
           borderRadius: radius.card,
-          paddingVertical: compact ? spacing[3] : spacing[4],
+          paddingVertical: spacing[4],
           paddingHorizontal: spacing[4],
           flexDirection: 'row',
           alignItems: 'center',
