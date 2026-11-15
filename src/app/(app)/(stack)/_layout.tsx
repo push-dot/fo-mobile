@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import { ConsentPromptListener } from '@/features/chat'
 import { fullPageOptions, modalOptions, sheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
@@ -53,7 +53,6 @@ const SignedInStack = () => {
       <Stack.Screen name="materials/pick" />
       <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="account-usage" />
-      {/* PlanUltra: the plan is a full page; 구독 안내 opened from it is a page sheet again, like the account. */}
       <Stack.Screen name="plan" options={fullPageOptions()} />
       <Stack.Screen name="job-filter" options={sheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
