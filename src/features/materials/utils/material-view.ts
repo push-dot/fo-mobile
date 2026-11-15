@@ -74,7 +74,7 @@ const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: 
     ]),
   document: (m, usedBy) =>
     facts([
-      ['종류', 'Push 서류'],
+      ['종류', 'Push 프로필'],
       ['만든 곳', madeByFact(m.madeBy)],
       ['수정', `${monthDay(m.updatedAt)} ${formatTime(m.updatedAt)}`],
       ['쓰인 대화', usedBy.map(botName).join(', ')],

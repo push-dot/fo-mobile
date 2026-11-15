@@ -122,7 +122,7 @@ export const OFFER_ARCHIVED_BADGE = '보관함'
 export { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from '@push/shared'
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
-export const PUSH_DOCS_TITLE = 'Push 서류'
+export const PUSH_DOCS_TITLE = 'Push 프로필'
 export const UPLOADS_TITLE = '올린 파일'
 
 export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | 'notifyOffer' | 'notifyComment' | 'notifyAiDone' | 'notifyApplicationStage'>; label: string }[] = [

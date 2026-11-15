@@ -17,7 +17,7 @@ describe('my detail rules', () => {
     expect(fitTen(undefined)).toBe('')
   })
 
-  it('reads a Push 서류 into profile sections the way push-be does', () => {
+  it('reads a Push 프로필 into profile sections the way push-be does', () => {
     const profile = hubProfile(
       doc(
         h('헤드라인'),
@@ -46,7 +46,7 @@ describe('my detail rules', () => {
     })
   })
 
-  it('treats a Push 서류 without headings as an intro', () => {
+  it('treats a Push 프로필 without headings as an intro', () => {
     expect(hubProfile(doc(p('첫 줄'), p('• 둘째 줄')))).toEqual({
       headline: '',
       intro: '첫 줄\n둘째 줄',
