@@ -28,6 +28,7 @@ export const MaterialLinkAddPage = () => {
   return (
     <PageModal
       title={LINK_ADD.title}
+      mpage
       left={<GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => router.back() }]} />}
       footer={<Button label={LINK_ADD.submit} onPress={() => add.mutate({ url: full, kind: kind ?? undefined, aiRead })} disabled={!valid || add.isPending} />}
     >

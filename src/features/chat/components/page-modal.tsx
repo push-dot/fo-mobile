@@ -10,6 +10,9 @@ import { spacing, useColors } from '@/theme'
 
 const GLASS_BUTTON = 44
 
+/** The 자료 modal's pages (`.bsh-h` and `.mpage`): 14 above the header, 4 under it, 16 beside it, a 52 spacer when no button sits right, a body that follows the header, and 20 around the actions. */
+const MPAGE = { top: 14, below: 4, side: 16, spacer: 52, inset: 20 }
+
 const PageModal = ({
   onClose = () => router.back(),
   title,
@@ -20,6 +23,7 @@ const PageModal = ({
   footer,
   tight,
   page,
+  mpage,
   scroll = true,
 }: {
   onClose?: () => void
@@ -33,29 +37,32 @@ const PageModal = ({
   tight?: boolean
   /** A full page (the plan route, owner rule 8), not a sheet: the header sits 6 under the status bar inset (PlanUltra: back button y68). */
   page?: boolean
+  /** A page pushed inside the 자료 modal (MaterialDetail*, BotPick, MaterialsLinkAdd). */
+  mpage?: boolean
   scroll?: boolean
 }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
+  const modalPage = !!mpage && ios
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: headerInset(ios, !!nav), paddingBottom: tight ? 0 : spacing[2] }}>
+    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
         {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
         </Text>
-        <View style={{ minWidth: 44, alignItems: 'flex-end' }}>{right}</View>
+        <View style={{ minWidth: modalPage && !right ? MPAGE.spacer : 44, height: modalPage && !right ? MPAGE.spacer : undefined, alignItems: 'flex-end' }}>{right}</View>
       </View>
       {scroll ? (
-        <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: spacing[1] }} contentContainerStyle={{ flexGrow: 1, gap: spacing[1], paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
+        <ScrollView keyboardDismissMode="on-drag" style={{ marginTop: modalPage ? 0 : spacing[1] }} contentContainerStyle={{ flexGrow: 1, gap: spacing[1], paddingBottom: insets.bottom + spacing[6] + (footer ? 80 : 0) }}>{children}</ScrollView>
       ) : (
-        <View style={{ flex: 1, marginTop: spacing[1] }}>{children}</View>
+        <View style={{ flex: 1, marginTop: modalPage ? 0 : spacing[1] }}>{children}</View>
       )}
       {footer ? (
         <View
           style={[
-            { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (ios ? 6 : 10) },
+            { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: modalPage ? MPAGE.inset : spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (modalPage ? MPAGE.inset : ios ? 6 : 10) },
             // The boards' `.and .ctabar`: a solid `bg` bar with a 1px line on top, no fade.
             ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
           ]}
