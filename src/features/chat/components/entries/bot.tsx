@@ -34,46 +34,46 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
   return (
     <Bubble gap={item.card ? 10 : 6} wide={!!item.card}>
-        {splitBotText(item.text).map((block, i) =>
-          block.kind === 'paragraph' ? (
-            <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
-          ) : block.kind === 'ordered' ? (
-            <View key={i} style={{ gap: spacing[1] }}>
-              {block.items.map((line, n) => (
-                <Rich key={line} v="b1" text={`${n + 1}. ${line}`} markId={item.id} {...big} />
-              ))}
-            </View>
-          ) : (
-            // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
-            <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
-              {block.items.map((line) => (
-                <Rich key={line} v="b1" text={line} markId={item.id} {...big} />
-              ))}
-            </View>
-          ),
-        )}
-        {item.detail ? <Detail text={item.detail} /> : null}
-        {item.card ? <BubbleCard item={item.card} /> : null}
-        {item.bullets?.length ? (
-          <Text v="b2" color="t2">
-            {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}
-          </Text>
-        ) : null}
-        {item.sources?.length ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
-            <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
-              출처:
-            </Text>
-            {item.sources.map((source) => (
-              <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
-                <FindText itemId={`${item.id}:source`} v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
-                  {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
-                  <Marked text={source.title} itemId={`${item.id}:source`} />
-                </FindText>
-              </Pressable>
+      {splitBotText(item.text).map((block, i) =>
+        block.kind === 'paragraph' ? (
+          <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
+        ) : block.kind === 'ordered' ? (
+          <View key={i} style={{ gap: spacing[1] }}>
+            {block.items.map((line, n) => (
+              <Rich key={line} v="b1" text={`${n + 1}. ${line}`} markId={item.id} {...big} />
             ))}
           </View>
-        ) : null}
+        ) : (
+          // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
+          <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
+            {block.items.map((line) => (
+              <Rich key={line} v="b1" text={line} markId={item.id} {...big} />
+            ))}
+          </View>
+        ),
+      )}
+      {item.detail ? <Detail text={item.detail} /> : null}
+      {item.card ? <BubbleCard item={item.card} /> : null}
+      {item.bullets?.length ? (
+        <Text v="b2" color="t2">
+          {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}
+        </Text>
+      ) : null}
+      {item.sources?.length ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
+          <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
+            출처:
+          </Text>
+          {item.sources.map((source) => (
+            <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
+              <FindText itemId={`${item.id}:source`} v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
+                {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
+                <Marked text={source.title} itemId={`${item.id}:source`} />
+              </FindText>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
     </Bubble>
   )
 }

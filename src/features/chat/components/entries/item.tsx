@@ -580,4 +580,3 @@ export const Queued = ({ text }: { text: string }) => {
 }
 
 export { default as Rich } from './rich'
-export { default as Glyph } from './glyph'

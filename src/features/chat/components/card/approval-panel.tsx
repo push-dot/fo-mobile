@@ -61,7 +61,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   }, [rise, reduce])
 
   // iOS: a single-pick card is the platform's action sheet, so the panel draws nothing; leaving it hands the floor to the composer.
-  const sheet = Platform.OS === 'ios' && !expired ? choiceSheet(approval) : null
+  const sheet = Platform.OS === 'ios' ? choiceSheet(approval) : null
   useEffect(() => {
     if (!sheet) return
     showActionSheet({
