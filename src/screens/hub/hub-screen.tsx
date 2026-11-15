@@ -17,12 +17,13 @@ import { Badge, Button, Chip, ChipRow, Glass, Icon, SkeletonRows, StatusNote, Te
 import { radius, spacing, useColors } from '@/theme'
 
 // The boards draw the search pill as glass on iOS and as a filled pill on Android.
-const SearchPill = Platform.OS === 'ios' ? InteractiveGlass : View
+// Interactive glass draws no RN boxShadow, which the list's clip would cut just under the header.
 const InteractiveGlass = ({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) => (
   <Glass interactive style={style}>
     {children}
   </Glass>
 )
+const SearchPill = Platform.OS === 'ios' ? InteractiveGlass : View
 const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
 
 // Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
