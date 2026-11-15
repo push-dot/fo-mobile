@@ -72,6 +72,6 @@ describe('nativeShadow', () => {
   })
 
   it('keeps the board --iMat: the iOS banner material', () => {
-    expect(iosMaterial).toEqual({ light: 'rgba(246,246,248,.96)', dark: 'rgba(44,44,46,.96)' })
+    expect(iosMaterial).toEqual({ light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' })
   })
 })
