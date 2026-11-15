@@ -53,7 +53,7 @@ const Numbered = ({ approval, onAnswer }: Props) => {
   )
 }
 
-/** ChatPh2XPrevent: checkboxes, the stop row, and "N개로 진행하기 ›" as the closing link. */
+/** ChatPh2XPrevent: the checkboxes, the stop row as a list of its own (6 gap + 6 margin under them), and "N개로 진행하기 ›" as the closing link (margin 8). */
 const Checklist = ({ approval, onAnswer }: Props) => {
   const section = approval.sections[0]
   const [sel, setSel] = useState<number[]>(() => (section?.kind === 'choices' ? section.selected : []))
@@ -66,15 +66,19 @@ const Checklist = ({ approval, onAnswer }: Props) => {
       <Text v="b1">{approval.question}</Text>
       <View style={{ marginTop: 6 }}>
         {section.items.map((item, i) => (isStop(item) ? null : <Row key={item.label} mark={sel.includes(i) ? '☑' : '☐'} label={item.label} on={sel.includes(i)} onPress={() => toggle(i)} />))}
-        {multi.stopLabel ? <Row label={multi.stopLabel} on={false} onPress={stop} /> : null}
       </View>
+      {multi.stopLabel ? (
+        <View style={{ marginTop: 6 }}>
+          <Row label={multi.stopLabel} on={false} onPress={stop} />
+        </View>
+      ) : null}
       <Pressable
         accessibilityRole="button"
         disabled={multi.disabled}
         onPress={() => onAnswer(sel.map((i) => multi.items[i]!.label).join(', '), sel)}
-        style={{ paddingTop: 6 }}
+        style={{ paddingTop: 8 }}
       >
-        <Text v="b1" weight="700" color={multi.disabled ? 't4' : 'acText'}>
+        <Text v="b1" weight="600" color={multi.disabled ? 't4' : 'acText'} style={{ lineHeight: ROW_LINE }}>
           {multi.submitLabel} ›
         </Text>
       </Pressable>
