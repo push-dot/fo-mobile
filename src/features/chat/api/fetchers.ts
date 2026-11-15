@@ -2,7 +2,7 @@ import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
-import { MICRO_CREDITS_PER_CREDIT } from '../constants'
+import { DEFAULT_DOC, MICRO_CREDITS_PER_CREDIT } from '../constants'
 import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
@@ -25,7 +25,7 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
   recent: async () => (await api.me.postingViews({ limit: 50 })).data,
   recommended: async () => (await api.profiles.list({ explore: 'recommended', limit: 50 })).data,
   profile: () => api.me.profile(),
-  doc: async () => (await realDocs())[0]?.fileName,
+  doc: async () => DEFAULT_DOC,
 }
 
 export const chatApi = {
@@ -33,6 +33,8 @@ export const chatApi = {
   conversation: (id: string) => data(c.get<DataEnvelope<ConversationRow>>(`conversations/${id}`)),
   /** Mock-only: the scripted agent run for one message or approval answer. */
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
+  /** The id of the default hub profile document the quick starts hand to the run, when the user has one. */
+  hubProfileId: async () => (await api.documents.list({ kind: 'HUB_PROFILE', limit: 1 })).data[0]?.id,
   // shortcut: push-be has no chat/docs; real mode reads 마이 › 서류 (myApi.sources) and uploads there.
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
   addDoc: async (file: PickedFile) => {

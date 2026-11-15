@@ -135,6 +135,8 @@ export const useMe = () => {
 export const useChatDocs = (enabled = true) =>
   useQuery({ queryKey: CHAT_DOCS_KEY, queryFn: chatApi.docs, enabled })
 
+export const useHubProfileId = (enabled = true) => useQuery({ queryKey: ['me', 'hub-profile-id'], queryFn: chatApi.hubProfileId, enabled })
+
 export const useUploadChatDoc = () => {
   const qc = useQueryClient()
   return useMutation({

@@ -5,8 +5,8 @@ import { spacing } from '../../../theme'
 import { Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
-import { useAccessMode, useChatAccount, useChatDocs, useMe } from '../api/hooks'
-import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, ACCOUNT_REFERENCE_TITLE } from '../constants'
+import { useAccessMode, useChatAccount, useMe } from '../api/hooks'
+import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, DEFAULT_DOC, ACCOUNT_REFERENCE_TITLE } from '../constants'
 import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import GroupTitle from './group-title'
 import Mark from './mark'
@@ -56,7 +56,6 @@ const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
 const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => void }) => {
   const me = useMe()
   const settings = useMySettings(true)
-  const docs = useChatDocs()
   const save = useUpdateSettings()
   const access = useAccessMode()
   const mode = ACCESS_MODES.find((m) => m.key === access.mode)!
@@ -83,7 +82,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
         <SettingsGroup>
           <AccountRow label={currentRole(me.profile) || '희망 직무'} onPress={toMy} />
           <AccountRow label={me.profile?.tenureYears != null ? `${me.profile.tenureYears}년차` : '연차'} onPress={toMy} />
-          <AccountRow label={docs.data?.find((d) => !d.aiMade)?.fileName ?? '기본 서류'} onPress={toMy} />
+          <AccountRow label={DEFAULT_DOC} onPress={toMy} />
         </SettingsGroup>
       </View>
       <Note style={{ paddingTop: spacing[2] }}>{ACCOUNT_REFERENCE_NOTE}</Note>
