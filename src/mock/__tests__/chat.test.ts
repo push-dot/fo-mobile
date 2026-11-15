@@ -238,6 +238,13 @@ describe('chat mock', () => {
     setAccount({ few: false })
     expect((await call('GET', 'chat/docs')).data).toHaveLength(4)
   })
+
+  it('serves the first two documents on the picker-few account (ChatPh0Picker)', async () => {
+    setAccount({ picker: true })
+    expect(((await call('GET', 'chat/docs')).data as { id: string }[]).map((d) => d.id)).toEqual(['d1', 'd2'])
+    setAccount({ picker: false })
+    expect((await call('GET', 'chat/docs')).data).toHaveLength(4)
+  })
 })
 
 describe('clear chat', () => {

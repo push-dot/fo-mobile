@@ -118,10 +118,10 @@ export const initialPicks = (qs: Pick<QuickStart, 'layout' | 'multi'>, items: Qs
   return chosen.length || qs.layout !== 'cards' || qs.multi ? chosen : items.slice(0, 1).map((i) => i.id)
 }
 
-export const docMeta = (d: Pick<ChatDoc, 'fileName' | 'size' | 'createdAt'>) => {
+export const docMeta = (d: Pick<ChatDoc, 'size' | 'createdAt'>) => {
   const at = new Date(d.createdAt)
   const size = d.size >= 1_000_000 ? `${(d.size / 1_000_000).toFixed(1)}MB` : `${Math.max(1, Math.round(d.size / 1000))}KB`
-  return `${d.fileName.split('.').pop()!.toUpperCase()} · ${size} · ${at.getMonth() + 1}월 ${at.getDate()}일`
+  return `${size} · ${at.getMonth() + 1}월 ${at.getDate()}일`
 }
 
 export const postingMeta = (p: Posting, now = new Date()) =>

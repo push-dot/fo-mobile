@@ -5,6 +5,8 @@ tags:
 ---
 - runFlow: ../flows/_login.yaml
 - runFlow: _company_tab.yaml
+# ChatPh0Picker draws an account with two documents and one bookmark.
+- openLink: push://bots/b-moa?mock=picker-few
 - runFlow:
     file: _say.yaml
     env:
@@ -26,6 +28,6 @@ tags:
     visible: "자료 고르기"
     timeout: 10000
 - waitForAnimationToEnd
-- tapOn: ".*PDF · 2\\.4MB.*"
+- tapOn: ".*2\\.4MB.*"
 - tapOn: ".*모아페이 · 백엔드 엔지니어.*"
 - takeScreenshot: ChatPh0Picker
