@@ -3,12 +3,12 @@ name: 마이 서류 → 파일 등록 → 올리는 중 (Uploading)
 tags:
   - visual
 ---
-# mock=pick-file: 파일에서 고르기 returns the resume PDF (the system file picker cannot be driven), and POST sources never answers,
-# so the upload row stays on 올리는 중 (Uploading).
+# mock=pick-career: 파일에서 고르기 returns the career statement PDF (the system file picker cannot be driven), its row stays at 1.1 of 1.8MB,
+# and POST sources never answers, so the upload row stays on 올리는 중 (Uploading).
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=pick-file,hang:POST:sources"
+      MOCK: "push://sign-in?mock=pick-career,hang:POST:sources"
       READY: "새로 올라온 공고"
 - tapOn: "마이"
 - extendedWaitUntil:
@@ -30,10 +30,4 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 3000
-# The board shows the toast of the earlier upload over the row that is still going up. The app holds one upload at a time, so the
-# link raises that toast (mock=upload-toast, shown 2.5 s) and the shot follows at once.
-- openLink: push://my?mock=upload-toast
-- extendedWaitUntil:
-    visible: "파일을 올렸어요"
-    timeout: 5000
 - takeScreenshot: Uploading
