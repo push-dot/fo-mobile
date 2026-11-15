@@ -20,6 +20,7 @@ const PAGE_INSET = 6
 const PAGE_GAP = 10
 const PAGE_PAD_X = 24
 const PAGE_PAD_Y = 30
+// The gate device lays the board's A4 box out at the screen width (568.3 pt at 402), not at the 390 pt card width.
 const A4 = 1.414
 const TITLE_MAX_WIDTH = 168
 // The page counter floats over the paper, centred above the CTA bar (DocViewer: 28pt pill, 92pt over the home indicator).
@@ -31,8 +32,8 @@ const PROJECT_BARS = [88, 76, 82, 60]
 const PAGE_TOP = 4
 
 const sheet = palette.light
-// WebKit's line box of the board's 13, 14.5 and 22px text: 1.448 of the size.
-const LINE = { name: 31.9, small: 18.8, body: 21, bullet: 20 }
+// The gate device's line boxes of the board's spans without a line-height (22, 13 and 14.5px text), measured on render/ios/DocViewer/1.text.json.
+const LINE = { name: 33, small: 19.5, head: 20, intro: 21, title: 22, bullet: 20 }
 
 const Bars = ({ widths }: { widths: readonly number[] }) =>
   widths.map((w) => (
@@ -43,12 +44,12 @@ const pageStyle = { width: '100%', backgroundColor: sheet.paper, borderRadius: 3
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
   const p = d.profile
-  const a4 = (useWindowDimensions().width - 2 * PAGE_INSET) * A4
+  const a4 = useWindowDimensions().width * A4
   const head = (t: string) => (
     <Text
       v="c1"
       weight="800"
-      style={{ color: sheet.acText, lineHeight: LINE.small, borderBottomWidth: 1, borderBottomColor: sheet.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
+      style={{ color: sheet.acText, lineHeight: LINE.head, borderBottomWidth: 1, borderBottomColor: sheet.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
     >
       {t}
     </Text>
@@ -65,13 +66,13 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         <Text v="c1" weight="400" style={{ color: sheet.t3, lineHeight: LINE.small }}>
           {[d.email, ...d.links].filter(Boolean).join(' · ')}
         </Text>
-        <Text v="b2" weight="400" style={{ color: sheet.t2, fontSize: 14.5, lineHeight: LINE.body }}>
+        <Text v="b2" weight="400" style={{ color: sheet.t2, fontSize: 14.5, lineHeight: LINE.intro }}>
           {p.intro}
         </Text>
         {head(PREVIEW_HEADINGS[0])}
         {p.careers.map((cr, i) => (
           <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: spacing[2], marginTop: i ? 2 : 0 }}>
-            <Text v="b2" weight="700" style={{ color: sheet.t1, fontSize: 14.5, lineHeight: LINE.body }}>
+            <Text v="b2" weight="700" style={{ color: sheet.t1, fontSize: 14.5, lineHeight: LINE.title }}>
               {cr.company} · {cr.role}{' '}
               <Text v="b2" weight="500" style={{ color: sheet.t3, fontSize: 14.5 }}>
                 {cr.startedOn.replace('-', '.')} – {cr.endedOn?.replace('-', '.') ?? '현재'}
@@ -106,7 +107,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         </Text>
       </View>
       {Array.from({ length: Math.max((d.pageCount ?? 1) - 1, 0) }, (_, i) => (
-        <View key={i} style={{ ...pageStyle, aspectRatio: 1 / A4, boxShadow: paperPage.ring }} />
+        <View key={i} style={{ ...pageStyle, height: a4, boxShadow: paperPage.ring }} />
       ))}
     </View>
   )

@@ -7,10 +7,10 @@ const WORD_JOINER = /⁠/g
 export const clampLines = (laidOut: string[], count: number) =>
   laidOut.length <= count ? null : laidOut.slice(0, count).map((line) => line.replace(WORD_JOINER, '').replace(/\n$/, ''))
 
-/** `line` with its trailing words dropped one at a time, each followed by the dots: the candidates for a last line that has no room left for them. */
+/** `line` cut after each character, each followed by the dots: the candidates for a last line that has no room left for them. WebKit's line clamp drops characters, not words (Social: '따로 표시해' ends '따로 표시…'). */
 export const dotted = (line: string) => {
-  const words = line.trimEnd().split(' ')
-  return words.map((_, i) => `${words.slice(0, i + 1).join(' ')}…`)
+  const chars = Array.from(line.trimEnd())
+  return chars.map((_, i) => `${chars.slice(0, i + 1).join('')}…`)
 }
 
 /** The longest candidate whose measured width fits `limit` (the first one when none does). */

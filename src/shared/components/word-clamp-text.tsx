@@ -13,7 +13,7 @@ type Props = Omit<ComponentProps<typeof Text>, 'children' | 'numberOfLines' | 'o
   /**
    * `hang`: the dots sit after the last word, outside the centred line (the board's centred clamp).
    * `inline`: one line, the dots follow the kept text, space included (`text-overflow`).
-   * `line`: the dots end the last kept line inside the box, which a `-webkit-box` shrinks to its widest line plus a space, so a last word that leaves no room for them is cut.
+   * `line`: the dots end the last kept line inside the box, which a `-webkit-box` shrinks to its widest line plus a space, so characters of a last line that leaves no room for them are cut.
    */
   ellipsis: 'hang' | 'inline' | 'line'
   /** Sets the width the text wraps at; the hidden measuring copy fills it. */

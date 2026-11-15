@@ -43,13 +43,17 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         <Text v="b1" weight="700" numberOfLines={1}>
           {displayName(doc.fileName)}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text v="c1" color="t3">
             {fileSize(doc.size)}
             {doc.createdAt ? ` · ${monthDay(doc.createdAt)}` : ''}
             {reading || failed ? ' · ' : ''}
           </Text>
-          {reading && !failed ? <Spinner color="t3" /> : null}
+          {reading && !failed ? (
+            <View style={{ marginRight: spacing[1] }}>
+              <Spinner color="t3" />
+            </View>
+          ) : null}
           {reading || failed ? (
             <Text v="c1" weight="700" color={failed ? 'red' : 't1'}>
               {failed ? INGEST_TEXT.failed : INGEST_TEXT.reading}
