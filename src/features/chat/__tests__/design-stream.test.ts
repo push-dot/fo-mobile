@@ -130,7 +130,7 @@ describe('agent stream for the new design', () => {
     expect(review).toMatchObject({
       type: 'approval',
       approval: {
-        sections: [{ items: [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, { label: '모던', desc: '깔끔한 한 단' }, { label: '그만하기' }] }],
+        sections: [{ items: [{ label: '클래식', badge: { label: '추천', tone: 'ac' } }, { label: '모던', desc: '깔끔한 한 단' }, { label: '닫기' }] }],
       },
     })
     const items = review?.type === 'approval' && review.approval.sections[0]?.kind === 'choices' ? review.approval.sections[0].items : []

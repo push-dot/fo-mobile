@@ -198,7 +198,7 @@ describe('stream v3', () => {
     if (ev?.type !== 'approval') throw new Error('expected approval')
     const a = ev.approval
     expect(a.optionIds).toEqual(['submit', 'CLASSIC', 'MODERN', 'photo', 'cancel'])
-    expect(a.secondary).toBe('그만하기')
+    expect(a.secondary).toBe('닫기')
     const ids = (sel: number[][]) => sectionPicks(a, sel).map((i) => a.optionIds![i])
     expect(ids([[1], [0]])).toEqual(['submit', 'MODERN', 'photo'])
     expect(ids([[0], []])).toEqual(['submit', 'CLASSIC'])

@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
 import { describe, expect, it } from 'vitest'
-import { applyText, doneNextActions, doneNextCopy, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
+import { applyText, doneNextActions, doneNextCopy, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle, saveFailed } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -33,7 +33,7 @@ const profile = {
 describe('agent result cards', () => {
   it('shows the uploaded file meta and convert button, with no format badge', () => {
     expect(resultTitle(file)).toBe('김서준_모아페이_백엔드.pdf')
-    expect(resultMeta(file)).toBe('A4 1쪽 · 186KB · 내 서류에 자동 저장됨')
+    expect(resultMeta(file)).toBe('A4 1쪽 · 186KB')
     expect(resultButtons(file)).toEqual(['모아페이에 바로 지원하기', '프로필로 전환'])
     expect(resultButtons(file).join(' ')).not.toMatch(/PDF|DOCX|v1/)
     expect(resultChrome(file)).toEqual({ share: true, initials: null, color: null })
@@ -83,5 +83,11 @@ describe('agent result cards', () => {
   it('does not say "에 바로 지원해 줘" without a company', () => {
     expect(applyText('모아페이')).toBe('모아페이에 바로 지원해 줘')
     expect(applyText()).toBe('바로 지원해 줘')
+  })
+
+  it('a file with no savedLine is a failed save', () => {
+    expect(saveFailed(file)).toBe(false)
+    expect(saveFailed({ source: 'external' })).toBe(true)
+    expect(saveFailed({ source: 'profile' })).toBe(false)
   })
 })

@@ -42,6 +42,7 @@ import {
   stop,
   waitingLine,
   useDoneNext,
+  useSaveFailAlert,
   useChat,
   useChatLimit,
   useDraftStore,
@@ -190,6 +191,7 @@ const Thread = ({ id }: { id: string }) => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }, [])
+  useSaveFailAlert(chat)
   useDoneNext(chat, (action, card) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)

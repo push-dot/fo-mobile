@@ -13,6 +13,7 @@ type ResultFields = {
   fileName?: string
   pageLine?: string
   cardMeta?: string
+  savedLine?: string
   name?: string
   title?: string
   subtitle?: string
@@ -41,6 +42,9 @@ export const doneNextCopy = (card: Pick<ResultFields, 'source'>) => ({
   message: '다음으로 무엇을 할까요?',
 })
 
+/** The server sends savedLine with an external file it saved; no line means the save failed (ChatPh6ResultFail). */
+export const saveFailed = (card: Pick<ResultFields, 'source' | 'savedLine'>) => card.source === 'external' && !card.savedLine
+
 export const PROFILE_SAVE_TITLE = 'Push 프로필에 저장했어요'
 
 /** Pre-confirm profile card. Absent note keeps the normal title and actions. */
@@ -56,7 +60,7 @@ export const resultTitle = (card: Pick<ResultFields, 'source' | 'fileName' | 'ti
 }
 
 export const resultMeta = (card: Pick<ResultFields, 'source' | 'pageLine' | 'cardMeta' | 'subtitle'>) =>
-  card.source === 'external' ? (card.cardMeta ?? card.pageLine ?? '') : (card.subtitle ?? '')
+  card.source === 'external' ? (card.pageLine ?? card.cardMeta ?? '') : (card.subtitle ?? '')
 
 /** 공유 sends the saved document's PDF export, so a card whose document was not saved has nothing to share. */
 export const resultChrome = (card: Pick<ResultFields, 'source' | 'name' | 'documentId'>) =>

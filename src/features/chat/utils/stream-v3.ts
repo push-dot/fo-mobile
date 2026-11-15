@@ -1,5 +1,6 @@
 import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
+import { closeLabel } from './close-label'
 import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
 /** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
@@ -110,7 +111,7 @@ export const approvalFromSections = (ev: Extract<StreamEvent, { type: 'choice' }
     question: ev.title ?? '',
     sections,
     optionIds: ['submit', ...answerableIds(sections), ...(cancel ? ['cancel'] : [])],
-    ...(cancel ? { secondary: cancel.label } : {}),
+    ...(cancel ? { secondary: closeLabel(cancel.label) } : {}),
     ...(submit ? { submit: submit.label } : {}),
     ...(submit?.optionLabels ? { submitLabels: submit.optionLabels } : {}),
     ...(submit?.zeroLabel ? { zeroSubmit: submit.zeroLabel } : {}),

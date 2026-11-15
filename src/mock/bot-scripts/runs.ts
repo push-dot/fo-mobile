@@ -53,7 +53,8 @@ export const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계�
 const FILE_TODO = TODO
 export const PROFILE_TASK = '프로필 수정 · Push 프로필 · 경력'
 const FILE_PAGE = 'A4 1쪽 · 186KB'
-const FILE_SAVED = '내 서류에 자동 저장됨'
+// The server's save flag: a card with no savedLine means the save failed (never drawn).
+const FILE_SAVED = '저장됨'
 export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'PDF로 만들기']
 const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
 // Hold a running line this long so a screenshot can catch it.
@@ -146,7 +147,7 @@ const profileCard = (score: string, josa = '로'): Step[] => [
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
   ...profileDone(200, score, josa, BULLETS),
 ]
-const present = ask({ ...numbered('present', 'Push 프로필에 저장했어요. 결과를 확인할까요?', ['확인했어요', '그만하기']), note: 'PDF는 Push 프로필에서 내보낼 수 있어요.' })
+const present = ask({ ...numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']), note: 'PDF는 Push 프로필에서 내보낼 수 있어요.' })
 const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), present, awaitingDone]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
@@ -172,7 +173,7 @@ const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boo
       fileName: o.fileName ?? EXT_FILE,
       pageLine: FILE_PAGE,
       ...(saved ? { savedLine: FILE_SAVED } : {}),
-      cardMeta: saved ? `${FILE_PAGE} · ${FILE_SAVED}` : FILE_PAGE,
+      cardMeta: FILE_PAGE,
       documentId: 'src-upload',
       ...(job ? { company: '모아페이' } : {}),
       actions: o.gate
@@ -477,7 +478,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', '이 공고에 지원해요', ['실행', '취소']), '지원하면 취소할 수 없어요')),
+  ask(confirm(numbered('apply', `${MOA}에 지원해요`, ['실행', '취소']), '지원하면 취소할 수 없어요')),
 ]
 
 export const generic = (text: string): Step[] => [
@@ -614,8 +615,8 @@ export const TOKENS: Record<string, Step[]> = {
   'ext-done': ext({}),
   'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'PDF로 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
   'ext-nosave': ext({ saved: false }),
-  'ext-ok': ext({ josa: '으로', gate: '내 서류에 저장했어요. 결과를 확인할까요?' }),
-  'ext-fail': ext({ josa: '으로', saved: false, gate: '내 서류에 저장하지 못했어요. 결과를 확인할까요?' }),
+  'ext-ok': ext({ josa: '으로', gate: '결과를 확인할까요?' }),
+  'ext-fail': ext({ josa: '으로', saved: false, gate: '결과를 확인할까요?' }),
   // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
   'ph0-input': ph0Input,
