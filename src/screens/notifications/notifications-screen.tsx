@@ -14,12 +14,14 @@ import {
   useReadNotifications,
 } from '@/features/notifications'
 import { Button, ScreenBar, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
+import { useXlChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
 const NotificationsScreen = () => {
   const c = useColors()
   const q = useNotifications()
   const read = useReadNotifications()
+  const { button } = useXlChrome()
   const items = q.data?.data ?? []
   const sections = useMemo(() => {
     const rows = q.data?.data ?? []
@@ -48,7 +50,7 @@ const NotificationsScreen = () => {
         bar={{
           title: '알림',
           onBack: () => router.back(),
-          right: <Button label="모두 읽음" variant="secondary" size="sm" disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
+          right: <Button label="모두 읽음" variant="secondary" size="sm" style={{ minHeight: button }} disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
         }}
       >
         {({ topInset, onScroll }) => (
