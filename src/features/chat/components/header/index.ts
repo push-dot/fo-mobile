@@ -1,7 +1,7 @@
 export { default as HeaderPill } from '../header-pill'
 export { CreditBanner } from './credit-banner'
 export { FindBar } from './find-bar'
-export { FindHighlight, Marked } from './highlight'
+export { FindHighlight, FindText, Marked } from './highlight'
 export { NewMessagesPill } from './new-messages-pill'
 export { endsInError, headerLightOf } from './state'
 export { useChatLimit } from './use-chat-limit'
