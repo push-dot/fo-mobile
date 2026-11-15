@@ -116,10 +116,10 @@ describe('chat mock', () => {
     expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(true)
   })
 
-  it('draws the result gates as the closing line and the card alone, with no bullets or elapsed footer', async () => {
-    for (const text of ['profile-gate', 'ext-ok', 'ext-fail']) {
-      const events = await run(`t-gate-${text}`, { text })
-      expect(types(events)).toEqual(['agentText', 'result', 'approval'])
+  it('draws the result boards as the closing line and the card alone, with no bullets and no gate to answer', async () => {
+    for (const text of ['profile-result', 'ext-ok', 'ext-fail']) {
+      const events = await run(`t-result-${text}`, { text })
+      expect(types(events)).toEqual(['agentText', 'result', 'done'])
       expect(events[0]).not.toHaveProperty('bullets')
     }
   })

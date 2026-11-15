@@ -49,7 +49,7 @@ describe('scripted runs (mock)', () => {
       subtitle: 'Push 프로필 · 방금 수정',
       documentId: 'd1',
     })
-    expect(s.approval?.question).toBe('결과를 확인할까요?')
+    expect(s.approval).toBeNull()
     expect(s.items.some((i) => i.type === 'worked')).toBe(true)
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
   }, 10_000)

@@ -70,7 +70,11 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, 'Push Bot')).toBe('Push Bot에게 물어보기')
     expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     const result: ChatItem = { type: 'result', id: 'r', source: 'external', checklist: [], actions: [], documentId: 'd', fileName: 'a.pdf', pageLine: 'A4 1쪽' }
-    expect(composerPlaceholder({ items: [user, result, { type: 'worked', id: 'w', seconds: 3 }], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
+    const worked: ChatItem = { type: 'worked', id: 'w', seconds: 3 }
+    const flowCard: ChatItem = { type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'done' }] }
+    // ChatDone*: the flow's own cards sit above the result, so the finished run keeps the talking box; ChatPh6Result starts at its result and asks.
+    expect(composerPlaceholder({ items: [user, flowCard, result, worked], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
+    expect(composerPlaceholder({ items: [result, worked], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
     // ChatStates.4: the lines after the result (apply record, busy error) keep the talking box.
     const later: ChatItem[] = [user, result, { type: 'agentText', id: 'rec', text: '지원했어요. [이동하기](/my)' }, user, { type: 'error', id: 'e', text: '지금 요청이 많아요.', code: 'QUEUE_BUSY' }]
