@@ -36,7 +36,6 @@ const SignedInStack = () => {
       <Stack.Screen name="activity/posts" />
       <Stack.Screen name="activity/applications/[id]" />
       <Stack.Screen name="access-mode" options={sheetOptions(c)} />
-      <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
       <Stack.Screen name="terms-view" />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
