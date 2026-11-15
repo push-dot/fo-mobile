@@ -51,8 +51,40 @@ tags:
       platform: iOS
     commands:
       - takeScreenshot: MyCalendarStates.2
-      # "일정 추가" is the + button; "일정 추가하기" is the sheet's own submit button.
-      - tapOn: "일정 추가"
+      # .1 is a connected calendar on 10월 21일 (3 events and the deadline row) under the add sheet; the sheet's date is 10월 23일 (금) as the board draws it.
+      # The not-connected rule above is cached by the calendar query, so the app starts again without it.
+      - runFlow: ../flows/_login.yaml
+      - runFlow: ../flows/_dismiss_logbox.yaml
+      - tapOn: "마이"
+      - extendedWaitUntil:
+          visible: "김서준"
+          timeout: 10000
+      - tapOn: "내 활동"
+      - extendedWaitUntil:
+          visible: "지원한 공고"
+          timeout: 10000
+      - tapOn: "캘린더"
+      - extendedWaitUntil:
+          visible: "Google 캘린더 연결됨"
+          timeout: 10000
+      - tapOn: ".*달력 열기.*"
+      - extendedWaitUntil:
+          visible: "이전 달"
+          timeout: 10000
+      - runFlow:
+          when:
+            visible: "2026년 11월"
+          commands:
+            - tapOn: "이전 달"
+      - tapOn: ".*10월 21일.*"
+      - extendedWaitUntil:
+          visible: "10월 21일 수요일"
+          timeout: 10000
+      - extendedWaitUntil:
+          visible: "Google 캘린더 연결됨"
+          timeout: 10000
+      # The sheet opens by its route, so the day it carries (10월 23일) is not the day behind it, as in the board.
+      - openLink: push://activity/add-event?day=2026-10-23
       - extendedWaitUntil:
           visible: "어떤 일정을 추가할까요?"
           timeout: 10000
