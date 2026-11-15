@@ -40,7 +40,7 @@ const SignedInStack = () => {
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
       <Stack.Screen name="terms-view" />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
-      <Stack.Screen name="material-picker" options={sheetOptions(c)} />
+      <Stack.Screen name="material-picker" options={modalOptions(c)} />
       <Stack.Screen name="bots/[botId]/index" />
       <Stack.Screen name="bots/[botId]/profile" />
       <Stack.Screen name="bots/[botId]/companies" />

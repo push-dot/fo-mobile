@@ -52,6 +52,7 @@ import {
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
+import MaterialPickerScreen from '@/screens/chat/material-picker-screen'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
@@ -273,7 +274,7 @@ const Thread = ({ id }: { id: string }) => {
           approval={chat.approval!}
           onAnswer={(text, choice) => answer(id, text, choice)}
           onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
-          onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}
+          renderPicker={(onClose) => <MaterialPickerScreen target={id} onClose={onClose} />}
         />
       ) : (
         <>
