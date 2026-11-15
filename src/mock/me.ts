@@ -101,9 +101,9 @@ let sources: (Source & { jobId?: string })[] = [
   { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
-// The 지원 서류 sheet lists with no kind filter and reads origin/kind: today's AI résumé first, the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
+// The 지원 서류 sheet lists with no kind filter and reads origin/kind: the AI résumé first (dated like the ApplySheet board), the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
 const applySources = () => [
-  { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, new Date().toISOString()), origin: 'AI' },
+  { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, on(11, 13)), origin: 'AI' },
   ...sources.filter((s) => s.id !== 's2').map((s) => ({ ...s, origin: 'UPLOAD', ...(s.id === 's3' ? { kind: 'PORTFOLIO' } : {}) })),
 ]
 mock('GET', 'sources', ({ query }) => page(query.get('kind') ? sources : applySources(), query))
