@@ -16,6 +16,7 @@ const StatusLineRow = ({ view, color }: { view: StatusLineView; color: MascotCol
   const big = xl ? largeType : null
   return (
     <View
+      accessible
       accessibilityLiveRegion="polite"
       accessibilityLabel={view.accessibilityLabel}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40, alignSelf: 'stretch' }}
