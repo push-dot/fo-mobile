@@ -147,14 +147,14 @@ const DocsTab = () => {
         }}
       >
         <Text v="h2" style={{ textAlign: 'center' }}>
-          아직 등록한 서류가 없어요
+          아직 Push 프로필이 없어요
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-          {'Bot 채팅에서 Push 프로필을 만들거나\n파일을 올려 보세요.'}
+          {'Bot 채팅에서 지원할 공고에 맞춘\nPush 프로필을 만들어 보세요.'}
         </Text>
         <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
-          <Button label="파일 등록" onPress={pickFile} />
-          <Button label="Bot 채팅에서 새로 만들기" variant="secondary" onPress={openChat} />
+          <Button label="Bot 채팅에서 만들기" onPress={openChat} />
+          <Button label="가진 이력서 올리기" variant="secondary" onPress={pickFile} />
         </View>
       </View>
     )
