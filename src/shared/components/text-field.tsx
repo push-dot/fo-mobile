@@ -10,9 +10,9 @@ import Text from './text'
 const RING = 2
 
 /** `compact`: the 48pt `.field` some boards draw instead of the 56pt default. `slim`: the iOS filter sheet's 40pt `.isearch` (17pt text, 12pt side padding). */
-type Props = TextInputProps & { icon?: IconName; label?: string; max?: number; variant?: 'field' | 'search'; compact?: boolean; slim?: boolean; trailing?: ReactNode; focusRing?: boolean }
+type Props = TextInputProps & { icon?: IconName; label?: string; max?: number; variant?: 'field' | 'search'; compact?: boolean; slim?: boolean; trailing?: ReactNode; focusRing?: boolean; minHeight?: number }
 
-const TextField = ({ icon, label, max, multiline, value, style, variant = 'field', compact, slim, trailing, focusRing, ...rest }: Props) => {
+const TextField = ({ icon, label, max, multiline, value, style, variant = 'field', compact, slim, trailing, focusRing, minHeight, ...rest }: Props) => {
   const c = useColors()
   const { fontScale } = useWindowDimensions()
   const search = variant === 'search'
@@ -27,7 +27,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
         backgroundColor: glass ? undefined : slim ? iosSystemFill[dark ? 'dark' : 'light'] : c.fill,
         paddingHorizontal: slim ? spacing[3] : spacing[4],
         paddingVertical: multiline || label ? spacing[4] : 0,
-        minHeight: slim ? 40 : search || compact ? 48 : 56,
+        minHeight: minHeight ?? (slim ? 40 : search || compact ? 48 : 56),
         justifyContent: 'center',
         gap: spacing[2],
       }}

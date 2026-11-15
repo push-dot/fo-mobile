@@ -76,8 +76,9 @@ tags:
 - extendedWaitUntil:
     visible: "추가하기"
     timeout: 5000
-- inputText: "github.com/seojun-kim/payment-gateway"
+- inputText: "seojun-kim/payment-gateway"
 - runFlow: _hide_kbd.yaml
+- tapOn: "GitHub"
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLinkAdd
 # 링크 추가 is a page inside the modal: 뒤로 returns to the list.
