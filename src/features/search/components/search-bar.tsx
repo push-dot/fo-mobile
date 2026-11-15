@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Glass, Icon, Text } from '../../../shared/components'
+import { Glass, GlassField, Icon, Text } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '../../../theme'
 
@@ -49,14 +49,7 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
       <View style={{ minHeight: 56, justifyContent: 'center', paddingHorizontal: ios ? spacing[3] : spacing[2] }}>
         <View style={{ flexDirection: 'row', alignItems: 'stretch', gap: spacing[2] }}>
           <View style={{ flex: 1 }}>
-            {ios ? (
-              // Untinted native glass draws near-black on the dark background, the board draws its lighter --glass.
-              <Glass tint={dark ? c.glass : undefined} style={{ flex: 1, borderRadius: 22 }}>
-                {field}
-              </Glass>
-            ) : (
-              <View style={{ flex: 1, borderRadius: 22, backgroundColor: c.fill }}>{field}</View>
-            )}
+            <GlassField style={{ flex: 1, borderRadius: 22 }}>{field}</GlassField>
           </View>
           <Pressable accessibilityRole="button" onPress={() => router.back()}>
             {/* The row stretches, so the button is as tall as the field at any text size. */}
