@@ -58,7 +58,6 @@ import {
   NAME_PLACEHOLDER,
   ORGANIZE_LABEL,
   RETRY_LABEL,
-  SEARCH_CLOSE,
   SEARCH_DEBOUNCE_MS,
   SEARCH_EMPTY,
   SEARCH_PLACEHOLDER,
@@ -408,7 +407,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     </View>
   )
   const searchIcon = <Icon name="search" size={20} color="t3" />
-  const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
   // Board `.smod .rr` (r4p): padding 14px 16px, no min-height, title 17/22.
   const rowTitle = { justifyContent: 'center' as const, gap: 2, paddingVertical: 14, paddingHorizontal: spacing[4] }
   const rowTitleText = { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight }
@@ -550,7 +548,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           </>,
           { flex: 1 },
         )}
-        {closeButton}
       </View>
     </>
   )
