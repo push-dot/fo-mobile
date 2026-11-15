@@ -3011,7 +3011,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > running conversation 1`] = `
 "
 {"text":"이어서 봐 주세요","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n• Kafka 기반 결제 이벤트 파이프라인 구축\\n[초안 전체 보기](/docs/push/d1) ›","type":"agentText"}
 card {"id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -7894,7 +7894,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: pick 0 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n• Kafka 기반 결제 이벤트 파이프라인 구축\\n[초안 전체 보기](/docs/push/d1) ›","type":"agentText"}
 {"text":"이어서 작성하기","type":"user"}
 {"text":"멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7906,7 +7906,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: pick 1 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n• Kafka 기반 결제 이벤트 파이프라인 구축\\n[초안 전체 보기](/docs/push/d1) ›","type":"agentText"}
 {"text":"닫기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7918,7 +7918,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: say 이렇게 해 주세요 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n• Kafka 기반 결제 이벤트 파이프라인 구축\\n[초안 전체 보기](/docs/push/d1) ›","type":"agentText"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7930,7 +7930,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n• Kafka 기반 결제 이벤트 파이프라인 구축\\n[초안 전체 보기](/docs/push/d1) ›","type":"agentText"}
 card {"id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
