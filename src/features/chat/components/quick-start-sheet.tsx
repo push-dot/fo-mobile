@@ -4,6 +4,7 @@ import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } fr
 import { Badge, Chip, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
+import { displayName } from '@/shared/utility/display-name'
 import { type QsItem } from '../api/schemas'
 import { useChatDocs, useHubProfileId, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
@@ -53,7 +54,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
   const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
   // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
-  const input = { picked, url: startLink(url, clip), chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
+  const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
@@ -332,7 +333,7 @@ const DocField = ({
 }) =>
   label && doc ? (
     <>
-      <PickerRow label={label} value={doc} onPress={picker ? onToggle : undefined} />
+      <PickerRow label={label} value={displayName(doc)} onPress={picker ? onToggle : undefined} />
       {picker && picking
         ? docs?.map((x) => (
             <Pressable
@@ -344,7 +345,7 @@ const DocField = ({
             >
               <Pick on={x.fileName === doc} />
               <Text v="b2" numberOfLines={1} style={{ flex: 1 }}>
-                {x.fileName}
+                {displayName(x.fileName)}
               </Text>
             </Pressable>
           ))

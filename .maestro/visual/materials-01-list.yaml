@@ -13,7 +13,7 @@ tags:
 - takeScreenshot: Materials
 - tapOn: "서류"
 - extendedWaitUntil:
-    visible: "경력증명서_2025.pdf 자세히"
+    visible: "경력증명서_2025 자세히"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsDocs
@@ -53,9 +53,9 @@ tags:
       TITLE: "바로가기"
 - tapOn: "전체"
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서.pdf 자세히"
+    visible: "김서준_백엔드_이력서 자세히"
     timeout: 10000
-- tapOn: "김서준_백엔드_이력서.pdf 자세히"
+- tapOn: "김서준_백엔드_이력서 자세히"
 - extendedWaitUntil:
     visible: "서류로 들어가기"
     timeout: 10000
@@ -63,7 +63,7 @@ tags:
 - takeScreenshot: MaterialDetailDoc
 - tapOn: "자료 삭제"
 - extendedWaitUntil:
-    visible: "‘김서준_백엔드_이력서.pdf’를 삭제할까요?"
+    visible: "‘김서준_백엔드_이력서’를 삭제할까요?"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailDelete

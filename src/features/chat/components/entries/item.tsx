@@ -15,6 +15,7 @@ import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
 import { usePop, usePulse } from '../../hooks'
 import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
+import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { fitChrome } from '../../utils/fit-card'
 import { FIT_LOCKED, fitProjected, fitProjectedLink } from '../../constants'
@@ -52,7 +53,7 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
           {item.target ? (
             <Text v="b2" color="t3" weight="500">
               {' '}
-              {item.target}
+              {displayName(item.target)}
             </Text>
           ) : null}
         </Text>
@@ -229,7 +230,7 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
       <Surface>
         <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
           <Text v="b2" weight="700" numberOfLines={1}>
-            {item.name}
+            {displayName(item.name)}
           </Text>
           {!done ? (
             <View style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}>
@@ -252,7 +253,7 @@ const ResultCard = ({ item, onView }: { item: Of<'result'>; onView: () => void }
   const chrome = resultChrome(item)
   const share = useShareFile()
   const save = profileSaveCopy(item)
-  const title = save?.title ?? resultTitle(item)
+  const title = displayName(save?.title ?? resultTitle(item))
   const body = (
     <Surface>
       {chrome.initials && chrome.color ? <Mark text={chrome.initials} color={chrome.color} size={40} round /> : null}

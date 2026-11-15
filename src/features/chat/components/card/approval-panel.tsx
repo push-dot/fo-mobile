@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
 import { showChoiceModal } from '@/shared/navigation'
+import { displayName } from '@/shared/utility/display-name'
 import { SPRING } from '../../constants'
 import ApprovalModal from './approval-modal'
 import { RISE_MS, riseOnMount } from './approval-rise'
@@ -170,7 +171,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
                 ) : null}
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text v="b2" weight="700" numberOfLines={1}>
-                    {r.title}
+                    {displayName(r.title)}
                   </Text>
                   <Text v="c2" weight={r.ac ? '700' : '400'} color={r.ac ? 't1' : 't3'}>
                     {r.sub}

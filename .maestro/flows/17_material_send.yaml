@@ -20,15 +20,15 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     text: "자료"
     index: 0
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서.pdf 보내기"
+    visible: "김서준_백엔드_이력서 보내기"
     timeout: 20000
-- tapOn: "김서준_백엔드_이력서.pdf 보내기"
+- tapOn: "김서준_백엔드_이력서 보내기"
 - extendedWaitUntil:
     visible: "어느 Bot한테 보낼까요?"
     timeout: 10000
 - tapOn: "모아페이"
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서.pdf"
+    visible: "김서준_백엔드_이력서"
     timeout: 15000
 - takeScreenshot: 17_material_send
 - tapOn: "뒤로"

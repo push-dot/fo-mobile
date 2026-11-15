@@ -4,6 +4,7 @@ import { ActivityIndicator, Platform, Pressable, TextInput, useWindowDimensions,
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
+import { displayName } from '@/shared/utility/display-name'
 import ModePicker from './mode-picker'
 import { composerWeight } from '../utils/composer-weight'
 
@@ -89,12 +90,12 @@ export const ComposerBody = ({ inputRef, roomy, ...p }: ComposerProps) => {
         // margin-left -6 puts the chip at the composer's 12pt edge while the text keeps its own 18pt inset.
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${p.attachment} 첨부 빼기`}
+          accessibilityLabel={`${displayName(p.attachment)} 첨부 빼기`}
           onPress={p.onClearAttachment ?? (() => undefined)}
           style={{ alignSelf: 'flex-start', marginLeft: -6, flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: 6, borderRadius: 14, backgroundColor: c.bg, boxShadow: `0 0 0 1px ${c.line}`, maxWidth: 270 }}
         >
           <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
-            {p.attachment}
+            {displayName(p.attachment)}
           </Text>
           <View style={{ width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="x" size={14} color="t3" />

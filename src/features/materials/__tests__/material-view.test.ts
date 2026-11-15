@@ -57,7 +57,7 @@ describe('copy that names a word', () => {
 
   it('asks before a delete in the words of MaterialDetailDelete, and toasts as DeleteDoc', () => {
     expect(deleteCopy(resume)).toEqual({
-      title: '‘김서준_백엔드_이력서.pdf’를 삭제할까요?',
+      title: '‘김서준_백엔드_이력서’를 삭제할까요?',
       body: '30일 뒤 완전히 지워져요.',
       done: '서류를 삭제했어요',
       failed: '서류를 삭제하지 못했어요',
@@ -74,7 +74,7 @@ describe('copy that names a word', () => {
 
 describe('detail sheet', () => {
   it('prints MaterialDetailDoc', () => {
-    expect(detailTitle(resume)).toBe('김서준_백엔드_이력서.pdf')
+    expect(detailTitle(resume)).toBe('김서준_백엔드_이력서')
     expect(detailFacts(resume, [moapay, dotori], now)).toEqual([
       { label: '종류', value: 'PDF · 2쪽 · 312KB' },
       { label: '만든 곳', value: '모아페이 Bot' },

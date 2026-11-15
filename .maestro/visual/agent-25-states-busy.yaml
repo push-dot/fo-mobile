@@ -18,7 +18,7 @@ tags:
             KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
             EN: "Fix this file for the Moapay job"
       - extendedWaitUntil:
-          visible: ".*김서준_모아페이_백엔드.pdf.*"
+          visible: ".*김서준_모아페이_백엔드.*"
           timeout: 30000
       - waitForAnimationToEnd
       - runFlow:

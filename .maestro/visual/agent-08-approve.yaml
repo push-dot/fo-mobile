@@ -20,7 +20,7 @@ tags:
 - extendedWaitUntil:
     visible: "결과를 확인할까요?"
     timeout: 60000
-# ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드.pdf card) with the three-button sheet
+# ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드 card) with the three-button sheet
 # (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
 - runFlow: _fresh_company.yaml
 - runFlow:

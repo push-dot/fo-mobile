@@ -16,7 +16,7 @@ tags:
     timeout: 10000
 - tapOn: "서류"
 - extendedWaitUntil:
-    visible: "포트폴리오_결제시스템.pdf"
+    visible: "포트폴리오_결제시스템"
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 3000

@@ -14,9 +14,9 @@ tags:
     timeout: 10000
 - tapOn: "서류"
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서_2026.pdf"
+    visible: "김서준_백엔드_이력서_2026"
     timeout: 10000
-- tapOn: "김서준_백엔드_이력서_2026.pdf"
+- tapOn: "김서준_백엔드_이력서_2026"
 - extendedWaitUntil:
     visible: "Bot한테 보내기"
     timeout: 10000

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { botChatPath } from '@/features/bots'
 import { Button, Icon, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
@@ -37,10 +38,10 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
     void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
   }
   return (
-    <Row label={doc.fileName} onPress={() => router.push(`/docs/${doc.id}`)}>
+    <Row label={displayName(doc.fileName)} onPress={() => router.push(`/docs/${doc.id}`)}>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="700" numberOfLines={1}>
-          {doc.fileName}
+          {displayName(doc.fileName)}
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
           <Text v="c1" color="t3">
@@ -69,7 +70,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
       ) : null}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${doc.fileName} 더 보기`}
+        accessibilityLabel={`${displayName(doc.fileName)} 더 보기`}
         onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
@@ -191,7 +192,7 @@ const DocsTab = () => {
           <Row>
             <View style={{ flex: 1, minWidth: 0, gap: spacing[2] }}>
               <Text v="b1" weight="700" numberOfLines={1}>
-                {upload.name}
+                {displayName(upload.name)}
               </Text>
               <View
                 accessibilityRole="progressbar"

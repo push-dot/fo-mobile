@@ -4,6 +4,7 @@ import { TOAST_ABOVE, askConfirm, showActionSheet, showToast, type ConfirmReques
 import { showChoiceModal } from '@/shared/navigation'
 import { botChatPath } from '@/features/bots'
 import { pickDocument } from '@/shared/infrastructure'
+import { displayName } from '@/shared/utility/display-name'
 import { MAX_BYTES, RESUME_DOCUMENT_OPTIONS, SHEET_SWAP_MS } from './constants'
 import type { PickedFile } from './types'
 import { deleteWithUndo, useDocDelete, useDocImport, usePendingDelete } from './stores'
@@ -60,7 +61,7 @@ export const pickResume = async (): Promise<PickedFile | null> => {
 export const useFileMenu = (file: { id: string; fileName: string } | undefined) => () => {
   if (!file) return
   showChoiceModal({
-    title: file.fileName,
+    title: displayName(file.fileName),
     items: [
       { label: '이름 변경', onPress: () => router.push(`/docs/${file.id}/rename`) },
       { label: '서류 삭제하기', destructive: true, onPress: () => askConfirm(deleteConfirm(file, () => useDocDelete.setState({ doc: file }))) },
