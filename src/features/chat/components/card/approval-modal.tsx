@@ -11,7 +11,7 @@ const ApprovalModal = ({ title, footer, onClose, own, children }: { title: strin
     {own ? (
       children
     ) : (
-      <PageModal title={title} onClose={onClose} footer={footer}>
+      <PageModal sheet chip title={title} onClose={onClose} footer={footer}>
         {children}
       </PageModal>
     )}

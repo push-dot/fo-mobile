@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { Keyboard } from 'react-native'
 import { create } from 'zustand'
 
 export type ChoiceModalRequest = {
@@ -27,6 +28,8 @@ export const useChoiceModal = create<{ request: ChoiceModalRequest | null }>(() 
 
 /** A choice or confirmation that is not a warning: the regular modal (a sheet with no X and no 취소), not an alert or action sheet. */
 export const showChoiceModal = (request: ChoiceModalRequest) => {
+  // The sheet hides the keyboard but not the focus: a field left focused under it keeps its caret with no keyboard once the sheet is gone.
+  Keyboard.dismiss()
   useChoiceModal.setState({ request })
   router.push('/choice')
 }

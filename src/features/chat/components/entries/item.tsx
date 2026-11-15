@@ -1,13 +1,13 @@
 import { memo, useState } from 'react'
 import { Animated, Platform, Pressable, View } from 'react-native'
-import BotText, { BulletList, Bubble, PlanBlock } from './bot'
+import BotText, { BulletList, Bubble, NumberMark, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
-import { radius, spacing, useColors, type Colors } from '../../../../theme'
+import { radius, spacing, type as typography, useColors, type Colors } from '../../../../theme'
 import { Button, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
@@ -18,6 +18,7 @@ import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { fitChrome } from '../../utils/fit-card'
+import { BUBBLE_GAP } from '../../utils/thread-inset'
 import { FIT_LOCKED } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
@@ -130,7 +131,7 @@ const TodoList = ({ item }: { item: Of<'todo'> }) => (
         const done = line.state === 'done'
         return (
           <View key={line.text} style={{ flexDirection: 'row' }}>
-            <Text v="b1" color={done ? 't3' : 't1'} style={{ width: 24 }}>{`${n + 1}.`}</Text>
+            <NumberMark n={n + 1} color={done ? 't3' : 't1'} />
             <View style={{ flexShrink: 1 }}>
               <StruckLabel on={done} v="b1" color={done ? 't3' : 't1'}>
                 {line.text}
@@ -171,7 +172,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const view = fitChrome(item)
   const first = fitBubble(item)
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View style={{ gap: BUBBLE_GAP }}>
       {view.locked ? (
         <Bubble>
           <Rich v="b1" text={first.text} markId={item.id} />
@@ -280,7 +281,7 @@ const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
   const [first, ...rest] = item.lines
   return (
     <Bubble wide>
-      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: typography.b1.lineHeight }}>
         {writing ? `${item.label} · ${WRITING}` : item.label}
       </Text>
       <Text v="h3">{item.heading}</Text>

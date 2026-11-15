@@ -2,6 +2,8 @@ import { spacing } from '../../../theme/tokens'
 
 // Last thread line to an approval sheet: iOS calibrated on the device, Android the board's 25 (thread bottom 236 over a 211pt sheet).
 const APPROVAL_GAP = { ios: 46, android: 25 }
+/** Between two bubbles of a thread, and between the two bubbles of one fit result (every board draws 18). */
+export const BUBBLE_GAP = 18
 const KEYBOARD_GAP = spacing[2]
 const THREAD_GAP = spacing[4]
 // ChatPh1Fit* draw the thread edge 30 above the approval sheet when no waiting line sits between them.

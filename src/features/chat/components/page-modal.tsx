@@ -28,6 +28,7 @@ const PageModal = ({
   page,
   mpage,
   sheet,
+  chip,
   scroll = true,
 }: {
   onClose?: () => void
@@ -45,6 +46,8 @@ const PageModal = ({
   mpage?: boolean
   /** An iOS pageSheet on the system sheet fill (`--iSheet`), not the page background. */
   sheet?: boolean
+  /** The close button is the solid `fill` chip, not glass (ChatPh0Input: `.isheet .iconbtn`). */
+  chip?: boolean
   scroll?: boolean
 }) => {
   const c = useColors()
@@ -57,7 +60,7 @@ const PageModal = ({
   return (
     <View style={{ flex: 1, backgroundColor: fill, paddingTop: iosSheet ? SHEET.top : modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: iosSheet ? SHEET.header : undefined, paddingHorizontal: iosSheet ? SHEET.side : modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: iosSheet ? 0 : modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
-        {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
+        {left ?? <GlassButton filled={chip} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
         </Text>
