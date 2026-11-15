@@ -127,7 +127,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             }}
           >
             <Text v="b2" weight="700" style={{ flex: 1 }}>
-              공고 보내기
+              Bot한테 이 공고 보내기
             </Text>
             <Icon name="chev" size={18} color="t3" />
           </Pressable>
@@ -142,7 +142,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             disabled={decline.isPending}
             style={{ paddingHorizontal: DECLINE_INSET }}
             onPress={() =>
-              Alert.alert('이 제안을 거절할까요?', undefined, [
+              Alert.alert('이 제안을 거절할까요?', `${o.sender.displayName} 님에게 이번 제안은 정중히 거절한다고 전해요.`, [
                 { text: '취소', style: 'cancel' },
                 { text: OFFER_DECLINE, style: 'destructive', onPress: () => decline.mutate() },
               ])

@@ -1,13 +1,15 @@
-import { Children, useEffect, useState, type ReactNode } from 'react'
+import { useIsFocused } from 'expo-router'
+import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
-import { Badge, Button, Icon, Text, hitSlopTo, showActionSheet, useReduceMotion } from '@/shared/components'
+import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
+import { showChoiceModal } from '@/shared/navigation'
 import { SPRING } from '../../constants'
 import ApprovalModal from './approval-modal'
 import { RISE_MS, riseOnMount } from './approval-rise'
 import type { Approval, ApprovalSection, Choice } from '../../types'
-import { choiceSheet, isSay } from '../../utils/choice-sheet'
+import { choiceSheet, confirmModal } from '../../utils/choice-sheet'
 import { approvalModalKind } from '../../utils/approval-modal'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
@@ -41,7 +43,6 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   const modal = approvalModalKind(approval)
   const [picking, setPicking] = useState(false)
   const [sel, setSel] = useState(() => approval.sections.map((s) => ('selected' in s ? s.selected : [])))
-  const numbered = !approval.submit && approval.sections.length === 1 && approval.sections[0]!.kind === 'choices' && !approval.sections[0]!.multi
   // push-be #224 section card (10-02, 10-21, 10-22): answered with submit + picked ids; cancel is its own button or chip.
   const sectioned = approval.sections.some((s) => s.kind !== 'choices')
   const last = approval.sections.at(-1)
@@ -64,29 +65,30 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
     return () => (stop(), rise.stopAnimation())
   }, [rise, reduce])
 
-  // iOS: a single-pick card is the platform's action sheet, so the panel draws nothing; leaving it hands the floor to the composer.
-  const sheet = Platform.OS === 'ios' ? choiceSheet(approval) : null
+  // A single-pick card the bot has no suggestion for (a help question, a page permission) and an edit card are regular modals, so the panel draws nothing; swiping one away hands the floor to the composer.
+  const sheet = choiceSheet(approval)
+  const confirm = confirmModal(approval)
+  // Opens once, and only while the chat is the focused screen: another sheet over it would make a modal on a modal.
+  const focused = useIsFocused()
+  const opened = useRef(false)
   useEffect(() => {
-    if (!sheet) return
-    showActionSheet({
-      title: sheet.title,
-      message: sheet.message,
-      items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
-      cancel: sheet.cancel,
-      onCancel: onSay,
-    })
+    if (!focused || opened.current) return
+    opened.current = true
+    if (sheet) {
+      showChoiceModal({
+        title: sheet.title,
+        message: sheet.message,
+        items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
+        onDismiss: onSay,
+      })
+    } else if (confirm) {
+      showChoiceModal({ title: confirm.title, message: confirm.message, confirm: { label: confirm.confirm, onPress: () => onAnswer(confirm.confirm, 0) }, onDismiss: onSay })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
-  }, [])
+  }, [focused])
 
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))
-
-  const pickNumbered = (i: number, ch: Choice) => {
-    if (isSay(ch)) return onSay()
-    toggle(0, i)
-    // Let the 150ms selection land before the panel leaves.
-    setTimeout(() => onAnswer(ch.label, i), 150)
-  }
 
   const section = (s: ApprovalSection, si: number) => {
     switch (s.kind) {
@@ -94,13 +96,10 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
         const rows = s.items.map((ch, i) => (
           <ChoiceRow
             key={`${si}-${i}`}
-            n={numbered ? i + 1 : undefined}
             choice={ch}
             on={sel[si]!.includes(i)}
-            square={!numbered}
             bare={!!s.multi && isStop(ch)}
             onPress={() => {
-              if (numbered) return pickNumbered(i, ch)
               if (s.multi && isStop(ch)) return onAnswer(ch.label, i)
               toggle(si, i, s.multi)
             }}
@@ -119,14 +118,14 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
         const title = s.title && s.title !== approval.question ? s.title : undefined
         const stop = sectioned && modal === 'none' ? approval.secondary : undefined
         if (s.multi) {
-          const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare center onPress={cancel} /> : null
+          const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} bare center onPress={cancel} /> : null
           const inGrid = s.options.length % 2 === 1
           return (
             <View key={si} style={{ gap: PANEL_GAP }}>
               {title ? <Question label={title} /> : null}
               <MultiGrid stop={stopRow && !inGrid ? <View style={{ marginTop: 2 }}>{stopRow}</View> : undefined}>
                 {s.options.map((o, i) => (
-                  <ChoiceRow key={o} choice={{ label: o }} on={sel[si]!.includes(i)} square center onPress={() => toggle(si, i, true)} />
+                  <ChoiceRow key={o} choice={{ label: o }} on={sel[si]!.includes(i)} center onPress={() => toggle(si, i, true)} />
                 ))}
                 {stopRow && inGrid ? stopRow : null}
               </MultiGrid>
@@ -191,7 +190,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
           </View>
         )
       case 'toggle':
-        return s.items.map((ch, i) => <ChoiceRow key={`${si}-${i}`} choice={ch} on={sel[si]!.includes(i)} square tall={approval.sections.some((x) => x.kind === 'templates')} onPress={() => toggle(si, i, true)} />)
+        return s.items.map((ch, i) => <ChoiceRow key={`${si}-${i}`} choice={ch} on={sel[si]!.includes(i)} tall={approval.sections.some((x) => x.kind === 'templates')} onPress={() => toggle(si, i, true)} />)
     }
   }
 
@@ -261,7 +260,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
-  if (sheet) return null
+  if (sheet || confirm) return null
 
   if (modal !== 'none')
     return (
@@ -309,16 +308,15 @@ const Sub = ({ label }: { label: string }) => (
 )
 
 /** `tall`: the row is `.ch.two` (64 high, top aligned) although it has no description (ChatPh4Design's 프로필 사진 넣기). */
-const ChoiceRow = ({ n, choice, on, square, bare, center, tall, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; tall?: boolean; onPress: () => void }) => {
+const ChoiceRow = ({ choice, on, bare, center, tall, onPress }: { choice: Choice; on: boolean; bare?: boolean; center?: boolean; tall?: boolean; onPress: () => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
   const two = !!choice.desc || !!tall
-  const paleNumber = Platform.OS === 'ios' && !square
   return (
     <Pressable
-      accessibilityRole={square ? 'checkbox' : 'button'}
-      accessibilityState={square ? { checked: on } : { selected: on }}
-      accessibilityLabel={n ? `${n}. ${choice.label}` : choice.label}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={choice.label}
       onPress={onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
@@ -338,20 +336,14 @@ const ChoiceRow = ({ n, choice, on, square, bare, center, tall, onPress }: { n?:
           style={{
             width: 24,
             height: 24,
-            borderRadius: square ? 7 : 8,
+            borderRadius: 7,
             marginTop: two ? 1 : 0,
-            backgroundColor: on && !paleNumber ? c.ac : c.fill,
+            backgroundColor: on ? c.ac : c.fill,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {n ? (
-            <Text v="c1" weight="800" style={{ color: on ? onAccent : c.t2 }}>
-              {n}
-            </Text>
-          ) : on ? (
-            <Icon name="check" size={14} color={onAccent} />
-          ) : null}
+          {on ? <Icon name="check" size={14} color={onAccent} /> : null}
         </View>
       )}
       <View style={{ flex: center ? undefined : 1, flexShrink: 1, minWidth: 0, gap: 2 }}>

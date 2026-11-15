@@ -4,7 +4,7 @@ export type PushDocAction = 'posting' | 'export' | 'rename' | 'duplicate' | 'del
 
 const ITEMS: Record<PushDocAction, Omit<MenuAction, 'key' | 'onPress'>> = {
   posting: { label: '공고 보기', systemImage: 'doc.text.magnifyingglass', icon: 'ext' },
-  export: { label: 'PDF로 내보내기', systemImage: 'square.and.arrow.up', icon: 'download-pdf' },
+  export: { label: '내보내기', systemImage: 'square.and.arrow.up', icon: 'download-pdf' },
   rename: { label: '이름 바꾸기', systemImage: 'pencil.line', icon: 'edit' },
   duplicate: { label: '복제하기', systemImage: 'doc.on.doc', icon: 'copy' },
   delete: { label: '삭제하기', systemImage: 'trash', icon: 'delete', destructive: true },

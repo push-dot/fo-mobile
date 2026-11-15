@@ -1,15 +1,14 @@
-import { memo, useEffect, useState } from 'react'
-import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import BotText, { Bubble, PlanBlock } from './bot'
+import { memo, useState } from 'react'
+import { Animated, Platform, Pressable, View } from 'react-native'
+import BotText, { BulletList, Bubble, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
-import { radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
-import { Badge, Button, Icon, Text, useReduceMotion } from '@/shared/components'
-import Blur from '@/shared/components/blur'
+import { radius, spacing, useColors, type Colors } from '../../../../theme'
+import { Button, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
@@ -17,8 +16,8 @@ import { usePop, usePulse } from '../../hooks'
 import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
-import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, FIT_LOCKED_PCT, KEYWORD_GLYPH, fitProjected } from '../../constants'
+import { fitChrome } from '../../utils/fit-card'
+import { FIT_LOCKED, fitProjected, fitProjectedLink } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -144,189 +143,52 @@ const Plan = ({ item }: { item: Of<'plan'> }) => (
 const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
   <Bubble>
     <Rich v="b1" text={view.text} markId={id} />
+    {view.list ? <BulletList items={view.list} markId={id} /> : null}
     {view.detail ? <Detail text={view.detail.text} more={view.detail.more} /> : null}
   </Bubble>
 )
 
-/** Bar that grows from the left (900ms) to `pct`. */
-const BAR_HEIGHT = 8
-const Bar = ({ pct, low, delay = 150 }: { pct: number; low?: boolean; delay?: number }) => {
-  const c = useColors()
-  const reduce = useReduceMotion()
-  const v = useState(() => new Animated.Value(reduce ? 1 : 0))[0]
-  useEffect(() => {
-    Animated.timing(v, { toValue: 1, duration: reduce ? 0 : 900, delay, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: false }).start()
-  }, [v, reduce, delay])
-  return (
-    <View style={{ flex: 1, height: BAR_HEIGHT, borderRadius: BAR_HEIGHT / 2, backgroundColor: c.fill2, overflow: 'hidden' }}>
-      <Animated.View
-        style={{
-          height: '100%',
-          borderRadius: BAR_HEIGHT / 2,
-          backgroundColor: low ? c.orange : c.ac,
-          width: v.interpolate({ inputRange: [0, 1], outputRange: ['0%', `${Math.min(100, pct)}%`] }),
-        }}
-      />
-    </View>
-  )
-}
-
-const FitRow = ({ label, score, index }: { label: string; score: number; index: number }) => (
-  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-    <Text v="c1" color="t2" style={{ width: 76 }}>
-      {label}
-    </Text>
-    <Bar pct={score * 10} low={score < 6} delay={150 + index * 80} />
-    <Text v="c1" weight="700" style={{ width: 28, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
-      {score.toFixed(1)}
-    </Text>
-  </View>
-)
-
-const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () => void }) => {
-  const c = useColors()
-  const shadow = useShadow().pop
-  return (
-    <View>
-      <View style={{ gap: spacing[3], opacity: 0.55, ...(Platform.OS === 'android' ? { filter: [{ blur: 5 }] } : {}) }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        {rows.map((r, i) => (
-          <FitRow key={r.label} label={r.label} score={FIT_LOCKED_PCT[i % FIT_LOCKED_PCT.length]! / 10} index={i} />
-        ))}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
-          {LOCKED_KEYWORDS.map((k) => (
-            <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
-          ))}
-        </View>
-      </View>
-      <Blur intensity={20} style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }} />
-      <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing[2] }}>
-        <Pressable
-          accessibilityRole={onPlan ? 'button' : 'text'}
-          disabled={!onPlan}
-          onPress={onPlan}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: radius.pill, backgroundColor: c.bg, elevation: 3, ...shadow }}
-        >
-          <Icon name="lock" size={14} color="t1" />
-          <Text v="c1" numberOfLines={1} style={{ flexShrink: 1, textAlign: 'center' }}>
-            {FIT_LOCKED}
-          </Text>
-        </Pressable>
-      </View>
-    </View>
-  )
-}
-
-// ChatPh1FitUltraOpen's thread box is 2 short of its content and cuts this card at 142 (16 padding would draw 144), so the open card takes 15.
-const Projected = ({ label, bullets, open, onToggle }: { label: string; bullets: string[]; open: boolean; onToggle: () => void }) => {
-  const c = useColors()
-  return (
-    <Appear style={{ gap: spacing[2], paddingHorizontal: spacing[4], paddingVertical: open ? 15 : 11, borderRadius: radius.card, backgroundColor: c.bg2 }}>
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={onToggle} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-        <Text v="b2" weight="700" style={{ flex: 1 }}>
-          {fitProjected(label)}
-        </Text>
-        <View style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }}>
-          <Icon name="chev" size={16} color="t3" />
-        </View>
-      </Pressable>
-      {open
-        ? bullets.map((b) => (
-            <Text key={b} v="b2" color="t2">
-              • {b}
-            </Text>
-          ))
-        : null}
-    </Appear>
-  )
-}
-
-// iOS draws the 40pt numeral ~6pt higher in its 44pt line box than the board (card top to numeral 15.6 vs 21, '/ 10' 8pt low); the shift grows with the text size.
-const FIT_DROP = 6
-const useFitDrop = () => {
-  const { fontScale } = useWindowDimensions()
-  return Platform.OS === 'ios' ? Math.round(FIT_DROP * fontScale) : 0
-}
-
-const FitNum = ({ size, color, children }: { size: 'mid' | 'big'; color: keyof Colors; children: string }) => {
-  const drop = useFitDrop()
-  return (
-    <Text
-      v={size === 'big' ? 'h1' : 'h2'}
-      weight="800"
-      color={color}
-      style={size === 'big' ? { fontSize: 40, lineHeight: 44, letterSpacing: -1.2, fontVariant: ['tabular-nums'], transform: [{ translateY: drop }] } : { fontSize: 22, fontVariant: ['tabular-nums'] }}
-    >
-      {children}
-    </Text>
-  )
-}
-
+/** The fit result as bubbles (ChatPh1Fit*): the sentence with its parts a tap away, the summary with the ULTRA projection, the PRO teaser. */
 const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => void }) => {
   const c = useColors()
   // No upgrade entry while payments are closed or the account has not loaded.
   const open = paymentsOpen(useChatAccount(true).data)
   const onPlan = open ? planEntry : undefined
   const view = fitChrome(item, open)
-  // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10, 16 between its rows and 16 under, so the card follows the teaser's state.
   const [projectedOpen, setProjectedOpen] = useState(false)
-  const opened = !!view.projected && projectedOpen
-  const basic = !view.locked && !view.projected
-  const compact = !view.locked && item.from === undefined && !opened
-  const head = item.from !== undefined ? (
-    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing[2] }}>
-      <Text v="c1" weight="700" color="t3">
-        적합도
-      </Text>
-      <FitNum size="mid" color="t3">{item.from.toFixed(1)}</FitNum>
-      <Text color="t3">→</Text>
-      <FitNum size="mid" color="t1">{item.score.toFixed(1)}</FitNum>
-      <View style={{ flex: 1 }} />
-      {item.delta ? <Badge label={item.delta} tone="green" /> : null}
-    </View>
-  ) : (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: spacing[3] }}>
-      <FitNum size="big" color="t1">{item.score.toFixed(1)}</FitNum>
-      <Text v="b2" color="t3" style={{ paddingBottom: spacing[2] }}>
-        / 10
-      </Text>
-      {item.caption ? (
-        <Text v="c1" color="t3" style={{ flex: 1, textAlign: 'right', paddingBottom: spacing[1] }}>
-          {item.caption}
-        </Text>
-      ) : null}
-    </View>
-  )
+  const first = fitBubble(item)
   return (
-    <View style={{ gap: opened ? spacing[4] : spacing[3] }}>
-      {basic ? (
-        <BubbleDetailText id={item.id} view={fitBubble(item)} />
+    <View style={{ gap: projectedOpen ? spacing[4] : spacing[3] }}>
+      {view.locked ? (
+        <Bubble>
+          <Rich v="b1" text={first.text} markId={item.id} />
+          <Pressable accessibilityRole={onPlan ? 'button' : 'text'} disabled={!onPlan} onPress={onPlan}>
+            <Text v="c1" color="t3">
+              {FIT_LOCKED}
+            </Text>
+          </Pressable>
+        </Bubble>
       ) : (
-        <Appear style={compact ? { gap: spacing[2], padding: spacing[4], paddingBottom: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2 } : { gap: 10, padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-          {head}
-          {view.locked ? (
-            <LockedParts rows={item.rows ?? []} onPlan={onPlan} />
-          ) : (
-            <>
-              {item.rows?.map((r, i) => (
-                <FitRow key={r.label} label={r.label} score={r.score} index={i} />
-              ))}
-              {item.keywords ? (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
-                  {item.keywords.map((k) => (
-                    <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
-                  ))}
-                </View>
-              ) : null}
-            </>
-          )}
-        </Appear>
+        <BubbleDetailText id={item.id} view={first} />
       )}
-      {view.summary ? <BotText item={{ type: 'agentText', id: `${item.id}-summary`, text: view.summary }} /> : null}
+      {view.summary ? (
+        <Bubble>
+          <Rich v="b1" text={view.projected && projectedOpen ? `${view.summary} ${fitProjected(view.projected.label)}` : view.summary} markId={`${item.id}-summary`} />
+          {view.projected && projectedOpen ? <BulletList items={view.projected.bullets} markId={`${item.id}-summary`} /> : null}
+          {view.projected && !projectedOpen ? (
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: false }} onPress={() => setProjectedOpen(true)}>
+              <Text v="c1" color="t3">
+                {fitProjectedLink(view.projected.label)}
+              </Text>
+            </Pressable>
+          ) : null}
+        </Bubble>
+      ) : null}
       {view.teaser ? (
         <Pressable
           accessibilityRole="button"
           onPress={onPlan}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: 44, paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: 44, paddingHorizontal: spacing[4], borderRadius: radius.pill, backgroundColor: c.fill }}
         >
           <Icon name="lock" size={16} color="t3" />
           <Text v="b2" weight="600" color="t2">
@@ -334,7 +196,6 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
           </Text>
         </Pressable>
       ) : null}
-      {view.projected ? <Projected label={view.projected.label} bullets={view.projected.bullets} open={projectedOpen} onToggle={() => setProjectedOpen((v) => !v)} /> : null}
     </View>
   )
 }
@@ -459,7 +320,7 @@ const ItemComponent = ({
     case 'user':
       return <UserBubble item={item} />
     case 'agentText':
-      return <BotText item={item} />
+      return <BotText item={item} onView={onView} />
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
     case 'readOff':

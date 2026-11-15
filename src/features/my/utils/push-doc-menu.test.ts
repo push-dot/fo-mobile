@@ -6,11 +6,11 @@ const labels = (s: ReturnType<typeof pushDocMenu>) => s.map((g) => g.actions.map
 
 describe('pushDocMenu', () => {
   it('lists the board items in two groups for a doc with a posting', () => {
-    expect(labels(pushDocMenu({ hasPosting: true }, on()))).toEqual([['공고 보기', 'PDF로 내보내기', '이름 바꾸기', '복제하기'], ['삭제하기']])
+    expect(labels(pushDocMenu({ hasPosting: true }, on()))).toEqual([['공고 보기', '내보내기', '이름 바꾸기', '복제하기'], ['삭제하기']])
   })
 
   it('hides 공고 보기 and 복제하기 for a doc without a posting (POST documents needs an application)', () => {
-    expect(labels(pushDocMenu({ hasPosting: false }, on()))).toEqual([['PDF로 내보내기', '이름 바꾸기'], ['삭제하기']])
+    expect(labels(pushDocMenu({ hasPosting: false }, on()))).toEqual([['내보내기', '이름 바꾸기'], ['삭제하기']])
   })
 
   it('marks only 삭제하기 destructive and runs the handler of the tapped item', () => {

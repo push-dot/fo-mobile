@@ -4,6 +4,7 @@ import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
 import { foldBubbleCards } from './bubble-card'
+import { choiceInThread } from './choice-sheet'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
@@ -94,9 +95,7 @@ export const isDrawn = (item: ChatItem) =>
 
 /** The running line, drawn inside the list under the last line (the boards draw it in the thread, not above the composer). */
 export type RunningRow = { type: 'running'; id: 'running' }
-/** The orange 확인을 기다리는 중 line of an open edit card, drawn above the diff it asks about (ChatApprove: the line, then the diff card). */
-export type WaitingRow = { type: 'waiting'; id: 'waiting' }
-export type ThreadRow = ChatItem | RunningRow | WaitingRow
+export type ThreadRow = ChatItem | RunningRow
 
 /**
  * The list in order, drawn lines only, and while the run works its running line under the last line (ChatBotStatusThink, Work, Long,
@@ -104,10 +103,8 @@ export type ThreadRow = ChatItem | RunningRow | WaitingRow
  * run works) is what the running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running
  * line, draft card).
  */
-export const threadRows = (items: readonly ChatItem[], working: boolean, waiting = false): ThreadRow[] => {
-  const folded = foldBubbleCards(items.filter(isDrawn))
-  // An edit card that waits for an answer: its tool line (the waiting line) comes before the diff it shows, not after it. Other cards keep the line at the end.
-  const drawn: ThreadRow[] = waiting && folded.at(-1)?.type === 'diff' ? [...folded.slice(0, -1), { type: 'waiting', id: 'waiting' }, folded.at(-1)!] : folded
+export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
+  const drawn: ThreadRow[] = foldBubbleCards(items.filter(isDrawn))
   if (!working) return drawn
   const running: RunningRow = { type: 'running', id: 'running' }
   const last = drawn.at(-1)
@@ -128,8 +125,9 @@ const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'
 // A file sent with the first line starts the flow too: DocAgentNew draws 작업 중에도 말할 수 있어요 right under the file chip, before any card.
 export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type) || (i.type === 'user' && !!i.attachment))
 
-export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
+export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'> & Partial<Pick<ChatState, 'approval'>>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
+  if (chat.approval && choiceInThread(chat.approval)) return COMPOSER_PLACEHOLDER.choice
   // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
   if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
   if (name) return holdsResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)

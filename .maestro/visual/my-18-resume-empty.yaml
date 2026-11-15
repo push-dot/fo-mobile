@@ -16,7 +16,7 @@ tags:
     timeout: 10000
 - tapOn: "서류"
 - extendedWaitUntil:
-    visible: "아직 등록한 서류가 없어요"
+    visible: "아직 Push 프로필이 없어요"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MyResumeEmpty

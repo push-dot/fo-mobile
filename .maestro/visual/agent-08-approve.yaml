@@ -11,12 +11,12 @@ tags:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "tailor resume"
 - extendedWaitUntil:
-    visible: "이 수정을 적용할까요?"
+    visible: "수정 적용"
     timeout: 60000
-# The approval panel slides up; a tap during the slide can land on 그대로 두기.
+# The edit modal slides up; its one 적용 button answers, the title 수정 적용 is not a tap target.
 - waitForAnimationToEnd
 - takeScreenshot: ChatApprove
-- tapOn: ".*적용"
+- tapOn: "적용"
 - extendedWaitUntil:
     visible: "결과를 확인할까요?"
     timeout: 60000
@@ -43,7 +43,7 @@ tags:
 - takeScreenshot: ChatDoneNext
 - tapOn: "모아페이에 바로 지원하기"
 - extendedWaitUntil:
-    visible: "모아페이 · 백엔드 엔지니어에 지원해요"
+    visible: "모아페이 · 백엔드 엔지니어.Kotlin·Spring.에 지원할까요?"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply

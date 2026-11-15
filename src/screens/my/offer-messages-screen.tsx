@@ -5,6 +5,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  StyleSheet,
   TextInput,
   View,
 } from 'react-native'
@@ -38,12 +39,14 @@ const Bubble = ({
   mine,
   faded,
   onPress,
+  posting,
 }: {
   body: string
   at?: string
   mine: boolean
   faded?: boolean
   onPress?: () => void
+  posting?: { title: string; company: string; onPress: () => void }
 }) => {
   const c = useColors()
   return (
@@ -66,6 +69,24 @@ const Bubble = ({
         <Text v="b2" style={{ color: mine ? onAccent : c.t1 }}>
           {body}
         </Text>
+        {posting ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`함께 보낸 공고 ${posting.company} ${posting.title}`}
+            onPress={posting.onPress}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], marginTop: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.bg, borderWidth: StyleSheet.hairlineWidth, borderColor: c.line }}
+          >
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text v="b2" weight="700" numberOfLines={1}>
+                {posting.title}
+              </Text>
+              <Text v="c1" color="t3" numberOfLines={1}>
+                {posting.company}
+              </Text>
+            </View>
+            <Icon name="chev" size={18} color="t3" />
+          </Pressable>
+        ) : null}
       </Pressable>
       {at ? (
         <Text v="c2" color="t3">
@@ -124,9 +145,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   )
   const posted = o.posting ? (
     <Bubble
-      body={postingSentLine(o.sender.displayName, o.posting.title)}
+      body={postingSentLine(o.sender.displayName)}
       mine={o.sender.id === meId}
-      onPress={() => router.push(`/postings/${o.posting!.id}`)}
+      posting={{ title: o.posting.title, company: o.posting.company, onPress: () => router.push(`/postings/${o.posting!.id}`) }}
     />
   ) : null
   const post = (body: string) =>

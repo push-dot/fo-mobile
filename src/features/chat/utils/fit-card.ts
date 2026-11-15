@@ -10,11 +10,3 @@ export const fitChrome = (item: Fit, paymentsOpen = true) => ({
   teaser: item.plan === 'PRO' && paymentsOpen ? FIT_TEASER : undefined,
   projected: item.plan === 'ULTRA' ? item.projected : undefined,
 })
-
-export const LOCKED_KEYWORDS = [
-  { ok: true, label: 'Kotlin' },
-  { ok: true, label: 'Spring Boot' },
-  { ok: true, label: 'JPA' },
-  { ok: false, label: 'Kafka' },
-  { ok: false, label: '정산 도메인' },
-] as const
