@@ -8,7 +8,7 @@ tags:
     commands:
       - tapOn: "Bot"
       - extendedWaitUntil:
-          visible: "(동의하고 시작하기|새 회사 Bot 만들기|Push Bot)"
+          visible: "(동의하고 시작하기|계정 · .*|Push Bot)"
           timeout: 6000
 - runFlow:
     when:
