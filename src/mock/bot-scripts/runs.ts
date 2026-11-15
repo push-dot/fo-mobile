@@ -5,7 +5,7 @@ import type { StreamEvent } from '@push/api-client'
 import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
-import { PAGE_READ_OPTIONS } from './cards'
+import { DRAFT_V1_MD, PAGE_READ_OPTIONS } from './cards'
 
 type Frame = Step['frame']
 type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
@@ -210,7 +210,7 @@ const failRun: Step[] = [
   s(200, tool('gh', 'GitHub 살펴보기', 'seojun-kim', 'run', '저장소를 훑는 중')),
   s(2000, tool('gh', 'GitHub 살펴보기', 'seojun-kim', 'wait', '시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요')),
   s(200, tool('jd', '공고 읽기', '회사 채용 페이지', 'run', '본문을 읽는 중')),
-  s(1500, { ...tool('jd', '공고 읽기', '회사 채용 페이지', 'err'), result: { error: '“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요' } }),
+  s(1500, { ...tool('jd', '공고 읽기', '회사 채용 페이지', 'err'), result: { error: '“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.' } }),
   s(400, agent('나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.')),
   ask(numbered('fail-choice', '어떻게 할까요?', ['공고 내용을 붙여넣을게요', '이대로 진행해 주세요', 'Push 공고에서 고를게요'])),
 ]
@@ -316,6 +316,7 @@ const feedbackOnly: Step[] = [
 ]
 export const startDocument: Step[] = [
   s(400, agent('작성 중인 이력서 초안(v1)이 있어요.')),
+  s(100, agent(`\n${DRAFT_V1_MD}`)),
   ask(numbered('start-document', '이어서 작성할까요?', ['이어서 작성하기', '그만하기'])),
 ]
 const ph2: Step[] = [
@@ -530,7 +531,7 @@ export const verifyFail: Step[] = [
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
   // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
-  s(200, { type: 'notice', text: '방향 검증에서 문제가 생겼어요' } as unknown as Frame),
+  s(200, { type: 'notice', text: '방향 검증에서 문제가 생겼어요.' } as unknown as Frame),
   ask({ ...numbered('ph2x-verify', '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', ['다시 고르기', '그만하기']), gate: HINTLESS_GATES[0] }),
 ]
 const autoPick: Step[] = [

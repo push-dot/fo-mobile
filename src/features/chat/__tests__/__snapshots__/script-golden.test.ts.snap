@@ -111,7 +111,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"공고 내용을 붙여넣을게요","type":"user"}
 {"text":"공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.","type":"agentText"}
@@ -126,7 +126,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
@@ -152,7 +152,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
@@ -179,7 +179,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
@@ -206,7 +206,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
@@ -230,7 +230,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
@@ -252,7 +252,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
@@ -276,7 +276,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
@@ -295,7 +295,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"Push 공고에서 고를게요","type":"user"}
 {"text":"북마크한 공고 중에서 골라 주세요. @언급으로 불러올 수 있어요.","type":"agentText"}
@@ -310,7 +310,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"북마크한 공고 중에서 골라 주세요. @언급으로 불러올 수 있어요.","type":"agentText"}
@@ -325,7 +325,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"채용 페이지 실패 테스트","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 card {"id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -337,7 +337,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"fail","type":"user"}
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"GitHub 살펴보기","result":"시간이 오래 걸려서 한 번 더 시도했어요 · 저장소 3개만 읽었어요","state":"wait","target":"seojun-kim","type":"tool"}
-{"action":"공고 읽기","error":"“자격 요건”을 읽지 못했어요 · 로그인이 필요한 영역이에요","state":"err","target":"회사 채용 페이지","type":"tool"}
+{"action":"공고 읽기","error":"“자격 요건”은 로그인이 필요한 영역이라 읽지 못했어요.","state":"err","target":"회사 채용 페이지","type":"tool"}
 {"text":"나머지 내용으로 진행할 수 있지만, 자격 요건이 빠지면 적합도가 정확하지 않을 수 있어요.","type":"agentText"}
 card {"id":"fail-choice","question":"어떻게 할까요?","sections":[{"items":[{"label":"공고 내용을 붙여넣을게요"},{"label":"이대로 진행해 주세요"},{"label":"Push 공고에서 고를게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -2471,7 +2471,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2495,7 +2495,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2519,7 +2519,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2543,7 +2543,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2564,7 +2564,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2585,7 +2585,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -2606,7 +2606,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -2626,7 +2626,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -2646,7 +2646,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 card {"id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -2663,7 +2663,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2682,7 +2682,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2701,7 +2701,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2717,7 +2717,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2733,7 +2733,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -3028,7 +3028,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > running conversation 1`] = `
 "
 {"text":"이어서 봐 주세요","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
 card {"id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -7250,7 +7250,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7272,7 +7272,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7294,7 +7294,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7316,7 +7316,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7335,7 +7335,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7354,7 +7354,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -7373,7 +7373,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -7391,7 +7391,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -7409,7 +7409,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 card {"id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -7424,7 +7424,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7441,7 +7441,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7458,7 +7458,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -7472,7 +7472,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -7486,7 +7486,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -7918,7 +7918,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: pick 0 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
 {"text":"이어서 작성하기","type":"user"}
 {"text":"멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7930,7 +7930,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: pick 1 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7942,7 +7942,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: say 이렇게 해 주세요 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -7954,7 +7954,7 @@ card null
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc 1`] = `
 "
 {"text":"resume-doc","type":"user"}
-{"text":"작성 중인 이력서 초안(v1)이 있어요.","type":"agentText"}
+{"text":"작성 중인 이력서 초안(v1)이 있어요.\\n**김서준 · 백엔드 개발자**\\n**모아페이 · 백엔드 엔지니어 · 2022.03–현재**\\n- 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms\\n- Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을 하루에서 10분으로 줄임","type":"agentText"}
 card {"id":"start-document","question":"이어서 작성할까요?","sections":[{"items":[{"label":"이어서 작성하기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -8316,7 +8316,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"verify-fail","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10683,11 +10683,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10705,11 +10705,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10727,11 +10727,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10749,11 +10749,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10768,11 +10768,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10787,11 +10787,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
@@ -10806,11 +10806,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10824,11 +10824,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10842,11 +10842,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 card {"id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -10857,11 +10857,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10874,11 +10874,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10891,11 +10891,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10905,11 +10905,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10919,11 +10919,11 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -10933,7 +10933,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10947,7 +10947,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
@@ -10961,7 +10961,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"다시 고르기","type":"user"}
 card {"id":"ph2x-level","question":"병목 강도를 어느 정도로 할까요?","sections":[{"items":[{"label":"가벼운 제약으로"},{"label":"중간 제약으로"},{"label":"강한 제약으로"},{"label":"그만하기"}],"kind":"choices","selected":[1]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
@@ -10972,7 +10972,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"그만하기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10985,7 +10985,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -10998,7 +10998,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요"},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?","sections":[{"items":[{"label":"다시 고르기"},{"label":"그만하기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "

@@ -59,7 +59,7 @@ describe('chat mock', () => {
 
   it('draws the failed check of the first 병목 강도 pick as a red line under the user line (ChatVerifyFail)', async () => {
     const events = await run('t-verify-notice', { text: 'verify-fail' })
-    expect(events.find((e) => e.type === 'notice')).toMatchObject({ notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요' } })
+    expect(events.find((e) => e.type === 'notice')).toMatchObject({ notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요.' } })
   })
 
   it('stamps a tool card with the time it was asked, so the room draws the waiting line (ChatBotStatusApprove)', async () => {
