@@ -201,12 +201,12 @@ const Thread = ({ id }: { id: string }) => {
   })
   const working = chat.working
   const renderItem = useCallback(
-    ({ item }: { item: ThreadRow }) => (
+    ({ item, index }: { item: ThreadRow; index: number }) => (
       <RowMotion.Provider value={{ key: `${id}/${item.id}`, live }}>
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
         ) : (
-          <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
+          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
         )}
       </RowMotion.Provider>
     ),

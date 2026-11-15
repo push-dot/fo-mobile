@@ -12,7 +12,7 @@ import { Button, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
-import { usePop, usePulse } from '../../hooks'
+import { usePop } from '../../hooks'
 import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
@@ -119,13 +119,28 @@ const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<ty
   )
 }
 
+const TODO_TITLE = '할 일'
+const WRITING = '쓰는 중'
+
+/** `.mdol`: the title, then a numbered list whose marker column is 24 wide (22 padding + 2 of the item's own). */
 const TodoList = ({ item }: { item: Of<'todo'> }) => (
-  <Bubble gap={spacing[1]}>
-    {todoLines(item).map((line) => (
-      <StruckLabel key={line.text} on={line.state === 'done'} v="b1" color={line.state === 'done' ? 't3' : 't1'} weight={line.state === 'now' ? '700' : '400'}>
-        {line.text}
-      </StruckLabel>
-    ))}
+  <Bubble>
+    <Text v="b1">{TODO_TITLE}</Text>
+    <View style={{ gap: 2, marginTop: 2 }}>
+      {todoLines(item).map((line, n) => {
+        const done = line.state === 'done'
+        return (
+          <View key={line.text} style={{ flexDirection: 'row' }}>
+            <Text v="b1" color={done ? 't3' : 't1'} style={{ width: 24 }}>{`${n + 1}.`}</Text>
+            <View style={{ flexShrink: 1 }}>
+              <StruckLabel on={done} v="b1" color={done ? 't3' : 't1'}>
+                {line.text}
+              </StruckLabel>
+            </View>
+          </View>
+        )
+      })}
+    </View>
   </Bubble>
 )
 
@@ -261,24 +276,21 @@ const ResultCard = ({ item, onView }: { item: Of<'result'>; onView: () => void }
   )
 }
 
-/** The draft as markdown inside the bot's bubble (rule 38): its label, the heading in bold, the lines as written, a caret on the last one while it is written. */
-const Paper = ({ item }: { item: Of<'paper'> }) => {
-  const c = useColors()
-  const caret = usePulse(true, 1000, 0)
+/** The draft as markdown inside the bot's bubble (rule 38, ChatPh3): its label (with "쓰는 중" while it is written), the title, the role line, the bullets. */
+const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
   const [first, ...rest] = item.lines
   return (
     <Bubble wide>
-      <Text v="c1" color="t3">
-        {item.label}
+      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+        {writing ? `${item.label} · ${WRITING}` : item.label}
       </Text>
-      <Rich v="b1" text={`**${item.heading}**`} />
-      {first ? <Rich v="b1" text={`**${first}**`} /> : null}
-      {rest.map((l, i) => (
-        <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-          <Rich v="b2" color="t2" text={l} style={{ flexShrink: 1 }} />
-          {i === rest.length - 1 ? <Animated.View style={{ width: 2, height: 15, marginLeft: 1, marginBottom: 2, backgroundColor: c.ac, opacity: caret }} /> : null}
-        </View>
-      ))}
+      <Text v="h3">{item.heading}</Text>
+      {first ? (
+        <Text v="b2" weight="600" style={{ marginTop: spacing[1] }}>
+          {first}
+        </Text>
+      ) : null}
+      {rest.length ? <BulletList items={rest.map((line) => line.replace(/^•\s+/, ''))} markId={item.id} /> : null}
     </Bubble>
   )
 }
@@ -286,11 +298,14 @@ const Paper = ({ item }: { item: Of<'paper'> }) => {
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
 const ItemComponent = ({
   item,
+  writing,
   onUsage,
   onView,
   onReadOff,
 }: {
   item: ChatItem
+  /** The run is still writing this draft: the last line before the running line. */
+  writing?: boolean
   onUsage?: (action: 'plan' | 'credits') => void
   onView?: (item: Of<'result'>) => void
   onReadOff?: (action: ReadOffAction) => void
@@ -322,7 +337,7 @@ const ItemComponent = ({
     case 'file':
       return <FileCard item={item} />
     case 'paper':
-      return <Paper item={item} />
+      return <Paper item={item} writing={writing} />
     case 'result':
       return <ResultCard item={item} onView={() => onView?.(item)} />
     case 'worked':

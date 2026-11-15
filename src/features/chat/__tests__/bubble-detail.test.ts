@@ -62,8 +62,8 @@ describe('diffLinesDetail', () => {
 describe('todoLines (ChatInterrupt)', () => {
   it('is a numbered list that keeps each step state and names an added step', () => {
     expect(todoLines({ type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'done' }, { label: '자기소개서 쓰기', state: 'now', added: true }] })).toEqual([
-      { text: '1. 이력서 읽기', state: 'done' },
-      { text: '2. 자기소개서 쓰기 · 새로 추가', state: 'now' },
+      { text: '이력서 읽기', state: 'done' },
+      { text: '자기소개서 쓰기 (새로 추가)', state: 'now' },
     ])
   })
 })
