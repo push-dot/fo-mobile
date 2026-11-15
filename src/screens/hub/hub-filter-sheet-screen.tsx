@@ -24,7 +24,7 @@ const HubFilterSheetScreen = () => {
         },
       }}
     >
-      <HubFilterSheet draft={draft} sent={sent} onChange={setDraft} onClose={() => router.back()} />
+      <HubFilterSheet draft={draft} sent={sent} onChange={setDraft} />
     </Sheet>
   )
 }
