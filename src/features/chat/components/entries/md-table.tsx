@@ -1,37 +1,31 @@
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { useColors } from '../../../../theme'
 import type { TableBlock } from '../../utils/bot-text'
+import { CELL, tableColumns } from '../../utils/table-columns'
 import Rich from './rich'
 
-// A column's share follows its longest cell, so a tag column stays narrow and the text columns take the rest.
-const SHARE = { min: 3, max: 24 }
-const share = (cells: string[]) => Math.min(SHARE.max, Math.max(SHARE.min, ...cells.map((cell) => cell.length)))
-
-/** A markdown table inside a bot bubble: header in grey, a hairline between rows, no fill of its own (rule 38). */
-const MdTable = ({ table }: { table: TableBlock }) => {
+/** A markdown table inside a bot bubble (the boards' `.mdt`): auto-sized columns that fill `width`, the head in grey, a hairline under every row but the last, no fill of its own (rule 38). */
+const MdTable = ({ table, width }: { table: TableBlock; width: number }) => {
   const c = useColors()
-  const shares = table.head.map((_, col) => share([table.head[col]!, ...table.rows.map((row) => row[col] ?? '')]))
+  const columns = tableColumns(table.head, table.rows, width)
   const row = (cells: string[], head: boolean, key: string, last: boolean) => (
-    <View
-      key={key}
-      style={{ flexDirection: 'row', gap: spacing[3], paddingVertical: spacing[2], borderBottomWidth: last ? 0 : 1, borderBottomColor: c.line }}
-    >
-      {shares.map((flex, col) => (
-        <View key={col} style={{ flex, minWidth: col === 0 ? 40 : 0 }}>
+    <View key={key} style={{ flexDirection: 'row', paddingVertical: CELL.padY, borderBottomWidth: last ? 0 : 1, borderBottomColor: c.line }}>
+      {columns.map((w, col) => (
+        <View key={col} style={{ width: w, paddingRight: CELL.padRight }}>
           {head ? (
-            <Text v="c1" weight="700" color="t3">
+            <Text v="c1" weight="600" color="t3" style={{ lineHeight: CELL.line }}>
               {cells[col]}
             </Text>
           ) : (
-            <Rich v="b2" text={cells[col] ?? ''} />
+            <Rich v="b2" text={cells[col] ?? ''} style={{ fontSize: CELL.body, lineHeight: CELL.line }} />
           )}
         </View>
       ))}
     </View>
   )
   return (
-    <View accessibilityRole="summary">
+    <View accessibilityRole="summary" style={{ width }}>
       {row(table.head, true, 'head', false)}
       {table.rows.map((cells, i) => row(cells, false, `row${i}`, i === table.rows.length - 1))}
     </View>

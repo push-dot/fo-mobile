@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { STATUS_STEPS, canStop, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
+import { STATUS_STEPS, canStop, isStopping, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
 
 const at = (ms: number) => new Date(ms)
 const NOW = at(161_000)
 
 const run = (line: LiveLine) => statusLineView(line, NOW)
+
+describe('isStopping', () => {
+  it('is true only while the stop line is the run status (the composer then draws a grey send button)', () => {
+    expect(isStopping({ verbs: ['중지하는 중'] })).toBe(true)
+    expect(isStopping({ verbs: ['공고 읽는 중'] })).toBe(false)
+    expect(isStopping(null)).toBe(false)
+  })
+})
 
 describe('statusLineView', () => {
   it('draws the waiting state as the idle mascot alone (rule 29)', () => {
@@ -72,6 +80,11 @@ describe('statusLineView', () => {
     for (const text of STATUS_STEPS) {
       expect(run({ kind: 'run', phase: 'working', since: NOW, text })).toMatchObject({ mascot: 'work', tone: 'neutral', text, tail: '0초' })
     }
+  })
+
+  it('draws a status without the ellipsis the server appends (ChatPh5)', () => {
+    expect(lineFromWorking(['Push 프로필에 저장하는 중…'], NOW)).toMatchObject({ phase: 'working', text: 'Push 프로필에 저장하는 중' })
+    expect(lineFromWorking(['중지하는 중'], NOW)).toMatchObject({ text: '중지하는 중' })
   })
 
   it('reads a stored thinking verb as 생각 중 and can stop only a run', () => {
