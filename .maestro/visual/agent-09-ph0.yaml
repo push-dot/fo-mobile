@@ -14,6 +14,10 @@ tags:
     visible: "어떤 방식으로 진행할까요?"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*모아페이 백엔드 공고에 맞춰.*"
 - takeScreenshot: ChatPh0
 # Each board below draws one thread under its own user line, not the answers that led to it, so each takes a fresh run (mock tokens;
 # Android types the ASCII alias).
@@ -42,6 +46,10 @@ tags:
     visible: "이대로 분석을 시작할까요?"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*말투 그대로.*"
 - takeScreenshot: ChatPh0Start
 - runFlow: _fresh_company.yaml
 - runFlow:

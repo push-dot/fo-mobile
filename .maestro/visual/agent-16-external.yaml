@@ -49,6 +49,10 @@ tags:
     visible: "김서준_모아페이_백엔드.*"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*이 이력서 더 좋게 고쳐 줘.*"
 - takeScreenshot: ChatPh6ResultFile
 - runFlow: _fresh_company.yaml
 - runFlow:
