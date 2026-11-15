@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Text } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { useColors } from '../../../../theme'
 import type { Approval } from '../../types'
 import { choiceMulti, choiceSheet } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'
@@ -24,7 +24,7 @@ const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: strin
       <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
         {mark ?? number}
       </Text>
-      <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't1'} style={{ flexShrink: 1, lineHeight: ROW_LINE, paddingRight: spacing[1] }}>
+      <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't1'} style={{ flexShrink: 1, lineHeight: ROW_LINE }}>
         {label}
       </Text>
     </Pressable>
