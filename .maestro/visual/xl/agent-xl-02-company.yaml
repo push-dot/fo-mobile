@@ -47,5 +47,7 @@ tags:
 # The running line is not in the thread list, so the keyboard comes down by a tap on the thread's side gutter.
 - runFlow:
     file: ../_chat_kbd_down.yaml
+# The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat (agent-18-states.yaml).
+- openLink: push://bots/b-moa?mock=bot:b-moa:from:user
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusXL
