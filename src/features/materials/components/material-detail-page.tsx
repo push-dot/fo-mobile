@@ -114,14 +114,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
       }
       footer={
         <View style={{ gap: spacing[2], marginHorizontal: spacing[1] }}>
-          <Button
-            label={SEND_LABEL}
-            onPress={() => {
-              const context = sendContextOf(forBot)
-              if (context.from === 'home') router.back()
-              sendMaterial(context, m)
-            }}
-          />
+          <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
           <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
         </View>
       }
