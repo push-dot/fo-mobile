@@ -651,7 +651,7 @@ export const TOKENS: Record<string, Step[]> = {
   'st-work': held('공고 요건을 읽는 중'),
   'st-steps': statusSteps,
   'st-queue': held('순서를 기다리는 중 · 앞에 작업 1개'),
-  'st-long': held('누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사 공고 3개의 필수 요건과 우대 요건을 서로 비교하는 중'),
+  'st-long': held('공고 읽는 중'),
   'st-help': statusHelp,
   'st-approve': statusApprove,
   // The stream mapper reads a notice frame at runtime (notices.ts), though the scripted frame type does not list one.

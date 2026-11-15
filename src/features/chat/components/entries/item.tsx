@@ -627,7 +627,7 @@ const PlanRequired = ({ id }: { id: string }) => {
   return <ErrorLine id={id} text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
-/** Grey "대기 중" chip for messages sent while the agent works (ChatStates.3: filled, no border; the board's audit layer drops the dashed line). */
+/** Grey clock chip for messages sent while the agent works: the icon says it waits, no label (ChatStates.3, rule 29). */
 export const Queued = ({ text }: { text: string }) => {
   const c = useColors()
   const maxWidth = useBubbleMax(27)
@@ -638,7 +638,7 @@ export const Queued = ({ text }: { text: string }) => {
     >
       <Icon name="clock" size={16} color="t2" />
       <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>
-        대기 중 · {text}
+        {text}
       </Text>
     </Appear>
   )
