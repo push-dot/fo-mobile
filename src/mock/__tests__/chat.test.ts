@@ -66,7 +66,7 @@ describe('chat mock', () => {
     const events = await run('t-approve-stamp', { text: 'st-approve' })
     const approval = events.find((e) => e.type === 'approval')
     expect(approval).toMatchObject({ approval: { confirm: true } })
-    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval, 'open')).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
+    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval)).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
   })
 
   it('plays a run1 token for one natural line only, then the normal route', async () => {

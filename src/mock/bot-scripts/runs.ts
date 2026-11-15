@@ -5,7 +5,7 @@ import type { StreamEvent } from '@push/api-client'
 import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
-import { PAGE_READ_FOOT, PAGE_READ_OPTIONS } from './cards'
+import { PAGE_READ_OPTIONS } from './cards'
 
 type Frame = Step['frame']
 type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
@@ -600,7 +600,6 @@ const statusApprove: Step[] = [
     title: '모아페이 채용 페이지를 열어도 될까요?',
     summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
     options: PAGE_READ_OPTIONS,
-    foot: PAGE_READ_FOOT,
   }),
   awaitingDone,
 ]

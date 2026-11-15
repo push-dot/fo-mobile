@@ -112,9 +112,8 @@ export type Approval = {
   optionIds: string[]
   /** A tool asking permission (the wire's `approval`), as opposed to a choice. */
   confirm?: true
-  /** Server times in ms. A card with no `expiresAt` waits until answered. 다시 요청 replaces both. */
+  /** When the card was asked, in ms. A card waits until it is answered. */
   openedAt?: number
-  expiresAt?: number
   /** The waiting line's own words, for a card whose line names the work ("이력서 수정 · 확인을 기다리는 중", ChatApprove). */
   waitText?: string
 }
@@ -129,7 +128,6 @@ export type ChatEvent =
   | { type: 'sources'; sources: BotContract.Attachment[] }
   | { type: 'approval'; approval: Approval }
   | { type: 'answer'; text: string }
-  | { type: 'retried'; openedAt: number; expiresAt: number }
   /** The card leaves with no answer bubble: 닫기 on an expired card, or a retry a newer message superseded. */
   | { type: 'dismiss' }
   | { type: 'queue'; text: string; file?: PickedFile }

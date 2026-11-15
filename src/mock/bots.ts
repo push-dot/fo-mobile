@@ -355,7 +355,7 @@ export const muteBot = (id: string) => {
   const f = fixtureOf(id)
   if (f) f.bot.notificationsMuted = true
 }
-/** ChatBotStatusExpired: 모아페이 asks to open a page and the 10 minutes run out. */
+/** The server's expiry of a stored card (contract tests): 모아페이's page-read card has run out. No board draws it any more. */
 export const expireCard = () => {
   const f = fixtureOf('b-moa')
   if (!f) return

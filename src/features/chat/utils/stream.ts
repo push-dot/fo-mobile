@@ -33,7 +33,7 @@ type Ask = {
   warning?: string
   recommended?: string
   /** Set for a card with a lifetime. `foot` replaces the pick hint, `detail` sits under the question. */
-  tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt' | 'expiresAt'>
+  tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt'>
   /** When a choice card was asked: the room draws 답을 기다리고 있어요 from then, and a card it waits on with no recommended answer preselects none (ChatBotStatusHelp). A frame with no stamp keeps no line. */
   since?: number
 }
@@ -80,11 +80,10 @@ const askedAt = (ev: StreamEvent) => {
 
 /** A tool card's words and times. A stored card has openedAt; a live frame has only its stamp `at`, so the app reads the ask from that. */
 const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id'> => {
-  const stored = ev as { openedAt?: string; at?: string; expiresAt?: string | null }
-  const expiresAt = timeOf(stored.expiresAt ?? undefined)
+  const stored = ev as { openedAt?: string; at?: string }
   const openedAt = timeOf(stored.openedAt ?? stored.at)
   // A frame with no stamp (a hand-written script) has no ask time, so it keeps no waiting line.
-  const times = openedAt === undefined ? undefined : { openedAt, ...(expiresAt === undefined ? {} : { expiresAt }) }
+  const times = openedAt === undefined ? undefined : { openedAt }
   if (isSiteCard(ev.options.map((o) => o.id))) {
     return { question: ev.title, options: ev.options, tool: { ...times, ...(ev.summary ? { detail: ev.summary } : {}), ...(ev.foot ? { foot: ev.foot } : {}) } }
   }
