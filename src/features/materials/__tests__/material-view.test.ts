@@ -76,7 +76,7 @@ describe('detail sheet', () => {
   it('prints MaterialDetailDoc', () => {
     expect(detailTitle(resume)).toBe('김서준_백엔드_이력서')
     expect(detailFacts(resume, [moapay, dotori], now)).toEqual([
-      { label: '종류', value: 'PDF · 2쪽 · 312KB' },
+      { label: '종류', value: '2쪽 · 312KB' },
       { label: '만든 곳', value: '모아페이 Bot' },
       { label: '수정', value: '11월 2일 오후 3:14' },
       { label: '쓰인 대화', value: '모아페이 Bot, 도토리증권 Bot' },
@@ -105,7 +105,7 @@ describe('detail sheet', () => {
   it('hides 만든 곳 and 쓰인 대화 when the server does not have the fact', () => {
     const gone = detailFacts({ ...resume, madeBy: { by: 'bot', bot: null }, pages: null }, [], now)
     expect(gone.map((f) => f.label)).toEqual(['종류', '수정'])
-    expect(gone[0]?.value).toBe('PDF · 312KB')
+    expect(gone[0]?.value).toBe('312KB')
     expect(detailFacts({ ...moaPosting, careerMin: null, employmentType: null, location: null }, [], now).map((f) => f.label)).toEqual(['마감', '북마크'])
   })
 

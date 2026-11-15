@@ -3,7 +3,7 @@ import { fileSize } from '@push/shared'
 import type { BotId, BotRef } from '@/features/bots'
 import { formatTime } from '@/shared/utility/picker-date'
 import type { MadeBy, Material, MaterialKind, MaterialSection, MaterialsPage, MaterialTab, SendContext } from '../types'
-import { daysBetween, formatOf, hostOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
+import { daysBetween, hostOf, LINK_LABEL, materialTitle, monthDay } from './material-row'
 
 const hasBatchim = (word: string) => {
   const code = word.charCodeAt(word.length - 1) - 0xac00
@@ -67,7 +67,7 @@ const facts = (rows: [string, string | null][]): Fact[] => rows.flatMap(([label,
 const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: BotRef[], now: Date) => Fact[] } = {
   file: (m, usedBy) =>
     facts([
-      ['종류', [formatOf(m.title), m.pages === null ? null : `${m.pages}쪽`, fileSize(m.bytes)].filter(Boolean).join(' · ')],
+      ['종류', [m.pages === null ? null : `${m.pages}쪽`, fileSize(m.bytes)].filter(Boolean).join(' · ')],
       ['만든 곳', madeByFact(m.madeBy)],
       ['수정', `${monthDay(m.updatedAt)} ${formatTime(m.updatedAt)}`],
       ['쓰인 대화', usedBy.map(botName).join(', ')],
