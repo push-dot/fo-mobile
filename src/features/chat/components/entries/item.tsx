@@ -306,10 +306,11 @@ const LockedParts = ({ rows, onPlan }: { rows: { label: string }[]; onPlan?: () 
   )
 }
 
+// ChatPh1FitUltraOpen's thread box is 2 short of its content and cuts this card at 142 (16 padding would draw 144), so the open card takes 15.
 const Projected = ({ label, bullets, open, onToggle }: { label: string; bullets: string[]; open: boolean; onToggle: () => void }) => {
   const c = useColors()
   return (
-    <Appear style={{ gap: spacing[2], paddingHorizontal: spacing[4], paddingVertical: open ? spacing[4] : 11, borderRadius: radius.card, backgroundColor: c.bg2 }}>
+    <Appear style={{ gap: spacing[2], paddingHorizontal: spacing[4], paddingVertical: open ? 15 : 11, borderRadius: radius.card, backgroundColor: c.bg2 }}>
       <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={onToggle} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         <Text v="b2" weight="700" style={{ flex: 1 }}>
           {fitProjected(label)}
