@@ -1,10 +1,10 @@
 import type { LinkKind } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 import { LINK_KIND_LABEL, kindOf } from '@/features/chat'
 import { useAddLink } from '@/features/my'
-import { Button, Chip, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
+import { Button, Chip, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 import { useRefreshMaterials } from '../api/hooks'
 import { LINK_ADD } from '../constants'
@@ -27,23 +27,13 @@ export const MaterialLinkAddSheet = () => {
   })
   return (
     <Sheet gap={spacing[4]}>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
-        <View style={{ flex: 1, gap: spacing[1] }}>
-          <Text v="h2" accessibilityRole="header">
-            {LINK_ADD.title}
-          </Text>
-          <Text v="b2" color="t3">
-            {LINK_ADD.hint}
-          </Text>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="닫기"
-          onPress={() => router.back()}
-          style={{ width: 44, height: 44, margin: -spacing[1], borderRadius: 22, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Icon name="x" size={16} color="t1" />
-        </Pressable>
+      <View style={{ gap: spacing[1] }}>
+        <Text v="h2" accessibilityRole="header">
+          {LINK_ADD.title}
+        </Text>
+        <Text v="b2" color="t3">
+          {LINK_ADD.hint}
+        </Text>
       </View>
       <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="링크 주소" />
       <View style={{ gap: spacing[2] }}>

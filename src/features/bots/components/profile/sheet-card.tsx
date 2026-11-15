@@ -34,7 +34,7 @@ export const SheetCard = ({ label, title, gap, onClose, children }: { label: str
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       {/* The scrim is not one accessibility element: a grouping Pressable hides the sheet's rows from VoiceOver and Maestro. */}
-      <Pressable accessible={false} onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
+      <Pressable accessible={false} onPress={onClose} onAccessibilityEscape={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: c.scrim }}>
         <Pressable accessible={false} accessibilityLabel={label} onPress={() => undefined} style={card}>
           <View
             style={{
