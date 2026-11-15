@@ -15,9 +15,10 @@ const FindPaint = createContext<Paint | null>(null)
 /** The marks whose boxes are drawn behind the paragraph; the others fall back to the text's own background until their edges are read. */
 const FindDrawn = createContext<ReadonlySet<string>>(new Set())
 
-// The board's mark has 2px side padding; a nested Text takes none, so a no-break space at the size where its 0.224em advance is 2pt stands in.
-const PAD = { fontSize: 2 / 0.224, letterSpacing: 0 }
-const Pad = () => <RNText style={PAD}>{' '}</RNText>
+// The board's mark has 2px side padding; a nested Text takes none, so a no-break space at the size where its 0.224em advance is the padding stands in.
+// On the right the edge view and the joiner after it cost 0.67pt more than the CSS padding (device: the text after the mark starts 0.67 later), which wrapped a line the board fits by 0.5: that pad is 0.5 short.
+const MARK_PAD = { left: 2, right: 1.5 }
+const Pad = ({ pt }: { pt: number }) => <RNText style={{ fontSize: pt / 0.224, letterSpacing: 0 }}>{'\xa0'}</RNText>
 
 const ZERO = { width: 0, height: 0 }
 
@@ -51,9 +52,9 @@ export const Marked = ({ text, itemId, current: lineCurrent }: { text: string; i
           <Fragment key={i}>
             <Edge markKey={key} side="left" />
             <RNText style={{ color: current ? onAccent : undefined, backgroundColor: drawn.has(key) ? undefined : current ? c.ac : c.acSoft }}>
-              <Pad />
+              <Pad pt={MARK_PAD.left} />
               {mark.text}
-              <Pad />
+              <Pad pt={MARK_PAD.right} />
             </RNText>
             <Edge markKey={key} side="right" />
             {WORD_JOINER}

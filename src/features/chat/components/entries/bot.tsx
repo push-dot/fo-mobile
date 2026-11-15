@@ -3,14 +3,14 @@ import { useContext } from 'react'
 import { Pressable, View, useWindowDimensions } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
-import { useXlBoardText } from '@/shared/components/xl-chrome'
+import { useXlBoardText, XL_CHAT_TRACKING } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText, type BotTextBlock } from '../../utils/bot-text'
 import { hitsBefore } from '../../utils/find'
 import { diffLinesDetail } from '../../utils/bubble-detail'
-import { blueprintList, isBlueprints, planKeywords, planTable } from '../../utils/plan-table'
+import { blueprintList, isBlueprints, planGap, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindHighlight, FindText, Marked } from '../header/highlight'
 import Detail from './detail'
@@ -19,15 +19,16 @@ import ResultLine from './result-line'
 import Rich, { plainOf } from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
-const XL_LINE = { fontSize: 21, lineHeight: 31 }
+const XL_LINE = { fontSize: 21, lineHeight: 31, letterSpacing: XL_CHAT_TRACKING }
 
 /** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
 const BUBBLE_PAD_X = 15
 const BULLET_DOT = 6
-const BULLET_GAP = 10
-// The list's own indent, the dot and the gap before a bullet's text.
-const BULLET_LEAD = spacing[1] + BULLET_DOT + BULLET_GAP
+const BULLET_INDENT = 1
+const BULLET_GAP = 13
+// The list's own indent, the dot and the gap before a bullet's text (the board's `ul` padding 20 with the disc outside it).
+const BULLET_LEAD = BULLET_INDENT + BULLET_DOT + BULLET_GAP
 /** What a table can fill inside a bot bubble that is at its widest. */
 const useTableWidth = () => useBotBubbleMax() - BUBBLE_PAD_X * 2
 
@@ -36,7 +37,7 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   const c = useColors()
   const maxWidth = useBotBubbleMax()
   return (
-    // With a card inside, the board's box fills its max width (the card's rows wrap), and the gap to the card is 10.
+    // With a card inside, the board's box fills its max width (the card's rows wrap).
     <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth, ...(wide ? { width: maxWidth } : null) }}>
       <View style={{ maxWidth, gap, paddingVertical: 11, paddingHorizontal: BUBBLE_PAD_X, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         {children}
@@ -54,9 +55,34 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
   return (
     <View style={{ gap: 2 }}>
       {items.map((line, i) => (
-        <View key={line} style={{ flexDirection: 'row', gap: BULLET_GAP, paddingLeft: spacing[1] }}>
-          <View style={{ width: BULLET_DOT, height: BULLET_DOT, borderRadius: BULLET_DOT / 2, marginTop: 9, backgroundColor: c.t1 }} />
+        <View key={line} style={{ flexDirection: 'row', gap: BULLET_GAP, paddingLeft: BULLET_INDENT }}>
+          <View style={{ width: BULLET_DOT, height: BULLET_DOT, borderRadius: BULLET_DOT / 2, marginTop: 10, backgroundColor: c.t1 }} />
           <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={{ flexShrink: 1, maxWidth: textMax }} />
+        </View>
+      ))}
+    </View>
+  )
+}
+
+// `ol.mdol`: the text column starts at x59 (padding 22 + 2), the number hangs right-aligned with its right edge 6 before it.
+const NUMBER_COL = 24
+const NUMBER_PAD = 6
+
+export const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => (
+  <View style={{ width: NUMBER_COL, alignItems: 'flex-end', paddingRight: NUMBER_PAD }}>
+    <Text v="b1" color={color}>{`${n}.`}</Text>
+  </View>
+)
+
+/** An ordered list in the bot's bubble: its number, then the line, 2 apart and 2 under the line above (ChatPh2XBlueprints). */
+export const NumberedList = ({ items, markId, hitsBefore }: { items: string[]; markId?: string; hitsBefore?: number[] }) => {
+  const textMax = useBotBubbleMax() - BUBBLE_PAD_X * 2 - NUMBER_COL
+  return (
+    <View style={{ gap: 2, marginTop: 2 }}>
+      {items.map((line, n) => (
+        <View key={line} style={{ flexDirection: 'row' }}>
+          <NumberMark n={n + 1} />
+          <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[n]} style={{ flexShrink: 1, maxWidth: textMax }} />
         </View>
       ))}
     </View>
@@ -70,13 +96,7 @@ export const PlanBlock = ({ item }: { item: PlanItem }) => {
     const { lines, detail } = blueprintList(item)
     return (
       <>
-        <View style={{ gap: spacing[1] }}>
-          {lines.map((line) => (
-            <Text key={line} v="b1">
-              {line}
-            </Text>
-          ))}
-        </View>
+        <NumberedList items={lines} />
         <Detail text={detail.text} more={detail.more} />
       </>
     )
@@ -95,9 +115,9 @@ const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => 
   return <Detail text={view.text} more={view.more} />
 }
 
-/** The lines of a block that draw find marks, in render order (an ordered list draws its numbers). */
+/** The lines of a block that draw find marks, in render order. */
 const markedLines = (block: BotTextBlock): string[] =>
-  block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' ? block.items.map((line, n) => `${n + 1}. ${line}`) : block.kind === 'bullets' || block.kind === 'list' ? block.items : []
+  block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' || block.kind === 'bullets' || block.kind === 'list' ? block.items : []
 
 const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
@@ -111,7 +131,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
   const above = hitsBefore(lines.map(plainOf), query)
   const first = blocks.map((_, i) => blocks.slice(0, i).reduce((sum, b) => sum + markedLines(b).length, 0))
   return (
-    <Bubble gap={item.card ? 10 : 6} wide={!!item.card}>
+    <Bubble gap={item.card ? planGap(item.card) : 6} wide={!!item.card}>
       {blocks.map((block, i) =>
         block.kind === 'paragraph' ? (
           <Rich key={i} v="b1" text={block.text} markId={item.id} hitsBefore={above[first[i]!]} {...big} />
@@ -137,11 +157,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
             </Text>
           </Pressable>
         ) : block.kind === 'ordered' ? (
-          <View key={i} style={{ gap: spacing[1] }}>
-            {block.items.map((line, n) => (
-              <Rich key={line} v="b1" text={`${n + 1}. ${line}`} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
-            ))}
-          </View>
+          <NumberedList key={i} items={block.items} markId={item.id} hitsBefore={block.items.map((_, n) => above[first[i]! + n]!)} />
         ) : (
           // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
           <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
@@ -159,12 +175,12 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
       {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
-          <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
+          <Text v="c1" color="t2" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20 }}>
             출처:
           </Text>
           {item.sources.map((source) => (
             <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
-              <FindText itemId={`${item.id}:source`} v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
+              <FindText itemId={`${item.id}:source`} v="c1" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
                 {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
                 <Marked text={displayName(source.title)} itemId={`${item.id}:source`} />
               </FindText>

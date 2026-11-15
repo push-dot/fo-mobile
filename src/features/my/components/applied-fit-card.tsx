@@ -32,7 +32,7 @@ const AppliedFitCard = ({ fit, onPress }: { fit: AppliedFit; onPress: () => void
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={APPLIED_FIT_LABEL}
-      accessibilityValue={{ text: [`${fit.score}점`, fit.headline].filter(Boolean).join(', ') }}
+      accessibilityValue={{ text: `${fit.score}점` }}
       onPress={onPress}
       style={({ pressed }) => ({ padding: spacing[5], borderRadius: radius.card, backgroundColor: pressed ? c.fill : c.bg2, gap: spacing[3] })}
     >
@@ -42,7 +42,6 @@ const AppliedFitCard = ({ fit, onPress }: { fit: AppliedFit; onPress: () => void
           <Text v="c1" weight="700" color="t3" numberOfLines={1}>
             {fit.title}
           </Text>
-          {fit.headline ? <Text v="h3">{fit.headline}</Text> : null}
         </View>
         <Icon name="chev" size={18} color="t3" />
       </View>

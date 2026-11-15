@@ -5,7 +5,7 @@ import { Sheet, Switch, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
 import { iosSeparator, spacing, useColors, useThemeMode } from '@/theme'
 
-// .pm8: title 52 high, the body 4 under it (rows 6 apart, the message under the title), the button 14 under the last block.
+// .pm8: title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
@@ -37,7 +37,7 @@ const ChoiceSheetScreen = () => {
         </Text>
       </View>
       {request.message ? (
-        <Text v={request.items ? 'b2' : 'b1'} color="t2" style={{ paddingHorizontal: spacing[1] }}>
+        <Text v={request.items ? 'b2' : 'b1'} color="t2" style={{ paddingHorizontal: spacing[1], marginBottom: request.items || form ? 2 : 0 }}>
           {request.message}
         </Text>
       ) : null}

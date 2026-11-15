@@ -19,8 +19,8 @@ describe('clampLines', () => {
     expect(clampLines(['누리클라우드 플랫폼엔지니어링코리아 ', '판교캠퍼스 유한회사 · 플랫폼 엔지니어'], 1)).toEqual(['누리클라우드 플랫폼엔지니어링코리아 '])
   })
 
-  it('lists the last line with its trailing words dropped, each followed by the dots', () => {
-    expect(dotted('커피챗 어떠세요? 승인 경험이 딱 ')).toEqual(['커피챗…', '커피챗 어떠세요?…', '커피챗 어떠세요? 승인…', '커피챗 어떠세요? 승인 경험이…', '커피챗 어떠세요? 승인 경험이 딱…'])
+  it('lists the last line cut after each character, each followed by the dots', () => {
+    expect(dotted('좋은 곳은 따로 ')).toEqual(['좋…', '좋은…', '좋은 …', '좋은 곳…', '좋은 곳은…', '좋은 곳은 …', '좋은 곳은 따…', '좋은 곳은 따로…'])
   })
 
   it('keeps the longest candidate that fits and falls back to the first', () => {

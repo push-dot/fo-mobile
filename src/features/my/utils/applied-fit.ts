@@ -13,7 +13,6 @@ const PARTS: readonly (readonly [FitPartKey, string])[] = [
 export type AppliedFit = {
   score: string
   title: string
-  headline: string | null
   parts: { label: string; value: string; pct: number; low: boolean }[]
   weakness: string | null
 }
@@ -22,14 +21,12 @@ export type AppliedFit = {
 export const appliedFit = (listScore: number | null | undefined, fit: ApplicationDetail['fit']): AppliedFit | null => {
   if (!fit) {
     const score = fitTen(listScore)
-    return score ? { score, title: '내 적합도', headline: null, parts: [], weakness: null } : null
+    return score ? { score, title: '내 적합도', parts: [], weakness: null } : null
   }
   const open = fit.plan === 'PRO' || fit.plan === 'ULTRA'
-  const band = Math.floor(fit.reachable)
   return {
     score: fit.fitScore.toFixed(1),
     title: '내 적합도 · 허브 프로필 기준',
-    headline: open && band > Math.floor(fit.fitScore) ? `조금만 고치면 ${band}점대예요` : null,
     parts: open
       ? PARTS.map(([key, label]) => ({ label, value: fit.parts[key].toFixed(1), pct: fit.parts[key] * 10, low: fit.parts[key] < 5 }))
       : [],

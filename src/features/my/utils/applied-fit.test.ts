@@ -18,7 +18,6 @@ describe('applied job fit card', () => {
     expect(appliedFit(69, stored())).toEqual({
       score: '6.9',
       title: '내 적합도 · 허브 프로필 기준',
-      headline: '조금만 고치면 8점대예요',
       parts: [
         { label: '기술 스택', value: '7.5', pct: 75, low: false },
         { label: '경험 연관성', value: '7.0', pct: 70, low: false },
@@ -28,22 +27,17 @@ describe('applied job fit card', () => {
     })
   })
 
-  it('promises a band only when fixing the weakest part reaches a higher one', () => {
-    expect(appliedFit(null, stored({ fitScore: 8.2, reachable: 8.9 }))?.headline).toBeNull()
-  })
-
-  it('withholds the parts, the band, and the weakness of a FREE fit', () => {
+  it('withholds the parts and the weakness of a FREE fit', () => {
     expect(appliedFit(69, stored({ plan: 'FREE' }))).toEqual({
       score: '6.9',
       title: '내 적합도 · 허브 프로필 기준',
-      headline: null,
       parts: [],
       weakness: null,
     })
   })
 
   it('falls back to the list score until a fit is stored, and draws nothing without either', () => {
-    expect(appliedFit(69, undefined)).toEqual({ score: '6.9', title: '내 적합도', headline: null, parts: [], weakness: null })
+    expect(appliedFit(69, undefined)).toEqual({ score: '6.9', title: '내 적합도', parts: [], weakness: null })
     expect(appliedFit(null, undefined)).toBeNull()
     expect(appliedFit(null, stored({ documentTitle: null }))?.title).toBe('내 적합도 · 허브 프로필 기준')
   })

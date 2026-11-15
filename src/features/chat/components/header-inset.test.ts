@@ -24,4 +24,11 @@ describe('PageModal nav prop', () => {
   it('marks only the plan page (PlanUltra, PlanUpgrade) as nav', () => {
     expect(read('plan-page.tsx').match(/\bnav\b\s*(?:\n|left=)/g)).toHaveLength(1)
   })
+
+  it('draws the material picker as the boards\' pageSheet: system sheet fill, 52 high header, 52 high button', () => {
+    const picker = readFileSync(path.join(import.meta.dirname, '../../../screens/chat/material-picker-screen.tsx'), 'utf8')
+    expect(picker).toMatch(/<PageModal[^>]*\bsheet\b/)
+    expect(picker).toContain('ADD_BUTTON = { minHeight: 52, borderRadius: 26 }')
+    expect(read('page-modal.tsx')).toContain('const SHEET = { top: 17, header: 52, side: 16, bottom: 4 }')
+  })
 })
