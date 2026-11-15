@@ -15,10 +15,11 @@ export type ChatItem =
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
   /** `card` is the untitled plan that came right after the text: the board draws it inside the same bubble (ChatPh1Feedback). */
-  | { type: 'agentText'; id: string; text: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
+  /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */
+  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
-  /** How a run ended badly, drawn as a status line (ChatInterrupt, ChatVerifyFail). */
+  /** How a run ended badly, drawn as a bubble (ChatInterrupt, ChatVerifyFail). */
   | { type: 'notice'; id: string; notice: Notice }
   | { type: 'think'; id: string; seconds: number }
   /** `error` replaces the ⎿ result in red (failed or interrupted). `extra` collapses as "+N줄". */
@@ -76,7 +77,7 @@ export type ChatItem =
       pendingNote?: string
     }
   | { type: 'worked'; id: string; seconds: number }
-  /** `reason` set: the run broke with no line of its own to show, so the status line draws "작업 중 문제가 생겼어요 · {reason}" (ChatBotStatusError). */
+  /** `reason` set: the run broke with no line of its own to show, so a bubble says "작업 중 문제가 생겼어요" with the reason as grey sub-text (ChatBotStatusError). */
   | { type: 'error'; id: string; text: string; code?: string; reason?: string }
   | { type: 'stale'; id: string; text: string }
 

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { STATUS_STEPS, canStop, lineFromWorking, statusLineView, type StatusLine } from '../utils/status-line'
+import { STATUS_STEPS, canStop, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
 
 const at = (ms: number) => new Date(ms)
 const NOW = at(161_000)
 
-const run = (line: StatusLine) => statusLineView(line, NOW)
+const run = (line: LiveLine) => statusLineView(line, NOW)
 
 describe('statusLineView', () => {
   it('words the queue and keeps the idle mascot', () => {
@@ -14,7 +14,6 @@ describe('statusLineView', () => {
       tone: 'neutral',
       text: '순서를 기다리는 중',
       tail: '12초',
-      role: 'status',
       accessibilityLabel: '순서를 기다리는 중 12초',
     })
     expect(run({ kind: 'run', phase: 'queued', since, ahead: 1 }).text).toBe('순서를 기다리는 중 · 앞에 작업 1개')
@@ -43,37 +42,12 @@ describe('statusLineView', () => {
     expect(run({ kind: 'waiting', since: at(NOW.getTime() - 24_000), for: 'confirm', cardId: 'c', text: '확인을 기다리고 있어요' }).tail).toBe('24초')
   })
 
-  it('keeps both stop notices grey', () => {
-    expect(run({ kind: 'stopped', resumable: true })).toMatchObject({
-      mascot: 'idle',
-      tone: 'quiet',
-      text: '작업을 중지했어요 · 어떻게 할지 알려 주세요',
-      tail: null,
-      role: 'status',
-    })
-    expect(run({ kind: 'stopped', resumable: false })).toMatchObject({
-      mascot: 'idle',
-      tone: 'quiet',
-      text: '중지했어요. 고치던 내용은 반영하지 않았어요.',
-      tail: null,
-    })
-  })
-
-  it('draws a failed step and an error with its reason', () => {
-    expect(run({ kind: 'failed', text: '방향 검증에서 문제가 생겼어요' })).toMatchObject({
-      mascot: 'idle',
-      tone: 'danger',
-      text: '방향 검증에서 문제가 생겼어요',
-      tail: null,
-    })
-    expect(run({ kind: 'error', code: 'DISCONNECTED', reason: '연결 끊김' })).toMatchObject({
-      mascot: 'idle',
-      tone: 'danger',
-      text: '작업 중 문제가 생겼어요',
-      tail: '연결 끊김',
-      role: 'alert',
-      accessibilityLabel: '작업 중 문제가 생겼어요 연결 끊김',
-    })
+  it('draws no stop, failure or error in the status line: they are bubbles', () => {
+    expect(noticeBubble({ kind: 'stopped', resumable: true })).toEqual({ text: '작업을 중지했어요. 어떻게 할지 알려 주세요.' })
+    expect(noticeBubble({ kind: 'stopped', resumable: false })).toEqual({ text: '중지했어요. 고치던 내용은 반영하지 않았어요.' })
+    expect(noticeBubble({ kind: 'failed', text: '방향 검증에서 문제가 생겼어요' })).toEqual({ text: '방향 검증에서 문제가 생겼어요' })
+    expect(noticeBubble({ kind: 'error', code: 'DISCONNECTED', reason: '연결 끊김' })).toEqual({ text: '작업 중 문제가 생겼어요', detail: '연결 끊김' })
+    expect(noticeBubble({ kind: 'error', code: undefined, reason: null })).toEqual({ text: '작업 중 문제가 생겼어요' })
   })
 
   it('clamps a clock that is behind the server at 0초', () => {
@@ -105,6 +79,6 @@ describe('statusLineView', () => {
     expect(lineFromWorking(['생각하는 중…'], NOW)).toMatchObject({ phase: 'thinking', text: '생각 중' })
     expect(lineFromWorking(['대기 중'], NOW)).toMatchObject({ phase: 'queued', ahead: 0 })
     expect(canStop([{ kind: 'run', phase: 'working', since: NOW, text: '결과를 검토하는 중' }])).toBe(true)
-    expect(canStop([{ kind: 'stopped', resumable: true }])).toBe(false)
+    expect(canStop([{ kind: 'waiting', since: NOW, for: 'answer', cardId: 'c', text: '답을 기다리고 있어요' }])).toBe(false)
   })
 })

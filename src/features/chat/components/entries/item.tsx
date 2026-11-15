@@ -578,12 +578,12 @@ const ItemComponent = ({
     case 'agentText':
       return <BotText item={item} />
     case 'notice':
-      return <Notice notice={item.notice} />
+      return <Notice id={item.id} notice={item.notice} />
     case 'readOff':
       return <ReadOff item={item} onAction={onReadOff} />
     case 'tool':
       // Tool lines are not drawn, except a failed step that says why: the red line of ChatErrors ("자격 요건"을 읽지 못했어요 · …).
-      return item.state === 'err' && item.error ? <ErrorLine text={item.error} /> : null
+      return item.state === 'err' && item.error ? <ErrorLine id={item.id} text={item.error} /> : null
     case 'think':
       return null
     case 'todo':
@@ -607,24 +607,24 @@ const ItemComponent = ({
     case 'error':
       // The credit banner above the composer says it; the refused turn leaves no line of its own.
       return isUsageExhausted(item.code) ? null : item.code === 'PLAN_REQUIRED' ? (
-        <PlanRequired />
+        <PlanRequired id={item.id} />
       ) : item.reason ? (
-        <Notice notice={{ kind: 'error', code: item.code, reason: item.reason }} />
+        <Notice id={item.id} notice={{ kind: 'error', code: item.code, reason: item.reason }} />
       ) : (
-        <ErrorLine text={item.text} />
+        <ErrorLine id={item.id} text={item.text} />
       )
   }
 }
 
 export const Item = memo(ItemComponent)
 
-// ChatErrUnavailable: the Bot's own mascot and a red line, drawn like the status lines.
-const ErrorLine = ({ text }: { text: string }) => <Notice notice={{ kind: 'failed', text }} />
+// ChatErrUnavailable: an error is a bubble, not a status line (rule 29).
+const ErrorLine = ({ id, text }: { id: string; text: string }) => <Notice id={id} notice={{ kind: 'failed', text }} />
 
 // Read at render: payments can close or the account can load after the error arrived.
-const PlanRequired = () => {
+const PlanRequired = ({ id }: { id: string }) => {
   const account = useChatAccount(true).data
-  return <ErrorLine text={planRequired(account?.plan, paymentsOpen(account))} />
+  return <ErrorLine id={id} text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
 /** Grey "대기 중" chip for messages sent while the agent works (ChatStates.3: filled, no border; the board's audit layer drops the dashed line). */

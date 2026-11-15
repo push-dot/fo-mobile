@@ -558,8 +558,8 @@ const statesFile: Step[] = [
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
   s(900, tool('apply', '지원하기', MOA, 'ok')),
-  // The record is a line of its own (tool lines are not drawn), as ChatStates.4 shows it between the file card and the busy error.
-  s(300, agent('지원했어요 · 마이 › 내 활동에 기록했어요')),
+  // The record is a bubble of its own (tool lines are not drawn) with an in-bubble link, between the file card and the busy error (ChatStates.4).
+  s(300, agent('지원했어요. [이동하기](/my)')),
   done,
 ]
 // ChatStates.2 draws the answer as a plain finished reply (3 lines, no 확인을 기다리고 있어요 line, no sheet): the run ends with `done`, not `awaiting`.
