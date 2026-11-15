@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
+import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, showConsentAlert, useKeyboardHeight, WordClampText } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
@@ -41,16 +41,11 @@ import {
   type PostingPick,
 } from '../../utils/create-form'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
-import { SheetCard } from '../profile/sheet-card'
 import BotLimitDelete from './bot-limit-delete'
 import {
   CANCEL_LABEL,
   CLOSE_LABEL,
-  CONSENT_AGREE,
-  CONSENT_BODY,
-  CONSENT_LATER,
-  CONSENT_MORE,
-  CONSENT_TITLE,
+  CONSENT_COPY,
   CREATE_LABEL,
   CREATING_LABEL,
   CURRENT_PLAN,
@@ -214,28 +209,6 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
   )
 }
 
-// BotNewConsent is the platform's own sheet: the floating iOS sheet, the Android bottom sheet. Back and the scrim close it.
-const ConsentSheet = ({ saving, onAgree, onLater }: { saving: boolean; onAgree: () => void; onLater: () => void }) => (
-  <SheetCard label={CONSENT_TITLE.replace('\n', ' ')} gap={12} onClose={onLater}>
-    <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
-      {CONSENT_TITLE}
-    </Text>
-    <Text v="b2" color="t2">
-      {CONSENT_BODY}
-    </Text>
-    <View style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginVertical: -spacing[2] }}>
-      {/* Owner rule 3: the link is black (the board's t1); the accent stays on the main button. */}
-      <Text v="c1" weight="600" style={{ textDecorationLine: 'underline' }}>
-        {CONSENT_MORE}
-      </Text>
-    </View>
-    <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
-      <Button label={CONSENT_AGREE} disabled={saving} onPress={onAgree} />
-      <Button label={CONSENT_LATER} variant="secondary" onPress={onLater} />
-    </View>
-  </SheetCard>
-)
-
 const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
@@ -385,6 +358,16 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     ])
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per failure, not per render
   }, [failed])
+
+  // BotNewConsent: the platform's own alert; 동의하고 시작하기 saves the consent and creates the bot.
+  useEffect(() => {
+    if (!form.consent) return
+    showConsentAlert(CONSENT_COPY, {
+      onLater: () => setForm(dismissConsent),
+      onAgree: () => consent.save(true, { onSuccess: () => void run(dismissConsent(form)) }),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per consent request, not per render
+  }, [form.consent])
 
   const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')
   const onDeleteBot = (bot: CompanyBot) =>
@@ -626,13 +609,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           </>
         )}
       </KeyboardAvoidingView>
-      {form.consent ? (
-        <ConsentSheet
-          saving={consent.saving}
-          onLater={() => setForm(dismissConsent)}
-          onAgree={() => consent.save(true, { onSuccess: () => void run(dismissConsent(form)) })}
-        />
-      ) : null}
     </View>
   )
 }

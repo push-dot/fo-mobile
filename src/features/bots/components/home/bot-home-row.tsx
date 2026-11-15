@@ -1,8 +1,7 @@
 import { Pressable, View } from 'react-native'
-import { Highlight, Mascot, Text, type MenuAction } from '@/shared/components'
+import { ContextMenu, Highlight, Mascot, Text, type MenuAction } from '@/shared/components'
 import type { BotRow } from '../../types'
 import { rowMotion } from '../../utils/home-rows'
-import BotRowMenu from './bot-row-menu'
 import type { HomeChrome } from './metrics'
 
 const BotHomeRow = ({
@@ -67,9 +66,9 @@ const BotHomeRow = ({
     )
   }
   return (
-    <BotRowMenu actions={actions} accessibilityLabel={row.accessibilityLabel} onPress={onPress}>
+    <ContextMenu actions={actions} accessibilityLabel={row.accessibilityLabel} onPress={onPress}>
       {content}
-    </BotRowMenu>
+    </ContextMenu>
   )
 }
 

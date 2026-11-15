@@ -1,4 +1,3 @@
-import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
@@ -6,10 +5,10 @@ import { Badge, Chip, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScro
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
-import { useChatDocs, useQuickStart, useStartChat } from '../api/hooks'
+import { useChatDocs, useHubProfileId, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
 import Pick from './pick'
-import { CALENDAR_TASKS, type QuickStart } from '../constants'
+import { CALENDAR_TASKS, DEFAULT_DOC, type QuickStart } from '../constants'
 import { initialPicks, startLink } from '../utils/quick-start-data'
 
 
@@ -50,7 +49,9 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
   // 지원 현황 lists an active application under both tabs; pick it once.
   const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
-  const documentId = docs.data?.find((x) => x.fileName === doc)?.id
+  const hubId = useHubProfileId(!!qs.docLabel)
+  const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
+  const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
   // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
   const input = { picked, url: startLink(url, clip), chips, option, doc, documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
 
@@ -71,7 +72,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const job = qs.listLabel ? picked[0] : undefined
   const listOpen = !job || pickingJob
   const docField = (
-    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} chevron={!!qs.listLabel} docs={docs.data} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
+    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} chevron={!!qs.listLabel} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
   )
   return (
     <Sheet gap={spacing[3]} actionGap={SHEET_ACTION_GAP.quickStart} action={action} onLayout={bound.onSheetLayout}>
@@ -135,13 +136,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             ) : null}
 
             {qs.layout === 'calendar' ? (
-              <Calendar
-                items={d.items}
-                connected={!!d.calendar?.connected}
-                task={task}
-                setTask={setTask}
-                onChange={() => router.push({ pathname: '/my', params: { tab: 'activity', sub: 'calendar' } })}
-              />
+              <Calendar items={d.items} task={task} setTask={setTask} />
             ) : null}
 
             {qs.layout === 'cards' ? (
@@ -463,7 +458,7 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
   )
 }
 
-const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem[]; connected: boolean; task: number; setTask: (n: number) => void; onChange: () => void }) => {
+const Calendar = ({ items, task, setTask }: { items: QsItem[]; task: number; setTask: (n: number) => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
   return (
@@ -516,17 +511,6 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
             </Pressable>
           )
         })}
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: connected ? c.green : c.t4 }} />
-        <Text v="b2" style={{ flex: 1 }}>
-          {connected ? 'Google 캘린더와 연결됨' : 'Google 캘린더와 연결 안 됨'}
-        </Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="캘린더 변경" onPress={onChange} hitSlop={hitSlopTo(18)}>
-          <Text v="c1" weight="700" color="t1">
-            변경
-          </Text>
-        </Pressable>
       </View>
     </>
   )

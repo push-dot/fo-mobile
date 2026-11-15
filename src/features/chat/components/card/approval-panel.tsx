@@ -2,11 +2,12 @@ import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
-import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
+import { Badge, Button, Icon, Text, hitSlopTo, showActionSheet, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
 import { RISE_MS, riseOnMount } from './approval-rise'
 import { expiredNote } from '../../utils/card'
 import type { Approval, ApprovalSection, Choice } from '../../types'
+import { choiceSheet, isSay } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
 
@@ -33,7 +34,6 @@ const FOOT_TOP = 6
 // The board pads 그만하기 22pt per side; the Button gives 20.
 const STOP_PAD = { paddingHorizontal: 2 }
 
-const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 /** Replaces the composer until answered (design_system ApprovalPanel). */
 export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired = false, onClose, onRetry }: Props) => {
   const c = useColors()
@@ -66,6 +66,20 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
     const stop = riseOnMount(rise, () => Animated.timing(rise, { toValue: 1, duration: RISE_MS, easing: Easing.bezier(...SPRING), useNativeDriver: false }).start(), () => setLanded(true))
     return () => (stop(), rise.stopAnimation())
   }, [rise, reduce])
+
+  // iOS: a single-pick card is the platform's action sheet, so the panel draws nothing; leaving it hands the floor to the composer.
+  const sheet = Platform.OS === 'ios' && !expired ? choiceSheet(approval) : null
+  useEffect(() => {
+    if (!sheet) return
+    showActionSheet({
+      title: sheet.title,
+      message: sheet.message,
+      items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
+      cancel: sheet.cancel,
+      onCancel: onSay,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
+  }, [])
 
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))
@@ -264,6 +278,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
 
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
+
+  if (sheet) return null
 
   return (
     <Animated.View
