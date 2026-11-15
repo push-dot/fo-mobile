@@ -9,7 +9,6 @@ import {
   grantMeta,
   profileGroups,
   revokeA11y,
-  revokeToast,
 } from './profile-rows'
 
 const ids = (kind: 'push' | 'company', over: Partial<Parameters<typeof profileGroups>[0]> = {}) =>
@@ -53,12 +52,11 @@ describe('bot profile rows', () => {
     expect(allowedSheetTitle(2)).toBe('허용한 사이트 2')
   })
 
-  it('labels a grant, the intro, the toast, and the delete question from the boards', () => {
+  it('labels a grant, the intro, and the delete question from the boards', () => {
     expect(grantMeta('2026-11-03', 'posting')).toBe('11월 3일 허용 · 채용 공고')
     expect(grantMeta('2026-11-05', 'company')).toBe('11월 5일 허용 · 회사 소개')
     expect(grantMeta('2026-10-29', 'other')).toBe('10월 29일 허용')
     expect(GRANT_INTRO).toBe('Bot이 묻지 않고 읽는 사이트예요.')
-    expect(revokeToast('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용을 해제했어요')
     expect(revokeA11y('careers.moapay.co.kr')).toBe('careers.moapay.co.kr 허용 해제')
     expect(deleteTitle('모아페이')).toBe('모아페이 Bot을 삭제할까요?')
     expect(DELETE_BODY).toBe('이 Bot과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.')

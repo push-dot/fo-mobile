@@ -288,7 +288,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           />
           <Button
             label={applied ? '지원 완료' : '이 공고에 지원'}
-            disabled={applied}
+            pending={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}
           />

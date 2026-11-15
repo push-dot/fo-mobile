@@ -89,7 +89,7 @@ const BotHomeView = ({
     position: 'absolute' as const,
     left: 0,
     right: 0,
-    bottom: keyboard > 0 ? lift : 0,
+    bottom: keyboard > 0 && !ios ? lift : 0,
     height: ios ? 200 : 190,
     zIndex: 3,
   }
@@ -192,12 +192,14 @@ const BotHomeView = ({
           }}
         />
       )}
-      <LinearGradient
-        pointerEvents="none"
-        colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
-        locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]}
-        style={fade}
-      />
+      {ios && keyboard > 0 ? null : (
+        <LinearGradient
+          pointerEvents="none"
+          colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
+          locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]}
+          style={fade}
+        />
+      )}
       <BotHomeBar
         chrome={chrome}
         lift={lift}

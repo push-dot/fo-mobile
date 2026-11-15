@@ -101,7 +101,7 @@ const ReconsentTermsScreen = () => {
           onPress={() => openTerm('privacyPolicy')}
           style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}
         >
-          <Text v="c1" color="t2" style={{ textDecorationLine: 'underline' }}>
+          <Text v="c2" color="t2" style={{ textDecorationLine: 'underline' }}>
             {TERMS_PRIVACY_POLICY}
           </Text>
         </Pressable>

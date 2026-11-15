@@ -46,7 +46,7 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
             {personLine(who)}
           </Text>
         ) : null}
-        <WordClampText ellipsis="hang" v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} lines={2}>
+        <WordClampText ellipsis="line" v="b2" weight={unread ? '600' : '400'} color={unread ? 't1' : 't2'} lines={2}>
           {o.message}
         </WordClampText>
       </View>

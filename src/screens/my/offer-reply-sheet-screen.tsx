@@ -28,7 +28,7 @@ const OfferReplySheetScreen = () => {
       action={{
         label: accept.isPending ? '보내는 중' : '수락하고 보내기',
         onPress: () => accept.mutate(),
-        disabled: accept.isPending,
+        pending: accept.isPending,
       }}
     >
       <TextField
