@@ -35,6 +35,9 @@ export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows
 /** The boards' `--iFill` (iOS system fill): translucent, so a field greys whatever sheet it sits on (FilterSkill's `.isearch`, #E3E3E9 on the board). */
 export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' } as const
 
+/** The 1pt line between rows of a translucent iOS sheet: the board's --line is 6 steps darker than its #F3F3F6 sheet, the device sheet is #EBEBEB, where #EBEDF0 shows nothing, so the line is a tint. */
+export const iosSeparator = { light: 'rgba(118,118,128,0.06)', dark: palette.dark.line } as const
+
 /** The boards' `--iMat`: the iOS banner material (.ibanner). The board blurs what is behind it, RN cannot, so the fill is solid #F6F6F8: the header and the save button never show through. */
 export const iosMaterial = { light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' } as const
 

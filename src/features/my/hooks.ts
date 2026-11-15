@@ -74,8 +74,8 @@ export const showImportMenu = (fromModal = false) => {
   const request = {
     title: '서류 가져오기',
     items: [
-      { label: '파일에서 고르기', onPress: () => useDocImport.setState({ requested: true }) },
-      { label: 'Bot 채팅에서 새로 만들기', onPress: () => router.push(botChatPath('push')) },
+      { label: '파일에서 고르기', chevron: true, onPress: () => useDocImport.setState({ requested: true }) },
+      { label: 'Bot 채팅에서 새로 만들기', chevron: true, onPress: () => router.push(botChatPath('push')) },
     ],
   }
   return fromModal ? showActionSheet(request) : showChoiceModal(request)
