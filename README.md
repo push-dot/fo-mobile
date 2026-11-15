@@ -46,7 +46,7 @@ app.json
 package.json
 ```
 
-로그인 전 화면(`sign-in`, `phone`, `verify-phone`, `signup-terms`, `phone-registered`)은 `src/app/` 루트에 있습니다. 로그인 뒤 화면은 `(app)/(stack)` 아래에 있습니다. 그룹은 URL에 들어가지 않지만, typed routes 때문에 그룹을 쓰는 href는 `/(app)/(stack)/(tabs)/…` 전체를 적습니다.
+로그인 전 화면(`sign-in`, `phone`, `verify-phone`, `signup-terms`)은 `src/app/` 루트에 있습니다. 로그인 뒤 화면은 `(app)/(stack)` 아래에 있습니다. 그룹은 URL에 들어가지 않지만, typed routes 때문에 그룹을 쓰는 href는 `/(app)/(stack)/(tabs)/…` 전체를 적습니다.
 
 탭 다섯 개 밖에 검색, 알림, 제안, 설정, 대화(`chat/[id]`), 게시물, 서류(`docs/[id]`)가 있습니다. 필터, 지원, 제안하기, 확인, 일정 추가, 실행 방식, 빠른 시작, 자료 같은 시트는 네이티브 폼 시트 라우트입니다.
 

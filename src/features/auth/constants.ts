@@ -9,7 +9,6 @@ export const PROVIDER_MARK = {
 } as const
 
 export const PROVIDER_LABEL = { google: 'Google', apple: 'Apple', github: 'GitHub' } as const
-export const PROVIDER_ORDER = ['google', 'apple', 'github'] as const
 export const FAILURE_BODY = '잠시 후 다시 시도해 주세요.'
 
 export const GOOGLE_START = 'Google로 시작하기'
@@ -40,8 +39,6 @@ export const OTP_EXPIRED = '인증번호가 만료됐어요. 새 번호를 받�
 export const RESEND_CODE = '인증번호 다시 받기'
 export const TOO_MANY_TITLE = '인증번호를 5번 잘못 입력했어요'
 export const TOO_MANY_BODY = '새 인증번호를 받아 다시 입력해 주세요.'
-export const REGISTERED_TITLE = '이미 가입된 번호예요'
-export const OTHER_NUMBER = '다른 번호 입력하기'
 export const TERMS_TITLE = '서비스 이용에 동의해 주세요'
 export const TERMS_BODY = '필수 항목에 동의하면 시작할 수 있어요.'
 export const TERMS_ALL = '전체 동의'

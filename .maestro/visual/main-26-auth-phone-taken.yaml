@@ -1,10 +1,10 @@
 appId: app.push.mobile
-name: 이미 가입된 번호 · Google · Apple · 여러 개
+name: 이미 인증된 번호로 로그인 · Google · Apple · 여러 개
 tags:
   - visual
 ---
-# The mock reads the code's tail (mock/home.ts): 482444 the number belongs to a Google account, 482555 an Apple one,
-# 482666 a Google and a GitHub one. Boards: iOS 라이트 Google (.1), iOS 다크 Apple (.2), Android 여러 개 (.3).
+# A number verified on a Google / Apple account signs in to it (RULINGS 33), no 이미 가입된 번호 stop. The mock reads the code's tail (mock/home.ts):
+# 482444 a Google account, 482555 an Apple one, 482666 a Google and a GitHub one. Each lands on the home feed.
 - runFlow:
     when:
       platform: iOS
@@ -14,8 +14,8 @@ tags:
       - runFlow: _hide_kbd.yaml
       - tapOn: "확인"
       - extendedWaitUntil:
-          visible: "이미 가입된 번호예요"
-          timeout: 10000
+          visible: "새로 올라온 공고"
+          timeout: 20000
       - waitForAnimationToEnd
       - takeScreenshot: AuthPhoneTaken.1
       - runFlow: _phone_code.yaml
@@ -23,8 +23,8 @@ tags:
       - runFlow: _hide_kbd.yaml
       - tapOn: "확인"
       - extendedWaitUntil:
-          visible: "이미 가입된 번호예요"
-          timeout: 10000
+          visible: "새로 올라온 공고"
+          timeout: 20000
       - waitForAnimationToEnd
       - takeScreenshot: AuthPhoneTaken.2
 - runFlow:
@@ -36,7 +36,7 @@ tags:
       - runFlow: _hide_kbd.yaml
       - tapOn: "확인"
       - extendedWaitUntil:
-          visible: "이미 가입된 번호예요"
-          timeout: 10000
+          visible: "새로 올라온 공고"
+          timeout: 20000
       - waitForAnimationToEnd
       - takeScreenshot: AuthPhoneTaken.3

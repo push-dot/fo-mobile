@@ -12,13 +12,11 @@ type PhoneDraft = {
   provider: LoginProvider | null
   digits: string
   cooldownEndsAt: number | null
-  providers: string[]
   held: Session | null
   beginSocial: (pendingToken: string, email: string | null, provider: LoginProvider) => void
   beginPhone: () => void
   setDigits: (digits: string) => void
   setCooldown: (endsAt: number) => void
-  setProviders: (providers: string[]) => void
   hold: (session: Session) => void
   clear: () => void
 }
@@ -30,7 +28,6 @@ const blank = {
   provider: null as LoginProvider | null,
   digits: '',
   cooldownEndsAt: null,
-  providers: [] as string[],
   held: null as Session | null,
 }
 
@@ -40,7 +37,6 @@ export const usePhoneAuth = create<PhoneDraft>((set) => ({
   beginPhone: () => set({ ...blank, mode: 'phone' }),
   setDigits: (digits) => set({ digits }),
   setCooldown: (cooldownEndsAt) => set({ cooldownEndsAt }),
-  setProviders: (providers) => set({ providers }),
   hold: (held) => set({ held }),
   clear: () => set(blank),
 }))

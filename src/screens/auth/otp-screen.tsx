@@ -36,7 +36,6 @@ const OtpScreen = () => {
   const pendingToken = usePhoneAuth((state) => state.pendingToken)
   const cooldownEndsAt = usePhoneAuth((state) => state.cooldownEndsAt)
   const setCooldown = usePhoneAuth((state) => state.setCooldown)
-  const setProviders = usePhoneAuth((state) => state.setProviders)
   const hold = usePhoneAuth((state) => state.hold)
   const clear = usePhoneAuth((state) => state.clear)
   const remaining = useCountdown(cooldownEndsAt)
@@ -94,11 +93,6 @@ const OtpScreen = () => {
       })
       .catch((caught: unknown) => {
         const mapped = mapPhoneAuthError(caught)
-        if (mapped.kind === 'registered') {
-          setProviders(mapped.providers)
-          router.push('/phone-registered')
-          return
-        }
         if (mapped.kind === 'too-many') {
           setBlocked(true)
           return
