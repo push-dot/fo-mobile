@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { Button, Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
+import { displayName, extensionOf } from '@/shared/utility/display-name'
 import { hitSlopTo, spacing, useColors } from '@/theme'
 import { useDocument, useRenameDocument, useRenameSource, useSource } from '../api/hooks'
 import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_MAX, titleOver, typedTitle } from '../utils'
@@ -14,7 +15,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data
   const upload = useSource(source ? id : '').data
-  const current = source ? upload?.fileName : doc?.title
+  const current = source ? (upload ? displayName(upload.fileName) : undefined) : doc?.title
   const max = source ? SOURCE_NAME_MAX : DOC_TITLE_MAX
   const [typed, setTyped] = useState<string>()
   const value = typed ?? current ?? ''
@@ -26,7 +27,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
     if (current === undefined || rename.isPending || over) return
     const next = renamedTitle(current, value)
     if (!next) return router.back()
-    rename.mutate(next, {
+    rename.mutate(source && upload ? `${next}${extensionOf(upload.fileName)}` : next, {
       onSuccess: () => router.back(),
       onError: () => showToast({ message: DOC_RENAME_COPY.failed, alert: true }),
     })

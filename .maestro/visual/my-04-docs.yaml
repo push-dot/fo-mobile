@@ -11,7 +11,7 @@ tags:
     timeout: 10000
 - tapOn: "서류"
 - extendedWaitUntil:
-    visible: "포트폴리오_결제시스템.pdf"
+    visible: "포트폴리오_결제시스템"
     timeout: 10000
 # The 읽는 중 spinner never stops, so do not wait out the full animation timeout.
 # (iOS reads each row as one element labelled with its file name, so 읽지 못했어요 is not matchable.)

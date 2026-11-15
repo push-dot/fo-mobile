@@ -34,7 +34,7 @@ describe('send a material to a bot', () => {
   it('from a bot attaches to that bot only and returns to its chat', () => {
     sendMaterial({ from: 'bot', botId: 'b1' as BotId }, file)
     expect(Object.keys(drafts.byBot)).toEqual(['b1'])
-    expect(drafts.byBot.b1).toBe('a.pdf')
+    expect(drafts.byBot.b1).toBe('a')
     expect(nav.dismissTo).toHaveBeenCalledWith('/bots/b1')
     expect(toast).toHaveBeenCalledWith({ message: '자료를 붙였어요', tone: 'success' })
   })

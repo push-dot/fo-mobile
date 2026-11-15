@@ -7,6 +7,7 @@ import { botChatPath, type BotId } from '@/features/bots'
 import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
+import { displayName } from '@/shared/utility/display-name'
 import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
 import { LINK_KIND_LABEL } from '../utils/links'
@@ -211,7 +212,7 @@ export const useMentionGroups = (): MentionGroup[] => {
       },
       {
         title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
+        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: displayName(d.fileName), sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
       },
       {
         title: '내 링크',

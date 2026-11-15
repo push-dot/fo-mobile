@@ -18,9 +18,9 @@ tags:
     text: "자료"
     index: 0
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서.pdf 보내기"
+    visible: "김서준_백엔드_이력서 보내기"
     timeout: 20000
-- tapOn: "김서준_백엔드_이력서.pdf 보내기"
+- tapOn: "김서준_백엔드_이력서 보내기"
 - extendedWaitUntil:
     visible: "어느 Bot한테 보낼까요?"
     timeout: 10000
@@ -28,7 +28,7 @@ tags:
 - takeScreenshot: BotPick
 - tapOn: "모아페이"
 - extendedWaitUntil:
-    visible: ".*김서준_백엔드_이력서.pdf 첨부 빼기"
+    visible: ".*김서준_백엔드_이력서 첨부 빼기"
     timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: BotPickSent
@@ -38,7 +38,7 @@ tags:
     timeout: 10000
 - tapOn: "자료.*"
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서.pdf 보내기"
+    visible: "김서준_백엔드_이력서 보내기"
     timeout: 20000
 # The 자료를 붙였어요 toast of the attach above is still up when the profile route opens; the board has none, so wait it out.
 - extendedWaitUntil:
@@ -46,9 +46,9 @@ tags:
     timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsFromProfile
-- tapOn: "김서준_백엔드_이력서.pdf 보내기"
+- tapOn: "김서준_백엔드_이력서 보내기"
 - extendedWaitUntil:
-    visible: ".*김서준_백엔드_이력서.pdf 첨부 빼기"
+    visible: ".*김서준_백엔드_이력서 첨부 빼기"
     timeout: 15000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsSendHere

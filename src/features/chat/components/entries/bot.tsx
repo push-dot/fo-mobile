@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
+import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
@@ -89,7 +90,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
             <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
               <FindText itemId={`${item.id}:source`} v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
                 {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
-                <Marked text={source.title} itemId={`${item.id}:source`} />
+                <Marked text={displayName(source.title)} itemId={`${item.id}:source`} />
               </FindText>
             </Pressable>
           ))}

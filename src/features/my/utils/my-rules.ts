@@ -1,4 +1,5 @@
 import type { Settings } from '@push/api-client'
+import { displayName } from '@/shared/utility/display-name'
 import { MAX_BYTES } from '../constants'
 import { fitTen } from './fit-ten'
 
@@ -23,15 +24,18 @@ export const profileCountLabels = (profile: {
   posts: { count: profile.postCount ?? 0, label: '게시글' },
 })
 
-export const deleteDocCopy = (fileName: string) => ({
-  title: '이 서류를 삭제할까요?',
-  body: `${fileName}${objectParticle(fileName)} 서류에서 지워요. 이 서류로 지원한 기록은 남아요.`,
-  confirm: '삭제',
-  cancel: '취소',
-  toast: '서류를 삭제했어요',
-  undo: '되돌리기',
-  failed: '서류를 삭제하지 못했어요',
-})
+export const deleteDocCopy = (fileName: string) => {
+  const name = displayName(fileName)
+  return {
+    title: '이 서류를 삭제할까요?',
+    body: `${name}${objectParticle(name)} 서류에서 지워요. 이 서류로 지원한 기록은 남아요.`,
+    confirm: '삭제',
+    cancel: '취소',
+    toast: '서류를 삭제했어요',
+    undo: '되돌리기',
+    failed: '서류를 삭제하지 못했어요',
+  }
+}
 
 /** DELETE /sources/:id answers 409 when a career row still cites the upload. */
 export const DELETE_REFERENCED = '경력 기록에서 쓰고 있어 지울 수 없어요'

@@ -64,7 +64,7 @@ describe('my screen rules', () => {
   it('keeps the application record when a file is deleted, and uses 삭제', () => {
     expect(deleteDocCopy('경력기술서.pdf')).toEqual({
       title: '이 서류를 삭제할까요?',
-      body: '경력기술서.pdf를 서류에서 지워요. 이 서류로 지원한 기록은 남아요.',
+      body: '경력기술서를 서류에서 지워요. 이 서류로 지원한 기록은 남아요.',
       confirm: '삭제',
       cancel: '취소',
       toast: '서류를 삭제했어요',

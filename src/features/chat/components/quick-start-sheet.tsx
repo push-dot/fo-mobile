@@ -4,6 +4,7 @@ import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } fr
 import { Badge, Chip, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
+import { displayName } from '@/shared/utility/display-name'
 import { type QsItem } from '../api/schemas'
 import { useChatDocs, useHubProfileId, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
@@ -330,7 +331,7 @@ const DocField = ({
     <>
       <PickerRow
         label={label}
-        value={doc}
+        value={displayName(doc)}
         onPress={onToggle}
         trailing={
           chevron ? undefined : (
@@ -351,7 +352,7 @@ const DocField = ({
             >
               <Pick on={x.fileName === doc} />
               <Text v="b2" numberOfLines={1} style={{ flex: 1 }}>
-                {x.fileName}
+                {displayName(x.fileName)}
               </Text>
             </Pressable>
           ))

@@ -12,6 +12,7 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
+import { displayName } from '@/shared/utility/display-name'
 import { palette, spacing, type, useColors } from '@/theme'
 
 // The paper is drawn for a 330 wide column (the board's card) and zoomed to the screen width: file viewer mode (DocViewer, owner 2026-11-15).
@@ -132,7 +133,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
       <TopBar
         left={
           <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ alignSelf: 'center', maxWidth: TITLE_MAX_WIDTH }}>
-            {s?.fileName ?? '서류 보기'}
+            {s ? displayName(s.fileName) : '서류 보기'}
           </Text>
         }
         onBack={() => router.back()}

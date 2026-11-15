@@ -1,4 +1,5 @@
 import type { Attachment } from '@/features/bots'
+import { displayName } from '@/shared/utility/display-name'
 import type { LinkLabel, MadeBy, Material, MaterialKind, MaterialRowView, MaterialSection, MaterialsPage } from '../types'
 
 const DAY = 24 * 60 * 60_000
@@ -50,7 +51,7 @@ export const hostOf = (url: string) =>
 
 /** The row's first line, also the title an attachment keeps. */
 export const materialTitle = (m: Material): string =>
-  m.kind === 'posting' ? `${m.company} · ${m.title}` : m.kind === 'link' ? hostOf(m.url) : m.title
+  m.kind === 'posting' ? `${m.company} · ${m.title}` : m.kind === 'link' ? hostOf(m.url) : m.kind === 'file' ? displayName(m.title) : m.title
 
 const subOf = (m: Material, now: Date): string => {
   switch (m.kind) {
