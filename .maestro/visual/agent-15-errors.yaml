@@ -65,12 +65,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*경력 섹션 3줄을 고쳤어요.*"
     timeout: 20000
-# The board starts at the first bot line (the greeting is an older turn) and has no keyboard.
-- runFlow:
-    file: _from.yaml
-    env:
-      BOT: "b-moa"
-      FROM: "agentText"
+# The board has no keyboard: the composer sits 32 lower while the one of the Push Bot chat before it is still up.
 - runFlow:
     file: _chat_kbd_down.yaml
     env:
