@@ -22,7 +22,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const bound = useSheetScrollMax(0.55)
   const start = useStartChat()
   const q = useQuickStart(qs.key)
-  const docs = useChatDocs(!!qs.docLabel)
+  const docs = useChatDocs(!!qs.listLabel)
   const d = q.data
   const [seg, setSeg] = useState(0)
   const [sel, setSel] = useState<string[]>([])
@@ -72,7 +72,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const job = qs.listLabel ? picked[0] : undefined
   const listOpen = !job || pickingJob
   const docField = (
-    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} chevron={!!qs.listLabel} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
+    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} picker={!!qs.listLabel} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
   )
   return (
     <Sheet gap={spacing[3]} actionGap={SHEET_ACTION_GAP.quickStart} action={action} onLayout={bound.onSheetLayout}>
@@ -286,15 +286,10 @@ const AddChip = ({ onPress }: { onPress: () => void }) => {
   )
 }
 
-const PickerRow = ({ label, value, lead, trailing, onPress }: { label: string; value: string; lead?: ReactNode; trailing?: ReactNode; onPress: () => void }) => {
+const PickerRow = ({ label, value, lead, onPress }: { label: string; value: string; lead?: ReactNode; onPress?: () => void }) => {
   const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${label} ${value}, 변경`}
-      onPress={onPress}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}
-    >
+  const content = (
+    <>
       {lead}
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="c2" weight="600" color="t3">
@@ -304,16 +299,25 @@ const PickerRow = ({ label, value, lead, trailing, onPress }: { label: string; v
           {value}
         </Text>
       </View>
-      {trailing ?? <Icon name="chev" size={18} color="t3" />}
+      {onPress ? <Icon name="chev" size={18} color="t3" /> : null}
+    </>
+  )
+  const style = { flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 } as const
+  return onPress ? (
+    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${value}`} onPress={onPress} style={style}>
+      {content}
     </Pressable>
+  ) : (
+    <View style={style}>{content}</View>
   )
 }
 
+/** The hub profile is the only document a quick start reads (RULINGS 31); only 점수 올리기 lets the user pick another one. */
 const DocField = ({
   label,
   doc,
   picking,
-  chevron,
+  picker,
   docs,
   onToggle,
   onPick,
@@ -321,26 +325,15 @@ const DocField = ({
   label?: string
   doc?: string
   picking: boolean
-  chevron: boolean
+  picker: boolean
   docs?: { id: string; fileName: string }[]
   onToggle: () => void
   onPick: (name: string) => void
 }) =>
   label && doc ? (
     <>
-      <PickerRow
-        label={label}
-        value={doc}
-        onPress={onToggle}
-        trailing={
-          chevron ? undefined : (
-            <Text v="c1" weight="700" color="t1">
-              변경
-            </Text>
-          )
-        }
-      />
-      {picking
+      <PickerRow label={label} value={doc} onPress={picker ? onToggle : undefined} />
+      {picker && picking
         ? docs?.map((x) => (
             <Pressable
               key={x.id}
