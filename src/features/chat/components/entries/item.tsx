@@ -18,7 +18,7 @@ import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { fitChrome } from '../../utils/fit-card'
-import { FIT_LOCKED, fitProjected, fitProjectedLink } from '../../constants'
+import { FIT_LOCKED } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -149,17 +149,15 @@ const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
   </Bubble>
 )
 
-/** The fit result as bubbles (ChatPh1Fit*): the sentence with its parts a tap away, the summary with the ULTRA projection, the PRO teaser. */
+/** The fit result as bubbles (ChatPh1Fit*): the sentence with its parts a tap away, then the summary. No projection line or pill (rule 39). */
 const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => void }) => {
-  const c = useColors()
   // No upgrade entry while payments are closed or the account has not loaded.
   const open = paymentsOpen(useChatAccount(true).data)
   const onPlan = open ? planEntry : undefined
-  const view = fitChrome(item, open)
-  const [projectedOpen, setProjectedOpen] = useState(false)
+  const view = fitChrome(item)
   const first = fitBubble(item)
   return (
-    <View style={{ gap: projectedOpen ? spacing[4] : spacing[3] }}>
+    <View style={{ gap: spacing[3] }}>
       {view.locked ? (
         <Bubble>
           <Rich v="b1" text={first.text} markId={item.id} />
@@ -174,28 +172,8 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
       )}
       {view.summary ? (
         <Bubble>
-          <Rich v="b1" text={view.projected && projectedOpen ? `${view.summary} ${fitProjected(view.projected.label)}` : view.summary} markId={`${item.id}-summary`} />
-          {view.projected && projectedOpen ? <BulletList items={view.projected.bullets} markId={`${item.id}-summary`} /> : null}
-          {view.projected && !projectedOpen ? (
-            <Pressable accessibilityRole="button" accessibilityState={{ expanded: false }} onPress={() => setProjectedOpen(true)}>
-              <Text v="c1" color="t3">
-                {fitProjectedLink(view.projected.label)}
-              </Text>
-            </Pressable>
-          ) : null}
+          <Rich v="b1" text={view.summary} markId={`${item.id}-summary`} />
         </Bubble>
-      ) : null}
-      {view.teaser ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={onPlan}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: 44, paddingHorizontal: spacing[4], borderRadius: radius.pill, backgroundColor: c.fill }}
-        >
-          <Icon name="lock" size={16} color="t3" />
-          <Text v="b2" weight="600" color="t2">
-            {view.teaser}
-          </Text>
-        </Pressable>
       ) : null}
     </View>
   )

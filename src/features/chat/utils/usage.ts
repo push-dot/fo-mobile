@@ -117,7 +117,11 @@ const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
 const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
 
 // ChatStates.4: a thread that holds a finished result keeps the talking box through the lines after it (apply record, busy error).
-const holdsResult = (items: ChatItem[]) => items.some((i) => i.type === 'result')
+// A thread that starts at its result (the run above it is older turns: ChatPh6Result, ChatPh6ResultFile) asks like any other; ChatDone* draw the flow's own cards above the result.
+const holdsResult = (items: ChatItem[]) => {
+  const at = items.findLastIndex((i) => i.type === 'result')
+  return at >= 0 && (inDocumentFlow(items) || items.slice(at + 1).some((i) => i.type !== 'worked'))
+}
 
 // The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
 // the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.

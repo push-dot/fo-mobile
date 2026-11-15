@@ -4,8 +4,8 @@ import { Text } from '@/shared/components'
 import { onAccent, type as typography, useColors } from '../../../../theme'
 import { MARK_RADIUS, markRects, splitMarks, type MarkEdges, type Point, type TextLine } from '../../utils/find'
 
-/** The find query and the line the current result sits in. Outside a find, the query is empty and lines draw plain. */
-export const FindHighlight = createContext<{ query: string; currentId?: string }>({ query: '' })
+/** The find query, the line the current result sits in and which of that line's hits it is (reading order). Outside a find, the query is empty and lines draw plain. */
+export const FindHighlight = createContext<{ query: string; currentId?: string; currentHit?: number }>({ query: '' })
 
 type Edges = Partial<Record<'left' | 'right', Point>>
 type Paint = { put: (key: string, side: 'left' | 'right', point: Point) => void; drop: (key: string) => void }
@@ -24,11 +24,12 @@ const Edge = ({ markKey, side }: { markKey: string; side: 'left' | 'right' }) =>
   return <View style={ZERO} onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => paint?.put(markKey, side, { x: layout.x, y: layout.y })} />
 }
 
-export const Marked = ({ text, itemId }: { text: string; itemId: string }) => {
+/** `current` overrides the default of marking every hit of the current line (a bubble with several lines passes which of them holds the current hit). */
+export const Marked = ({ text, itemId, current: lineCurrent }: { text: string; itemId: string; current?: boolean }) => {
   const { query, currentId } = useContext(FindHighlight)
   const id = useId()
   if (!query.trim()) return <>{text}</>
-  const current = itemId === currentId
+  const current = lineCurrent ?? itemId === currentId
   return (
     <>
       {splitMarks(text, query).map((mark, i) =>
@@ -49,7 +50,7 @@ export const Marked = ({ text, itemId }: { text: string; itemId: string }) => {
 }
 
 /** A Text whose find matches sit in boxes with the board's corner radius: a nested Text's background is square, so the boxes are Views behind the paragraph. */
-export const FindText = ({ itemId, v = 'b2', style, onTextLayout, children, ...rest }: ComponentProps<typeof Text> & { itemId: string }) => {
+export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onTextLayout, children, ...rest }: ComponentProps<typeof Text> & { itemId: string; current?: boolean }) => {
   const { query, currentId } = useContext(FindHighlight)
   const c = useColors()
   const fontSize = StyleSheet.flatten(style)?.fontSize ?? typography[v].fontSize
@@ -92,7 +93,7 @@ export const FindText = ({ itemId, v = 'b2', style, onTextLayout, children, ...r
     <FindPaint.Provider value={paint}>
       <View>
         {boxes.map((box, i) => (
-          <View key={i} pointerEvents="none" style={{ position: 'absolute', ...box, borderRadius: MARK_RADIUS, backgroundColor: itemId === currentId ? c.ac : c.acSoft }} />
+          <View key={i} pointerEvents="none" style={{ position: 'absolute', ...box, borderRadius: MARK_RADIUS, backgroundColor: (lineCurrent ?? itemId === currentId) ? c.ac : c.acSoft }} />
         ))}
         <Text v={v} style={style} onTextLayout={onLines} {...rest}>
           {children}

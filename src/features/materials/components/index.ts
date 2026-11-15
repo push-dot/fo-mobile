@@ -1,5 +1,5 @@
 export { MaterialsModal } from './materials-modal'
 export { sendMaterial, sendToBot } from './send-material'
-export { MaterialDetailSheet, isMaterialKind } from './material-detail-sheet'
-export { MaterialLinkAddSheet } from './link-add-sheet'
-export { SendBotSheet } from './send-bot-sheet'
+export { MaterialDetailPage, isMaterialKind } from './material-detail-page'
+export { MaterialLinkAddPage } from './link-add-page'
+export { SendBotPage } from './send-bot-page'

@@ -58,10 +58,10 @@ describe('bot and material routes', () => {
     [botProfilePath(id), 'bots/[botId]/profile', null],
     [botColorPath(id), 'bots/[botId]/color', '{sheetOptions(c)}'],
     [botNewPath('p1'), 'bots/new', '{modalOptions(c)}'],
-    [botPickPath({ kind: 'file', id: 'f1' }), 'bots/pick', '{sheetOptions(c)}'],
+    [botPickPath({ kind: 'file', id: 'f1' }), 'materials/pick', null],
     [materialsPath(id), 'materials/index', '{modalOptions(c)}'],
-    [materialDetailPath('posting', 'p1'), 'materials/[kind]/[id]', '{sheetOptions(c)}'],
-    [materialLinkAddPath(), 'materials/link-add', '{sheetOptions(c)}'],
+    [materialDetailPath('posting', 'p1'), 'materials/[kind]/[id]', null],
+    [materialLinkAddPath(), 'materials/link-add', null],
     [materialPickerPath(id), 'material-picker', '{modalOptions(c)}'],
     [accountPath(), 'account', '{modalOptions(c)}'],
     [accountPath('plan'), 'plan', '{fullPageOptions()}'],
@@ -72,7 +72,7 @@ describe('bot and material routes', () => {
 
   it('carries what the next screen needs in the query', () => {
     expect(botNewPath('p1')).toBe('/bots/new?posting=p1')
-    expect(botPickPath({ kind: 'link', id: 'l1' })).toBe('/bots/pick?kind=link&id=l1')
+    expect(botPickPath({ kind: 'link', id: 'l1' })).toBe('/materials/pick?kind=link&id=l1')
     expect(materialDetailPath('file', 'f1', id)).toBe('/materials/file/f1?for=b1')
     expect(materialPickerPath(id)).toBe('/material-picker?bot=b1')
   })

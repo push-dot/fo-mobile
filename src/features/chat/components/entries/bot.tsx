@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { useContext } from 'react'
 import { Pressable, View } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
@@ -6,15 +7,16 @@ import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
-import { splitBotText } from '../../utils/bot-text'
+import { splitBotText, type BotTextBlock } from '../../utils/bot-text'
+import { hitsBefore } from '../../utils/find'
 import { diffLinesDetail } from '../../utils/bubble-detail'
 import { blueprintList, isBlueprints, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
-import { FindText, Marked } from '../header/highlight'
+import { FindHighlight, FindText, Marked } from '../header/highlight'
 import Detail from './detail'
 import MdTable from './md-table'
 import ResultLine from './result-line'
-import Rich from './rich'
+import Rich, { plainOf } from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
 const XL_LINE = { fontSize: 21, lineHeight: 31 }
@@ -33,14 +35,14 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
 }
 
 /** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
-export const BulletList = ({ items, markId }: { items: string[]; markId: string }) => {
+export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: string; hitsBefore?: number[] }) => {
   const c = useColors()
   return (
     <View style={{ gap: 2 }}>
-      {items.map((line) => (
+      {items.map((line, i) => (
         <View key={line} style={{ flexDirection: 'row', gap: 10, paddingLeft: spacing[1] }}>
           <View style={{ width: 6, height: 6, borderRadius: 3, marginTop: 9, backgroundColor: c.t1 }} />
-          <Rich v="b1" text={line} markId={markId} style={{ flexShrink: 1 }} />
+          <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={{ flexShrink: 1 }} />
         </View>
       ))}
     </View>
@@ -78,19 +80,29 @@ const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => 
   return <Detail text={view.text} more={view.more} />
 }
 
+/** The lines of a block that draw find marks, in render order (an ordered list draws its numbers). */
+const markedLines = (block: BotTextBlock): string[] =>
+  block.kind === 'paragraph' ? [block.text] : block.kind === 'ordered' ? block.items.map((line, n) => `${n + 1}. ${line}`) : block.kind === 'bullets' || block.kind === 'list' ? block.items : []
+
 const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
   const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
+  const { query } = useContext(FindHighlight)
+  // 채팅에서 찾기: the hits the lines above one hold, so the line with the current hit is the one drawn as current.
+  const blocks = splitBotText(item.text)
+  const lines = blocks.flatMap(markedLines)
+  const above = hitsBefore(lines.map(plainOf), query)
+  const first = blocks.map((_, i) => blocks.slice(0, i).reduce((sum, b) => sum + markedLines(b).length, 0))
   return (
     <Bubble gap={item.card ? 10 : 6} wide={!!item.card}>
-      {splitBotText(item.text).map((block, i) =>
+      {blocks.map((block, i) =>
         block.kind === 'paragraph' ? (
-          <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
+          <Rich key={i} v="b1" text={block.text} markId={item.id} hitsBefore={above[first[i]!]} {...big} />
         ) : block.kind === 'table' ? (
           <MdTable key={i} table={block} />
         ) : block.kind === 'bullets' ? (
-          <BulletList key={i} items={block.items} markId={item.id} />
+          <BulletList key={i} items={block.items} markId={item.id} hitsBefore={block.items.map((_, n) => above[first[i]! + n]!)} />
         ) : block.kind === 'link' ? (
           <Pressable key={i} accessibilityRole="link" onPress={() => router.push(block.route as never)}>
             <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
@@ -103,14 +115,14 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
         ) : block.kind === 'ordered' ? (
           <View key={i} style={{ gap: spacing[1] }}>
             {block.items.map((line, n) => (
-              <Rich key={line} v="b1" text={`${n + 1}. ${line}`} markId={item.id} {...big} />
+              <Rich key={line} v="b1" text={`${n + 1}. ${line}`} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
             ))}
           </View>
         ) : (
           // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
           <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
-            {block.items.map((line) => (
-              <Rich key={line} v="b1" text={line} markId={item.id} {...big} />
+            {block.items.map((line, n) => (
+              <Rich key={line} v="b1" text={line} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
             ))}
           </View>
         ),

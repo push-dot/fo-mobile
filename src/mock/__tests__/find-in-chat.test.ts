@@ -10,11 +10,11 @@ const matches = async (q: string) => {
 }
 
 describe('ChatBotHeaderFind: the finished chat of ChatBotHeader', () => {
-  it('finds the user line "Push 프로필로" once and no save sentence in the answer', async () => {
+  it('finds 프로필 three times, the newest first: the last answer, then the first answer twice', async () => {
     seedThread('b-moa', 'thread')
     const { total, items } = await matches('프로필')
-    expect(items.map((m) => m.messageId)).toEqual(['m-t-ask-USER'])
-    expect(total).toBe(1)
+    expect(items.map((m) => m.messageId)).toEqual(['m-t-ask-ASSISTANT', 'm-t-req-ASSISTANT', 'm-t-req-ASSISTANT'])
+    expect(total).toBe(3)
     expect((await matches('저장했어요')).total).toBe(0)
   })
 })

@@ -1,0 +1,131 @@
+import { ApiError } from '@push/api-client'
+import { router } from 'expo-router'
+import { useMemo } from 'react'
+import { View } from 'react-native'
+import { PageModal } from '@/features/chat'
+import { Button, GlassButton, Spinner, Text, askConfirm, showToast } from '@/shared/components'
+import { openUrl } from '@/shared/infrastructure'
+import { spacing } from '@/theme'
+import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
+import {
+  CITED,
+  DELETE_CONFIRM,
+  DELETE_LABEL,
+  LOAD_ERROR,
+  OPEN_LABEL,
+  RESTORE_FAILED,
+  SEND_LABEL,
+  UNDO_LABEL,
+} from '../constants'
+import type { Material, MaterialKind } from '../types'
+import { NOUN, deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
+import MaterialFacts from './material-facts'
+import { useInMaterialsModal } from './in-materials-modal'
+import { sendMaterial } from './send-material'
+import { useSearchRoom } from './materials-search'
+
+const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
+export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
+  KINDS.includes(value as MaterialKind)
+
+/**
+ * 서류로 들어가기, 공고로 이동, 바로가기. A link opens in the browser over the page. The others close the page and the modal
+ * first, as the drawer's lists did: a full screen pushed inside a modal would draw under its top inset.
+ */
+const open = (m: Material, inModal: boolean) => {
+  if (m.kind === 'link') return void openUrl(m.url)
+  router.dismiss(inModal ? 2 : 1)
+  if (m.kind === 'posting') router.push(`/postings/${m.id}`)
+  else if (m.kind === 'document') router.push(`/docs/push/${m.id}`)
+  else router.push(`/docs/${m.id}`)
+}
+
+/** DELETE answers 409 for a file a career row still cites. */
+const cited = (error: unknown) => error instanceof ApiError && error.status === 409
+
+/** MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink, MaterialDetailLong, MaterialDetailDelete: a page pushed inside the 자료 modal. */
+export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
+  const detail = useMaterialDetail(kind, id)
+  const remove = useDeleteMaterial()
+  const restore = useRestoreMaterial()
+  const now = useMemo(() => new Date(), [])
+  const toastBottom = useSearchRoom().toast
+  const inModal = useInMaterialsModal()
+  const back = <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => router.back() }]} />
+
+  const m = detail.data?.material
+  if (!m) {
+    return (
+      <PageModal title={NOUN[kind]} left={back} page={!inModal} scroll={false}>
+        {detail.isError ? (
+          <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[6] }}>
+            <Text v="b2" color="t3">
+              {LOAD_ERROR.title}
+            </Text>
+            <Button label={LOAD_ERROR.retry} variant="secondary" size="sm" onPress={detail.refetch} />
+          </View>
+        ) : (
+          <View style={{ alignItems: 'center', paddingVertical: spacing[6] }}>
+            <Spinner />
+          </View>
+        )}
+      </PageModal>
+    )
+  }
+
+  const copy = deleteCopy(m)
+  const onDelete = () => {
+    router.back()
+    remove(m.kind, m.id).then(
+      () =>
+        showToast({
+          message: copy.done,
+          bottom: toastBottom,
+          action: {
+            label: UNDO_LABEL,
+            onPress: () =>
+              void restore(m.kind, m.id).catch(() => showToast({ message: RESTORE_FAILED, alert: true, bottom: toastBottom })),
+          },
+        }),
+      (error: unknown) => showToast({ message: cited(error) ? CITED : copy.failed, alert: true, bottom: toastBottom }),
+    )
+  }
+
+  const facts = detailFacts(m, detail.data?.usedBy ?? [], now)
+
+  return (
+    <PageModal
+      title={NOUN[m.kind]}
+      left={back}
+      page={!inModal}
+      right={
+        <GlassButton
+          filled
+          iconSize={21}
+          actions={[
+            {
+              icon: 'delete',
+              label: DELETE_LABEL,
+              color: 'red',
+              onPress: () => askConfirm({ title: copy.title, body: copy.body, confirm: DELETE_CONFIRM, danger: true, onConfirm: onDelete }),
+            },
+          ]}
+        />
+      }
+      footer={
+        <View style={{ gap: spacing[2], marginHorizontal: spacing[1] }}>
+          <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
+          <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
+        </View>
+      }
+    >
+      {/* .dhead sits 29 above the card: its 14 margin (MaterialFacts) and 15 more. */}
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: 15 }}>
+        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 32 }}>
+          {detailTitle(m)}
+        </Text>
+        <MaterialFacts facts={facts} />
+      </View>
+    </PageModal>
+  )
+}

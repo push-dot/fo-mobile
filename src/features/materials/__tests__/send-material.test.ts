@@ -27,7 +27,7 @@ describe('send a material to a bot', () => {
   it('from the bot home asks which bot and attaches nothing yet', () => {
     sendMaterial({ from: 'home' }, file)
     expect(toast).not.toHaveBeenCalled()
-    expect(nav.push).toHaveBeenCalledWith('/bots/pick?kind=file&id=f1')
+    expect(nav.push).toHaveBeenCalledWith('/materials/pick?kind=file&id=f1')
     expect(drafts.byBot).toEqual({})
   })
 

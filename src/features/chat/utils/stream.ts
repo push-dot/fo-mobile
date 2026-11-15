@@ -127,7 +127,6 @@ const fitOf = (ev: Extract<StreamEvent, { type: 'fit' }>): ChatItem => {
     ...(ev.summary ? { summary: ev.summary } : {}),
     ...(rows.length ? { rows } : {}),
     ...(ev.keywords?.length ? { keywords: ev.keywords } : {}),
-    ...(ev.projected ? { projected: { label: ev.projected.label, bullets: ev.projected.bullets } } : {}),
   }
 }
 

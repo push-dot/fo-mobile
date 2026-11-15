@@ -77,7 +77,7 @@ describe('bot:<id>:thread and :done', () => {
   it('stores the finished chat with its sources and no card to answer', async () => {
     seedThread('b-moa', 'thread')
     const all = await turns()
-    expect(all.map((t) => t.user?.text ?? null)).toEqual([null, '좋아요. 첫 번째부터 고쳐서 Push 프로필로 보여 주세요'])
+    expect(all.map((t) => t.user?.text ?? null)).toEqual([null, '좋아요. 첫 번째부터 고쳐 주세요'])
     expect(all.at(-1)!.assistant?.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서'])
     expect((await api.bots.get('b-moa')).activity).toBeNull()
   })

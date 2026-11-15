@@ -3,7 +3,7 @@ import type { BotContract } from '@push/api-client'
 import { showToast } from '@/shared/components/toast-store'
 import { botApi } from '@/shared/infrastructure'
 import { hasOlder, loadOlder, useChatStore } from '../../stores'
-import { matchLabel, revealMatch, stepMatch, type FindStep } from '../../utils/find'
+import { hitOf, matchLabel, revealMatch, stepMatch, type FindStep } from '../../utils/find'
 
 const DEBOUNCE_MS = 300
 const FAILED = '잠시 뒤에 다시 해 주세요.'
@@ -14,7 +14,7 @@ export const useFind = (botId: string) => {
   const [query, setQuery] = useState('')
   const [matches, setMatches] = useState<BotContract.TranscriptMatch[]>([])
   const [index, setIndex] = useState(0)
-  const [currentId, setCurrentId] = useState<string>()
+  const [current, setCurrent] = useState<{ id: string; hit: number }>()
   const latest = useRef(0)
 
   const land = useCallback(
@@ -27,7 +27,7 @@ export const useFind = (botId: string) => {
           hasOlder: () => hasOlder(botId),
           loadOlder: () => loadOlder(botId),
         })
-        if (ticket === latest.current) setCurrentId(id)
+        if (ticket === latest.current) setCurrent(id === undefined ? undefined : { id, hit: hitOf(list, at) })
       } catch {
         if (ticket === latest.current) showToast({ message: FAILED })
       }
@@ -46,7 +46,7 @@ export const useFind = (botId: string) => {
           if (ticket !== latest.current) return
           setMatches(found.items)
           setIndex(0)
-          setCurrentId(undefined)
+          setCurrent(undefined)
           void land(found.items, 0, ticket)
         },
         () => {
@@ -71,7 +71,7 @@ export const useFind = (botId: string) => {
     setOpen(false)
     setQuery('')
     setMatches([])
-    setCurrentId(undefined)
+    setCurrent(undefined)
   }
 
   return {
@@ -82,7 +82,7 @@ export const useFind = (botId: string) => {
     setQuery,
     label: matchLabel(index, shown.length),
     step,
-    currentId,
-    highlight: useMemo(() => ({ query: open ? query : '', currentId }), [open, query, currentId]),
+    currentId: current?.id,
+    highlight: useMemo(() => ({ query: open ? query : '', currentId: current?.id, currentHit: current?.hit }), [open, query, current]),
   }
 }

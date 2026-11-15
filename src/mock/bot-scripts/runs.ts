@@ -141,18 +141,17 @@ const profileCard = (score: string, josa = '로'): Step[] => [
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
   ...profileDone(200, score, josa, BULLETS),
 ]
-const present = ask(numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']))
-const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), present, awaitingDone]
+const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), done]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
 const EXT_FILE = '김서준_모아페이_백엔드.pdf'
-const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; gate?: string; josa?: string }): Step[] => {
+const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; bare?: boolean; josa?: string }): Step[] => {
   const labels = o.todo ?? FILE_TODO
   const job = o.job ?? true
   const saved = o.saved ?? true
   return [
-    // The gate boards (ChatPh6ResultFile, ChatPh6ResultFail) draw only the closing line and the card, no task lines or bullets.
-    ...(o.gate
+    // ChatPh6ResultFile and ChatPh6ResultFail draw only the closing line and the card, no task lines or bullets.
+    ...(o.bare
       ? []
       : [
           s(200, tool('task', '이력서 수정', '올린 파일 · 경력', 'ok', TASK_RESULT)),
@@ -170,16 +169,15 @@ const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boo
       cardMeta: FILE_PAGE,
       documentId: 'src-upload',
       ...(job ? { company: '모아페이' } : {}),
-      actions: o.gate
+      actions: o.bare
         ? []
         : [
             ...(job ? [{ id: 'apply', label: '모아페이에 바로 지원하기' }] : []),
             ...(saved ? [{ id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' }] : []),
           ],
-      ...closing(o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`, o.gate ? undefined : BULLETS),
+      ...closing(o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`, o.bare ? undefined : BULLETS),
     }),
-    // No done event while the gate is open, so no 작업했어요 footer under the card.
-    ...(o.gate ? [ask(numbered('ext-gate', o.gate, ['확인했어요', '그만하기']))] : [done]),
+    done,
   ]
 }
 const fileRun = (): Step[] => ext({})
@@ -234,9 +232,9 @@ const ph0Input: Step[] = [
         id: 's1',
         title: '가져올 자료',
         options: [
-          { id: 's1.0', label: RESUME, sub: '마이 › 서류', badge: 'PDF', action: 'change' },
+          { id: 's1.0', label: '허브 프로필', sub: '기본 서류' },
           { id: 's1.1', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '홈 › 북마크 공고', badge: '모', action: 'change' },
-          { id: 'm_github', label: 'github.com/seojun-kim', sub: '이력서에서 찾았어요', action: 'change' },
+          { id: 'm_github', label: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요', action: 'change' },
         ],
       },
       { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
@@ -261,7 +259,6 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
       { label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true },
       { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
     ],
-    ...(plan === 'ULTRA' ? { projected: { score: 8, label: '8점대', bullets: ['승인 API 성과를 숫자로 보여 주기', 'Kafka를 기술 스택 맨 앞으로 옮기기', '정산 도메인 경험을 한 줄 추가하기'] } } : {}),
   }),
   { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])), wait: gateWait },
 ]
@@ -487,7 +484,6 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
     c === 0 ? say('공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.')
       : c === 1 ? tailorFit(TODO)
         : say('북마크한 공고 중에서 골라 주세요. @언급으로 불러올 수 있어요.'),
-  present: (c) => (c === 0 ? [done] : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   ph0: (c) => (c === 0 ? ph0Input : c === 1 ? ph2xApproach : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph0-input': () => ph0Start,
   'ph0-start': (c) => (c === 0 ? ph1 : c === 1 ? ph0Input : say('알겠어요. 필요할 때 다시 불러 주세요.')),
@@ -504,7 +500,6 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
   'ph4-design': (c) => (c === -1 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1', '으로')]),
   'ph2x-verify': (c) => (c === 0 ? ph2xLevel : say('알겠어요. 필요할 때 다시 불러 주세요.')),
-  'ext-gate': (c) => (c === 0 ? [done] : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-level': (c) => (c === 3 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
   'ph2x-prevent': (c) => (c === 6 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
@@ -605,8 +600,8 @@ export const TOKENS: Record<string, Step[]> = {
   'ext-done': ext({}),
   'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'PDF로 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
   'ext-nosave': ext({ saved: false }),
-  'ext-ok': ext({ josa: '으로', gate: '결과를 확인할까요?' }),
-  'ext-fail': ext({ josa: '으로', saved: false, gate: '결과를 확인할까요?' }),
+  'ext-ok': ext({ josa: '으로', bare: true }),
+  'ext-fail': ext({ josa: '으로', saved: false, bare: true }),
   // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
   'ph0-input': ph0Input,
@@ -624,8 +619,8 @@ export const TOKENS: Record<string, Step[]> = {
   ph5: [...ph5, ...finish('6.9 → 8.1', '으로')],
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
-  // ChatPh6Result: the closing line and the card under the open gate, with no task lines, bullets or 작업했어요 footer.
-  'profile-gate': [...profileDone(300, '6.9 → 8.1', '으로'), present],
+  // ChatPh6Result: the closing line and the card, with no task lines or bullets above them.
+  'profile-result': [...profileDone(300, '6.9 → 8.1', '으로'), done],
   'ph1-free': ph1Plan('FREE'),
   'ph1-ultra': ph1Plan('ULTRA'),
   // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.
