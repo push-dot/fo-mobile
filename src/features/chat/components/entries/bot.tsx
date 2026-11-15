@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useContext } from 'react'
-import { Pressable, View } from 'react-native'
+import { Pressable, View, useWindowDimensions } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
@@ -21,13 +21,17 @@ import Rich, { plainOf } from './rich'
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
 const XL_LINE = { fontSize: 21, lineHeight: 31 }
 
+/** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
+export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
+
 /** The bot's bubble: everything the bot says or shows in one step lives inside one of these (rule 30). */
 export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode; gap?: number; wide?: boolean }) => {
   const c = useColors()
+  const maxWidth = useBotBubbleMax()
   return (
     // With a card inside, the board's box fills its max width (the card's rows wrap), and the gap to the card is 10.
-    <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth: '88%', ...(wide ? { width: '88%' } : null) }}>
-      <View style={{ gap, paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
+    <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth, ...(wide ? { width: maxWidth } : null) }}>
+      <View style={{ maxWidth, gap, paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         {children}
       </View>
     </Appear>
@@ -82,7 +86,7 @@ const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => 
 
 /** The lines of a block that draw find marks, in render order (an ordered list draws its numbers). */
 const markedLines = (block: BotTextBlock): string[] =>
-  block.kind === 'paragraph' ? [block.text] : block.kind === 'ordered' ? block.items.map((line, n) => `${n + 1}. ${line}`) : block.kind === 'bullets' || block.kind === 'list' ? block.items : []
+  block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' ? block.items.map((line, n) => `${n + 1}. ${line}`) : block.kind === 'bullets' || block.kind === 'list' ? block.items : []
 
 const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
@@ -99,6 +103,14 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
       {blocks.map((block, i) =>
         block.kind === 'paragraph' ? (
           <Rich key={i} v="b1" text={block.text} markId={item.id} hitsBefore={above[first[i]!]} {...big} />
+        ) : block.kind === 'heading' ? (
+          <Rich key={i} v={block.level === 1 ? 'h3' : 'b2'} weight={block.level === 1 ? '700' : '600'} style={block.level === 1 ? undefined : { marginTop: spacing[1] }} text={block.text} markId={item.id} hitsBefore={above[first[i]!]} />
+        ) : block.kind === 'sub' ? (
+          <Pressable key={i} accessibilityRole={block.route ? 'link' : 'text'} disabled={!block.route} onPress={() => router.push(block.route as never)}>
+            <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+              {block.text}
+            </Text>
+          </Pressable>
         ) : block.kind === 'table' ? (
           <MdTable key={i} table={block} />
         ) : block.kind === 'bullets' ? (
@@ -130,7 +142,8 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}
-      {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
+      {/* A closing line's summary is grey 15 text with "•" in it, not the dotted list (ChatDone, ChatKeyboardIOS). */}
+      {item.bullets?.length ? <Rich v="b2" color="t2" text={item.bullets.map((line) => `• ${line}`).join('\n')} markId={item.id} /> : null}
       {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>

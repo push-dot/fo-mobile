@@ -54,10 +54,10 @@ describe('scripted runs (mock)', () => {
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
   }, 10_000)
 
-  it('an uploaded file ends on the file card and PDF로 만들기', async () => {
+  it('an uploaded file ends on the file card and Push 프로필 만들기', async () => {
     const s = play(emptyChat, await run({ conversationId: 'up1', text: '이 파일로 맞춰 주세요', attachment: '김서준_모아페이_백엔드.pdf' }))
     const todo = s.items.findLast((i) => i.type === 'todo')
-    expect(todo && todo.type === 'todo' ? todo.items.at(-1)?.label : '').toBe('PDF로 만들기')
+    expect(todo && todo.type === 'todo' ? todo.items.at(-1)?.label : '').toBe('Push 프로필 만들기')
     expect(s.items.find((i) => i.type === 'result')).toMatchObject({
       source: 'external',
       fileName: '김서준_모아페이_백엔드.pdf',

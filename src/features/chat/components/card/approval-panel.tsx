@@ -79,7 +79,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
       showChoiceModal({
         title: sheet.title,
         message: sheet.message,
-        items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
+        items: sheet.items.map((i) => ({ label: i.label, onPress: () => onAnswer(i.label, i.index) })),
         onDismiss: onSay,
       })
     } else if (confirm) {

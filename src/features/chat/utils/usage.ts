@@ -99,16 +99,11 @@ export type ThreadRow = ChatItem | RunningRow
 
 /**
  * The list in order, drawn lines only, and while the run works its running line under the last line (ChatBotStatusThink, Work, Long,
- * Queue, XL, DocAgentNew: the line right under the user's line). A draft card that is still being written (the last line while the
- * run works) is what the running line is about, so the line sits above it, under the earlier cards (ChatPh3: 할 일 card, running
- * line, draft card).
+ * Queue, XL, DocAgentNew, and ChatPh3 where it follows the draft that is being written).
  */
 export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
   const drawn: ThreadRow[] = foldBubbleCards(items.filter(isDrawn))
-  if (!working) return drawn
-  const running: RunningRow = { type: 'running', id: 'running' }
-  const last = drawn.at(-1)
-  return last?.type === 'paper' ? [...drawn.slice(0, -1), running, last] : [...drawn, running]
+  return working ? [...drawn, { type: 'running', id: 'running' }] : drawn
 }
 
 const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)

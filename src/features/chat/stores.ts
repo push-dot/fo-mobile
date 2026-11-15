@@ -208,6 +208,11 @@ const sleep = (ms: number, signal: AbortSignal) =>
 // Mock only: a GATED_STEP waits here until a tour sends the mock link `step-next`.
 let openGate: (() => void) | null = null
 export const nextMockStep = () => openGate?.()
+// Mock only: the next stop stays on 중지하는 중 until `step-next`, so a tour can shoot it (ChatBotStatusStopped).
+let holdStop = false
+export const holdMockStop = () => {
+  holdStop = true
+}
 const gated = (signal: AbortSignal) =>
   new Promise<void>((resolve) => {
     openGate = () => {
@@ -403,7 +408,17 @@ const reportCancel = (id: string) => {
   const ctrl = runs.get(id)
   if (API_MOCK) {
     // The mock has no server to say whether a document flow is active: a flow that drew its to-do list is.
-    finishStop(id, ctrl, get(id).items.some((item) => item.type === 'todo'))
+    const resumable = get(id).items.some((item) => item.type === 'todo')
+    if (holdStop) {
+      holdStop = false
+      dispatch(id, { type: 'status', verbs: [STOPPING_TEXT] })
+      openGate = () => {
+        openGate = null
+        finishStop(id, ctrl, resumable)
+      }
+      return
+    }
+    finishStop(id, ctrl, resumable)
     return
   }
   if (halting.has(id)) return

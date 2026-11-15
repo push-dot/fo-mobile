@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Text } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { spacing, type, useColors } from '../../../../theme'
 import type { Approval } from '../../types'
 import { choiceMulti, choiceSheet } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'

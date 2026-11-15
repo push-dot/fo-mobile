@@ -1,26 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Animated, Easing } from 'react-native'
+import { Animated } from 'react-native'
 import { useReduceMotion } from '@/shared/components'
-
-export const usePulse = (active: boolean, period = 1000, low = 0.25) => {
-  const reduce = useReduceMotion()
-  const v = useState(() => new Animated.Value(1))[0]
-  useEffect(() => {
-    if (!active || reduce) {
-      v.setValue(1)
-      return
-    }
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(v, { toValue: low, duration: period / 2, easing: Easing.step0, useNativeDriver: true }),
-        Animated.timing(v, { toValue: 1, duration: period / 2, easing: Easing.step0, useNativeDriver: true }),
-      ]),
-    )
-    loop.start()
-    return () => loop.stop()
-  }, [active, reduce, v, period, low])
-  return v
-}
 
 export const usePop = (on: boolean, duration = 200) => {
   const reduce = useReduceMotion()

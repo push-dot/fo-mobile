@@ -78,7 +78,7 @@ export type ChatItem =
       pendingNote?: string
     }
   | { type: 'worked'; id: string; seconds: number }
-  /** `reason` set: the run broke with no line of its own to show, so a bubble says "작업 중 문제가 생겼어요" with the reason as grey sub-text (ChatBotStatusError). */
+  /** `reason` set: the run broke with no line of its own to show, so a bubble says "작업 중 문제가 생겼어요. {reason}. 다시 해 볼까요?" (ChatBotStatusError). */
   | { type: 'error'; id: string; text: string; code?: string; reason?: string }
   | { type: 'stale'; id: string; text: string }
 

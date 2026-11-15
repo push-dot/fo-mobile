@@ -189,8 +189,8 @@ describe('threadRows', () => {
   const paper: ChatItem = { type: 'paper', id: 'p', label: '이력서 초안 v1', heading: '김서준', lines: [] }
   const ids = (rows: { id: string }[]) => rows.map((r) => r.id)
 
-  it('puts the running line between the cards and the draft being written (ChatPh3)', () => {
-    expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'running', 'p'])
+  it('puts the running line under the draft being written (ChatPh3)', () => {
+    expect(ids(threadRows([user, todo, tool, paper], true))).toEqual(['u', 'todo', 'p', 'running'])
   })
 
   it('draws the line under the last line when no draft is being written (ChatBotStatusWork, Think, Queue)', () => {
