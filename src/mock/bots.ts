@@ -432,6 +432,7 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
     messages: set === 'thread' ? first : [said('t-ask', 'USER', DESIGN_ASK, 10), answer],
     cards: [],
     job: null,
+    older: set === 'thread',
     readAt: 0,
   })
 }
