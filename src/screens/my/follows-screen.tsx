@@ -21,7 +21,6 @@ const FollowsScreen = () => {
   const people = followMatches(query.data?.data ?? [], following ? q : '')
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      {/* the board draws a ≡ here (G37, not built): its slot stays so the title sits where the board puts it */}
       <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={{ width: button }} />} />
       {following ? (
         <GlassField

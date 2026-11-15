@@ -9,7 +9,6 @@ import { spacing, type, useColors } from '@/theme'
 
 type Row = { id: string; title: string; meta: string }
 
-// ChatPh0Picker `.pm8`: `.pm-b` 4/20 padding and 6 gap, `.pm-row` min-height 50 with 17/22 text and 12 gap, `.pm-sec` 13/18 with 10/2 padding.
 const LIST = { paddingTop: spacing[1], paddingHorizontal: spacing[5], gap: 6 }
 const ROW_MIN = 50
 const ROW_TEXT = { fontSize: type.h3.fontSize, lineHeight: type.b2.lineHeight }

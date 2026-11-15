@@ -177,7 +177,6 @@ const setBookmark = (id: string, on: boolean) => {
 export const fewBookmarks = () => {
   bookmarkOrder.splice(2)
 }
-// Tour switch (links.ts): ChatPh0Picker draws an account with only 모아페이's posting bookmarked, titled without its stack.
 let plainTitles = false
 export const pickerBookmarks = () => {
   bookmarkOrder.splice(1)

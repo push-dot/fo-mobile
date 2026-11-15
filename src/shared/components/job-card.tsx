@@ -41,7 +41,6 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           accessibilityState={{ selected: p.bookmarked }}
           onPress={onBookmark}
           hitSlop={hitSlopTo(30)}
-          // not in a header, so a plain button: the board's opaque `--bg` fill with a 1px shadow, no glass
           style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: radius.pill, backgroundColor: c.bg, boxShadow: '0 1px 4px rgba(0,0,0,.14)', alignItems: 'center', justifyContent: 'center' }}
         >
           <Icon name="bookmark" size={16} color={p.bookmarked ? c.acText : c.t1} filled={p.bookmarked} />

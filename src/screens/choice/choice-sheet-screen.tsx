@@ -22,7 +22,6 @@ const ChoiceSheetScreen = () => {
     router.back()
     setTimeout(onPress, CHOICE_HANDOFF_MS)
   }
-  // `.pm-h .nt`: 17 semibold, centred, in a 52 high head; `.pm-row`: 17 regular (h3 at 400), 50 high, a line under every row but the last.
   return (
     <Sheet gap={6} action={request.confirm ? { label: request.confirm.label, onPress: () => run(request.confirm!.onPress) } : undefined}>
       <View style={{ minHeight: 52, justifyContent: 'center' }}>

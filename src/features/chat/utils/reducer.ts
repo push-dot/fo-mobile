@@ -14,7 +14,6 @@ const upsert = (items: ChatItem[], item: ChatItem) => {
   return next
 }
 
-/** The 점수 올리기 rounds of this turn: the finished `boost` steps (the mock prefixes a run's tool names: `r1-boost2`) since the user's last line. */
 const boostRounds = (items: readonly ChatItem[]) =>
   items
     .slice(items.findLastIndex((x) => x.type === 'user') + 1)

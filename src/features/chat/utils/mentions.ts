@@ -28,7 +28,6 @@ export const filterMentions = (groups: MentionGroup[], query: string) =>
     })
     .filter((g) => g.items.length > 0)
 
-// The header's 56, the 8 between it and the list (ChatMention and ChatEmpty: the list is 283 high, its top at y125), the composer's 130.
 const MENTION_RESERVE = 56 + 8 + 130
 
 export const mentionMaxHeight = (windowHeight: number, insetTop: number, below: number) => Math.max(160, windowHeight - insetTop - below - MENTION_RESERVE)

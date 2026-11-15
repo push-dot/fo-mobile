@@ -208,7 +208,6 @@ const sleep = (ms: number, signal: AbortSignal) =>
 // Mock only: a GATED_STEP waits here until a tour sends the mock link `step-next`.
 let openGate: (() => void) | null = null
 export const nextMockStep = () => openGate?.()
-// Mock only: the next stop stays on 중지하는 중 until `step-next`, so a tour can shoot it (ChatBotStatusStopped).
 let holdStop = false
 export const holdMockStop = () => {
   holdStop = true

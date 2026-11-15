@@ -10,7 +10,6 @@ import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 18
 
-/** 이름 바꾸기: a regular modal with one 적용 button and no 취소 (PushDocRename, MyResumeRename). `source`: the id is an uploaded file's, not a Push 프로필's. */
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data

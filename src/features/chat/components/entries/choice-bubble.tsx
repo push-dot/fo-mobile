@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Text } from '@/shared/components'
-import { spacing, type, useColors } from '../../../../theme'
+import { spacing, useColors } from '../../../../theme'
 import type { Approval } from '../../types'
 import { choiceMulti, choiceSheet } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'
@@ -9,7 +9,6 @@ import { Bubble } from './bot'
 
 type Props = { approval: Approval; onAnswer: (text: string, choice: number | number[]) => void }
 
-// v426 `.mopt` line-height: 22 + 9px padding twice is the 40 pt row (b1's 24 made it 42).
 const ROW_LINE = 22
 
 const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: string; on: boolean; onPress: () => void; number?: number }) => {

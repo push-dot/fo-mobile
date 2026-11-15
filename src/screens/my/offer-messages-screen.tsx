@@ -85,7 +85,6 @@ const Bubble = ({
               </Text>
             </View>
             <Icon name="chev" size={16} color="t3" />
-            {/* The board's 1pt ring is inset: a border would add its width to the card. */}
             <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius.md, borderWidth: 1, borderColor: c.line }]} />
           </Pressable>
         ) : null}

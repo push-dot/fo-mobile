@@ -18,7 +18,6 @@ export type NoticeBubble = { text: string; detail?: string }
 export type StatusLineView = {
   mascot: 'think' | 'work' | 'help' | 'idle'
   tone: 'neutral' | 'help' | 'quiet'
-  /** Empty for the waiting state: an icon alone says it (ChatBotStatusQueue, rule 29). */
   text: string
   tail: string | null
   accessibilityLabel: string
@@ -68,7 +67,6 @@ const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], te
 export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
   if (line.kind === 'run' && line.phase === 'queued') return view('idle', 'neutral', '', null, QUEUE_LABEL)
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
-  // ChatBotStatusStopped: stopping is a line that counts nothing and is grey.
   if (line.kind === 'run' && line.text === STOPPING_TEXT) return view('work', 'quiet', line.text, null)
   if (line.kind === 'run') return view('work', 'neutral', line.text, elapsedText(line.since, now))
   return view('help', 'help', line.text, line.named ? null : elapsedText(line.since, now))
@@ -77,7 +75,6 @@ export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
 export const noticeBubble = (notice: Notice): NoticeBubble => {
   if (notice.kind === 'stopped') return { text: notice.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT }
   if (notice.kind === 'failed') return { text: notice.text }
-  // ChatBotStatusError: one sentence in the bubble, the reason between the two (a bubble holds what the Bot says; no grey sub-text).
   return { text: [ERROR_SENTENCE, notice.reason && `${notice.reason.replace(/\.$/, '')}.`, ERROR_RETRY].filter(Boolean).join(' ') }
 }
 

@@ -25,7 +25,6 @@ const MyPostsScreen = () => {
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {/* the board's count block sits on a 16px body line box: 12 above and 6 below the 18pt label put the first row where the board does */}
           <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: 6, paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? posts.length}개
           </Text>

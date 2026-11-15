@@ -51,5 +51,4 @@ export const diffBubble = (item: Diff): DetailText => {
   }
 }
 
-/** The to-do list as a plain numbered list (ChatInterrupt): no checkboxes, a finished step is grey and struck, an added step says so in brackets. */
 export const todoLines = (item: Todo) => item.items.map((i) => ({ text: `${i.label}${i.added ? ' (새로 추가)' : ''}`, state: i.state }))

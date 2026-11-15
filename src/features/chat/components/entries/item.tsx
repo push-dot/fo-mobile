@@ -122,7 +122,6 @@ const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<ty
 const TODO_TITLE = '할 일'
 const WRITING = '쓰는 중'
 
-/** `.mdol`: the title, then a numbered list whose marker column is 24 wide (22 padding + 2 of the item's own). */
 const TodoList = ({ item }: { item: Of<'todo'> }) => (
   <Bubble>
     <Text v="b1">{TODO_TITLE}</Text>
@@ -304,7 +303,6 @@ const ItemComponent = ({
   onReadOff,
 }: {
   item: ChatItem
-  /** The run is still writing this draft: the last line before the running line. */
   writing?: boolean
   onUsage?: (action: 'plan' | 'credits') => void
   onView?: (item: Of<'result'>) => void

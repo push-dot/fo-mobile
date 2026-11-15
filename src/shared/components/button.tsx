@@ -18,7 +18,6 @@ type Props = {
   iconSize?: number
   /** Horizontal padding when a board sets its own (the size's default otherwise). */
   paddingX?: number
-  /** Label weight when a board sets its own (700 otherwise). */
   weight?: '600' | '700'
   disabled?: boolean
   /** A button in the header bar is glass; every other button is plain. */
