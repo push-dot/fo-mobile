@@ -1,6 +1,6 @@
 import { router, useIsFocused } from 'expo-router'
 import { useEffect, useEffectEvent } from 'react'
-import { TOAST_ABOVE, askConfirm, showToast, type ConfirmRequest } from '@/shared/components'
+import { TOAST_ABOVE, askConfirm, showActionSheet, showToast, type ConfirmRequest } from '@/shared/components'
 import { showChoiceModal } from '@/shared/navigation'
 import { botChatPath } from '@/features/bots'
 import { pickDocument } from '@/shared/infrastructure'
@@ -68,13 +68,15 @@ export const useFileMenu = (file: { id: string; fileName: string } | undefined) 
   })
 }
 
-/** UploadPick: 파일 등록 asks where the 서류 comes from, in a regular modal. */
-export const showImportMenu = () =>
-  showChoiceModal({
+/** UploadPick: 파일 등록 asks where the 서류 comes from, in a regular modal; from inside a page-style modal it is the action sheet, so no modal stacks on a modal. */
+export const showImportMenu = (fromModal = false) => {
+  const request = {
     title: '서류 가져오기',
     message: 'PDF, DOCX · 20MB까지 올릴 수 있어요',
     items: [
       { label: '파일에서 고르기', onPress: () => useDocImport.setState({ requested: true }) },
       { label: 'Bot 채팅에서 새로 만들기', onPress: () => router.push(botChatPath('push')) },
     ],
-  })
+  }
+  return fromModal ? showActionSheet(request) : showChoiceModal(request)
+}
