@@ -53,7 +53,7 @@ const SettingsPickSheetScreen = () => {
 
   if (!pick.wheel) {
     return (
-      <Sheet title={pick.title} gap={spacing[2]}>
+      <Sheet title={pick.title} gap={spacing[4]}>
         <View accessibilityRole="radiogroup" accessibilityLabel={pick.title}>
           {items.map((it) => (
             <RadioRow

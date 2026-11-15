@@ -13,6 +13,8 @@ export const isXlScale = (fontScale: number) => fontScale >= XL_TEXT_SCALE
 export const XL_BOARD_TEXT_SCALE = 1.2
 export const isXlBoardText = (fontScale: number) => fontScale >= XL_BOARD_TEXT_SCALE
 export const useXlBoardText = () => isXlBoardText(useWindowDimensions().fontScale)
+/** `.xl .msg` and `.me` lay the 21 pt chat text out at -0.015em (-0.02em at 16): the harness render is 1.6 pt wider per line than CoreText at -0.02em, which moves a wrap. */
+export const XL_CHAT_TRACKING = -0.315
 
 /** Under `.xl` the boards grow every round header button from 44 to 52 and the header row from 56 to 68. */
 export const xlChrome = (xl: boolean) => ({ button: xl ? 52 : 44, row: xl ? 68 : 56 })

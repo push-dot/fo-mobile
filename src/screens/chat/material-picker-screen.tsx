@@ -12,6 +12,7 @@ type Row = { id: string; title: string; meta: string }
 const LIST = { paddingTop: spacing[1], paddingHorizontal: spacing[5], gap: 6 }
 const ROW_MIN = 50
 const ROW_TEXT = { fontSize: type.h3.fontSize, lineHeight: type.b2.lineHeight }
+const ADD_BUTTON = { minHeight: 52, borderRadius: 26 }
 const SECTION_LABEL = { paddingTop: 10, paddingBottom: 2 }
 
 const RowLine = () => {
@@ -67,8 +68,9 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
   return (
     <PageModal
       title="자료 고르기"
+      sheet
       onClose={onClose}
-      footer={<Button label={pasting ? '넣기' : `${picks.length}개 추가`} disabled={pasting ? !text.trim() : !picks.length} onPress={pasting ? submit : add} />}
+      footer={<Button label={pasting ? '넣기' : `${picks.length}개 추가`} disabled={pasting ? !text.trim() : !picks.length} onPress={pasting ? submit : add} style={ADD_BUTTON} />}
     >
       {pasting ? (
         <View style={{ paddingHorizontal: spacing[4] }}>
