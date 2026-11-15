@@ -88,7 +88,8 @@ export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine
     return { kind: 'run', phase: 'queued', since, ahead }
   }
   if (STORED_THINKING.has(text)) return { kind: 'run', phase: 'thinking', since, text: THINK_TEXT }
-  return { kind: 'run', phase: 'working', since, text }
+  // The server and the mock end a status with an ellipsis; the boards draw the phrase alone (rule 29).
+  return { kind: 'run', phase: 'working', since, text: text.replace(/…$/, '') }
 }
 
 export const canStop = (lines: readonly LiveLine[]) => lines.some((line) => line.kind === 'run')

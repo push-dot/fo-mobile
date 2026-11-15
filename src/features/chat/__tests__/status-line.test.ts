@@ -82,6 +82,11 @@ describe('statusLineView', () => {
     }
   })
 
+  it('draws a status without the ellipsis the server appends (ChatPh5)', () => {
+    expect(lineFromWorking(['Push 프로필에 저장하는 중…'], NOW)).toMatchObject({ phase: 'working', text: 'Push 프로필에 저장하는 중' })
+    expect(lineFromWorking(['중지하는 중'], NOW)).toMatchObject({ text: '중지하는 중' })
+  })
+
   it('reads a stored thinking verb as 생각 중 and can stop only a run', () => {
     expect(lineFromWorking(['생각하는 중…'], NOW)).toMatchObject({ phase: 'thinking', text: '생각 중' })
     expect(lineFromWorking(['대기 중'], NOW)).toMatchObject({ phase: 'queued', ahead: 0 })
