@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { ScrollView, View } from 'react-native'
+import { ScrollView, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile, useStartChat } from '@/features/chat'
 import {
@@ -39,10 +39,11 @@ const Bars = ({ widths }: { widths: readonly number[] }) =>
     <View key={w} style={{ width: `${w}%`, height: 6, borderRadius: 3, backgroundColor: sheet.deco, opacity: 0.55 }} />
   ))
 
-const pageStyle = { width: '100%', aspectRatio: 1 / A4, backgroundColor: sheet.paper, borderRadius: 3 } as const
+const pageStyle = { width: '100%', backgroundColor: sheet.paper, borderRadius: 3 } as const
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
   const p = d.profile
+  const a4 = (useWindowDimensions().width - 2 * PAGE_INSET) * A4
   const head = (t: string) => (
     <Text
       v="c1"
@@ -56,7 +57,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
     <View style={{ marginHorizontal: PAGE_INSET, marginTop: PAGE_TOP, gap: PAGE_GAP }}>
       <View
         accessibilityLabel={`${p.displayName} 서류 미리보기`}
-        style={{ ...pageStyle, boxShadow: paperPage.lifted, paddingVertical: PAGE_PAD_Y, paddingHorizontal: PAGE_PAD_X, gap: spacing[2] }}
+        style={{ ...pageStyle, minHeight: a4, boxShadow: paperPage.lifted, paddingVertical: PAGE_PAD_Y, paddingHorizontal: PAGE_PAD_X, gap: spacing[2] }}
       >
         <Text v="h3" weight="800" style={{ color: sheet.t1, fontSize: 22, lineHeight: LINE.name }}>
           {p.displayName}
@@ -105,7 +106,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
         </Text>
       </View>
       {Array.from({ length: Math.max((d.pageCount ?? 1) - 1, 0) }, (_, i) => (
-        <View key={i} style={{ ...pageStyle, boxShadow: paperPage.ring }} />
+        <View key={i} style={{ ...pageStyle, aspectRatio: 1 / A4, boxShadow: paperPage.ring }} />
       ))}
     </View>
   )

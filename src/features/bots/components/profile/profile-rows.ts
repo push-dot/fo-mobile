@@ -50,7 +50,6 @@ export const grantMeta = (grantedAt: string, kind: string) => {
 
 export const GRANT_INTRO = 'Bot이 묻지 않고 읽는 사이트예요.'
 
-
 export const revokeA11y = (host: string) => `${host} 허용 해제`
 
 export const deleteTitle = (name: string) => `${name} Bot을 삭제할까요?`

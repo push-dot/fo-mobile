@@ -13,6 +13,7 @@ export const stubs = {
   reactNative: {
     Platform: { OS: 'ios' },
     Dimensions: { get: () => ({ width: 402 }) },
+    useWindowDimensions: () => ({ width: 402 }),
     View: 'View',
     Pressable: 'Pressable',
     Switch: 'RNSwitch',

@@ -1,12 +1,13 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { Sheet, Switch, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
-import { iosSeparator, spacing, useThemeMode } from '@/theme'
+import { iosSeparator, spacing, useColors, useThemeMode } from '@/theme'
 
 // .pm8: title 52 high, the body 4 under it (rows 6 apart, the message under the title), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
+  const c = useColors()
   const dark = useThemeMode() === 'dark'
   const request = useChoiceModal((s) => s.request)
   const picked = useRef(false)
@@ -27,7 +28,7 @@ const ChoiceSheetScreen = () => {
     setTimeout(onPress, CHOICE_HANDOFF_MS)
   }
   const confirm = form ? { label: form.confirmLabel(selected, on), onPress: () => form.onConfirm(selected, on) } : request.confirm
-  const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: iosSeparator[dark ? 'dark' : 'light'] })
+  const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
     <Sheet gap={4} actionGap={10} slimAction action={confirm ? { label: confirm.label, onPress: () => run(confirm.onPress) } : undefined}>
       <View style={{ minHeight: 52, justifyContent: 'center' }}>
