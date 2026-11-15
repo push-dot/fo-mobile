@@ -27,4 +27,14 @@ describe('foldBubbleCards', () => {
   it('leaves a plan with no bot line before it', () => {
     expect(foldBubbleCards([{ type: 'user', id: 'u', text: '네' }, plan('')]).map((r) => r.type)).toEqual(['user', 'plan'])
   })
+
+  it('moves the result card into the closing line before it, unless a profile-save note is still open (ChatPh6Result)', () => {
+    const closing: ChatItem = { type: 'agentText', id: 'done-r', text: '다 됐어요!' }
+    const profile: Extract<ChatItem, { type: 'result'; source: 'profile' }> = { type: 'result', id: 'r', source: 'profile', checklist: [], documentId: 'd1', actions: [], name: '김서준', headline: '', title: '김서준', subtitle: '' }
+    const rows = foldBubbleCards([closing, profile])
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({ type: 'agentText', result: { id: 'r' } })
+    expect(foldBubbleCards([closing, { ...profile, pendingNote: '메모' }]).map((r) => r.type)).toEqual(['agentText', 'result'])
+    expect(foldBubbleCards([text, profile]).map((r) => r.type)).toEqual(['agentText', 'result'])
+  })
 })

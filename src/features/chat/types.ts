@@ -16,7 +16,7 @@ export type ChatItem =
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
   /** `card` is the plan that came right after the text, `diff` the edit: the bubble draws them under the text (ChatPh1Feedback, ChatApprove). */
   /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */
-  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem; diff?: Extract<ChatItem, { type: 'diff' }> }
+  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem; diff?: Extract<ChatItem, { type: 'diff' }>; result?: Extract<ChatItem, { type: 'result' }> }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
   /** How a run ended badly, drawn as a bubble (ChatInterrupt, ChatVerifyFail). */

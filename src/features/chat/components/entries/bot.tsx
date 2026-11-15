@@ -12,6 +12,7 @@ import { Appear } from '../motion'
 import { FindText, Marked } from '../header/highlight'
 import Detail from './detail'
 import MdTable from './md-table'
+import ResultLine from './result-line'
 import Rich from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
@@ -76,7 +77,7 @@ const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => 
   return <Detail text={view.text} more={view.more} />
 }
 
-const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
+const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
   const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
@@ -116,11 +117,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}
-      {item.bullets?.length ? (
-        <Text v="b2" color="t2">
-          {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}
-        </Text>
-      ) : null}
+      {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
+      {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
           <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>

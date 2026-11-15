@@ -147,7 +147,7 @@ const profileCard = (score: string, josa = '로'): Step[] => [
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
   ...profileDone(200, score, josa, BULLETS),
 ]
-const present = ask({ ...numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']), note: 'PDF는 Push 프로필에서 내보낼 수 있어요.' })
+const present = ask(numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']))
 const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), present, awaitingDone]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).

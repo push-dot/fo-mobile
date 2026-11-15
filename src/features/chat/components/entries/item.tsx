@@ -460,7 +460,7 @@ const ItemComponent = ({
     case 'user':
       return <UserBubble item={item} />
     case 'agentText':
-      return <BotText item={item} />
+      return <BotText item={item} onView={onView} />
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
     case 'readOff':

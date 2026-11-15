@@ -218,9 +218,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"적용","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -264,9 +264,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -501,9 +501,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"적용","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -555,9 +555,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -736,9 +736,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -940,9 +940,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1442,9 +1442,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1662,9 +1662,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3231,9 +3231,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3427,9 +3427,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3901,9 +3901,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4113,9 +4113,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5181,9 +5181,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5293,9 +5293,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5615,9 +5615,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5775,9 +5775,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6177,9 +6177,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6333,9 +6333,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6667,9 +6667,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6839,9 +6839,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7687,9 +7687,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7749,8 +7749,8 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"profile-gate","type":"user"}
 {"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7784,9 +7784,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7876,9 +7876,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8236,9 +8236,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"적용","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8278,9 +8278,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":3,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8390,9 +8390,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8534,9 +8534,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8820,9 +8820,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8952,9 +8952,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9188,9 +9188,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9372,9 +9372,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -9804,9 +9804,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10004,9 +10004,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -11048,9 +11048,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"프로필 수정","result":"반영했어요 · 2줄 추가, 1줄 삭제","state":"ok","target":"Push 프로필 · 경력","type":"tool"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"bullets":["승인 API 성과를 숫자로 보여 줬어요","Kafka를 기술 스택 맨 앞으로 옮겼어요","동아리 활동은 한 줄로 줄였어요"],"text":"다 됐어요! 적합도를 **6.9 → 8.1**으로 올렸어요.","type":"agentText"}
-{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
+{"actions":[{"id":"apply","label":"모아페이에 바로 지원하기"}],"checklist":["프로필 읽기","공고 요건 정리","적합도 계산","경력 섹션 고치기","프로필에 저장"],"company":"모아페이","documentId":"d1","headline":"백엔드 엔지니어","name":"김서준","source":"profile","subtitle":"Push 프로필 · 방금 수정","title":"김서준 · 백엔드 엔지니어","type":"result"}
 {"seconds":153,"type":"worked"}
-card {"id":"present","pendingNote":"PDF는 Push 프로필에서 내보낼 수 있어요.","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"present","question":"결과를 확인할까요?","sections":[{"items":[{"label":"확인했어요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
