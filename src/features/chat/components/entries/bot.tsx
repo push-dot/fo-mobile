@@ -23,6 +23,9 @@ const XL_LINE = { fontSize: 21, lineHeight: 31 }
 
 /** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
+const BUBBLE_PAD_X = 15
+/** What a table can fill inside a bot bubble that is at its widest. */
+const useTableWidth = () => useBotBubbleMax() - BUBBLE_PAD_X * 2
 
 /** The bot's bubble: everything the bot says or shows in one step lives inside one of these (rule 30). */
 export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode; gap?: number; wide?: boolean }) => {
@@ -31,7 +34,7 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   return (
     // With a card inside, the board's box fills its max width (the card's rows wrap), and the gap to the card is 10.
     <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth, ...(wide ? { width: maxWidth } : null) }}>
-      <View style={{ maxWidth, gap, paddingVertical: 11, paddingHorizontal: 15, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
+      <View style={{ maxWidth, gap, paddingVertical: 11, paddingHorizontal: BUBBLE_PAD_X, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         {children}
       </View>
     </Appear>
@@ -55,6 +58,7 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
 
 /** A plan or feedback inside the bot's bubble: the table, then its keywords as grey sub-text. */
 export const PlanBlock = ({ item }: { item: PlanItem }) => {
+  const tableWidth = useTableWidth()
   if (isBlueprints(item)) {
     const { lines, detail } = blueprintList(item)
     return (
@@ -73,7 +77,7 @@ export const PlanBlock = ({ item }: { item: PlanItem }) => {
   const keywords = planKeywords(item)
   return (
     <>
-      <MdTable table={planTable(item)} />
+      <MdTable table={planTable(item)} width={tableWidth} />
       {keywords ? <Detail text={keywords.text} more={keywords.more} /> : null}
     </>
   )
@@ -90,6 +94,7 @@ const markedLines = (block: BotTextBlock): string[] =>
 
 const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
+  const tableWidth = useTableWidth()
   const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
   const { query } = useContext(FindHighlight)
@@ -112,7 +117,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
             </Text>
           </Pressable>
         ) : block.kind === 'table' ? (
-          <MdTable key={i} table={block} />
+          <MdTable key={i} table={block} width={tableWidth} />
         ) : block.kind === 'bullets' ? (
           <BulletList key={i} items={block.items} markId={item.id} hitsBefore={block.items.map((_, n) => above[first[i]! + n]!)} />
         ) : block.kind === 'link' ? (
