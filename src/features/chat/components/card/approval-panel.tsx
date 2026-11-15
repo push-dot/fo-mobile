@@ -1,4 +1,5 @@
-import { Children, useEffect, useState, type ReactNode } from 'react'
+import { useIsFocused } from 'expo-router'
+import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
@@ -67,7 +68,12 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   // A single-pick card the bot has no suggestion for (a help question, a page permission) and an edit card are regular modals, so the panel draws nothing; swiping one away hands the floor to the composer.
   const sheet = choiceSheet(approval)
   const confirm = confirmModal(approval)
+  // Opens once, and only while the chat is the focused screen: another sheet over it would make a modal on a modal.
+  const focused = useIsFocused()
+  const opened = useRef(false)
   useEffect(() => {
+    if (!focused || opened.current) return
+    opened.current = true
     if (sheet) {
       showChoiceModal({
         title: sheet.title,
@@ -79,7 +85,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
       showChoiceModal({ title: confirm.title, message: confirm.message, confirm: { label: confirm.confirm, onPress: () => onAnswer(confirm.confirm, 0) }, onDismiss: onSay })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
-  }, [])
+  }, [focused])
 
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))

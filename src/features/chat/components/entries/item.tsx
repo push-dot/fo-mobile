@@ -158,7 +158,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const [projectedOpen, setProjectedOpen] = useState(false)
   const first = fitBubble(item)
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View style={{ gap: projectedOpen ? spacing[4] : spacing[3] }}>
       {view.locked ? (
         <Bubble>
           <Rich v="b1" text={first.text} markId={item.id} />
