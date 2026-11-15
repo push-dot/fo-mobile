@@ -1,8 +1,8 @@
 import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import { spacing, type, useColors } from '@/theme'
-import { Text } from '@/shared/components'
-import { SECTION_LABEL, SEND_LABEL } from '../constants'
+import { Icon, Text } from '@/shared/components'
+import { PICKED_LABEL, PICK_LABEL, SECTION_LABEL, SEND_LABEL } from '../constants'
 import type { Material, MaterialSection } from '../types'
 import { materialRow } from '../utils/material-row'
 import { useListSize } from './list-size'
@@ -47,16 +47,58 @@ export const MaterialItem = memo(function MaterialItem({
   )
 })
 
-/** `.msec`: "서류 8". */
-export const SectionTitle = memo(function SectionTitle({ section, count }: { section: MaterialSection; count: number }) {
+/** `.msec`: "서류 8". The picker sheet reuses it for its own groups, which carry no count. */
+export const GroupTitle = memo(function GroupTitle({ label, count }: { label: string; count?: number }) {
   return (
-    <View accessible accessibilityRole="header" accessibilityLabel={`${SECTION_LABEL[section]} ${count}`} style={{ flexDirection: 'row', gap: 6, paddingTop: 18, paddingBottom: 6, paddingHorizontal: spacing[5] }}>
+    <View accessible accessibilityRole="header" accessibilityLabel={count === undefined ? label : `${label} ${count}`} style={{ flexDirection: 'row', gap: 6, paddingTop: 18, paddingBottom: 6, paddingHorizontal: spacing[5] }}>
       <Text v="c1" weight="700" color="t3">
-        {SECTION_LABEL[section]}
+        {label}
       </Text>
-      <Text v="c1" weight="700" color="t3">
-        {count}
-      </Text>
+      {count === undefined ? null : (
+        <Text v="c1" weight="700" color="t3">
+          {count}
+        </Text>
+      )}
     </View>
+  )
+})
+
+export const SectionTitle = memo(function SectionTitle({ section, count }: { section: MaterialSection; count: number }) {
+  return <GroupTitle label={SECTION_LABEL[section]} count={count} />
+})
+
+/** The picker sheet's row: `.mrow` with the 선택 pill where Materials has 보내기. */
+export const MaterialPickRow = memo(function MaterialPickRow({ title, sub, picked, onToggle }: { title: string; sub: string; picked: boolean; onToggle: () => void }) {
+  const c = useColors()
+  const size = useListSize()
+  return (
+    <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: picked }} onPress={onToggle} style={{ flexDirection: 'row', gap: spacing[3], minHeight: 68, ...size.row }}>
+      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+        <Text v="b1" weight="600" numberOfLines={size.titleLines} style={{ lineHeight: type.b2.lineHeight }}>
+          {title}
+        </Text>
+        <Text v="c1" color="t3" numberOfLines={size.subLines}>
+          {sub}
+        </Text>
+      </View>
+      <View style={{ ...size.send, backgroundColor: picked ? c.fill2 : c.fill, justifyContent: 'center' }}>
+        <Text v="c1" weight="700" color={picked ? 'ac' : 't1'}>
+          {picked ? PICKED_LABEL : PICK_LABEL}
+        </Text>
+      </View>
+    </Pressable>
+  )
+})
+
+/** A row that opens something else (the picker's 파일에서 고르기 and 링크 붙여넣기), in `.mrow`'s box. */
+export const MaterialNavRow = memo(function MaterialNavRow({ label, onPress }: { label: string; onPress: () => void }) {
+  const size = useListSize()
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{ flexDirection: 'row', gap: spacing[3], minHeight: 56, ...size.row }}>
+      <Text v="b1" weight="600" style={{ flex: 1, lineHeight: type.b2.lineHeight }}>
+        {label}
+      </Text>
+      <Icon name="chev" size={16} color="t3" />
+    </Pressable>
   )
 })
