@@ -1,31 +1,17 @@
-import { useState, type ReactNode } from 'react'
-import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native'
+import { useState } from 'react'
+import { Alert, Platform, View } from 'react-native'
 import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, PageModal, isChatAttachment, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
+import { GroupTitle, MaterialNavRow, MaterialPickRow, SECTION_LABEL } from '@/features/materials'
 import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
 import { pickDocument } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'
-import { Button, Text, TextField } from '@/shared/components'
-import { spacing, type, useColors } from '@/theme'
+import { Button, TextField } from '@/shared/components'
+import { spacing } from '@/theme'
 
 type Row = { id: string; title: string; meta: string }
 
-const LIST = { paddingTop: spacing[1], paddingHorizontal: spacing[5], gap: 6 }
-const ROW_MIN = 50
-const ROW_TEXT = { fontSize: type.h3.fontSize, lineHeight: type.b2.lineHeight }
 const ADD_BUTTON = { minHeight: 52, borderRadius: 26 }
-const SECTION_LABEL = { paddingTop: 10, paddingBottom: 2 }
-
-const RowLine = () => {
-  const c = useColors()
-  return <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: -1, height: StyleSheet.hairlineWidth, backgroundColor: c.line }} />
-}
-
-const PickerRow = ({ last, onPress, role, checked, label, children }: { last?: boolean; onPress: () => void; role: 'checkbox' | 'button'; checked?: boolean; label?: string; children: ReactNode }) => (
-  <Pressable accessibilityRole={role} accessibilityLabel={label} accessibilityState={role === 'checkbox' ? { checked } : undefined} onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: ROW_MIN }}>
-    {children}
-    {last ? null : <RowLine />}
-  </Pressable>
-)
+const OTHER_TITLE = '다른 곳에서'
 
 /** ChatPh0Picker: 자료 고르기 is a page-style modal (a close button, one 추가 button), also opened inside the approval form's own modal. */
 const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: () => void }) => {
@@ -35,8 +21,8 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
   const docs = useChatDocs()
   const bookmarks = useBookmarkList(true)
   const sections: { title: string; rows: Row[] }[] = [
-    { title: '마이 › 서류', rows: (docs.data ?? []).map((d) => ({ id: d.id, title: displayName(d.fileName), meta: docMeta(d) })) },
-    { title: '홈 › 북마크 공고', rows: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, title: `${p.company} · ${p.title}`, meta: postingMeta(p) })) },
+    { title: SECTION_LABEL.doc, rows: (docs.data ?? []).map((d) => ({ id: d.id, title: displayName(d.fileName), meta: docMeta(d) })) },
+    { title: SECTION_LABEL.bookmark, rows: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, title: `${p.company} · ${p.title}`, meta: postingMeta(p) })) },
   ]
   const toggle = (id: string) => setPicks((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))
   const done = (value: string) => {
@@ -73,7 +59,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
       footer={<Button label={pasting ? '넣기' : `${picks.length}개 추가`} disabled={pasting ? !text.trim() : !picks.length} onPress={pasting ? submit : add} style={ADD_BUTTON} />}
     >
       {pasting ? (
-        <View style={{ paddingHorizontal: spacing[4] }}>
+        <View style={{ paddingHorizontal: spacing[5] }}>
           <TextField
             value={text}
             onChangeText={setText}
@@ -87,45 +73,20 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
           />
         </View>
       ) : (
-        <View style={LIST}>
+        <View>
           {sections.map((sec) =>
             sec.rows.length ? (
-              <View key={sec.title} style={{ gap: LIST.gap }}>
-                <Text v="c1" color="t3" style={SECTION_LABEL}>
-                  {sec.title}
-                </Text>
+              <View key={sec.title}>
+                <GroupTitle label={sec.title} count={sec.rows.length} />
                 {sec.rows.map((r) => (
-                  <PickerRow key={r.id} role="checkbox" checked={picks.includes(r.id)} onPress={() => toggle(r.id)}>
-                    <View style={{ flex: 1, minWidth: 0 }}>
-                      <Text v="b1" numberOfLines={1} style={ROW_TEXT}>
-                        {r.title}
-                      </Text>
-                      <Text v="c1" color="t3" numberOfLines={1}>
-                        {r.meta}
-                      </Text>
-                    </View>
-                    {picks.includes(r.id) ? (
-                      <Text v="b1" weight="700" color="ac" style={ROW_TEXT}>
-                        ✓
-                      </Text>
-                    ) : null}
-                  </PickerRow>
+                  <MaterialPickRow key={r.id} title={r.title} sub={r.meta} picked={picks.includes(r.id)} onToggle={() => toggle(r.id)} />
                 ))}
               </View>
             ) : null,
           )}
-          <Text v="c1" color="t3" style={SECTION_LABEL}>
-            다른 곳에서
-          </Text>
-          {others.map(([label, onPress], n) => (
-            <PickerRow key={label} role="button" label={label} last={n === others.length - 1} onPress={onPress}>
-              <Text v="b1" style={[{ flex: 1 }, ROW_TEXT]}>
-                {label}
-              </Text>
-              <Text v="b2" color="t3">
-                ›
-              </Text>
-            </PickerRow>
+          <GroupTitle label={OTHER_TITLE} />
+          {others.map(([label, onPress]) => (
+            <MaterialNavRow key={label} label={label} onPress={onPress} />
           ))}
         </View>
       )}

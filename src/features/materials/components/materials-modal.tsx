@@ -25,11 +25,9 @@ const runAdd = (action: AddAction) => {
   router.push('/jobs')
 }
 
-/** `.emp`: MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError. The boards top-align the block (`padding-top: 120px`), they do not centre it. */
-const NOTE_TOP = 120
-
-const Note = ({ title, body, action, alert }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean }) => (
-  <View accessibilityRole={alert ? 'alert' : undefined} style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: 36, paddingTop: NOTE_TOP }}>
+/** MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError: centred between the tabs and the search field (the owner overrides the boards' top-aligned block). */
+const Note = ({ title, body, action, alert, bottom }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean; bottom: number }) => (
+  <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: bottom }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
       {title}
     </Text>
@@ -105,11 +103,11 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
       case 'loading':
         return <Loading />
       case 'error':
-        return <Note alert title={LOAD_ERROR.title} body={LOAD_ERROR.body} action={{ label: LOAD_ERROR.retry, onPress: list.refetch }} />
+        return <Note alert bottom={room.list} title={LOAD_ERROR.title} body={LOAD_ERROR.body} action={{ label: LOAD_ERROR.retry, onPress: list.refetch }} />
       case 'empty': {
-        if (view.empty === 'search') return <Note title={searchEmptyTitle(q)} body={SEARCH_EMPTY_BODY} />
+        if (view.empty === 'search') return <Note bottom={room.list} title={searchEmptyTitle(q)} body={SEARCH_EMPTY_BODY} />
         const empty = EMPTY[view.empty]
-        return <Note title={empty.title} body={empty.body} action={{ label: ADD_LABEL[empty.action], onPress: () => runAdd(empty.action) }} />
+        return <Note bottom={room.list} title={empty.title} body={empty.body} action={{ label: ADD_LABEL[empty.action], onPress: () => runAdd(empty.action) }} />
       }
       case 'list':
         return (

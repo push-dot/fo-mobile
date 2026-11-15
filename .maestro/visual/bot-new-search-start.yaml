@@ -9,9 +9,9 @@ tags:
     visible: "이름"
     timeout: 20000
 - tapOn: "회사, 공고, 링크로 찾아보세요"
-# 검색 닫기 only shows in the search state, so it proves the field took focus.
+# The name preview is hidden in the search state, so its absence proves the field took focus.
 - extendedWaitUntil:
-    visible: "검색 닫기"
+    notVisible: "이름"
     timeout: 10000
 # The simulator shows no software keyboard for a field that only took focus; typing one character brings it up, and erasing it
 # leaves the empty field the board draws above the keyboard.

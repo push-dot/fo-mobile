@@ -16,6 +16,8 @@ export const SECTION_LABEL: Record<MaterialSection, string> = { doc: '서류', b
 
 export const SEARCH_PLACEHOLDER = '자료 이름, 회사, 주소로 검색'
 export const SEND_LABEL = '보내기'
+export const PICK_LABEL = '선택'
+export const PICKED_LABEL = '선택됨'
 
 /** What the + menu (MaterialsAdd) and the empty states' buttons do. */
 export type AddAction = 'link' | 'upload' | 'browse'

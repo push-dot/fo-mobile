@@ -1,0 +1,27 @@
+appId: app.push.mobile
+name: PlanUpgradeClosed
+tags:
+  - visual
+---
+# The server has payments off (mock payments-closed): the plan page still shows the pay button, with no 준비 중 line.
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=consent-on,payments-closed"
+      READY: "새로 올라온 공고"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "Bot"
+      READY: "(계정 · .*|Push Bot)"
+- tapOn: "계정 · .*"
+- extendedWaitUntil:
+    visible: "Bot이 참고하는 내 정보"
+    timeout: 10000
+- tapOn: "PRO"
+- extendedWaitUntil:
+    visible: "ULTRA로 업그레이드"
+    timeout: 5000
+- assertNotVisible: ".*준비 중.*"
+- waitForAnimationToEnd
+- takeScreenshot: PlanUpgradeClosed
