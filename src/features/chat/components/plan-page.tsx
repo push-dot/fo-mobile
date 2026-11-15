@@ -4,7 +4,7 @@ import { radius, selectedRing, spacing, useColors } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { useChatAccount } from '../api/hooks'
-import { PLAN_FOOT, PLAN_HEADER, PLAN_NOTICES, PLAN_NOTICE_FOOT, PLAN_NOTICE_LINK } from '../constants'
+import { PLAN_HEADER } from '../constants'
 import { Appear } from './motion'
 import PageModal from './page-modal'
 
@@ -108,44 +108,8 @@ export const PlanPage = () => {
             ))}
           </View>
           <LinkRow label="크레딧 구매" onPress={pay(() => purchase.buyCredits())} />
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing[1], paddingTop: 14, paddingHorizontal: spacing[6] }}>
-            <Text v="c1" color="t3">
-              {PLAN_FOOT}
-            </Text>
-            <Pressable accessibilityRole="link" onPress={() => router.push('/plan-notice')} hitSlop={spacing[2]}>
-              <Text v="c1" color="t3" style={{ textDecorationLine: 'underline' }}>
-                {PLAN_NOTICE_LINK}
-              </Text>
-            </Pressable>
-          </View>
         </Appear>
       ) : null}
     </PageModal>
   )
 }
-
-// The board's rows: 10 between the dot and the line, 16 between rows, 24pt lines; the foot sits 8 lower than a row gap.
-const NOTICE_LINE = 24
-
-/** 구독 안내 (PlanNotice): the long notice, one page. */
-export const PlanNoticePage = () => (
-  <PageModal title="구독 안내" tight nav left={<GlassButton actions={[...back]} />}>
-    <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[6], gap: spacing[4] }}>
-      {PLAN_NOTICES.map((line) => (
-        <View key={line} style={{ flexDirection: 'row', gap: 10 }}>
-          {/* The dot is its own glyph, 8.09 pt at 15px (board 8.1): the line starts at x42.1 and its column is 335.9, so "해지해도 남은" (338.1) wraps and "철회할 수 있어요." (335.7) holds. */}
-          {/* Fixed at the glyph's 8.1: the measured box rounds up to 8.33 on the pixel grid and the column would lose 0.25 pt of the 0.1 pt the third item has. */}
-          <Text v="b2" color="t3" style={{ width: 8.1 }}>
-            ·
-          </Text>
-          <Text v="b2" color="t2" style={{ flex: 1, lineHeight: NOTICE_LINE }}>
-            {line}
-          </Text>
-        </View>
-      ))}
-      <Text v="c1" color="t3" style={{ marginTop: spacing[2] }}>
-        {PLAN_NOTICE_FOOT}
-      </Text>
-    </View>
-  </PageModal>
-)

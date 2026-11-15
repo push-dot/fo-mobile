@@ -2,7 +2,7 @@ import type { LinkKind } from '@push/api-client'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { View } from 'react-native'
-import { LINK_KIND_LABEL, PageModal, kindOf } from '@/features/chat'
+import { fullLinkUrl, LINK_KIND_LABEL, PageModal, kindOf } from '@/features/chat'
 import { useAddLink } from '@/features/my'
 import { Button, Chip, GlassButton, Switch, Text, TextField } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
@@ -19,7 +19,7 @@ export const MaterialLinkAddPage = () => {
   const [picked, setPicked] = useState<LinkKind | null>(null)
   const [aiRead, setAiRead] = useState(true)
   const kind = picked ?? (url.trim() ? kindOf(url) : null)
-  const full = /^https?:\/\//.test(url.trim()) ? url.trim() : `https://${url.trim()}`
+  const full = fullLinkUrl(url, picked)
   const valid = /^https?:\/\/[^\s@/]+\.[^\s@]+$/.test(full)
   const add = useAddLink(() => {
     refresh()
@@ -36,7 +36,7 @@ export const MaterialLinkAddPage = () => {
         <Text v="b2" color="t3">
           {LINK_ADD.hint}
         </Text>
-        <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" autoFocus accessibilityLabel="링크 주소" />
+        <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" minHeight={54} autoFocus accessibilityLabel="링크 주소" />
         <View style={{ gap: spacing[2] }}>
           <Text v="c1" weight="700" color="t3">
             {LINK_ADD.kind}

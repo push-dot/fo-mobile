@@ -217,7 +217,7 @@ const DocsTab = () => {
               accessibilityRole="button"
               accessibilityLabel="취소"
               onPress={cancel}
-              style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
+              style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
             >
               <Icon name="x" size={20} color="t3" />
             </Pressable>

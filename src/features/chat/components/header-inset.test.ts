@@ -21,7 +21,7 @@ describe('PageModal nav prop', () => {
     expect(read('usage-page.tsx')).not.toMatch(/<PageModal[^>]*\bnav\b/)
   })
 
-  it('marks only the plan pages (PlanUltra, PlanUltraNotice) as nav', () => {
-    expect(read('plan-page.tsx').match(/\bnav\b\s*(?:\n|left=)/g)).toHaveLength(2)
+  it('marks only the plan page (PlanUltra, PlanUpgrade) as nav', () => {
+    expect(read('plan-page.tsx').match(/\bnav\b\s*(?:\n|left=)/g)).toHaveLength(1)
   })
 })

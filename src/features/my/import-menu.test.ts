@@ -18,5 +18,6 @@ describe('showImportMenu', () => {
     expect(request.title).toBe('서류 가져오기')
     expect(request.message).toBeUndefined()
     expect(request.items.map((item: { label: string }) => item.label)).toEqual(['파일에서 고르기', 'Bot 채팅에서 새로 만들기'])
+    expect(request.items.map((item: { chevron?: boolean }) => item.chevron)).toEqual([true, true])
   })
 })

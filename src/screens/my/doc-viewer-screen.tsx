@@ -1,6 +1,5 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
-import { ScrollView, useWindowDimensions, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile, useStartChat } from '@/features/chat'
 import {
@@ -14,109 +13,100 @@ import {
 } from '@/features/my'
 import { CtaBar, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
-import { counterPill, onAccent, palette, spacing, type, useColors } from '@/theme'
+import { counterPill, onAccent, palette, paperPage, spacing, useColors } from '@/theme'
 
-// The paper is drawn for a 330 wide column (the board's card) and zoomed to the screen width: file viewer mode (DocViewer, owner 2026-11-15).
-const PAPER_WIDTH = 330
+// DocViewer draws each page as a white A4 card 6 in from the screen edge, text at its natural size (file viewer mode, owner 2026-11-15).
+const PAGE_INSET = 6
+const PAGE_GAP = 10
+const PAGE_PAD_X = 24
+const PAGE_PAD_Y = 30
+const A4 = 1.414
 const TITLE_MAX_WIDTH = 168
 // The page counter floats over the paper, centred above the CTA bar (DocViewer: 28pt pill, 92pt over the home indicator).
 const COUNTER_BOTTOM = 92
 const COUNTER_HEIGHT = 28
 const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
+// The board sets 4pt under the TopBar before the first page.
+const PAGE_TOP = 4
 
 const sheet = palette.light
-const SMALL_LINE = type.c2.lineHeight
-const JOB_LINE = type.c1.lineHeight
-// CoreText lays the 12pt intro 0.23pt wider than the board's WebKit (290.23 in a 290pt column), which drops its last word to a third line.
-const LINE_OVERHANG = { marginRight: -1 }
+// WebKit's line box of the board's 13, 14.5 and 22px text: 1.448 of the size.
+const LINE = { name: 31.9, small: 18.8, body: 21, bullet: 20 }
 
 const Bars = ({ widths }: { widths: readonly number[] }) =>
   widths.map((w) => (
-    <View key={w} style={{ width: `${w}%`, height: 5, borderRadius: 3, backgroundColor: sheet.deco, opacity: 0.55 }} />
+    <View key={w} style={{ width: `${w}%`, height: 6, borderRadius: 3, backgroundColor: sheet.deco, opacity: 0.55 }} />
   ))
+
+const pageStyle = { width: '100%', aspectRatio: 1 / A4, backgroundColor: sheet.paper, borderRadius: 3 } as const
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
   const p = d.profile
   const head = (t: string) => (
     <Text
-      v="tab"
+      v="c1"
       weight="800"
-      style={{ color: sheet.acText, lineHeight: 17, borderBottomWidth: 1, borderBottomColor: sheet.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
+      style={{ color: sheet.acText, lineHeight: LINE.small, borderBottomWidth: 1, borderBottomColor: sheet.line, paddingBottom: spacing[1], marginTop: spacing[1] }}
     >
       {t}
     </Text>
   )
   return (
-    <View
-      accessibilityLabel={`${p.displayName} 서류 미리보기`}
-      style={{
-        width: '100%',
-        minHeight: PAPER_WIDTH * 1.414,
-        backgroundColor: sheet.paper,
-        paddingVertical: spacing[6],
-        paddingHorizontal: spacing[5],
-        gap: spacing[2],
-      }}
-    >
-      <Text v="h3" weight="800" style={{ color: sheet.t1, lineHeight: 25 }}>
-        {p.displayName}
-      </Text>
-      <Text v="tab" weight="400" style={{ color: sheet.t3, lineHeight: SMALL_LINE }}>
-        {[d.email, ...d.links].filter(Boolean).join(' · ')}
-      </Text>
-      <Text v="c2" style={{ color: sheet.t2, lineHeight: 17, ...LINE_OVERHANG }}>
-        {p.intro}
-      </Text>
-      {head(PREVIEW_HEADINGS[0])}
-      {p.careers.map((cr, i) => (
-        <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: spacing[2], marginTop: i ? 2 : 0 }}>
-          <Text v="c2" weight="700" style={{ color: sheet.t1, lineHeight: JOB_LINE }}>
-            {cr.company} · {cr.role}{' '}
-            <Text v="c2" weight="500" style={{ color: sheet.t3 }}>
-              {cr.startedOn.replace('-', '.')} – {cr.endedOn?.replace('-', '.') ?? '현재'}
+    <View style={{ marginHorizontal: PAGE_INSET, marginTop: PAGE_TOP, gap: PAGE_GAP }}>
+      <View
+        accessibilityLabel={`${p.displayName} 서류 미리보기`}
+        style={{ ...pageStyle, boxShadow: paperPage.lifted, paddingVertical: PAGE_PAD_Y, paddingHorizontal: PAGE_PAD_X, gap: spacing[2] }}
+      >
+        <Text v="h3" weight="800" style={{ color: sheet.t1, fontSize: 22, lineHeight: LINE.name }}>
+          {p.displayName}
+        </Text>
+        <Text v="c1" weight="400" style={{ color: sheet.t3, lineHeight: LINE.small }}>
+          {[d.email, ...d.links].filter(Boolean).join(' · ')}
+        </Text>
+        <Text v="b2" weight="400" style={{ color: sheet.t2, fontSize: 14.5, lineHeight: LINE.body }}>
+          {p.intro}
+        </Text>
+        {head(PREVIEW_HEADINGS[0])}
+        {p.careers.map((cr, i) => (
+          <View key={`${cr.company}-${cr.startedOn}`} style={{ gap: spacing[2], marginTop: i ? 2 : 0 }}>
+            <Text v="b2" weight="700" style={{ color: sheet.t1, fontSize: 14.5, lineHeight: LINE.body }}>
+              {cr.company} · {cr.role}{' '}
+              <Text v="b2" weight="500" style={{ color: sheet.t3, fontSize: 14.5 }}>
+                {cr.startedOn.replace('-', '.')} – {cr.endedOn?.replace('-', '.') ?? '현재'}
+              </Text>
             </Text>
-          </Text>
-          {cr.description ? (
-            <Text v="tab" weight="400" style={{ color: sheet.t2, lineHeight: SMALL_LINE, ...LINE_OVERHANG }}>
-              {cr.description
-                .split('\n')
-                .filter(Boolean)
-                .map((line) => `· ${line}`)
-                .join('\n')}
+            {cr.description ? (
+              <Text v="b2" weight="400" style={{ color: sheet.t2, fontSize: 13.5, lineHeight: LINE.bullet }}>
+                {cr.description
+                  .split('\n')
+                  .filter(Boolean)
+                  .map((line) => `· ${line}`)
+                  .join('\n')}
+              </Text>
+            ) : (
+              <Bars widths={CAREER_BARS} />
+            )}
+          </View>
+        ))}
+        {head(PREVIEW_HEADINGS[1])}
+        {d.projects?.length ? (
+          d.projects.map((project) => (
+            <Text key={project} v="c1" weight="400" style={{ color: sheet.t2, lineHeight: LINE.small }}>
+              {project}
             </Text>
-          ) : (
-            <Bars widths={CAREER_BARS} />
-          )}
-        </View>
-      ))}
-      {head(PREVIEW_HEADINGS[1])}
-      {d.projects?.length ? (
-        d.projects.map((project) => (
-          <Text key={project} v="tab" weight="400" style={{ color: sheet.t2, lineHeight: SMALL_LINE }}>
-            {project}
-          </Text>
-        ))
-      ) : (
-        <Bars widths={PROJECT_BARS} />
-      )}
-      {head(PREVIEW_HEADINGS[2])}
-      <Text v="tab" weight="400" style={{ color: sheet.t2, lineHeight: 17 }}>
-        {p.skills.join(' · ')}
-      </Text>
-    </View>
-  )
-}
-
-const ZoomedPaper = ({ d }: { d: ResumeDraft }) => {
-  const { width } = useWindowDimensions()
-  const [height, setHeight] = useState(0)
-  const scale = width / PAPER_WIDTH
-  return (
-    <View style={{ width, height: height * scale }}>
-      <View onLayout={(e) => setHeight(e.nativeEvent.layout.height)} style={{ width: PAPER_WIDTH, transform: [{ scale }], transformOrigin: 'top left' }}>
-        <Paper d={d} />
+          ))
+        ) : (
+          <Bars widths={PROJECT_BARS} />
+        )}
+        {head(PREVIEW_HEADINGS[2])}
+        <Text v="c1" weight="400" style={{ color: sheet.t2, lineHeight: LINE.small }}>
+          {p.skills.join(' · ')}
+        </Text>
       </View>
+      {Array.from({ length: Math.max((d.pageCount ?? 1) - 1, 0) }, (_, i) => (
+        <View key={i} style={{ ...pageStyle, boxShadow: paperPage.ring }} />
+      ))}
     </View>
   )
 }
@@ -153,7 +143,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
       />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         {d ? (
-          <ZoomedPaper d={d} />
+          <Paper d={d} />
         ) : draft.isPending ? (
           <Skeleton width="100%" height={420} radius={0} />
         ) : (

@@ -105,9 +105,9 @@ const ProfileTab = ({ share = true }: { share?: boolean }) => {
           ))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
-          <Button label="기본 정보 편집" variant="secondary" size="sm" onPress={() => edit('basic')} />
+          <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
           {share ? (
-            <Button label="공유" variant="secondary" size="sm" onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })} />
+            <Button label="공유" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })} />
           ) : null}
         </View>
       </View>
