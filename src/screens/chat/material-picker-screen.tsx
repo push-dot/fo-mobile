@@ -19,8 +19,8 @@ const RowLine = () => {
   return <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: -1, height: StyleSheet.hairlineWidth, backgroundColor: c.line }} />
 }
 
-const PickerRow = ({ last, onPress, role, checked, children }: { last?: boolean; onPress: () => void; role: 'checkbox' | 'button'; checked?: boolean; children: ReactNode }) => (
-  <Pressable accessibilityRole={role} accessibilityState={role === 'checkbox' ? { checked } : undefined} onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: ROW_MIN }}>
+const PickerRow = ({ last, onPress, role, checked, label, children }: { last?: boolean; onPress: () => void; role: 'checkbox' | 'button'; checked?: boolean; label?: string; children: ReactNode }) => (
+  <Pressable accessibilityRole={role} accessibilityLabel={label} accessibilityState={role === 'checkbox' ? { checked } : undefined} onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: ROW_MIN }}>
     {children}
     {last ? null : <RowLine />}
   </Pressable>
@@ -116,7 +116,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
             다른 곳에서
           </Text>
           {others.map(([label, onPress], n) => (
-            <PickerRow key={label} role="button" last={n === others.length - 1} onPress={onPress}>
+            <PickerRow key={label} role="button" label={label} last={n === others.length - 1} onPress={onPress}>
               <Text v="b1" style={[{ flex: 1 }, ROW_TEXT]}>
                 {label}
               </Text>
