@@ -36,7 +36,7 @@ export const MaterialLinkAddPage = () => {
         <Text v="b2" color="t3">
           {LINK_ADD.hint}
         </Text>
-        <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" minHeight={54} autoFocus accessibilityLabel="링크 주소" />
+        <TextField placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" minHeight={54} autoFocus accessibilityLabel="링크 주소" />
         <View style={{ gap: spacing[2] }}>
           <Text v="c1" weight="700" color="t3">
             {LINK_ADD.kind}
