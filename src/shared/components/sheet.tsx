@@ -22,6 +22,8 @@ type Props = {
   actionGap?: number
   /** iOS filter sheets (.ifoot .btn): a 52 high CTA with 26 under it instead of 56 with 20, the same 78 of footer. */
   slimAction?: boolean
+  /** iOS: extra space under the action, for a board that draws the sheet taller than the 26 under a slim CTA (PushDocRename: 38). */
+  bottomExtra?: number
   onLayout?: ViewProps['onLayout']
   /** Drawn to the top of the screen (route with fullSheetOptions): fills the sheet and keeps the CTA at the bottom. */
   full?: boolean
@@ -40,7 +42,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP, actionGap, slimAction, onLayout, full, attached, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, onLayout, full, attached, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -71,7 +73,7 @@ const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP
           ? insets.bottom + spacing[3]
           : full
             ? homeInset + spacing[3]
-            : (insets.bottom || (homeInset ? 0 : spacing[5])) + (slimAction ? SLIM_ACTION_BOTTOM : 0),
+            : (insets.bottom || (homeInset ? 0 : spacing[5])) + (slimAction ? SLIM_ACTION_BOTTOM : 0) + bottomExtra,
         gap,
       }}
     >

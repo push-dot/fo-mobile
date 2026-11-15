@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
 import { displayName, extensionOf } from '@/shared/utility/display-name'
 import { hitSlopTo, spacing, useColors } from '@/theme'
@@ -9,6 +9,9 @@ import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, t
 
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 18
+// The board's sheet starts 4 higher on the title (centre 43 under the top, not 47) and ends 38 under the CTA, not 26: the floating sheet sits at 866 on both, so the top lands 8 higher.
+const RENAME_TITLE_LIFT = -4
+const RENAME_BOTTOM_EXTRA = 12
 
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
@@ -31,8 +34,8 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
     })
   }
   return (
-    <Sheet gap={spacing[1]} actionGap={10} slimAction action={{ label: DOC_RENAME_COPY.save, onPress: save, disabled: current === undefined || !value.trim() || over || rename.isPending }}>
-      <View style={{ minHeight: 52, justifyContent: 'center' }}>
+    <Sheet gap={spacing[1]} actionGap={10} slimAction bottomExtra={RENAME_BOTTOM_EXTRA} action={{ label: DOC_RENAME_COPY.save, onPress: save, disabled: current === undefined || !value.trim() || over || rename.isPending }}>
+      <View style={{ minHeight: 52, justifyContent: 'center', marginTop: Platform.OS === 'ios' ? RENAME_TITLE_LIFT : 0 }}>
         <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {source ? DOC_RENAME_COPY.fileTitle : DOC_RENAME_COPY.title}
         </Text>
