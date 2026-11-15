@@ -6,11 +6,11 @@ type Frame = BotContract.StreamEvent
 
 /** The draft a resumed chat shows with its offer (ChatResume): markdown, as the bot writes it. */
 export const DRAFT_V1_MD = [
-  '**김서준 · 백엔드 개발자**',
-  '**모아페이 · 백엔드 엔지니어 · 2022.03–현재**',
+  '# 김서준 · 백엔드 개발자',
+  '### 모아페이 · 백엔드 엔지니어 · 2022.03–현재',
   '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms',
   '• Kafka 기반 결제 이벤트 파이프라인 구축',
-  '[초안 전체 보기](/docs/push/d1) ›',
+  '> [초안 전체 보기](/docs/push/d1) ›',
 ].join('\n')
 
 /** A message with these words makes the mock bot ask to open a page instead of answering. */

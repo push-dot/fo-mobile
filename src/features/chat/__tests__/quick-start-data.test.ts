@@ -91,8 +91,8 @@ describe('quickStartFrom (real mode)', () => {
   })
 
   it('formats 자료 고르기 row meta', () => {
-    expect(docMeta({ fileName: '이력서.pdf', size: 2_400_000, createdAt: '2026-10-12T09:00:00' })).toBe('PDF · 2.4MB · 10월 12일')
-    expect(docMeta({ fileName: '경력.docx', size: 640_000, createdAt: '2026-09-28T09:00:00' })).toBe('DOCX · 640KB · 9월 28일')
+    expect(docMeta({ size: 2_400_000, createdAt: '2026-10-12T09:00:00' })).toBe('2.4MB · 10월 12일')
+    expect(docMeta({ size: 640_000, createdAt: '2026-09-28T09:00:00' })).toBe('640KB · 9월 28일')
     expect(postingMeta(posting('a', '2026-11-03'), new Date('2026-10-21T09:00:00'))).toBe('서울 강남구 · 경력 4–6년 · D-13')
     expect(postingMeta(posting('a', null, { careerMin: 0, careerMax: null }))).toBe('서울 강남구 · 신입')
   })

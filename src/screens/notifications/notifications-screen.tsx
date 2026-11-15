@@ -50,7 +50,8 @@ const NotificationsScreen = () => {
         bar={{
           title: '알림',
           onBack: () => router.back(),
-          right: <Button label="모두 읽음" variant="secondary" size="sm" glass style={{ minHeight: button }} disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
+          pillRight: true,
+          right: <Button label="모두 읽음" variant="secondary" size="sm" glass paddingX={18} style={{ minHeight: button }} disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
         }}
       >
         {({ topInset, onScroll }) => (

@@ -92,7 +92,7 @@ describe('bot:<id>:thread and :done', () => {
   it('answers ChatBotStatusDone with the board text: a paragraph and two items', async () => {
     seedThread('b-moa', 'done')
     const text = (await turns())[0]!.assistant!.text
-    expect(splitBotText(text).map((b) => (b.kind === 'paragraph' ? b.text.slice(0, 8) : b.kind === 'table' ? b.rows.length : b.kind === 'link' ? 0 : b.items.length))).toEqual(['경력 섹션 3줄', 2])
+    expect(splitBotText(text).map((b) => (b.kind === 'paragraph' ? b.text.slice(0, 8) : b.kind === 'table' ? b.rows.length : b.kind === 'link' || b.kind === 'heading' || b.kind === 'sub' ? 0 : b.items.length))).toEqual(['경력 섹션 3줄', 2])
   })
 })
 

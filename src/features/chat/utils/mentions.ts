@@ -28,6 +28,6 @@ export const filterMentions = (groups: MentionGroup[], query: string) =>
     })
     .filter((g) => g.items.length > 0)
 
-const MENTION_RESERVE = 56 + 16 + 130
+const MENTION_RESERVE = 56 + 8 + 130
 
 export const mentionMaxHeight = (windowHeight: number, insetTop: number, below: number) => Math.max(160, windowHeight - insetTop - below - MENTION_RESERVE)

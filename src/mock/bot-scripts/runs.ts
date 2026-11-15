@@ -49,13 +49,13 @@ const DOC = 'd1'
 export const RESUME = '김서준_백엔드_이력서_2026.pdf'
 export const MOA = '모아페이 · 백엔드 엔지니어'
 export const PROFILE_TODO = ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장']
-export const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'PDF로 만들기']
+export const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'Push 프로필 만들기']
 const FILE_TODO = TODO
 export const PROFILE_TASK = '프로필 수정 · Push 프로필 · 경력'
 const FILE_PAGE = 'A4 1쪽 · 186KB'
 // The server's save flag: a card with no savedLine means the save failed (never drawn).
 const FILE_SAVED = '저장됨'
-export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'PDF로 만들기']
+export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필 만들기']
 const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
@@ -341,7 +341,7 @@ const ph3Open: Step[] = [
 ]
 const paper = s(300, {
   type: 'paper', id: 'paper', label: '이력서 초안 v1', heading: '김서준 · 백엔드 개발자',
-  lines: ['모아페이 · 백엔드 엔지니어 · 2022.03–현재', '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms', '• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을'],
+  lines: ['모아페이 · 백엔드 엔지니어 · 2022.03–현재', '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms', '• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을…'],
 })
 const DRAFT_REVIEW_MD = [
   '첫 번째 초안(v1)을 만들었어요.',
@@ -594,12 +594,11 @@ const statusApprove: Step[] = [
 // Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
 export const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('NOT_CONFIGURED'),
-  // ChatBotStatusError: the run broke with a reason the app has no sentence for, so the status line carries it.
-  'err-disconnect': fail('DISCONNECTED', { reason: '연결 끊김' }),
+  'err-disconnect': fail('DISCONNECTED', { reason: '연결이 끊겼어요' }),
   'err-credit': fail('INSUFFICIENT_CREDITS'),
   'err-other': [s(300, agent('좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('UNKNOWN')],
   'ext-done': ext({}),
-  'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'PDF로 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
+  'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'Push 프로필 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
   'ext-nosave': ext({ saved: false }),
   'ext-ok': ext({ josa: '으로', bare: true }),
   'ext-fail': ext({ josa: '으로', saved: false, bare: true }),

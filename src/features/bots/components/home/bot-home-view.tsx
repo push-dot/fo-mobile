@@ -11,7 +11,7 @@ import { isXlScale } from '@/shared/components/xl-chrome'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
-import { accountPath, botChatAtPath, botChatPath, botNewPath, botProfilePath, materialsPath } from '../../utils/paths'
+import { accountPath, botChatAtPath, botChatPath, botProfilePath, materialsPath } from '../../utils/paths'
 import BotHomeBar from './bot-home-bar'
 import BotHomeError from './bot-home-error'
 import BotHomeHeader from './bot-home-header'
@@ -142,7 +142,6 @@ const BotHomeView = ({
         label={accountLabel(accountName, plan)}
         name={accountName}
         onAccount={() => router.push(accountPath())}
-        onNew={() => router.push(botNewPath())}
       />
       {searching ? (
         <BotHomeSearch
@@ -152,7 +151,7 @@ const BotHomeView = ({
           local={local}
           now={now}
           chrome={chrome}
-          top={top}
+          top={insets.top + chrome.searchTop}
           bottom={lift + chrome.control}
           bots={bots ?? []}
           onOpenBot={openChat}

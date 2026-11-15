@@ -8,6 +8,8 @@ import FilterOptions from './filter-options'
 import FilterRegions from './filter-regions'
 import FilterSkills from './filter-skills'
 
+const REGION_SLOT = 44
+
 type Props = {
   kind: FilterKey
   draft: Filters
@@ -42,10 +44,11 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
         <FilterSheetNav title={FILTER_TITLES[kind]} onReset={reset} />
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: compact ? 52 : undefined }}>
-          <Text v="h2" accessibilityRole="header">
+          <View style={{ width: REGION_SLOT }} />
+          <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
             {FILTER_TITLES[kind]}
           </Text>
-          <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }}>
+          <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }} style={{ width: REGION_SLOT, alignItems: 'flex-end' }}>
             {/* The region sheet (.sheet2.rg) draws 13 regular in the accent; Android keeps the bold accent. */}
             <Text v="c1" weight={ios ? '400' : '700'} color={ios ? 'ac' : 'acText'}>
               초기화

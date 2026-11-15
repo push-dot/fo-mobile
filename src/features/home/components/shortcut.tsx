@@ -36,7 +36,7 @@ const Shortcut = ({ label, icon, glow, opacity, href }: (typeof SHORTCUTS)[numbe
         style={{
           position: 'absolute',
           right: 6,
-          bottom: 4,
+          bottom: 9,
           transform: [{ rotate: '-8deg' }],
           ...(Platform.OS === 'ios' ? shadow.icon : androidIconShadow(shadow.icon)),
         }}

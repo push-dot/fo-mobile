@@ -15,6 +15,10 @@ tags:
     visible: "피드백을 반영해서 수정할까요?"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: "피드백만 받을게요"
 - takeScreenshot: ChatPh1Feedback
 # Each phase board draws its thread under its own user line and without the earlier phases, so each one jumps there in a fresh conversation (mock tokens).
 - runFlow: _fresh_company.yaml
@@ -27,6 +31,10 @@ tags:
     visible: "이 전략대로 초안을 쓸까요?"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: "네, 맞춰서 고쳐 주세요"
 - takeScreenshot: ChatPh2
 - tapOn: ".*초안 쓸게요"
 - extendedWaitUntil:
@@ -45,6 +53,10 @@ tags:
     visible: "점수를 한 번 더 올릴까요?"
     timeout: 40000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*좋아요, 계속해 주세요.*"
 - runFlow: _chat_bottom.yaml
 - takeScreenshot: ChatPh3Boost
 # ChatPh3BoostStop draws two stops under the same boost line (panel 1 and 2 are the first on iOS light and dark, panel 3 the second on Android, so the shots are .1 and .3): all five rounds used,

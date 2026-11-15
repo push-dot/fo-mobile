@@ -1,9 +1,9 @@
 appId: app.push.mobile
-name: 회사 봇 · 오류 상태 줄 (작업 중 문제가 생겼어요 · 연결 끊김)
+name: 회사 봇 · 오류 말풍선 (작업 중 문제가 생겼어요. 연결이 끊겼어요. 다시 해 볼까요?)
 tags:
   - visual
 ---
-# run:err-disconnect makes the next message end in an error frame with the reason 연결 끊김 (ChatBotStatusError).
+# run:err-disconnect makes the next message end in an error frame with the reason 연결이 끊겼어요, which the bubble says in one sentence (ChatBotStatusError).
 - runFlow:
     file: _login_mock.yaml
     env:

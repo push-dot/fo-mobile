@@ -74,9 +74,9 @@ const Bubble = ({
             accessibilityRole="button"
             accessibilityLabel={`함께 보낸 공고 ${posting.company} ${posting.title}`}
             onPress={posting.onPress}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], marginTop: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.bg, borderWidth: StyleSheet.hairlineWidth, borderColor: c.line }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, paddingVertical: spacing[3], paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: c.bg }}
           >
-            <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={{ flexShrink: 1, minWidth: 0 }}>
               <Text v="b2" weight="700" numberOfLines={1}>
                 {posting.title}
               </Text>
@@ -84,7 +84,8 @@ const Bubble = ({
                 {posting.company}
               </Text>
             </View>
-            <Icon name="chev" size={18} color="t3" />
+            <Icon name="chev" size={16} color="t3" />
+            <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius.md, borderWidth: 1, borderColor: c.line }]} />
           </Pressable>
         ) : null}
       </Pressable>
@@ -216,8 +217,8 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
                 {m.day}
               </Text>
             ) : null}
-            <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
             {i === 0 ? posted : null}
+            <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
           </View>
         ))}
         {thread.length === 0 ? posted : null}

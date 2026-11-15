@@ -77,8 +77,8 @@ describe('applyTranscript', () => {
     expect(noticeBubble(noticeOf(stopped)).text).toBe('작업을 중지했어요. 어떻게 할지 알려 주세요.')
     const dropped = applyTranscript(open, { type: 'end', outcome: 'stopped', resumable: false })
     expect(noticeBubble(noticeOf(dropped)).text).toBe('중지했어요. 고치던 내용은 반영하지 않았어요.')
-    const failed = applyTranscript(open, { type: 'end', outcome: 'error', code: 'DISCONNECTED', reason: '연결 끊김' })
-    expect(noticeBubble(noticeOf(failed))).toEqual({ text: '작업 중 문제가 생겼어요', detail: '연결 끊김' })
+    const failed = applyTranscript(open, { type: 'end', outcome: 'error', code: 'DISCONNECTED', reason: '연결이 끊겼어요' })
+    expect(noticeBubble(noticeOf(failed))).toEqual({ text: '작업 중 문제가 생겼어요. 연결이 끊겼어요. 다시 해 볼까요?' })
     expect(applyTranscript(stopped, { type: 'end', outcome: 'done' })).toBe(stopped)
   })
 
