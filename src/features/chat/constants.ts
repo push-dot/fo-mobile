@@ -33,9 +33,6 @@ export const HINTLESS_GATES = ['validate_cap']
 export const STOPPING_TEXT = '중지하는 중'
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
-/** The edit card's waiting line names the edit it waits on, then this (ChatApprove). */
-export const EDIT_WAIT = { subject: '이력서 수정', tail: '확인을 기다리는 중' } as const
-
 export const FIT_ROWS = [
   { key: 'techStack', label: '기술 스택' },
   { key: 'experienceLink', label: '경험 연관성' },
@@ -43,12 +40,13 @@ export const FIT_ROWS = [
   { key: 'keyword', label: '키워드' },
   { key: 'domain', label: '도메인' },
 ] as const
-/** One line on the FREE lock (ChatPh1FitFree). */
-export const FIT_LOCKED = 'PRO에서 항목별 점수를 볼 수 있어요'
+/** The FREE lock under the fit sentence (ChatPh1FitFree). */
+export const FIT_LOCKED = '항목별 점수는 PRO에서 볼 수 있어요 ›'
 export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
-/** Decorative bar widths behind the FREE lock, from the design. */
-export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]
-export const fitProjected = (label: string) => `이렇게 고치면 ${label}`
+/** The ULTRA projection: the grey line that opens it, and its sentence once open (ChatPh1FitUltra, ChatPh1FitUltraOpen). */
+const subject = (label: string) => `${label}${(label.charCodeAt(label.length - 1) - 0xac00) % 28 ? '이' : '가'}`
+export const fitProjectedLink = (label: string) => `어떻게 고치면 ${subject(label)} 되는지 보기 ›`
+export const fitProjected = (label: string) => `이렇게 고치면 ${subject(label)} 돼요.`
 
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
@@ -105,7 +103,7 @@ export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 �
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
 /** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
-export const DEFAULT_DOC = '기본 프로필'
+export const DEFAULT_DOC = '허브 프로필'
 const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
@@ -162,27 +160,27 @@ const host = (url: string) => url.replace(/^https?:\/\//, '').split(/[/?#]/)[0] 
 // Order per feature-spec 15.1: what people do most first, social tasks last.
 export const QUICK_STARTS: QuickStart[] = [
   {
-    key: 'link', label: '공고 링크로 맞추기', icon: 'link', layout: 'link', action: '맞추기 시작', docLabel: '비교할 서류',
+    key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', docLabel: '기본 서류',
     title: '어떤 공고에 맞출까요?', description: '공고 링크를 붙여넣으면 내 서류를 그 공고에 맞춰 고쳐요.',
     start: (i) => (/^https?:\/\/\S+\.\S+/.test(i.url.trim()) ? opened(`${host(i.url)} 공고 맞춤`, `${i.url.trim()} 공고에 맞춰 ${eulReul(i.doc)} 고쳐 주세요`, 'match_posting', i.documentId) : null),
   },
   {
-    key: 'match', label: '나에게 맞는 공고 찾기', icon: 'target', layout: 'match', action: '공고 찾기',
+    key: 'match', label: '나에게 맞는 공고 찾기', icon: 'qs-match', layout: 'match', action: '공고 찾기',
     title: '이 조건으로 찾아볼까요?', description: '',
     start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
-    key: 'gap', label: '부족한 점 찾기', icon: 'glass', layout: 'pick', action: '부족한 점 찾기', docLabel: '비교할 서류',
+    key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '부족한 점 찾기', docLabel: '기준',
     title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해 부족한 점을 찾아요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 공고 갭 분석`, `${one(i)!.over} ${one(i)!.title} 공고와 ${eulReul(i.doc)} 비교해서 부족한 점을 찾아 주세요`, 'gaps', i.documentId),
   },
   {
-    key: 'fit', label: '적합도 보기', icon: 'chart', layout: 'pick', action: '적합도 보기', docLabel: '비교할 서류',
+    key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', docLabel: '기준',
     title: '어떤 공고로 볼까요?', description: '적합도를 보고, 점수가 오르도록 서류를 고쳐 드려요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고 기준으로 ${i.doc} 적합도를 봐 주세요`, 'fit', i.documentId),
   },
   {
-    key: 'boost', label: '점수 올리기', icon: 'chart', layout: 'pick', action: '점수 올리기 시작', docLabel: '올릴 서류', listLabel: '공고',
+    key: 'boost', label: '점수 올리기', icon: 'qs-boost', layout: 'pick', action: '점수 올리기 시작', docLabel: '올릴 서류', listLabel: '공고',
     title: '어떤 서류의 점수를 올릴까요?', description: '공고에 맞춰 서류를 여러 번 고치며 적합도 점수를 올려요. 최대 5번까지 해요.',
     start: (i) => {
       const job = one(i)
@@ -190,27 +188,27 @@ export const QUICK_STARTS: QuickStart[] = [
     },
   },
   {
-    key: 'deadline', label: '마감 임박 공고 정리', icon: 'bookmark', layout: 'deadline', action: '준비할 일 정리하기',
+    key: 'deadline', label: '마감 임박 공고 정리', icon: 'qs-deadline', layout: 'deadline', action: '준비할 일 정리하기',
     title: '마감 임박 공고', description: '북마크한 공고 중 일주일 안에 마감돼요. 준비할 일을 정리해 드려요.',
     start: (i) => opened('마감 임박 공고 정리', `마감 임박 공고 ${i.picked.length}개(${i.picked.map((p) => p.over).join(', ')})의 준비할 일을 정리해 주세요`, 'deadline_postings'),
   },
   {
-    key: 'status', label: '지원 현황 정리', icon: 'paper', layout: 'status', multi: true, action: (n) => `${n}개 정리하기`,
+    key: 'status', label: '지원 현황 정리', icon: 'qs-status', layout: 'status', multi: true, action: (n) => `${n}개 정리하기`,
     title: '어떤 지원을 정리할까요?', description: '단계별로 지금 상황과 다음에 할 일을 정리해요.',
     start: (i) => (i.picked.length ? opened('지원 현황 정리', `${i.picked.map((p) => p.over).join(', ')} 지원 현황을 정리하고 다음에 할 일을 알려 주세요`, 'applications') : null),
   },
   {
-    key: 'calendar', label: '캘린더 관리', icon: 'cal', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!.label,
+    key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!.label,
     title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗 일정을 한 캘린더에서 정리해요.',
     start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
   },
   {
-    key: 'hub', label: '허브 프로필 다듬기', icon: 'person', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', docLabel: '바탕이 될 서류',
+    key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', docLabel: '기본 서류',
     title: '어떤 부분을 다듬을까요?', description: '내 서류를 바탕으로 허브 프로필을 고쳐요. 바꾸기 전에 보여 드려요.',
-    start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `${eulReul(i.doc)} 바탕으로 허브 프로필의 ${i.picked.map((p) => p.title).join(', ')}을 다듬어 주세요`, 'hub_profile', i.documentId) : null),
+    start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `허브 프로필의 ${eulReul(i.picked.map((p) => p.title).join(', '))} 다듬어 주세요`, 'hub_profile', i.documentId) : null),
   },
   {
-    key: 'exp', label: '경험 만들기', icon: 'star', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기',
+    key: 'exp', label: '경험 만들기', icon: 'qs-experience', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기',
     title: '어떤 경험을 만들까요?', description: '최근 갭 분석에서 부족했던 경험이에요. 작은 프로젝트로 근거를 만들어요.',
     start: (i) => {
       const topic = i.custom.trim() || one(i)?.title
@@ -218,17 +216,17 @@ export const QUICK_STARTS: QuickStart[] = [
     },
   },
   {
-    key: 'reply', label: '제안 답장 쓰기', icon: 'mail', layout: 'reply',
+    key: 'reply', label: '제안 답장 쓰기', icon: 'qs-reply', layout: 'reply',
     title: '어떤 제안에 답장할까요?', description: '제안 내용과 내 프로필을 읽고 답장 초안을 써요.',
     start: (i) => one(i) && opened(`${one(i)!.title} 님 제안 답장`, `${one(i)!.title} 님의 제안 “${one(i)!.body}”에 보낼 답장 초안을 써 주세요`, 'offer_reply'),
   },
   {
-    key: 'coffee', label: '커피챗 제안 쓰기', icon: 'coffee', layout: 'pick', action: '제안 글 쓰기',
+    key: 'coffee', label: '커피챗 제안 쓰기', icon: 'qs-coffee', layout: 'pick', action: '제안 글 쓰기',
     title: '누구에게 제안할까요?', description: '상대 프로필과 내 경력을 읽고 제안 글을 써요.',
     start: (i) => one(i) && opened(`${one(i)!.title} 님께 커피챗`, `${one(i)!.title} 님에게 보낼 커피챗 제안 글을 써 주세요`, 'coffee_chat'),
   },
   {
-    key: 'post', label: '커리어 글 쓰기', icon: 'bubble', layout: 'cards', action: '초안 쓰기', custom: '직접 주제 정하기',
+    key: 'post', label: '커리어 글 쓰기', icon: 'qs-post', layout: 'cards', action: '초안 쓰기', custom: '직접 주제 정하기',
     title: '어떤 이야기를 쓸까요?', description: '내 활동에서 쓸 만한 주제를 골라 봤어요.',
     start: (i) => {
       const topic = i.custom.trim() || one(i)?.title

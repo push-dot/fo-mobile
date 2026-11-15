@@ -18,12 +18,12 @@ tags:
       TEXT: ".*품질 검사로 넘어가기.*"
 # The recommended fixes are applied without asking: the run says so, then the design card follows ten seconds later.
 - extendedWaitUntil:
-    visible: ".*추천 수정 3곳도 반영했어요.*"
+    visible: ".*추천 수정까지 반영했어요.*"
     timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh4Quality
 - extendedWaitUntil:
-    visible: "검증을 마쳤어요. 어떤 디자인을 적용할까요?"
+    visible: "검증을 마쳤어요. 디자인을 골라 주세요."
     timeout: 30000
 - waitForAnimationToEnd
 - tapOn: "프로필 사진 넣기"

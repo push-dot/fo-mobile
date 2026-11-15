@@ -3,9 +3,9 @@ import type { ChatItem } from '../../types'
 
 export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
 
-/** Red (the bot cannot be used, or the last run failed: ChatBotStatusError) wins over green (bot messages below the fold). */
-export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean }): HeaderLight =>
-  input.creditsOut ? 'limit' : input.failed ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
+/** Red (the bot cannot be used, the last run failed: ChatBotStatusError, or a modal waits for an answer: ChatApprove, ChatBotStatusHelp) wins over green (bot messages below the fold). */
+export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean; attention?: boolean }): HeaderLight =>
+  input.creditsOut ? 'limit' : input.failed || input.attention ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
 
 const failedItem = (item: ChatItem) =>
   item.type === 'error'

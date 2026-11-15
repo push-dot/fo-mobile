@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { fitChrome } from '../utils/fit-card'
 import { resultTask } from '../utils/result-card'
-import { FIT_TEASER } from '../constants'
+import { FIT_TEASER, fitProjected, fitProjectedLink } from '../constants'
 
 const card = { rows: [{ label: '기술 스택', score: 7.5 }], summary: '기술 스택은 잘 맞아요.', projected: { label: '8점대', bullets: ['Kafka를 맨 앞으로'] } }
 
@@ -24,6 +24,14 @@ describe('fit card by plan', () => {
 
   it('shows everything it got when the plan is unknown (mock and boost cards)', () => {
     expect(fitChrome({ rows: card.rows })).toEqual({ locked: false, summary: undefined, teaser: undefined, projected: undefined })
+  })
+})
+
+describe('ULTRA projection wording (ChatPh1FitUltra, ChatPh1FitUltraOpen)', () => {
+  it('puts the subject particle the label takes', () => {
+    expect(fitProjectedLink('8점대')).toBe('어떻게 고치면 8점대가 되는지 보기 ›')
+    expect(fitProjected('8점대')).toBe('이렇게 고치면 8점대가 돼요.')
+    expect(fitProjected('9점')).toBe('이렇게 고치면 9점이 돼요.')
   })
 })
 

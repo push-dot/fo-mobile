@@ -21,13 +21,12 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
     env:
       TEXT: "맞추기 시작"
 - extendedWaitUntil:
-    visible: "이 수정을 적용할까요?"
+    visible: "수정 적용"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-02
-# The approval panel slides up; a tap during the slide can land on 그대로 두기.
+# The edit modal slides up; its one 적용 button answers, the title 수정 적용 is not a tap target.
 - waitForAnimationToEnd
-# iOS reads the numbered option as one label, "1. 적용".
-- tapOn: ".*적용"
+- tapOn: "적용"
 - extendedWaitUntil:
     visible: "Push 프로필에 저장했어요.*"
     timeout: 60000

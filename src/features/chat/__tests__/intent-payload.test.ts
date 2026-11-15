@@ -21,9 +21,9 @@ describe('quick start intent payloads', () => {
   })
 
   it('writes the default hub profile with the right particle', () => {
-    expect(start('link', { url: 'https://moapay.com/jobs/1', doc: DEFAULT_DOC })?.message).toBe('https://moapay.com/jobs/1 공고에 맞춰 기본 프로필을 고쳐 주세요')
-    expect(start('gap', { picked: [job], doc: DEFAULT_DOC })?.message).toBe('모아페이 백엔드 공고와 기본 프로필을 비교해서 부족한 점을 찾아 주세요')
-    expect(start('hub', { picked: [{ id: 'headline', title: '헤드라인' }], doc: DEFAULT_DOC })?.message).toBe('기본 프로필을 바탕으로 허브 프로필의 헤드라인을 다듬어 주세요')
+    expect(start('link', { url: 'https://moapay.com/jobs/1', doc: DEFAULT_DOC })?.message).toBe('https://moapay.com/jobs/1 공고에 맞춰 허브 프로필을 고쳐 주세요')
+    expect(start('gap', { picked: [job], doc: DEFAULT_DOC })?.message).toBe('모아페이 백엔드 공고와 허브 프로필을 비교해서 부족한 점을 찾아 주세요')
+    expect(start('hub', { picked: [{ id: 'headline', title: '헤드라인' }], doc: DEFAULT_DOC })?.message).toBe('허브 프로필의 헤드라인을 다듬어 주세요')
   })
 
   it('sends find_postings in the seed sentence, with a document id only when one is picked', () => {
@@ -77,7 +77,7 @@ describe('quick start intent payloads', () => {
     })
     expect(start('hub', { doc: '이력서.pdf', documentId: DOC, picked: [{ id: 'h', title: '헤드라인' }, { id: 's', title: '소개' }] })).toEqual({
       title: '허브 프로필 다듬기',
-      message: '이력서.pdf를 바탕으로 허브 프로필의 헤드라인, 소개을 다듬어 주세요',
+      message: '허브 프로필의 헤드라인, 소개를 다듬어 주세요',
       intent: 'hub_profile',
       context: { documentId: DOC },
     })
