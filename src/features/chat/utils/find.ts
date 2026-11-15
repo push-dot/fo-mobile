@@ -42,7 +42,10 @@ export const prependOlder = (current: readonly ChatItem[], older: readonly ChatI
 }
 
 /** The thread from its first line of `type`: what came before counts as older turns. */
-export const fromFirst = (items: readonly ChatItem[], type: ChatItem['type']) => items.slice(Math.max(0, items.findIndex((item) => item.type === type)))
+export const fromFirst = (items: readonly ChatItem[], type: ChatItem['type'], nth: number | 'last' = 1) => {
+  const at = items.flatMap((item, i) => (item.type === type ? [i] : []))
+  return items.slice((nth === 'last' ? at.at(-1) : at[nth - 1]) ?? 0)
+}
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // The text component joins words with U+2060; a query typed without it still finds the word.
