@@ -1,7 +1,6 @@
 import type { BotContract, StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
-import { statusLineView } from '../utils/status-line'
-import { waitingLine } from '../utils/card'
+import { confirmModal } from '../utils/choice-sheet'
 import { mapEvent } from '../utils/stream'
 import { restoreBotTurns } from '../utils/turns'
 import type { Approval } from '../types'
@@ -21,18 +20,16 @@ const help: StreamEvent = {
 }
 
 describe('a choice card that carries its ask time (ChatBotStatusHelp)', () => {
-  it('opens a waiting line from the stamp and preselects nothing', () => {
+  it('keeps its ask time from the stamp and preselects nothing (the room then opens the modal)', () => {
     const card = approvalOf({ ...help, at: ASKED } as StreamEvent)
     expect(card.openedAt).toBe(Date.parse(ASKED))
     expect(card.sections[0]).toMatchObject({ selected: [] })
-    expect(waitingLine(card)).toMatchObject({ kind: 'waiting', for: 'answer', text: '답을 기다리고 있어요' })
   })
 
-  it('keeps its first pick, and no line, when the frame has no stamp', () => {
+  it('keeps its first pick when the frame has no stamp', () => {
     const card = approvalOf(help)
     expect(card.openedAt).toBeUndefined()
     expect(card.sections[0]).toMatchObject({ selected: [0] })
-    expect(waitingLine(card)).toBeNull()
   })
 
   it('keeps the recommended pick even when the frame is stamped', () => {
@@ -50,25 +47,13 @@ describe('the edit card (ChatApprove)', () => {
     options: [{ id: 'apply', label: '적용' }, { id: 'keep', label: '그대로 두기' }],
   }
 
-  it('names the edit in its waiting line, with no elapsed time', () => {
-    const card = approvalOf({ ...edit, at: ASKED } as StreamEvent)
-    const line = waitingLine(card)!
-    expect(line).toMatchObject({ for: 'confirm', text: '이력서 수정 · 확인을 기다리는 중', named: true })
-    expect(statusLineView(line, new Date(Date.parse(ASKED) + 90_000))).toMatchObject({ text: '이력서 수정 · 확인을 기다리는 중', tail: null })
+  it('is the modal: the title, the server summary as its message and 적용 as its one button', () => {
+    const card = approvalOf({ ...edit, title: '수정 적용', summary: '경력 섹션 3줄을 고쳤어요.' })
+    expect(confirmModal(card)).toEqual({ title: '수정 적용', message: '경력 섹션 3줄을 고쳤어요.', confirm: '적용' })
   })
 
-  it('takes the server summary as the subject when there is one', () => {
-    const card = approvalOf({ ...edit, summary: '자기소개서 수정', at: ASKED } as StreamEvent)
-    expect(card.waitText).toBe('자기소개서 수정 · 확인을 기다리는 중')
-  })
-
-  it('draws no line without a stamp', () => {
-    expect(waitingLine(approvalOf(edit))).toBeNull()
-  })
-
-  it('an ordinary waiting line still counts the seconds', () => {
-    const line = waitingLine(approvalOf({ ...help, at: ASKED } as StreamEvent))!
-    expect(statusLineView(line, new Date(Date.parse(ASKED) + 72_000))).toMatchObject({ tail: '1분 12초' })
+  it('has no message without a summary', () => {
+    expect(confirmModal(approvalOf(edit))).toEqual({ title: '이 수정을 적용할까요?', confirm: '적용' })
   })
 })
 

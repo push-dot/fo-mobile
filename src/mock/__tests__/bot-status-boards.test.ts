@@ -37,7 +37,7 @@ describe('company-bot status board tokens', () => {
 
   it('stops at a card that waits for an answer', () => {
     expect(frames('st-help').map((f) => f.type)).toEqual(['choice', 'done'])
-    expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '모아페이 채용 페이지를 열어도 될까요?' })
+    expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '채용 페이지 열기', summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?' })
   })
 
   it('refuses with the read-off notice', () => {
@@ -77,8 +77,8 @@ describe('bot:<id>:thread and :done', () => {
   it('stores the finished chat with its sources and no card to answer', async () => {
     seedThread('b-moa', 'thread')
     const all = await turns()
-    expect(all.map((t) => t.user?.text ?? null)).toEqual([null, '좋아요. 첫 번째부터 고쳐서 PDF로 보여 주세요'])
-    expect(all.at(-1)!.assistant?.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서.pdf'])
+    expect(all.map((t) => t.user?.text ?? null)).toEqual([null, '좋아요. 첫 번째부터 고쳐서 Push 프로필로 보여 주세요'])
+    expect(all.at(-1)!.assistant?.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서'])
     expect((await api.bots.get('b-moa')).activity).toBeNull()
   })
 
@@ -89,20 +89,20 @@ describe('bot:<id>:thread and :done', () => {
     expect(all[0]!.user?.text).toBe('모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요')
   })
 
-  it('answers ChatBotStatusDone with the board text: a paragraph, two items, the PDF sentence', async () => {
+  it('answers ChatBotStatusDone with the board text: a paragraph and two items', async () => {
     seedThread('b-moa', 'done')
     const text = (await turns())[0]!.assistant!.text
-    expect(splitBotText(text).map((b) => (b.kind === 'paragraph' ? b.text.slice(0, 8) : b.kind === 'table' ? b.rows.length : b.items.length))).toEqual(['경력 섹션 3줄', 2, 'PDF는 내 서'])
+    expect(splitBotText(text).map((b) => (b.kind === 'paragraph' ? b.text.slice(0, 8) : b.kind === 'table' ? b.rows.length : b.kind === 'link' ? 0 : b.items.length))).toEqual(['경력 섹션 3줄', 2])
   })
 })
 
 describe('bot:<id>:sent (BotPickSent)', () => {
-  it('stores one answer with a paragraph, a two-line list, a closing line and the 출처 row', async () => {
+  it('stores one answer with a paragraph, a two-line list and the 출처 row', async () => {
     seedThread('b-moa', 'sent')
     const all = (await api.bots.transcript('b-moa')).data
     expect(all).toHaveLength(1)
     expect(all[0]!.user).toBeNull()
-    expect(splitBotText(all[0]!.assistant!.text).map((b) => b.kind)).toEqual(['paragraph', 'list', 'paragraph'])
-    expect(all[0]!.assistant!.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서.pdf'])
+    expect(splitBotText(all[0]!.assistant!.text).map((b) => b.kind)).toEqual(['paragraph', 'list'])
+    expect(all[0]!.assistant!.sources.map((s) => s.title)).toEqual(['모아페이 채용 공고', '김서준_백엔드_이력서'])
   })
 })

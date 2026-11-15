@@ -2,7 +2,6 @@ import type { BotContract, StreamEvent, StreamOption } from '@push/api-client'
 import {
   CHOICE_QUESTION,
   DEFAULT_ERROR_TEXT,
-  EDIT_WAIT,
   ERROR_TEXT,
   FIT_ROWS,
   MULTI_PICK_SUBMIT,
@@ -37,6 +36,8 @@ type Ask = {
   tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt'>
   /** When a choice card was asked: the room draws 답을 기다리고 있어요 from then, and a card it waits on with no recommended answer preselects none (ChatBotStatusHelp). A frame with no stamp keeps no line. */
   since?: number
+  /** The server's line under a choice's title; only a help question (no recommended answer) shows it, as the message of its modal (ChatBotStatusHelp). */
+  detail?: string
 }
 
 const choiceOf = (o: StreamOption): Choice => ({
@@ -54,12 +55,13 @@ const autoPicks = (ev: Extract<StreamEvent, { type: 'choice' }>) => {
   return labels.length ? labels.join(', ') : (ev.submit.zeroLabel ?? recommended)
 }
 
-const ask = ({ id, question, options, multiple, warning, recommended, tool, since }: Ask): ChatEvent => {
+const ask = ({ id, question, options, multiple, warning, recommended, tool, since, detail }: Ask): ChatEvent => {
   const first = Math.max(0, options.findIndex((o) => o.id === recommended))
   const approval: Approval = {
     id,
     question,
     warning,
+    ...(detail && since !== undefined && recommended === undefined && !multiple ? { detail } : {}),
     submit: multiple ? MULTI_PICK_SUBMIT : undefined,
     optionIds: options.map((o) => o.id),
     sections: [{ kind: 'choices', selected: multiple || tool?.detail || (since !== undefined && recommended === undefined) ? [] : [first], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
@@ -94,14 +96,12 @@ const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id
 /** The edit card: preview of the change, then 그대로 두기 · 적용 side by side. */
 const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] => {
   const [apply, keep] = ev.options
-  const openedAt = askedAt(ev)
   const approval: Approval = {
     id: ev.id,
     question: ev.title,
     optionIds: ev.options.map((o) => o.id),
     sections: [],
-    // The board names the edit in the waiting line (ChatApprove); a frame with no stamp keeps no line.
-    ...(openedAt === undefined ? {} : { openedAt, waitText: `${ev.summary || EDIT_WAIT.subject} · ${EDIT_WAIT.tail}` }),
+    ...(ev.summary ? { detail: ev.summary } : {}),
     ...(apply ? { submit: apply.label } : {}),
     ...(keep ? { secondary: keep.label } : {}),
   }
@@ -186,7 +186,7 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       if (!ev.auto) {
         const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
         const since = askedAt(ev)
-        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, recommended: ev.recommended, since })
+        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, recommended: ev.recommended, since, detail: ev.detail })
         if (event.type === 'approval' && pending) event.approval.pendingNote = pending
         return [event]
       }

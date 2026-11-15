@@ -203,13 +203,10 @@ describe('threadRows', () => {
     expect(ids(threadRows([user, todo, paper], false))).toEqual(['u', 'todo', 'p'])
   })
 
-  it('puts the waiting line above the diff of an open edit card, and leaves other cards alone (ChatApprove)', () => {
-    const say: ChatItem = { type: 'agentText', id: 'a', text: '경력 섹션부터 고쳐 볼게요.' }
+  it('lets a diff that follows a bot line ride on that line\'s bubble (ChatApprove)', () => {
+    const say: ChatItem = { type: 'agentText', id: 'a', text: '경력 섹션을 공고에 맞게 고쳤어요.' }
     const diff: ChatItem = { type: 'diff', id: 'd', lines: [{ n: 13, sign: '+', text: '재설계' }] }
-    expect(ids(threadRows([user, diff], false, true))).toEqual(['u', 'waiting', 'd'])
     expect(ids(threadRows([user, diff], false))).toEqual(['u', 'd'])
-    // A diff that follows a bot line rides on that line's bubble, so the waiting line goes under it.
-    expect(ids(threadRows([user, say, diff], false, true))).toEqual(['u', 'a'])
-    expect(ids(threadRows([user, say], false, true))).toEqual(['u', 'a'])
+    expect(ids(threadRows([user, say, diff], false))).toEqual(['u', 'a'])
   })
 })

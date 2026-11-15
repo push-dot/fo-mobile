@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Sheet, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
@@ -8,11 +8,17 @@ import { spacing, useColors } from '@/theme'
 const ChoiceSheetScreen = () => {
   const c = useColors()
   const request = useChoiceModal((s) => s.request)
+  const picked = useRef(false)
+  const onDismiss = request?.onDismiss
   useEffect(() => {
     if (!request) router.back()
   }, [request])
+  useEffect(() => () => {
+    if (!picked.current) onDismiss?.()
+  }, [onDismiss])
   if (!request) return null
   const run = (onPress: () => void) => {
+    picked.current = true
     router.back()
     setTimeout(onPress, CHOICE_HANDOFF_MS)
   }

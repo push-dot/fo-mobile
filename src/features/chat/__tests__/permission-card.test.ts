@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { Approval } from '../types'
 
 const { applyEvent, emptyChat } = await import('../utils/reducer')
-const { isSiteCard, waitingLine } = await import('../utils/card')
+const { isSiteCard } = await import('../utils/card')
 const { mapEvent } = await import('../utils/stream')
 
 const OPENED = Date.parse('2026-11-13T01:00:00Z')
@@ -16,17 +16,6 @@ const card = (over: Partial<Approval> = {}): Approval => ({
   openedAt: OPENED,
   optionIds: ['approve', 'approve_always', 'reject'],
   ...over,
-})
-
-describe('waitingLine', () => {
-  it('shows for as long as the card is open: a card waits until answered', () => {
-    expect(waitingLine(card())).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요', cardId: 'card1' })
-    expect(waitingLine(null)).toBeNull()
-  })
-
-  it('counts the wait from the ask', () => {
-    expect(waitingLine(card())?.since.getTime()).toBe(OPENED)
-  })
 })
 
 describe('reducer', () => {

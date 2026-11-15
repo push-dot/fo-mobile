@@ -7,11 +7,12 @@ import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
 import { diffLinesDetail } from '../../utils/bubble-detail'
-import { planKeywords, planTable } from '../../utils/plan-table'
+import { blueprintList, isBlueprints, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindText, Marked } from '../header/highlight'
 import Detail from './detail'
 import MdTable from './md-table'
+import ResultLine from './result-line'
 import Rich from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
@@ -30,13 +31,43 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
+/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
+export const BulletList = ({ items, markId }: { items: string[]; markId: string }) => {
+  const c = useColors()
+  return (
+    <View style={{ gap: 2 }}>
+      {items.map((line) => (
+        <View key={line} style={{ flexDirection: 'row', gap: 10, paddingLeft: spacing[1] }}>
+          <View style={{ width: 6, height: 6, borderRadius: 3, marginTop: 9, backgroundColor: c.t1 }} />
+          <Rich v="b1" text={line} markId={markId} style={{ flexShrink: 1 }} />
+        </View>
+      ))}
+    </View>
+  )
+}
+
 /** A plan or feedback inside the bot's bubble: the table, then its keywords as grey sub-text. */
 export const PlanBlock = ({ item }: { item: PlanItem }) => {
+  if (isBlueprints(item)) {
+    const { lines, detail } = blueprintList(item)
+    return (
+      <>
+        <View style={{ gap: spacing[1] }}>
+          {lines.map((line) => (
+            <Text key={line} v="b1">
+              {line}
+            </Text>
+          ))}
+        </View>
+        <Detail text={detail.text} more={detail.more} />
+      </>
+    )
+  }
   const keywords = planKeywords(item)
   return (
     <>
       <MdTable table={planTable(item)} />
-      {keywords ? <Detail text={keywords} /> : null}
+      {keywords ? <Detail text={keywords.text} more={keywords.more} /> : null}
     </>
   )
 }
@@ -46,7 +77,7 @@ const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => 
   return <Detail text={view.text} more={view.more} />
 }
 
-const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
+const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
   const c = useColors()
   const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
@@ -57,6 +88,17 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
           <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
         ) : block.kind === 'table' ? (
           <MdTable key={i} table={block} />
+        ) : block.kind === 'bullets' ? (
+          <BulletList key={i} items={block.items} markId={item.id} />
+        ) : block.kind === 'link' ? (
+          <Pressable key={i} accessibilityRole="link" onPress={() => router.push(block.route as never)}>
+            <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+              <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline' }}>
+                {block.label}
+              </Text>
+              {block.tail}
+            </Text>
+          </Pressable>
         ) : block.kind === 'ordered' ? (
           <View key={i} style={{ gap: spacing[1] }}>
             {block.items.map((line, n) => (
@@ -75,11 +117,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}
-      {item.bullets?.length ? (
-        <Text v="b2" color="t2">
-          {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}
-        </Text>
-      ) : null}
+      {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
+      {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
           <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>

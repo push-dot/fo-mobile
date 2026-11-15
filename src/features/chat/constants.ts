@@ -33,9 +33,6 @@ export const HINTLESS_GATES = ['validate_cap']
 export const STOPPING_TEXT = '중지하는 중'
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
-/** The edit card's waiting line names the edit it waits on, then this (ChatApprove). */
-export const EDIT_WAIT = { subject: '이력서 수정', tail: '확인을 기다리는 중' } as const
-
 export const FIT_ROWS = [
   { key: 'techStack', label: '기술 스택' },
   { key: 'experienceLink', label: '경험 연관성' },
@@ -43,12 +40,13 @@ export const FIT_ROWS = [
   { key: 'keyword', label: '키워드' },
   { key: 'domain', label: '도메인' },
 ] as const
-/** One line on the FREE lock (ChatPh1FitFree). */
-export const FIT_LOCKED = 'PRO에서 항목별 점수를 볼 수 있어요'
+/** The FREE lock under the fit sentence (ChatPh1FitFree). */
+export const FIT_LOCKED = '항목별 점수는 PRO에서 볼 수 있어요 ›'
 export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
-/** Decorative bar widths behind the FREE lock, from the design. */
-export const FIT_LOCKED_PCT = [75, 70, 80, 45, 50]
-export const fitProjected = (label: string) => `이렇게 고치면 ${label}`
+/** The ULTRA projection: the grey line that opens it, and its sentence once open (ChatPh1FitUltra, ChatPh1FitUltraOpen). */
+const subject = (label: string) => `${label}${(label.charCodeAt(label.length - 1) - 0xac00) % 28 ? '이' : '가'}`
+export const fitProjectedLink = (label: string) => `어떻게 고치면 ${subject(label)} 되는지 보기 ›`
+export const fitProjected = (label: string) => `이렇게 고치면 ${subject(label)} 돼요.`
 
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.

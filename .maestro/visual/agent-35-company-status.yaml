@@ -102,7 +102,7 @@ tags:
       KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
       EN: "st-help"
 - extendedWaitUntil:
-    visible: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
+    visible: "지원 동기 첫 문장"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusHelp
@@ -111,7 +111,7 @@ tags:
     file: _pick.yaml
     env:
       PICK: ".*제품 관점.*"
-      ASK: "지원 동기 첫 문장을 어느 쪽으로 쓸까요?"
+      ASK: "지원 동기 첫 문장"
       NEXT: ".*메시지.*"
 # The generic reply to that answer streams for a few seconds; the empty link below must come after its last line, or the line lands in the emptied thread (ChatBotStatusApprove draws the greeting and one request only).
 - extendedWaitUntil:
@@ -125,7 +125,7 @@ tags:
       KO: "모아페이 공고에 맞춰 경력 섹션을 고쳐 주세요"
       EN: "st-approve"
 - extendedWaitUntil:
-    visible: "모아페이 채용 페이지를 열어도 될까요?"
+    visible: "채용 페이지 열기"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusApprove

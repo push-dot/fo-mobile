@@ -92,15 +92,8 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(100, status(added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(hold + 1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
-  s(300, {
-    type: 'fit',
-    score: 8.1,
-    from: 6.9,
-    delta: '+1.2 예상',
-    parts: { techStack: 7.5, experienceLink: 8.2, keyword: 4.5 },
-  }),
   s(400, todo('todo', labels, 3, added)),
-  s(500, agent('경력 섹션부터 공고에 맞게 고쳐 볼게요.')),
+  s(500, agent('경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.')),
   s(300, status('끄적이는 중…')),
   s(1200, tool('edit', '이력서 수정', '경력 · 모아페이', 'wait', '2줄 추가, 1줄 삭제')),
   s(200, {
@@ -117,7 +110,8 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
     type: 'approval',
     id: 'tailor-apply',
     kind: 'DOCUMENT_EDIT',
-    title: '이 수정을 적용할까요?',
+    title: '수정 적용',
+    summary: '경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.',
     documentId: DOC,
     options: [{ id: 'apply', label: '적용' }, { id: 'keep', label: '그대로 두기' }],
   }),
@@ -147,7 +141,7 @@ const profileCard = (score: string, josa = '로'): Step[] => [
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
   ...profileDone(200, score, josa, BULLETS),
 ]
-const present = ask({ ...numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']), note: 'PDF는 Push 프로필에서 내보낼 수 있어요.' })
+const present = ask(numbered('present', '결과를 확인할까요?', ['확인했어요', '그만하기']))
 const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), present, awaitingDone]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
@@ -259,7 +253,7 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
   s(300, {
     type: 'fit',
     score: 6.9,
-    band: '보통 · 개선 여지 있어요',
+    band: '보통이고, 고칠 여지가 있어요.',
     plan,
     summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
     parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },
@@ -307,9 +301,9 @@ const feedbackOnly: Step[] = [
     title: '',
     meta: '',
     rows: [
-      { tag: '키워드', label: 'Kafka, 정산 배치가 없어요', note: '경험 문장에 직접 넣어 주세요' },
-      { tag: '도메인', label: '정산 경험이 약해 보여요', note: 'payment-retry-lab을 정산 맥락으로 써 주세요' },
-      { tag: '성과', label: '숫자가 부족해요', note: '승인 API 개선 결과를 수치로 보여 주세요' },
+      { tag: '키워드', label: 'Kafka, 정산 배치가 없어요', note: '경험 문장에 직접 넣기' },
+      { tag: '도메인', label: '정산 경험이 약해요', note: 'payment-retry-lab을 정산 맥락으로' },
+      { tag: '성과', label: '숫자가 부족해요', note: '승인 API 개선을 수치로' },
     ],
     keywords: [],
   }),
@@ -331,10 +325,10 @@ const ph2: Step[] = [
     title: '수정 전략',
     meta: '섹션 5개',
     rows: [
-      { tag: '강화', label: '경력 · 모아페이', note: '대용량 결제 요구 → 승인 API 성과를 숫자로' },
+      { tag: '강화', label: '경력 · 모아페이', note: '승인 API 성과를 숫자로' },
       { tag: '수정', label: '기술 스택', note: 'Kafka 경험을 맨 앞으로' },
-      { tag: '추가', label: '프로젝트 · payment-retry-lab', note: '우대 사항 “장애 대응” 근거' },
-      { tag: '축소', label: '사내 동아리 활동', note: '공고와 연관이 낮아요' },
+      { tag: '추가', label: '프로젝트', note: 'payment-retry-lab' },
+      { tag: '축소', label: '사내 동아리', note: '공고와 연관이 낮아요' },
     ],
     keywords: ['결제 승인', '정산 배치', 'Kafka', '장애 대응'],
   }),
@@ -352,34 +346,33 @@ const paper = s(300, {
   type: 'paper', id: 'paper', label: '이력서 초안 v1', heading: '김서준 · 백엔드 개발자',
   lines: ['모아페이 · 백엔드 엔지니어 · 2022.03–현재', '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms', '• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을'],
 })
+const DRAFT_REVIEW_MD = [
+  '첫 번째 초안(v1)을 만들었어요.',
+  '• 승인 API 성과를 숫자로 강조했어요',
+  '• 프로젝트 payment-retry-lab을 넣었어요',
+  '• Kafka를 기술 스택 맨 앞으로 옮겼어요',
+  '• 사내 동아리 활동은 줄였어요',
+  `[이력서 초안 v1](/docs/push/${DOC}) · 미리보기`,
+].join('\n')
 const ph3Rest = (wait: number): Step[] => [
   s(wait, todo('todo3', PH3, 3)),
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
-  s(300, agent('첫 번째 초안(v1)을 만들었어요.')),
-  s(200, {
-    type: 'diff', documentId: DOC, revisionId: 'diff3',
-    hunks: [
-      { line: null, sign: '+', text: '승인 API 성과를 숫자로 강조' },
-      { line: null, sign: '+', text: '프로젝트 payment-retry-lab 추가' },
-      // push-be has no moved sign: a line removed and added back with the same text is the board's "~" line.
-      { line: null, sign: '-', text: 'Kafka를 기술 스택 맨 앞으로' },
-      { line: null, sign: '+', text: 'Kafka를 기술 스택 맨 앞으로' },
-      { line: null, sign: '-', text: '사내 동아리 활동 세부 내용' },
-    ],
-  }),
+  s(300, agent(DRAFT_REVIEW_MD)),
   ask(numbered('ph3-review', '첫 번째 초안(v1)이에요. 이대로 검토할까요?', ['검토할게요', '그만하기'])),
 ]
-// ChatPh3Review goes from the 초안 쓰기 line straight to the diff, with no draft card between.
+// ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between.
 const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL)]
 // ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
 const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD)]
 const ph3Boost: Step[] = [
   s(200, status('점수 올리는 중…')),
-  s(200, tool('boost1', '점수 올리기 1회', '키워드 밀도', 'run', '키워드를 넣는 중')),
-  s(1300, tool('boost1', '점수 올리기 1회', '키워드 밀도', 'ok', '6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요')),
-  s(200, tool('boost2', '점수 올리기 2회', '도메인 경험', 'run', '도메인 맥락을 다시 쓰는 중')),
-  s(1300, tool('boost2', '점수 올리기 2회', '도메인 경험', 'ok', '7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요')),
+  s(200, tool('boost1', '점수 올리기 1회', '키워드', 'run', '키워드를 넣는 중')),
+  s(1300, tool('boost1', '점수 올리기 1회', '키워드', 'ok', '6.9 → 7.5 · 정산 배치, 장애 대응을 경력 문장에 넣었어요')),
+  s(200, tool('boost2', '점수 올리기 2회', '경력 · 모아페이', 'run', '성과를 숫자로 쓰는 중')),
+  s(1300, tool('boost2', '점수 올리기 2회', '경력 · 모아페이', 'ok', '7.5 → 8.0 · 승인 API 성과를 숫자로 보여 줬어요')),
+  s(200, tool('boost3', '점수 올리기 3회', '도메인', 'run', '도메인 맥락을 다시 쓰는 중')),
+  s(1300, tool('boost3', '점수 올리기 3회', '도메인', 'ok', '8.0 → 8.3 · payment-retry-lab을 정산 맥락으로 고쳤어요')),
   s(300, {
     type: 'fit',
     score: 8.3,
@@ -396,7 +389,7 @@ const ph4Design: Step[] = [
   ask({
     type: 'choice',
     id: 'ph4-design',
-    title: '검증을 마쳤어요. 어떤 디자인을 적용할까요?',
+    title: '검증을 마쳤어요. 디자인을 골라 주세요.',
     options: [{ id: 'cancel', label: '그만하기' }],
     recommended: 't0',
     sections: [
@@ -406,26 +399,21 @@ const ph4Design: Step[] = [
     submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
   }),
 ]
+const QUALITY_MD = [
+  '품질 검사를 마치고 추천 수정까지 반영했어요.',
+  '• 오타: 트랜젝션 → 트랜잭션',
+  '• 날짜: 2022.04 → 2022.03',
+  '• 가운데점(·) 나열을 쉼표로',
+  '• 경력 본문의 현재형 문장 2곳',
+  '• 말투를 “~했습니다”로 통일',
+].join('\n')
 const ph4Quality: Step[] = [
   s(200, status('검사하는 중…')),
   s(300, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장을 하나씩 보는 중')),
   s(1200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
-  s(300, agent('맞춤법과 날짜 2곳을 바로 고치고, 추천 수정 3곳도 반영했어요.')),
-  s(200, {
-    type: 'diff', documentId: DOC, revisionId: 'qdiff',
-    hunks: [
-      { line: 8, sign: '-', text: '결제 트랜젝션 처리 성능 개선' },
-      { line: 8, sign: '+', text: '결제 트랜잭션 처리 성능 개선' },
-      { line: 12, sign: '-', text: '모아페이 · 2022.04–현재' },
-      { line: 12, sign: '+', text: '모아페이 · 2022.03–현재' },
-      { line: 14, sign: '-', text: 'Kotlin · Spring · Kafka' },
-      { line: 14, sign: '+', text: 'Kotlin, Spring, Kafka' },
-      { line: 15, sign: '-', text: '결제 장애에 대응한다' },
-      { line: 15, sign: '+', text: '결제 장애에 대응했다' },
-      { line: 16, sign: '-', text: '정산 지연을 줄였음' },
-      { line: 16, sign: '+', text: '정산 지연을 줄였습니다' },
-    ],
-  }),
+  s(300, agent(QUALITY_MD)),
+  s(200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '추천 수정 3곳도 반영했어요')),
+  s(300, agent('이제 디자인을 고를게요.')),
   ...ph4Design,
 ]
 const ph5: Step[] = [
@@ -459,7 +447,7 @@ const ph2xBlueprints: Step[] = [
   s(200, status('기획하는 중…')),
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'ok', '공고 연관성·임팩트·실현 가능성 모두 통과')),
-  s(300, agent('이런 프로젝트를 기획했어요.')),
+  s(300, agent('프로젝트 기획서 4개를 만들었어요.')),
   s(300, {
     type: 'plan',
     id: 'strategy',
@@ -481,7 +469,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', `${MOA}에 지원해요`, ['실행', '취소']), '지원하면 취소할 수 없어요')),
+  ask(confirm(numbered('apply', `${MOA}(Kotlin·Spring)에 지원할까요?`, ['지원하기', '취소']), '지원하면 취소할 수 없어요')),
 ]
 
 export const generic = (text: string): Step[] => [
@@ -581,15 +569,15 @@ const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP :
 /** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
 export const WAITING_CHOICES = new Set(['st-help'])
 export const WAITING_SINCE_MS = 72_000
-const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
   ask({
     type: 'choice',
     id: 'st-help',
-    title: STATUS_ASK,
+    title: '지원 동기 첫 문장',
+    detail: '두 버전 모두 만들어 두었어요. 어느 쪽으로 쓸까요?',
     options: [
-      { id: '0', label: '제품 관점', desc: '결제 경험을 사용자 입장에서 풀어요' },
-      { id: '1', label: '데이터 관점', desc: '처리량과 지연 수치를 앞세워요' },
+      { id: '0', label: '제품 관점' },
+      { id: '1', label: '데이터 관점' },
       { id: '2', label: '직접 입력할게요' },
     ],
   }),
@@ -600,8 +588,8 @@ const statusApprove: Step[] = [
     type: 'approval',
     id: 'st-approve',
     kind: 'TOOL_ACTION',
-    title: '모아페이 채용 페이지를 열어도 될까요?',
-    summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
+    title: '채용 페이지 열기',
+    summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?',
     options: PAGE_READ_OPTIONS,
   }),
   awaitingDone,

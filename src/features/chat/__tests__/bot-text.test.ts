@@ -27,6 +27,22 @@ describe('markdown tables', () => {
   })
 })
 
+describe('marked lists and link lines of a document run (ChatPh3Review, ChatPh6Result)', () => {
+  it('keeps "- " lines marker-less and gives "• " lines their own marked block', () => {
+    expect(splitBotText('고쳤어요.\n- 가\n• 나\n• 다')).toEqual([
+      { kind: 'paragraph', text: '고쳤어요.' },
+      { kind: 'list', items: ['가'] },
+      { kind: 'bullets', items: ['나', '다'] },
+    ])
+  })
+  it('reads a line that opens with [label](/route) as a link line with its grey tail', () => {
+    expect(splitBotText('끝\n[이력서 초안 v1](/docs/push/d1) · 미리보기')).toEqual([
+      { kind: 'paragraph', text: '끝' },
+      { kind: 'link', label: '이력서 초안 v1', route: '/docs/push/d1', tail: ' · 미리보기' },
+    ])
+  })
+})
+
 describe('answer sources', () => {
   const sources = [{ kind: 'posting' as const, id: 'p1', title: '모아페이 채용 공고' }]
   it('land on the last bot line of the turn', () => {
