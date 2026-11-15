@@ -75,6 +75,9 @@ tags:
 - waitForAnimationToEnd:
     timeout: 1000
 - takeScreenshot: ProposalToastBlocked
+- extendedWaitUntil:
+    notVisible: "오지현 님을 차단했어요"
+    timeout: 10000
 
 # Blocking 오지현 leaves 3 received offers and the one archived offer.
 - tapOn: "보관한 제안.*"

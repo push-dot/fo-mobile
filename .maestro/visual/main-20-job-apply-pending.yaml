@@ -3,11 +3,12 @@ name: 공고 상세 → 지원 서류 → 지원하는 중
 tags:
   - visual
 ---
+# The ApplySheet boards draw the fit card with three parts (G74), so the page opens under `fit-three`.
 # POST apply never answers, so the sheet stays on 지원하는 중….
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=hang:POST:postings/.*/apply"
+      MOCK: "push://sign-in?mock=fit-three,hang:POST:postings/.*/apply"
       READY: "새로 올라온 공고"
 - runFlow: _open_jobs.yaml
 - extendedWaitUntil:
