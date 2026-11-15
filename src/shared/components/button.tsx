@@ -19,6 +19,8 @@ type Props = {
   /** Horizontal padding when a board sets its own (the size's default otherwise). */
   paddingX?: number
   disabled?: boolean
+  /** A button in the header bar is glass; every other button is plain. */
+  glass?: boolean
   style?: StyleProp<ViewStyle>
 }
 
@@ -36,7 +38,7 @@ const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFil
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 
-const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, disabled, style }: Props) => {
+const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, disabled, glass, style }: Props) => {
   const c = useColors()
   const s = SIZES[size]
   const v = VARIANTS[variant]
@@ -47,7 +49,7 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSi
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      glass={v.glass}
+      glass={glass ?? v.glass}
       fill={v.fill}
       pressedFill={v.pressedFill}
       style={[{ minHeight: s.minHeight, borderRadius: s.borderRadius }, style]}

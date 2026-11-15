@@ -64,7 +64,7 @@ export const listenMockLinks = () =>
     // Uploading draws the toast of an earlier upload over a row still going up; the app holds one upload at a time, so the tour raises the toast itself.
     if (specs.includes('upload-toast')) {
       const { showToast, TOAST_ABOVE } = components()
-      showToast({ message: '이력서 파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs })
+      showToast({ message: '파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs })
     }
     if (specs.includes('upload-fail')) {
       infra().stubPickDocument([RESUME_FILE])

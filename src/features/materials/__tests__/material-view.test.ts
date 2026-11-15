@@ -112,7 +112,7 @@ describe('detail sheet', () => {
   it('names who made a 서류, and reads a Push document as one', () => {
     const doc: Material = { kind: 'document', id: 'd1', title: '기본 이력서', docKind: 'RESUME', madeBy: { by: 'bot', bot: pushBot }, updatedAt: at(10, 16, 9, 5) }
     expect(detailFacts(doc, [pushBot], now)).toEqual([
-      { label: '종류', value: 'Push 서류' },
+      { label: '종류', value: 'Push 프로필' },
       { label: '만든 곳', value: 'Push Bot' },
       { label: '수정', value: '10월 16일 오전 9:05' },
       { label: '쓰인 대화', value: 'Push Bot' },

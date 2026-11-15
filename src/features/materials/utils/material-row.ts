@@ -57,7 +57,7 @@ const subOf = (m: Material, now: Date): string => {
     case 'file':
       return `${formatOf(m.title)} · ${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
     case 'document':
-      return `Push 서류 · ${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
+      return `Push 프로필 · ${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
     case 'posting':
       return `공고 · ${deadlineLabel(m.deadline, now)} · 북마크 ${monthDay(m.bookmarkedAt)}`
     case 'link':

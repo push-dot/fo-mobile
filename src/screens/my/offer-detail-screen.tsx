@@ -59,7 +59,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
           <GlassButton
             actions={[
               {
-                icon: 'menu',
+                icon: 'more',
                 label: '더 보기',
                 menu: menu ?? [],
               },

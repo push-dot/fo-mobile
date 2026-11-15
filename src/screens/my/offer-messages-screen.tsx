@@ -156,7 +156,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           </Pressable>
         }
         right={
-          menu ? <GlassButton actions={[{ icon: 'menu', label: '더 보기', menu }]} /> : undefined
+          menu ? <GlassButton actions={[{ icon: 'more', label: '더 보기', menu }]} /> : undefined
         }
       />
       <ScrollView

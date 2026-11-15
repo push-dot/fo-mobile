@@ -73,7 +73,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Icon name="menu" size={20} color="t3" />
+        <Icon name="more" size={20} color="t3" />
       </Pressable>
     </Row>
   )
@@ -126,7 +126,7 @@ const DocsTab = () => {
   const { data, isLoading } = useSources()
   const push = useDocuments()
   const hidden = useUndoRemove()
-  const { upload, start, cancel } = useUpload(() => showToast({ message: '이력서 파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs }))
+  const { upload, start, cancel } = useUpload(() => showToast({ message: '파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs }))
   const pickFile = () => void pickResume().then((file) => file && start(file))
   useImportRequest(pickFile)
 
@@ -150,7 +150,7 @@ const DocsTab = () => {
           아직 등록한 서류가 없어요
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-          {'PDF나 DOCX 파일을 올리거나\nBot 채팅에서 새로 만들어 보세요.'}
+          {'Bot 채팅에서 Push 프로필을 만들거나\n파일을 올려 보세요.'}
         </Text>
         <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
           <Button label="파일 등록" onPress={pickFile} />

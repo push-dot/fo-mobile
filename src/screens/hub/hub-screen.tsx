@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
-import { useCallback, useMemo } from 'react'
-import { ActivityIndicator, FlatList, Platform, Pressable, View } from 'react-native'
+import { useCallback, useMemo, type ReactNode } from 'react'
+import { ActivityIndicator, FlatList, Platform, Pressable, View, type StyleProp, type ViewStyle } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -17,7 +17,13 @@ import { Badge, Button, Chip, ChipRow, Glass, Icon, SkeletonRows, StatusNote, Te
 import { radius, spacing, useColors } from '@/theme'
 
 // The boards draw the search pill as glass on iOS and as a filled pill on Android.
-const SearchPill = Platform.OS === 'ios' ? Glass : View
+// Interactive glass draws no RN boxShadow, which the list's clip would cut just under the header.
+const InteractiveGlass = ({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) => (
+  <Glass interactive style={style}>
+    {children}
+  </Glass>
+)
+const SearchPill = Platform.OS === 'ios' ? InteractiveGlass : View
 const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
 
 // Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
@@ -83,7 +89,7 @@ const HubScreen = () => {
         right={
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP }}>
             {viewerId ? (
-              <Button label="내 프로필" variant="secondary" size="sm" onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
+              <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}
             <FilterButton count={appliedCount(sheet)} onPress={() => router.push('/hub-filter')} />
           </View>

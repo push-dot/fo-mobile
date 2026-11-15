@@ -9,7 +9,7 @@ import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 12
 
-/** Android's 이름 바꾸기. `source`: the id is an uploaded file's, not a Push 서류's. */
+/** Android's 이름 바꾸기. `source`: the id is an uploaded file's, not a Push 프로필's. */
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data

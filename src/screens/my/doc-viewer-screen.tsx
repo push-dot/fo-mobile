@@ -131,7 +131,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
-              { icon: 'menu', label: '더 보기', onPress: openMenu },
+              { icon: 'more', label: '더 보기', onPress: openMenu },
             ]}
           />
         }
