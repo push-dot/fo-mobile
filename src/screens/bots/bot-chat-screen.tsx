@@ -9,6 +9,7 @@ import {
   ApprovalPanel,
   AwaitingRow,
   ChatBotColor,
+  ChoiceBubble,
   ComposerArea,
   ConsentSheet,
   CreditBanner,
@@ -27,6 +28,7 @@ import {
   THREAD_WINDOW,
   answer,
   applyText,
+  choiceInThread,
   composerPlaceholder,
   turnFailed,
   followScroll,
@@ -135,7 +137,8 @@ const Thread = ({ id }: { id: string }) => {
   const [sayingFor, setSayingFor] = useState<string>()
   const input = useRef<TextInputInstance>(null)
   const saying = !!chat.approval && sayingFor === chat.approval.id
-  const showPanel = chat.approval && !saying
+  const inThread = !!chat.approval && choiceInThread(chat.approval)
+  const showPanel = chat.approval && !saying && !inThread
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
@@ -253,8 +256,9 @@ const Thread = ({ id }: { id: string }) => {
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, !!showPanel && !waitsLine), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
-          chat.queue.length || (waitsLine && !waitsAboveDiff) ? (
+          chat.queue.length || (waitsLine && !waitsAboveDiff) || inThread ? (
             <View style={{ gap: 18 }}>
+              {inThread ? <ChoiceBubble approval={chat.approval!} onPick={(text, choice) => answer(id, text, choice)} /> : null}
               {waitsLine && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />

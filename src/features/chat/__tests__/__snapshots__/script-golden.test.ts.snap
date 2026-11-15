@@ -8020,7 +8020,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"st-approve","type":"user"}
 {"seconds":1,"type":"worked"}
-card {"confirm":true,"detail":"careers.moapay.co.kr · 공고 1개를 읽어요","id":"st-approve","openedAt":250,"question":"모아페이 채용 페이지를 열어도 될까요?","sections":[{"items":[{"label":"한 번 허용"},{"desc":"이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요","label":"항상 허용"},{"label":"거절"}],"kind":"choices","selected":[]}]}
+card {"confirm":true,"detail":"모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?","id":"st-approve","openedAt":250,"question":"채용 페이지 열기","sections":[{"items":[{"label":"한 번 허용"},{"desc":"이 Bot이 이 사이트를 읽을 때 다시 묻지 않아요","label":"항상 허용"},{"label":"거절"}],"kind":"choices","selected":[]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8085,7 +8085,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"st-help","type":"user"}
 {"seconds":1,"type":"worked"}
-card {"id":"st-help","openedAt":-71750,"question":"지원 동기 첫 문장을 어느 쪽으로 쓸까요?","sections":[{"items":[{"desc":"결제 경험을 사용자 입장에서 풀어요","label":"제품 관점"},{"desc":"처리량과 지연 수치를 앞세워요","label":"데이터 관점"},{"label":"직접 입력할게요"}],"kind":"choices","selected":[]}]}
+card {"detail":"두 버전 모두 만들어 두었어요. 어느 쪽으로 쓸까요?","id":"st-help","openedAt":-71750,"question":"지원 동기 첫 문장","sections":[{"items":[{"label":"제품 관점"},{"label":"데이터 관점"},{"label":"직접 입력할게요"}],"kind":"choices","selected":[]}]}
 {"awaiting":"approval","interrupted":false,"queue":[],"working":null}
 "
 `;

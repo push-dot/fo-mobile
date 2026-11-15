@@ -4,6 +4,7 @@ import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
 import { foldBubbleCards } from './bubble-card'
+import { choiceInThread } from './choice-sheet'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
@@ -128,8 +129,9 @@ const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'
 // A file sent with the first line starts the flow too: DocAgentNew draws 작업 중에도 말할 수 있어요 right under the file chip, before any card.
 export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type) || (i.type === 'user' && !!i.attachment))
 
-export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>, name?: string, chipKind?: AttachmentKind) => {
+export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'> & Partial<Pick<ChatState, 'approval'>>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
+  if (chat.approval && choiceInThread(chat.approval)) return COMPOSER_PLACEHOLDER.choice
   // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
   if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
   if (name) return holdsResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)

@@ -581,15 +581,15 @@ const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP :
 /** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
 export const WAITING_CHOICES = new Set(['st-help'])
 export const WAITING_SINCE_MS = 72_000
-const STATUS_ASK = '지원 동기 첫 문장을 어느 쪽으로 쓸까요?'
 const statusHelp: Step[] = [
   ask({
     type: 'choice',
     id: 'st-help',
-    title: STATUS_ASK,
+    title: '지원 동기 첫 문장',
+    detail: '두 버전 모두 만들어 두었어요. 어느 쪽으로 쓸까요?',
     options: [
-      { id: '0', label: '제품 관점', desc: '결제 경험을 사용자 입장에서 풀어요' },
-      { id: '1', label: '데이터 관점', desc: '처리량과 지연 수치를 앞세워요' },
+      { id: '0', label: '제품 관점' },
+      { id: '1', label: '데이터 관점' },
       { id: '2', label: '직접 입력할게요' },
     ],
   }),
@@ -600,8 +600,8 @@ const statusApprove: Step[] = [
     type: 'approval',
     id: 'st-approve',
     kind: 'TOOL_ACTION',
-    title: '모아페이 채용 페이지를 열어도 될까요?',
-    summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
+    title: '채용 페이지 열기',
+    summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?',
     options: PAGE_READ_OPTIONS,
   }),
   awaitingDone,

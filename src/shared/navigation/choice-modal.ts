@@ -8,6 +8,8 @@ export type ChoiceModalRequest = {
   items?: { label: string; destructive?: boolean; onPress: () => void }[]
   /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
   confirm?: { label: string; onPress: () => void }
+  /** The sheet was swiped away without a pick. */
+  onDismiss?: () => void
 }
 
 // The sheet has to leave before a route or an alert is opened over the screen under it.
