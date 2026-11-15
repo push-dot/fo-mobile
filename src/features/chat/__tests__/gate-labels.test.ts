@@ -47,7 +47,7 @@ describe('server gate labels', () => {
       ],
     })
     expect(ev).toMatchObject({ type: 'approval', approval: { question: '이 공고에 지원해요' } })
-    expect(labels(ev!)).toEqual(['실행', '취소'])
+    expect(labels(ev!)).toEqual(['실행', '닫기'])
   })
 
   it('renders verification, boost, and the profile result from the server options', async () => {
@@ -60,7 +60,7 @@ describe('server gate labels', () => {
         { id: 'cancel', label: '그만하기' },
       ],
     })
-    expect(labels(fail!)).toEqual(['다시 고르기', '그만하기'])
+    expect(labels(fail!)).toEqual(['다시 고르기', '닫기'])
 
     const [boost] = await map({
       type: 'choice',
@@ -75,7 +75,7 @@ describe('server gate labels', () => {
     })
     expect(boost).toMatchObject({ type: 'approval', approval: { question: '점수를 한 번 더 올릴까요?' } })
     expect(boost).not.toHaveProperty('approval.detail')
-    expect(labels(boost!)).toEqual(['한 번 더 올리기', '여기서 멈추기', '그만하기'])
+    expect(labels(boost!)).toEqual(['한 번 더 올리기', '여기서 멈추기', '닫기'])
 
     const [saved] = await map({
       type: 'choice',
@@ -90,7 +90,7 @@ describe('server gate labels', () => {
     const state = applyEvent(emptyChat, saved!)
     expect(state.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
     expect(state.approval).not.toHaveProperty('detail')
-    expect(labels(saved!)).toEqual(['확인했어요', '그만하기'])
+    expect(labels(saved!)).toEqual(['확인했어요', '닫기'])
     expect(JSON.stringify(saved)).not.toContain('PDF로')
   })
 
@@ -110,7 +110,7 @@ describe('server gate labels', () => {
       type: 'approval',
       approval: { id: 'feedback', question: '피드백을 반영해서 수정할까요?', optionIds: ['continue', 'cancel'] },
     })
-    expect(labels(feedback!)).toEqual(['반영해서 수정할게요', '그만하기'])
+    expect(labels(feedback!)).toEqual(['반영해서 수정할게요', '닫기'])
 
     const [cont] = await map({
       type: 'choice',
@@ -127,7 +127,7 @@ describe('server gate labels', () => {
       type: 'approval',
       approval: { id: 'start-document', question: '이어서 작성할까요?', optionIds: ['continue', 'cancel'] },
     })
-    expect(labels(cont!)).toEqual(['이어서 작성하기', '그만하기'])
+    expect(labels(cont!)).toEqual(['이어서 작성하기', '닫기'])
 
     const [fit] = await map({
       type: 'choice',
@@ -167,7 +167,7 @@ describe('server gate labels', () => {
       type: 'approval',
       approval: {
         optionIds: ['resume', 'portfolio', 'cover_letter', 'cancel'],
-        sections: [{ kind: 'choices', multi: true, items: [{ label: '이력서' }, { label: '포트폴리오' }, { label: '자기소개서' }, { label: '그만하기' }] }],
+        sections: [{ kind: 'choices', multi: true, items: [{ label: '이력서' }, { label: '포트폴리오' }, { label: '자기소개서' }, { label: '닫기' }] }],
       },
     })
   })

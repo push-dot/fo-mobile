@@ -1,8 +1,8 @@
 import type { Approval, Choice } from '../types'
 
-export const isStop = (c: Choice) => c.label === '그만하기' || c.label === '그만할게요'
+export const isStop = (c: Choice) => c.label === '닫기' || c.label === '그만하기' || c.label === '그만할게요'
 
-/** A multi-pick gate ends in [그만하기] [N개로 진행하기]: the stop row leaves the grid and the count shows on the button. */
+/** A multi-pick gate ends in [닫기] [N개로 진행하기]: the stop row leaves the grid and the count shows on the button. */
 export const multiPick = (approval: Approval, sel: number[][]) => {
   const at = approval.sections.findIndex((s) => s.kind === 'choices' && s.multi)
   const section = at >= 0 ? approval.sections[at] : undefined

@@ -4,9 +4,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
 import { Badge, Button, Icon, Text, hitSlopTo, showActionSheet, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
+import ApprovalModal from './approval-modal'
 import { RISE_MS, riseOnMount } from './approval-rise'
 import type { Approval, ApprovalSection, Choice } from '../../types'
 import { choiceSheet, isSay } from '../../utils/choice-sheet'
+import { approvalModalKind } from '../../utils/approval-modal'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
 
@@ -16,8 +18,8 @@ type Props = {
   onAnswer: (text: string, choice: number | number[]) => void
   /** "직접 말하기": hand the floor back to the composer. */
   onSay: () => void
-  /** A material row's 변경: pick another material (자료 고르기). */
-  onMaterials: () => void
+  /** A material row's 변경: the picker page (자료 고르기) drawn inside the form's own modal. `onClose` returns to the form. */
+  renderPicker: (onClose: () => void) => ReactNode
 }
 
 // `.panel { gap: 6px }`: between the panel's blocks and inside each section.
@@ -28,7 +30,7 @@ const FOOT_TOP = 6
 const STOP_PAD = { paddingHorizontal: 2 }
 
 /** Replaces the composer until answered (design_system ApprovalPanel). */
-export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props) => {
+export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props) => {
   const c = useColors()
     const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
@@ -36,6 +38,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   const rise = useState(() => new Animated.Value(0))[0]
   // Once the rise is over the panel uses a static style, whatever the native animation did (see riseOnMount).
   const [landed, setLanded] = useState(false)
+  const modal = approvalModalKind(approval)
+  const [picking, setPicking] = useState(false)
   const [sel, setSel] = useState(() => approval.sections.map((s) => ('selected' in s ? s.selected : [])))
   const numbered = !approval.submit && approval.sections.length === 1 && approval.sections[0]!.kind === 'choices' && !approval.sections[0]!.multi
   // push-be #224 section card (10-02, 10-21, 10-22): answered with submit + picked ids; cancel is its own button or chip.
@@ -113,7 +117,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
       case 'chips': {
         // The first chips title is usually the card question; don't print it twice.
         const title = s.title && s.title !== approval.question ? s.title : undefined
-        const stop = sectioned ? approval.secondary : undefined
+        const stop = sectioned && modal === 'none' ? approval.secondary : undefined
         if (s.multi) {
           const stopRow = stop ? <ChoiceRow choice={{ label: stop }} on={false} square bare center onPress={cancel} /> : null
           const inGrid = s.options.length % 2 === 1
@@ -173,7 +177,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
                     {r.sub}
                   </Text>
                 </View>
-                {r.action === 'change' ? <MiniChip label="변경" onPress={onMaterials} /> : null}
+                {r.action === 'change' ? <MiniChip label="변경" onPress={() => setPicking(true)} /> : null}
               </View>
             ))}
           </View>
@@ -205,7 +209,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
       {sectioned ? (
         <View style={{ gap: PANEL_GAP, marginTop: spacing[1] }}>
           {sectionSubmit ? <Button label={sectionSubmit} onPress={() => sendSections(sel)} /> : null}
-          {approval.secondary && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
+          {approval.secondary && modal === 'none' && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
         </View>
       ) : approval.submit ? (
         <>
@@ -258,6 +262,13 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props)
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
   if (sheet) return null
+
+  if (modal !== 'none')
+    return (
+      <ApprovalModal kind={modal} onClose={onSay} own={picking}>
+        {picking ? renderPicker(() => setPicking(false)) : body}
+      </ApprovalModal>
+    )
 
   return (
     <Animated.View

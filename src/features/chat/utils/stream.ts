@@ -9,6 +9,7 @@ import {
   queueBusyMessage,
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
+import { closeLabel } from './close-label'
 import { resultTask } from './result-card'
 import { diffLines } from './diff-lines'
 import { noticeOf } from './notices'
@@ -39,7 +40,7 @@ type Ask = {
 }
 
 const choiceOf = (o: StreamOption): Choice => ({
-  label: o.label,
+  label: closeLabel(o.label),
   ...(o.desc ? { desc: o.desc } : {}),
   ...(o.badge ? { badge: { label: o.badge, tone: 'ac' as const } } : {}),
 })
