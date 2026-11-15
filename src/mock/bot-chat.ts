@@ -103,9 +103,9 @@ mock('GET', 'bots/:id/transcript/matches', ({ params, query }) => {
   const q = (query.get('q') ?? '').trim().toLowerCase()
   if (!q || [...q].length > 200) return error(400, 'VALIDATION_ERROR', 'q must be 1-200 characters', { field: 'q' })
   const now = new Date()
-  // A source title is searched too (ChatBotHeaderFind counts "…pdf" as a hit). Its match comes before the text's: the newest hit is the last in reading order.
+  // Every hit of a message is a match (ChatBotHeaderFind counts three 프로필 in two bubbles), a source title included. The newest hit is the last in reading order, so the sources come first.
   const items = f.messages
-    .flatMap((m) => [...(m.sources ?? []).filter((x) => x.title.toLowerCase().includes(q)).map(() => m), ...(m.text.toLowerCase().includes(q) ? [m] : [])])
+    .flatMap((m) => [...(m.sources ?? []).filter((x) => x.title.toLowerCase().includes(q)).map(() => m), ...m.text.toLowerCase().split(q).slice(1).map(() => m)])
     .map((m) => ({ messageId: m.id, turnId: m.turn, at: atOf(m.at, now).toISOString() }))
     .sort((a, b) => b.at.localeCompare(a.at))
   const data: BotContract.TranscriptMatches = { total: items.length, items: items.slice(0, 200) }

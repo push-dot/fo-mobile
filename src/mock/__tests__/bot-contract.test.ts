@@ -136,7 +136,7 @@ describe('bots', () => {
     seedThread('b-moa', 'thread')
     const { data } = await api.bots.transcript('b-moa')
     const first = data.at(-1)!.assistant!.text
-    expect(first.split('\n').slice(1)).toEqual(['- 결제 승인 API 재설계 경험을 처리량 수치와 함께 쓰기', '- 정산 배치 개선을 장애 대응 사례로 옮기기', '- Kafka 경험은 우대 요건이라 한 줄로 줄이기'])
+    expect(first.split('\n').slice(1)).toEqual(['- 결제 승인 API 재설계 경험을 처리량 수치와 함께 쓰기', '- 정산 배치 개선을 장애 대응 사례로 옮기기', '- Kafka 경험은 우대 요건이라 프로필에서 한 줄로 줄이기'])
   })
 
   it('lists the three bots of BotNewLimitDelete at the FREE limit, each with the role it was made from', async () => {

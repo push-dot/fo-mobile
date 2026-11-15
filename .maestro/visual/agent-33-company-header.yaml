@@ -26,9 +26,13 @@ tags:
 # The find field takes the focus when the bar opens; a tap makes sure it does (the menu item is gone by now).
 - tapOn: "채팅에서 찾기"
 - inputText: "프로필"
-# One hit: the user's "Push 프로필로". The v425 board draws 2/3 with extra marks the finished chat of ChatBotHeader does not have (NEEDS-BOARD B1A-find).
+# Three hits (프로필 in the first answer twice, once in the last): the first result is the newest (1/3), and 이전 결과 steps to the board's 2/3, the list line.
 - extendedWaitUntil:
-    visible: ".*1/1.*"
+    visible: ".*1/3.*"
+    timeout: 10000
+- tapOn: "이전 결과"
+- extendedWaitUntil:
+    visible: ".*2/3.*"
     timeout: 10000
 # The board draws the result with the keyboard down (the field has a search return key, so Return lowers it).
 - runFlow: _hide_kbd.yaml

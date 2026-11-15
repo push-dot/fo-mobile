@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fromFirst, markRects, matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch, type TextLine } from '../utils/find'
+import { fromFirst, hitCount, hitOf, hitsBefore, markRects, matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch, type TextLine } from '../utils/find'
 import type { ChatItem } from '../types'
 
 const user = (id: string): ChatItem => ({ type: 'user', id, text: id })
@@ -127,5 +127,30 @@ describe('markRects', () => {
 
   it('draws nothing while an edge has no line yet', () => {
     expect(markRects([], { left: { x: 1, y: 1 }, right: { x: 2, y: 1 } }, 16)).toEqual([])
+  })
+})
+
+describe('hitOf', () => {
+  const list = [match('a', 't2'), match('r', 't1'), match('r', 't1')]
+
+  it('numbers the hits of a message in reading order, the newest (last in reading order) coming first', () => {
+    expect([0, 1, 2].map((i) => hitOf(list, i))).toEqual([0, 1, 0])
+  })
+
+  it('is the first hit for a server that returns one match per message', () => {
+    expect(hitOf([match('a', 't2'), match('r', 't1')], 1)).toBe(0)
+  })
+})
+
+describe('hitCount', () => {
+  it('counts the hits of a line, none without a query', () => {
+    expect(hitCount('Push 프로필에 이미 있고 프로필만', '프로필')).toBe(2)
+    expect(hitCount('Push 프로필에', '')).toBe(0)
+  })
+})
+
+describe('hitsBefore', () => {
+  it('counts the hits above each line, so the line holding the current hit can be told apart', () => {
+    expect(hitsBefore(['Push 프로필에 이미 드러나 있고', '결제 승인 API', 'Kafka 경험은 프로필에서 한 줄로'], '프로필')).toEqual([0, 1, 1])
   })
 })

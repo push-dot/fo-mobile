@@ -48,6 +48,17 @@ const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // The text component joins words with U+2060; a query typed without it still finds the word.
 const wordJoinerTolerant = (q: string) => [...q].map(escapeRegExp).join(`${WORD_JOINER}*`)
 
+/**
+ * Which hit of the matched message the match at `index` is, in reading order. A message with n hits comes n times, newest hit (the last in reading order) first,
+ * so the first of its entries is the last hit. Counted over the whole list, a source-title hit follows the text's hits in reading order.
+ */
+export const hitOf = (matches: readonly BotContract.TranscriptMatch[], index: number) => {
+  const id = matches[index]?.messageId
+  const total = matches.filter((m) => m.messageId === id).length
+  const rank = matches.slice(0, index).filter((m) => m.messageId === id).length
+  return total - 1 - rank
+}
+
 export type Mark = { text: string; hit: boolean }
 
 export const splitMarks = (text: string, query: string): Mark[] => {
@@ -58,6 +69,12 @@ export const splitMarks = (text: string, query: string): Mark[] => {
     .map((part, i) => ({ text: part, hit: i % 2 === 1 }))
     .filter((mark) => mark.text !== '')
 }
+
+/** How many hits the query has in `text`. */
+export const hitCount = (text: string, query: string) => splitMarks(text, query).filter((mark) => mark.hit).length
+
+/** `hitsBefore[i]` is how many hits the lines above line i hold. */
+export const hitsBefore = (lines: readonly string[], query: string) => lines.map((_, i) => lines.slice(0, i).reduce((sum, line) => sum + hitCount(line, query), 0))
 
 /** One line of a Text's onTextLayout; `ascender` is the baseline's distance below the line's top. */
 export type TextLine = { x: number; y: number; width: number; height: number; ascender: number }
