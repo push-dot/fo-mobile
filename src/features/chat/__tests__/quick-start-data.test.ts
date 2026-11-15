@@ -39,7 +39,7 @@ describe('quickStartFrom (real mode)', () => {
 
   it('leaves AI-suggested sheets empty', () => {
     expect(quickStartFrom('exp', {}, now).items).toEqual([])
-    expect(quickStartFrom('calendar', { connected: true }, now).calendar).toEqual({ connected: true })
+    expect(quickStartFrom('calendar', {}, now)).toEqual({ items: [] })
   })
 
   it('gap sub joins location and career', () => {

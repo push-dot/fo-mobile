@@ -26,7 +26,6 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
   recommended: async () => (await api.profiles.list({ explore: 'recommended', limit: 50 })).data,
   profile: () => api.me.profile(),
   doc: async () => (await realDocs())[0]?.fileName,
-  connected: () => myApi.googleConnected(),
 }
 
 export const chatApi = {

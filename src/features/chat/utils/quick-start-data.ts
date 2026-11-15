@@ -16,7 +16,6 @@ export type QsSources = {
   recommended?: Profile[]
   profile?: Profile
   doc?: string
-  connected?: boolean
 }
 
 const DAY = 86_400_000
@@ -108,7 +107,7 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
         ],
       }
     case 'calendar':
-      return { items: [], calendar: { connected: !!s.connected } }
+      return { items: [] }
     default:
       return { doc: s.doc, items: [] }
   }
@@ -135,7 +134,7 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   boost: ['bookmarks', 'doc'],
   deadline: ['bookmarks'],
   status: ['applications'],
-  calendar: ['connected'],
+  calendar: [],
   hub: ['doc', 'profile'],
   reply: ['offers'],
   coffee: ['follows', 'recommended'],

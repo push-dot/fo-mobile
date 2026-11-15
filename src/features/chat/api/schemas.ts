@@ -44,7 +44,6 @@ export type QsData = {
   items: QsItem[]
   doc?: string
   chips?: string[]
-  calendar?: { connected: boolean }
 }
 
 export type RunInput = {

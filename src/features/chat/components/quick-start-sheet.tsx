@@ -1,4 +1,3 @@
-import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
@@ -138,13 +137,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
             ) : null}
 
             {qs.layout === 'calendar' ? (
-              <Calendar
-                items={d.items}
-                connected={!!d.calendar?.connected}
-                task={task}
-                setTask={setTask}
-                onChange={() => router.push({ pathname: '/my', params: { tab: 'activity', sub: 'calendar' } })}
-              />
+              <Calendar items={d.items} task={task} setTask={setTask} />
             ) : null}
 
             {qs.layout === 'cards' ? (
@@ -466,7 +459,7 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
   )
 }
 
-const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem[]; connected: boolean; task: number; setTask: (n: number) => void; onChange: () => void }) => {
+const Calendar = ({ items, task, setTask }: { items: QsItem[]; task: number; setTask: (n: number) => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
   return (
@@ -519,17 +512,6 @@ const Calendar = ({ items, connected, task, setTask, onChange }: { items: QsItem
             </Pressable>
           )
         })}
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: connected ? c.green : c.t4 }} />
-        <Text v="b2" style={{ flex: 1 }}>
-          {connected ? 'Google 캘린더와 연결됨' : 'Google 캘린더와 연결 안 됨'}
-        </Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="캘린더 변경" onPress={onChange} hitSlop={hitSlopTo(18)}>
-          <Text v="c1" weight="700" color="t1">
-            변경
-          </Text>
-        </Pressable>
       </View>
     </>
   )

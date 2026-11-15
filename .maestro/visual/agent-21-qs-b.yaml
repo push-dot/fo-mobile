@@ -21,7 +21,7 @@ tags:
     file: _qs.yaml
     env:
       LABEL: "캘린더 관리"
-      WAIT: "Google 캘린더와 연결됨"
+      WAIT: "이번 주 3건"
       SHOT: QsInterview
 - runFlow:
     file: _qs.yaml
