@@ -21,8 +21,9 @@ tags:
     visible: "새 작업"
     timeout: 30000
 - waitForAnimationToEnd
+# The row's button is labelled "<material> 변경" for VoiceOver, and a Maestro text is a whole-label match.
 - tapOn:
-    text: "변경"
+    text: ".*변경"
     index: 0
 - extendedWaitUntil:
     visible: "자료 고르기"

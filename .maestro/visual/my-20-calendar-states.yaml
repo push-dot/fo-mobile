@@ -78,7 +78,7 @@ tags:
             - tapOn: "이전 달"
       - tapOn: ".*10월 21일.*"
       - extendedWaitUntil:
-          visible: "10월 21일 수요일"
+          visible: "10월 21일 수요일.*"
           timeout: 10000
       - extendedWaitUntil:
           visible: "Google 캘린더 연결됨"
