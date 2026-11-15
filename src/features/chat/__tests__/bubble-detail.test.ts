@@ -13,8 +13,14 @@ describe('fitBubble', () => {
     expect(view.detail).toEqual({ text: '기술 스택 7.5 · 키워드 4.5 · ✓ Kotlin · ✗ Kafka', more: '기술 스택 7.5\n키워드 4.5\n✓ Kotlin  ✗ Kafka' })
   })
 
+  it('says the first fit as a sentence with the parts a tap away (ChatPh1Fit)', () => {
+    const view = fitBubble({ type: 'fit', id: 'f', score: 6.9, caption: '보통이고, 고칠 여지가 있어요.', rows: [{ label: '기술 스택', score: 7.5 }, { label: '키워드', score: 4.5 }] })
+    expect(view.text).toBe('적합도는 6.9점이에요. 보통이고, 고칠 여지가 있어요.')
+    expect(view.detail).toEqual({ text: '항목별 점수 보기 ›', more: '기술 스택 7.5 · 키워드 4.5' })
+  })
+
   it('has no sub-text when the card has no parts', () => {
-    expect(fitBubble({ type: 'fit', id: 'f', score: 7, caption: '공고 기준' })).toEqual({ text: '적합도 **7.0** / 10 · 공고 기준' })
+    expect(fitBubble({ type: 'fit', id: 'f', score: 7 })).toEqual({ text: '적합도는 7.0점이에요.' })
   })
 })
 

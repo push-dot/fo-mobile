@@ -259,7 +259,7 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
   s(300, {
     type: 'fit',
     score: 6.9,
-    band: '보통 · 개선 여지 있어요',
+    band: '보통이고, 고칠 여지가 있어요.',
     plan,
     summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
     parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },

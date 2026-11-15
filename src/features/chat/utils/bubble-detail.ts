@@ -19,12 +19,15 @@ const boostBubble = (item: Fit & { from: number }): DetailText => {
   return rounds.length ? { text, list: rounds.map((r) => `${r.label}: ${r.line.split(' · ').slice(1).join(' · ')}`) } : { text }
 }
 
-/** The fit card as a bubble line (rule 30): the numbers in the bubble, the parts as grey sub-text that a tap opens. */
+/** The fit card as a bubble line (rule 30): the sentence or the numbers in the bubble, the parts as grey sub-text that a tap opens. */
 export const fitBubble = (item: Fit): DetailText => {
   if (item.note && item.from !== undefined) return boostBubble({ ...item, from: item.from })
-  const head = item.from === undefined ? `적합도 **${score(item.score)}** / 10` : `적합도 **${score(item.from)} → ${score(item.score)}**`
-  const text = [head, item.delta ?? item.caption].filter(Boolean).join(' · ')
   const rows = (item.rows ?? []).map((r) => `${r.label} ${score(r.score)}`)
+  if (item.from === undefined) {
+    const text = `적합도는 ${score(item.score)}점이에요.${item.caption ? ` ${item.caption}` : ''}`
+    return rows.length ? { text, detail: { text: '항목별 점수 보기 ›', more: rows.join(' · ') } } : { text }
+  }
+  const text = [`적합도 **${score(item.from)} → ${score(item.score)}**`, item.delta ?? item.caption].filter(Boolean).join(' · ')
   const keywords = (item.keywords ?? []).map((k) => `${k.ok ? '✓' : '✗'} ${k.label}`)
   const lines = [...rows, ...(keywords.length ? [keywords.join('  ')] : [])]
   return lines.length ? { text, detail: { text: [...rows, ...keywords].join(' · '), more: lines.join('\n') } } : { text }
