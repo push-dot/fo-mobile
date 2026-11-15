@@ -2,7 +2,7 @@ import type { Settings } from '@push/api-client'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Platform, PlatformColor, Pressable, View } from 'react-native'
-import { RadioRow, SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
+import { SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
 import { Sheet, Text, WheelPicker } from '@/shared/components'
 import { spacing, useColors, useThemePreference, type ThemeChoice } from '@/theme'
 
@@ -25,19 +25,16 @@ const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; o
   )
 }
 
-const SETTING_KEY = { locale: 'locale', contact: 'contactVisibility', tone: 'defaultTone' } as const
+const SETTING_KEY = { locale: 'locale', career: 'careerStatusVisibility', contact: 'contactVisibility', tone: 'defaultTone' } as const
 
-/**
- * v415 Settings pickers. Language and theme: a regular modal with a wheel and 적용 (no 취소, owner 2026-11-15);
- * the choice applies on 적용. Contact and tone: a sheet under a question with a radio list, where a tap applies and closes (SettingsStates.3 and .4).
- */
+/** Settings pickers: a regular modal with a wheel of the choices and 적용 (no 취소, owner 2026-11-15); the choice applies on 적용. */
 const SettingsPickSheetScreen = () => {
   const { kind } = useLocalSearchParams<{ kind: SettingsPickKind }>()
   const { s, set } = useSettings()
   const theme = useThemePreference((state) => state.choice)
   const setTheme = useThemePreference((state) => state.setChoice)
   const pick = SETTINGS_PICKS[kind]
-  const current = !pick ? undefined : kind === 'locale' ? s?.locale : kind === 'theme' ? theme : kind === 'contact' ? s?.contactVisibility : s?.defaultTone
+  const current = !pick ? undefined : kind === 'theme' ? theme : s?.[SETTING_KEY[kind]]
   const [draft, setDraft] = useState<string | undefined>(current)
   useEffect(() => {
     if (!pick) router.back()
@@ -50,26 +47,6 @@ const SettingsPickSheetScreen = () => {
     else set({ [SETTING_KEY[kind]]: key } as Partial<Settings>)
   }
   const items = pick.items.map(({ key, label }) => ({ key, label }))
-
-  if (!pick.wheel) {
-    return (
-      <Sheet title={pick.title} gap={spacing[4]}>
-        <View accessibilityRole="radiogroup" accessibilityLabel={pick.title}>
-          {items.map((it) => (
-            <RadioRow
-              key={it.key}
-              label={it.label}
-              on={it.key === current}
-              onPress={() => {
-                apply(it.key)
-                router.back()
-              }}
-            />
-          ))}
-        </View>
-      </Sheet>
-    )
-  }
 
   const confirm = () => {
     if (draft) apply(draft)

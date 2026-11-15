@@ -40,3 +40,12 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: SettingsVisibility
+# The 커리어 상태 row shows only the current value; the choice is a wheel in a modal with 적용 only.
+- tapOn: "모두에게"
+- extendedWaitUntil:
+    visible: "적용"
+    timeout: 5000
+- waitForAnimationToEnd
+- takeScreenshot: SettingsVisibilityPick
+- tapOn: "적용"
+- waitForAnimationToEnd

@@ -13,7 +13,7 @@ tags:
 - extendedWaitUntil:
     visible: "김서준"
     timeout: 10000
-# v427 board: .1 = the 로그아웃 alert, .2 = the 회원 탈퇴 alert, .3 = the 연락처 sheet, .4 = the 말투 sheet. Neither alert is confirmed:
+# v427 board: .1 = the 로그아웃 alert, .2 = the 회원 탈퇴 alert, .3 = the 연락처 wheel modal, .4 = the 말투 wheel modal. Neither alert is confirmed:
 # logging out or deleting would end the session.
 - runFlow:
     when:
@@ -31,11 +31,8 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.3
-      # These sheets have no 닫기 button of their own (iOS only labels the scrim 팝업 닫기).
-      - runFlow:
-          file: _close_sheet.yaml
-          env:
-            TITLE: "누구에게 연락처를 보여 줄까요?"
+      # Every settings choice is a wheel modal with 적용 only.
+      - tapOn: "적용"
       - extendedWaitUntil:
           notVisible: "누구에게 연락처를 보여 줄까요?"
           timeout: 5000
@@ -46,10 +43,7 @@ tags:
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: SettingsStates.4
-      - runFlow:
-          file: _close_sheet.yaml
-          env:
-            TITLE: "Bot이 어떤 말투로 쓸까요?"
+      - tapOn: "적용"
       - extendedWaitUntil:
           notVisible: "Bot이 어떤 말투로 쓸까요?"
           timeout: 5000

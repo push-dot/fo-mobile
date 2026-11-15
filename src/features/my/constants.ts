@@ -121,16 +121,14 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
   { key: 'ko', label: '한국어' },
   { key: 'en', label: 'English' },
 ]
-/**
- * The values Settings lets you choose in a sheet (the row shows only the current value). Language and theme open the wheel (iOS) or the radio dialog (Android);
- * contact and tone open a radio list under a question (v415 SettingsStates.3 and .4). 커리어 상태 is its own page (/settings/career).
- */
+/** The values Settings lets you choose: every row shows only the current value and opens a wheel in a modal (iOS) or a radio dialog (Android). */
 export const SETTINGS_PICKS = {
-  locale: { title: '언어', items: LANGS, wheel: true },
-  theme: { title: '테마', items: THEME_CHOICES, wheel: true },
-  contact: { title: '누구에게 연락처를 보여 줄까요?', items: CONTACT, wheel: false },
-  tone: { title: 'Bot이 어떤 말투로 쓸까요?', items: TONES, wheel: false },
-} as const satisfies Record<string, { title: string; items: readonly { key: string; label: string }[]; wheel: boolean }>
+  locale: { title: '언어', items: LANGS },
+  theme: { title: '테마', items: THEME_CHOICES },
+  career: { title: '커리어 상태', items: VISIBILITY },
+  contact: { title: '누구에게 연락처를 보여 줄까요?', items: CONTACT },
+  tone: { title: 'Bot이 어떤 말투로 쓸까요?', items: TONES },
+} as const satisfies Record<string, { title: string; items: readonly { key: string; label: string }[] }>
 export type SettingsPickKind = keyof typeof SETTINGS_PICKS
 export const NOTIFY_SUB: Partial<Record<keyof Settings, string>> = {
   notifyDeadline: '북마크한 공고 마감 3일 전',
