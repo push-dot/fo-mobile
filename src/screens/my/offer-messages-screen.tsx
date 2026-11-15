@@ -101,9 +101,17 @@ const Bubble = ({
 // The board centres the empty line over the whole screen (composer overlaid) with a 120pt lift; here the composer takes its own height.
 const EMPTY_LIFT = 120
 const COMPOSER_HEIGHT = 52
+const SCROLL_PAD_BOTTOM = spacing[5]
 const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
 // ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
 const DAY_LABEL_LIFT = 2
+
+const DayLabel = ({ day }: { day: string | null }) =>
+  day ? (
+    <Text v="c2" weight="600" color="t3" style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}>
+      {day}
+    </Text>
+  ) : null
 
 const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const c = useColors()
@@ -201,33 +209,29 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           gap: spacing[4],
           paddingTop: spacing[1],
           paddingHorizontal: spacing[5],
-          paddingBottom: spacing[5],
+          paddingBottom: SCROLL_PAD_BOTTOM,
         }}
         keyboardShouldPersistTaps="handled"
       >
         {thread.map((m, i) => (
           <View key={m.id} style={{ gap: spacing[4] }}>
-            {m.day ? (
-              <Text
-                v="c2"
-                weight="600"
-                color="t3"
-                style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}
-              >
-                {m.day}
-              </Text>
-            ) : null}
+            <DayLabel day={m.day} />
             {i === 0 ? posted : null}
             <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
           </View>
         ))}
-        {thread.length === 0 ? posted : null}
+        {thread.length === 0 && posted ? (
+          <View style={{ gap: spacing[4] }}>
+            <DayLabel day={dayBreaks([{ createdAt: o.createdAt }])[0]!.day} />
+            {posted}
+          </View>
+        ) : null}
         {empty ? (
           <View
             style={{
               flex: 1,
               justifyContent: 'center',
-              paddingBottom: Math.max(EMPTY_LIFT - composerH, 0),
+              paddingBottom: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0),
             }}
           >
             <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
