@@ -4,6 +4,8 @@ import { Avatar, BLOCKED_COPY, blockedLine, OFFER_MENU_COPY, RETRY_LABEL, useBlo
 import { Button, emptyNoteStyle, SettingsGroup, StatusNote, Text, TopBar } from '@/shared/components'
 import { HIT_TARGET, spacing, useColors } from '@/theme'
 
+const UNBLOCK_HEIGHT = 36
+
 const SettingsBlockedScreen = () => {
   const c = useColors()
   const { data, isPending, refetch } = useBlocked()
@@ -37,10 +39,10 @@ const SettingsBlockedScreen = () => {
                 </View>
                 <Button
                   label={BLOCKED_COPY.unblock}
-                  variant="secondary"
                   size="sm"
+                  weight="600"
                   disabled={unblock.isPending && unblock.variables === b.user.id}
-                  style={{ minHeight: 36, borderRadius: 18, backgroundColor: c.bg, borderWidth: 1, borderColor: c.fill2 }}
+                  style={{ height: UNBLOCK_HEIGHT, minHeight: UNBLOCK_HEIGHT, borderRadius: UNBLOCK_HEIGHT / 2, alignSelf: 'center', flexShrink: 0 }}
                   onPress={() => unblock.mutate(b.user.id)}
                 />
               </View>
