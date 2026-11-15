@@ -14,6 +14,9 @@ export const planTable = (item: PlanItem): TableBlock => ({
   rows: item.rows.map((r) => [r.tag, r.label, r.note]),
 })
 
+/** The gap of a bubble that holds a plan: ChatPh1Feedback draws its bubble with an inline gap of 10, ChatPh2 and ChatPh2XBlueprints keep the bubble's 6. */
+export const planGap = (item: PlanItem) => (item.id.endsWith('feedback') ? 10 : 6)
+
 export const isBlueprints = (item: PlanItem) => isVerdictPlan(item.rows)
 
 /** The project blueprints as one line per project, a conditional one marked, and the grey line that opens each project's reason (ChatPh2XBlueprints). */

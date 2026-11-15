@@ -5,7 +5,7 @@ import type { TableBlock } from '../../utils/bot-text'
 import { CELL, tableColumns } from '../../utils/table-columns'
 import Rich from './rich'
 
-/** A markdown table inside a bot bubble (the boards' `.mdt`): auto-sized columns that fill `width`, the head in grey, a hairline under every row but the last, no fill of its own (rule 38). */
+/** A markdown table inside a bot bubble (the boards' `.mdt`): auto-sized columns that fill `width`, the head in grey, a hairline under every row but the last, 2 above and below (`margin:2px 0`), no fill of its own (rule 38). */
 const MdTable = ({ table, width }: { table: TableBlock; width: number }) => {
   const c = useColors()
   const columns = tableColumns(table.head, table.rows, width)
@@ -25,7 +25,7 @@ const MdTable = ({ table, width }: { table: TableBlock; width: number }) => {
     </View>
   )
   return (
-    <View accessibilityRole="summary" style={{ width }}>
+    <View accessibilityRole="summary" style={{ width, marginVertical: 2 }}>
       {row(table.head, true, 'head', false)}
       {table.rows.map((cells, i) => row(cells, false, `row${i}`, i === table.rows.length - 1))}
     </View>

@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { Animated, Platform, Pressable, View } from 'react-native'
-import BotText, { BulletList, Bubble, PlanBlock } from './bot'
+import BotText, { BulletList, Bubble, NumberMark, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
@@ -131,7 +131,7 @@ const TodoList = ({ item }: { item: Of<'todo'> }) => (
         const done = line.state === 'done'
         return (
           <View key={line.text} style={{ flexDirection: 'row' }}>
-            <Text v="b1" color={done ? 't3' : 't1'} style={{ width: 24 }}>{`${n + 1}.`}</Text>
+            <NumberMark n={n + 1} color={done ? 't3' : 't1'} />
             <View style={{ flexShrink: 1 }}>
               <StruckLabel on={done} v="b1" color={done ? 't3' : 't1'}>
                 {line.text}
