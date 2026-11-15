@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { Text } from '@/shared/components'
 import { spacing, useColors } from '../../../../theme'
 import type { Approval } from '../../types'
@@ -10,6 +10,8 @@ import { Bubble } from './bot'
 type Props = { approval: Approval; onAnswer: (text: string, choice: number | number[]) => void }
 
 const ROW_LINE = 22
+// The ☐ and ☑ come from a fallback font, which sits higher in a 22 line than the board's baseline-aligned glyph; the drop was measured on the device against the board.
+const MARK_DROP = { off: 10 / 3, on: 5 / 3 }
 
 const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: string; on: boolean; onPress: () => void; number?: number }) => {
   const c = useColors()
@@ -19,9 +21,16 @@ const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: strin
       accessibilityState={mark ? { checked: on } : undefined}
       accessibilityLabel={number ? `${number}. ${label}` : label}
       onPress={onPress}
-      style={{ flexDirection: 'row', gap: 10, paddingVertical: 9, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line }}
+      style={{ flexDirection: 'row', gap: 10, paddingVertical: 9 }}
     >
-      <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
+      {/* The board's 1px box-shadow line sits above the row and takes no height. */}
+      <View pointerEvents="none" style={{ position: 'absolute', top: -1, left: 0, right: 0, height: 1, backgroundColor: c.line }} />
+      <Text
+        v="b1"
+        weight={on ? '600' : '400'}
+        color={on ? 'acText' : 't3'}
+        style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'], top: mark ? MARK_DROP[on ? 'on' : 'off'] : 0 }}
+      >
         {mark ?? number}
       </Text>
       <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't1'} style={{ flexShrink: 1, lineHeight: ROW_LINE }}>
