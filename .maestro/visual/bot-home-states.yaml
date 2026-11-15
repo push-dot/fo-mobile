@@ -36,7 +36,7 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "Bot"
-      READY: "새 회사 Bot 만들기"
+      READY: "계정 · .*"
 - extendedWaitUntil:
     visible: ".*누리클라우드 플랫폼엔지니어링코리아.*"
     timeout: 10000
@@ -51,7 +51,7 @@ tags:
     file: ../flows/_tap_tab.yaml
     env:
       TAB: "Bot"
-      READY: "새 회사 Bot 만들기"
+      READY: "계정 · .*"
 - extendedWaitUntil:
     visible: ".*승인 요청이 만료됐어요.*"
     timeout: 10000

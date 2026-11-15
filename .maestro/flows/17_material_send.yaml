@@ -7,7 +7,7 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     file: _tap_tab.yaml
     env:
       TAB: "Bot"
-      READY: "(동의하고 시작하기|새 회사 Bot 만들기)"
+      READY: "(동의하고 시작하기|계정 · .*)"
 - runFlow:
     when:
       visible: "동의하고 시작하기"

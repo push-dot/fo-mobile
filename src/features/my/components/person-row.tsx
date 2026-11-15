@@ -39,7 +39,7 @@ const PersonRow = ({ p, known }: { p: Profile; known: boolean | undefined }) => 
             backgroundColor: following ? c.fill : c.ac,
           }}
         >
-          <Text v="c1" weight="700" style={{ color: following ? c.t1 : onAccent }}>
+          <Text v="c1" weight="700" style={{ fontSize: 14, color: following ? c.t1 : onAccent }}>
             {following ? '팔로잉' : '팔로우'}
           </Text>
         </Pressable>
