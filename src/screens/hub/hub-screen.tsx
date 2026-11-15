@@ -88,7 +88,7 @@ const HubScreen = () => {
         right={
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP }}>
             {viewerId ? (
-              <Button label="내 프로필" variant="secondary" size="sm" onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
+              <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}
             <FilterButton count={appliedCount(sheet)} onPress={() => router.push('/hub-filter')} />
           </View>
