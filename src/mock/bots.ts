@@ -232,14 +232,16 @@ const home = (): BotFixture[] => [
   ),
 ]
 
+const OUTCOME_ASK = '이 사이트를 열어도 될까요?'
+
 /** AgentHomeRowExpiredFailed: AgentHome with 모아페이 asking a card that ran out and 도토리증권 ending a run in failure. */
 const homeOutcome = (): BotFixture[] => {
   const [push, ...rest] = home()
   const moa = rest.find((f) => f.bot.id === 'b-moa')!
   const dotori = rest.find((f) => f.bot.id === 'b-dotori')!
   // The user read the thread after the card was asked, so the row is 대기 with no unread dot (G19: an expired card needs nothing from the user).
-  moa.messages = [said('m-moa-1', 't-moa-2', '좋아요. 첫 번째부터 고쳐서 Push 프로필로 보여 주세요', 10, 'USER')]
-  moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', at: 10, expiresAt: 1 }]
+  moa.messages = [said('m-moa-1', 't-moa-2', OUTCOME_ASK, 10)]
+  moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', title: OUTCOME_ASK, at: 10, expiresAt: 1 }]
   moa.readAt = 5
   dotori.job = null
   dotori.failedAt = 60
