@@ -25,7 +25,7 @@ const runAdd = (action: AddAction) => {
   router.push('/jobs')
 }
 
-/** MaterialsEmpty*, MaterialsSearchEmpty, MaterialsError: centred between the tabs and the search field (the owner overrides the boards' top-aligned block). */
+/** Centred between the tabs and the search field: one block for every empty, search-empty and error state. */
 const Note = ({ title, body, action, alert, bottom }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean; bottom: number }) => (
   <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: bottom }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
