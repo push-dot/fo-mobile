@@ -29,6 +29,9 @@ export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
 export const HINTLESS_GATES = ['validate_cap']
 
+/** The in-progress phrase while the cancel request is out (ChatBotStatusStopped, rule 29: a status is the step under way, the result is a bubble). */
+export const STOPPING_TEXT = '중지하는 중'
+
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
 /** The edit card's waiting line names the edit it waits on, then this (ChatApprove). */

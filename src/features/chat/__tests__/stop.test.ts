@@ -41,6 +41,15 @@ beforeEach(() => {
 })
 
 describe('stop', () => {
+  it('says 중지하는 중 while the cancel is out, and gives the old status back when it fails', async () => {
+    prime()
+    botApi.bots.cancel.mockRejectedValueOnce(new Error('offline'))
+    stop('c1')
+    expect(useChatStore.getState().chats.c1!.working?.verbs).toEqual(['중지하는 중'])
+    await settled()
+    expect(useChatStore.getState().chats.c1!.working?.verbs).toEqual(['생각하는 중…'])
+  })
+
   it('cancels the server job once, then clears the local run', async () => {
     prime()
     stop('c1')

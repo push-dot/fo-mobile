@@ -37,8 +37,6 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       return { ...s, working: null, approval: e.approval, items: attachPendingNote(s.items, e.approval.pendingNote) }
     case 'answer':
       return { ...s, approval: null, awaiting: null, items: [...clearPendingNote(s.items), { type: 'user', id: `ans-${s.items.length}`, text: e.text }] }
-    case 'retried':
-      return s.approval ? { ...s, approval: { ...s.approval, openedAt: e.openedAt, expiresAt: e.expiresAt } } : s
     case 'dismiss':
       return { ...s, approval: null, awaiting: null, items: clearPendingNote(s.items) }
     case 'queue':

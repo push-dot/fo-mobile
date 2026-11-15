@@ -10,7 +10,7 @@ const Transcript = ({ entries }: { entries: readonly TranscriptEntry[] }) => (
   <View style={{ gap: 18 }}>
     {entries.map((entry) => {
       if (entry.type === 'status') return <StatusLine key={entry.id} line={entry.line} />
-      if (entry.type === 'notice') return <Notice key={entry.id} notice={entry.notice} />
+      if (entry.type === 'notice') return <Notice key={entry.id} id={entry.id} notice={entry.notice} />
       if (entry.type === 'user') return <UserBubble key={entry.id} item={{ type: 'user', id: entry.id, text: entry.text }} />
       if (entry.type === 'bot') return <BotText key={entry.id} item={{ type: 'agentText', id: entry.id, text: entry.text }} />
       return (

@@ -29,6 +29,6 @@ name: 봇 → 대화 → 키보드가 떠 있어도 보내기 버튼 보임
 - tapOn: "보내기"
 # The queued chip is painted after the keyboard inset settles. 10s raced that layout, so wait out the same budget as the working line.
 - extendedWaitUntil:
-    visible: ".*대기 중.*"
+    visible: ".*use numbers.*"
     timeout: 40000
 - takeScreenshot: 12_chat_composer_keyboard-02
