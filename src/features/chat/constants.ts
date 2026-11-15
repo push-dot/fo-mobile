@@ -243,3 +243,6 @@ export const KEYWORD_GLYPH = {
   // eslint-disable-next-line no-restricted-syntax -- board value; importing the theme here breaks the node tests
   miss: { char: '!', gap: 4 },
 } as const
+
+/** The page-style modal a form card (ChatPh0Input) opens in: its title is the sheet's, not the bot's question. */
+export const NEW_TASK_TITLE = '새 작업'

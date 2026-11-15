@@ -137,15 +137,18 @@ export const submitLabelFor = (approval: Approval, selected: { templateId?: stri
   return base.replaceAll('{n}', String(selected.toggleCount))
 }
 
-/** A card whose last section is a single-pick chip row (ChatPh0Input 말투) is sent by tapping that chip. */
-export const chipSends = (approval: Approval) => {
+/** A card whose last section is a single-pick chip row is sent by tapping that chip... */
+const endsOnChip = (approval: Approval) => {
   const last = approval.sections.at(-1)
   return last?.kind === 'chips' && !last.multi
 }
 
+/** ...unless the card has a confirm button of its own (ChatPh0Input 시작하기): then the chips only pick. */
+export const chipSends = (approval: Approval) => endsOnChip(approval) && !approval.submit
+
 /** The user bubble after a section card: ChatPh0Input "이력서만 · 자료 3개 · 원래 말투로", else the button label. */
 export const sectionLabel = (approval: Approval, sel: number[][]): string => {
-  if (chipSends(approval))
+  if (endsOnChip(approval))
     return approval.sections
       .flatMap((s, si) => {
         if (s.kind === 'rows') return s.items.length ? [`자료 ${s.items.length}개`] : []
