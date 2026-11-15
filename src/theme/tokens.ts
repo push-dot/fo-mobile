@@ -35,6 +35,9 @@ export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows
 /** The boards' `--iFill` (iOS system fill): translucent, so a field greys whatever sheet it sits on (FilterSkill's `.isearch`, #E3E3E9 on the board). */
 export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' } as const
 
+/** A white A4 page in DocViewer: the board's 1pt ring, and the ring plus a soft drop under the first page. */
+export const paperPage = { ring: 'rgba(0,0,0,0.06) 0px 0px 0px 1px', lifted: 'rgba(0,0,0,0.06) 0px 0px 0px 1px, rgba(0,0,0,0.12) 0px 4px 14px' } as const
+
 /** The 1pt line between rows of a translucent iOS sheet: the board's --line is 6 steps darker than its #F3F3F6 sheet, the device sheet is #EBEBEB, where #EBEDF0 shows nothing, so the line is a tint. */
 export const iosSeparator = { light: 'rgba(118,118,128,0.06)', dark: palette.dark.line } as const
 
