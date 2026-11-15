@@ -31,15 +31,8 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: PushDocRename
-# iOS asks for the name in a system alert (Alert.prompt: native wins); a tap outside or a swipe cannot close it, 취소 does. Android keeps its sheet.
+# The rename modal is a regular sheet with no 취소: swipe it away.
 - runFlow:
-    when:
-      platform: iOS
-    commands:
-      - tapOn: "취소"
-- runFlow:
-    when:
-      platform: Android
     file: _close_sheet.yaml
     env:
       TITLE: "서류 이름 바꾸기"

@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { Alert } from 'react-native'
-import { showActionSheet } from '@/shared/components/action-sheet'
+import { showChoiceModal } from '@/shared/navigation'
 import { doneNextActions, doneNextCopy, saveFailed, type ResultAction } from '../utils/result-card'
 import type { ChatItem, ChatState } from '../types'
 
 type Result = Extract<ChatItem, { type: 'result' }>
 
 /**
- * ChatDoneNext: when a run finishes with a result card, ask what to do next in the platform's action sheet
+ * ChatDoneNext: when a run finishes with a result card, ask what to do next in a regular modal
  * instead of drawing buttons in the chat. A card already in the thread when it opens is never asked about.
  */
 export const useDoneNext = (chat: Pick<ChatState, 'items' | 'working' | 'approval'>, run: (action: ResultAction, card: Result) => void) => {
@@ -27,7 +27,7 @@ export const useDoneNext = (chat: Pick<ChatState, 'items' | 'working' | 'approva
     if (saveFailed(card)) return
     const actions = doneNextActions(card)
     if (!actions.length) return
-    showActionSheet({ ...doneNextCopy(card), items: actions.map((a) => ({ label: a.label, onPress: () => latest.current(a, card) })) })
+    showChoiceModal({ ...doneNextCopy(card), items: actions.map((a) => ({ label: a.label, onPress: () => latest.current(a, card) })) })
   }, [chat.items, chat.working, chat.approval])
 }
 
