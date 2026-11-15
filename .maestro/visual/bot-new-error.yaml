@@ -14,5 +14,5 @@ tags:
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewError
-- tapOn: "취소"
+- tapOn: "닫기"
 - openLink: push://?mock=reset

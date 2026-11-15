@@ -82,7 +82,7 @@ tags:
       KO: "누리클라우드 공고 3개 비교해서 어디에 먼저 낼지 정리해 주세요"
       EN: "st-long"
 - extendedWaitUntil:
-    visible: ".*공고 3개의 필수 요건과 우대 요건을.*"
+    visible: ".*공고 읽는 중.*"
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
@@ -92,7 +92,7 @@ tags:
 - takeScreenshot: ChatBotStatusLong
 - tapOn: "중지"
 - extendedWaitUntil:
-    notVisible: ".*공고 3개의 필수 요건과 우대 요건을.*"
+    notVisible: ".*공고 읽는 중.*"
     timeout: 10000
 # 선택 카드: the run waits for an answer.
 - openLink: "push://bots/b-moa?mock=run:st-help,bot:b-moa:empty"

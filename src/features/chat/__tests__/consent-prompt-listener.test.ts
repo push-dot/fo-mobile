@@ -26,8 +26,7 @@ vi.mock('../api/fetchers', () => ({
   updateAiAccessMode: vi.fn(),
 }))
 
-const { askConsent, useConsentPrompt } = await import('../stores')
-const { routeConsentWhenOpen } = await import('../components/consent-prompt-listener')
+const { useConsentPrompt } = await import('../stores')
 
 const chatTabSource = readFileSync(
   new URL('../../../app/(app)/(stack)/(tabs)/(bots)/bots.tsx', import.meta.url),
@@ -47,10 +46,10 @@ beforeEach(() => {
 })
 
 describe('ConsentPromptListener', () => {
-  it('pushes the consent route when askConsent(true) fires while the chat tab stays unfocused', () => {
-    askConsent(true)
-    routeConsentWhenOpen(useConsentPrompt.getState().open)
-    expect(pushed).toHaveBeenCalledWith('/consent')
+  it('shows the platform alert, not a route, when the prompt opens while the chat tab stays unfocused', () => {
+    expect(listenerSource).toContain('showConsentAlert(')
+    expect(listenerSource).not.toContain('router')
+    expect(stackLayoutSource).not.toContain('name="consent"')
   })
 
   it('does not read consents or settings on cold start', () => {

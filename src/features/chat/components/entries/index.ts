@@ -1,5 +1,4 @@
 export { Item, Queued, ToolLine } from './item'
-export { default as Glyph } from './glyph'
 export { default as Rich } from './rich'
 export { default as UserBubble } from './user'
 export { default as BotText } from './bot'

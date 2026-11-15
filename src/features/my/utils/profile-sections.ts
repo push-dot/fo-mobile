@@ -35,16 +35,19 @@ const SECTIONS = [
     label: '기술 스택',
     on: false,
     fields: ['skills'],
-    sub: (d: Draft) => d.skills.slice(0, 2).join(', ') + (d.skills.length > 2 ? ` 외 ${d.skills.length - 2}개` : ''),
+    sub: (d: Draft, main: readonly string[]) =>
+      [...main.filter((s) => d.skills.includes(s)), ...d.skills.filter((s) => !main.includes(s))].slice(0, 2).join(', ') +
+      (d.skills.length > 2 ? ` 외 ${d.skills.length - 2}개` : ''),
   },
-] as const satisfies readonly { key: string; label: string; on: boolean; fields: readonly (keyof Draft)[]; sub: (d: Draft) => string }[]
+] as const satisfies readonly { key: string; label: string; on: boolean; fields: readonly (keyof Draft)[]; sub: (d: Draft, main: readonly string[]) => string }[]
 
 export type ProfileSectionKey = (typeof SECTIONS)[number]['key']
 
 const filled = (v: unknown) => (Array.isArray(v) ? v.length > 0 : v != null && v !== '')
 
-export const profileSections = (draft: Draft) =>
-  SECTIONS.filter((s) => s.fields.some((f) => filled(draft[f]))).map((s) => ({ key: s.key, label: s.label, on: s.on, sub: s.sub(draft) }))
+/** `main` is the stack the resume leads with; the row names those first, while the document keeps its own order. */
+export const profileSections = (draft: Draft, main: readonly string[] = []) =>
+  SECTIONS.filter((s) => s.fields.some((f) => filled(draft[f]))).map((s) => ({ key: s.key, label: s.label, on: s.on, sub: s.sub(draft, main) }))
 
 export const profilePatch = (draft: Draft, picked: readonly ProfileSectionKey[]): Partial<Profile> =>
   Object.fromEntries(SECTIONS.filter((s) => picked.includes(s.key)).flatMap((s) => s.fields.map((f) => [f, draft[f]])))

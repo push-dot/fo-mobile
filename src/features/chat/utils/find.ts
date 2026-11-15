@@ -1,4 +1,5 @@
 import type { BotContract } from '@push/api-client'
+import { WORD_JOINER } from '@/shared/utility/keep-words'
 import type { ChatItem } from '../types'
 
 export type FindStep = 'older' | 'newer'
@@ -44,6 +45,8 @@ export const prependOlder = (current: readonly ChatItem[], older: readonly ChatI
 export const fromFirst = (items: readonly ChatItem[], type: ChatItem['type']) => items.slice(Math.max(0, items.findIndex((item) => item.type === type)))
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+// The text component joins words with U+2060; a query typed without it still finds the word.
+const wordJoinerTolerant = (q: string) => [...q].map(escapeRegExp).join(`${WORD_JOINER}*`)
 
 export type Mark = { text: string; hit: boolean }
 
@@ -51,7 +54,30 @@ export const splitMarks = (text: string, query: string): Mark[] => {
   const q = query.trim()
   if (!q) return [{ text, hit: false }]
   return text
-    .split(new RegExp(`(${escapeRegExp(q)})`, 'gi'))
+    .split(new RegExp(`(${wordJoinerTolerant(q)})`, 'gi'))
     .map((part, i) => ({ text: part, hit: i % 2 === 1 }))
     .filter((mark) => mark.text !== '')
+}
+
+/** One line of a Text's onTextLayout; `ascender` is the baseline's distance below the line's top. */
+export type TextLine = { x: number; y: number; width: number; height: number; ascender: number }
+export type Point = { x: number; y: number }
+export type MarkEdges = { left: Point; right: Point }
+
+// The boards draw `mark` over its inline box, the font's content area: Noto Sans KR hhea ascent 1.16 em, descent 0.288 em.
+const ASCENT_EM = 1.16
+const DESCENT_EM = 0.288
+export const MARK_RADIUS = 4
+
+const lineAt = (lines: readonly TextLine[], y: number) => lines.find((line) => y >= line.y - 0.5 && y <= line.y + line.height + 0.5)
+
+/** The boxes behind a mark: one per line it spans, from the position of its two edges in the paragraph. */
+export const markRects = (lines: readonly TextLine[], { left, right }: MarkEdges, fontSize: number) => {
+  const first = lineAt(lines, left.y)
+  const last = lineAt(lines, right.y)
+  if (!first || !last) return []
+  const box = (line: TextLine, from: number, to: number) => ({ left: from, width: to - from, top: line.y + line.ascender - ASCENT_EM * fontSize, height: (ASCENT_EM + DESCENT_EM) * fontSize })
+  if (first === last) return [box(first, left.x, right.x)]
+  const between = lines.slice(lines.indexOf(first) + 1, lines.indexOf(last))
+  return [box(first, left.x, first.x + first.width), ...between.map((line) => box(line, line.x, line.x + line.width)), box(last, last.x, right.x)]
 }

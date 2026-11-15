@@ -25,6 +25,14 @@ import { homeChrome } from './metrics'
 
 const VIEWABILITY = { itemVisiblePercentThreshold: 60 }
 
+const MENU_SYMBOL: Record<HomeMenuKey, MenuAction['systemImage']> = {
+  profile: 'person',
+  find: 'magnifyingglass',
+  read: 'checkmark.circle',
+  mute: 'bell.slash',
+  delete: 'trash',
+}
+
 const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
   profile: 'user',
   find: 'search',
@@ -111,6 +119,7 @@ const BotHomeView = ({
       key: item.key,
       label: item.label,
       destructive: item.destructive,
+      systemImage: item.key === 'mute' && bot.muted ? 'bell' : MENU_SYMBOL[item.key],
       icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
       onPress: () => run(item.key, bot),
     }))
@@ -127,16 +136,14 @@ const BotHomeView = ({
 
   return (
     <View style={screen}>
-      {searching ? null : (
-        <BotHomeHeader
-          chrome={chrome}
-          topInset={insets.top}
-          label={accountLabel(accountName, plan)}
-          name={accountName}
-          onAccount={() => router.push(accountPath())}
-          onNew={() => router.push(botNewPath())}
-        />
-      )}
+      <BotHomeHeader
+        chrome={chrome}
+        topInset={insets.top}
+        label={accountLabel(accountName, plan)}
+        name={accountName}
+        onAccount={() => router.push(accountPath())}
+        onNew={() => router.push(botNewPath())}
+      />
       {searching ? (
         <BotHomeSearch
           query={query}
@@ -145,7 +152,7 @@ const BotHomeView = ({
           local={local}
           now={now}
           chrome={chrome}
-          top={insets.top + 8}
+          top={top}
           bottom={lift + chrome.control}
           bots={bots ?? []}
           onOpenBot={openChat}

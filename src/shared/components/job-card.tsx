@@ -29,7 +29,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
         ) : (
           <>
             <LinearGradient colors={[brand, shade(brand)]} start={{ x: 0.13, y: -0.16 }} end={{ x: 0.87, y: 1.16 }} style={{ position: 'absolute', inset: 0 }} />
-            <Text v="h1" style={{ fontSize: 52, lineHeight: 60, color: photo.ink, letterSpacing: -2 }}>
+            <Text v="h1" style={{ fontSize: 52, lineHeight: 76, color: photo.ink, letterSpacing: -2 }}>
               {[...p.company][0]}
             </Text>
           </>

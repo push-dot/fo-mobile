@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fromFirst, matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch } from '../utils/find'
+import { fromFirst, markRects, matchItemId, matchLabel, prependOlder, revealMatch, splitMarks, stepMatch, type TextLine } from '../utils/find'
 import type { ChatItem } from '../types'
 
 const user = (id: string): ChatItem => ({ type: 'user', id, text: id })
@@ -108,5 +108,24 @@ describe('splitMarks', () => {
 
   it('draws a blank query plain', () => {
     expect(splitMarks('안녕', '  ')).toEqual([{ text: '안녕', hit: false }])
+  })
+})
+
+describe('markRects', () => {
+  const line = (y: number): TextLine => ({ x: 0, y, width: 300, height: 23, ascender: 17 })
+
+  it('boxes a mark on one line as the board draws it: the font content area around the baseline', () => {
+    const [box] = markRects([line(0), line(23)], { left: { x: 100, y: 17 }, right: { x: 133, y: 17 } }, 16)
+    expect(box).toEqual({ left: 100, width: 33, top: 17 - 1.16 * 16, height: 1.448 * 16 })
+  })
+
+  it('splits a mark that wraps into the end of its first line, whole middle lines and the start of its last', () => {
+    const lines = [line(0), line(23), line(46)]
+    const rects = markRects(lines, { left: { x: 250, y: 17 }, right: { x: 40, y: 63 } }, 16)
+    expect(rects.map((r) => [r.left, r.width])).toEqual([[250, 50], [0, 300], [0, 40]])
+  })
+
+  it('draws nothing while an edge has no line yet', () => {
+    expect(markRects([], { left: { x: 1, y: 1 }, right: { x: 2, y: 1 } }, 16)).toEqual([])
   })
 })

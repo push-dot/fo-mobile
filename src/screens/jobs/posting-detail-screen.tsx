@@ -1,19 +1,15 @@
 import { router } from 'expo-router'
-import { Platform, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { View } from 'react-native'
 import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
-import { Button, DetailWebView, GlassButton, TopBar, type DetailFrom } from '@/shared/components'
+import { Button, CtaBar, DetailWebView, GlassButton, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { spacing, useColors } from '@/theme'
+import { useColors } from '@/theme'
 
 const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const { data: p } = usePosting(id)
   const toggleBookmark = useToggleBookmark()
-  const android = Platform.OS === 'android'
-  const barBottom = insets.bottom + (android ? 10 : 6)
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -31,18 +27,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         }
       />
       <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} />
-      <View
-        style={{
-          flexDirection: 'row',
-          gap: spacing[2],
-          paddingTop: 14,
-          paddingHorizontal: spacing[4],
-          paddingBottom: barBottom,
-          backgroundColor: c.bg,
-          borderTopWidth: android ? 1 : 0,
-          borderTopColor: c.line,
-        }}
-      >
+      <CtaBar>
         <Button
           label="Bot한테 보내기"
           variant="secondary"
@@ -59,7 +44,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
           onPress={() => router.push({ pathname: '/apply', params: { postingId: id } })}
           style={{ flex: 1 }}
         />
-      </View>
+      </CtaBar>
     </View>
   )
 }

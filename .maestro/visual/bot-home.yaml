@@ -18,14 +18,14 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHome
-# The board lifts 도토리증권 over the blurred list with its five actions under it.
+# The long press opens the platform's own context menu: the row lifts and its five actions sit under it.
 - longPressOn: ".*도토리증권.*"
 - extendedWaitUntil:
     visible: "Bot 프로필 보기"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHomePress
-- tapOn: "메뉴 닫기"
+- runFlow: _dismiss_menu.yaml
 - extendedWaitUntil:
     notVisible: "Bot 프로필 보기"
     timeout: 5000

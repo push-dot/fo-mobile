@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import {
@@ -61,13 +61,12 @@ const DocToProfileSheetScreen = () => {
   const draft = query.data?.profile
   const { data: me } = useMyProfile()
   const apply = useApplyResumeProfile(() => undefined)
-  const sections = draft ? profileSections(draft) : []
+  const sections = draft ? profileSections(draft, query.data?.mainSkills) : []
   const [picked, setPicked] = useState<ProfileSectionKey[] | null>(null)
   if (!draft)
     return (
       <Sheet
         title="이 이력서로 프로필을 채울까요?"
-        onClose={() => router.back()}
         action={query.isPending ? undefined : { label: RETRY_LABEL, onPress: () => void query.refetch() }}
       >
         {query.isPending ? <ListSkeleton count={3} /> : null}

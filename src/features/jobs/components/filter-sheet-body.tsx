@@ -1,6 +1,6 @@
 import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
 import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
-import { FilterSheetNav, GlassButton, SheetScroll, Text } from '../../../shared/components'
+import { FilterSheetNav, SheetScroll, Text } from '../../../shared/components'
 import { hitSlopTo, type } from '../../../theme'
 import { FILTER_TITLES } from '../constants'
 import { EMPTY, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
@@ -13,14 +13,12 @@ type Props = {
   draft: Filters
   trending: string[]
   onChange: (filters: Filters) => void
-  /** iOS draws a glass close button left of the centred title (the boards' native sheet header). */
-  onClose: () => void
   /** A header over one chip group: the native sheet's 52pt header with the chips right under it. */
   compact?: boolean
   scroll?: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
-const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, compact, scroll }: Props) => {
+const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: Props) => {
   const ios = Platform.OS === 'ios'
   const set = (list: Filters[FilterKey]) => onChange({ ...draft, [kind]: list })
   const options =
@@ -41,11 +39,10 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, onClose, compact, sc
   return (
     <View style={{ gap: compact || isheet ? 0 : 14, flexGrow: 1 }}>
       {isheet ? (
-        <FilterSheetNav title={FILTER_TITLES[kind]} onClose={onClose} onReset={reset} />
+        <FilterSheetNav title={FILTER_TITLES[kind]} onReset={reset} />
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: compact ? 52 : undefined }}>
-          {ios ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null}
-          <Text v={ios ? 'h3' : 'h2'} accessibilityRole="header" style={ios ? { flex: 1, textAlign: 'center' } : undefined}>
+          <Text v="h2" accessibilityRole="header">
             {FILTER_TITLES[kind]}
           </Text>
           <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }}>

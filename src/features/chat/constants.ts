@@ -29,6 +29,9 @@ export const READ_OFF_CODE = 'read_switch_off'
 export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
 export const HINTLESS_GATES = ['validate_cap']
 
+/** The in-progress phrase while the cancel request is out (ChatBotStatusStopped, rule 29: a status is the step under way, the result is a bubble). */
+export const STOPPING_TEXT = '중지하는 중'
+
 export const STALE_GATE = { title: '확인 대기 중', badge: '멈춤' } as const
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
 /** The edit card's waiting line names the edit it waits on, then this (ChatApprove). */
@@ -102,6 +105,9 @@ export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const CONSENT_LATER = '나중에'
+/** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
+export const DEFAULT_DOC = '기본 프로필'
+const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`
 // Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 
@@ -159,7 +165,7 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'link', label: '공고 링크로 맞추기', icon: 'link', layout: 'link', action: '맞추기 시작', docLabel: '비교할 서류',
     title: '어떤 공고에 맞출까요?', description: '공고 링크를 붙여넣으면 내 서류를 그 공고에 맞춰 고쳐요.',
-    start: (i) => (/^https?:\/\/\S+\.\S+/.test(i.url.trim()) ? opened(`${host(i.url)} 공고 맞춤`, `${i.url.trim()} 공고에 맞춰 ${i.doc}를 고쳐 주세요`, 'match_posting', i.documentId) : null),
+    start: (i) => (/^https?:\/\/\S+\.\S+/.test(i.url.trim()) ? opened(`${host(i.url)} 공고 맞춤`, `${i.url.trim()} 공고에 맞춰 ${eulReul(i.doc)} 고쳐 주세요`, 'match_posting', i.documentId) : null),
   },
   {
     key: 'match', label: '나에게 맞는 공고 찾기', icon: 'target', layout: 'match', action: '공고 찾기',
@@ -169,7 +175,7 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'gap', label: '부족한 점 찾기', icon: 'glass', layout: 'pick', action: '부족한 점 찾기', docLabel: '비교할 서류',
     title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해 부족한 점을 찾아요.',
-    start: (i) => one(i) && opened(`${one(i)!.over} 공고 갭 분석`, `${one(i)!.over} ${one(i)!.title} 공고와 ${i.doc}를 비교해서 부족한 점을 찾아 주세요`, 'gaps', i.documentId),
+    start: (i) => one(i) && opened(`${one(i)!.over} 공고 갭 분석`, `${one(i)!.over} ${one(i)!.title} 공고와 ${eulReul(i.doc)} 비교해서 부족한 점을 찾아 주세요`, 'gaps', i.documentId),
   },
   {
     key: 'fit', label: '적합도 보기', icon: 'chart', layout: 'pick', action: '적합도 보기', docLabel: '비교할 서류',
@@ -202,7 +208,7 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'hub', label: '허브 프로필 다듬기', icon: 'person', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', docLabel: '바탕이 될 서류',
     title: '어떤 부분을 다듬을까요?', description: '내 서류를 바탕으로 허브 프로필을 고쳐요. 바꾸기 전에 보여 드려요.',
-    start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `${i.doc}를 바탕으로 허브 프로필의 ${i.picked.map((p) => p.title).join(', ')}을 다듬어 주세요`, 'hub_profile', i.documentId) : null),
+    start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `${eulReul(i.doc)} 바탕으로 허브 프로필의 ${i.picked.map((p) => p.title).join(', ')}을 다듬어 주세요`, 'hub_profile', i.documentId) : null),
   },
   {
     key: 'exp', label: '경험 만들기', icon: 'star', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기',

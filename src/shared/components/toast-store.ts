@@ -38,7 +38,13 @@ export const showToast = (toast: ToastInput) => {
     // A plain toast may replace that undo. Anything already waiting stays in order and shows after this one.
     return { current: next, queued: s.queued }
   })
+  return next.id
 }
+
+/** True while the toast is on screen or waiting its turn. */
+export const toastLive = (s: State, id: number) => s.current?.id === id || s.queued.some((t) => t.id === id)
+
+export const useToastLive = (id: number | null) => useToastStore((s) => id != null && toastLive(s, id))
 
 export const hideToast = (id: number) =>
   useToastStore.setState((s) => {

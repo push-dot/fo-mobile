@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
-import { Icon, Text, TopBar } from '@/shared/components'
+import { GlassField, Icon, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
 
@@ -21,13 +21,12 @@ const FollowsScreen = () => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} />
       {following ? (
-        <View
+        <GlassField
           style={{
             marginHorizontal: spacing[5],
             marginVertical: spacing[2],
             height: 44,
             borderRadius: radius.card,
-            backgroundColor: c.bg2,
             paddingHorizontal: spacing[4],
             flexDirection: 'row',
             alignItems: 'center',
@@ -43,7 +42,7 @@ const FollowsScreen = () => {
             placeholderTextColor={c.t4}
             style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1, ...inputReset }, fontFor('400')]}
           />
-        </View>
+        </GlassField>
       ) : null}
       {query.isLoading ? (
         <ListSkeleton />

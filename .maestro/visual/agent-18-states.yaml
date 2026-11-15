@@ -22,6 +22,9 @@ tags:
           file: _chat_kbd_down.yaml
           env:
             TEXT: ".*PDF로 만들어 줘.*"
+      # The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat.
+      - openLink: push://bots/b-moa?mock=bot:b-moa:from:user
+      - waitForAnimationToEnd
       - takeScreenshot: ChatStates.1
       - runFlow: _fresh_company.yaml
       - runFlow:

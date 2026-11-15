@@ -9,21 +9,20 @@ type Props = {
   draft: SheetFilters
   sent: number | undefined
   onChange: (sheet: SheetFilters) => void
-  onClose: () => void
 }
 
 const exploreChip = (draft: SheetFilters, key: Explore, label: string, onChange: (sheet: SheetFilters) => void) => (
   <Chip sheet key={key} label={label} check on={draft.explore === key} onPress={() => onChange({ ...draft, explore: key })} />
 )
 
-const HubFilterSheet = ({ draft, sent, onChange, onClose }: Props) => {
+const HubFilterSheet = ({ draft, sent, onChange }: Props) => {
   const ios = Platform.OS === 'ios'
   const reset = () => onChange(EMPTY_SHEET)
   return (
     // iOS: the 52pt .inav then the groups, no gap (.ihead carries its own 14 above and 6 below).
     <View style={{ gap: ios ? 0 : 14 }}>
       {ios ? (
-        <FilterSheetNav title="필터" onClose={onClose} onReset={reset} />
+        <FilterSheetNav title="필터" onReset={reset} />
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text v="h2" accessibilityRole="header">

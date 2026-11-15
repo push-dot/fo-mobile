@@ -2,11 +2,11 @@ import { Children, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cssShadow, onAccent, radius, selectedRing, spacing, type, useColors } from '../../../../theme'
-import { Badge, Button, Icon, Text, hitSlopTo, useReduceMotion } from '@/shared/components'
+import { Badge, Button, Icon, Text, hitSlopTo, showActionSheet, useReduceMotion } from '@/shared/components'
 import { SPRING } from '../../constants'
 import { RISE_MS, riseOnMount } from './approval-rise'
-import { expiredNote } from '../../utils/card'
 import type { Approval, ApprovalSection, Choice } from '../../types'
+import { choiceSheet, isSay } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
 
@@ -18,12 +18,6 @@ type Props = {
   onSay: () => void
   /** A material row's 변경: pick another material (자료 고르기). */
   onMaterials: () => void
-  /** Past `expiresAt` (cardState): the answers go grey and 닫기 / 다시 요청 take their place. */
-  expired?: boolean
-  /** 닫기: answers reject, so the run that asked can end. */
-  onClose?: () => void
-  /** 다시 요청: asks the same card again for the same span. */
-  onRetry?: () => void
 }
 
 // `.panel { gap: 6px }`: between the panel's blocks and inside each section.
@@ -33,9 +27,8 @@ const FOOT_TOP = 6
 // The board pads 그만하기 22pt per side; the Button gives 20.
 const STOP_PAD = { paddingHorizontal: 2 }
 
-const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 /** Replaces the composer until answered (design_system ApprovalPanel). */
-export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired = false, onClose, onRetry }: Props) => {
+export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials }: Props) => {
   const c = useColors()
     const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
@@ -67,6 +60,20 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
     return () => (stop(), rise.stopAnimation())
   }, [rise, reduce])
 
+  // iOS: a single-pick card is the platform's action sheet, so the panel draws nothing; leaving it hands the floor to the composer.
+  const sheet = Platform.OS === 'ios' ? choiceSheet(approval) : null
+  useEffect(() => {
+    if (!sheet) return
+    showActionSheet({
+      title: sheet.title,
+      message: sheet.message,
+      items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
+      cancel: sheet.cancel,
+      onCancel: onSay,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
+  }, [])
+
   const toggle = (si: number, i: number, multi?: boolean) =>
     setSel((all) => all.map((cur, k) => (k !== si ? cur : multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i])))
 
@@ -83,9 +90,8 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
         const rows = s.items.map((ch, i) => (
           <ChoiceRow
             key={`${si}-${i}`}
-            disabled={expired}
             n={numbered ? i + 1 : undefined}
-            choice={expired ? { label: ch.label } : ch}
+            choice={ch}
             on={sel[si]!.includes(i)}
             square={!numbered}
             bare={!!s.multi && isStop(ch)}
@@ -187,30 +193,16 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
 
   const body = (
     <View style={{ gap: PANEL_GAP, paddingTop: ios ? 22 : spacing[5], paddingHorizontal: ios ? 14 : spacing[4], paddingBottom: ios ? 18 : insets.bottom + spacing[3] }}>
-      {expired ? (
-        <View style={{ flexDirection: 'row', paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
-          <Badge label="만료됨" tone="grey" />
-        </View>
-      ) : null}
-      <Text v="h3" accessibilityRole="header" color={expired ? 't3' : 't1'} style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
+      <Text v="h3" accessibilityRole="header" style={{ fontSize: 18, lineHeight: 26, paddingHorizontal: spacing[1], paddingBottom: spacing[2] }}>
         {approval.question}
       </Text>
-      {expired || approval.detail ? (
+      {approval.detail ? (
         <Text v="c1" color="t3" style={{ paddingHorizontal: spacing[1], paddingBottom: 6, marginTop: -PANEL_GAP }}>
-          {expired ? expiredNote(approval) : approval.detail}
+          {approval.detail}
         </Text>
       ) : null}
       {approval.sections.map(section)}
-      {expired ? (
-        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[2] }}>
-          <View style={{ flex: 1 }}>
-            <Button variant="secondary" label="닫기" onPress={() => onClose?.()} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button label="다시 요청" onPress={() => onRetry?.()} />
-          </View>
-        </View>
-      ) : sectioned ? (
+      {sectioned ? (
         <View style={{ gap: PANEL_GAP, marginTop: spacing[1] }}>
           {sectionSubmit ? <Button label={sectionSubmit} onPress={() => sendSections(sel)} /> : null}
           {approval.secondary && !approval.sections.some((s) => s.kind === 'chips') ? <Button variant="secondary" label={approval.secondary} onPress={cancel} /> : null}
@@ -250,7 +242,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
           </View>
         </>
       ) : null}
-      {expired ? null : approval.warning ? (
+      {approval.warning ? (
         <Text v="c1" weight="600" color="t2" style={{ textAlign: 'center', paddingTop: 6 }}>
           {approval.warning}
         </Text>
@@ -265,10 +257,12 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, onMaterials, expired 
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
+  if (sheet) return null
+
   return (
     <Animated.View
       accessibilityViewIsModal
-      accessibilityLabel={expired ? '만료된 요청' : '확인 요청'}
+      accessibilityLabel="확인 요청"
       style={[
         ios
           ? // `.ios .panel`: the 1px ring is a spread shadow (`0 0 0 1px line`), not a border, so it adds nothing to the panel's height (ChatApprove: 136, a border made it 138).
@@ -304,7 +298,7 @@ const Sub = ({ label }: { label: string }) => (
 )
 
 /** `tall`: the row is `.ch.two` (64 high, top aligned) although it has no description (ChatPh4Design's 프로필 사진 넣기). */
-const ChoiceRow = ({ n, choice, on, square, bare, center, disabled, tall, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; disabled?: boolean; tall?: boolean; onPress: () => void }) => {
+const ChoiceRow = ({ n, choice, on, square, bare, center, tall, onPress }: { n?: number; choice: Choice; on: boolean; square: boolean; bare?: boolean; center?: boolean; tall?: boolean; onPress: () => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
   const two = !!choice.desc || !!tall
@@ -315,9 +309,7 @@ const ChoiceRow = ({ n, choice, on, square, bare, center, disabled, tall, onPres
       accessibilityState={square ? { checked: on } : { selected: on }}
       accessibilityLabel={n ? `${n}. ${choice.label}` : choice.label}
       onPress={onPress}
-      disabled={disabled}
       style={({ pressed }) => ({
-        opacity: disabled ? 0.45 : 1,
         flexDirection: 'row',
         alignItems: two ? 'flex-start' : 'center',
         justifyContent: center ? 'center' : undefined,

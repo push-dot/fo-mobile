@@ -38,7 +38,6 @@ const ProposalSheetScreen = () => {
           onMessage={setMessage}
           onPosting={setPostingId}
           onError={setError}
-          onClose={() => router.back()}
         />
       </Sheet>
     </ScrollView>

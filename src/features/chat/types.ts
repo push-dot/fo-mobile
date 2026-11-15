@@ -15,10 +15,11 @@ export type ChatItem =
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
   /** `card` is the untitled plan that came right after the text: the board draws it inside the same bubble (ChatPh1Feedback). */
-  | { type: 'agentText'; id: string; text: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
+  /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */
+  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
-  /** How a run ended badly, drawn as a status line (ChatInterrupt, ChatVerifyFail). */
+  /** How a run ended badly, drawn as a bubble (ChatInterrupt, ChatVerifyFail). */
   | { type: 'notice'; id: string; notice: Notice }
   | { type: 'think'; id: string; seconds: number }
   /** `error` replaces the ⎿ result in red (failed or interrupted). `extra` collapses as "+N줄". */
@@ -76,7 +77,7 @@ export type ChatItem =
       pendingNote?: string
     }
   | { type: 'worked'; id: string; seconds: number }
-  /** `reason` set: the run broke with no line of its own to show, so the status line draws "작업 중 문제가 생겼어요 · {reason}" (ChatBotStatusError). */
+  /** `reason` set: the run broke with no line of its own to show, so a bubble says "작업 중 문제가 생겼어요" with the reason as grey sub-text (ChatBotStatusError). */
   | { type: 'error'; id: string; text: string; code?: string; reason?: string }
   | { type: 'stale'; id: string; text: string }
 
@@ -111,9 +112,8 @@ export type Approval = {
   optionIds: string[]
   /** A tool asking permission (the wire's `approval`), as opposed to a choice. */
   confirm?: true
-  /** Server times in ms. A card with no `expiresAt` waits until answered. 다시 요청 replaces both. */
+  /** When the card was asked, in ms. A card waits until it is answered. */
   openedAt?: number
-  expiresAt?: number
   /** The waiting line's own words, for a card whose line names the work ("이력서 수정 · 확인을 기다리는 중", ChatApprove). */
   waitText?: string
 }
@@ -128,7 +128,6 @@ export type ChatEvent =
   | { type: 'sources'; sources: BotContract.Attachment[] }
   | { type: 'approval'; approval: Approval }
   | { type: 'answer'; text: string }
-  | { type: 'retried'; openedAt: number; expiresAt: number }
   /** The card leaves with no answer bubble: 닫기 on an expired card, or a retry a newer message superseded. */
   | { type: 'dismiss' }
   | { type: 'queue'; text: string; file?: PickedFile }

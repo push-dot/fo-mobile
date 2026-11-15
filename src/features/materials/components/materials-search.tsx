@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Icon, useKeyboardHeight } from '@/shared/components'
+import { GlassField, Icon, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '@/theme'
 import { SEARCH_PLACEHOLDER } from '../constants'
@@ -75,8 +75,7 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
           end={{ x: 0, y: 0 }}
           style={{ position: 'absolute', inset: 0 }}
         />
-        {/* The boards draw the field as a flat fill on both platforms (no glass, no shadow). */}
-        <View style={{ borderRadius: size.borderRadius, backgroundColor: c.fill }}>{field}</View>
+        <GlassField style={{ borderRadius: size.borderRadius }}>{field}</GlassField>
       </View>
     </KeyboardAvoidingView>
   )

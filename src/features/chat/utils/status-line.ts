@@ -10,15 +10,15 @@ export type Notice =
   | { kind: 'failed'; text: string }
   | { kind: 'error'; code: string | undefined; reason: string | null }
 
-export type StatusLine = LiveLine | Notice
+/** A notice is a result, so it is a chat bubble; `detail` is its grey sub-text (rule 29). */
+export type NoticeBubble = { text: string; detail?: string }
 
 export type StatusLineView = {
   mascot: 'think' | 'work' | 'help' | 'idle'
-  tone: 'neutral' | 'quiet' | 'help' | 'danger'
+  tone: 'neutral' | 'help'
   text: string
   tail: string | null
   accessibilityLabel: string
-  role: 'status' | 'alert'
 }
 
 export const STATUS_STEPS = [
@@ -39,7 +39,7 @@ export const STATUS_STEPS = [
 
 const QUEUE_TEXT = '순서를 기다리는 중'
 const THINK_TEXT = '생각 중'
-const STOP_RESUMABLE_TEXT = '작업을 중지했어요 · 어떻게 할지 알려 주세요'
+const STOP_RESUMABLE_TEXT = '작업을 중지했어요. 어떻게 할지 알려 주세요.'
 const STOP_DROPPED_TEXT = '중지했어요. 고치던 내용은 반영하지 않았어요.'
 const ERROR_SENTENCE = '작업 중 문제가 생겼어요'
 const STORED_THINKING = new Set(['생각 중', '생각하는 중…'])
@@ -52,26 +52,28 @@ export const formatElapsed = (seconds: number) => {
 
 const elapsedText = (since: Date, now: Date) => formatElapsed(Math.max(0, Math.floor((now.getTime() - since.getTime()) / 1000)))
 
-const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], text: string, tail: string | null, role: StatusLineView['role']): StatusLineView => ({
+const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], text: string, tail: string | null): StatusLineView => ({
   mascot,
   tone,
   text,
   tail,
-  role,
   accessibilityLabel: tail ? `${text} ${tail}` : text,
 })
 
-export const statusLineView = (line: StatusLine, now: Date): StatusLineView => {
+export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
   if (line.kind === 'run' && line.phase === 'queued') {
     const text = line.ahead > 0 ? `${QUEUE_TEXT} · 앞에 작업 ${line.ahead}개` : QUEUE_TEXT
-    return view('idle', 'neutral', text, elapsedText(line.since, now), 'status')
+    return view('idle', 'neutral', text, elapsedText(line.since, now))
   }
-  if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now), 'status')
-  if (line.kind === 'run' && line.phase === 'working') return view('work', 'neutral', line.text, elapsedText(line.since, now), 'status')
-  if (line.kind === 'waiting') return view('help', 'help', line.text, line.named ? null : elapsedText(line.since, now), 'status')
-  if (line.kind === 'stopped') return view('idle', 'quiet', line.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT, null, 'status')
-  if (line.kind === 'failed') return view('idle', 'danger', line.text, null, 'status')
-  return view('idle', 'danger', ERROR_SENTENCE, line.reason, 'alert')
+  if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
+  if (line.kind === 'run') return view('work', 'neutral', line.text, elapsedText(line.since, now))
+  return view('help', 'help', line.text, line.named ? null : elapsedText(line.since, now))
+}
+
+export const noticeBubble = (notice: Notice): NoticeBubble => {
+  if (notice.kind === 'stopped') return { text: notice.resumable ? STOP_RESUMABLE_TEXT : STOP_DROPPED_TEXT }
+  if (notice.kind === 'failed') return { text: notice.text }
+  return { text: ERROR_SENTENCE, ...(notice.reason ? { detail: notice.reason } : {}) }
 }
 
 export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine => {
@@ -84,6 +86,6 @@ export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine
   return { kind: 'run', phase: 'working', since, text }
 }
 
-export const canStop = (lines: readonly StatusLine[]) => lines.some((line) => line.kind === 'run')
+export const canStop = (lines: readonly LiveLine[]) => lines.some((line) => line.kind === 'run')
 
 export const isWorkTrail = (type: string) => type === 'think' || type === 'tool' || type === 'worked'

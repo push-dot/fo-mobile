@@ -11,7 +11,7 @@ tags:
 - tapOn: "회사, 공고, 링크로 찾아보세요"
 - inputText: "moapay.co.kr/about"
 - extendedWaitUntil:
-    visible: "공고를 찾지 못한 링크예요. 채용 공고 링크를 붙여 넣어 주세요."
+    visible: ".*공고를 찾지 못한 링크예요.*"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: BotNewLinkBad

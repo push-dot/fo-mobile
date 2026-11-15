@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
-import { Glass, Icon, Text } from '@/shared/components'
+import { Glass, GlassField, Icon, Text } from '@/shared/components'
 import { fontFor, spacing, type, useColors } from '../../../../theme'
 import { MATERIALS_LABEL, SEARCH_CLOSE, SEARCH_LABEL } from './copy'
 import type { HomeChrome } from './metrics'
@@ -51,13 +51,11 @@ const BotHomeBar = ({
     paddingLeft: spacing[4],
     paddingRight: 6,
     justifyContent: 'center' as const,
-    backgroundColor: c.fill,
   }
   const fill = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2] }
   const input = { flex: 1, fontSize: chrome.control > 44 ? type.h2.fontSize : type.b1.fontSize, color: c.t1, padding: 0, ...fontFor('400') }
   const hint = { fontSize: chrome.control > 44 ? type.h2.fontSize : type.b1.fontSize, lineHeight: chrome.control > 44 ? 26 : type.b2.lineHeight }
-  // AgentHome board: the search field is a flat grey pill (rule 18); only the folder and close buttons are glass.
-  const shell = (child: ReactNode) => <View style={field}>{child}</View>
+  const shell = (child: ReactNode) => <GlassField style={field}>{child}</GlassField>
   return (
     <View style={row} pointerEvents="box-none">
       {searching ? null : (

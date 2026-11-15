@@ -1,6 +1,6 @@
-import StatusLine from '../status-line'
-import type { Notice as NoticeModel } from '../../utils/status-line'
+import { noticeBubble, type Notice as NoticeModel } from '../../utils/status-line'
+import BotText from './bot'
 
-const Notice = ({ notice }: { notice: NoticeModel }) => <StatusLine line={notice} />
+const Notice = ({ id, notice }: { id: string; notice: NoticeModel }) => <BotText item={{ type: 'agentText', id, ...noticeBubble(notice) }} />
 
 export default Notice

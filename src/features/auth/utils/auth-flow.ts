@@ -1,5 +1,5 @@
 import { ApiError } from '@push/api-client'
-import { FAILURE_BODY, OTP_LENGTH, PENDING_EXPIRED, PHONE_TAKEN, PHONE_UNAVAILABLE, PROVIDER_LABEL, PROVIDER_ORDER, TRY_AGAIN } from '../constants'
+import { FAILURE_BODY, OTP_LENGTH, PENDING_EXPIRED, PHONE_TAKEN, PHONE_UNAVAILABLE, PROVIDER_LABEL, TRY_AGAIN } from '../constants'
 
 export const formatCountdown = (totalSeconds: number) => {
   const seconds = Math.max(0, Math.floor(totalSeconds))
@@ -20,7 +20,6 @@ export type PhoneAuthFailure =
   | { kind: 'expired' }
   | { kind: 'too-many' }
   | { kind: 'cooldown'; retryAfterSec: number }
-  | { kind: 'registered'; providers: string[] }
   | { kind: 'unavailable' }
   | { kind: 'pending-expired' }
   | { kind: 'taken' }
@@ -28,17 +27,10 @@ export type PhoneAuthFailure =
 
 const COOLDOWN_FALLBACK_SEC = 168
 
-const providersOf = (details: Record<string, unknown> | null | undefined) => {
-  const raw = details?.existingProviders
-  if (!Array.isArray(raw)) return []
-  return raw.filter((item): item is string => typeof item === 'string')
-}
-
 export const mapPhoneAuthError = (error: unknown): PhoneAuthFailure => {
   if (!(error instanceof ApiError)) return { kind: 'unknown' }
   if (error.code === 'PHONE_CODE_INVALID') return { kind: 'invalid' }
   if (error.code === 'PHONE_CODE_EXPIRED') return { kind: 'expired' }
-  if (error.code === 'PHONE_ALREADY_REGISTERED') return { kind: 'registered', providers: providersOf(error.details) }
   if (error.code === 'RATE_LIMITED' && error.message === 'too many attempts') return { kind: 'too-many' }
   if (error.code === 'RATE_LIMITED') {
     const retryAfterSec = Number(error.details?.retryAfterSec)
@@ -50,24 +42,7 @@ export const mapPhoneAuthError = (error: unknown): PhoneAuthFailure => {
   return { kind: 'unknown' }
 }
 
-export const formatProviderList = (providers: string[]) =>
-  PROVIDER_ORDER.filter((provider) => providers.includes(provider)).map((provider) => PROVIDER_LABEL[provider]).join(' 또는 ')
-
-export const registeredBody = (providers: string[]) => {
-  const list = formatProviderList(providers)
-  return `이 번호는 ${list} 계정으로 가입돼 있어요. ${list}로 로그인해 주세요.`
-}
-
-export const registeredButton = (providers: string[]) => `${formatProviderList(providers)}로 로그인`
-
 export type LoginProvider = 'google' | 'apple' | 'github'
-
-export const loginTarget = (providers: string[], canApple: boolean): LoginProvider | 'choose' | null => {
-  const actionable = PROVIDER_ORDER.filter((provider) => providers.includes(provider) && (provider !== 'apple' || canApple))
-  if (actionable.length === 1) return actionable[0]
-  if (actionable.length > 1) return 'choose'
-  return null
-}
 
 export const showAppleButton = (platform: string, available: boolean) => platform === 'ios' && available
 

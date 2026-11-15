@@ -5,7 +5,7 @@ import type { StreamEvent } from '@push/api-client'
 import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
-import { PAGE_READ_FOOT, PAGE_READ_OPTIONS } from './cards'
+import { PAGE_READ_OPTIONS } from './cards'
 
 type Frame = Step['frame']
 type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
@@ -558,8 +558,8 @@ const statesFile: Step[] = [
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
   s(900, tool('apply', '지원하기', MOA, 'ok')),
-  // The record is a line of its own (tool lines are not drawn), as ChatStates.4 shows it between the file card and the busy error.
-  s(300, agent('지원했어요 · 마이 › 내 활동에 기록했어요')),
+  // The record is a bubble of its own (tool lines are not drawn) with an in-bubble link, between the file card and the busy error (ChatStates.4).
+  s(300, agent('지원했어요. [이동하기](/my)')),
   done,
 ]
 // ChatStates.2 draws the answer as a plain finished reply (3 lines, no 확인을 기다리고 있어요 line, no sheet): the run ends with `done`, not `awaiting`.
@@ -600,7 +600,6 @@ const statusApprove: Step[] = [
     title: '모아페이 채용 페이지를 열어도 될까요?',
     summary: 'careers.moapay.co.kr · 공고 1개를 읽어요',
     options: PAGE_READ_OPTIONS,
-    foot: PAGE_READ_FOOT,
   }),
   awaitingDone,
 ]
@@ -651,7 +650,7 @@ export const TOKENS: Record<string, Step[]> = {
   'st-work': held('공고 요건을 읽는 중'),
   'st-steps': statusSteps,
   'st-queue': held('순서를 기다리는 중 · 앞에 작업 1개'),
-  'st-long': held('누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사 공고 3개의 필수 요건과 우대 요건을 서로 비교하는 중'),
+  'st-long': held('공고 읽는 중'),
   'st-help': statusHelp,
   'st-approve': statusApprove,
   // The stream mapper reads a notice frame at runtime (notices.ts), though the scripted frame type does not list one.

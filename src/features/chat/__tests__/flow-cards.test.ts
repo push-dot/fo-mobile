@@ -2,7 +2,7 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { READ_OFF_TEXT } from '../constants'
 import { applyEvent, emptyChat } from '../utils/reducer'
-import { statusLineView } from '../utils/status-line'
+import { noticeBubble } from '../utils/status-line'
 import { fromStream, mapEvent } from '../utils/stream'
 import { restoreBotTurns } from '../utils/turns'
 
@@ -82,6 +82,6 @@ describe('ChatInterrupt', () => {
     expect(applyEvent(next, stop!).items).toHaveLength(1)
     const afterCancelPost = applyEvent(run, { type: 'stop', resumable: true })
     expect(applyEvent(afterCancelPost, stop!).items).toEqual(next.items)
-    expect(statusLineView({ kind: 'stopped', resumable: true }, new Date())).toMatchObject({ text: '작업을 중지했어요 · 어떻게 할지 알려 주세요', tone: 'quiet' })
+    expect(noticeBubble({ kind: 'stopped', resumable: true })).toEqual({ text: '작업을 중지했어요. 어떻게 할지 알려 주세요.' })
   })
 })

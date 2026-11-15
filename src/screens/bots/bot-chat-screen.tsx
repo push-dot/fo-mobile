@@ -27,7 +27,6 @@ import {
   THREAD_WINDOW,
   answer,
   applyText,
-  closeApproval,
   composerPlaceholder,
   endsInError,
   followScroll,
@@ -38,11 +37,9 @@ import {
   threadRows,
   type ThreadRow,
   threadGreeting,
-  retryApproval,
   quickStartPath,
   send,
   stop,
-  useCardState,
   waitingLine,
   useDoneNext,
   useChat,
@@ -137,7 +134,6 @@ const Thread = ({ id }: { id: string }) => {
   const input = useRef<TextInputInstance>(null)
   const saying = !!chat.approval && sayingFor === chat.approval.id
   const showPanel = chat.approval && !saying
-  const cardIs = useCardState(chat.approval)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
@@ -145,7 +141,7 @@ const Thread = ({ id }: { id: string }) => {
   const greeting: ChatItem[] =
     !empty && !hasOlder(id) && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
   // The waiting line sits above a diff card it asks about, otherwise under the last line (ChatApprove, ChatBotStatusApprove).
-  const waitsLine = !!showPanel && waitingLine(chat.approval!, cardIs) !== null
+  const waitsLine = !!showPanel && waitingLine(chat.approval!) !== null
   const rows = threadRows(chat.items, !!chat.working, waitsLine)
   const waitsAboveDiff = rows.some((r) => r.type === 'waiting')
   const data: ThreadRow[] = [...rows].reverse().concat(greeting)
@@ -251,12 +247,12 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, !!showPanel && !waitsLine), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
-          chat.queue.length || (showPanel && !waitsAboveDiff) ? (
+          chat.queue.length || (waitsLine && !waitsAboveDiff) ? (
             <View style={{ gap: 18 }}>
-              {showPanel && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
+              {waitsLine && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}
@@ -273,9 +269,6 @@ const Thread = ({ id }: { id: string }) => {
         <ApprovalPanel
           key={chat.approval!.id}
           approval={chat.approval!}
-          expired={cardIs === 'expired'}
-          onClose={() => closeApproval(id)}
-          onRetry={() => retryApproval(id)}
           onAnswer={(text, choice) => answer(id, text, choice)}
           onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
           onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}

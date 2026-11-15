@@ -8,7 +8,7 @@ import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
@@ -390,32 +390,6 @@ export const answer = (id: string, text: string, choice: number | number[]) => {
   void startRun({ conversationId: id, text, resolve: { approvalId: approval.id, optionId, ...(ids.length > 1 ? { optionIds: ids } : {}) } })
 }
 
-/** 닫기 on an expired card: answers reject, which the server closes without a run. The card leaves once it did. */
-export const closeApproval = async (id: string) => {
-  const approval = get(id).approval
-  if (!approval) return
-  try {
-    await botApi.bots.answer(id, approval.id, { optionId: 'reject' })
-  } catch (error) {
-    // A card the server already closed has nothing left to close.
-    if (!(error instanceof ApiError && error.status === 409)) return showToast({ message: errorText(error instanceof ApiError ? error.code : undefined) })
-  }
-  dispatch(id, { type: 'dismiss' })
-}
-
-/** 다시 요청: the server asks the same card again for the same span. A newer message superseded it: the card is gone. */
-export const retryApproval = async (id: string) => {
-  const approval = get(id).approval
-  if (!approval) return
-  try {
-    const card = await botApi.bots.retryCard(id, approval.id)
-    dispatch(id, { type: 'retried', openedAt: Date.parse(card.openedAt), expiresAt: Date.parse(card.expiresAt) })
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 409 && error.code === 'APPROVAL_SUPERSEDED') return dispatch(id, { type: 'dismiss' })
-    showToast({ message: errorText(error instanceof ApiError ? error.code : undefined) })
-  }
-}
-
 const halting = new Set<string>()
 
 const finishStop = (id: string, ctrl: AbortController | undefined, resumable: boolean) => {
@@ -434,6 +408,8 @@ const reportCancel = (id: string) => {
   }
   if (halting.has(id)) return
   halting.add(id)
+  const before = get(id).working?.verbs
+  dispatch(id, { type: 'status', verbs: [STOPPING_TEXT] })
   void botApi.bots.cancel(id).then(
     (result) => finishStop(id, ctrl, result.resumable),
     (error: unknown) => {
@@ -442,6 +418,7 @@ const reportCancel = (id: string) => {
         return
       }
       halting.delete(id)
+      if (before) dispatch(id, { type: 'status', verbs: before })
       showToast({ message: error instanceof ApiError && error.status === 403 ? CHAT_STOP_FORBIDDEN : CHAT_STOP_FAILED })
     },
   )

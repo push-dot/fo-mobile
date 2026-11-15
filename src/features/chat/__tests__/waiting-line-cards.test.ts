@@ -25,14 +25,14 @@ describe('a choice card that carries its ask time (ChatBotStatusHelp)', () => {
     const card = approvalOf({ ...help, at: ASKED } as StreamEvent)
     expect(card.openedAt).toBe(Date.parse(ASKED))
     expect(card.sections[0]).toMatchObject({ selected: [] })
-    expect(waitingLine(card, 'open')).toMatchObject({ kind: 'waiting', for: 'answer', text: '답을 기다리고 있어요' })
+    expect(waitingLine(card)).toMatchObject({ kind: 'waiting', for: 'answer', text: '답을 기다리고 있어요' })
   })
 
   it('keeps its first pick, and no line, when the frame has no stamp', () => {
     const card = approvalOf(help)
     expect(card.openedAt).toBeUndefined()
     expect(card.sections[0]).toMatchObject({ selected: [0] })
-    expect(waitingLine(card, 'open')).toBeNull()
+    expect(waitingLine(card)).toBeNull()
   })
 
   it('keeps the recommended pick even when the frame is stamped', () => {
@@ -52,7 +52,7 @@ describe('the edit card (ChatApprove)', () => {
 
   it('names the edit in its waiting line, with no elapsed time', () => {
     const card = approvalOf({ ...edit, at: ASKED } as StreamEvent)
-    const line = waitingLine(card, 'open')!
+    const line = waitingLine(card)!
     expect(line).toMatchObject({ for: 'confirm', text: '이력서 수정 · 확인을 기다리는 중', named: true })
     expect(statusLineView(line, new Date(Date.parse(ASKED) + 90_000))).toMatchObject({ text: '이력서 수정 · 확인을 기다리는 중', tail: null })
   })
@@ -63,11 +63,11 @@ describe('the edit card (ChatApprove)', () => {
   })
 
   it('draws no line without a stamp', () => {
-    expect(waitingLine(approvalOf(edit), 'open')).toBeNull()
+    expect(waitingLine(approvalOf(edit))).toBeNull()
   })
 
   it('an ordinary waiting line still counts the seconds', () => {
-    const line = waitingLine(approvalOf({ ...help, at: ASKED } as StreamEvent), 'open')!
+    const line = waitingLine(approvalOf({ ...help, at: ASKED } as StreamEvent))!
     expect(statusLineView(line, new Date(Date.parse(ASKED) + 72_000))).toMatchObject({ tail: '1분 12초' })
   })
 })

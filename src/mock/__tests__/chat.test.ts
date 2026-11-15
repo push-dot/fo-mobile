@@ -66,7 +66,7 @@ describe('chat mock', () => {
     const events = await run('t-approve-stamp', { text: 'st-approve' })
     const approval = events.find((e) => e.type === 'approval')
     expect(approval).toMatchObject({ approval: { confirm: true } })
-    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval, 'open')).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
+    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval)).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
   })
 
   it('plays a run1 token for one natural line only, then the normal route', async () => {
@@ -188,7 +188,7 @@ describe('chat mock', () => {
     expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [] })
     const applied = await run('t-states', { text: 'states-apply' })
     // Tool lines are not drawn, so the record is a bot line of its own.
-    expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '지원했어요 · 마이 › 내 활동에 기록했어요' }))
+    expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '지원했어요. [이동하기](/my)' }))
     expect(await run('t-states', { text: '도토리증권 공고도 맞춰 줘' })).toContainEqual(
       expect.objectContaining({ type: 'error', code: 'QUEUE_BUSY', text: '지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.' }),
     )
