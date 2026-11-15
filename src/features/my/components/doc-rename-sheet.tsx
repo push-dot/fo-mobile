@@ -8,9 +8,9 @@ import { useDocument, useRenameDocument, useRenameSource, useSource } from '../a
 import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_MAX, titleOver, typedTitle } from '../utils'
 
 const CLEAR_SIZE = 24
-const CLEAR_ICON = 12
+const CLEAR_ICON = 18
 
-/** 이름 바꾸기: a regular modal with one 저장 button and no 취소 (PushDocRename, MyResumeRename). `source`: the id is an uploaded file's, not a Push 프로필's. */
+/** 이름 바꾸기: a regular modal with one 적용 button and no 취소 (PushDocRename, MyResumeRename). `source`: the id is an uploaded file's, not a Push 프로필's. */
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data
@@ -34,7 +34,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   }
   return (
     <Sheet gap={spacing[2]}>
-      <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
+      <Text v="h3" weight="600" accessibilityRole="header" style={{ paddingTop: spacing[1], textAlign: 'center' }}>
         {source ? DOC_RENAME_COPY.fileTitle : DOC_RENAME_COPY.title}
       </Text>
       <Text v="b2" color="t2">
@@ -45,7 +45,6 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
           value={value}
           onChangeText={(t) => setTyped(typedTitle(value, t, max))}
           placeholder={DOC_RENAME_COPY.placeholder}
-          autoFocus
           focusRing
           returnKeyType="done"
           onSubmitEditing={save}
@@ -57,9 +56,9 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
                 accessibilityLabel={DOC_RENAME_COPY.clear}
                 hitSlop={hitSlopTo(CLEAR_SIZE, CLEAR_SIZE)}
                 onPress={() => setTyped('')}
-                style={{ width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: c.t4, alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
               >
-                <Icon name="x" size={CLEAR_ICON} color="bg" />
+                <Icon name="x" size={CLEAR_ICON} color="t3" />
               </Pressable>
             ) : null
           }

@@ -9,7 +9,7 @@ export const DOC_RENAME_COPY = {
   field: '서류 이름',
   placeholder: '서류 이름을 입력하세요',
   clear: '모두 지우기',
-  save: '저장',
+  save: '적용',
   failed: '서류 이름을 바꾸지 못했어요',
 } as const
 
