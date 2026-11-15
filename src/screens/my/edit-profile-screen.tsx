@@ -24,7 +24,6 @@ import {
   Avatar,
   careerDeleteBody,
   careerDeleteCopy,
-  restoreAt,
   careerPeriod,
   FieldLabel,
   AVATAR_IMAGE_OPTIONS,
@@ -57,6 +56,7 @@ import {
   TextField,
   ToastHost,
   useKeyboardHeight,
+  useToastLive,
   type MenuAction,
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
@@ -405,20 +405,19 @@ const EditCareer = ({ p }: { p: Profile }) => {
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const [tried, setTried] = useState(false)
+  // DeleteCareer.2 keeps the card listed behind the banner: it leaves the list when 되돌리기 times out, and saving leaves it out from the start.
+  const [pending, setPending] = useState<{ key: string; toast: number } | null>(null)
+  const gone = !useToastLive(pending?.toast ?? null) ? pending?.key : undefined
   const parsed = items.map(toCareer)
-  const removeAt = (i: number, item: CareerDraft) => {
-    setItems((xs) => xs.filter((_, j) => j !== i))
-    setOpen(null)
-    showToast({
+  const kept = parsed.filter((_, i) => items[i]!.key !== pending?.key)
+  const removeAt = (item: CareerDraft) => {
+    const toast = showToast({
       message: careerDeleteCopy.toast,
-      action: {
-        label: careerDeleteCopy.undo,
-        onPress: () => {
-          setItems((xs) => restoreAt(xs, i, item))
-          setOpen(i)
-        },
-      },
+      action: { label: careerDeleteCopy.undo, onPress: () => setPending(null) },
     })
+    setPending({ key: item.key, toast })
+    // This toast replaced the last one, so that row's 되돌리기 is gone: it leaves now.
+    if (pending) setItems((xs) => xs.filter((x) => x.key !== pending.key))
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
@@ -438,13 +437,14 @@ const EditCareer = ({ p }: { p: Profile }) => {
       <SheetHeader
         title={TITLES.career}
         saving={save.isPending}
-        onSave={() => (parsed.every(Boolean) ? save.mutate({ careers: parsed as Career[] }) : setTried(true))}
+        onSave={() => (kept.every(Boolean) ? save.mutate({ careers: kept as Career[] }) : setTried(true))}
       />
       <ScrollView
         contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
         {items.map((it, i) => {
+          if (it.key === gone) return null
           const expanded = open === i
           const valid = parsed[i]
           const start = parseYm(it.start)
@@ -560,7 +560,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         body: careerDeleteBody(it),
                         confirm: careerDeleteCopy.confirm,
                         danger: true,
-                        onConfirm: () => removeAt(i, it),
+                        onConfirm: () => removeAt(it),
                       })
                     }
                     style={{

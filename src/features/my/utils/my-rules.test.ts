@@ -11,7 +11,6 @@ import {
   OFFER_EMPTY_ACTION,
   OFFER_FAIL,
   OFFER_FAIL_LINE,
-  restoreAt,
   PREVIEW_HEADINGS,
   REFERENCE_LABEL,
   REFERENCE_SUB,
@@ -253,18 +252,7 @@ describe('my screen rules', () => {
   })
 })
 
-describe('restoreAt', () => {
-  it('puts a deleted row back where it was', () => {
-    expect(restoreAt(['b', 'c'], 0, 'a')).toEqual(['a', 'b', 'c'])
-    expect(restoreAt(['a', 'c'], 1, 'b')).toEqual(['a', 'b', 'c'])
-  })
-
-  it('clamps an index past the end and leaves the input alone', () => {
-    const list = ['a']
-    expect(restoreAt(list, 5, 'b')).toEqual(['a', 'b'])
-    expect(list).toEqual(['a'])
-  })
-
+describe('setting rows', () => {
   it('names a setting row by its value, with a short name where the value alone is unclear', () => {
     expect(careerRowLabel('everyone')).toBe('커리어 상태 모두 공개')
     expect(contactRowLabel('accepted')).toBe('연락처는 제안 수락한 사람만')
