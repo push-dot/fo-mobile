@@ -7,7 +7,7 @@ import Rich from './rich'
 import Notice from './notice'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
-import { radius, spacing, useColors, type Colors } from '../../../../theme'
+import { radius, spacing, type as typography, useColors, type Colors } from '../../../../theme'
 import { Button, Icon, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
@@ -281,7 +281,7 @@ const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
   const [first, ...rest] = item.lines
   return (
     <Bubble wide>
-      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 24 }}>
+      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: typography.b1.lineHeight }}>
         {writing ? `${item.label} · ${WRITING}` : item.label}
       </Text>
       <Text v="h3">{item.heading}</Text>

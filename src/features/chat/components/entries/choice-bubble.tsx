@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Text } from '@/shared/components'
-import { useColors } from '../../../../theme'
+import { spacing, useColors } from '../../../../theme'
 import type { Approval } from '../../types'
 import { choiceMulti, choiceSheet } from '../../utils/choice-sheet'
 import { isStop, multiPick } from '../../utils/multi-pick'
@@ -76,7 +76,7 @@ const Checklist = ({ approval, onAnswer }: Props) => {
         accessibilityRole="button"
         disabled={multi.disabled}
         onPress={() => onAnswer(sel.map((i) => multi.items[i]!.label).join(', '), sel)}
-        style={{ paddingTop: 8 }}
+        style={{ paddingTop: spacing[2] }}
       >
         <Text v="b1" weight="600" color={multi.disabled ? 't4' : 'acText'} style={{ lineHeight: ROW_LINE }}>
           {multi.submitLabel} ›
