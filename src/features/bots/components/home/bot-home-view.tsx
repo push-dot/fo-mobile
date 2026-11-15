@@ -127,16 +127,14 @@ const BotHomeView = ({
 
   return (
     <View style={screen}>
-      {searching ? null : (
-        <BotHomeHeader
-          chrome={chrome}
-          topInset={insets.top}
-          label={accountLabel(accountName, plan)}
-          name={accountName}
-          onAccount={() => router.push(accountPath())}
-          onNew={() => router.push(botNewPath())}
-        />
-      )}
+      <BotHomeHeader
+        chrome={chrome}
+        topInset={insets.top}
+        label={accountLabel(accountName, plan)}
+        name={accountName}
+        onAccount={() => router.push(accountPath())}
+        onNew={() => router.push(botNewPath())}
+      />
       {searching ? (
         <BotHomeSearch
           query={query}
@@ -145,7 +143,7 @@ const BotHomeView = ({
           local={local}
           now={now}
           chrome={chrome}
-          top={insets.top + 8}
+          top={top}
           bottom={lift + chrome.control}
           bots={bots ?? []}
           onOpenBot={openChat}

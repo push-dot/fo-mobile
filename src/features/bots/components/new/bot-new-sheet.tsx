@@ -433,13 +433,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
+  const noResults = phase.kind === 'searching' && !!query && !asLink(query) && !loading && rows.length === 0
 
   // The iOS modal starts under the status bar, so its header sits 14pt from the sheet's own top: the board's 36pt to the title centre. Android's full sheet reaches under the status bar.
   const header = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: (ios ? 0 : insets.top) + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-      {searching ? (
-        <View style={{ width: control, height: control }} />
-      ) : organizing ? (
+      {organizing ? (
         <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => setOrganizing(false) }]} />
       ) : (
         <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
@@ -507,8 +506,8 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   const searchBody = (
     <>
-      <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: keepTop ? 'flex-start' : 'flex-end' }}>
-        {phase.kind === 'searching' && query && !asLink(query) && !loading && rows.length === 0 ? <Text color="t3" style={note}>{SEARCH_EMPTY}</Text> : null}
+      <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: noResults ? 'center' : keepTop ? 'flex-start' : 'flex-end' }}>
+        {noResults ? <Text color="t3" style={[note, { paddingBottom: 0 }]}>{SEARCH_EMPTY}</Text> : null}
         {showRows
           ? rows.map((row) => (
               <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
@@ -618,9 +617,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
               </View>
             </ScrollView>
-            {/* Outside the scroll view, whose clip cut the field's shadow into a line along its bottom edge (BotNew). */}
-            <View style={{ paddingTop: 28, paddingBottom: spacing[3] }}>{mainField}</View>
-            {footer}
+            {/* Outside the scroll view, whose clip cut the field's shadow into a line along its bottom edge (BotNew). The field and the action share one
+                container with no fill of its own, so no sibling edge cuts the shadow into the two-tone line BotNewCreating and BotNewXL showed. */}
+            <View>
+              <View style={{ paddingTop: 28, paddingBottom: spacing[3] }}>{mainField}</View>
+              {footer}
+            </View>
           </>
         )}
       </KeyboardAvoidingView>

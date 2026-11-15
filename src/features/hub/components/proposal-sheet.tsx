@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
 import { Platform, ScrollView, View } from 'react-native'
-import { Chip, GlassButton, Text, TextField } from '../../../shared/components'
+import { Chip, Text, TextField } from '../../../shared/components'
 import { onAccent, spacing } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
@@ -17,20 +17,16 @@ type Props = {
   onMessage: (message: string) => void
   onPosting: (id: string | undefined) => void
   onError: (message: string | null) => void
-  onClose: () => void
 }
 
 const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
 
-const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError, onClose }: Props) => {
+const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError }: Props) => {
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        {Platform.OS === 'ios' ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null}
-        <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
-          제안하기
-        </Text>
-      </View>
+      <Text v="h2" accessibilityRole="header">
+        제안하기
+      </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
         <Avatar name={name} size={44} />
         <View style={{ flex: 1 }}>

@@ -8,7 +8,6 @@ import { GRABBER } from './constants'
 import { SheetSurface } from './glass'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
-import GlassButton from './glass-button'
 import Text from './text'
 import { mountSheet, sizeSheet } from './toast-store'
 
@@ -18,8 +17,6 @@ type Props = {
   children: ReactNode
   action?: { label: string; onPress: () => void; disabled?: boolean }
   secondary?: { label: string; onPress: () => void }
-  /** iOS only: a glass close button left of the title. Android closes by drag or back. */
-  onClose?: () => void
   gap?: number
   /** Extra space above the action: the boards add 6 (filters) or 4 (quick starts) to the sheet gap. */
   actionGap?: number
@@ -43,7 +40,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, actionGap, slimAction, onLayout, full, attached, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP, actionGap, slimAction, onLayout, full, attached, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -60,7 +57,6 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
     })
     return () => (sub(), close())
   }, [android, id, navigation])
-  const close = onClose && !android ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null
   return (
     <View
       onLayout={(e) => {
@@ -82,9 +78,8 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
       {android ? (
         <View style={{ ...GRABBER.android, backgroundColor: c.deco, alignSelf: 'center' }} />
       ) : null}
-      {title || close ? (
+      {title ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-          {close}
           {title ? (
             <View style={{ flex: 1, gap: spacing[1] }}>
               <Text v="h2" accessibilityRole="header">

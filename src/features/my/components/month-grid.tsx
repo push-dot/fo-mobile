@@ -29,10 +29,10 @@ const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date)
         </Text>
         {/* The 44pt buttons overlap the row by 4 above and below, so the row is the board's 36 high. */}
         <View style={{ marginVertical: -spacing[1] }}>
-          <GlassButton actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
+          <GlassButton filled actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
         </View>
         <View style={{ marginVertical: -spacing[1] }}>
-          <GlassButton actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
+          <GlassButton filled actions={[{ icon: 'chev', label: '다음 달', onPress: () => shift(1) }]} />
         </View>
       </View>
       <View style={{ flexDirection: 'row', paddingHorizontal: ROW_PAD }}>

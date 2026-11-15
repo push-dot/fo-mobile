@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
-import { Badge, Chip, GlassButton, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Badge, Chip, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { type QsItem } from '../api/schemas'
@@ -85,9 +85,6 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
               {qs.description}
             </Text>
           ) : null}
-        </View>
-        <View style={{ margin: -spacing[1] }}>
-          <GlassButton filled actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />
         </View>
       </View>
       <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled">

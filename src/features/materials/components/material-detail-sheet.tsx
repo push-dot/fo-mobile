@@ -130,7 +130,7 @@ export const MaterialDetailSheet = ({
           {detailTitle(m)}
         </Text>
         <GlassButton
-          circle
+          filled
           iconSize={21}
           actions={[
             {

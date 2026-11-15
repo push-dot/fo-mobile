@@ -15,7 +15,6 @@ const OfferReplySheetScreen = () => {
     return (
       <Sheet
         title={TITLE}
-        onClose={() => router.back()}
         action={offer.isPending ? undefined : { label: RETRY_LABEL, onPress: () => void offer.refetch() }}
       >
         {offer.isPending ? <ListSkeleton count={2} /> : null}
