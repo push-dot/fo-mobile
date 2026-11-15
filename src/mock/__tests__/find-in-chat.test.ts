@@ -9,13 +9,13 @@ const matches = async (q: string) => {
   return ((await res.json()) as { data: { total: number; items: { messageId: string }[] } }).data
 }
 
-describe('ChatBotHeaderFind: 2/3 with three hits', () => {
-  it('counts the source line "…pdf" as a hit before the answer text, then the user line', async () => {
+describe('ChatBotHeaderFind: the finished chat of ChatBotHeader', () => {
+  it('finds the user line "Push 프로필로" once and no save sentence in the answer', async () => {
     seedThread('b-moa', 'thread')
-    const { total, items } = await matches('PDF')
-    // newest first: source of the answer (1/3), the answer's PDF는 (2/3), the user's PDF로 (3/3)
-    expect(items.map((m) => m.messageId)).toEqual(['m-t-ask-ASSISTANT', 'm-t-ask-ASSISTANT', 'm-t-ask-USER'])
-    expect(total).toBe(3)
+    const { total, items } = await matches('프로필')
+    expect(items.map((m) => m.messageId)).toEqual(['m-t-ask-USER'])
+    expect(total).toBe(1)
+    expect((await matches('저장했어요')).total).toBe(0)
   })
 })
 

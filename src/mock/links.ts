@@ -37,7 +37,7 @@ const RESUME_FILE = { uri: 'file:///mock/김서준_백엔드_이력서_2026.pdf'
 // ChatBotHeaderNew: a bot line lands while the reader is scrolled up, so the thread keeps its place and shows 새 메시지 1개 and the green dot.
 const lateAnswer = (botId: string) => {
   const id = fixtureOf(botId)?.bot.id ?? botId
-  const text = '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요. PDF는 내 서류에 저장했어요.'
+  const text = '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두었어요.'
   const { emptyChat, useChatStore } = chat()
   useChatStore.setState((s) => {
     const current = s.chats[id] ?? emptyChat
