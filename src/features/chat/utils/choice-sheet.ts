@@ -15,5 +15,12 @@ export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   return { title: approval.question, ...(approval.detail ? { message: approval.detail } : {}), items }
 }
 
+/** A card that is one list of picks with the stop row and a count button (ChatPh2XPrevent): drawn as checkboxes in the bubble. */
+export const choiceMulti = (approval: Approval) => {
+  const section = approval.sections.length === 1 ? approval.sections[0] : undefined
+  return !!approval.submit && !approval.confirm && section?.kind === 'choices' && !!section.multi
+}
+
 /** What the bot asks as part of the flow (ChatPh2, ChatPh3Boost, ChatResume): a single pick with a suggested first option, drawn as the numbered bubble under the last line (v425). */
-export const choiceInThread = (approval: Approval) => !approval.confirm && choiceSheet(approval) !== null && approval.sections[0]?.kind === 'choices' && approval.sections[0].selected.length > 0
+export const choiceInThread = (approval: Approval) =>
+  choiceMulti(approval) || (!approval.confirm && choiceSheet(approval) !== null && approval.sections[0]?.kind === 'choices' && approval.sections[0].selected.length > 0)

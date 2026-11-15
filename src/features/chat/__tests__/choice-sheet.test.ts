@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { choiceInThread, choiceSheet } from '../utils/choice-sheet'
+import { choiceInThread, choiceMulti, choiceSheet } from '../utils/choice-sheet'
 import { composerPlaceholder } from '../utils/usage'
 import type { Approval } from '../types'
 
@@ -60,5 +60,22 @@ describe('choiceInThread', () => {
 
   it('keeps multi picks and confirm-button cards out of the thread', () => {
     expect(choiceInThread(gate({ submit: '보내기' }))).toBe(false)
+  })
+})
+
+describe('choiceMulti (ChatPh2XPrevent)', () => {
+  const prevent = gate({
+    question: '어떤 문제를 예방할까요?',
+    submit: '이대로 진행',
+    sections: [{ kind: 'choices', selected: [3, 5], multi: true, items: [{ label: '성능' }, { label: '보안' }, { label: '확장성' }, { label: '안정성' }, { label: '유지보수' }, { label: '데이터 무결성' }, { label: '닫기' }] }],
+  })
+
+  it('is a checklist in the thread, not the bottom panel', () => {
+    expect(choiceMulti(prevent)).toBe(true)
+    expect(choiceInThread(prevent)).toBe(true)
+  })
+
+  it('leaves a multi card with other sections to the panel', () => {
+    expect(choiceMulti({ ...prevent, sections: [...prevent.sections, { kind: 'chips', selected: [], options: ['a'] }] })).toBe(false)
   })
 })

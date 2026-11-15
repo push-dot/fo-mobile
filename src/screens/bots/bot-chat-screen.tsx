@@ -258,7 +258,7 @@ const Thread = ({ id }: { id: string }) => {
         ListHeaderComponent={
           chat.queue.length || (waitsLine && !waitsAboveDiff) || inThread ? (
             <View style={{ gap: 18 }}>
-              {inThread ? <ChoiceBubble approval={chat.approval!} onPick={(text, choice) => answer(id, text, choice)} /> : null}
+              {inThread ? <ChoiceBubble approval={chat.approval!} onAnswer={(text, choice) => answer(id, text, choice)} /> : null}
               {waitsLine && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
