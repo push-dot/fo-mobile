@@ -82,12 +82,16 @@ describe('chat mock', () => {
     expect(boost.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
-  it('jumps to the quality check without the boost card, applies the recommended fixes without asking, then asks for the design', async () => {
+  it('jumps to the quality check without the boost card and applies the recommended fixes without asking; the design is the next turn', async () => {
     const events = await run('t-quality', { text: '품질 검사로 넘어가기' })
     expect(types(events)).not.toContain('fit')
     expect(events.some((e) => e.type === 'token' && e.text.includes('추천 수정까지 반영했어요'))).toBe(true)
-    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-quality')).toBe(false)
-    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design')).toBe(true)
+    expect(events.some((e) => e.type === 'approval')).toBe(false)
+    expect(events.at(-1)).toMatchObject({ type: 'done' })
+    const design = await run('t-design', { text: '2개 반영하고 디자인으로' })
+    const sentences = design.filter((e) => e.type === 'token').map((e) => e.text)
+    expect(sentences).toEqual(['템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.', '검증을 마쳤어요. 디자인을 골라 주세요.'])
+    expect(design.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design' && e.approval.question === '디자인')).toBe(true)
   })
 
   it('selects 중간 제약으로 in the 병목 강도 gate', async () => {
