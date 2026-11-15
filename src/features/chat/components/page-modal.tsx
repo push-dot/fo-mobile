@@ -6,9 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassButton, Text, ToastHost } from '@/shared/components'
 import { headerInset } from './header-inset'
 import { sheetHeaderTop } from '@/shared/navigation'
-import { spacing, useColors } from '@/theme'
+import { iosSheetBg, spacing, useColors, useThemeMode } from '@/theme'
 
 const GLASS_BUTTON = 44
+// `.isheet.pm8.full`: 17 under the sheet's top (8 + the 5 grabber + 4), then the 52 header row, then the body's own 4.
+const SHEET = { top: 17, header: 52 }
 
 /** The 자료 modal's pages (`.bsh-h` and `.mpage`): 14 above the header, 4 under it, 16 beside it, a 52 spacer when no button sits right, a body that follows the header, and 20 around the actions. */
 const MPAGE = { top: 14, below: 4, side: 16, spacer: 52, inset: 20 }
@@ -25,6 +27,7 @@ const PageModal = ({
   page,
   mpage,
   scroll = true,
+  sheet,
 }: {
   onClose?: () => void
   title: string
@@ -40,15 +43,20 @@ const PageModal = ({
   /** A page pushed inside the 자료 modal (MaterialDetail*, BotPick, MaterialsLinkAdd). */
   mpage?: boolean
   scroll?: boolean
+  /** The chat's page-style modal (ChatPh0Input): the sheet's grey background, a 52 header row and a plain close chip (`.isheet .iconbtn` is `fill`, not glass). */
+  sheet?: boolean
 }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const ios = Platform.OS === 'ios'
   const modalPage = !!mpage && ios
+  const grey = !!sheet && ios
+  const mode = useThemeMode()
+  const bg = grey ? iosSheetBg[mode] : c.bg
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
-        {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
+    <View style={{ flex: 1, backgroundColor: bg, paddingTop: modalPage ? MPAGE.top : grey ? SHEET.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: grey ? SHEET.header : undefined, paddingHorizontal: modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: modalPage ? MPAGE.below : tight || grey ? 0 : spacing[2] }}>
+        {left ?? <GlassButton filled={grey} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
         </Text>
@@ -67,7 +75,7 @@ const PageModal = ({
             ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
           ]}
         >
-          {ios ? <LinearGradient pointerEvents="none" colors={[c.bg, c.bg, `${c.bg}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} /> : null}
+          {ios ? <LinearGradient pointerEvents="none" colors={[bg, bg, `${bg}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} /> : null}
           {footer}
         </View>
       ) : null}

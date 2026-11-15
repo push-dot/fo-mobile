@@ -41,6 +41,9 @@ export const paperPage = { ring: 'rgba(0,0,0,0.06) 0px 0px 0px 1px', lifted: 'rg
 /** The 1pt line between rows of a translucent iOS sheet: the board's --line is 6 steps darker than its #F3F3F6 sheet, the device sheet is #EBEBEB, where #EBEDF0 shows nothing, so the line is a tint. */
 export const iosSeparator = { light: 'rgba(118,118,128,0.06)', dark: palette.dark.line } as const
 
+/** The boards' `--iSheet`: the background of a page-style sheet (.isheet), a step greyer than the screen's white. */
+export const iosSheetBg = { light: '#F2F2F7', dark: '#1C1C1E' } as const
+
 /** The boards' `--iMat`: the iOS banner material (.ibanner). The board blurs what is behind it, RN cannot, so the fill is solid #F6F6F8: the header and the save button never show through. */
 export const iosMaterial = { light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' } as const
 
