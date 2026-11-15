@@ -63,7 +63,7 @@ describe('fromStream', () => {
         question: '점수를 한 번 더 올릴까요?',
         sections: [
           {
-            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '그만하기' }],
+            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '닫기' }],
           },
         ],
       },

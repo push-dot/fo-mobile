@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
 import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
-import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
+import { botChatPath, openPostingBot } from '@/features/bots'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
 import {
   APPLICATION_LOAD_FAILED,
@@ -85,12 +85,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
           {fit ? (
             <AppliedFitCard
               fit={fit}
-              onPress={() => {
-                void findBotForPosting(item.jobId).then(
-                  (bot) => router.push(bot ? botChatPath(bot.id) : botNewPath(item.jobId)),
-                  () => router.push(botNewPath(item.jobId)),
-                )
-              }}
+              onPress={() => openPostingBot(item.jobId)}
             />
           ) : null}
           {p ? (

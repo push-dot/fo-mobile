@@ -26,4 +26,6 @@ tags:
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileChiefAllowed
-- tapOn: "닫기"
+# The sheet has no close button; a tap on the dimmed area above it closes it.
+- tapOn:
+    point: "50%,10%"

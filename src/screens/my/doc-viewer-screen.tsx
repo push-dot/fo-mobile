@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { useState } from 'react'
 import { ScrollView, useWindowDimensions, View } from 'react-native'
 import { useShareFile, useStartChat } from '@/features/chat'
 import {
@@ -11,9 +12,10 @@ import {
   type ResumeDraft,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
-import { palette, radius, spacing, type, useColors } from '@/theme'
+import { palette, spacing, type, useColors } from '@/theme'
 
-const PAGE_PAD = 36
+// The paper is drawn for a 330 wide column (the board's card) and zoomed to the screen width: file viewer mode (DocViewer, owner 2026-11-15).
+const PAPER_WIDTH = 330
 const TITLE_MAX_WIDTH = 168
 const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
@@ -23,7 +25,6 @@ const SMALL_LINE = type.c2.lineHeight
 const JOB_LINE = type.c1.lineHeight
 // CoreText lays the 12pt intro 0.23pt wider than the board's WebKit (290.23 in a 290pt column), which drops its last word to a third line.
 const LINE_OVERHANG = { marginRight: -1 }
-const PAPER_SHADOW = '0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.1)'
 
 const Bars = ({ widths }: { widths: readonly number[] }) =>
   widths.map((w) => (
@@ -31,7 +32,6 @@ const Bars = ({ widths }: { widths: readonly number[] }) =>
   ))
 
 const Paper = ({ d }: { d: ResumeDraft }) => {
-  const { width } = useWindowDimensions()
   const p = d.profile
   const head = (t: string) => (
     <Text
@@ -47,15 +47,11 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
       accessibilityLabel={`${p.displayName} 서류 미리보기`}
       style={{
         width: '100%',
-        // DocViewer board: WebKit resolves `aspect-ratio: 1 / 1.414` against the 402pt screen width (card 330 x 568), not the 330pt card.
-        minHeight: width * 1.414,
+        minHeight: PAPER_WIDTH * 1.414,
         backgroundColor: sheet.paper,
-        borderRadius: radius.xs,
         paddingVertical: spacing[6],
         paddingHorizontal: spacing[5],
         gap: spacing[2],
-        // The board draws the hairline as a 0 0 0 1px shadow, which takes no layout: the text column is 290pt (a 1pt border made it 288 and dropped "왔어요." to a third line).
-        boxShadow: PAPER_SHADOW,
       }}
     >
       <Text v="h3" weight="800" style={{ color: sheet.t1, lineHeight: 25 }}>
@@ -107,6 +103,19 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
   )
 }
 
+const ZoomedPaper = ({ d }: { d: ResumeDraft }) => {
+  const { width } = useWindowDimensions()
+  const [height, setHeight] = useState(0)
+  const scale = width / PAPER_WIDTH
+  return (
+    <View style={{ width, height: height * scale }}>
+      <View onLayout={(e) => setHeight(e.nativeEvent.layout.height)} style={{ width: PAPER_WIDTH, transform: [{ scale }], transformOrigin: 'top left' }}>
+        <Paper d={d} />
+      </View>
+    </View>
+  )
+}
+
 const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const start = useStartChat()
@@ -131,7 +140,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
-              { icon: 'menu', label: '더 보기', onPress: openMenu },
+              { icon: 'more', label: '더 보기', onPress: openMenu },
             ]}
           />
         }
@@ -140,11 +149,11 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingVertical: spacing[1], paddingHorizontal: spacing[5] }}>
           {d?.pageCount ? <Badge label={`1 / ${d.pageCount}`} tone="grey" /> : null}
         </View>
-        <View style={{ paddingTop: spacing[1], paddingHorizontal: PAGE_PAD }}>
+        <View style={{ paddingTop: spacing[1] }}>
           {d ? (
-            <Paper d={d} />
+            <ZoomedPaper d={d} />
           ) : draft.isPending ? (
-            <Skeleton width="100%" height={420} radius={radius.xs} />
+            <Skeleton width="100%" height={420} radius={0} />
           ) : (
             <Text v="b2" color="t3" style={{ marginTop: 60, textAlign: 'center' }}>
               미리보기는 곧 볼 수 있어요

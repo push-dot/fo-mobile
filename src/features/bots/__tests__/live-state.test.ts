@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Bot, BotActivity, BotId, CardId, CompanyBot, LocalActivity, MascotState } from '../types'
 import { LIVE_POLL_MS } from '../constants'
-import { botRow, expiredAt, mascotStateOf, mergeFacts, pollIntervalOf } from '../utils/live-state'
+import { botRow, mascotStateOf, mergeFacts, pollIntervalOf } from '../utils/live-state'
 
 const now = new Date(2026, 10, 9, 15, 0)
 const minAgo = (m: number) => new Date(now.getTime() - m * 60_000)
@@ -12,7 +12,7 @@ const ACTIVITY: Record<BotActivity['phase'], BotActivity> = {
   queued: { phase: 'queued', since, ahead: 1 },
   thinking: { phase: 'thinking', since, label: null },
   working: { phase: 'working', since, label: '경력 섹션 고치는 중' },
-  waiting: { phase: 'waiting', since, for: 'confirm', cardId: 'card1' as CardId, cardTitle: '이 변경을 이력서에 반영할까요?', expiresAt: null },
+  waiting: { phase: 'waiting', since, for: 'confirm', cardId: 'card1' as CardId, cardTitle: '이 변경을 이력서에 반영할까요?' },
 }
 
 const bot = (over: Partial<CompanyBot> = {}): CompanyBot => ({
@@ -51,36 +51,21 @@ describe('mascotStateOf', () => {
   })
 })
 
-describe('expiredAt', () => {
-  const waiting = (expiresAt: Date | null): BotActivity => ({ ...(ACTIVITY.waiting as Extract<BotActivity, { phase: 'waiting' }>), expiresAt })
-
-  it('drops a card whose time has come, and keeps one still open or without a time', () => {
-    expect(expiredAt(waiting(minAgo(0)), now)).toEqual({ phase: 'idle' })
-    expect(expiredAt(waiting(minAgo(-1)), now).phase).toBe('waiting')
-    expect(expiredAt(waiting(null), now).phase).toBe('waiting')
-  })
-
-  it('leaves every other phase alone', () => {
-    expect(expiredAt(ACTIVITY.working, now)).toBe(ACTIVITY.working)
-  })
-})
-
 describe('mergeFacts', () => {
   it('takes the session stream over the list answer', () => {
     const local: LocalActivity = { streaming: ACTIVITY.working, reading: false }
-    expect(mergeFacts(bot({ activity: ACTIVITY.queued }), local, now).activity).toBe(ACTIVITY.working)
+    expect(mergeFacts(bot({ activity: ACTIVITY.queued }), local).activity).toBe(ACTIVITY.working)
   })
 
-  it('takes the server answer when the session holds no stream, with an expired card dropped', () => {
-    const card = { ...ACTIVITY.waiting, expiresAt: minAgo(1) } as BotActivity
-    expect(mergeFacts(bot({ activity: ACTIVITY.thinking }), { reading: false }, now).activity).toBe(ACTIVITY.thinking)
-    expect(mergeFacts(bot({ activity: card }), undefined, now).activity).toEqual({ phase: 'idle' })
+  it('takes the server answer when the session holds no stream', () => {
+    expect(mergeFacts(bot({ activity: ACTIVITY.thinking }), { reading: false }).activity).toBe(ACTIVITY.thinking)
+    expect(mergeFacts(bot({ activity: ACTIVITY.waiting }), undefined).activity).toBe(ACTIVITY.waiting)
   })
 
   it('reads nothing as unread while the user is in the chat', () => {
-    expect(mergeFacts(bot({ unread: true }), { reading: true }, now).unread).toBe(false)
-    expect(mergeFacts(bot({ unread: true }), { reading: false }, now).unread).toBe(true)
-    expect(mergeFacts(bot({ unread: true }), undefined, now).unread).toBe(true)
+    expect(mergeFacts(bot({ unread: true }), { reading: true }).unread).toBe(false)
+    expect(mergeFacts(bot({ unread: true }), { reading: false }).unread).toBe(true)
+    expect(mergeFacts(bot({ unread: true }), undefined).unread).toBe(true)
   })
 })
 
@@ -141,18 +126,10 @@ describe('botRow', () => {
 })
 
 describe('botRow outcome (AgentHomeRowExpiredFailed)', () => {
-  const ended = (kind: 'expired' | 'failed') => bot({ outcome: { kind, at: minAgo(10) } })
-
-  it('draws an expired card as an idle row with its line and no state word', () => {
-    expect(botRow(ended('expired'), undefined, now)).toMatchObject({
-      mascot: 'idle',
-      line: '승인 요청이 만료됐어요',
-      accessibilityLabel: '모아페이 Bot, 승인 요청이 만료됐어요, 10분 전',
-    })
-  })
+  const ended = () => bot({ outcome: { kind: 'failed', at: minAgo(10) } })
 
   it('draws a failed run as 확인 필요 with its retry line', () => {
-    expect(botRow(ended('failed'), undefined, now)).toMatchObject({
+    expect(botRow(ended(), undefined, now)).toMatchObject({
       mascot: 'help',
       line: '작업을 끝내지 못했어요. 다시 시도해 주세요.',
       accessibilityLabel: '모아페이 Bot, 확인 필요, 작업을 끝내지 못했어요. 다시 시도해 주세요., 10분 전',
@@ -160,7 +137,7 @@ describe('botRow outcome (AgentHomeRowExpiredFailed)', () => {
   })
 
   it('lets this session\'s stream replace the outcome until the next fetch', () => {
-    const row = botRow(ended('failed'), { streaming: ACTIVITY.working, reading: false }, now)
+    const row = botRow(ended(), { streaming: ACTIVITY.working, reading: false }, now)
     expect(row).toMatchObject({ mascot: 'work', line: '경력 섹션 고치는 중' })
   })
 })

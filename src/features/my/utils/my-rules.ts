@@ -9,7 +9,7 @@ const hasBatchim = (word: string) => {
   return code >= 0 && code <= 11171 && code % 28 !== 0
 }
 
-const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
+export const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
 
 export const skillOrderHint = '길게 누르면 앞으로 옮겨요. 앞의 5개가 허브 목록에 보여요.'
 
@@ -62,7 +62,6 @@ export const SET_BASE_COPY = {
   title: '이 프로필을 기본 프로필로 설정할까요?',
   body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
   confirm: '설정',
-  cancel: '취소',
   toast: '기본 프로필로 설정했어요.',
 } as const
 
@@ -122,7 +121,7 @@ export const OFFER_ARCHIVED_BADGE = '보관함'
 export { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from '@push/shared'
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
-export const PUSH_DOCS_TITLE = 'Push 서류'
+export const PUSH_DOCS_TITLE = 'Push 프로필'
 export const UPLOADS_TITLE = '올린 파일'
 
 export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | 'notifyOffer' | 'notifyComment' | 'notifyAiDone' | 'notifyApplicationStage'>; label: string }[] = [

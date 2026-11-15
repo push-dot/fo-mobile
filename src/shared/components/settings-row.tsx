@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
-import { spacing, type, useColors } from '../../theme'
+import { spacing, type } from '../../theme'
 import Icon from './icon'
 import Text from './text'
 
@@ -11,8 +11,6 @@ type RowProps = {
   onPress?: () => void
   right?: ReactNode
   danger?: boolean
-  /** The entry state (SettingsBlockedEntry): acSoft row with a t1, 700 label (owner rule 3: the accent is the fill only). */
-  entry?: boolean
   /** Draws the chevron on a row that does not open anything (the board shows it before there is a posting). */
   chevron?: boolean
   /** The row's value sits inside the board `.v` (커리어 상태, 연락처, 차단한 사람), so its chevron is t3; other rows keep the label colour (t1). */
@@ -21,8 +19,7 @@ type RowProps = {
   picker?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, chevron, mutedChevron, picker }: RowProps) => {
-  const c = useColors()
+const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker }: RowProps) => {
   const body = (
     <View
       style={{
@@ -31,11 +28,10 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, entry, chevron
         alignItems: 'center',
         gap: spacing[3],
         paddingVertical: spacing[2],
-        ...(entry ? { backgroundColor: c.acSoft } : {}),
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text v="b1" color={danger ? 'red' : 't1'} weight={entry ? '700' : undefined} style={{ lineHeight: type.b2.lineHeight }}>
+        <Text v="b1" color={danger ? 'red' : 't1'} style={{ lineHeight: type.b2.lineHeight }}>
           {label}
         </Text>
         {sub ? (

@@ -9,7 +9,7 @@ import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 12
 
-/** Android's 이름 바꾸기. `source`: the id is an uploaded file's, not a Push 서류's. */
+/** 이름 바꾸기: a regular modal with one 저장 button and no 취소 (PushDocRename, MyResumeRename). `source`: the id is an uploaded file's, not a Push 프로필's. */
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data
@@ -67,10 +67,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
       <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingRight: spacing[1] }}>
         {savedLength(value)}/{max}
       </Text>
-      <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[2] }}>
-        <Button label={DOC_RENAME_COPY.cancel} variant="secondary" onPress={() => router.back()} style={{ flex: 1 }} />
-        <Button label={DOC_RENAME_COPY.save} disabled={current === undefined || !value.trim() || over || rename.isPending} onPress={save} style={{ flex: 1 }} />
-      </View>
+      <Button label={DOC_RENAME_COPY.save} disabled={current === undefined || !value.trim() || over || rename.isPending} onPress={save} style={{ marginTop: spacing[2] }} />
     </Sheet>
   )
 }

@@ -8,7 +8,7 @@ import { spacing, useColors, useThemePreference, type ThemeChoice } from '@/them
 
 const ANDROID = Platform.OS === 'android'
 
-// iOS (.inav .nb): 17 system blue, min 56 wide; 완료 is 600 and sits right, 취소 is 400. Android keeps the accent text button.
+// iOS (.inav .nb): 17 system blue, min 56 wide; 적용 is 600 and sits right. Android keeps the accent text button.
 const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; onPress: () => void }) => {
   const c = useColors()
   return (
@@ -28,8 +28,8 @@ const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; o
 const SETTING_KEY = { locale: 'locale', contact: 'contactVisibility', tone: 'defaultTone' } as const
 
 /**
- * v415 Settings pickers. Language and theme: a wheel in a sheet with 취소 · title · 완료 (iOS) or a radio dialog with 취소 · 확인 (Android);
- * the choice applies on 완료. Contact and tone: a sheet under a question with a radio list, where a tap applies and closes (SettingsStates.3 and .4).
+ * v415 Settings pickers. Language and theme: a regular modal with a wheel and 적용 (no 취소, owner 2026-11-15);
+ * the choice applies on 적용. Contact and tone: a sheet under a question with a radio list, where a tap applies and closes (SettingsStates.3 and .4).
  */
 const SettingsPickSheetScreen = () => {
   const { kind } = useLocalSearchParams<{ kind: SettingsPickKind }>()
@@ -80,11 +80,11 @@ const SettingsPickSheetScreen = () => {
     <Sheet title={ANDROID ? pick.title : undefined} gap={ANDROID ? undefined : 0}>
       {ANDROID ? null : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
-          <TextAction label="취소" onPress={() => router.back()} />
+          <View style={{ minWidth: 56 }} />
           <Text v="h3" weight="600" accessibilityRole="header">
             {pick.title}
           </Text>
-          <TextAction label="완료" bold onPress={confirm} />
+          <TextAction label="적용" bold onPress={confirm} />
         </View>
       )}
       {/* .wheels.short: 6 above, 14 below and the sheet's 26 under it (the sheet gives 20), so the sheet is 17+52+6+120+14+26 = 235. */}
@@ -92,9 +92,8 @@ const SettingsPickSheetScreen = () => {
         <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
       </View>
       {ANDROID ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: spacing[2] }}>
-          <TextAction label="취소" onPress={() => router.back()} />
-          <TextAction label="확인" bold onPress={confirm} />
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <TextAction label="적용" bold onPress={confirm} />
         </View>
       ) : null}
     </Sheet>

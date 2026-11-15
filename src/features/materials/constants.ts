@@ -20,7 +20,7 @@ export const SEND_LABEL = '보내기'
 /** What the + menu (MaterialsAdd) and the empty states' buttons do. */
 export type AddAction = 'link' | 'upload' | 'browse'
 /** The toast 마이 › 서류 shows after an upload, the same file landing in the same place. */
-export const UPLOADED = '이력서 파일을 올렸어요'
+export const UPLOADED = '파일을 올렸어요'
 export const ADD_LABEL: Record<AddAction, string> = { link: '링크 추가', upload: '서류 올리기', browse: '공고 둘러보기' }
 
 /** MaterialsEmpty, MaterialsEmptyDocs, MaterialsEmptyBookmarks, MaterialsEmptyLinks. `\n` is where the boards' balanced body breaks (RN has no `text-wrap: balance`). */

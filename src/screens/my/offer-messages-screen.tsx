@@ -18,8 +18,8 @@ import {
   failedLine,
   failedSend,
   OFFER_BLOCKED_COMPOSER,
-  OfferPostingCard,
   personLine,
+  postingSentLine,
   useOffer,
   useOfferMenu,
   useViewerBox,
@@ -37,16 +37,21 @@ const Bubble = ({
   at,
   mine,
   faded,
+  onPress,
 }: {
   body: string
   at?: string
   mine: boolean
   faded?: boolean
+  onPress?: () => void
 }) => {
   const c = useColors()
   return (
     <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: spacing[1] }}>
-      <View
+      <Pressable
+        accessibilityRole={onPress ? 'button' : undefined}
+        disabled={!onPress}
+        onPress={onPress}
         style={{
           maxWidth: '82%',
           borderRadius: radius.md,
@@ -61,7 +66,7 @@ const Bubble = ({
         <Text v="b2" style={{ color: mine ? onAccent : c.t1 }}>
           {body}
         </Text>
-      </View>
+      </Pressable>
       {at ? (
         <Text v="c2" color="t3">
           {clock(at)}
@@ -117,6 +122,13 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       ? [{ id: o.id, senderId: o.sender.id, body: o.message, createdAt: o.createdAt }, ...messages]
       : [],
   )
+  const posted = o.posting ? (
+    <Bubble
+      body={postingSentLine(o.sender.displayName, o.posting.title)}
+      mine={o.sender.id === meId}
+      onPress={() => router.push(`/postings/${o.posting!.id}`)}
+    />
+  ) : null
   const post = (body: string) =>
     send.mutate(body, {
       onError: (e) => setFailed((f) => [...f, failedSend(body, e)]),
@@ -156,7 +168,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           </Pressable>
         }
         right={
-          menu ? <GlassButton actions={[{ icon: 'menu', label: '더 보기', menu }]} /> : undefined
+          menu ? <GlassButton actions={[{ icon: 'more', label: '더 보기', menu }]} /> : undefined
         }
       />
       <ScrollView
@@ -171,8 +183,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {o.posting ? <OfferPostingCard posting={o.posting} compact /> : null}
-        {thread.map((m) => (
+        {thread.map((m, i) => (
           <View key={m.id} style={{ gap: spacing[4] }}>
             {m.day ? (
               <Text
@@ -185,8 +196,10 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
               </Text>
             ) : null}
             <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
+            {i === 0 ? posted : null}
           </View>
         ))}
+        {thread.length === 0 ? posted : null}
         {empty ? (
           <View
             style={{

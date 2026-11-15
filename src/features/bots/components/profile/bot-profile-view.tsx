@@ -10,7 +10,6 @@ import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths
 import type { Bot, BotAddress } from '../../types'
 import {
   ALLOWED_SHEET_LABEL,
-  CLOSE_LABEL,
   COLOR_A11Y,
   PROFILE_ERROR_BODY,
   PROFILE_ERROR_TITLE,
@@ -307,7 +306,6 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
               </View>
             ))}
           </View>
-          <Button label={CLOSE_LABEL} variant="secondary" onPress={() => setSheet(null)} style={{ marginTop: spacing[2] }} />
         </SheetCard>
       ) : null}
     </View>

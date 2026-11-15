@@ -109,7 +109,6 @@ describe('my screen rules', () => {
       title: '이 프로필을 기본 프로필로 설정할까요?',
       body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
       confirm: '설정',
-      cancel: '취소',
       toast: '기본 프로필로 설정했어요.',
     })
     expect(setBaseProfilePath('doc-1')).toBe('documents/doc-1/base-profile')

@@ -36,8 +36,8 @@ const SocialScreen = () => {
           </>
         }
       />
-      <View>
-        <ChipRow paddingTop={spacing[1]} paddingBottom={spacing[2]}>
+      <View style={{ marginBottom: spacing[1] }}>
+        <ChipRow paddingTop={spacing[1]} paddingBottom={spacing[1]}>
           {POST_CATEGORIES.map((cat) => (
             <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
           ))}

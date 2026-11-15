@@ -28,7 +28,7 @@ import {
   answer,
   applyText,
   composerPlaceholder,
-  endsInError,
+  turnFailed,
   followScroll,
   hasOlder,
   headerLightOf,
@@ -42,6 +42,7 @@ import {
   stop,
   waitingLine,
   useDoneNext,
+  useSaveFailAlert,
   useChat,
   useChatLimit,
   useDraftStore,
@@ -51,6 +52,7 @@ import {
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
+import MaterialPickerScreen from '@/screens/chat/material-picker-screen'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
@@ -158,7 +160,7 @@ const Thread = ({ id }: { id: string }) => {
   }, [])
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items) })
   const list = useRef<FlatList<ThreadRow>>(null)
   const dataRef = useRef(data)
   useEffect(() => {
@@ -190,6 +192,7 @@ const Thread = ({ id }: { id: string }) => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }, [])
+  useSaveFailAlert(chat)
   useDoneNext(chat, (action, card) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
@@ -271,7 +274,7 @@ const Thread = ({ id }: { id: string }) => {
           approval={chat.approval!}
           onAnswer={(text, choice) => answer(id, text, choice)}
           onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
-          onMaterials={() => (setSayingFor(chat.approval?.id), router.push(botMaterialPath(id as BotId)))}
+          renderPicker={(onClose) => <MaterialPickerScreen target={id} onClose={onClose} />}
         />
       ) : (
         <>

@@ -40,7 +40,7 @@ const SettingsBlockedScreen = () => {
                   variant="secondary"
                   size="sm"
                   disabled={unblock.isPending && unblock.variables === b.user.id}
-                  style={{ minHeight: 36, borderRadius: 18 }}
+                  style={{ minHeight: 36, borderRadius: 18, backgroundColor: c.bg, borderWidth: 1, borderColor: c.fill2 }}
                   onPress={() => unblock.mutate(b.user.id)}
                 />
               </View>

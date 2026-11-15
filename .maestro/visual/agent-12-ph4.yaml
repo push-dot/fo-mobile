@@ -16,12 +16,12 @@ tags:
     file: _chat_kbd_down.yaml
     env:
       TEXT: ".*품질 검사로 넘어가기.*"
+# The recommended fixes are applied without asking: the run says so, then the design card follows ten seconds later.
 - extendedWaitUntil:
-    visible: "추천 수정도 반영할까요?"
-    timeout: 30000
+    visible: ".*추천 수정 3곳도 반영했어요.*"
+    timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh4Quality
-- tapOn: "2개 반영하고 디자인으로"
 - extendedWaitUntil:
     visible: "검증을 마쳤어요. 어떤 디자인을 적용할까요?"
     timeout: 30000

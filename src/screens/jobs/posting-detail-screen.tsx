@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
-import { botChatPath, botNewPath, findBotForPosting } from '@/features/bots'
+import { openPostingBot } from '@/features/bots'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
 import { Button, CtaBar, DetailWebView, GlassButton, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
@@ -31,12 +31,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         <Button
           label="Bot한테 보내기"
           variant="secondary"
-          onPress={() => {
-            void findBotForPosting(id).then(
-              (bot) => router.push(bot ? botChatPath(bot.id) : botNewPath(id)),
-              () => router.push(botNewPath(id)),
-            )
-          }}
+          onPress={() => openPostingBot(id)}
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}

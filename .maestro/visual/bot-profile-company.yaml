@@ -21,7 +21,7 @@ tags:
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileColor
-- tapOn: "완료"
+- tapOn: "적용"
 - extendedWaitUntil:
     visible: "백엔드 엔지니어"
     timeout: 5000

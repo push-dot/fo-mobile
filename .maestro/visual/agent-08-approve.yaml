@@ -18,7 +18,7 @@ tags:
 - takeScreenshot: ChatApprove
 - tapOn: ".*적용"
 - extendedWaitUntil:
-    visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
+    visible: "결과를 확인할까요?"
     timeout: 60000
 # ChatDoneNext draws the finished resume run (할 일 5/5, closing line, the 김서준_모아페이_백엔드.pdf card) with the three-button sheet
 # (바로 지원하기 · 프로필로 전환 · 취소), not the profile run, so it takes its own run (mock token ext-done).
@@ -43,7 +43,7 @@ tags:
 - takeScreenshot: ChatDoneNext
 - tapOn: "모아페이에 바로 지원하기"
 - extendedWaitUntil:
-    visible: "이 공고에 지원해요"
+    visible: "모아페이 · 백엔드 엔지니어에 지원해요"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply
@@ -71,7 +71,7 @@ tags:
       KO: "프로필 더 좋게 고쳐 줘"
       EN: "Make my profile better"
 - extendedWaitUntil:
-    visible: "Push 프로필에 저장했어요. 결과를 확인할까요?"
+    visible: "결과를 확인할까요?"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Result

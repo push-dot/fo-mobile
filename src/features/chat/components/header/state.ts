@@ -7,11 +7,15 @@ export type HeaderLight = 'none' | 'new' | 'limit' | 'error'
 export const headerLightOf = (input: { creditsOut: boolean; unseenBotMessages: number; failed?: boolean }): HeaderLight =>
   input.creditsOut ? 'limit' : input.failed ? 'error' : input.unseenBotMessages > 0 ? 'new' : 'none'
 
-/** The thread ends on a failed run; the next message clears it. A failed upload is no run, and a busy queue (QUEUE_BUSY, ChatStates.4) refused one before it started, so neither counts. */
-export const endsInError = (items: readonly ChatItem[]) => {
-  const last = items.at(-1)
-  return last?.type === 'error' && last.code !== UPLOAD_ERROR_CODE && last.code !== 'QUEUE_BUSY'
-}
+const failedItem = (item: ChatItem) =>
+  item.type === 'error'
+    ? item.code !== UPLOAD_ERROR_CODE && item.code !== 'QUEUE_BUSY'
+    : item.type === 'tool'
+      ? item.state === 'err' && !!item.error
+      : item.type === 'notice' && item.notice.kind !== 'stopped'
+
+/** Something failed since the user's last line (a run, a step the run went on from, a failed check); the next message clears it. A failed upload is no run, and a busy queue (QUEUE_BUSY, ChatStates.4) refused one before it started, so neither counts. */
+export const turnFailed = (items: readonly ChatItem[]) => items.slice(items.findLastIndex((item) => item.type === 'user') + 1).some(failedItem)
 
 /** Bot lines after the newest line the reader saw at the bottom. Identity, not a count: paging older turns in at the front must not look like news. */
 export const unseenBotMessages = (items: readonly ChatItem[], seenId: string | undefined) => {

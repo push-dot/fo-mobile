@@ -40,11 +40,13 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
   const row = chat && !xl ? CHAT_ROW : baseRow
   const solidChat = chat && !ios
   const veil = translucent && !solidChat
+  // The boards' `.ios .topbar` has no fill: the screen shows through, so a glass control's shadow just below the bar is not cut at the bar's edge.
+  const flat = ios && !sheet && !chat
   return (
     <View
       style={{
         paddingTop: safeTop ? sheetHeaderTop(Platform.OS, sheet, insets.top, row) : 0,
-        backgroundColor: veil || transparent ? undefined : c.bg,
+        backgroundColor: veil || transparent || flat ? undefined : c.bg,
         borderBottomWidth: solidChat ? 1 : 0,
         borderBottomColor: c.line,
         zIndex: 3,

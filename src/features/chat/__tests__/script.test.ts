@@ -49,7 +49,7 @@ describe('scripted runs (mock)', () => {
       subtitle: 'Push 프로필 · 방금 수정',
       documentId: 'd1',
     })
-    expect(s.approval?.question).toBe('Push 프로필에 저장했어요. 결과를 확인할까요?')
+    expect(s.approval?.question).toBe('결과를 확인할까요?')
     expect(s.items.some((i) => i.type === 'worked')).toBe(true)
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
   }, 10_000)
@@ -62,7 +62,7 @@ describe('scripted runs (mock)', () => {
       source: 'external',
       fileName: '김서준_모아페이_백엔드.pdf',
       pageLine: 'A4 1쪽 · 186KB',
-      cardMeta: 'A4 1쪽 · 186KB · 내 서류에 자동 저장됨',
+      cardMeta: 'A4 1쪽 · 186KB',
       documentId: 'src-upload',
     })
     expect(s.items.some((i) => i.type === 'worked')).toBe(true)
@@ -92,7 +92,7 @@ describe('scripted runs (mock)', () => {
     })
     expect(s.items.find((i) => i.type === 'plan')).toMatchObject({ rows: expect.arrayContaining([expect.objectContaining({ tag: '키워드' })]) })
     expect(s.approval?.question).toBe('피드백을 반영해서 수정할까요?')
-    expect(choiceLabels(s)).toEqual(['반영해서 수정할게요', '그만하기'])
+    expect(choiceLabels(s)).toEqual(['반영해서 수정할게요', '닫기'])
     s = await reply(s, 'fit1', 'feedback', '1')
     expect(s.approval).toBeNull()
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '알겠어요. 필요할 때 다시 불러 주세요.' })
@@ -101,7 +101,7 @@ describe('scripted runs (mock)', () => {
   it('an in-progress document asks to continue', async () => {
     let s = play(emptyChat, await run({ conversationId: 'c-dotori', text: '이어서 봐 주세요' }))
     expect(s.approval?.question).toBe('이어서 작성할까요?')
-    expect(choiceLabels(s)).toEqual(['이어서 작성하기', '그만하기'])
+    expect(choiceLabels(s)).toEqual(['이어서 작성하기', '닫기'])
     s = await reply(s, 'c-dotori', 'start-document', '0')
     expect(s.approval).toBeNull()
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '멈춘 곳부터 이어서 할게요.' })

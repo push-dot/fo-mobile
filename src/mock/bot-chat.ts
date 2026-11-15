@@ -22,7 +22,9 @@ const readRefused = (text: string, attached: number) => !readsMyFiles() && attac
 const error = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 
 const cardEvent = (c: MockCard, now: Date): Unstamped => {
-  const resolution = { status: c.status, optionId: null }
+  // The server closes a card unanswered once its time has gone by.
+  const closed = c.status === 'PENDING' && c.expiresAt !== null && atOf(c.expiresAt, now) <= now
+  const resolution = { status: closed ? ('EXPIRED' as const) : c.status, optionId: null }
   const times = { openedAt: atOf(c.at, now).toISOString(), expiresAt: c.expiresAt === null ? null : atOf(c.expiresAt, now).toISOString(), retryable: c.expiresAt !== null }
   return c.for === 'answer'
     ? { type: 'choice', id: c.id, title: c.title, options: c.options, ...(c.recommended ? { recommended: c.recommended } : {}), resolution, ...times }

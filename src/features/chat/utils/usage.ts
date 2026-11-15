@@ -70,13 +70,12 @@ export const withMaterial = <T extends DraftText>(drafts: Record<string, T>, id:
 }
 
 const PLAN_OPEN = '플랜을 올리면 쓸 수 있어요.'
-const PLAN_CLOSED = '지금 플랜에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.'
 const PLAN_BARE = '지금 플랜에서는 쓸 수 없어요.'
 
 /** PLAN_REQUIRED line. The plan is undefined until the account loads: say the fact and offer nothing to buy. */
 export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
   if (plan === undefined) return PLAN_BARE
-  if (!paymentsOpen) return PLAN_CLOSED
+  if (!paymentsOpen) return PLAN_BARE
   return PLAN_OPEN
 }
 

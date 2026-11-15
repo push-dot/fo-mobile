@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 'react-native'
 import type { Settings } from '@push/api-client'
@@ -68,7 +68,6 @@ const SettingsScreen = () => {
   const { data: account } = useAuthMe()
   const blocked = useBlocked()
   const purchase = usePersonalPurchase()
-  const { entry } = useLocalSearchParams<{ entry?: string }>()
   const login = LOGIN_LABEL[account?.provider ?? ''] ?? ''
   if (!s) {
     return (
@@ -157,7 +156,6 @@ const SettingsScreen = () => {
         <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} mutedChevron />
         <SettingsRow
           label={blockedRowLabel(blocked.data?.page.total)}
-          entry={entry === 'blocked'}
           mutedChevron
           onPress={() => router.push('/settings/blocked')}
         />

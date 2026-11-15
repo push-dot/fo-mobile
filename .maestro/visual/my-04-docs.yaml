@@ -25,8 +25,11 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: UploadPick
-# UploadPick is the platform's action list now: 취소 closes it.
-- tapOn: "취소"
+# UploadPick is a regular modal (no 취소): swipe it away.
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "서류 가져오기"
 - extendedWaitUntil:
     notVisible: "서류 가져오기"
     timeout: 10000
@@ -48,14 +51,17 @@ tags:
       - waitForAnimationToEnd
       - takeScreenshot: MyResumeStates.1
       - takeScreenshot: MyResumeStates.2
-      # 이름 변경 asks in the system alert with a text field.
+      # 이름 변경 opens the regular rename modal (no 취소).
       - tapOn: "이름 변경"
       - extendedWaitUntil:
           visible: "서류 이름 바꾸기"
           timeout: 5000
       - waitForAnimationToEnd
       - takeScreenshot: MyResumeRename
-      - tapOn: "취소"
+      - runFlow:
+          file: _close_sheet.yaml
+          env:
+            TITLE: "서류 이름 바꾸기"
       - tapOn:
           point: "90%,56%"
       - extendedWaitUntil:
