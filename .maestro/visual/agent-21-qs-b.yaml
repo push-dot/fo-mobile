@@ -27,5 +27,5 @@ tags:
     file: _qs.yaml
     env:
       LABEL: "허브 프로필 다듬기"
-      WAIT: ".*바탕이 될 서류.*"
+      WAIT: "기본 서류"
       SHOT: QsHub
