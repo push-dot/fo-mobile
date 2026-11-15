@@ -8,7 +8,7 @@ import { SPRING } from '../../constants'
 import ApprovalModal from './approval-modal'
 import { RISE_MS, riseOnMount } from './approval-rise'
 import type { Approval, ApprovalSection, Choice } from '../../types'
-import { choiceSheet } from '../../utils/choice-sheet'
+import { choiceSheet, confirmModal } from '../../utils/choice-sheet'
 import { approvalModalKind } from '../../utils/approval-modal'
 import { isStop, multiPick } from '../../utils/multi-pick'
 import { chipSends as sendsOnChip, sectionLabel, sectionPicks } from '../../utils/stream-v3'
@@ -64,16 +64,20 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
     return () => (stop(), rise.stopAnimation())
   }, [rise, reduce])
 
-  // A single-pick card with a lifetime (a help question, a page permission) is the regular modal, so the panel draws nothing; swiping it away hands the floor to the composer.
+  // A single-pick card the bot has no suggestion for (a help question, a page permission) and an edit card are regular modals, so the panel draws nothing; swiping one away hands the floor to the composer.
   const sheet = choiceSheet(approval)
+  const confirm = confirmModal(approval)
   useEffect(() => {
-    if (!sheet) return
-    showChoiceModal({
-      title: sheet.title,
-      message: sheet.message,
-      items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
-      onDismiss: onSay,
-    })
+    if (sheet) {
+      showChoiceModal({
+        title: sheet.title,
+        message: sheet.message,
+        items: sheet.items.map((i) => ({ label: i.label, destructive: i.destructive, onPress: () => onAnswer(i.label, i.index) })),
+        onDismiss: onSay,
+      })
+    } else if (confirm) {
+      showChoiceModal({ title: confirm.title, message: confirm.message, confirm: { label: confirm.confirm, onPress: () => onAnswer(confirm.confirm, 0) }, onDismiss: onSay })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- opened once per card (the panel is keyed by the card id)
   }, [])
 
@@ -250,7 +254,7 @@ export const ApprovalPanel = ({ approval, onAnswer, onSay, renderPicker }: Props
   // The landed style is explicit: a view that once had native-driven props keeps their last value when a prop turns undefined.
   const motion = landed || reduce ? { opacity: 1, transform: [{ translateY: 0 }] } : { transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }
 
-  if (sheet) return null
+  if (sheet || confirm) return null
 
   if (modal !== 'none')
     return (

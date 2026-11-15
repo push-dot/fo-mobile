@@ -15,6 +15,10 @@ export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   return { title: approval.question, ...(approval.detail ? { message: approval.detail } : {}), items }
 }
 
+/** An edit card (title, message, one 적용 button): the regular modal with a single confirm, swiping it away hands the floor to the composer (ChatApprove). */
+export const confirmModal = (approval: Approval) =>
+  approval.submit && !approval.sections.length ? { title: approval.question, ...(approval.detail ? { message: approval.detail } : {}), confirm: approval.answer ?? approval.submit } : null
+
 /** A card that is one list of picks with the stop row and a count button (ChatPh2XPrevent): drawn as checkboxes in the bubble. */
 export const choiceMulti = (approval: Approval) => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined

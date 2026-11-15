@@ -53,14 +53,9 @@ describe('diffBubble', () => {
 })
 
 describe('diffLinesDetail', () => {
-  it('counts the changed lines as "바뀐 곳 N개 보기" and opens to every line', () => {
-    const lines = [{ n: 12, sign: '' as const, text: '모아페이' }, { n: 13, sign: '-' as const, text: '결제 API 개발' }, { n: 13, sign: '+' as const, text: 'Kotlin 재설계' }]
-    expect(diffLinesDetail(lines)).toEqual({ text: '바뀐 곳 1개 보기 ›', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계' })
-  })
-
-  it('counts a removed and an added line of the same line number as one place, and unnumbered lines one each', () => {
-    expect(diffLinesDetail([{ sign: '+', text: 'a' }, { sign: '-', text: 'b' }, { sign: '+', text: 'c' }]).text).toBe('바뀐 곳 3개 보기 ›')
-    expect(diffLinesDetail([{ n: 8, sign: '-', text: 'x' }, { n: 8, sign: '+', text: 'y' }, { n: 12, sign: '-', text: 'p' }, { n: 12, sign: '+', text: 'q' }]).text).toBe('바뀐 곳 2개 보기 ›')
+  it('counts the changed lines as "바뀐 내용 N줄 보기" and opens to every line (ChatApprove)', () => {
+    const lines = [{ n: 12, sign: '' as const, text: '모아페이' }, { n: 13, sign: '-' as const, text: '결제 API 개발' }, { n: 13, sign: '+' as const, text: 'Kotlin 재설계' }, { n: 14, sign: '+' as const, text: 'Kafka' }]
+    expect(diffLinesDetail(lines)).toEqual({ text: '바뀐 내용 3줄 보기 ›', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계\n+ Kafka' })
   })
 })
 

@@ -1,7 +1,7 @@
 import type { ChatItem } from '../types'
 
 /**
- * A plan right after a bot line is that line's table, a diff its "바뀐 곳 보기" and the result card the closing line's link
+ * A plan right after a bot line is that line's table, a diff its "바뀐 내용 보기" and the result card the closing line's link
  * (ChatPh1Feedback, ChatPh2, ChatPh6Result): the bubble draws them under the text, so they leave the list and ride on the text.
  * A result still waiting on a profile-save note stays its own card.
  */

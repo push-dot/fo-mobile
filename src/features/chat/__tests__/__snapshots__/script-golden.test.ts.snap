@@ -131,8 +131,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -157,8 +156,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -184,8 +182,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -211,8 +208,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -235,8 +231,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"그대로 뒀어요","state":"ok","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"그대로 두기","type":"user"}
@@ -257,8 +252,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"이렇게 해 주세요","type":"user"}
@@ -281,11 +275,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이대로 진행해 주세요","type":"user"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":7000,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -494,8 +487,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"알겠어요. 할 일에 자기소개서를 넣고, 멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -522,8 +514,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"알겠어요. 할 일에 자기소개서를 넣고, 멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"added":true,"label":"자기소개서 초안 쓰기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"그대로 뒀어요","state":"ok","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"그대로 두기","type":"user"}
@@ -548,8 +539,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"알겠어요. 할 일에 자기소개서를 넣고, 멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"items":[{"label":"프로필 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"done"},{"label":"프로필에 저장","state":"done"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"이렇게 해 주세요","type":"user"}
@@ -576,11 +566,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"알겠어요. 할 일에 자기소개서를 넣고, 멈춘 곳부터 이어서 할게요.","type":"agentText"}
 {"items":[{"label":"이력서 읽기","state":"done"},{"label":"공고 요건 정리","state":"done"},{"label":"적합도 계산","state":"done"},{"label":"경력 섹션 고치기","state":"now"},{"added":true,"label":"자기소개서 초안 쓰기","state":"now"},{"label":"PDF로 만들기","state":"todo"}],"type":"todo"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":10250,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3002,11 +2991,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":250,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[{"text":"use numbers"}],"working":null}
 "
 `;
@@ -3064,11 +3052,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":250,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3081,11 +3068,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":250,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8155,8 +8141,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -8179,8 +8164,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -8204,8 +8188,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -8229,8 +8212,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"적용","type":"user"}
@@ -8251,8 +8233,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"그대로 뒀어요","state":"ok","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"그대로 두기","type":"user"}
@@ -8271,8 +8252,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
 {"text":"이렇게 해 주세요","type":"user"}
@@ -8293,11 +8273,10 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"이력서 읽기","result":"2쪽 · 경력 2건, 프로젝트 5건, 링크 3개","state":"ok","target":"김서준_백엔드_이력서_2026.pdf","type":"tool"}
 {"action":"공고 읽기","extra":["필수 · Kotlin 또는 Java 4년 이상","필수 · Spring Boot 운영","필수 · RDBMS 설계와 튜닝","필수 · 대용량 트래픽 처리","필수 · 결제·정산 도메인 이해","우대 · Kafka · 장애 대응 · MSA"],"result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"action":"적합도 계산","result":"6.9점 · 키워드와 도메인이 약해요","state":"ok","target":"5개 항목","type":"tool"}
-{"delta":"+1.2 예상","from":6.9,"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":8.2},{"label":"키워드","score":4.5}],"score":8.1,"type":"fit"}
-{"text":"경력 섹션부터 공고에 맞게 고쳐 볼게요.","type":"agentText"}
+{"text":"경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.","type":"agentText"}
 {"action":"이력서 수정","result":"2줄 추가, 1줄 삭제","state":"wait","target":"경력 · 모아페이","type":"tool"}
 {"lines":[{"n":12,"sign":"","text":"모아페이 · 백엔드 엔지니어 · 2022.03–현재"},{"n":13,"sign":"-","text":"결제 API 개발 및 운영"},{"n":13,"sign":"+","text":"결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms"},{"n":14,"sign":"+","text":"Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축"},{"n":15,"sign":"","text":"결제 장애 대응 매뉴얼 작성"}],"type":"diff"}
-card {"id":"tailor-apply","openedAt":250,"question":"이 수정을 적용할까요?","secondary":"그대로 두기","sections":[],"submit":"적용","waitText":"이력서 수정 · 확인을 기다리는 중"}
+card {"detail":"경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.","id":"tailor-apply","question":"수정 적용","secondary":"그대로 두기","sections":[],"submit":"적용"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;

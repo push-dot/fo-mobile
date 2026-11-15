@@ -116,8 +116,6 @@ export type Approval = {
   confirm?: true
   /** When the card was asked, in ms. A card waits until it is answered. */
   openedAt?: number
-  /** The waiting line's own words, for a card whose line names the work ("이력서 수정 · 확인을 기다리는 중", ChatApprove). */
-  waitText?: string
 }
 
 export type Awaiting = 'approval' | 'choice'

@@ -7,6 +7,8 @@ describe('headerLightOf', () => {
   it('shows nothing, green for unseen bot lines, and red once credits run out', () => {
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 0 })).toBe('none')
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 2 })).toBe('new')
+    expect(headerLightOf({ creditsOut: false, unseenBotMessages: 0, attention: true })).toBe('error')
+    expect(headerLightOf({ creditsOut: true, unseenBotMessages: 0, attention: true })).toBe('limit')
     expect(headerLightOf({ creditsOut: true, unseenBotMessages: 0 })).toBe('limit')
   })
 

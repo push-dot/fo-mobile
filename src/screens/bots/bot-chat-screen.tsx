@@ -29,6 +29,8 @@ import {
   answer,
   applyText,
   choiceInThread,
+  choiceSheet,
+  confirmModal,
   composerPlaceholder,
   turnFailed,
   followScroll,
@@ -42,7 +44,6 @@ import {
   quickStartPath,
   send,
   stop,
-  waitingLine,
   useDoneNext,
   useSaveFailAlert,
   useChat,
@@ -50,7 +51,6 @@ import {
   useDraftStore,
   useFind,
   useUnseen,
-  WaitingLine,
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
@@ -139,16 +139,15 @@ const Thread = ({ id }: { id: string }) => {
   const saying = !!chat.approval && sayingFor === chat.approval.id
   const inThread = !!chat.approval && choiceInThread(chat.approval)
   const showPanel = chat.approval && !saying && !inThread
+  // A single pick or an edit goes to a modal (the panel draws nothing), so only the other cards reserve the room of a panel.
+  const panelDrawn = !!showPanel && !choiceSheet(chat.approval!) && !confirmModal(chat.approval!)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
     !empty && !hasOlder(id) && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
-  // The waiting line sits above a diff card it asks about, otherwise under the last line (ChatApprove, ChatBotStatusApprove).
-  const waitsLine = !!showPanel && waitingLine(chat.approval!) !== null
-  const rows = threadRows(chat.items, !!chat.working, waitsLine)
-  const waitsAboveDiff = rows.some((r) => r.type === 'waiting')
+  const rows = threadRows(chat.items, !!chat.working)
   const data: ThreadRow[] = [...rows].reverse().concat(greeting)
 
   const find = useFind(id)
@@ -163,7 +162,7 @@ const Thread = ({ id }: { id: string }) => {
   }, [])
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items) })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items), attention: !!chat.approval && !inThread })
   const list = useRef<FlatList<ThreadRow>>(null)
   const dataRef = useRef(data)
   useEffect(() => {
@@ -206,14 +205,12 @@ const Thread = ({ id }: { id: string }) => {
       <RowMotion.Provider value={{ key: `${id}/${item.id}`, live }}>
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
-        ) : item.type === 'waiting' ? (
-          chat.approval ? <WaitingLine approval={chat.approval} color={color} /> : null
         ) : (
           <Item item={item} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
         )}
       </RowMotion.Provider>
     ),
-    [onView, onUsage, onReadOff, working, id, color, live, chat.approval],
+    [onView, onUsage, onReadOff, working, id, color, live],
   )
 
   return (
@@ -253,13 +250,12 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, !!showPanel && !waitsLine), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, panelDrawn), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
-          chat.queue.length || (waitsLine && !waitsAboveDiff) || inThread ? (
+          chat.queue.length || inThread ? (
             <View style={{ gap: 18 }}>
               {inThread ? <ChoiceBubble approval={chat.approval!} onAnswer={(text, choice) => answer(id, text, choice)} /> : null}
-              {waitsLine && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}

@@ -2,7 +2,6 @@ import type { BotContract, StreamEvent, StreamOption } from '@push/api-client'
 import {
   CHOICE_QUESTION,
   DEFAULT_ERROR_TEXT,
-  EDIT_WAIT,
   ERROR_TEXT,
   FIT_ROWS,
   MULTI_PICK_SUBMIT,
@@ -97,14 +96,12 @@ const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id
 /** The edit card: preview of the change, then 그대로 두기 · 적용 side by side. */
 const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] => {
   const [apply, keep] = ev.options
-  const openedAt = askedAt(ev)
   const approval: Approval = {
     id: ev.id,
     question: ev.title,
     optionIds: ev.options.map((o) => o.id),
     sections: [],
-    // The board names the edit in the waiting line (ChatApprove); a frame with no stamp keeps no line.
-    ...(openedAt === undefined ? {} : { openedAt, waitText: `${ev.summary || EDIT_WAIT.subject} · ${EDIT_WAIT.tail}` }),
+    ...(ev.summary ? { detail: ev.summary } : {}),
     ...(apply ? { submit: apply.label } : {}),
     ...(keep ? { secondary: keep.label } : {}),
   }

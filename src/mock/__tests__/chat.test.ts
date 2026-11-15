@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatEvent, Step } from '@/features/chat'
 import { applyEvent, emptyChat } from '../../features/chat/utils/reducer'
-import { waitingLine } from '../../features/chat/utils/card'
 import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
 import '../bots'
@@ -62,11 +61,11 @@ describe('chat mock', () => {
     expect(events.find((e) => e.type === 'notice')).toMatchObject({ notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요.' } })
   })
 
-  it('stamps a tool card with the time it was asked, so the room draws the waiting line (ChatBotStatusApprove)', async () => {
+  it('stamps a tool card with the time it was asked (ChatBotStatusApprove)', async () => {
     const events = await run('t-approve-stamp', { text: 'st-approve' })
     const approval = events.find((e) => e.type === 'approval')
-    expect(approval).toMatchObject({ approval: { confirm: true } })
-    expect(waitingLine((approval as Extract<ChatEvent, { type: 'approval' }>).approval)).toMatchObject({ kind: 'waiting', for: 'confirm', text: '확인을 기다리고 있어요' })
+    expect(approval).toMatchObject({ approval: { confirm: true, question: '채용 페이지 열기', detail: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?' } })
+    expect((approval as Extract<ChatEvent, { type: 'approval' }>).approval.openedAt).toBeTypeOf('number')
   })
 
   it('plays a run1 token for one natural line only, then the normal route', async () => {
