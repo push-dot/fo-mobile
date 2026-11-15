@@ -53,7 +53,7 @@ export const queueBusyMessage = (retryAfterSec?: number, reason?: unknown) => {
   return ERROR_TEXT.QUEUE_BUSY
 }
 /** The tail of the status line when the stream drops and cannot be picked up again. */
-export const DISCONNECT_REASON = '연결 끊김'
+export const DISCONNECT_REASON = '연결이 끊겼어요'
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 /** A scripted mock step with this wait does not run on a timer: it waits for the mock link `step-next` (ChatBotStatusSteps). */
 export const GATED_STEP = -1

@@ -18,7 +18,7 @@ import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
 
-/** A code with no sentence of its own, sent with a reason, is drawn as the status line's 작업 중 문제가 생겼어요 · {reason}. */
+/** A code with no sentence of its own, sent with a reason, is drawn as the bubble 작업 중 문제가 생겼어요. {reason}. 다시 해 볼까요? */
 export const errorReason = (code: string | undefined, reason: unknown) =>
   code !== 'QUEUE_BUSY' && !(code && ERROR_TEXT[code]) && typeof reason === 'string' && reason ? reason : undefined
 

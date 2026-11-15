@@ -33,7 +33,7 @@ tags:
     notVisible: ".*생각 중.*"
     timeout: 10000
 # 작업 중, then 중지 on it (nothing was edited yet, so the stop drops the work).
-- openLink: "push://bots/b-moa?mock=run:st-work,bot:b-moa:empty"
+- openLink: "push://bots/b-moa?mock=run:st-work,bot:b-moa:empty,stop-hold"
 - runFlow:
     file: _say.yaml
     env:
@@ -49,13 +49,18 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusWork
 - tapOn: "중지"
+# stop-hold keeps the stop on 중지하는 중 (the board's one grey status line) until step-next lets it end.
+- extendedWaitUntil:
+    visible: ".*중지하는 중.*"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ChatBotStatusStopped
+- openLink: push://bots/b-moa?mock=step-next
 # The stop line lands below the fold on Android; bring the thread to its end first.
 - runFlow: _chat_bottom.yaml
 - extendedWaitUntil:
     visible: ".*고치던 내용은 반영하지 않았어요.*"
     timeout: 10000
-- waitForAnimationToEnd
-- takeScreenshot: ChatBotStatusStopped
 - openLink: "push://bots/b-moa?mock=run:st-queue,bot:b-moa:empty"
 - runFlow:
     file: _say.yaml

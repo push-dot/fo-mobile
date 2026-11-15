@@ -7,16 +7,14 @@ const NOW = at(161_000)
 const run = (line: LiveLine) => statusLineView(line, NOW)
 
 describe('statusLineView', () => {
-  it('words the queue and keeps the idle mascot', () => {
+  it('draws the waiting state as the idle mascot alone (rule 29)', () => {
     const since = at(161_000 - 12_000)
-    expect(run({ kind: 'run', phase: 'queued', since, ahead: 0 })).toMatchObject({
-      mascot: 'idle',
-      tone: 'neutral',
-      text: '순서를 기다리는 중',
-      tail: '12초',
-      accessibilityLabel: '순서를 기다리는 중 12초',
-    })
-    expect(run({ kind: 'run', phase: 'queued', since, ahead: 1 }).text).toBe('순서를 기다리는 중 · 앞에 작업 1개')
+    for (const ahead of [0, 1])
+      expect(run({ kind: 'run', phase: 'queued', since, ahead })).toEqual({ mascot: 'idle', tone: 'neutral', text: '', tail: null, accessibilityLabel: '대기 중' })
+  })
+
+  it('draws stopping as a grey line that counts nothing (ChatBotStatusStopped)', () => {
+    expect(run({ kind: 'run', phase: 'working', since: at(NOW.getTime() - 5_000), text: '중지하는 중' })).toMatchObject({ tone: 'quiet', text: '중지하는 중', tail: null })
   })
 
   it('prints the server sentence for thinking, working, and waiting', () => {
@@ -46,8 +44,9 @@ describe('statusLineView', () => {
     expect(noticeBubble({ kind: 'stopped', resumable: true })).toEqual({ text: '작업을 중지했어요. 어떻게 할지 알려 주세요.' })
     expect(noticeBubble({ kind: 'stopped', resumable: false })).toEqual({ text: '중지했어요. 고치던 내용은 반영하지 않았어요.' })
     expect(noticeBubble({ kind: 'failed', text: '방향 검증에서 문제가 생겼어요' })).toEqual({ text: '방향 검증에서 문제가 생겼어요' })
-    expect(noticeBubble({ kind: 'error', code: 'DISCONNECTED', reason: '연결 끊김' })).toEqual({ text: '작업 중 문제가 생겼어요', detail: '연결 끊김' })
-    expect(noticeBubble({ kind: 'error', code: undefined, reason: null })).toEqual({ text: '작업 중 문제가 생겼어요' })
+    expect(noticeBubble({ kind: 'error', code: 'DISCONNECTED', reason: '연결이 끊겼어요' })).toEqual({ text: '작업 중 문제가 생겼어요. 연결이 끊겼어요. 다시 해 볼까요?' })
+    expect(noticeBubble({ kind: 'error', code: undefined, reason: '시간이 너무 오래 걸렸어요.' })).toEqual({ text: '작업 중 문제가 생겼어요. 시간이 너무 오래 걸렸어요. 다시 해 볼까요?' })
+    expect(noticeBubble({ kind: 'error', code: undefined, reason: null })).toEqual({ text: '작업 중 문제가 생겼어요. 다시 해 볼까요?' })
   })
 
   it('clamps a clock that is behind the server at 0초', () => {
