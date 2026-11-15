@@ -12,16 +12,16 @@ tags:
       - runFlow:
           file: _say.yaml
           env:
-            KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
+            KO: "모아페이 공고에 맞춰 Push 프로필 만들어 줘"
             EN: "auto-pick"
       - extendedWaitUntil:
-          visible: ".*자동으로 골랐어요: 경력 섹션부터 고치기.*"
+          visible: ".*경력 섹션부터 고칠게요.*"
           timeout: 30000
       # The boards have no keyboard: a tap on the user's own bubble lowers it (a tap on a bot line opens the Bot's profile).
       - runFlow:
           file: _chat_kbd_down.yaml
           env:
-            TEXT: ".*PDF로 만들어 줘.*"
+            TEXT: ".*Push 프로필 만들어 줘.*"
       # The board's thread starts at the user line: the greeting above it is the first line of a thread, so this one is shown as a page of a longer chat.
       - openLink: push://bots/b-moa?mock=bot:b-moa:from:user
       - waitForAnimationToEnd

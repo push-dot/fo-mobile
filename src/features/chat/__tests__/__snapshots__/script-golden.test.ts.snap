@@ -75,12 +75,11 @@ card null
 
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > auto pick 1`] = `
 "
-{"text":"PDF로 만들어 줘","type":"user"}
+{"text":"Push 프로필 만들어 줘","type":"user"}
 {"action":"공고 읽기","result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"자동으로 골랐어요: 모던 템플릿","type":"agentText"}
-{"text":"자동으로 골랐어요: 경력 섹션부터 고치기","type":"agentText"}
+{"text":"모던 템플릿으로 만들고, 경력 섹션부터 고칠게요.","type":"agentText"}
 {"action":"PDF 만들기","result":"A4 1쪽 · 186KB","state":"ok","target":"모던 템플릿","type":"tool"}
-{"seconds":2,"type":"worked"}
+{"seconds":21,"type":"worked"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2652,7 +2651,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"seconds":1,"type":"worked"}
 {"text":"states-apply","type":"user"}
 {"action":"지원하기","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"지원했어요. [이동하기](/my)","type":"agentText"}
+{"text":"모아페이에 지원했어요.\\n[이동하기](/my)","type":"agentText"}
 {"seconds":2,"type":"worked"}
 {"text":"도토리증권 공고도 맞춰 줘","type":"user"}
 {"code":"QUEUE_BUSY","text":"지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.","type":"error"}
@@ -4438,10 +4437,9 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"auto-pick","type":"user"}
 {"action":"공고 읽기","result":"필수 5개 · 우대 3개","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"자동으로 골랐어요: 모던 템플릿","type":"agentText"}
-{"text":"자동으로 골랐어요: 경력 섹션부터 고치기","type":"agentText"}
+{"text":"모던 템플릿으로 만들고, 경력 섹션부터 고칠게요.","type":"agentText"}
 {"action":"PDF 만들기","result":"A4 1쪽 · 186KB","state":"ok","target":"모던 템플릿","type":"tool"}
-{"seconds":2,"type":"worked"}
+{"seconds":21,"type":"worked"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -6898,7 +6896,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"states-apply","type":"user"}
 {"action":"지원하기","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"지원했어요. [이동하기](/my)","type":"agentText"}
+{"text":"모아페이에 지원했어요.\\n[이동하기](/my)","type":"agentText"}
 {"seconds":2,"type":"worked"}
 card null
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}

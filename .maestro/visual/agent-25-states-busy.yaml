@@ -40,7 +40,7 @@ tags:
       - runFlow:
           file: _chat_kbd_down.yaml
           env:
-            TEXT: ".*이동하기.*"
+            TEXT: ".*모아페이에 바로 지원해 줘.*"
       - retry:
           maxRetries: 3
           commands:
