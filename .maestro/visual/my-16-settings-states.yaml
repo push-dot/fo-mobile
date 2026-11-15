@@ -23,7 +23,8 @@ tags:
       - extendedWaitUntil:
           visible: ".*Google 계정으로 로그인.*"
           timeout: 10000
-      # The sheets' backdrop is the list from its top (허브 공개 under the title), which is where it opens and returns to after a sheet closes.
+      # The 허브 공개 rows sit below the fold of a list that opens at its top; at the scrolled end they are in view (연락처 under the title).
+      - runFlow: _settings_end.yaml
       - tapOn: "연락처는.*"
       - extendedWaitUntil:
           visible: "누구에게 연락처를 보여 줄까요?"
@@ -38,6 +39,7 @@ tags:
       - extendedWaitUntil:
           notVisible: "누구에게 연락처를 보여 줄까요?"
           timeout: 5000
+      - runFlow: _settings_end.yaml
       - tapOn: "말투.*"
       - extendedWaitUntil:
           visible: "Bot이 어떤 말투로 쓸까요?"

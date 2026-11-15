@@ -3,7 +3,7 @@ name: 회사 봇 · 새 메시지 알림 (ChatBotHeaderNew)
 tags:
   - visual
 ---
-# The reader scrolls up in a finished chat, then a bot answer lands (bot:b-moa:late, twice): the header avatar gets the green dot and the
+# The reader scrolls up in a finished chat, then a bot answer lands (bot:b-moa:late, three times): the header avatar gets the green dot and the
 # thread shows the 새 메시지 1개 pill (ChatBotHeaderNew).
 - runFlow:
     file: _login_mock.yaml
@@ -14,11 +14,13 @@ tags:
 - extendedWaitUntil:
     visible: ".*경력 섹션 3줄을 고쳤어요.*"
     timeout: 20000
-# The seeded thread is shorter than the screen, so nothing can scroll yet: a first late answer makes it longer and the chat follows it
-# to the bottom. Then the reader scrolls up, and the second late answer lands while the thread is away from the bottom.
+# The seeded thread fits the screen and one late answer overflows it by less than AT_BOTTOM (40 pt), which still counts as the bottom, so
+# two answers make the thread long enough to scroll past it. Then the reader scrolls up, and the third lands while the thread is away from the bottom.
 - openLink: push://bots/b-moa?mock=bot:b-moa:late
 - waitForAnimationToEnd
-# The second answer is timed in the link (6 s), so no link opens after the scroll-up.
+- openLink: push://bots/b-moa?mock=bot:b-moa:late
+- waitForAnimationToEnd
+# The third answer is timed in the link (6 s), so no link opens after the scroll-up.
 - openLink: push://bots/b-moa?mock=bot:b-moa:late:6000
 - waitForAnimationToEnd
 - swipe:
