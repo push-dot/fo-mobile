@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import { Pressable, View, useWindowDimensions } from 'react-native'
 import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
-import { useXlBoardText } from '@/shared/components/xl-chrome'
+import { useXlBoardText, XL_CHAT_TRACKING } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
@@ -19,7 +19,7 @@ import ResultLine from './result-line'
 import Rich, { plainOf } from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
-const XL_LINE = { fontSize: 21, lineHeight: 31 }
+const XL_LINE = { fontSize: 21, lineHeight: 31, letterSpacing: XL_CHAT_TRACKING }
 
 /** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
@@ -159,12 +159,12 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
       {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
-          <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
+          <Text v="c1" color="t2" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20 }}>
             출처:
           </Text>
           {item.sources.map((source) => (
             <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
-              <FindText itemId={`${item.id}:source`} v="c1" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
+              <FindText itemId={`${item.id}:source`} v="c1" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
                 {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
                 <Marked text={displayName(source.title)} itemId={`${item.id}:source`} />
               </FindText>
