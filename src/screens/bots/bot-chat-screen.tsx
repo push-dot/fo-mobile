@@ -41,6 +41,7 @@ import {
   shownItems,
   headerLightOf,
   openBot,
+  BUBBLE_GAP,
   threadBottomGap,
   threadRows,
   type ThreadRow,
@@ -67,8 +68,6 @@ const COMPOSER_BOTTOM = 6
 // An inverted list sits at the bottom while its offset is near zero.
 const AT_BOTTOM = 40
 const OPEN_REST_MS = 800
-// The list's own gap (18) sits between its footer and the first line, so the footer is shorter than the header by that much.
-const LIST_GAP = 18
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
@@ -251,11 +250,11 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, panelDrawn), paddingBottom: spacing[4] }}
-        ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP) }} />}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, panelDrawn), paddingBottom: spacing[4] }}
+        ListFooterComponent={<View style={{ height: Math.max(0, headerH - BUBBLE_GAP) }} />}
         ListHeaderComponent={
           chat.queue.length || inThread ? (
-            <View style={{ gap: 18 }}>
+            <View style={{ gap: BUBBLE_GAP }}>
               {inThread ? <ChoiceBubble approval={chat.approval!} onAnswer={(text, choice) => answer(id, text, choice)} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />

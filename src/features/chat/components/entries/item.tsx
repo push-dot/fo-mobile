@@ -18,6 +18,7 @@ import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { fitChrome } from '../../utils/fit-card'
+import { BUBBLE_GAP } from '../../utils/thread-inset'
 import { FIT_LOCKED } from '../../constants'
 import { Appear } from '../motion'
 import Mark from '../mark'
@@ -171,7 +172,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   const view = fitChrome(item)
   const first = fitBubble(item)
   return (
-    <View style={{ gap: spacing[3] }}>
+    <View style={{ gap: BUBBLE_GAP }}>
       {view.locked ? (
         <Bubble>
           <Rich v="b1" text={first.text} markId={item.id} />
