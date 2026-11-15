@@ -169,6 +169,7 @@ const draft: ResumeDraft = {
   pageCount: 2,
   email: 'seojun.kim@example.com',
   links: ['github.com/seojun'],
+  mainSkills: ['Kotlin', 'Spring Boot'],
   profile: {
     displayName: '김서준',
     headline: '결제 시스템을 만드는 백엔드 개발자',
@@ -193,7 +194,7 @@ const draft: ResumeDraft = {
         description: '',
       },
     ],
-    skills: ['Kotlin', 'Spring Boot', 'Java', 'JPA', 'MySQL', 'Kafka', 'Redis'],
+    skills: ['Kotlin', 'Java', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'Redis'],
   },
 }
 mock('GET', 'sources/:id/profile-draft', () => ({ data: draft }))

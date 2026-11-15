@@ -34,6 +34,7 @@ export type ResumeDraft = {
   email: string | null
   links: string[]
   projects?: string[]
+  mainSkills?: string[]
   profile: Pick<
     Profile,
     'displayName' | 'headline' | 'jobCategory' | 'tenureYears' | 'intro' | 'careers' | 'skills'

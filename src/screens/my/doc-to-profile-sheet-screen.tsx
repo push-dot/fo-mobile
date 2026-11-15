@@ -61,7 +61,7 @@ const DocToProfileSheetScreen = () => {
   const draft = query.data?.profile
   const { data: me } = useMyProfile()
   const apply = useApplyResumeProfile(() => undefined)
-  const sections = draft ? profileSections(draft) : []
+  const sections = draft ? profileSections(draft, query.data?.mainSkills) : []
   const [picked, setPicked] = useState<ProfileSectionKey[] | null>(null)
   if (!draft)
     return (
