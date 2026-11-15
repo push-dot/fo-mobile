@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Platform, StyleSheet, Text as RNText, type TextProps } from 'react-native'
 import { fontFor, type, useColors, type Colors, type TypeName } from '../../theme'
+import { keepWordsWhole } from '../utility/keep-words'
 
 // RN 0.88 TextMeasurementRounding.h:36-39 adds 0.001 before ceiling to the pixel grid (react-native#53450), so a line height already on
 // the grid grows one physical pixel per Text; list rows of 3 Text nodes ran +1pt. A hair under the line height keeps the box on it.
@@ -11,12 +12,6 @@ const LINE_EPSILON = Platform.OS === 'ios' ? 0.01 : 0
 // +0.06 pt, so a line that fits on the board (a 362 pt profile intro at 361.7) fits on the device too instead of dropping its last word.
 const BOARD_TRACK_EM = Platform.OS === 'ios' ? 0.0015 : 0
 export const boardTracking = (fontSize: number) => (fontSize < 16 ? -BOARD_TRACK_EM * (16 - fontSize) * fontSize : 0)
-
-// Rule 5: a word the boards keep whole (WebKit keep-all) is not broken at its middle dot or its brackets. TextKit breaks between a Hangul
-// syllable and "(" and after a middle dot, so a line could start with "·정산". A word joiner (U+2060) forbids the break at those spots only.
-const WJ = '\u2060'
-export const keepWordsWhole = (s: string) =>
-  s.replace(/(\S)\(/g, `$1${WJ}(`).replace(/\)(\S)/g, `)${WJ}$1`).replace(/([^\s·\u2060])·(?=[^\s·])/g, `$1${WJ}·${WJ}`)
 
 /** Joins only flat strings and numbers: Maestro and VoiceOver read the original through `label`; a nested Text keeps its text as written. */
 export const joinWords = (children: ReactNode): { children: ReactNode; label?: string } => {

@@ -5,7 +5,7 @@ const flatten = (s: unknown): Record<string, unknown> => (Array.isArray(s) ? Obj
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Text: 'RNText', StyleSheet: { flatten } }))
 vi.mock('../../../theme', async () => ({ ...(await import('@/theme/tokens')), fontFor: () => ({}), useColors: () => ({ t1: '#000' }) }))
 
-const { default: Text, boardTracking, keepWordsWhole, joinWords } = await import('../text')
+const { default: Text, boardTracking, joinWords } = await import('../text')
 const lineHeight = (props: Parameters<typeof Text>[0]) => flatten(Text(props)!.props.style).lineHeight
 
 describe('Text line height on iOS', () => {
@@ -52,17 +52,6 @@ describe('board tracking (device WebKit lays 12-15px narrower than CoreText)', (
 
 describe('words the boards keep whole', () => {
   const WJ = '\u2060'
-
-  it('forbids a break at a middle dot inside a word and around its brackets', () => {
-    expect(keepWordsWhole('엔지니어(결제·정산 플랫폼) 채용')).toBe(`엔지니어${WJ}(결제${WJ}·${WJ}정산 플랫폼) 채용`)
-    expect(keepWordsWhole('(Kotlin·Spring)을')).toBe(`(Kotlin${WJ}·${WJ}Spring)${WJ}을`)
-  })
-
-  it('leaves spaced dots, plain words and an already joined word alone', () => {
-    expect(keepWordsWhole('개발 · 4년차')).toBe('개발 · 4년차')
-    expect(keepWordsWhole('안녕하세요. 반가워요')).toBe('안녕하세요. 반가워요')
-    expect(keepWordsWhole(keepWordsWhole('결제·정산'))).toBe(keepWordsWhole('결제·정산'))
-  })
 
   it('reads the original through the label, and keeps nested text and a caller label as written', () => {
     expect(joinWords('결제·정산')).toEqual({ children: [`결제${WJ}·${WJ}정산`], label: '결제·정산' })

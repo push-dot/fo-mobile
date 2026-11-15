@@ -1,10 +1,12 @@
 import { Fragment, type ComponentProps } from 'react'
 import { Text } from '@/shared/components'
+import { keepPartsWhole } from '@/shared/utility/keep-words'
 import { FindText, Marked } from '../header/highlight'
 
 /** `markId` is the line's id: pass it to draw 채팅에서 찾기 matches. */
 const Rich = ({ text, markId, ...rest }: { text: string; markId?: string } & ComponentProps<typeof Text>) => {
-  const parts = text.split(/\*\*(.+?)\*\*/g)
+  const plain = text.split(/\*\*(.+?)\*\*/g)
+  const parts = keepPartsWhole(plain)
   const show = (part: string) => (markId ? <Marked text={part} itemId={markId} /> : part)
   const body = (
     <>
@@ -19,12 +21,15 @@ const Rich = ({ text, markId, ...rest }: { text: string; markId?: string } & Com
       )}
     </>
   )
+  const label = plain.join('')
   return markId ? (
-    <FindText itemId={markId} {...rest}>
+    <FindText itemId={markId} accessibilityLabel={label} {...rest}>
       {body}
     </FindText>
   ) : (
-    <Text {...rest}>{body}</Text>
+    <Text accessibilityLabel={label} {...rest}>
+      {body}
+    </Text>
   )
 }
 

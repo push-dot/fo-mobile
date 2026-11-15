@@ -251,12 +251,12 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, !!showPanel && !waitsLine), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
         ListHeaderComponent={
-          chat.queue.length || (showPanel && !waitsAboveDiff) ? (
+          chat.queue.length || (waitsLine && !waitsAboveDiff) ? (
             <View style={{ gap: 18 }}>
-              {showPanel && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
+              {waitsLine && !waitsAboveDiff ? <WaitingLine approval={chat.approval!} color={color} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}

@@ -1,4 +1,5 @@
 import type { BotContract } from '@push/api-client'
+import { WORD_JOINER } from '@/shared/utility/keep-words'
 import type { ChatItem } from '../types'
 
 export type FindStep = 'older' | 'newer'
@@ -44,6 +45,8 @@ export const prependOlder = (current: readonly ChatItem[], older: readonly ChatI
 export const fromFirst = (items: readonly ChatItem[], type: ChatItem['type']) => items.slice(Math.max(0, items.findIndex((item) => item.type === type)))
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+// The text component joins words with U+2060; a query typed without it still finds the word.
+const wordJoinerTolerant = (q: string) => [...q].map(escapeRegExp).join(`${WORD_JOINER}*`)
 
 export type Mark = { text: string; hit: boolean }
 
@@ -51,7 +54,7 @@ export const splitMarks = (text: string, query: string): Mark[] => {
   const q = query.trim()
   if (!q) return [{ text, hit: false }]
   return text
-    .split(new RegExp(`(${escapeRegExp(q)})`, 'gi'))
+    .split(new RegExp(`(${wordJoinerTolerant(q)})`, 'gi'))
     .map((part, i) => ({ text: part, hit: i % 2 === 1 }))
     .filter((mark) => mark.text !== '')
 }
