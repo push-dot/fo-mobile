@@ -22,19 +22,16 @@ describe('fitBubble of a score boost (ChatPh3Boost, ChatPh3BoostStop)', () => {
   const boost = { type: 'fit' as const, id: 'f', score: 8.3, from: 6.9, delta: '+1.4', note: '적합도 6.9 → 8.3 (+1.4)' }
 
   it('says what the score went to in one line, with the josa the number takes', () => {
-    expect(fitBubble(boost).text).toBe('적합도를 **6.9 → 8.3**으로 올렸어요. (+1.4)')
-    expect(fitBubble({ ...boost, score: 8.1, delta: undefined }).text).toBe('적합도를 **6.9 → 8.1**로 올렸어요. (+1.2)')
+    expect(fitBubble(boost).text).toBe('적합도를 6.9 → 8.3으로 올렸어요. (+1.4)')
+    expect(fitBubble({ ...boost, score: 8.1, delta: undefined }).text).toBe('적합도를 6.9 → 8.1로 올렸어요. (+1.2)')
   })
 
-  it('names what each round raised, with its numbers, as grey sub-text that opens line by line', () => {
+  it('names what each round raised as a marked list under the score line', () => {
     const rounds = [
-      { label: '키워드 밀도', line: '6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요' },
-      { label: '도메인 경험', line: '7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요' },
+      { label: '키워드', line: '6.9 → 7.5 · 정산 배치, 장애 대응을 경력 문장에 넣었어요' },
+      { label: '경력 · 모아페이', line: '7.5 → 8.0 · 승인 API 성과를 숫자로 보여 줬어요' },
     ]
-    expect(fitBubble({ ...boost, rounds }).detail).toEqual({
-      text: '키워드 밀도 6.9 → 7.8 · 도메인 경험 7.8 → 8.3',
-      more: '키워드 밀도 6.9 → 7.8 · 결제 승인, 정산 배치 키워드를 넣었어요\n도메인 경험 7.8 → 8.3 · payment-retry-lab을 정산 맥락으로 다시 썼어요',
-    })
+    expect(fitBubble({ ...boost, rounds }).list).toEqual(['키워드: 정산 배치, 장애 대응을 경력 문장에 넣었어요', '경력 · 모아페이: 승인 API 성과를 숫자로 보여 줬어요'])
   })
 })
 

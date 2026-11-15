@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import BotText, { Bubble, PlanBlock } from './bot'
+import BotText, { BulletList, Bubble, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
@@ -144,6 +144,7 @@ const Plan = ({ item }: { item: Of<'plan'> }) => (
 const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
   <Bubble>
     <Rich v="b1" text={view.text} markId={id} />
+    {view.list ? <BulletList items={view.list} markId={id} /> : null}
     {view.detail ? <Detail text={view.detail.text} more={view.detail.more} /> : null}
   </Bubble>
 )

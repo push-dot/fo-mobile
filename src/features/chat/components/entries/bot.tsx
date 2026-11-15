@@ -7,7 +7,7 @@ import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
 import { diffLinesDetail } from '../../utils/bubble-detail'
-import { planKeywords, planTable } from '../../utils/plan-table'
+import { blueprintList, isBlueprints, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindText, Marked } from '../header/highlight'
 import Detail from './detail'
@@ -30,13 +30,43 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
+/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
+export const BulletList = ({ items, markId }: { items: string[]; markId: string }) => {
+  const c = useColors()
+  return (
+    <View style={{ gap: 2 }}>
+      {items.map((line) => (
+        <View key={line} style={{ flexDirection: 'row', gap: 10, paddingLeft: spacing[1] }}>
+          <View style={{ width: 6, height: 6, borderRadius: 3, marginTop: 9, backgroundColor: c.t1 }} />
+          <Rich v="b1" text={line} markId={markId} style={{ flexShrink: 1 }} />
+        </View>
+      ))}
+    </View>
+  )
+}
+
 /** A plan or feedback inside the bot's bubble: the table, then its keywords as grey sub-text. */
 export const PlanBlock = ({ item }: { item: PlanItem }) => {
+  if (isBlueprints(item)) {
+    const { lines, detail } = blueprintList(item)
+    return (
+      <>
+        <View style={{ gap: spacing[1] }}>
+          {lines.map((line) => (
+            <Text key={line} v="b1">
+              {line}
+            </Text>
+          ))}
+        </View>
+        <Detail text={detail.text} more={detail.more} />
+      </>
+    )
+  }
   const keywords = planKeywords(item)
   return (
     <>
       <MdTable table={planTable(item)} />
-      {keywords ? <Detail text={keywords} /> : null}
+      {keywords ? <Detail text={keywords.text} more={keywords.more} /> : null}
     </>
   )
 }
@@ -57,6 +87,17 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
           <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
         ) : block.kind === 'table' ? (
           <MdTable key={i} table={block} />
+        ) : block.kind === 'bullets' ? (
+          <BulletList key={i} items={block.items} markId={item.id} />
+        ) : block.kind === 'link' ? (
+          <Pressable key={i} accessibilityRole="link" onPress={() => router.push(block.route as never)}>
+            <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+              <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline' }}>
+                {block.label}
+              </Text>
+              {block.tail}
+            </Text>
+          </Pressable>
         ) : block.kind === 'ordered' ? (
           <View key={i} style={{ gap: spacing[1] }}>
             {block.items.map((line, n) => (
