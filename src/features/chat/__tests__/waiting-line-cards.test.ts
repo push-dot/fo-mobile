@@ -77,21 +77,20 @@ describe('restoreBotTurns (ChatResume)', () => {
     ({ id, status: 'DONE', createdAt: ASKED, user: user ? { messageId: `m-${id}`, text: user, attachments: [] } : null, answer: null, events, assistant: null }) as BotContract.Turn
   const card = (id: string, over: Record<string, unknown>) =>
     ({ type: 'choice', id, title: `질문 ${id}`, options: [{ id: '0', label: '예' }, { id: '1', label: '아니오' }], seq: 1, at: ASKED, openedAt: ASKED, ...over }) as unknown as BotContract.TurnEvent
-  const past = '2026-11-14T00:00:00.000Z'
 
-  it('draws an earlier turn card that ran out as a 확인 대기 중 · 멈춤 line, and the newest turn card stays open', () => {
+  it('draws an earlier turn card the server closed as the bot question, and the newest turn card stays open', () => {
     const state = restoreBotTurns([
       turn('t2', [card('open', { resolution: { status: 'PENDING', optionId: null }, expiresAt: null })], '새 이력서 만들어 줘'),
-      turn('t1', [card('old', { resolution: { status: 'PENDING', optionId: null }, expiresAt: past })]),
+      turn('t1', [card('old', { resolution: { status: 'EXPIRED', optionId: null } })]),
     ])
     expect(state.items.map((i) => i.type)).toEqual(['stale', 'user'])
     expect(state.items[0]).toMatchObject({ type: 'stale', text: '질문 old' })
     expect(state.approval?.id).toBe('open')
   })
 
-  it('also reads the server EXPIRED status', () => {
-    const state = restoreBotTurns([turn('t2', [], '안녕'), turn('t1', [card('old', { resolution: { status: 'EXPIRED', optionId: null } })])])
-    expect(state.items[0]).toMatchObject({ type: 'stale', id: 'stale-old' })
+  it('keeps an old card that only passed its own time open, as no clock decides it', () => {
+    const state = restoreBotTurns([turn('t2', [], '안녕'), turn('t1', [card('old', { resolution: { status: 'PENDING', optionId: null }, expiresAt: '2026-11-14T00:00:00.000Z' })])])
+    expect(state.items.some((i) => i.type === 'stale')).toBe(false)
   })
 
   it('a reopened chat draws no waiting line for a stored choice card, a reattached run does', () => {

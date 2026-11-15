@@ -28,7 +28,7 @@ import {
   answer,
   applyText,
   composerPlaceholder,
-  endsInError,
+  turnFailed,
   followScroll,
   hasOlder,
   headerLightOf,
@@ -160,7 +160,7 @@ const Thread = ({ id }: { id: string }) => {
   }, [])
   const unseen = useUnseen(chat.items, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: endsInError(chat.items) })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items) })
   const list = useRef<FlatList<ThreadRow>>(null)
   const dataRef = useRef(data)
   useEffect(() => {

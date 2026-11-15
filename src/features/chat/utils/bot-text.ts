@@ -1,12 +1,34 @@
-export type BotTextBlock = { kind: 'paragraph'; text: string } | { kind: 'list'; items: string[] } | { kind: 'ordered'; items: string[] }
+export type BotTextBlock = { kind: 'paragraph'; text: string } | { kind: 'list'; items: string[] } | { kind: 'ordered'; items: string[] } | TableBlock
+
+/** A markdown table: the header cells, then one array of cells per row (rule 38). */
+export type TableBlock = { kind: 'table'; head: string[]; rows: string[][] }
 
 const LIST_LINE = /^\s*(?:[-*•])\s+(.*\S)\s*$/
 const ORDERED_LINE = /^\s*\d+[.)]\s+(.*\S)\s*$/
+const TABLE_LINE = /^\s*\|.*\|\s*$/
+const TABLE_RULE = /^\s*\|(\s*:?-{3,}:?\s*\|)+\s*$/
+
+const cellsOf = (line: string) =>
+  line
+    .trim()
+    .slice(1, -1)
+    .split(/(?<!\\)\|/)
+    .map((cell) => cell.trim().replaceAll('\\|', '|'))
 
 /** The boards draw a model's "- item" lines as a gap-4 stack under the paragraph, without markers (ChatBotHeader); "1. item" lines are a numbered list (rule 30). */
 export const splitBotText = (text: string): BotTextBlock[] => {
   const blocks: BotTextBlock[] = []
-  for (const line of text.split('\n')) {
+  const lines = text.split('\n')
+  for (let at = 0; at < lines.length; at++) {
+    const line = lines[at]!
+    if (TABLE_LINE.test(line) && TABLE_RULE.test(lines[at + 1] ?? '')) {
+      const rows: string[][] = []
+      let end = at + 2
+      while (TABLE_LINE.test(lines[end] ?? '')) rows.push(cellsOf(lines[end++]!))
+      blocks.push({ kind: 'table', head: cellsOf(line), rows })
+      at = end - 1
+      continue
+    }
     const ordered = ORDERED_LINE.exec(line)?.[1]
     const item = ordered ?? LIST_LINE.exec(line)?.[1]
     const kind = ordered ? 'ordered' : 'list'

@@ -18,19 +18,16 @@ const activityOf = (a: BotContract.BotActivity | null): BotActivity | null => {
       return { phase: 'thinking', since, label: a.label }
     case 'working':
       return { phase: 'working', since, label: a.label }
-    case 'waiting': {
-      const expiresAt = a.expiresAt === null ? null : dateOf(a.expiresAt)
-      if (a.expiresAt !== null && !expiresAt) return null
-      return { phase: 'waiting', since, for: a.for, cardId: a.cardId as CardId, cardTitle: a.cardTitle, expiresAt }
-    }
+    case 'waiting':
+      return { phase: 'waiting', since, for: a.for, cardId: a.cardId as CardId, cardTitle: a.cardTitle }
   }
 }
 
-/** Undefined when the date does not parse, null when the bot has no outcome. */
+/** Undefined when the date does not parse, null when the bot has no outcome. A card waits until it is answered, so the server's `expired` outcome is no outcome (rule 29). */
 const outcomeOf = (o: BotContract.BotOutcome | null): BotOutcome | null | undefined => {
-  if (o === null) return null
+  if (o === null || o.kind !== 'failed') return null
   const at = dateOf(o.at)
-  return at ? { kind: o.kind, at } : undefined
+  return at ? { kind: 'failed', at } : undefined
 }
 
 /** Null for a row whose dates do not parse: a list drops it instead of drawing it half-built. */

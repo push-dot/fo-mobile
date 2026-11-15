@@ -2,6 +2,7 @@
 // version 396: AgentHome, AgentHomeLong, AgentHomeSearch, BotProfile*, BotNewLinkOk, BotNewLimit.
 import type { BotContract } from '@push/api-client'
 import { BOT_COLORS } from '../features/bots/constants'
+import { DRAFT_V1_MD } from './bot-scripts/cards'
 import { forgetRun, hasReferenceConsent } from './chat'
 import { postings } from './postings'
 import { mock } from './server'
@@ -391,11 +392,11 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
   const f = fixtureOf(id)
   if (!f) return
   if (set === 'resume') {
-    // ChatResume: the draft's review card ran out an hour ago (a 확인 대기 중 · 멈춤 line), then the user asks for a new resume and the bot offers the draft.
+    // ChatResume: the draft's review card ran out an hour ago (the bot's earlier question as a bubble), then the user asks for a new resume and the bot offers the draft.
     Object.assign(f, {
       messages: [
         { id: 'm-resume-user', turn: 't-resume', role: 'USER', text: '새 이력서 만들어 줘', at: 5 },
-        { id: 'm-resume-bot', turn: 't-resume', role: 'ASSISTANT', text: '작성 중인 이력서 초안(v1)이 있어요.', at: 4 },
+        { id: 'm-resume-bot', turn: 't-resume', role: 'ASSISTANT', text: `작성 중인 이력서 초안(v1)이 있어요.\n${DRAFT_V1_MD}`, at: 4 },
       ],
       cards: [
         { id: 'card-draft-review', turn: 't-draft', for: 'answer', title: '첫 번째 초안(v1)이에요. 이대로 검토할까요?', status: 'PENDING', at: 60, expiresAt: 50, options: [{ id: 'review', label: '검토할게요' }, { id: 'stop', label: '그만하기' }] },

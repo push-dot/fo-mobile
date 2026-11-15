@@ -14,6 +14,19 @@ describe('bot text blocks', () => {
   })
 })
 
+describe('markdown tables', () => {
+  it('reads a header, its rule line and the rows, with escaped pipes kept in the cell', () => {
+    expect(splitBotText('이렇게 고칠게요.\n| 구분 | 섹션 |\n| --- | --- |\n| 강화 | 경력 \\| 모아페이 |\n| 수정 | 기술 스택 |\n끝')).toEqual([
+      { kind: 'paragraph', text: '이렇게 고칠게요.' },
+      { kind: 'table', head: ['구분', '섹션'], rows: [['강화', '경력 | 모아페이'], ['수정', '기술 스택']] },
+      { kind: 'paragraph', text: '끝' },
+    ])
+  })
+  it('keeps a pipe line with no rule line below it as text', () => {
+    expect(splitBotText('| 구분 | 섹션 |')).toEqual([{ kind: 'paragraph', text: '| 구분 | 섹션 |' }])
+  })
+})
+
 describe('answer sources', () => {
   const sources = [{ kind: 'posting' as const, id: 'p1', title: '모아페이 채용 공고' }]
   it('land on the last bot line of the turn', () => {

@@ -8,15 +8,15 @@ import type { Notice } from './utils/status-line'
 export type ToolState = 'run' | 'ok' | 'err' | 'wait'
 export type TodoState = 'todo' | 'now' | 'done'
 
-export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; tone: BadgeTone; label: string; note: string }[]; keywords: string[] }
+export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; label: string; note: string }[]; keywords: string[] }
 
 export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }
   /** `text` supports **bold**; `bullets` render as a t2 list under it. */
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
-  /** `card` is the untitled plan that came right after the text: the board draws it inside the same bubble (ChatPh1Feedback). */
+  /** `card` is the plan that came right after the text, `diff` the edit: the bubble draws them under the text (ChatPh1Feedback, ChatApprove). */
   /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */
-  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem }
+  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem; diff?: Extract<ChatItem, { type: 'diff' }> }
   /** ChatBotReadOff: the server refused to read 마이 files because 내 자료 읽기 허용 is off. */
   | { type: 'readOff'; id: string; text: string }
   /** How a run ended badly, drawn as a bubble (ChatInterrupt, ChatVerifyFail). */
@@ -38,8 +38,10 @@ export type ChatItem =
       caption?: string
       rows?: { label: string; score: number }[]
       keywords?: { label: string; ok: boolean }[]
-      /** Single overall bar with a note (점수 올리기). */
+      /** A 점수 올리기 result carries a note; the bubble draws it from the scores and `rounds`. */
       note?: string
+      /** What each 점수 올리기 round raised: its target and its result line ("6.9 → 7.8 · …"). */
+      rounds?: { label: string; line: string }[]
       /** FREE locks the part rows; PRO shows the ULTRA teaser; ULTRA shows `projected`. */
       plan?: 'FREE' | 'PRO' | 'ULTRA'
       summary?: string

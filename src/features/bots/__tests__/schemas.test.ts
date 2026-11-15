@@ -21,9 +21,10 @@ const dto = (over: Partial<BotContract.Bot> = {}): BotContract.Bot => ({
 })
 
 describe('toBot', () => {
-  it('reads the outcome of a bot whose card ran out or whose run failed, and drops a row whose outcome date is unreadable', () => {
+  it('reads the outcome of a bot whose run failed, and drops a row whose outcome date is unreadable', () => {
     expect(toBot(dto({ outcome: { kind: 'failed', at: '2026-11-09T05:00:00Z' } }))?.outcome).toEqual({ kind: 'failed', at: new Date('2026-11-09T05:00:00Z') })
-    expect(toBot(dto({ outcome: { kind: 'expired', at: 'x' } }))).toBeNull()
+    expect(toBot(dto({ outcome: { kind: 'failed', at: 'x' } }))).toBeNull()
+    expect(toBot(dto({ outcome: { kind: 'expired', at: '2026-11-09T05:00:00Z' } }))?.outcome).toBeNull()
   })
 
   it('reads a company bot with its colour, posting, and no run as idle', () => {
@@ -56,7 +57,7 @@ describe('toBot', () => {
 
   it('reads each phase with its own facts and dates', () => {
     const waiting = toBot(dto({ activity: { phase: 'waiting', since: '2026-11-09T05:50:00Z', for: 'confirm', cardId: 'c1', cardTitle: '열어도 될까요?', expiresAt: '2026-11-09T06:00:00Z' } }))
-    expect(waiting?.activity).toEqual({ phase: 'waiting', since: new Date('2026-11-09T05:50:00Z'), for: 'confirm', cardId: 'c1', cardTitle: '열어도 될까요?', expiresAt: new Date('2026-11-09T06:00:00Z') })
+    expect(waiting?.activity).toEqual({ phase: 'waiting', since: new Date('2026-11-09T05:50:00Z'), for: 'confirm', cardId: 'c1', cardTitle: '열어도 될까요?' })
     const queued = toBot(dto({ activity: { phase: 'queued', since: '2026-11-09T05:50:00Z', ahead: 2 } }))
     expect(queued?.activity).toEqual({ phase: 'queued', since: new Date('2026-11-09T05:50:00Z'), ahead: 2 })
   })

@@ -1,25 +1,10 @@
-import type { BadgeTone } from '@/shared/components'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
 import { closeLabel } from './close-label'
 import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
-/** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
-export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
-  강화: 'ac',
-  수정: 'grey',
-  추가: 'green',
-  축소: 'orange',
-  키워드: 'orange',
-  도메인: 'orange',
-  통과: 'green',
-  조건부: 'orange',
-}
-
 const VERDICT_TAGS = ['통과', '조건부']
 
 export const isVerdictPlan = (rows: { tag: string }[]) => rows.length > 0 && rows.every((r) => VERDICT_TAGS.includes(r.tag))
-
-export const planTone = (tag: string): BadgeTone => PLAN_TAG_TONE[tag] ?? 'grey'
 
 const toggleChoiceOf = (o: StreamOption): Choice => ({
   label: o.label,
@@ -130,7 +115,7 @@ export const mapPlan = (ev: Extract<StreamEvent, { type: 'plan' }>): ChatItem =>
   id: ev.id ?? `plan-${ev.seq ?? 0}`,
   title: ev.title,
   meta: ev.meta,
-  rows: ev.rows.map((r) => ({ tag: r.tag, tone: planTone(r.tag), label: r.label, note: r.note })),
+  rows: ev.rows.map((r) => ({ tag: r.tag, label: r.label, note: r.note })),
   keywords: ev.keywords ?? [],
 })
 

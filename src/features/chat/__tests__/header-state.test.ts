@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { UPLOAD_ERROR_CODE } from '../constants'
-import { bannerText, creditBanner, endsInError, headerLightOf, unseenBotMessages } from '../components/header/state'
+import { bannerText, creditBanner, turnFailed, headerLightOf, unseenBotMessages } from '../components/header/state'
 import type { ChatItem } from '../types'
 
 describe('headerLightOf', () => {
@@ -13,13 +13,26 @@ describe('headerLightOf', () => {
   it('turns red when the last run failed, and clears once the thread moves on', () => {
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 0, failed: true })).toBe('error')
     expect(headerLightOf({ creditsOut: false, unseenBotMessages: 2, failed: true })).toBe('error')
-    expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x' }])).toBe(true)
-    expect(endsInError([{ type: 'error', id: 'e', text: 'x' }, { type: 'user', id: 'u', text: 'x' }])).toBe(false)
-    expect(endsInError([])).toBe(false)
+    expect(turnFailed([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x' }])).toBe(true)
+    expect(turnFailed([{ type: 'error', id: 'e', text: 'x' }, { type: 'user', id: 'u', text: 'x' }])).toBe(false)
+    expect(turnFailed([])).toBe(false)
     // A busy queue refused the message before a run began (ChatStates.4 draws no lamp).
-    expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x', code: 'QUEUE_BUSY' }])).toBe(false)
+    expect(turnFailed([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x', code: 'QUEUE_BUSY' }])).toBe(false)
     // ChatErrUpload: the line says the file did not go up; no run failed, so no red lamp.
-    expect(endsInError([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x', code: UPLOAD_ERROR_CODE }])).toBe(false)
+    expect(turnFailed([{ type: 'user', id: 'u', text: 'x' }, { type: 'error', id: 'e', text: 'x', code: UPLOAD_ERROR_CODE }])).toBe(false)
+  })
+
+  it('turns red for any failure bubble of the turn, even when the thread goes on after it (ChatErrors, ChatVerifyFail)', () => {
+    const user: ChatItem = { type: 'user', id: 'u', text: 'x' }
+    const stepFailed: ChatItem = { type: 'tool', id: 't', action: '공고 읽기', state: 'err', error: '“자격 요건”을 읽지 못했어요' }
+    const said: ChatItem = { type: 'agentText', id: 'a', text: '나머지 내용으로 진행할 수 있어요.' }
+    expect(turnFailed([user, stepFailed, said])).toBe(true)
+    expect(turnFailed([user, { type: 'notice', id: 'n', notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요' } }, said])).toBe(true)
+    expect(turnFailed([user, { type: 'notice', id: 'n', notice: { kind: 'error', code: 'X', reason: null } }])).toBe(true)
+    // An earlier turn's failure is behind the next user line, a stop is no failure, and a tool step that went fine is none either.
+    expect(turnFailed([stepFailed, user, said])).toBe(false)
+    expect(turnFailed([user, { type: 'notice', id: 'n', notice: { kind: 'stopped', resumable: true } }])).toBe(false)
+    expect(turnFailed([user, { type: 'tool', id: 't', action: '공고 읽기', state: 'ok' }])).toBe(false)
   })
 
   it('lets red win over green', () => {
