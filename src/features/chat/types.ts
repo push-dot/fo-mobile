@@ -38,8 +38,10 @@ export type ChatItem =
       caption?: string
       rows?: { label: string; score: number }[]
       keywords?: { label: string; ok: boolean }[]
-      /** Single overall bar with a note (점수 올리기). */
+      /** A 점수 올리기 result carries a note; the bubble draws it from the scores and `rounds`. */
       note?: string
+      /** What each 점수 올리기 round raised: its target and its result line ("6.9 → 7.8 · …"). */
+      rounds?: { label: string; line: string }[]
       /** FREE locks the part rows; PRO shows the ULTRA teaser; ULTRA shows `projected`. */
       plan?: 'FREE' | 'PRO' | 'ULTRA'
       summary?: string

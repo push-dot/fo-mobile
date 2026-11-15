@@ -14,6 +14,12 @@ const upsert = (items: ChatItem[], item: ChatItem) => {
   return next
 }
 
+/** The 점수 올리기 rounds of this turn: the finished `boostN` steps since the user's last line. */
+const boostRounds = (items: readonly ChatItem[]) =>
+  items
+    .slice(items.findLastIndex((x) => x.type === 'user') + 1)
+    .flatMap((x) => (x.type === 'tool' && x.state === 'ok' && x.target && x.result && /^boost\d+$/.test(x.name ?? '') ? [{ label: x.target, line: x.result }] : []))
+
 export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
   switch (e.type) {
     case 'start':
@@ -74,6 +80,10 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     }
     case 'error':
       return { ...s, working: null, runStartedAt: null, items: upsert(s.items, e) }
+    case 'fit': {
+      const rounds = e.note ? boostRounds(s.items) : []
+      return { ...s, items: upsert(s.items, rounds.length ? { ...e, rounds } : e) }
+    }
     default:
       return { ...s, items: upsert(s.items, e) }
   }

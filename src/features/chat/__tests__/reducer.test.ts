@@ -80,3 +80,23 @@ describe('applyEvent', () => {
     expect(s.items.at(-1)).toMatchObject({ type: 'error', text: '크레딧이 모자라요' })
   })
 })
+
+describe('boost rounds on the fit bubble', () => {
+  const round = (name: string, target: string, result: string) => ({ type: 'tool' as const, id: name, name, action: '점수 올리기', target, state: 'ok' as const, result })
+  it('carries what the rounds since the last user line raised, and nothing from an earlier turn', () => {
+    let s = emptyChat
+    for (const e of [
+      { type: 'user' as const, id: 'u0', text: '처음' },
+      round('boost1', '이전', '5.0 → 5.5 · 예전'),
+      { type: 'user' as const, id: 'u', text: '좋아요, 계속해 주세요' },
+      round('boost1', '키워드 밀도', '6.9 → 7.8 · 키워드를 넣었어요'),
+      round('boost2', '도메인 경험', '7.8 → 8.3 · 다시 썼어요'),
+      { type: 'fit' as const, id: 'f', score: 8.3, from: 6.9, delta: '+1.4', note: 'x' },
+    ]) s = applyEvent(s, e)
+    expect(s.items.at(-1)).toMatchObject({ type: 'fit', rounds: [{ label: '키워드 밀도', line: '6.9 → 7.8 · 키워드를 넣었어요' }, { label: '도메인 경험', line: '7.8 → 8.3 · 다시 썼어요' }] })
+  })
+  it('leaves an analysis fit with no rounds', () => {
+    const s = applyEvent(emptyChat, { type: 'fit', id: 'f', score: 6.9 })
+    expect(s.items[0]).not.toHaveProperty('rounds')
+  })
+})

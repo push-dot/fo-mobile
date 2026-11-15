@@ -8,8 +8,22 @@ export type DetailText = { text: string; detail?: { text: string; more: string }
 
 const score = (n: number) => n.toFixed(1)
 
+// A decimal's last digit says 영, 삼 or 육 with a final consonant: 으로; the others end open or in ㄹ: 로.
+const roForNumber = (text: string) => ('036'.includes(text.at(-1)!) ? '으로' : '로')
+
+/** The result of 점수 올리기: the score line, then what each round raised with its numbers as grey sub-text (ChatPh3Boost). */
+const boostBubble = (item: Fit & { from: number }): DetailText => {
+  const to = score(item.score)
+  const text = `적합도를 **${score(item.from)} → ${to}**${roForNumber(to)} 올렸어요. (${item.delta ?? `+${(item.score - item.from).toFixed(1)}`})`
+  const rounds = item.rounds ?? []
+  if (!rounds.length) return { text }
+  const range = (line: string) => line.split(' · ')[0]!
+  return { text, detail: { text: rounds.map((r) => `${r.label} ${range(r.line)}`).join(' · '), more: rounds.map((r) => `${r.label} ${r.line}`).join('\n') } }
+}
+
 /** The fit card as a bubble line (rule 30): the numbers in the bubble, the parts as grey sub-text that a tap opens. */
 export const fitBubble = (item: Fit): DetailText => {
+  if (item.note && item.from !== undefined) return boostBubble({ ...item, from: item.from })
   const head = item.from === undefined ? `적합도 **${score(item.score)}** / 10` : `적합도 **${score(item.from)} → ${score(item.score)}**`
   const text = [head, item.delta ?? item.caption].filter(Boolean).join(' · ')
   const rows = (item.rows ?? []).map((r) => `${r.label} ${score(r.score)}`)
