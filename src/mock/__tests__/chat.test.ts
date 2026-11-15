@@ -186,7 +186,7 @@ describe('chat mock', () => {
 
   it('draws ChatStates.4 in one conversation: file card, apply record, then QUEUE_BUSY with a 12s wait', async () => {
     const file = await run('t-states', { text: 'states-file' })
-    expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [] })
+    expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [], savedLine: expect.any(String) })
     const applied = await run('t-states', { text: 'states-apply' })
     // Tool lines are not drawn, so the record is a bot line of its own.
     expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '지원했어요. [이동하기](/my)' }))

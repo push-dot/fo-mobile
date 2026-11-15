@@ -27,14 +27,15 @@ tags:
 - tapOn: "채팅에서 찾기"
 - inputText: "프로필"
 # Three hits (프로필 in the first answer twice, once in the last): the first result is the newest (1/3), and 이전 결과 steps to the board's 2/3, the list line.
+# The search runs 300 ms after the last key and resets the result to 1/3, so the keyboard goes down (the board draws it down) before the step.
 - extendedWaitUntil:
     visible: ".*1/3.*"
     timeout: 10000
+- runFlow: _hide_kbd.yaml
+- waitForAnimationToEnd
 - tapOn: "이전 결과"
 - extendedWaitUntil:
     visible: ".*2/3.*"
     timeout: 10000
-# The board draws the result with the keyboard down (the field has a search return key, so Return lowers it).
-- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderFind
