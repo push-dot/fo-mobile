@@ -25,10 +25,10 @@ const moapay = { id: 'b1' as BotId, kind: 'company' as const, name: '모아페�
 
 describe('materialRow', () => {
   it.each<[Material, string, string]>([
-    [file({ by: 'bot', bot: moapay }), '김서준_백엔드_이력서', 'PDF · 11월 2일 · 모아페이 Bot이 만듦'],
-    [file({ by: 'user' }), '김서준_백엔드_이력서', 'PDF · 11월 2일 · 직접 올림'],
-    [file({ by: 'bot', bot: { id: 'push' as BotId, kind: 'push', name: 'Push Bot', color: null } }), '김서준_백엔드_이력서', 'PDF · 11월 2일 · Push Bot이 만듦'],
-    [file({ by: 'bot', bot: null }), '김서준_백엔드_이력서', 'PDF · 11월 2일 · Bot이 만듦'],
+    [file({ by: 'bot', bot: moapay }), '김서준_백엔드_이력서', '11월 2일 · 모아페이 Bot이 만듦'],
+    [file({ by: 'user' }), '김서준_백엔드_이력서', '11월 2일 · 직접 올림'],
+    [file({ by: 'bot', bot: { id: 'push' as BotId, kind: 'push', name: 'Push Bot', color: null } }), '김서준_백엔드_이력서', '11월 2일 · Push Bot이 만듦'],
+    [file({ by: 'bot', bot: null }), '김서준_백엔드_이력서', '11월 2일 · Bot이 만듦'],
     [posting(day(11, 12)), '도토리증권 · 서버 개발자', '공고 · 마감 11월 12일(D-3) · 북마크 10월 30일'],
     [posting(day(11, 20), '모아페이', '백엔드 엔지니어'), '모아페이 · 백엔드 엔지니어', '공고 · 마감 11월 20일 · 북마크 10월 30일'],
     [posting(null, '누리클라우드', '플랫폼 엔지니어'), '누리클라우드 · 플랫폼 엔지니어', '공고 · 상시 채용 · 북마크 10월 30일'],

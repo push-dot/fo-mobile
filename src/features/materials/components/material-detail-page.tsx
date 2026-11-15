@@ -56,7 +56,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   const m = detail.data?.material
   if (!m) {
     return (
-      <PageModal title={NOUN[kind]} left={back} page={!inModal} scroll={false}>
+      <PageModal title={NOUN[kind]} left={back} page={!inModal} mpage={inModal} scroll={false}>
         {detail.isError ? (
           <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[6] }}>
             <Text v="b2" color="t3">
@@ -98,6 +98,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
       title={NOUN[m.kind]}
       left={back}
       page={!inModal}
+      mpage={inModal}
       right={
         <GlassButton
           filled
@@ -113,15 +114,15 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
         />
       }
       footer={
-        <View style={{ gap: spacing[2], marginHorizontal: spacing[1] }}>
+        <View style={{ gap: spacing[2], marginHorizontal: inModal ? 0 : spacing[1] }}>
           <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
           <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
         </View>
       }
     >
-      {/* .dhead sits 29 above the card: its 14 margin (MaterialFacts) and 15 more. */}
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: 15 }}>
-        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 32 }}>
+      {/* .pname sits 30 above the card: its 14 margin (MaterialFacts) and the page gap of 16. */}
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: spacing[4] }}>
+        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30 }}>
           {detailTitle(m)}
         </Text>
         <MaterialFacts facts={facts} />

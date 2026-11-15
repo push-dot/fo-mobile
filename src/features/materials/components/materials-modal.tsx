@@ -4,10 +4,10 @@ import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
-import { Button, GlassButton, Skeleton, Text, ToastHost, showToast, type MenuAction } from '@/shared/components'
+import { Button, GlassButton, Skeleton, Text, ToastHost, type MenuAction } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
-import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, UPLOADED, type AddAction } from '../constants'
+import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, type AddAction } from '../constants'
 import type { Material, MaterialTab } from '../types'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
 import { sendMaterial } from './send-material'
@@ -85,10 +85,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const refresh = useRefreshMaterials()
   const room = useSearchRoom()
 
-  const { start } = useUpload(() => {
-    refresh()
-    showToast({ message: UPLOADED, tone: 'success', bottom: room.toast })
-  })
+  const { start } = useUpload(refresh)
   useImportRequest(() => void pickResume().then((file) => file && start(file)))
 
   const onOpen = useCallback((m: Material) => router.push(materialDetailPath(m.kind, m.id, bot)), [bot])

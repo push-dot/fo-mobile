@@ -37,9 +37,6 @@ export const madeByLabel = (madeBy: MadeBy): string => {
   return madeBy.bot.kind === 'push' ? `${madeBy.bot.name}이 만듦` : `${madeBy.bot.name} Bot이 만듦`
 }
 
-/** "PDF" from "이력서.pdf". A title without an extension reads 파일. */
-export const formatOf = (title: string) => /\.([a-z0-9]{1,5})$/i.exec(title)?.[1]?.toUpperCase() ?? '파일'
-
 /** A link shows its host only: "https://www.google.com/search?q=x" reads google.com (MaterialDetailLong). */
 export const hostOf = (url: string) =>
   url
@@ -56,7 +53,7 @@ export const materialTitle = (m: Material): string =>
 const subOf = (m: Material, now: Date): string => {
   switch (m.kind) {
     case 'file':
-      return `${formatOf(m.title)} · ${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
+      return `${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
     case 'document':
       return `Push 프로필 · ${monthDay(m.updatedAt)} · ${madeByLabel(m.madeBy)}`
     case 'posting':
