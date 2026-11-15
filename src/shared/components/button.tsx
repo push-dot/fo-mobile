@@ -18,6 +18,8 @@ type Props = {
   iconSize?: number
   /** Horizontal padding when a board sets its own (the size's default otherwise). */
   paddingX?: number
+  /** Label weight when a board sets its own (700 otherwise). */
+  weight?: '600' | '700'
   disabled?: boolean
   /** A button in the header bar is glass; every other button is plain. */
   glass?: boolean
@@ -38,7 +40,7 @@ const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFil
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 
-const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, disabled, glass, style }: Props) => {
+const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, weight, disabled, glass, style }: Props) => {
   const c = useColors()
   const s = SIZES[size]
   const v = VARIANTS[variant]
@@ -56,7 +58,7 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSi
       contentStyle={{ paddingHorizontal: paddingX ?? s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
     >
       {icon ? <Icon name={icon} size={iconSize ?? s.icon} color={fg} /> : null}
-      <Text v={s.text} weight="700" style={{ color: fg, fontSize: s.fontSize }}>
+      <Text v={s.text} weight={weight ?? '700'} style={{ color: fg, fontSize: s.fontSize }}>
         {label}
       </Text>
     </GlassPressable>

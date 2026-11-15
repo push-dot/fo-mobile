@@ -44,7 +44,8 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
     setSeen(d)
     setSel(initialPicks(qs, d.items))
     setChips(d.chips ?? [])
-    setDoc(d.doc)
+    // Only the quick start with a document list reads another file; every other one reads the hub profile (RULINGS 31), whatever the server seeds.
+    setDoc(d.doc && !qs.listLabel ? DEFAULT_DOC : d.doc)
   }
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
