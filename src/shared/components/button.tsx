@@ -1,6 +1,7 @@
 import type { StyleProp, ViewStyle } from 'react-native'
 import type { IconName } from '@push/design-system'
 import { onAccent, platformTheme, spacing, type, useColors, type Colors, type TypeName } from '../../theme'
+import { PENDING_OPACITY } from './constants'
 import GlassPressable from './glass-pressable'
 import Icon from './icon'
 import Text from './text'
@@ -20,6 +21,8 @@ type Props = {
   paddingX?: number
   weight?: '600' | '700'
   disabled?: boolean
+  /** The action is running or done: the button is disabled, dimmed like the boards' 지원하는 중… / 지원 완료. */
+  pending?: boolean
   /** A button in the header bar is glass; every other button is plain. */
   glass?: boolean
   style?: StyleProp<ViewStyle>
@@ -39,7 +42,7 @@ const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFil
   danger: { glass: false, fill: 'red', ink: 'accent' },
 }
 
-const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, weight, disabled, glass, style }: Props) => {
+const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, weight, disabled, pending, glass, style }: Props) => {
   const c = useColors()
   const s = SIZES[size]
   const v = VARIANTS[variant]
@@ -47,8 +50,9 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSi
   return (
     <GlassPressable
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ disabled: disabled || pending }}
+      disabled={disabled || pending}
+      dimOpacity={pending ? PENDING_OPACITY : undefined}
       onPress={onPress}
       glass={glass ?? v.glass}
       fill={v.fill}

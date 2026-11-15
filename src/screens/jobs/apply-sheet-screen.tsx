@@ -34,7 +34,8 @@ const ApplySheetScreen = () => {
       action={{
         label: apply.isPending ? '지원하는 중…' : '이 서류로 지원하기',
         onPress: () => apply.mutate(applyBody(doc, chosen)),
-        disabled: apply.isPending || !doc,
+        disabled: !doc,
+        pending: apply.isPending,
       }}
     >
       <ScrollView keyboardShouldPersistTaps="handled">
