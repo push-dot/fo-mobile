@@ -142,7 +142,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             disabled={decline.isPending}
             style={{ paddingHorizontal: DECLINE_INSET }}
             onPress={() =>
-              Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
+              Alert.alert('이 제안을 거절할까요?', undefined, [
                 { text: '취소', style: 'cancel' },
                 { text: OFFER_DECLINE, style: 'destructive', onPress: () => decline.mutate() },
               ])
