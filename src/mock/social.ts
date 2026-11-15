@@ -14,9 +14,11 @@ const minho = user('u-minho', '강민호')
 const doyun = user('u-doyun', '박도윤')
 const yuna = user('u-yuna', '한유나')
 
-const seed: Omit<Post, 'id' | 'createdAt'>[] = [
+// feedBody: the feed card's text when it differs from the opened post (Social ends its second card at 있어요!, PostDetail keeps the tail).
+type Seed = Omit<Post, 'id' | 'createdAt'> & { feedBody?: string }
+const seed: Seed[] = [
   { author: subin, category: 'career', title: '3년차 백엔드, 이직 타이밍 고민돼요', body: '지금 회사에서 배울 건 다 배운 느낌인데, 연봉 협상 시즌까지 기다리는 게 나을까요? 비슷한 고민 해보신 분들 의견이 궁금해요.', imageUrls: [], commentCount: 24, viewCount: 412 },
-  { author: haerin, category: 'daily', title: '판교 점심 지도 만들어 봤어요', body: '회사 근처 다니면서 기록해 둔 곳들 공유해요. 국밥부터 샐러드까지 골고루 있어요! 혼밥하기 좋은 곳은 따로 표시해 뒀어요.', imageUrls: [img('lunch1'), img('lunch2'), img('lunch3')], commentCount: 12, viewCount: 237 },
+  { author: haerin, category: 'daily', title: '판교 점심 지도 만들어 봤어요', body: '회사 근처 다니면서 기록해 둔 곳들 공유해요. 국밥부터 샐러드까지 골고루 있어요! 혼밥하기 좋은 곳은 따로 표시해 뒀어요.', feedBody: '회사 근처 다니면서 기록해 둔 곳들 공유해요. 국밥부터 샐러드까지 골고루 있어요!', imageUrls: [img('lunch1'), img('lunch2'), img('lunch3')], commentCount: 12, viewCount: 237 },
   { author: minho, category: 'dev', title: 'Swift Concurrency 도입 후기', body: '레거시 콜백 코드를 async/await로 옮기면서 겪은 문제와 해결 방법을 정리했어요.', imageUrls: [img('swift1'), img('swift2')], commentCount: 31, viewCount: 980 },
   { author: doyun, category: 'coffeechat', title: '프론트엔드 5년차, 커피챗 열어요', body: '이직 준비나 포트폴리오 고민 있으시면 편하게 신청해 주세요. 주 2회 저녁에 가능해요.', imageUrls: [img('coffee')], commentCount: 8, viewCount: 155 },
   { author: yuna, category: 'work', title: '재택 2년 해 보고 느낀 점', body: '집중은 잘 되는데 동료와의 거리감이 생기더라고요. 저희 팀이 해 본 방법들을 적어 봤어요.', imageUrls: [img('home1'), img('home2'), img('home3'), img('home4')], commentCount: 19, viewCount: 610 },
@@ -24,7 +26,7 @@ const seed: Omit<Post, 'id' | 'createdAt'>[] = [
 ]
 
 // Repeat the seed so the infinite feed has a few pages.
-const posts: Post[] = Array.from({ length: 28 }, (_, i) => ({
+const posts: (Post & { feedBody?: string })[] = Array.from({ length: 28 }, (_, i) => ({
   ...seed[i % seed.length]!,
   id: `post-${i + 1}`,
   createdAt: at(i === 0 ? 2 : i === 1 ? 4 : i === 2 ? 26 : i * 9),
@@ -50,7 +52,8 @@ export const emptyFeed = () => {
 mock('GET', 'posts', ({ query }) => {
   const category = query.get('category') as PostCategory | null
   if (feedEmpty) return page([], query)
-  return page(category ? posts.filter((p) => p.category === category) : posts, query)
+  const rows = category ? posts.filter((p) => p.category === category) : posts
+  return page(rows.map(({ feedBody, ...p }) => (feedBody ? { ...p, body: feedBody } : p)), query)
 })
 
 mock('GET', 'posts/:id', ({ params }) => {
