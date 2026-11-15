@@ -177,12 +177,18 @@ const setBookmark = (id: string, on: boolean) => {
 export const fewBookmarks = () => {
   bookmarkOrder.splice(2)
 }
+// Tour switch (links.ts): ChatPh0Picker draws an account with only 모아페이's posting bookmarked, titled without its stack.
+let plainTitles = false
+export const pickerBookmarks = () => {
+  bookmarkOrder.splice(1)
+  plainTitles = true
+}
 mock('POST', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, true))
 mock('DELETE', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, false))
 // shortcut: the 허브 제안 sheet (the only limit=10 caller) draws the title without its stack suffix; drop when the sheet trims it.
 const SHEET_TITLES: Record<string, string> = { p1: '백엔드 엔지니어' }
 mock('GET', 'me/bookmarks', ({ query }) => {
-  const sheet = query.get('limit') === '10'
+  const sheet = query.get('limit') === '10' || plainTitles
   const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, title: (sheet && SHEET_TITLES[p.id]) || p.title, location: p.id === 'p8' ? '성남 판교' : p.location }))
   return page(list, query)
 })

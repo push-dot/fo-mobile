@@ -359,7 +359,7 @@ export const removeChatDoc = (id: string) => {
   const i = docs.findIndex((d) => d.id === id)
   if (i >= 0) docs.splice(i, 1)
 }
-mock('GET', 'chat/docs', () => ({ data: account.few ? docs.filter((d) => d.id === 'd2' || d.id === 'd4') : docs }))
+mock('GET', 'chat/docs', () => ({ data: account.few ? docs.filter((d) => d.id === 'd2' || d.id === 'd4') : account.picker ? docs.slice(0, 2) : docs }))
 mock('POST', 'chat/docs', ({ body }) => {
   const b = body as { fileName: string; size: number }
   const d: ChatDoc = { id: `d${Date.now()}`, fileName: b.fileName, size: b.size, createdAt: new Date().toISOString() }
@@ -368,8 +368,8 @@ mock('POST', 'chat/docs', ({ body }) => {
 })
 // Tour switches (links.ts): `plan-ultra` is an ULTRA account (4x PRO's credits), `credits-out` has spent all of them (ChatNoCreditUltra).
 // `few-materials` is the account ChatMention draws: two bookmarks, two documents, one link. `run` is the token the next messages play.
-// `payments-closed` answers paymentsEnabled: false, so every buy button hides (ChatPh1FitClosed).
-let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; run?: string; once?: boolean } = { ultra: false, spent: false, few: false, closed: false }
+// `picker-few` is the account ChatPh0Picker draws: two documents, one bookmark. `payments-closed` answers paymentsEnabled: false, so every buy button hides (ChatPh1FitClosed).
+let account: { ultra: boolean; spent: boolean; few: boolean; picker: boolean; closed: boolean; run?: string; once?: boolean } = { ultra: false, spent: false, few: false, picker: false, closed: false }
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }
 }
