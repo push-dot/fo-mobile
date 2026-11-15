@@ -368,7 +368,7 @@ mock('POST', 'chat/docs', ({ body }) => {
 })
 // Tour switches (links.ts): `plan-ultra` is an ULTRA account (4x PRO's credits), `credits-out` has spent all of them (ChatNoCreditUltra).
 // `few-materials` is the account ChatMention draws: two bookmarks, two documents, one link. `run` is the token the next messages play.
-// `payments-closed` answers paymentsEnabled: false, so every buy button hides (PlanUpgradeClosed, PlanUltraClosed, ChatPh1FitClosed).
+// `payments-closed` answers paymentsEnabled: false, so every buy button hides (ChatPh1FitClosed).
 let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; run?: string; once?: boolean } = { ultra: false, spent: false, few: false, closed: false }
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }

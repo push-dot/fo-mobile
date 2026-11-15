@@ -106,7 +106,7 @@ describe('composerPlaceholder', () => {
 
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
     expect(planRequired('FREE', true)).toBe('플랜을 올리면 쓸 수 있어요.')
-    expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.')
+    expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요.')
     expect(planRequired(undefined, false)).toBe('지금 플랜에서는 쓸 수 없어요.')
   })
 })
