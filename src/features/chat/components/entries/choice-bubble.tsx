@@ -21,7 +21,7 @@ const Row = ({ mark, label, on, onPress, number }: { mark?: string; label: strin
       onPress={onPress}
       style={{ flexDirection: 'row', gap: 10, paddingVertical: 9, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line }}
     >
-      <Text v="b1" color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
+      <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't3'} style={{ width: 18, lineHeight: ROW_LINE, fontVariant: ['tabular-nums'] }}>
         {mark ?? number}
       </Text>
       <Text v="b1" weight={on ? '600' : '400'} color={on ? 'acText' : 't1'} style={{ flexShrink: 1, lineHeight: ROW_LINE, paddingRight: spacing[1] }}>
