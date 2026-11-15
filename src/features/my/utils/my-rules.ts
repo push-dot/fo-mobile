@@ -62,10 +62,7 @@ export const profileConvertBody = () => ({})
 
 export const SET_BASE_COPY = {
   action: '기본 프로필로 설정',
-  title: '이 프로필을 기본 프로필로 설정할까요?',
   body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
-  confirm: '설정',
-  toast: '기본 프로필로 설정했어요.',
 } as const
 
 export const setBaseProfilePath = (id: string) => `documents/${id}/base-profile`
