@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, Pressable, TextInput, useWindowDimensio
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassField, Icon, useKeyboardHeight } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
-import { fontFor, radius, spacing, type, useColors, useThemeMode } from '@/theme'
+import { fontFor, radius, spacing, type, useColors } from '@/theme'
 import { SEARCH_PLACEHOLDER } from '../constants'
 import { useListSize } from './list-size'
 
@@ -17,12 +17,6 @@ export const useSearchRoom = () => {
   const { field } = useListSize()
   const bottom = useSafeAreaInsets().bottom
   return { list: FADE + field.height + GAP_BELOW + bottom, toast: field.height + GAP_BELOW + spacing[2] }
-}
-
-/** Untinted native glass draws near-black on the dark background, where the board draws its lighter --glass. */
-export const useGlassTint = () => {
-  const c = useColors()
-  return useThemeMode() === 'dark' ? c.glass : undefined
 }
 
 /** `.msearch`: the search field floats at the bottom over a fade of the background, and rides up with the keyboard as the chat composer does. */
