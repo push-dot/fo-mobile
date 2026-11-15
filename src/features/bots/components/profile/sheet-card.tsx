@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Modal, Platform, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Text, ToastHost } from '@/shared/components'
+import { Text } from '@/shared/components'
 import { GRABBER } from '@/shared/components/constants'
 import { radius, spacing, useColors } from '../../../../theme'
 
@@ -51,8 +51,6 @@ export const SheetCard = ({ label, title, gap, onClose, children }: { label: str
           {children}
         </Pressable>
       </Pressable>
-      {/* iOS: the root ToastHost sits under this modal (허용 해제 toast); Android shows the root one. */}
-      {float ? <ToastHost /> : null}
     </Modal>
   )
 }

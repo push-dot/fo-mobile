@@ -94,7 +94,7 @@ const roots = (tokens: string[]): Path[] => {
     ['fix a document', [say('이 서류를 고쳐 줘')]],
     ['make a resume', [say('이력서 만들어 주세요')]],
     ['make a resume alias', [say('make resume')]],
-    ['auto pick', [say('PDF로 만들어 줘')]],
+    ['auto pick', [say('Push 프로필 만들어 줘')]],
     ['await a reply', [say('경력 섹션을 공고에 맞게 바꿔 주세요')]],
     ['apply', [say('이 공고에 지원해 줘')]],
     ['apply alias', [say('apply')]],

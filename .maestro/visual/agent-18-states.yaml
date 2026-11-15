@@ -12,10 +12,10 @@ tags:
       - runFlow:
           file: _say.yaml
           env:
-            KO: "모아페이 공고에 맞춰 이력서 PDF로 만들어 줘"
+            KO: "모아페이 공고에 맞춰 Push 프로필 만들어 줘"
             EN: "auto-pick"
       - extendedWaitUntil:
-          visible: ".*자동으로 골랐어요: 경력 섹션부터 고치기.*"
+          visible: ".*경력 섹션부터 고칠게요.*"
           timeout: 30000
       # The boards have no keyboard.
       - runFlow:

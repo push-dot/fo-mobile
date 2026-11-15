@@ -50,7 +50,8 @@ export const emptyFeed = () => {
 mock('GET', 'posts', ({ query }) => {
   const category = query.get('category') as PostCategory | null
   if (feedEmpty) return page([], query)
-  return page(category ? posts.filter((p) => p.category === category) : posts, query)
+  const rows = category ? posts.filter((p) => p.category === category) : posts
+  return page(rows, query)
 })
 
 mock('GET', 'posts/:id', ({ params }) => {

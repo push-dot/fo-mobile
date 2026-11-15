@@ -37,6 +37,7 @@ import {
   turnFailed,
   followScroll,
   hasOlder,
+  isStopping,
   shownItems,
   headerLightOf,
   openBot,
@@ -68,9 +69,6 @@ const AT_BOTTOM = 40
 const OPEN_REST_MS = 800
 // The list's own gap (18) sits between its footer and the first line, so the footer is shorter than the header by that much.
 const LIST_GAP = 18
-// The boards start a company Bot's thread (greeting) 16pt under the header (.cthread) and a thread with no greeting 4pt over its bottom edge (.thread, top + 56 vs the header's 60).
-const GREETING_TOP = spacing[4]
-const PLAIN_TOP = -4
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
@@ -254,7 +252,7 @@ const Thread = ({ id }: { id: string }) => {
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: 18, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, panelDrawn), paddingBottom: spacing[4] }}
-        ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP + (greeting.length ? 0 : PLAIN_TOP - GREETING_TOP)) }} />}
+        ListFooterComponent={<View style={{ height: Math.max(0, headerH - LIST_GAP) }} />}
         ListHeaderComponent={
           chat.queue.length || inThread ? (
             <View style={{ gap: 18 }}>
@@ -287,7 +285,7 @@ const Thread = ({ id }: { id: string }) => {
             botId={id}
             inputRef={input}
             placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
-            working={!!chat.working}
+            working={!!chat.working && !isStopping(chat.working)}
             disabled={!!limit.banner}
             onGrow={setGrow}
             onStop={() => stop(id)}

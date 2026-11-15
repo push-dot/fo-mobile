@@ -64,6 +64,9 @@ const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], te
   accessibilityLabel: tail ? `${label} ${tail}` : label,
 })
 
+/** The stop was sent and the run has not ended yet: the board draws the composer's send button grey, not the stop button. */
+export const isStopping = (working: { verbs: readonly string[] } | null) => working?.verbs[0] === STOPPING_TEXT
+
 export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
   if (line.kind === 'run' && line.phase === 'queued') return view('idle', 'neutral', '', null, QUEUE_LABEL)
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
@@ -85,7 +88,8 @@ export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine
     return { kind: 'run', phase: 'queued', since, ahead }
   }
   if (STORED_THINKING.has(text)) return { kind: 'run', phase: 'thinking', since, text: THINK_TEXT }
-  return { kind: 'run', phase: 'working', since, text }
+  // The server and the mock end a status with an ellipsis; the boards draw the phrase alone (rule 29).
+  return { kind: 'run', phase: 'working', since, text: text.replace(/…$/, '') }
 }
 
 export const canStop = (lines: readonly LiveLine[]) => lines.some((line) => line.kind === 'run')

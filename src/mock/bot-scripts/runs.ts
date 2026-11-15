@@ -15,8 +15,6 @@ type Tool = Extract<StreamEvent, { type: 'tool' }>
 const s = (wait: number, frame: Frame): Step => ({ wait, frame })
 const status = (text: string): Frame => ({ type: 'status', text })
 const agent = (text: string): Frame => ({ type: 'token', text })
-/** A choice the run made by itself: the app draws "자동으로 골랐어요: {label}". */
-const autoPicked = (id: string, label: string): Frame => ({ type: 'choice', id, auto: true, options: [{ id: 'pick', label }], recommended: 'pick' })
 const tool = (name: string, summary: string, target: string | undefined, state: Tool['state'], resultLine?: string, extra?: string[]): Tool => ({
   type: 'tool', name, summary, state, ...(target ? { target } : {}), ...(resultLine ? { resultLine } : {}), ...(extra ? { extra } : {}),
 })
@@ -528,9 +526,10 @@ export const verifyFail: Step[] = [
 ]
 const autoPick: Step[] = [
   s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개')),
-  s(400, autoPicked('auto1', '모던 템플릿')),
-  s(400, autoPicked('auto2', '경력 섹션부터 고치기')),
-  s(300, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
+  // ChatStates.1: the Bot says what it chose in one sentence and goes on writing; the run is held long enough for a tour to take the panel while the status line shows.
+  s(400, agent('모던 템플릿으로 만들고, 경력 섹션부터 고칠게요.')),
+  s(300, status('경력 섹션을 쓰는 중')),
+  s(DWELL + 12000, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
   done,
 ]
 const statesFile: Step[] = [
@@ -554,7 +553,7 @@ const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
   s(900, tool('apply', '지원하기', MOA, 'ok')),
   // The record is a bubble of its own (tool lines are not drawn) with an in-bubble link, between the file card and the busy error (ChatStates.4).
-  s(300, agent('지원했어요. [이동하기](/my)')),
+  s(300, agent('모아페이에 지원했어요.\n[이동하기](/my)')),
   done,
 ]
 // ChatStates.2 draws the answer as a plain finished reply (3 lines, no 확인을 기다리고 있어요 line, no sheet): the run ends with `done`, not `awaiting`.
@@ -690,7 +689,7 @@ export const pick = (text: string, interrupted: boolean, attachment?: string, in
   if (/저장해/.test(t)) return { steps: [s(300, tool('save', '내 서류에 저장', undefined, 'ok', '저장했어요 · 마이 › 서류')), done] }
   if (/실패|채용 페이지|^fail$/.test(t)) return { steps: failRun, labels: TODO }
   if (/만들어 주세요|^make resume$/.test(t)) return { steps: ph0 }
-  if (/pdf로 만들어 줘/.test(t)) return { steps: autoPick }
+  if (/push 프로필 만들어 줘/.test(t)) return { steps: autoPick }
   if (/경력 섹션을 공고에 맞게/.test(t)) return { steps: awaitReply }
   if (interrupted) return null
   if (t === '이 서류를 고쳐 줘') return { steps: fixDocRun, labels: TODO }

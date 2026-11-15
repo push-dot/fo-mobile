@@ -118,6 +118,7 @@ describe('ContextMenu (iOS)', () => {
     const row = find(find(tree, 'ContextMenu.Trigger'), 'Pressable')
     expect(row.props.onPress).toBe(onPress)
     expect(row.props.accessibilityLabel).toBe('대화')
+    expect(row.props.style).toEqual({ maxWidth: 402 })
     expect(find(find(tree, 'ContextMenu.Items'), MenuButtons).props.actions).toBe(actions)
     expect(find(find(tree, 'ContextMenu.Preview'), 'RNHostView').props.children).toBe(preview)
   })

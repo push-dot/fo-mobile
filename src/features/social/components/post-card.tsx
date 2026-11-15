@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Post } from '@push/api-client'
-import { Icon, Text } from '../../../shared/components'
+import { Icon, Text, WordClampText } from '../../../shared/components'
 import { spacing } from '../../../theme'
 import AuthorRow from './author-row'
 import ImageGrid from './image-grid'
@@ -19,9 +19,9 @@ const PostCard = ({ post }: { post: Post }) => {
       <AuthorRow post={post} size={36} />
       <View style={{ gap: spacing[1] }}>
         <Text v="h3">{post.title}</Text>
-        <Text v="b2" color="t2" numberOfLines={2}>
+        <WordClampText v="b2" color="t2" lines={2} ellipsis="line">
           {post.body}
-        </Text>
+        </WordClampText>
       </View>
       <ImageGrid urls={post.imageUrls} row={88} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>

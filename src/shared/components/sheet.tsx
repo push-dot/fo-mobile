@@ -15,7 +15,7 @@ type Props = {
   title?: string
   description?: string
   children: ReactNode
-  action?: { label: string; onPress: () => void; disabled?: boolean }
+  action?: { label: string; onPress: () => void; disabled?: boolean; pending?: boolean }
   secondary?: { label: string; onPress: () => void }
   gap?: number
   /** Extra space above the action: the boards add 6 (filters) or 4 (quick starts) to the sheet gap. */
@@ -95,7 +95,7 @@ const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP
         </View>
       ) : null}
       {children}
-      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && SLIM_ACTION]} /> : null}
+      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && SLIM_ACTION]} /> : null}
       {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} /> : null}
     </View>
   )

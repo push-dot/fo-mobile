@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
-import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, showToast } from '@/shared/components'
+import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
 import { isXlScale } from '@/shared/components/xl-chrome'
 import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
@@ -21,7 +21,6 @@ import {
   grantMeta,
   profileGroups,
   revokeA11y,
-  revokeToast,
   type ProfileRow,
 } from './profile-rows'
 import { companyNames } from './companies'
@@ -192,7 +191,6 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     } catch {
       return
     }
-    showToast({ message: revokeToast(host), tone: 'success' })
     if (left === 0) setSheet(null)
   }
   const onDelete = async () => {

@@ -3,11 +3,12 @@ name: 공고 상세 → 지원 서류 → 지원 실패
 tags:
   - visual
 ---
+# The ApplySheet boards draw the fit card with three parts (G74), so the page opens under `fit-three`.
 # POST apply answers 500, so the sheet shows the error line and the button is back.
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=fail:POST:postings/.*/apply"
+      MOCK: "push://sign-in?mock=fit-three,fail:POST:postings/.*/apply"
       READY: "새로 올라온 공고"
 - runFlow: _open_jobs.yaml
 - extendedWaitUntil:

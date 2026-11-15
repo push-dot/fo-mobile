@@ -34,7 +34,7 @@ import {
 } from '@/features/my'
 import { showChoiceModal } from '@/shared/navigation'
 import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { lineRing, radius, spacing, useColors } from '@/theme'
 
 const HUB_BADGE = '지원 서류용 프로필(허브형)'
 
@@ -162,8 +162,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
                 marginHorizontal: spacing[5],
                 marginTop: spacing[2],
                 borderRadius: radius.card,
-                borderWidth: 1,
-                borderColor: c.line,
+                ...lineRing(c),
                 backgroundColor: c.paper,
                 paddingVertical: spacing[4],
                 paddingLeft: spacing[5],
@@ -289,7 +288,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           />
           <Button
             label={applied ? '지원 완료' : '이 공고에 지원'}
-            disabled={applied}
+            pending={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}
           />

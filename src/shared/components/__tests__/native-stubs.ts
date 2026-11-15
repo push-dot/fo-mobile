@@ -12,6 +12,8 @@ const modifiers = (names: string[]) => Object.fromEntries(names.map((n) => [n, m
 export const stubs = {
   reactNative: {
     Platform: { OS: 'ios' },
+    Dimensions: { get: () => ({ width: 402 }) },
+    useWindowDimensions: () => ({ width: 402 }),
     View: 'View',
     Pressable: 'Pressable',
     Switch: 'RNSwitch',

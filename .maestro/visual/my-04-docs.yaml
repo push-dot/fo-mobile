@@ -52,6 +52,10 @@ tags:
           visible: "20MB까지 올릴 수 있어요"
           timeout: 10000
       - takeScreenshot: MyResumeStates.3
+      # The toast hides itself; the ⋯ menu (.1) is drawn without it.
+      - extendedWaitUntil:
+          notVisible: "20MB까지 올릴 수 있어요"
+          timeout: 15000
       - waitForAnimationToEnd:
           timeout: 3000
       # The row's own accessibility label hides its ⋯ menu from iOS accessibility, so tap the ⋯ of the first file by position (its row spans 51-60% of the screen).

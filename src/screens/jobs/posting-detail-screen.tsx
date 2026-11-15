@@ -35,7 +35,8 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}
-          disabled={!p || p.applied}
+          disabled={!p}
+          pending={p?.applied}
           onPress={() => router.push({ pathname: '/apply', params: { postingId: id } })}
           style={{ flex: 1 }}
         />

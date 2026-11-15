@@ -7,10 +7,10 @@ const HEADS = {
   strategy: ['구분', '섹션', '바꿀 점'],
 } as const
 
-/** A plan or feedback as the markdown table the bot's bubble draws (ChatPh1Feedback, ChatPh2). Blueprints are a list, see blueprintList. */
+/** A plan or feedback as the markdown table (push-be names a plan by its kind; the mock prefixes it with its scenario, so the kind is the id's end), as the bot's bubble draws it (ChatPh1Feedback, ChatPh2). Blueprints are a list, see blueprintList. */
 export const planTable = (item: PlanItem): TableBlock => ({
   kind: 'table',
-  head: [...HEADS[item.id === 'feedback' ? 'feedback' : 'strategy']],
+  head: [...HEADS[item.id.endsWith('feedback') ? 'feedback' : 'strategy']],
   rows: item.rows.map((r) => [r.tag, r.label, r.note]),
 })
 

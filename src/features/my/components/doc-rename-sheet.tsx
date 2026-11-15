@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
-import { Button, Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
+import { Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
 import { displayName, extensionOf } from '@/shared/utility/display-name'
 import { hitSlopTo, spacing, useColors } from '@/theme'
 import { useDocument, useRenameDocument, useRenameSource, useSource } from '../api/hooks'
@@ -32,41 +32,43 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
     })
   }
   return (
-    <Sheet gap={spacing[2]}>
-      <Text v="h3" weight="600" accessibilityRole="header" style={{ paddingTop: spacing[1], textAlign: 'center' }}>
-        {source ? DOC_RENAME_COPY.fileTitle : DOC_RENAME_COPY.title}
-      </Text>
-      <Text v="b2" color="t2">
-        {DOC_RENAME_COPY.description}
-      </Text>
-      <View style={{ marginTop: spacing[2] }}>
-        <TextField
-          value={value}
-          onChangeText={(t) => setTyped(typedTitle(value, t, max))}
-          placeholder={DOC_RENAME_COPY.placeholder}
-          focusRing
-          returnKeyType="done"
-          onSubmitEditing={save}
-          accessibilityLabel={DOC_RENAME_COPY.field}
-          trailing={
-            value ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={DOC_RENAME_COPY.clear}
-                hitSlop={hitSlopTo(CLEAR_SIZE, CLEAR_SIZE)}
-                onPress={() => setTyped('')}
-                style={{ width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
-              >
-                <Icon name="x" size={CLEAR_ICON} color="t3" />
-              </Pressable>
-            ) : null
-          }
-        />
+    <Sheet gap={spacing[1]} actionGap={10} slimAction action={{ label: DOC_RENAME_COPY.save, onPress: save, disabled: current === undefined || !value.trim() || over || rename.isPending }}>
+      <View style={{ minHeight: 52, justifyContent: 'center' }}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+          {source ? DOC_RENAME_COPY.fileTitle : DOC_RENAME_COPY.title}
+        </Text>
       </View>
-      <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingRight: spacing[1] }}>
-        {savedLength(value)}/{max}
-      </Text>
-      <Button label={DOC_RENAME_COPY.save} disabled={current === undefined || !value.trim() || over || rename.isPending} onPress={save} style={{ marginTop: spacing[2] }} />
+      <View style={{ paddingHorizontal: spacing[1], gap: 6 }}>
+        <Text v="b2" color="t2">
+          {DOC_RENAME_COPY.description}
+        </Text>
+        <View style={{ marginTop: spacing[1] }}>
+          <TextField
+            value={value}
+            onChangeText={(t) => setTyped(typedTitle(value, t, max))}
+            placeholder={DOC_RENAME_COPY.placeholder}
+            returnKeyType="done"
+            onSubmitEditing={save}
+            accessibilityLabel={DOC_RENAME_COPY.field}
+            trailing={
+              value ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={DOC_RENAME_COPY.clear}
+                  hitSlop={hitSlopTo(CLEAR_SIZE, CLEAR_SIZE)}
+                  onPress={() => setTyped('')}
+                  style={{ width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Icon name="x" size={CLEAR_ICON} color="t3" />
+                </Pressable>
+              ) : null
+            }
+          />
+        </View>
+        <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingTop: 2, paddingRight: spacing[1] }}>
+          {savedLength(value)}/{max}
+        </Text>
+      </View>
     </Sheet>
   )
 }
