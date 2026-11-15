@@ -39,7 +39,7 @@ const Tag = ({ label, on, onPress }: { label: string; on: boolean; onPress: () =
 const ApprovalForm = ({ approval, sel, onToggle, onChange }: Props) => {
   const c = useColors()
   return (
-    <View style={{ gap: 6, paddingHorizontal: spacing[5] }}>
+    <View style={{ gap: 6, paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
       {approval.sections.map((s, si) => {
         if (s.kind === 'chips')
           return (
