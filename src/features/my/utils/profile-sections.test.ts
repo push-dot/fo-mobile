@@ -25,6 +25,11 @@ describe('profile sections from a resume', () => {
     ])
   })
 
+  it('names the resume\'s lead stack first, whatever order the document lists the skills in', () => {
+    const skills = profileSections({ ...draft, skills: ['Kotlin', 'Java', 'Spring Boot', 'JPA'] }, ['Kotlin', 'Spring Boot']).find((s) => s.key === 'skills')
+    expect(skills?.sub).toBe('Kotlin, Spring Boot 외 2개')
+  })
+
   it('hides a section the resume has nothing for', () => {
     expect(profileSections({ ...draft, skills: [], intro: '' }).map((s) => s.key)).toEqual(['basic', 'career'])
   })
