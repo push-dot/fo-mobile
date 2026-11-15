@@ -92,7 +92,7 @@ describe('bot:<id>:thread and :done', () => {
   it('answers ChatBotStatusDone with the board text: a paragraph, two items, the PDF sentence', async () => {
     seedThread('b-moa', 'done')
     const text = (await turns())[0]!.assistant!.text
-    expect(splitBotText(text).map((b) => (b.kind === 'list' ? b.items.length : b.text.slice(0, 8)))).toEqual(['경력 섹션 3줄', 2, 'PDF는 내 서'])
+    expect(splitBotText(text).map((b) => (b.kind === 'paragraph' ? b.text.slice(0, 8) : b.items.length))).toEqual(['경력 섹션 3줄', 2, 'PDF는 내 서'])
   })
 })
 

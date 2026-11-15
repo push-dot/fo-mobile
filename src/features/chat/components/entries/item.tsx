@@ -1,20 +1,21 @@
 import { memo, useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import BotText from './bot'
+import BotText, { Bubble } from './bot'
+import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
 import { PlanRows } from './plan-card'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
-import { onAccent, radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
-import { monoNumber } from '../../../../theme/mono'
+import { radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
 import { Badge, Button, Icon, Text, useReduceMotion } from '@/shared/components'
 import Blur from '@/shared/components/blur'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
 import { usePop, usePulse } from '../../hooks'
+import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { LOCKED_KEYWORDS, fitChrome } from '../../utils/fit-card'
@@ -119,38 +120,6 @@ const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<ty
   )
 }
 
-// ChatPh1: the current item is black (owner rule 3: the accent stays on the main button and the selected state).
-const TodoRow = ({ item }: { item: Of<'todo'>['items'][number] }) => {
-  const c = useColors()
-  const done = item.state === 'done'
-  const now = item.state === 'now'
-  const pop = usePop(done)
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-      <Animated.View
-        style={{
-          width: 18,
-          height: 18,
-          borderRadius: 5,
-          borderWidth: now ? 2 : 1.5,
-          borderColor: done ? c.t3 : now ? c.t1 : c.deco,
-          backgroundColor: done ? c.t3 : 'transparent',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: [{ scale: pop }],
-        }}
-      >
-        {done ? <Icon name="check" size={12} color={onAccent} /> : null}
-        {now ? <View style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: c.t1 }} /> : null}
-      </Animated.View>
-      <StruckLabel on={done} v="b2" color={done ? 't3' : 't1'} weight={now ? '700' : '400'}>
-        {item.label}
-      </StruckLabel>
-      {item.added ? <Badge label="새로 추가" tone="ac" /> : null}
-    </View>
-  )
-}
-
 const Card = ({ children, gap = 7, padding }: { children: React.ReactNode; gap?: number; padding?: number }) => {
   const c = useColors()
   return (
@@ -160,24 +129,15 @@ const Card = ({ children, gap = 7, padding }: { children: React.ReactNode; gap?:
   )
 }
 
-const TodoList = ({ item }: { item: Of<'todo'> }) => {
-  const done = item.items.filter((i) => i.state === 'done').length
-  return (
-    <Card>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text v="c1" weight="700" color="t3">
-          {item.title ?? '할 일'}
-        </Text>
-        <Text v="c1" weight="700" color="t3" style={{ fontVariant: ['tabular-nums'] }}>
-          {done}/{item.items.length}
-        </Text>
-      </View>
-      {item.items.map((i) => (
-        <TodoRow key={i.label} item={i} />
-      ))}
-    </Card>
-  )
-}
+const TodoList = ({ item }: { item: Of<'todo'> }) => (
+  <Bubble gap={spacing[1]}>
+    {todoLines(item).map((line) => (
+      <StruckLabel key={line.text} on={line.state === 'done'} v="b1" color={line.state === 'done' ? 't3' : 't1'} weight={line.state === 'now' ? '700' : '400'}>
+        {line.text}
+      </StruckLabel>
+    ))}
+  </Bubble>
+)
 
 const StaleGate = ({ item }: { item: Of<'stale'> }) => (
   <Card gap={8}>
@@ -203,41 +163,12 @@ const Plan = ({ item }: { item: Of<'plan'> }) => {
   return titled ? card : <View style={{ paddingLeft: 18, marginTop: -spacing[2] }}>{card}</View>
 }
 
-const Diff = ({ item }: { item: Of<'diff'> }) => {
-  const c = useColors()
-  return (
-    <View style={{ borderRadius: radius.card, overflow: 'hidden', backgroundColor: c.bg2 }}>
-      {item.lines.map((l, i) => {
-        const add = l.sign === '+'
-        const del = l.sign === '-'
-        return (
-          // Lines land one by one: 300ms each, 150ms apart.
-          <Appear
-            key={i}
-            kind="fade"
-            delay={i * 150}
-            duration={300}
-            style={{ flexDirection: 'row', gap: 10, paddingVertical: 5, paddingHorizontal: spacing[3], backgroundColor: add ? c.greenSoft : del ? c.redSoft : 'transparent' }}
-          >
-            <Text v="c2" color="t4" style={{ width: spacing[4], textAlign: 'right', lineHeight: 20, ...monoNumber }}>
-              {l.n ?? ' '}
-            </Text>
-            <Text v="c1" weight="700" style={{ width: 10, lineHeight: 20, color: add ? c.green : del ? c.red : c.t3 }}>
-              {l.sign === '-' ? '−' : l.sign || '\u00A0'}
-            </Text>
-            <Text
-              v="c1"
-              color={del ? 't2' : 't1'}
-              style={[{ flex: 1, lineHeight: 20 }, del ? { textDecorationLine: 'line-through', textDecorationColor: c.red } : null]}
-            >
-              {l.text}
-            </Text>
-          </Appear>
-        )
-      })}
-    </View>
-  )
-}
+const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
+  <Bubble>
+    <Rich v="b1" text={view.text} markId={id} />
+    {view.detail ? <Detail text={view.detail.text} more={view.detail.more} /> : null}
+  </Bubble>
+)
 
 /** Bar that grows from the left (900ms) to `pct`. */
 const Bar = ({ pct, low, height = 8, delay = 150 }: { pct: number; low?: boolean; height?: number; delay?: number }) => {
@@ -363,6 +294,7 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   // ChatPh1FitUltra (closed) draws the card at gap 8 and 12 under; ChatPh1FitUltraOpen draws it at the standard gap 10, 16 between its rows and 16 under, so the card follows the teaser's state.
   const [projectedOpen, setProjectedOpen] = useState(false)
   const opened = !!view.projected && projectedOpen
+  const basic = !view.locked && !item.note && !view.projected
   const compact = !view.locked && !item.note && item.from === undefined && !opened
   const drop = useFitDrop()
   const head = item.note ? (
@@ -402,33 +334,37 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   )
   return (
     <View style={{ gap: opened ? spacing[4] : spacing[3] }}>
-      <Appear style={compact ? { gap: spacing[2], padding: spacing[4], paddingBottom: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2 } : { gap: 10, padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-        {head}
-        {view.locked ? (
-          <LockedParts rows={item.rows ?? []} onPlan={onPlan} />
-        ) : (
-          <>
-            {item.rows?.map((r, i) => (
-              <FitRow key={r.label} label={r.label} score={r.score} index={i} />
-            ))}
-            {item.keywords ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
-                {item.keywords.map((k) => (
-                  <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
-                ))}
-              </View>
-            ) : null}
-          </>
-        )}
-        {item.note ? (
-          <>
-            <Bar pct={item.score * 10} height={10} />
-            <Text v="c1" color="t3">
-              {item.note}
-            </Text>
-          </>
-        ) : null}
-      </Appear>
+      {basic ? (
+        <BubbleDetailText id={item.id} view={fitBubble(item)} />
+      ) : (
+        <Appear style={compact ? { gap: spacing[2], padding: spacing[4], paddingBottom: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2 } : { gap: 10, padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
+          {head}
+          {view.locked ? (
+            <LockedParts rows={item.rows ?? []} onPlan={onPlan} />
+          ) : (
+            <>
+              {item.rows?.map((r, i) => (
+                <FitRow key={r.label} label={r.label} score={r.score} index={i} />
+              ))}
+              {item.keywords ? (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], paddingTop: spacing[1] }}>
+                  {item.keywords.map((k) => (
+                    <Badge key={k.label} label={k.label} glyph={KEYWORD_GLYPH[k.ok ? 'ok' : 'miss']} tone={k.ok ? 'green' : 'orange'} />
+                  ))}
+                </View>
+              ) : null}
+            </>
+          )}
+          {item.note ? (
+            <>
+              <Bar pct={item.score * 10} height={10} />
+              <Text v="c1" color="t3">
+                {item.note}
+              </Text>
+            </>
+          ) : null}
+        </Appear>
+      )}
       {view.summary ? <BotText item={{ type: 'agentText', id: `${item.id}-summary`, text: view.summary }} /> : null}
       {view.teaser ? (
         <Pressable
@@ -447,14 +383,12 @@ const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => 
   )
 }
 
+/** A file or result the bot made sits in a bubble of its own, the bot's bubble colour and corners (rule 30). */
 const Surface = ({ children }: { children: React.ReactNode }) => {
   const c = useColors()
   return (
     <View
-      style={[
-        { flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 14, borderRadius: radius.card },
-        Platform.OS === 'ios' ? { backgroundColor: c.bg2 } : { borderWidth: 1, borderColor: c.line },
-      ]}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 14, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}
     >
       {children}
     </View>
@@ -593,7 +527,7 @@ const ItemComponent = ({
     case 'plan':
       return <Plan item={item} />
     case 'diff':
-      return <Diff item={item} />
+      return <BubbleDetailText id={item.id} view={diffBubble(item)} />
     case 'fit':
       return <FitCard item={item} onPlan={onUsage ? () => onUsage('plan') : undefined} />
     case 'file':
