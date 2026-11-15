@@ -52,6 +52,10 @@ tags:
     visible: "어떻게 할까요?"
     timeout: 40000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+    env:
+      TEXT: ".*이 채용 페이지 읽고.*"
 - takeScreenshot: ChatErrors
 # ChatBotHeaderLimit draws the 모아페이 chat (the finished thread) under the credit banner, with the composer shut, not the Push Bot.
 # It runs last because the 모아페이 chat has no clear-chat menu for _fresh_chat; reset first clears the Push Bot's run rule and the thread.
