@@ -6,3 +6,13 @@ const WORD_JOINER = /⁠/g
  */
 export const clampLines = (laidOut: string[], count: number) =>
   laidOut.length <= count ? null : laidOut.slice(0, count).map((line) => line.replace(WORD_JOINER, '').replace(/\n$/, ''))
+
+/** `line` with its trailing words dropped one at a time, each followed by the dots: the candidates for a last line that has no room left for them. */
+export const dotted = (line: string) => {
+  const words = line.trimEnd().split(' ')
+  return words.map((_, i) => `${words.slice(0, i + 1).join(' ')}…`)
+}
+
+/** The longest candidate whose measured width fits `limit` (the first one when none does). */
+export const longestFit = (candidates: string[], widths: number[], limit: number) =>
+  candidates.findLast((_, i) => (widths[i] ?? Infinity) <= limit) ?? candidates[0]!

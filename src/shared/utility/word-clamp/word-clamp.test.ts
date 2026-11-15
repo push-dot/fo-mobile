@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clampLines } from './word-clamp'
+import { clampLines, dotted, longestFit } from './word-clamp'
 
 describe('clampLines', () => {
   it('keeps the first lines whole when the text needs more', () => {
@@ -17,5 +17,14 @@ describe('clampLines', () => {
 
   it('cuts a single line the same way', () => {
     expect(clampLines(['누리클라우드 플랫폼엔지니어링코리아 ', '판교캠퍼스 유한회사 · 플랫폼 엔지니어'], 1)).toEqual(['누리클라우드 플랫폼엔지니어링코리아 '])
+  })
+
+  it('lists the last line with its trailing words dropped, each followed by the dots', () => {
+    expect(dotted('커피챗 어떠세요? 승인 경험이 딱 ')).toEqual(['커피챗…', '커피챗 어떠세요?…', '커피챗 어떠세요? 승인…', '커피챗 어떠세요? 승인 경험이…', '커피챗 어떠세요? 승인 경험이 딱…'])
+  })
+
+  it('keeps the longest candidate that fits and falls back to the first', () => {
+    expect(longestFit(['a…', 'a b…', 'a b c…'], [10, 20, 30], 25)).toBe('a b…')
+    expect(longestFit(['a…', 'a b…'], [40, 50], 25)).toBe('a…')
   })
 })
