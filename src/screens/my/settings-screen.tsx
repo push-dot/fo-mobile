@@ -153,7 +153,7 @@ const SettingsScreen = () => {
       <SettingsGroup title="허브 공개">
         <SettingsRow label="프로필 공개" right={sw('profilePublic', '프로필 공개')} />
         <SettingsRow label={careerRowLabel(s.careerStatusVisibility)} onPress={() => router.push('/settings/career')} mutedChevron />
-        <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} mutedChevron />
+        <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} picker />
         <SettingsRow
           label={blockedRowLabel(blocked.data?.page.total)}
           mutedChevron
@@ -165,7 +165,7 @@ const SettingsScreen = () => {
         <SettingsRow
           label={toneRowLabel(TONES.find((t) => t.key === s.defaultTone)?.label ?? '')}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
-          mutedChevron
+          picker
         />
         <SettingsRow label={READ_FILES_ROW.label} right={sw(READ_FILES_ROW.key, READ_FILES_ROW.label)} />
         <SettingsRow
