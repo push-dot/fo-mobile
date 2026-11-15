@@ -19,13 +19,13 @@ tags:
     file: _qs.yaml
     env:
       LABEL: "부족한 점 찾기"
-      WAIT: ".*비교할 서류.*"
+      WAIT: "기준"
       SHOT: QsGap
 - runFlow:
     file: _qs.yaml
     env:
       LABEL: "적합도 보기"
-      WAIT: ".*비교할 서류.*"
+      WAIT: "기준"
       SHOT: QsFit
 - runFlow:
     file: _qs.yaml
