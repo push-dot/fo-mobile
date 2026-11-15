@@ -42,6 +42,11 @@ const Numbered = ({ approval, onAnswer }: Props) => {
           <Row key={item.index} number={n + 1} label={item.label} on={section.selected.includes(item.index)} onPress={() => onAnswer(item.label, item.index)} />
         ))}
       </View>
+      {approval.warning ? (
+        <Text v="c1" color="t3" style={{ paddingTop: spacing[2] }}>
+          {approval.warning}
+        </Text>
+      ) : null}
     </Bubble>
   )
 }

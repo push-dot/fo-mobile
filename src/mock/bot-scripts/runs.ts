@@ -475,7 +475,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', `${MOA}에 지원해요`, ['실행', '취소']), '지원하면 취소할 수 없어요')),
+  ask(confirm(numbered('apply', `${MOA}(Kotlin·Spring)에 지원할까요?`, ['지원하기', '취소']), '지원하면 취소할 수 없어요')),
 ]
 
 export const generic = (text: string): Step[] => [

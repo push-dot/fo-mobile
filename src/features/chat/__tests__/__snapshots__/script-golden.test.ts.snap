@@ -5,7 +5,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"지원했어요","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"실행","type":"user"}
+{"text":"지원하기","type":"user"}
 {"text":"지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -44,7 +44,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어에 지원해요","sections":[{"items":[{"label":"실행"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
+card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -54,7 +54,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"apply","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어에 지원해요","sections":[{"items":[{"label":"실행"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
+card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -415,7 +415,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"지원했어요","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-{"text":"실행","type":"user"}
+{"text":"지원하기","type":"user"}
 {"text":"지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -475,7 +475,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":10250,"question":"모아페이 · 백엔드 엔지니어에 지원해요","sections":[{"items":[{"label":"실행"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
+card {"confirm":true,"id":"apply","openedAt":10250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"warning":"지원하면 취소할 수 없어요"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -594,7 +594,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"닫기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -608,7 +608,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2243,7 +2243,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"닫기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2262,7 +2262,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2330,7 +2330,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-{"text":"닫기","type":"user"}
+{"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -2374,7 +2374,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2405,7 +2405,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-{"text":"닫기","type":"user"}
+{"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -2439,7 +2439,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3097,7 +3097,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"닫기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3109,7 +3109,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4658,7 +4658,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"닫기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4675,7 +4675,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4692,7 +4692,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4719,7 +4719,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-{"text":"닫기","type":"user"}
+{"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -4749,7 +4749,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -6085,7 +6085,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"ph0-start","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10495,7 +10495,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"닫기","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10509,7 +10509,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10562,7 +10562,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-{"text":"닫기","type":"user"}
+{"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -10596,7 +10596,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
 {"text":"이력서만 · 자료 3개 · 원래 말투로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -10617,7 +10617,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"이력서만 · 자료 3개 · 말투 그대로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-{"text":"닫기","type":"user"}
+{"text":"그만할게요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
 card null
@@ -10641,7 +10641,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"이력서만 · 자료 3개 · 말투 그대로","type":"user"}
 {"action":"입력 정리","result":"이력서 **김서준_백엔드_이력서_2026.pdf**\\n공고 **모아페이 · 백엔드 엔지니어**\\nGitHub **github.com/seojun-kim** · 말투 **그대로**","state":"ok","type":"tool"}
-card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"id":"ph0-start","question":"이대로 분석을 시작할까요?","sections":[{"items":[{"label":"네, 시작해 주세요"},{"label":"자료를 바꿀래요"},{"label":"그만할게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;

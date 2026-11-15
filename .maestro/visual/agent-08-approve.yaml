@@ -43,7 +43,7 @@ tags:
 - takeScreenshot: ChatDoneNext
 - tapOn: "모아페이에 바로 지원하기"
 - extendedWaitUntil:
-    visible: "모아페이 · 백엔드 엔지니어에 지원해요"
+    visible: "모아페이 · 백엔드 엔지니어.Kotlin·Spring.에 지원할까요?"
     timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh6Apply
