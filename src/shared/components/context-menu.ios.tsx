@@ -1,11 +1,14 @@
 import { ContextMenu as SwiftContextMenu, RNHostView } from '@expo/ui/swift-ui'
-import { Pressable } from 'react-native'
+import { Dimensions, Pressable } from 'react-native'
 import type { ContextMenuProps } from './menu-action'
 import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/** iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress. */
+/**
+ * iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress.
+ * SwiftUI hands the trigger its ideal width, so a long name would push the row past the screen: the hosted row is capped at the window's width.
+ */
 const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => (
   <NativeHost matchContents={{ vertical: true }} seedColor={useColors().t1}>
     <SwiftContextMenu>
@@ -14,7 +17,7 @@ const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }
       </SwiftContextMenu.Items>
       <SwiftContextMenu.Trigger>
         <RNHostView matchContents={{ vertical: true }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
+          <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={{ maxWidth: Dimensions.get('window').width }}>
             {children}
           </Pressable>
         </RNHostView>
