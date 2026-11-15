@@ -533,6 +533,7 @@ const statesFile: Step[] = [
     checklist: FILE_TODO,
     fileName: EXT_FILE,
     pageLine: FILE_PAGE,
+    savedLine: FILE_SAVED,
     cardMeta: FILE_PAGE,
     documentId: 'src-upload',
     company: '모아페이',
