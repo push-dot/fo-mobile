@@ -8,7 +8,7 @@ import type { Notice } from './utils/status-line'
 export type ToolState = 'run' | 'ok' | 'err' | 'wait'
 export type TodoState = 'todo' | 'now' | 'done'
 
-export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; tone: BadgeTone; label: string; note: string }[]; keywords: string[] }
+export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; rows: { tag: string; label: string; note: string }[]; keywords: string[] }
 
 export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }

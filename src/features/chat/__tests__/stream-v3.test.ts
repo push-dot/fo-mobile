@@ -2,7 +2,7 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream, mapEvent } from '../utils/stream'
-import { isVerdictPlan, planTone, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
+import { isVerdictPlan, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
 import type { Approval, ChatItem } from '../types'
 
 const profile = (): ChatItem => ({
@@ -53,8 +53,8 @@ describe('stream v3', () => {
       id: 'strategy',
       keywords: ['결제'],
       rows: [
-        { tag: '강화', tone: 'ac', label: '경력' },
-        { tag: '기타', tone: 'grey', label: '소개' },
+        { tag: '강화', label: '경력' },
+        { tag: '기타', label: '소개' },
       ],
     })
   })
@@ -63,7 +63,6 @@ describe('stream v3', () => {
     expect(isVerdictPlan([{ tag: '통과' }, { tag: '조건부' }])).toBe(true)
     expect(isVerdictPlan([{ tag: '통과' }, { tag: '강화' }])).toBe(false)
     expect(isVerdictPlan([])).toBe(false)
-    expect([planTone('통과'), planTone('조건부')]).toEqual(['green', 'orange'])
   })
 
   it('maps paper', () => {

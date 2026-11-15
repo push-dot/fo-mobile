@@ -4,12 +4,13 @@ import { materialDetailPath } from '@/features/bots'
 import { Text } from '@/shared/components'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { radius, spacing, useColors } from '../../../../theme'
-import type { ChatItem } from '../../types'
+import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
+import { planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindText, Marked } from '../header/highlight'
 import Detail from './detail'
-import { BubbleCard } from './plan-card'
+import MdTable from './md-table'
 import Rich from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
@@ -28,6 +29,17 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
+/** A plan or feedback inside the bot's bubble: the table, then its keywords as grey sub-text. */
+export const PlanBlock = ({ item }: { item: PlanItem }) => {
+  const keywords = planKeywords(item)
+  return (
+    <>
+      <MdTable table={planTable(item)} />
+      {keywords ? <Detail text={keywords} /> : null}
+    </>
+  )
+}
+
 const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
   const c = useColors()
   const xl = useXlBoardText()
@@ -37,6 +49,8 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       {splitBotText(item.text).map((block, i) =>
         block.kind === 'paragraph' ? (
           <Rich key={i} v="b1" text={block.text} markId={item.id} {...big} />
+        ) : block.kind === 'table' ? (
+          <MdTable key={i} table={block} />
         ) : block.kind === 'ordered' ? (
           <View key={i} style={{ gap: spacing[1] }}>
             {block.items.map((line, n) => (
@@ -53,7 +67,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
         ),
       )}
       {item.detail ? <Detail text={item.detail} /> : null}
-      {item.card ? <BubbleCard item={item.card} /> : null}
+      {item.card ? <PlanBlock item={item.card} /> : null}
       {item.bullets?.length ? (
         <Text v="b2" color="t2">
           {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}

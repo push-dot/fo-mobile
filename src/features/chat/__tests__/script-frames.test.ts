@@ -83,7 +83,7 @@ describe('mock-wire-frames codemod', () => {
     expect(run(`s(200, { type: 'diff', id: 'diff3', lines: [{ n: 12, sign: '-', text: 'a' }, { sign: '~', text: 'b' }] })`)).toContain(
       `type: 'diff', documentId: DOC, revisionId: 'diff3',\n    hunks: [\n      { line: 12, sign: '-', text: 'a' },\n      { line: null, sign: MOVED, text: 'b' },\n    ],`,
     )
-    expect(run(`s(300, { type: 'plan', id: 'fbplan', title: '', meta: '', rows: [{ tag: '성과', tone: 'grey', label: 'l', note: 'n' }], keywords: [] })`)).toContain(
+    expect(run(`s(300, { type: 'plan', id: 'fbplan', title: '', meta: '', rows: [{ tag: '성과', label: 'l', note: 'n' }], keywords: [] })`)).toContain(
       `id: 'feedback',\n    title: '',\n    meta: '',\n    rows: [\n      { tag: '성과', label: 'l', note: 'n' },\n    ],`,
     )
     expect(run(`s(200, { type: 'think', id: 'think', seconds: 6 })`)).toContain(`s(200, { type: 'think', seconds: 6, phase: 'think' })`)

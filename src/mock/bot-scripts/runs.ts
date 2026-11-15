@@ -322,6 +322,7 @@ const ph2: Step[] = [
   s(200, status('궁리하는 중…')),
   s(200, tool('strategy', '전략 세우기', '공고 요건 ↔ 내 경력', 'run', '섹션마다 할 일을 정하는 중')),
   s(1500, tool('strategy', '전략 세우기', '공고 요건 ↔ 내 경력', 'ok', '섹션 5개 · 추가할 키워드 4개')),
+  s(300, agent('이렇게 고칠게요.')),
   s(300, {
     type: 'plan',
     id: 'strategy',
@@ -456,6 +457,7 @@ const ph2xBlueprints: Step[] = [
   s(200, status('기획하는 중…')),
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'ok', '공고 연관성·임팩트·실현 가능성 모두 통과')),
+  s(300, agent('이런 프로젝트를 기획했어요.')),
   s(300, {
     type: 'plan',
     id: 'strategy',

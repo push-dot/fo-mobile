@@ -1,11 +1,10 @@
 import { memo, useEffect, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, View, useWindowDimensions } from 'react-native'
-import BotText, { Bubble } from './bot'
+import BotText, { Bubble, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
-import { PlanRows } from './plan-card'
 import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { radius, spacing, useColors, useShadow, type Colors } from '../../../../theme'
@@ -120,15 +119,6 @@ const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<ty
   )
 }
 
-const Card = ({ children, gap = 7, padding }: { children: React.ReactNode; gap?: number; padding?: number }) => {
-  const c = useColors()
-  return (
-    <Appear style={{ gap, ...(padding === undefined ? { paddingVertical: 14, paddingHorizontal: spacing[4] } : { padding }), borderRadius: radius.card, backgroundColor: c.bg2 }}>
-      {children}
-    </Appear>
-  )
-}
-
 const TodoList = ({ item }: { item: Of<'todo'> }) => (
   <Bubble gap={spacing[1]}>
     {todoLines(item).map((line) => (
@@ -145,15 +135,11 @@ const StaleGate = ({ item }: { item: Of<'stale'> }) => (
   </Bubble>
 )
 
-const Plan = ({ item }: { item: Of<'plan'> }) => {
-  const titled = !!item.title
-  const card = (
-    <Card gap={titled ? spacing[3] : 14} padding={titled ? undefined : spacing[4]}>
-      <PlanRows item={item} />
-    </Card>
-  )
-  return titled ? card : <View style={{ paddingLeft: 18, marginTop: -spacing[2] }}>{card}</View>
-}
+const Plan = ({ item }: { item: Of<'plan'> }) => (
+  <Bubble wide>
+    <PlanBlock item={item} />
+  </Bubble>
+)
 
 const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
   <Bubble>
