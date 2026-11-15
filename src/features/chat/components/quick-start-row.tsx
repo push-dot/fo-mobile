@@ -1,6 +1,6 @@
 import { Pressable, ScrollView } from 'react-native'
 import { radius, spacing, useColors } from '../../../theme'
-import { Text } from '@/shared/components'
+import { Icon3D, Text } from '@/shared/components'
 import { QUICK_STARTS } from '../constants'
 
 const COMPANY_CHIP_KEYS = ['fit', 'gap', 'boost', 'exp'] as const
@@ -13,7 +13,7 @@ export const quickStartsFor = (kind: 'push' | 'company') =>
         return row ? [row] : []
       })
 
-/** One line of plain pills right above the input (ChatBotOnboardPush, ChatBotOnboard): no glass, no icons. */
+/** One line of plain pills with their 3D icon right above the input (ChatBotOnboardPush, ChatBotOnboard): no glass. */
 const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (key: string) => void }) => {
   const c = useColors()
   return (
@@ -31,8 +31,9 @@ const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (ke
           key={item.key}
           accessibilityRole="button"
           onPress={() => onChip(item.key)}
-          style={{ height: 52, paddingHorizontal: spacing[5], borderRadius: radius.pill, backgroundColor: c.bg2, justifyContent: 'center' }}
+          style={{ height: 52, paddingLeft: spacing[3], paddingRight: spacing[5], gap: spacing[2], borderRadius: radius.pill, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center' }}
         >
+          <Icon3D name={item.icon} size={30} />
           <Text v="b2" weight="600" numberOfLines={1}>
             {item.label}
           </Text>
