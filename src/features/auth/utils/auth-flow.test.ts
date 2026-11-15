@@ -5,14 +5,10 @@ import {
   emailFromPendingToken,
   formatCountdown,
   formatNational,
-  formatProviderList,
   isAppleCancel,
   loginFailureCopy,
-  loginTarget,
   mapPhoneAuthError,
   otpErrorAfterInput,
-  registeredBody,
-  registeredButton,
   remainingSeconds,
   showAppleButton,
   toE164,
@@ -48,28 +44,6 @@ describe('phone auth errors', () => {
       kind: 'cooldown',
       retryAfterSec: 40,
     })
-    expect(
-      mapPhoneAuthError(new ApiError('phone is already registered', 'PHONE_ALREADY_REGISTERED', 409, {
-        existingProviders: ['github', 'google', 1],
-      })),
-    ).toEqual({ kind: 'registered', providers: ['github', 'google'] })
-  })
-})
-
-describe('provider list', () => {
-  it('lists Google, Apple, and GitHub with 또는', () => {
-    expect(formatProviderList(['github', 'google'])).toBe('Google 또는 GitHub')
-    expect(formatProviderList(['apple', 'github', 'google'])).toBe('Google 또는 Apple 또는 GitHub')
-    expect(formatProviderList(['apple'])).toBe('Apple')
-    expect(registeredBody(['google'])).toBe('이 번호는 Google 계정으로 가입돼 있어요. Google로 로그인해 주세요.')
-    expect(registeredButton(['google', 'github'])).toBe('Google 또는 GitHub로 로그인')
-  })
-
-  it('starts the only provider the device can use', () => {
-    expect(loginTarget(['apple'], false)).toBeNull()
-    expect(loginTarget(['apple'], true)).toBe('apple')
-    expect(loginTarget(['google', 'github'], true)).toBe('choose')
-    expect(loginTarget(['apple', 'github'], false)).toBe('github')
   })
 })
 

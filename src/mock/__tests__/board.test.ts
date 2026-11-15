@@ -67,7 +67,7 @@ describe('mock data drawn on the design boards', () => {
 
   it('lets the phone code pick the outcome', async () => {
     const verify = (code: string) =>
-      fetchJson<{ error?: { code: string; details?: unknown }; data?: { accessToken: string } }>('auth/phone/verify', {
+      fetchJson<{ error?: { code: string; details?: unknown }; data?: { accessToken: string; created: boolean } }>('auth/phone/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: '+821012345678', code }),
@@ -75,8 +75,8 @@ describe('mock data drawn on the design boards', () => {
     expect((await verify('482111')).error?.code).toBe('PHONE_CODE_INVALID')
     expect((await verify('482222')).error?.code).toBe('PHONE_CODE_EXPIRED')
     expect((await verify('482333')).error?.code).toBe('RATE_LIMITED')
-    expect((await verify('482666')).error).toMatchObject({ code: 'PHONE_ALREADY_REGISTERED', details: { existingProviders: ['google', 'github'] } })
-    expect((await verify('482915')).data?.accessToken).toBeTruthy()
+    expect((await verify('482666')).data).toMatchObject({ created: false, accessToken: expect.any(String) })
+    expect((await verify('482915')).data).toMatchObject({ created: true, accessToken: expect.any(String) })
   })
 
   it('opens the phone screen as after a Google sign-in', async () => {

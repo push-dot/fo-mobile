@@ -48,7 +48,6 @@ const RootLayout = () => {
               <Stack.Screen name="verify-phone" />
               <Stack.Screen name="signup-terms" />
               <Stack.Screen name="terms-view" />
-              <Stack.Screen name="phone-registered" />
             </Stack.Protected>
           </Stack>
           <ToastHost />
