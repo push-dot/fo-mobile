@@ -281,7 +281,7 @@ const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
   const [first, ...rest] = item.lines
   return (
     <Bubble wide>
-      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
+      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 24 }}>
         {writing ? `${item.label} · ${WRITING}` : item.label}
       </Text>
       <Text v="h3">{item.heading}</Text>
