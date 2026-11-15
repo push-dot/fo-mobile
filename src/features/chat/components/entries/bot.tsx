@@ -64,12 +64,11 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
   )
 }
 
-// `ol.mdol`: the text column starts at x59 (padding 22 + 2), the number hangs right-aligned with its right edge 6 before it.
+// `ol.mdol`: the text column starts at x59 (padding 22 + 2); the device's WebKit draws the number at the left of that 24 column (x35), not beside the text.
 const NUMBER_COL = 24
-const NUMBER_PAD = 6
 
 export const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => (
-  <View style={{ width: NUMBER_COL, alignItems: 'flex-end', paddingRight: NUMBER_PAD }}>
+  <View style={{ width: NUMBER_COL }}>
     <Text v="b1" color={color}>{`${n}.`}</Text>
   </View>
 )

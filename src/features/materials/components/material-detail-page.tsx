@@ -5,7 +5,7 @@ import { View } from 'react-native'
 import { PageModal } from '@/features/chat'
 import { Button, GlassButton, Spinner, Text, askConfirm, showToast } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing } from '@/theme'
+import { spacing, type } from '@/theme'
 import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
 import {
   CITED,
@@ -23,6 +23,9 @@ import MaterialFacts from './material-facts'
 import { useInMaterialsModal } from './in-materials-modal'
 import { sendMaterial } from './send-material'
 import { useSearchRoom } from './materials-search'
+
+// The board's .pname inherits -.02em resolved at the page's 16px (-0.32px), not the h2 token's -0.025em of 22px.
+const TITLE_TRACKING = type.b1.letterSpacing
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
@@ -122,7 +125,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
     >
       {/* .pname sits 30 above the card: its 14 margin (MaterialFacts) and the page gap of 16. */}
       <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: spacing[4] }}>
-        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30 }}>
+        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30, letterSpacing: TITLE_TRACKING }}>
           {detailTitle(m)}
         </Text>
         <MaterialFacts facts={facts} />

@@ -71,7 +71,7 @@ const links = (): Material[] => [
   link('l5', 'https://velog.io/@seojun/kafka-retry', 'blog', '2026-08-11T02:00:00Z'),
   link('l6', 'https://github.com/seojun-kim/pay-gw', 'github', '2026-07-20T02:00:00Z'),
   link('l7', 'https://github.com/seojun-kim/settlement-batch', 'github', '2026-07-02T02:00:00Z'),
-  link('l8', 'https://seojun.dev/projects', 'portfolio', '2026-06-18T02:00:00Z'),
+  link('l8', 'https://seojun.dev/projects', 'blog', '2026-06-18T02:00:00Z'),
   link('l9', 'https://velog.io/@seojun/spring-batch', 'blog', '2026-06-01T02:00:00Z'),
   link('l10', 'https://careers.moapay.kr/jobs/1182', 'job', '2026-05-20T02:00:00Z'),
 ]
