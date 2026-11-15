@@ -16,8 +16,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: "필요한 프로젝트 경험까지 만들어 주세요"
 - takeScreenshot: ChatPh2XApproach
 - runFlow:
     file: _pick.yaml
@@ -63,6 +61,4 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*중간 제약으로.*"
 - takeScreenshot: ChatVerifyFail

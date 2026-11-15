@@ -23,7 +23,5 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusError

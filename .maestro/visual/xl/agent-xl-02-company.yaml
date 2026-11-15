@@ -44,10 +44,8 @@ tags:
 - extendedWaitUntil:
     visible: ".*공고 요건을 읽는 중.*"
     timeout: 20000
-# The running line is not in the thread list, so the keyboard comes down on the user line (a tap on the line does nothing).
+# The running line is not in the thread list, so the keyboard comes down by a tap on the thread's side gutter.
 - runFlow:
     file: ../_chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusXL

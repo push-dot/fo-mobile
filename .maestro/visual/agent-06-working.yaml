@@ -44,8 +44,6 @@ tags:
     timeout: 10000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력은 숫자 위주로.*"
 - takeScreenshot: ChatWorking
 - runFlow:
     when:

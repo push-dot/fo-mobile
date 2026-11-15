@@ -64,8 +64,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*이 이력서 더 좋게 고쳐 줘.*"
 - takeScreenshot: ChatPh6ResultFile
 - runFlow: _fresh_company.yaml
 - runFlow:
@@ -109,7 +107,7 @@ tags:
       EN: "Make this resume better"
 # The finished run asks ChatDoneNext at once and the action sheet hides the thread from the accessibility tree: wait for either, then close it.
 - extendedWaitUntil:
-    visible: "((이력서|프로필)를 다 고쳤어요|.*김서준_백엔드_이력서_수정본.*)"
+    visible: "((이력서를|프로필을) 다 고쳤어요|.*김서준_백엔드_이력서_수정본.*)"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow: _dismiss_next.yaml

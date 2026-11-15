@@ -5,10 +5,10 @@ tags:
 ---
 - runFlow:
     when:
-      visible: "(이력서|프로필)를 다 고쳤어요"
+      visible: "(이력서를|프로필을) 다 고쳤어요"
     commands:
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "(이력서|프로필)를 다 고쳤어요"
+            TITLE: "(이력서를|프로필을) 다 고쳤어요"
       - waitForAnimationToEnd

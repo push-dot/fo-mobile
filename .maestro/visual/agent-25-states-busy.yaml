@@ -39,8 +39,6 @@ tags:
             EN: "queue-busy"
       - runFlow:
           file: _chat_kbd_down.yaml
-          env:
-            TEXT: ".*이동하기.*"
       - retry:
           maxRetries: 3
           commands:

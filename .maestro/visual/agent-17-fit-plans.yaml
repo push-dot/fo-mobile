@@ -19,8 +19,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*내 이력서가 얼마나 맞는지.*"
 - takeScreenshot: ChatPh1FitFree
 - runFlow: _fresh_company.yaml
 - runFlow:
@@ -36,8 +34,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*내 이력서가 얼마나 맞는지.*"
 - takeScreenshot: ChatPh1FitUltra
 # The card cannot be tapped once the gate is up, so a second run holds the gate back (mock token) until the card is open.
 - runFlow: _fresh_company.yaml
@@ -61,6 +57,4 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*내 이력서가 얼마나 맞는지.*"
 - takeScreenshot: ChatPh1FitUltraOpen

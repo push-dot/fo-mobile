@@ -16,8 +16,6 @@ tags:
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: "필요한 프로젝트 경험까지 만들어 주세요"
 - tapOn: ".*문제를 예방할게요"
 - extendedWaitUntil:
     visible: "어떤 문제를 예방할까요?"

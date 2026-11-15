@@ -25,8 +25,6 @@ tags:
     timeout: 30000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*공고에 맞춰 이력서 고쳐 주세요.*"
 - takeScreenshot: ChatBotStatusSteps
 - openLink: push://bots/b-moa?mock=step-next
 - extendedWaitUntil:

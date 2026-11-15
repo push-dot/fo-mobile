@@ -24,8 +24,6 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusThink
 - tapOn: "중지"
@@ -44,8 +42,6 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusWork
 - tapOn: "중지"
@@ -72,8 +68,6 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*경력 섹션을 고쳐 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusQueue
 - tapOn: "중지"
@@ -91,8 +85,6 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*어디에 먼저 낼지 정리해 주세요.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotStatusLong
 - tapOn: "중지"

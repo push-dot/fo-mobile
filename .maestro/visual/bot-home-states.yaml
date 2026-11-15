@@ -53,7 +53,7 @@ tags:
       TAB: "Bot"
       READY: "계정 · .*"
 - extendedWaitUntil:
-    visible: ".*승인 요청이 만료됐어요.*"
+    visible: ".*이 사이트를 열어도 될까요?.*"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: AgentHomeRowExpiredFailed

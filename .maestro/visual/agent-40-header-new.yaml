@@ -18,13 +18,14 @@ tags:
 # to the bottom. Then the reader scrolls up, and the second late answer lands while the thread is away from the bottom.
 - openLink: push://bots/b-moa?mock=bot:b-moa:late
 - waitForAnimationToEnd
+# The second answer is timed in the link (6 s), so no link opens after the scroll-up.
+- openLink: push://bots/b-moa?mock=bot:b-moa:late:6000
+- waitForAnimationToEnd
 - swipe:
     direction: DOWN
     duration: 400
-- waitForAnimationToEnd
-- openLink: push://bots/b-moa?mock=bot:b-moa:late
 - extendedWaitUntil:
     visible: "새 메시지 1개"
-    timeout: 10000
+    timeout: 20000
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotHeaderNew

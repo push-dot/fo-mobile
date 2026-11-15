@@ -28,14 +28,10 @@ tags:
     env:
       KO: "잠깐, 자기소개서도 같이 써 줘"
       EN: "wait also write cover letter"
-# The keyboard goes down first, while the sent line is still on screen: the working lines that stream in afterwards push it above
-# the fold of a keyboard-high thread, and a tap on an off-screen line leaves the keyboard up (the board has none).
-# A tap on a bot line opens the Bot's profile, so it lands on the user's own bubble.
+# The board has no keyboard, so it goes down first.
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*자기소개서도 같이 써 줘.*"
-# The swipe that lowers the keyboard drags the thread up and the resumed run's working line falls below the fold, so the thread goes back to its end first.
+# The resumed run's working line falls below the fold of a keyboard-high thread, so the thread goes back to its end.
 - runFlow:
     file: _chat_bottom.yaml
 - extendedWaitUntil:

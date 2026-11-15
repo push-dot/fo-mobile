@@ -26,7 +26,5 @@ tags:
     timeout: 20000
 - runFlow:
     file: _chat_kbd_down.yaml
-    env:
-      TEXT: ".*내 자료 읽기가 꺼져 있어서.*"
 - waitForAnimationToEnd
 - takeScreenshot: ChatBotReadOff
