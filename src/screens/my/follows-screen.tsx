@@ -4,11 +4,13 @@ import { ScrollView, TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
 import { GlassField, Icon, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
+import { useXlChrome } from '@/shared/components/xl-chrome'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
 
 
 const FollowsScreen = () => {
   const c = useColors()
+  const { button } = useXlChrome()
   const { box } = useLocalSearchParams<{ box?: string }>()
   const following = box !== 'followers'
   const [q, setQ] = useState('')
@@ -19,7 +21,8 @@ const FollowsScreen = () => {
   const people = followMatches(query.data?.data ?? [], following ? q : '')
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} />
+      {/* the board draws a ≡ here (G37, not built): its slot stays so the title sits where the board puts it */}
+      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={{ width: button }} />} />
       {following ? (
         <GlassField
           style={{

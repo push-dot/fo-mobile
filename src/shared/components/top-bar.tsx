@@ -23,6 +23,8 @@ type Props = {
   chat?: boolean
   /** The back button is the board's `.gbtn` (Android: a solid `fill` circle); the chat header always is. */
   circleBack?: boolean
+  /** `right` is a `.btn` pill (the notifications 모두 읽음): the board gives it no left margin, unlike the round `.iconbtn`s. */
+  pillRight?: boolean
 }
 
 const ios = Platform.OS === 'ios'
@@ -32,8 +34,10 @@ const CHAT_ROW = 60
 const RIGHT_GAP = 10
 // A chat header's find bar (ChatBotHeaderFind) is a `.chead` with gap 8, not a `.topbar`.
 const CHAT_RIGHT_GAP = 8
+// `.ios .topbar .iconbtn{margin-left:8px}`: the right-hand button keeps 8 off the title, which is why the board's title sits 4 left of the screen centre.
+const RIGHT_MARGIN = 8
 
-const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false, circleBack = false }: Props) => {
+const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false, circleBack = false, pillRight = false }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { xl, row: baseRow, button } = useXlChrome()
@@ -67,7 +71,7 @@ const TopBar = ({ title, left, onBack, right, safeTop = true, sheet = false, tra
           </Text>
         ) : null}
         {!left && !title ? <View style={{ flex: 1 }} /> : null}
-        <View style={{ minWidth: onBack ? button : 0, flexDirection: 'row', justifyContent: 'flex-end', gap: ios ? (chat ? CHAT_RIGHT_GAP : RIGHT_GAP) : 2 }}>{right}</View>
+        <View style={{ minWidth: onBack ? button : 0, marginLeft: flat && title && right && !pillRight ? RIGHT_MARGIN : 0, flexDirection: 'row', justifyContent: 'flex-end', gap: ios ? (chat ? CHAT_RIGHT_GAP : RIGHT_GAP) : 2 }}>{right}</View>
       </View>
     </View>
   )
