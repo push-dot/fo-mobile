@@ -1901,7 +1901,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1981,7 +1981,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -2041,7 +2041,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서부터 쓸게요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3984,7 +3984,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4036,7 +4036,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"1번, 지금 이력서로 할게요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5109,7 +5109,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph0-input","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8642,7 +8642,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8702,7 +8702,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료를 바꿀래요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"ac":true,"action":"change","sub":"마이 › 서류","tag":"PDF","title":"김서준_백엔드_이력서_2026.pdf"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"이력서에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0]},{"items":[{"sub":"기본 서류","tag":"","title":"허브 프로필"},{"ac":true,"action":"change","sub":"홈 › 북마크 공고","tag":"모","title":"백엔드 엔지니어 (Kotlin·Spring)"},{"action":"change","sub":"허브 프로필에서 찾았어요","tag":"link","title":"github.com/seojun-kim"}],"kind":"rows","title":"가져올 자료"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이대로 진행"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;

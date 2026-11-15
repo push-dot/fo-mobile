@@ -232,9 +232,9 @@ const ph0Input: Step[] = [
         id: 's1',
         title: '가져올 자료',
         options: [
-          { id: 's1.0', label: RESUME, sub: '마이 › 서류', badge: 'PDF', action: 'change' },
+          { id: 's1.0', label: '허브 프로필', sub: '기본 서류' },
           { id: 's1.1', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '홈 › 북마크 공고', badge: '모', action: 'change' },
-          { id: 'm_github', label: 'github.com/seojun-kim', sub: '이력서에서 찾았어요', action: 'change' },
+          { id: 'm_github', label: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요', action: 'change' },
         ],
       },
       { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
