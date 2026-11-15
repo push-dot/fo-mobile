@@ -8,7 +8,7 @@ import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
 import { chatApi, updateAiAccessMode } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
@@ -408,6 +408,8 @@ const reportCancel = (id: string) => {
   }
   if (halting.has(id)) return
   halting.add(id)
+  const before = get(id).working?.verbs
+  dispatch(id, { type: 'status', verbs: [STOPPING_TEXT] })
   void botApi.bots.cancel(id).then(
     (result) => finishStop(id, ctrl, result.resumable),
     (error: unknown) => {
@@ -416,6 +418,7 @@ const reportCancel = (id: string) => {
         return
       }
       halting.delete(id)
+      if (before) dispatch(id, { type: 'status', verbs: before })
       showToast({ message: error instanceof ApiError && error.status === 403 ? CHAT_STOP_FORBIDDEN : CHAT_STOP_FAILED })
     },
   )
