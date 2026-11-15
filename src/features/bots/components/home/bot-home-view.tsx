@@ -25,6 +25,14 @@ import { homeChrome } from './metrics'
 
 const VIEWABILITY = { itemVisiblePercentThreshold: 60 }
 
+const MENU_SYMBOL: Record<HomeMenuKey, MenuAction['systemImage']> = {
+  profile: 'person',
+  find: 'magnifyingglass',
+  read: 'checkmark.circle',
+  mute: 'bell.slash',
+  delete: 'trash',
+}
+
 const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
   profile: 'user',
   find: 'search',
@@ -111,6 +119,7 @@ const BotHomeView = ({
       key: item.key,
       label: item.label,
       destructive: item.destructive,
+      systemImage: item.key === 'mute' && bot.muted ? 'bell' : MENU_SYMBOL[item.key],
       icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
       onPress: () => run(item.key, bot),
     }))
