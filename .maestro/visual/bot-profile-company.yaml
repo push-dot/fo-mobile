@@ -37,7 +37,7 @@ tags:
 - takeScreenshot: BotProfileAllowed
 - tapOn: "careers.moapay.co.kr 허용 해제"
 - extendedWaitUntil:
-    visible: "careers.moapay.co.kr 허용을 해제했어요"
+    notVisible: "careers.moapay.co.kr 허용 해제"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: BotProfileAllowedRevoke
@@ -46,10 +46,6 @@ tags:
 - extendedWaitUntil:
     notVisible: "허용한 사이트.*"
     timeout: 5000
-# The 허용 해제 toasts are still up (they have no place on the delete board); wait them out before the alert.
-- extendedWaitUntil:
-    notVisible: "moapay.notion.site 허용을 해제했어요"
-    timeout: 10000
 - tapOn: "Bot 삭제"
 - extendedWaitUntil:
     visible: "모아페이 Bot을 삭제할까요?"
