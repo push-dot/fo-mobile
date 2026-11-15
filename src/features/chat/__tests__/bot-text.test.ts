@@ -55,3 +55,16 @@ describe('answer sources', () => {
     expect(applyEvent(asked, { type: 'sources', sources }).items).toEqual(asked.items)
   })
 })
+
+describe('splitBotText headings and grey lines (ChatResume)', () => {
+  it('reads # as a title, ### as a role line and > as a grey line that may open a route', () => {
+    expect(splitBotText('있어요.\n# 김서준 · 백엔드 개발자\n### 모아페이 · 2022.03–현재\n• 승인 API\n> [초안 전체 보기](/docs/push/d1) ›\n> 메모')).toEqual([
+      { kind: 'paragraph', text: '있어요.' },
+      { kind: 'heading', level: 1, text: '김서준 · 백엔드 개발자' },
+      { kind: 'heading', level: 2, text: '모아페이 · 2022.03–현재' },
+      { kind: 'bullets', items: ['승인 API'] },
+      { kind: 'sub', text: '초안 전체 보기 ›', route: '/docs/push/d1' },
+      { kind: 'sub', text: '메모' },
+    ])
+  })
+})
