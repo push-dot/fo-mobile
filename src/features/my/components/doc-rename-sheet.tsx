@@ -5,7 +5,7 @@ import { Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
 import { displayName, extensionOf } from '@/shared/utility/display-name'
 import { hitSlopTo, spacing, useColors } from '@/theme'
 import { useDocument, useRenameDocument, useRenameSource, useSource } from '../api/hooks'
-import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, SOURCE_NAME_MAX, titleOver, typedTitle } from '../utils'
+import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, typedTitle } from '../utils'
 
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 18
@@ -15,13 +15,12 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   const doc = useDocument(source ? '' : id).data?.data
   const upload = useSource(source ? id : '').data
   const current = source ? (upload ? displayName(upload.fileName) : undefined) : doc?.title
-  const max = source ? SOURCE_NAME_MAX : DOC_TITLE_MAX
   const [typed, setTyped] = useState<string>()
   const value = typed ?? current ?? ''
   const renameDoc = useRenameDocument(doc)
   const renameSource = useRenameSource(source ? id : undefined)
   const rename = source ? renameSource : renameDoc
-  const over = titleOver(value, max)
+  const over = titleOver(value)
   const save = () => {
     if (current === undefined || rename.isPending || over) return
     const next = renamedTitle(current, value)
@@ -45,7 +44,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
         <View style={{ marginTop: spacing[1] }}>
           <TextField
             value={value}
-            onChangeText={(t) => setTyped(typedTitle(value, t, max))}
+            onChangeText={(t) => setTyped(typedTitle(value, t))}
             placeholder={DOC_RENAME_COPY.placeholder}
             returnKeyType="done"
             onSubmitEditing={save}
@@ -66,7 +65,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
           />
         </View>
         <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingTop: 2, paddingRight: spacing[1] }}>
-          {savedLength(value)}/{max}
+          {savedLength(value)}/{DOC_TITLE_MAX}
         </Text>
       </View>
     </Sheet>

@@ -1,6 +1,4 @@
 export const DOC_TITLE_MAX = 40
-/** An uploaded file's name (PATCH sources/:id takes 1-200). */
-export const SOURCE_NAME_MAX = 200
 
 export const DOC_RENAME_COPY = {
   title: '서류 이름 바꾸기',
