@@ -55,7 +55,6 @@ const SignedInStack = () => {
       <Stack.Screen name="account-usage" />
       {/* PlanUltra: the plan is a full page; 구독 안내 opened from it is a page sheet again, like the account. */}
       <Stack.Screen name="plan" options={fullPageOptions()} />
-      <Stack.Screen name="plan-notice" options={Platform.OS === 'ios' ? { presentation: 'modal' } : undefined} />
       <Stack.Screen name="job-filter" options={sheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
       <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />

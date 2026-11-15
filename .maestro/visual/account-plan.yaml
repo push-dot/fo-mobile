@@ -32,10 +32,3 @@ tags:
 - takeScreenshot: PlanUpgrade
 # PlanUpgradeNotice is the old before-purchase board, now the same screen as PlanUpgrade.
 - takeScreenshot: PlanUpgradeNotice
-# 구독 안내 is the link in the footnote; it opens PlanNotice.
-- tapOn: "구독 안내"
-- extendedWaitUntil:
-    visible: ".*미성년자가 법정대리인.*"
-    timeout: 10000
-- waitForAnimationToEnd
-- takeScreenshot: PlanNotice
