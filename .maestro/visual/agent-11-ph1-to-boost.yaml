@@ -38,7 +38,7 @@ tags:
 - takeScreenshot: ChatPh2
 - tapOn: ".*초안 쓸게요"
 - extendedWaitUntil:
-    visible: "첫 번째 초안.v1.이에요.*"
+    visible: "첫 번째 초안.v1.을 만들었어요.*"
     timeout: 40000
 - waitForAnimationToEnd
 - runFlow: _chat_bottom.yaml
