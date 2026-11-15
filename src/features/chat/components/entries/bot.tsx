@@ -6,6 +6,7 @@ import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText } from '../../utils/bot-text'
+import { diffLinesDetail } from '../../utils/bubble-detail'
 import { planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindText, Marked } from '../header/highlight'
@@ -40,6 +41,11 @@ export const PlanBlock = ({ item }: { item: PlanItem }) => {
   )
 }
 
+const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => {
+  const view = diffLinesDetail(item.lines)
+  return <Detail text={view.text} more={view.more} />
+}
+
 const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
   const c = useColors()
   const xl = useXlBoardText()
@@ -68,6 +74,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       )}
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
+      {item.diff ? <DiffDetail item={item.diff} /> : null}
       {item.bullets?.length ? (
         <Text v="b2" color="t2">
           {item.bullets.map((bullet) => `• ${bullet}`).join('\n')}

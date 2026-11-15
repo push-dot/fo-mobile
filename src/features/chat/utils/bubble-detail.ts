@@ -34,13 +34,19 @@ export const fitBubble = (item: Fit): DetailText => {
 
 const SIGN = { '+': '+', '-': '−', '~': '~', '': ' ' } as const
 
+/** The edit under a bot line: the number of changed lines to open, every line when opened (ChatPh3Review "바뀐 곳 4개 보기 ›"). */
+export const diffLinesDetail = (lines: Diff['lines']) => ({
+  text: `바뀐 곳 ${lines.filter((l) => l.sign !== '').length}개 보기 ›`,
+  more: lines.map((l) => `${SIGN[l.sign]} ${l.text}`).join('\n'),
+})
+
 /** A document edit as a bubble line: the count of changed lines, the lines themselves as grey sub-text. */
 export const diffBubble = (item: Diff): DetailText => {
   const added = item.lines.filter((l) => l.sign === '+').length
   const removed = item.lines.filter((l) => l.sign === '-').length
   return {
     text: '수정안이에요',
-    detail: { text: `+${added}줄 · −${removed}줄`, more: item.lines.map((l) => `${SIGN[l.sign]} ${l.text}`).join('\n') },
+    detail: { text: `+${added}줄 · −${removed}줄`, more: diffLinesDetail(item.lines).more },
   }
 }
 

@@ -354,6 +354,7 @@ const ph3Rest = (wait: number): Step[] => [
   s(wait, todo('todo3', PH3, 3)),
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
+  s(300, agent('첫 번째 초안(v1)을 만들었어요.')),
   s(200, {
     type: 'diff', documentId: DOC, revisionId: 'diff3',
     hunks: [

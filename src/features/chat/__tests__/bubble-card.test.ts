@@ -16,6 +16,14 @@ describe('foldBubbleCards', () => {
     expect(foldBubbleCards([text, plan('수정 전략')]).map((r) => r.type)).toEqual(['agentText'])
   })
 
+  it('moves a diff into the bot line before it, which says what was changed (ChatPh3Review, ChatApprove)', () => {
+    const diff: ChatItem = { type: 'diff', id: 'd', lines: [{ sign: '+', text: '가' }] }
+    const rows = foldBubbleCards([text, diff])
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({ type: 'agentText', id: 'a', diff: { id: 'd' } })
+    expect(foldBubbleCards([{ type: 'user', id: 'u', text: '네' }, diff]).map((r) => r.type)).toEqual(['user', 'diff'])
+  })
+
   it('leaves a plan with no bot line before it', () => {
     expect(foldBubbleCards([{ type: 'user', id: 'u', text: '네' }, plan('')]).map((r) => r.type)).toEqual(['user', 'plan'])
   })

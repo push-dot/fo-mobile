@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { diffBubble, fitBubble, todoLines } from '../utils/bubble-detail'
+import { diffBubble, diffLinesDetail, fitBubble, todoLines } from '../utils/bubble-detail'
 import { splitBotText } from '../utils/bot-text'
 
 describe('fitBubble', () => {
@@ -46,6 +46,13 @@ describe('diffBubble', () => {
     })
     expect(view.text).toBe('수정안이에요')
     expect(view.detail).toEqual({ text: '+1줄 · −1줄', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계' })
+  })
+})
+
+describe('diffLinesDetail', () => {
+  it('counts the changed lines as "바뀐 곳 N개 보기" and opens to every line', () => {
+    const lines = [{ n: 12, sign: '' as const, text: '모아페이' }, { n: 13, sign: '-' as const, text: '결제 API 개발' }, { n: 13, sign: '+' as const, text: 'Kotlin 재설계' }]
+    expect(diffLinesDetail(lines)).toEqual({ text: '바뀐 곳 2개 보기 ›', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계' })
   })
 })
 
