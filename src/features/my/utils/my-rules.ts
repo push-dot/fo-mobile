@@ -9,7 +9,7 @@ const hasBatchim = (word: string) => {
   return code >= 0 && code <= 11171 && code % 28 !== 0
 }
 
-const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
+export const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
 
 export const skillOrderHint = '길게 누르면 앞으로 옮겨요. 앞의 5개가 허브 목록에 보여요.'
 

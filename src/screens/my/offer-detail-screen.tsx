@@ -15,7 +15,7 @@ import {
   useOfferMenu,
   useViewerBox,
 } from '@/features/my'
-import { botChatPath } from '@/features/bots'
+import { openPostingBot } from '@/features/bots'
 import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
@@ -115,7 +115,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
         {pending && p ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push(botChatPath('push'))}
+            onPress={() => openPostingBot(p.id)}
             style={{
               paddingVertical: spacing[4],
               paddingHorizontal: spacing[5],
@@ -126,14 +126,9 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
               gap: spacing[3],
             }}
           >
-            <View style={{ flex: 1 }}>
-              <Text v="b2" weight="700">
-                이 공고를 Bot한테 보내서 고쳐 보세요
-              </Text>
-              <Text v="c1" color="t2">
-                Bot이 적합도를 보고 공고에 맞게 고쳐요
-              </Text>
-            </View>
+            <Text v="b2" weight="700" style={{ flex: 1 }}>
+              공고 보내기
+            </Text>
             <Icon name="chev" size={18} color="t3" />
           </Pressable>
         ) : null}
@@ -147,7 +142,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             disabled={decline.isPending}
             style={{ paddingHorizontal: DECLINE_INSET }}
             onPress={() =>
-              Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
+              Alert.alert('이 제안을 거절할까요?', undefined, [
                 { text: '취소', style: 'cancel' },
                 { text: OFFER_DECLINE, style: 'destructive', onPress: () => decline.mutate() },
               ])

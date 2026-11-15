@@ -10,8 +10,7 @@ tags:
     env:
       MOCK: "push://sign-in?mock=consent-on"
       READY: "새로 올라온 공고"
-# The board is the entry state (the 차단한 사람 row bold on acSoft, route param entry=blocked), which a tap on 설정 never sets.
-- openLink: push://settings?entry=blocked
+- openLink: push://settings
 - extendedWaitUntil:
     visible: ".*Google 계정으로 로그인.*"
     timeout: 10000
