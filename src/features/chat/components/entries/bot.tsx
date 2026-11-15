@@ -25,9 +25,10 @@ const XL_LINE = { fontSize: 21, lineHeight: 31 }
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
 const BUBBLE_PAD_X = 15
 const BULLET_DOT = 6
-const BULLET_GAP = 10
-// The list's own indent, the dot and the gap before a bullet's text.
-const BULLET_LEAD = spacing[1] + BULLET_DOT + BULLET_GAP
+const BULLET_INDENT = 1
+const BULLET_GAP = 13
+// The list's own indent, the dot and the gap before a bullet's text (the board's `ul` padding 20 with the disc outside it).
+const BULLET_LEAD = BULLET_INDENT + BULLET_DOT + BULLET_GAP
 /** What a table can fill inside a bot bubble that is at its widest. */
 const useTableWidth = () => useBotBubbleMax() - BUBBLE_PAD_X * 2
 
@@ -54,8 +55,8 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
   return (
     <View style={{ gap: 2 }}>
       {items.map((line, i) => (
-        <View key={line} style={{ flexDirection: 'row', gap: BULLET_GAP, paddingLeft: spacing[1] }}>
-          <View style={{ width: BULLET_DOT, height: BULLET_DOT, borderRadius: BULLET_DOT / 2, marginTop: 9, backgroundColor: c.t1 }} />
+        <View key={line} style={{ flexDirection: 'row', gap: BULLET_GAP, paddingLeft: BULLET_INDENT }}>
+          <View style={{ width: BULLET_DOT, height: BULLET_DOT, borderRadius: BULLET_DOT / 2, marginTop: 10, backgroundColor: c.t1 }} />
           <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={{ flexShrink: 1, maxWidth: textMax }} />
         </View>
       ))}
