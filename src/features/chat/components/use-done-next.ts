@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Alert } from 'react-native'
+import { Alert, Keyboard } from 'react-native'
 import { showChoiceModal } from '@/shared/navigation'
 import { doneNextActions, doneNextCopy, SAVE_FAIL_MESSAGE, SAVE_FAIL_TITLE, saveFailed, type ResultAction } from '../utils/result-card'
 import type { ChatItem, ChatState } from '../types'
@@ -42,6 +42,8 @@ export const useSaveFailAlert = (chat: Pick<ChatState, 'items'>, retry: () => vo
     const card = chat.items.findLast((i): i is Result => i.type === 'result')
     if (!card || told.current.has(card.id)) return
     told.current.add(card.id)
-    if (saveFailed(card)) Alert.alert(SAVE_FAIL_TITLE, SAVE_FAIL_MESSAGE, [{ text: '닫기', style: 'cancel' }, { text: '다시 시도', onPress: () => latest.current() }])
+    if (!saveFailed(card)) return
+    Keyboard.dismiss()
+    Alert.alert(SAVE_FAIL_TITLE, SAVE_FAIL_MESSAGE, [{ text: '닫기', style: 'cancel' }, { text: '다시 시도', onPress: () => latest.current() }])
   }, [chat.items])
 }
