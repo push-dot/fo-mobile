@@ -429,7 +429,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
         {organizing ? DELETE_TITLE : SHEET_TITLE}
       </Text>
-      <View style={{ width: control, height: control }} />
+      <View style={{ width: FIELD, height: control }} />
     </View>
   )
 
