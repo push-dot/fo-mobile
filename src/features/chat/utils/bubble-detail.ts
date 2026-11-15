@@ -34,9 +34,13 @@ export const fitBubble = (item: Fit): DetailText => {
 
 const SIGN = { '+': '+', '-': '−', '~': '~', '': ' ' } as const
 
+// A removed line and the added line that replaces it (same line number) are one place.
+const placesChanged = (lines: Diff['lines']) =>
+  lines.filter((l, i) => l.sign !== '' && !(l.sign === '+' && l.n !== undefined && lines[i - 1]?.sign === '-' && lines[i - 1]?.n === l.n)).length
+
 /** The edit under a bot line: the number of changed lines to open, every line when opened (ChatPh3Review "바뀐 곳 4개 보기 ›"). */
 export const diffLinesDetail = (lines: Diff['lines']) => ({
-  text: `바뀐 곳 ${lines.filter((l) => l.sign !== '').length}개 보기 ›`,
+  text: `바뀐 곳 ${placesChanged(lines)}개 보기 ›`,
   more: lines.map((l) => `${SIGN[l.sign]} ${l.text}`).join('\n'),
 })
 

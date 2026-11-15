@@ -387,33 +387,10 @@ const ph3Boost: Step[] = [
   }),
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
-const ph4Quality: Step[] = [
-  s(200, status('검사하는 중…')),
-  s(300, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장을 하나씩 보는 중')),
-  s(1200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
-  s(200, {
-    type: 'diff', documentId: DOC, revisionId: 'qdiff',
-    hunks: [
-      { line: 8, sign: '-', text: '결제 트랜젝션 처리 성능 개선' },
-      { line: 8, sign: '+', text: '결제 트랜잭션 처리 성능 개선' },
-      { line: 12, sign: '-', text: '모아페이 · 2022.04–현재' },
-      { line: 12, sign: '+', text: '모아페이 · 2022.03–현재' },
-    ],
-  }),
-  ask({
-    type: 'choice',
-    id: 'ph4-quality',
-    title: '추천 수정도 반영할까요?',
-    options: [],
-    sections: [
-      { kind: 'toggle', id: 's0', options: [{ id: 'dots', label: '가운데점(·) 나열을 쉼표로' }, { id: 'tense', label: '경력 본문의 현재형 문장 2곳' }, { id: 'tone', label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }], selected: ['dots', 'tense'] },
-    ],
-    submit: { label: '{n}개 반영하고 디자인으로', zeroLabel: '그대로 디자인으로' },
-  }),
-]
+// ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design (the card follows after the tour has shot the sentence).
+const QUALITY_HOLD = 10_000
 const ph4Design: Step[] = [
-  s(300, tool('applied', '추천 수정 반영', '2개', 'ok', '쉼표 정리 · 현재형 문장 고침')),
-  s(400, agent('템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
+  s(QUALITY_HOLD, agent('템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
   ask({
     type: 'choice',
     id: 'ph4-design',
@@ -426,6 +403,28 @@ const ph4Design: Step[] = [
     ],
     submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
   }),
+]
+const ph4Quality: Step[] = [
+  s(200, status('검사하는 중…')),
+  s(300, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'run', '문장을 하나씩 보는 중')),
+  s(1200, tool('qa', '품질 검사', '오타 · 문법 · 말투 · ATS', 'ok', '바로 고친 것 2개 · 추천 3개')),
+  s(300, agent('맞춤법과 날짜 2곳을 바로 고치고, 추천 수정 3곳도 반영했어요.')),
+  s(200, {
+    type: 'diff', documentId: DOC, revisionId: 'qdiff',
+    hunks: [
+      { line: 8, sign: '-', text: '결제 트랜젝션 처리 성능 개선' },
+      { line: 8, sign: '+', text: '결제 트랜잭션 처리 성능 개선' },
+      { line: 12, sign: '-', text: '모아페이 · 2022.04–현재' },
+      { line: 12, sign: '+', text: '모아페이 · 2022.03–현재' },
+      { line: 14, sign: '-', text: 'Kotlin · Spring · Kafka' },
+      { line: 14, sign: '+', text: 'Kotlin, Spring, Kafka' },
+      { line: 15, sign: '-', text: '결제 장애에 대응한다' },
+      { line: 15, sign: '+', text: '결제 장애에 대응했다' },
+      { line: 16, sign: '-', text: '정산 지연을 줄였음' },
+      { line: 16, sign: '+', text: '정산 지연을 줄였습니다' },
+    ],
+  }),
+  ...ph4Design,
 ]
 const ph5: Step[] = [
   s(200, status('정리하는 중…')),
@@ -513,7 +512,6 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
       : c === 1
         ? ph4Quality
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
-  'ph4-quality': () => ph4Design,
   'ph4-design': (c) => (c === -1 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1', '으로')]),
   'ph2x-verify': (c) => (c === 0 ? ph2xLevel : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ext-gate': (c) => (c === 0 ? [done] : say('알겠어요. 필요할 때 다시 불러 주세요.')),

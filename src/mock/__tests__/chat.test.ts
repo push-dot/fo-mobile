@@ -83,10 +83,12 @@ describe('chat mock', () => {
     expect(boost.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
-  it('jumps to the quality check without the boost card', async () => {
+  it('jumps to the quality check without the boost card, applies the recommended fixes without asking, then asks for the design', async () => {
     const events = await run('t-quality', { text: '품질 검사로 넘어가기' })
     expect(types(events)).not.toContain('fit')
-    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-quality')).toBe(true)
+    expect(events.some((e) => e.type === 'token' && e.text.includes('추천 수정 3곳도 반영했어요'))).toBe(true)
+    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-quality')).toBe(false)
+    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design')).toBe(true)
   })
 
   it('selects 중간 제약으로 in the 병목 강도 gate', async () => {
