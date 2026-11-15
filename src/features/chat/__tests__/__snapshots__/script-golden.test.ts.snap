@@ -5989,7 +5989,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"ph1-ultra","type":"user"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
-{"caption":"보통이고, 고칠 여지가 있어요.","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","projected":{"bullets":["승인 API 성과를 숫자로 보여 주기","Kafka를 기술 스택 맨 앞으로 옮기기","정산 도메인 경험을 한 줄 추가하기"],"label":"8점대"},"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
+{"caption":"보통이고, 고칠 여지가 있어요.","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
 card {"id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -5999,7 +5999,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"ph1-ultra-open","type":"user"}
 {"action":"적합도 계산","result":"6.9점","state":"ok","target":"5개 항목 · 가중치 반영","type":"tool"}
-{"caption":"보통이고, 고칠 여지가 있어요.","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","projected":{"bullets":["승인 API 성과를 숫자로 보여 주기","Kafka를 기술 스택 맨 앞으로 옮기기","정산 도메인 경험을 한 줄 추가하기"],"label":"8점대"},"rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
+{"caption":"보통이고, 고칠 여지가 있어요.","keywords":[{"label":"Kotlin","ok":true},{"label":"Spring Boot","ok":true},{"label":"JPA","ok":true},{"label":"Kafka","ok":false},{"label":"정산 도메인","ok":false}],"plan":"ULTRA","rows":[{"label":"기술 스택","score":7.5},{"label":"경험 연관성","score":7},{"label":"경력 수준","score":8},{"label":"키워드","score":4.5},{"label":"도메인","score":5}],"score":6.9,"summary":"기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.","type":"fit"}
 card {"id":"ph1-fit","question":"이 공고에 맞춰 이력서를 고칠까요?","sections":[{"items":[{"label":"네, 맞춰서 고쳐 주세요"},{"label":"피드백만 받을게요"},{"label":"점수만 보고 끝낼게요"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "

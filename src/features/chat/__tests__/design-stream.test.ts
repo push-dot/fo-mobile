@@ -48,7 +48,7 @@ describe('agent stream for the new design', () => {
     ])
   })
 
-  it('maps the analysis fit card with five parts, band, keywords, summary and the plan', async () => {
+  it('maps the analysis fit card with five parts, band, keywords, summary and the plan, and drops the projection the server may still send', async () => {
     const s = play(
       await map({
         type: 'fit', score: 6.9, topGap: '키워드', plan: 'ULTRA', band: '보통 · 개선 여지 있어요',
@@ -68,7 +68,6 @@ describe('agent stream for the new design', () => {
           { label: '키워드', score: 4.5 }, { label: '도메인', score: 5 },
         ],
         keywords: [{ label: 'Kotlin', ok: true }, { label: 'Kafka', ok: false }],
-        projected: { label: '8점대', bullets: ['승인 API 성과를 숫자로 보여 주기'] },
       },
     ])
   })

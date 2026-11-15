@@ -42,10 +42,9 @@ export type ChatItem =
       note?: string
       /** What each 점수 올리기 round raised: its target and its result line ("6.9 → 7.8 · …"). */
       rounds?: { label: string; line: string }[]
-      /** FREE locks the part rows; PRO shows the ULTRA teaser; ULTRA shows `projected`. */
+      /** FREE locks the part rows. */
       plan?: 'FREE' | 'PRO' | 'ULTRA'
       summary?: string
-      projected?: { label: string; bullets: string[] }
     }
   /** `url` is relative to the API base (server artifacts). */
   | { type: 'file'; id: string; name: string; meta?: string; progress?: number; preview?: boolean; url?: string }

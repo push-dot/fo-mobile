@@ -259,7 +259,6 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
       { label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true },
       { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
     ],
-    ...(plan === 'ULTRA' ? { projected: { score: 8, label: '8점대', bullets: ['승인 API 성과를 숫자로 보여 주기', 'Kafka를 기술 스택 맨 앞으로 옮기기', '정산 도메인 경험을 한 줄 추가하기'] } } : {}),
   }),
   { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])), wait: gateWait },
 ]

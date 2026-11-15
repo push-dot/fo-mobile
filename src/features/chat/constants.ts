@@ -42,11 +42,6 @@ export const FIT_ROWS = [
 ] as const
 /** The FREE lock under the fit sentence (ChatPh1FitFree). */
 export const FIT_LOCKED = '항목별 점수는 PRO에서 볼 수 있어요 ›'
-export const FIT_TEASER = '이렇게 고치면 N점대 · ULTRA'
-/** The ULTRA projection: the grey line that opens it, and its sentence once open (ChatPh1FitUltra, ChatPh1FitUltraOpen). */
-const subject = (label: string) => `${label}${(label.charCodeAt(label.length - 1) - 0xac00) % 28 ? '이' : '가'}`
-export const fitProjectedLink = (label: string) => `어떻게 고치면 ${subject(label)} 되는지 보기 ›`
-export const fitProjected = (label: string) => `이렇게 고치면 ${subject(label)} 돼요.`
 
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
