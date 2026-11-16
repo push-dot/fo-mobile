@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router'
 
 // Unique initial route per tab group avoids duplicate "/" paths across groups.
-export const unstable_settings = { initialRouteName: 'my' }
+export const unstable_settings = { anchor: 'my' }
 
 const TabStack = () => (
   <Stack screenOptions={{ headerShown: false }}>

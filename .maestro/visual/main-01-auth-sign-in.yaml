@@ -11,6 +11,8 @@ tags:
 - extendedWaitUntil:
     visible: "Google로 시작하기"
     timeout: 60000
+# The boards draw the focused phone field without the system pad: no-pad keeps the pad down while the field is focused.
+- openLink: "push://sign-in?mock=no-pad"
 # The cleared launch shows the LogBox toast over 휴대폰 번호로 시작하기; a tap there opens the debugger.
 - runFlow: ../flows/_dismiss_logbox.yaml
 - waitForAnimationToEnd
@@ -27,8 +29,8 @@ tags:
           timeout: 6000
 - tapOn: "휴대폰 번호"
 - inputText: "01012345678"
-# The board draws the field filled with the pad already down and 인증번호 받기 in view.
-- runFlow: _hide_kbd.yaml
+# The board draws the field filled and still focused (accent border, caret) with 인증번호 받기 in view. The screen opens
+# focused (PhoneField autoFocus) and no-pad keeps the pad down, so the shot is taken as typed: a Return would blur the field.
 - waitForAnimationToEnd
 - takeScreenshot: PhoneInputDirect
 - tapOn: "인증번호 받기"
@@ -48,6 +50,5 @@ tags:
     timeout: 10000
 - tapOn: "휴대폰 번호"
 - inputText: "01012345678"
-- runFlow: _hide_kbd.yaml
 - waitForAnimationToEnd
 - takeScreenshot: PhoneInput

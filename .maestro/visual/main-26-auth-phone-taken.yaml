@@ -3,7 +3,8 @@ name: 이미 인증된 번호로 로그인 · Google · Apple · 여러 개
 tags:
   - visual
 ---
-# A number verified on a Google / Apple account signs in to it (RULINGS 33), no 이미 가입된 번호 stop. The mock reads the code's tail (mock/home.ts):
+# A number verified on a Google / Apple account signs in to it (RULINGS 33), no 이미 가입된 번호 stop, so the board (v435) is gone and this
+# tour only checks the sign-in reaches the home feed. The mock reads the code's tail (mock/home.ts):
 # 482444 a Google account, 482555 an Apple one, 482666 a Google and a GitHub one. Each lands on the home feed.
 - runFlow:
     when:
@@ -17,7 +18,6 @@ tags:
           visible: "새로 올라온 공고"
           timeout: 20000
       - waitForAnimationToEnd
-      - takeScreenshot: AuthPhoneTaken.1
       - runFlow: _phone_code.yaml
       - inputText: "482555"
       - runFlow: _hide_kbd.yaml
@@ -26,7 +26,6 @@ tags:
           visible: "새로 올라온 공고"
           timeout: 20000
       - waitForAnimationToEnd
-      - takeScreenshot: AuthPhoneTaken.2
 - runFlow:
     when:
       platform: Android
@@ -39,4 +38,3 @@ tags:
           visible: "새로 올라온 공고"
           timeout: 20000
       - waitForAnimationToEnd
-      - takeScreenshot: AuthPhoneTaken.3
