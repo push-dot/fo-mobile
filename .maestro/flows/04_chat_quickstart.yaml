@@ -24,6 +24,6 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 - waitForAnimationToEnd
 - tapOn: "적용"
 - extendedWaitUntil:
-    visible: "Push 프로필에 저장했어요.*"
+    visible: "다 됐어요.*"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-03

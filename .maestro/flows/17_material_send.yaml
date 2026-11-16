@@ -3,16 +3,8 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- runFlow:
-    file: _tap_tab.yaml
-    env:
-      TAB: "Bot"
-      READY: "(동의하고 시작하기|계정 · .*)"
-- runFlow:
-    when:
-      visible: "동의하고 시작하기"
-    commands:
-      - tapOn: "동의하고 시작하기"
+# The chat asks the company-Bot consent on its first message (ChatConsentCompany); consent-on answers it ahead.
+- openLink: push://bots?mock=consent-on
 - extendedWaitUntil:
     visible: ".*모아페이 Bot.*"
     timeout: 10000
