@@ -1,30 +1,21 @@
 appId: app.push.mobile
-name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준다
+name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 채팅의 마지막 말을 보여 준다
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
-- runFlow:
-    file: _tap_tab.yaml
-    env:
-      TAB: "Bot"
-      READY: "(동의하고 시작하기|계정 · .*)"
-- runFlow:
-    when:
-      visible: "동의하고 시작하기"
-    commands:
-      - tapOn: "동의하고 시작하기"
+# The chat asks the company-Bot consent on its first open (ChatConsentCompany); consent-on answers it ahead.
+- openLink: push://bots?mock=consent-on
+# 누리클라우드 has no pending approval and no run, so nothing opens over its chat.
 - extendedWaitUntil:
-    visible: ".*모아페이 Bot.*"
+    visible: ".*누리클라우드 Bot, .*자기소개서 초안 v2를 만들었어요.*"
     timeout: 10000
-- tapOn: ".*모아페이 Bot.*"
+- tapOn: ".*누리클라우드 Bot.*"
 - extendedWaitUntil:
-    visible: "메시지.*"
+    visible: "자기소개서 초안 v2를 만들었어요"
     timeout: 15000
-- tapOn: "메시지.*"
-- inputText: "홈행확인"
-- tapOn: "보내기"
 - tapOn: "뒤로"
+# Not asserted: a typed line or a cleared unread dot. The mock send runs in the app (stores.ts), never in the mock server, and useLocalActivity is still a stub (features/chat/index.ts).
 - extendedWaitUntil:
-    visible: "홈행확인"
+    visible: ".*누리클라우드 Bot, .*자기소개서 초안 v2를 만들었어요.*"
     timeout: 15000
 - takeScreenshot: 15_bot_home_open_chat

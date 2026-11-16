@@ -20,4 +20,4 @@ name: 공고에서 회사 봇 만들기 → 그 채팅
 - extendedWaitUntil:
     visible: "새벽마켓 Bot에게 물어보기"
     timeout: 20000
-- assertVisible: "새벽마켓"
+- assertVisible: ".*새벽마켓.*"
