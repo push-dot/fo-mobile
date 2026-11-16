@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
-import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, usePostSaved, useTogglePostSave } from '@/features/social'
+import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
 import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors } from '@/theme'
@@ -13,7 +13,6 @@ const PostDetailScreen = ({ id }: { id: string }) => {
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null)
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null)
   const post = usePost(id)
-  const saved = usePostSaved(id)
   const toggleSave = useTogglePostSave(id)
   const comments = useComments(id, !!post.data)
   const rows = threadComments(comments.data?.pages.flatMap((p) => p.data) ?? [])
@@ -26,7 +25,7 @@ const PostDetailScreen = ({ id }: { id: string }) => {
           <Menu
             accessibilityLabel="더 보기"
             actions={[
-              { key: 'save', actions: [saveMenuAction(!!saved.data, () => toggleSave.mutate(!saved.data))] },
+              { key: 'save', actions: [saveMenuAction(!!post.data?.saved, () => toggleSave.mutate(!post.data?.saved))] },
               {
                 key: 'send',
                 actions: [

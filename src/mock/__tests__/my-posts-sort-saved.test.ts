@@ -34,6 +34,22 @@ it('saves and unsaves a post, newest save first, idempotent, 404 for a post that
   expect((await call('POST', 'posts/nope/save')).status).toBe(404)
 })
 
+it('carries saved on the post detail, the feed and the saved list, following save and unsave', async () => {
+  const saved = async (path: string) => {
+    const body = (await call('GET', path)).json!.data as unknown
+    const rows = (Array.isArray(body) ? body : [body]) as { id: string; saved: boolean }[]
+    return Object.fromEntries(rows.map((p) => [p.id, p.saved]))
+  }
+  expect(await saved('posts/post-3')).toEqual({ 'post-3': true })
+  expect(await saved('posts/post-4')).toEqual({ 'post-4': false })
+  expect((await saved('posts'))['post-5']).toBe(true)
+  expect(Object.values(await saved('me/saved-posts'))).toEqual([true, true])
+  await call('POST', 'posts/post-4/save')
+  expect(await saved('posts/post-4')).toEqual({ 'post-4': true })
+  await call('DELETE', 'posts/post-4/save')
+  expect(await saved('posts/post-4')).toEqual({ 'post-4': false })
+})
+
 it('serves the profile PDF', async () => {
   const { status, res } = await call('GET', 'me/profile/pdf')
   expect(status).toBe(200)
