@@ -11,7 +11,7 @@ import { spacing, useColors } from '@/theme'
 const OwnProfile = () => {
   const { data: me } = useMyProfile()
   const share = useShareFile()
-  return <ProfileTab share={false} exporting={share.isPending} onExport={me ? () => share.mutate({ profile: true, name: me.displayName }) : undefined} />
+  return <ProfileTab share={false} exporting={share.isPending} onExport={me ? () => share.mutate({ profile: true, name: me.displayName, photo: !!me.avatarUrl }) : undefined} />
 }
 
 const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {

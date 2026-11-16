@@ -663,7 +663,7 @@ export const TOKENS: Record<string, Step[]> = {
   '품질 검사로 넘어가기': after([...ph4Check, done], QUALITY_LATER),
   design: ph4Design,
   '2개 반영하고 디자인으로': ph4Design,
-  // An earlier turn of the same document flow: its to-do card is why the composer says 작업 중에도 말할 수 있어요 on the later boards (ChatPh5).
+  // An earlier turn of the same document flow: its to-do card stays above the later boards (ChatPh5).
   'flow-history': [s(200, todo('todo', TODO, TODO.length)), done],
   'ph2x': ph2xApproach,
   '네, 시작해 주세요': ph1,
