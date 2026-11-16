@@ -24,10 +24,9 @@ vi.mock('../api/fetchers', () => ({
   followConversation: () => (async function* () {})(),
   resolveConversationApproval: vi.fn(),
   streamConversation: () => (async function* () {})(),
-  updateAiAccessMode: vi.fn(),
 }))
 
-const { send, useChatStore, usePrefs } = await import('../stores')
+const { send, useChatStore } = await import('../stores')
 
 const file = { uri: 'file:///resume.pdf', name: 'resume.pdf', mimeType: 'application/pdf', size: 1200 }
 const chat = (id: string) => useChatStore.getState().chats[id]!
@@ -36,7 +35,6 @@ beforeEach(() => {
   vi.clearAllMocks()
   failing.on = false
   useChatStore.setState({ chats: {} })
-  usePrefs.setState({ accessMode: 'AUTO' })
   post.mockResolvedValue({ data: [{ wait: 0, event: { type: 'done', at: 0 } }] })
 })
 

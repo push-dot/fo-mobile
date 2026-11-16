@@ -4,7 +4,7 @@ import { type ChatIntent, type ListEnvelope } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { botChatPath, type BotId } from '@/features/bots'
-import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
+import { useMyLinks, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
@@ -16,7 +16,7 @@ import { exclusive, pdfName, shareErrorText } from '../utils/share'
 import type { MentionGroup } from '../utils/mentions'
 import { isConsentRequired } from '../utils/consent'
 import { retryUnlessMissing } from '../utils/retry'
-import { askConsent, bindOpenChat, forget, holdOpen, openBot, pickAccessMode, send, usePrefs } from '../stores'
+import { askConsent, bindOpenChat, forget, holdOpen, openBot, send } from '../stores'
 import {
   archiveConversation,
   chatApi,
@@ -181,21 +181,6 @@ export const useShareFile = () =>
       }),
     onError: (e) => showToast({ message: shareErrorText(e), bottom: TOAST_ABOVE.tabs }),
   })
-
-export const useAccessMode = () => {
-  const qc = useQueryClient()
-  const server = useMySettings(true).data?.aiAccessMode
-  const mode = usePrefs((s) => s.accessMode)
-  useEffect(() => {
-    if (server) usePrefs.setState({ accessMode: server })
-  }, [server])
-  const save = useMutation({
-    mutationFn: pickAccessMode,
-    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
-    onError: () => Alert.alert('바꾸지 못했어요', RETRY_LATER),
-  })
-  return { mode, pick: save.mutate }
-}
 
 export const useQuickStart = (key: string) =>
   useQuery({ queryKey: ['chat', 'quick-start', key], queryFn: () => chatApi.quickStart(key) })

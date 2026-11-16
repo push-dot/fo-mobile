@@ -17,9 +17,9 @@ tags:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "tailor resume"
 - extendedWaitUntil:
-    visible: "수정 적용"
+    visible: "이렇게 고쳤어요"
     timeout: 60000
-# The edit modal slides up; its one 적용 button answers, the title 수정 적용 is not a tap target.
+# The review modal slides up with the changed lines as a table; 적용 applies them (되돌리기 below it sets them aside), the title is not a tap target.
 - waitForAnimationToEnd
 - takeScreenshot: ChatApprove
 - tapOn: "적용"

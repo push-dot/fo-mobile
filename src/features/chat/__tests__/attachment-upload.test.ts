@@ -25,10 +25,9 @@ vi.mock('../api/fetchers', () => ({
   followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
   resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string])),
   streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
-  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
 }))
 
-const { send, useChatStore, usePrefs } = await import('../stores')
+const { send, useChatStore } = await import('../stores')
 
 const file = { uri: 'file:///resume.pdf', name: 'resume.pdf', mimeType: 'application/pdf', size: 1200 }
 const sourceId = '11111111-1111-4111-8111-111111111111'
@@ -41,7 +40,6 @@ const chat = (id: string) => useChatStore.getState().chats[id]!
 beforeEach(() => {
   vi.clearAllMocks()
   useChatStore.setState({ chats: {} })
-  usePrefs.setState({ accessMode: 'AUTO' })
   botApi.bots.send.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
   botApi.bots.follow.mockImplementation(() => frames())
 })

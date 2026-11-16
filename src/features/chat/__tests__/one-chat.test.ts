@@ -28,7 +28,6 @@ vi.mock('../api/fetchers', () => ({
   followConversation: vi.fn(),
   resolveConversationApproval: vi.fn(),
   streamConversation: vi.fn(),
-  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 

@@ -6,10 +6,8 @@ import { usePersonalPurchase } from '@/features/billing'
 import { accountPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
   AWAITING_TEXT,
-  ApprovalPanel,
   AwaitingRow,
   ChatBotColor,
-  ChoiceBubble,
   ComposerArea,
   ConsentSheet,
   CreditBanner,
@@ -29,10 +27,6 @@ import {
   THREAD_WINDOW,
   answer,
   applyText,
-  choiceInThread,
-  choiceSheet,
-  confirmModal,
-  designModal,
   composerPlaceholder,
   turnFailed,
   followScroll,
@@ -50,6 +44,7 @@ import {
   send,
   stop,
   useDoneNext,
+  useGateModal,
   useSaveFailAlert,
   useChat,
   useChatLimit,
@@ -60,7 +55,6 @@ import {
   type ChatItem,
 } from '@/features/chat'
 import { useConvertDocument } from '@/features/my'
-import MaterialPickerScreen from '@/screens/chat/material-picker-screen'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
@@ -138,10 +132,6 @@ const Thread = ({ id }: { id: string }) => {
   const [sayingFor, setSayingFor] = useState<string>()
   const input = useRef<TextInputInstance>(null)
   const saying = !!chat.approval && sayingFor === chat.approval.id
-  const inThread = !!chat.approval && choiceInThread(chat.approval)
-  const showPanel = chat.approval && !saying && !inThread
-  // A single pick or an edit goes to a modal (the panel draws nothing), so only the other cards reserve the room of a panel.
-  const panelDrawn = !!showPanel && !choiceSheet(chat.approval!) && !confirmModal(chat.approval!) && !designModal(chat.approval!)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(chat, name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
@@ -164,7 +154,7 @@ const Thread = ({ id }: { id: string }) => {
   const unseen = useUnseen(chat.items, atBottom)
   useReadWhileOpen(bot.data, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items), attention: !!chat.approval && !inThread })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items), attention: !!chat.approval })
   const list = useRef<FlatList<ThreadRow>>(null)
   const dataRef = useRef(data)
   useEffect(() => {
@@ -197,6 +187,7 @@ const Thread = ({ id }: { id: string }) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
   })
+  useGateModal(id, chat, (text, choice) => answer(id, text, choice), () => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50)))
   const working = chat.working
   const renderItem = useCallback(
     ({ item, index }: { item: ThreadRow; index: number }) => (
@@ -248,12 +239,11 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow, panelDrawn), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - BUBBLE_GAP) }} />}
         ListHeaderComponent={
-          chat.queue.length || inThread ? (
+          chat.queue.length ? (
             <View style={{ gap: BUBBLE_GAP }}>
-              {inThread ? <ChoiceBubble approval={chat.approval!} onAnswer={(text, choice) => answer(id, text, choice)} /> : null}
               {chat.queue.map((item, i) => (
                 <Queued key={`${i}-${item.text}`} text={item.text} />
               ))}
@@ -266,38 +256,26 @@ const Thread = ({ id }: { id: string }) => {
       {unseen > 0 && followScroll(atBottom, !!chat.working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
       </View>
       )}
-      {showPanel ? (
-        <ApprovalPanel
-          key={chat.approval!.id}
-          approval={chat.approval!}
-          onAnswer={(text, choice) => answer(id, text, choice)}
-          onSay={() => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50))}
-          renderPicker={(onClose) => <MaterialPickerScreen target={id} onClose={onClose} />}
+      {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
+      <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
+        <ComposerArea
+          botId={id}
+          inputRef={input}
+          placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
+          working={!!chat.working && !isStopping(chat.working)}
+          disabled={!!limit.banner}
+          onGrow={setGrow}
+          onStop={() => stop(id)}
+          onSend={(text, attachment) => send(id, text, attachment)}
+          above={
+            chat.awaiting ? (
+              <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
+            ) : empty && kind ? (
+              <QuickStartRow kind={kind} onChip={(key) => router.push(quickStartPath(key))} />
+            ) : null
+          }
         />
-      ) : (
-        <>
-        {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
-        <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
-          <ComposerArea
-            botId={id}
-            inputRef={input}
-            placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
-            working={!!chat.working && !isStopping(chat.working)}
-            disabled={!!limit.banner}
-            onGrow={setGrow}
-            onStop={() => stop(id)}
-            onSend={(text, attachment) => send(id, text, attachment)}
-            above={
-              chat.awaiting ? (
-                <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
-              ) : empty && kind ? (
-                <QuickStartRow kind={kind} onChip={(key) => router.push(quickStartPath(key))} />
-              ) : null
-            }
-          />
-        </View>
-        </>
-      )}
+      </View>
       <ConsentSheet />
       </KeyboardAvoidingView>
     </View>

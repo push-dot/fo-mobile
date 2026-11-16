@@ -1,4 +1,4 @@
-import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api-client'
+import { type DataEnvelope, type ListEnvelope } from '@push/api-client'
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
@@ -87,8 +87,6 @@ export const fetchDocumentPdf = async (id: string) => {
   if (!version) throw new Error(`document ${id} has no version`)
   return { title: doc.title, bytes: await bytesOf(api.documents.exportFile(id, version)) }
 }
-
-export const updateAiAccessMode = (mode: AccessMode) => api.me.updateSettings({ aiAccessMode: mode })
 
 export const streamConversation = api.conversations.stream
 

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { accessMenu, botUsageRows, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
+import { currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 
 vi.mock('@/features/my', async () => ({ TONES: (await import('../../my/constants')).TONES }))
 
@@ -17,36 +17,12 @@ describe('account inline menus', () => {
     expect(toneMenu(undefined, () => {}).findIndex((a) => a.selected)).toBe(0)
   })
 
-  it('access menu selects current', () => {
-    const pick = vi.fn()
-    const actions = accessMenu('BYPASS', pick)
-    expect(actions.map((a) => a.label)).toEqual(['항상 묻기', '자동', '바로 실행'])
-    expect(actions.findIndex((a) => a.selected)).toBe(2)
-    actions[0]!.onPress()
-    expect(pick).toHaveBeenCalledWith('ALWAYS_ASK')
-  })
-
   it('usage percent rounds, clamps and hides without credits', () => {
     expect(usagePercent({ used: 64, total: 100 })).toBe(64)
     expect(usagePercent({ used: 150, total: 100 })).toBe(100)
     expect(usagePercent({ used: 1, total: 3 })).toBe(33)
     expect(usagePercent({ used: 0, total: 0 })).toBeNull()
     expect(usagePercent(null)).toBeNull()
-  })
-
-  it('lists each Bot share of the allowance, biggest first, and hides without a split', () => {
-    const credits = { used: 3200, total: 5000 }
-    const usageByBot = [
-      { id: 'b', name: 'Push Bot', used: 900 },
-      { id: 'a', name: '모아페이', used: 1400 },
-    ]
-    expect(botUsageRows({ credits, usageByBot })).toEqual([
-      { id: 'a', name: '모아페이', percent: 28, used: 1400 },
-      { id: 'b', name: 'Push Bot', percent: 18, used: 900 },
-    ])
-    expect(botUsageRows({ credits })).toEqual([])
-    expect(botUsageRows({ credits: null, usageByBot })).toEqual([])
-    expect(botUsageRows(undefined)).toEqual([])
   })
 
   it('names the tone row 그대로 for the default tone and "<tone> 말투" otherwise', () => {

@@ -5,18 +5,31 @@ import { create } from 'zustand'
 export type ChoiceModalRequest = {
   title: string
   message?: string
+  /** A markdown table under the message (a plan or a change set the question is about). */
+  table?: { head: string[]; rows: string[][] }
   /** A choice: one plain row per option; the modal closes first, then the option runs. */
-  items?: { label: string; destructive?: boolean; /** The row opens something next: a grey › at its right edge. */ chevron?: boolean; onPress: () => void }[]
-  /** One pick out of rows, an optional switch row, and a button that names the pick (ChatPh4Design). */
+  items?: {
+    label: string
+    /** Grey second line under the label. */
+    sub?: string
+    destructive?: boolean
+    /** The row opens something next: a grey › at its right edge. */
+    chevron?: boolean
+    onPress: () => void
+  }[]
+  /** One or several picks out of rows, an optional switch row, and a button that names the pick (ChatPh4Design, ChatPh2XPrevent). With nothing picked the button is off. */
   form?: {
     options: { label: string; sub?: string }[]
-    selected: number
+    selected: number[]
+    multi?: boolean
     toggle?: { label: string; on: boolean }
-    confirmLabel: (selected: number, on: boolean) => string
-    onConfirm: (selected: number, on: boolean) => void
+    confirmLabel: (selected: number[], on: boolean) => string
+    onConfirm: (selected: number[], on: boolean) => void
   }
-  /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void }
+  /** One line of text, and a button that sends it (a pasted link). */
+  input?: { placeholder: string; confirm: string; keyboardType?: 'default' | 'url'; onSubmit: (text: string) => void }
+  /** A confirmation: one primary button, and an optional plain second button that sets the proposal aside (ChatApprove 되돌리기). A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
+  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void } }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

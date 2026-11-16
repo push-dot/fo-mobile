@@ -25,15 +25,24 @@ tags:
     env:
       KO: "1번, 지금 이력서로 할게요"
       EN: "ph0-input"
+# ChatPh0Input is three regular modals one after the other (what to make, which material, which tone); each one is shot when it is up.
 - extendedWaitUntil:
-    visible: "새 작업"
+    visible: "어떤 산출물을 만들까요?"
     timeout: 30000
-# The sheet's second block (자료 rows) is off screen until the panel has risen, so it is the sign that the slide is done.
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0Input
+- tapOn: "다음"
 - extendedWaitUntil:
     visible: "가져올 자료"
     timeout: 15000
 - waitForAnimationToEnd
-- takeScreenshot: ChatPh0Input
+- takeScreenshot: ChatPh0InputMaterials
+- tapOn: "다음"
+- extendedWaitUntil:
+    visible: "말투"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: ChatPh0InputTone
 - runFlow: _fresh_company.yaml
 - runFlow:
     file: _say.yaml

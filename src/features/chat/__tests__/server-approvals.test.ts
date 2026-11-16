@@ -24,10 +24,9 @@ vi.mock('../api/fetchers', () => ({
   followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
   resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string, string?])),
   streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
-  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
 }))
 
-const { answer, pickAccessMode, send, useChatStore, usePrefs } = await import('../stores')
+const { answer, send, useChatStore } = await import('../stores')
 const { emptyChat } = await import('../utils/reducer')
 
 async function* frames(...evs: StreamEvent[]) {
@@ -47,36 +46,9 @@ const pending = (id: string, optionIds: string[]) =>
 
 beforeEach(() => {
   vi.clearAllMocks()
-  usePrefs.setState({ accessMode: 'AUTO' })
   botApi.bots.send.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
   botApi.bots.follow.mockImplementation(() => frames({ type: 'tool', name: 'send_mail', state: 'ok', summary: '메일 보내기' }, { type: 'done', operation: null }))
   botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'approve' } })
-})
-
-describe('access mode', () => {
-  it('defaults to AUTO and sends the current mode with every stream', async () => {
-    send('c1', '안녕')
-    await settled('c1')
-    expect(botApi.bots.send).toHaveBeenLastCalledWith('c1', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
-    usePrefs.setState({ accessMode: 'BYPASS' })
-    send('c1', '또')
-    await settled('c1')
-    expect(botApi.bots.send).toHaveBeenLastCalledWith('c1', { text: '또', accessMode: 'BYPASS' }, expect.anything())
-  })
-
-  it('picking a mode updates local state first and saves it', async () => {
-    api.me.updateSettings.mockResolvedValue({ aiAccessMode: 'ALWAYS_ASK' })
-    const saving = pickAccessMode('ALWAYS_ASK')
-    expect(usePrefs.getState().accessMode).toBe('ALWAYS_ASK')
-    await saving
-    expect(api.me.updateSettings).toHaveBeenCalledWith({ aiAccessMode: 'ALWAYS_ASK' })
-  })
-
-  it('rolls the mode back when saving fails', async () => {
-    api.me.updateSettings.mockRejectedValue(new Error('offline'))
-    await expect(pickAccessMode('BYPASS')).rejects.toThrow()
-    expect(usePrefs.getState().accessMode).toBe('AUTO')
-  })
 })
 
 describe('server approvals', () => {

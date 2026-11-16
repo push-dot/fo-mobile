@@ -21,7 +21,7 @@ const StatusLineRow = ({ view, color }: { view: StatusLineView; color: MascotCol
       accessibilityLabel={view.accessibilityLabel}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40, alignSelf: 'stretch' }}
     >
-      <Mascot size={xl ? 28 : 24} state={view.mascot} color={color} motion={view.mascot === 'idle' ? { mode: 'still' } : { mode: 'animate' }} />
+      <Mascot size={xl ? 28 : 24} state={view.mascot} color={color} motion={{ mode: 'animate' }} />
       <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', flexWrap: xl ? 'wrap' : 'nowrap', alignItems: 'baseline', columnGap: spacing[2] }}>
         {view.text ? (
           <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={xl ? undefined : 1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, big?.b2]}>

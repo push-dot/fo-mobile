@@ -17,10 +17,10 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
     env:
       TEXT: "맞추기 시작"
 - extendedWaitUntil:
-    visible: "수정 적용"
+    visible: "이렇게 고쳤어요"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-02
-# The edit modal slides up; its one 적용 button answers, the title 수정 적용 is not a tap target.
+# The edit modal slides up; its one 적용 button answers, the title is not a tap target.
 - waitForAnimationToEnd
 - tapOn: "적용"
 - extendedWaitUntil:

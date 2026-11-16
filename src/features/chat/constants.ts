@@ -7,15 +7,8 @@ export { COMPOSER_PLACEHOLDER } from './composer-placeholder'
 export { ERROR_TEXT } from './error-text'
 
 // Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.
-export const SPRING = [0.2, 0.9, 0.25, 1] as const
 export const BUBBLE = [0.2, 0.9, 0.25, 1.15] as const
 
-// `row`: the 계정 row names the mode as a sentence, so no value label sits on its right (ChatAccount).
-export const ACCESS_MODES: { key: AccessMode; label: string; row: string; desc: string }[] = [
-  { key: 'ALWAYS_ASK', label: '항상 묻기', row: '항상 물어보고 변경', desc: '바꾸기 전에 매번 물어봐요' },
-  { key: 'AUTO', label: '자동', row: '자동으로 변경', desc: '나만 바뀌는 일은 바로 하고, 다른 사람에게 닿는 일은 물어봐요' },
-  { key: 'BYPASS', label: '바로 실행', row: '바로 변경', desc: '묻지 않고 실행해요' },
-]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
@@ -229,4 +222,3 @@ export const KEYWORD_GLYPH = {
 } as const
 
 /** The page-style modal a form card (ChatPh0Input) opens in: its title is the sheet's, not the bot's question. */
-export const NEW_TASK_TITLE = '새 작업'

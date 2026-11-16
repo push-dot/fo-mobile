@@ -23,7 +23,6 @@ vi.mock('../api/fetchers', () => ({
   followConversation: vi.fn(),
   resolveConversationApproval: vi.fn(),
   streamConversation: vi.fn(),
-  updateAiAccessMode: vi.fn(),
 }))
 
 const { useConsentPrompt } = await import('../stores')
