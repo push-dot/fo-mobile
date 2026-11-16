@@ -15,6 +15,8 @@ tags:
     timeout: 30000
     optional: true
 - waitForAnimationToEnd
-- takeScreenshot: ProfileDetailMe
-# ProfileDetailMePdf draws 내보내기, which has no endpoint (G33): the same screen is shot under its name so it is judged against it.
+# 내보내기 downloads the profile PDF (GET me/profile/pdf), so the screen is ProfileDetailMePdf; ProfileDetailMe is the same screen without that button.
+- extendedWaitUntil:
+    visible: "내보내기"
+    timeout: 10000
 - takeScreenshot: ProfileDetailMePdf

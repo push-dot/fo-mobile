@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
-import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
+import { type LinkKind, type MyPostsSort, type Offer, type Profile, type Settings } from '@push/api-client'
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
 import { mockUploadHeldAt, useSession } from '@/shared/infrastructure'
-import { marketingResult, nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
+import { marketingResult, nextEventFor, type PostsView, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
 import {
   acceptOffer,
   addLink,
@@ -32,6 +32,7 @@ import {
   fetchMyApplications,
   fetchMyBookmarks,
   fetchMyPosts,
+  fetchSavedPosts,
   fetchMyProfile,
   fetchOffer,
   fetchOfferMessages,
@@ -313,13 +314,24 @@ export const useMyFollowers = () =>
     queryFn: fetchFollowers,
   })
 
-export const useMyPosts = () => useQuery({ queryKey: ['me', 'posts'], queryFn: fetchMyPosts })
+export const useMyPosts = (sort: MyPostsSort = 'latest') =>
+  useQuery({ queryKey: ['me', 'posts', sort], queryFn: () => fetchMyPosts(sort) })
 
-export const useMyCommentedPosts = () =>
+export const useMyCommentedPosts = (sort: MyPostsSort = 'latest') =>
   useQuery({
-    queryKey: ['me', 'commented-posts'],
-    queryFn: fetchCommentedPosts,
+    queryKey: ['me', 'commented-posts', sort],
+    queryFn: () => fetchCommentedPosts(sort),
   })
+
+const POSTS_LISTS = {
+  mine: { key: 'posts', fetch: fetchMyPosts },
+  commented: { key: 'commented-posts', fetch: fetchCommentedPosts },
+  saved: { key: 'saved-posts', fetch: fetchSavedPosts },
+} as const
+
+/** The list behind the 내가 쓴 글 screen's current 보기 and 정렬; the other views are not fetched. */
+export const usePostsList = (view: PostsView, sort: MyPostsSort) =>
+  useQuery({ queryKey: ['me', POSTS_LISTS[view].key, sort], queryFn: () => POSTS_LISTS[view].fetch(sort) })
 
 export const useCalendarEvents = (from: string, to: string) =>
   useQuery({

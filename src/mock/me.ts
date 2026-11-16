@@ -15,7 +15,7 @@ import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from 
 import { appliedOnly } from '@/features/my/utils/applied-only'
 import { deadlineEvents } from './calendar-deadlines'
 import { removeChatDoc } from './chat'
-import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
+import { MOCK_USER_ID, mock, page, pdfResponse, sortPosts } from './server'
 
 const ME: UserRef = { id: MOCK_USER_ID, displayName: '김서준', avatarUrl: null }
 const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, headline: '' }
@@ -592,7 +592,11 @@ const commented = [
     displayName: '김태윤',
   }),
 ]
-mock('GET', 'me/posts', ({ query }) => page(myPosts, query, true))
+const sortedList = (items: Post[], query: URLSearchParams, total?: number) => {
+  const { rows, fail } = sortPosts(items, query)
+  return fail ?? (total === undefined ? page(rows, query, true) : withTotal(rows, query, total))
+}
+mock('GET', 'me/posts', ({ query }) => sortedList(myPosts, query))
 // social.ts owns `posts/:id` and 404s my ids, so index.ts loads this file first and these patterns
 // (regex, not :params) catch the mp* ids only. shortcut: only mp1 has a body and comments.
 mock('GET', 'posts/mp[0-9]+', ({ path }) => {
@@ -612,7 +616,9 @@ mock('GET', 'posts/mp[0-9]+/comments', ({ path, query }) =>
     query,
   ),
 )
-mock('GET', 'me/commented-posts', ({ query }) => withTotal(commented, query, 9))
+mock('GET', 'me/commented-posts', ({ query }) => sortedList(commented, query, 9))
+// The profile screen as a PDF; the sample file is the same stub the document export serves.
+mock('GET', 'me/profile/pdf', () => pdfResponse())
 
 // 제안함
 // push-be embeds only a posting stub in offers.

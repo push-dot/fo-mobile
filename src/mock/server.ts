@@ -28,6 +28,19 @@ trailer<</Root 1 0 R>>
 export const pdfResponse = () =>
   new Response(Uint8Array.from(PDF, (ch) => ch.charCodeAt(0)), { headers: { 'Content-Type': 'application/pdf' } })
 
+/**
+ * sort of me/posts, me/saved-posts and me/commented-posts like push-be: views and comments rank first and newest-first breaks ties (the lists are
+ * kept newest first, and sort is stable); an unknown sort is a 422.
+ */
+export const sortPosts = <T extends { viewCount: number; commentCount: number }>(items: T[], query: URLSearchParams) => {
+  const sort = query.get('sort') ?? 'latest'
+  if (!['latest', 'views', 'comments'].includes(sort)) {
+    return { fail: { status: 422, body: { error: { code: 'VALIDATION_ERROR', message: 'unsupported sort', details: { field: 'sort' } } } } }
+  }
+  const by = sort === 'views' ? 'viewCount' : sort === 'comments' ? 'commentCount' : null
+  return { rows: by ? [...items].sort((a, b) => b[by] - a[by]) : items }
+}
+
 /** Cursor page like push-be. Only GET postings reports `total`, so other lists leave it out too. */
 export const page = <T>(items: T[], query: URLSearchParams, withTotal = false) => {
   const limit = Number(query.get('limit') ?? 20)

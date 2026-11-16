@@ -1,6 +1,6 @@
 // Mock routes for the social area. Owned by that area's screens.
 import type { Comment, Post, PostCategory, UserRef } from '@push/api-client'
-import { MOCK_USER_ID, mock, page } from './server'
+import { MOCK_USER_ID, mock, page, sortPosts } from './server'
 
 const H = 3600_000
 const at = (hoursAgo: number) => new Date(Date.now() - hoursAgo * H).toISOString()
@@ -76,6 +76,23 @@ mock('POST', 'posts', ({ body }) => {
   }
   posts.unshift(p)
   return { status: 201, body: { data: p } }
+})
+
+// Posts the reader saved, newest save first (push-be post_saves); two are saved from the start so 저장한 글 has rows.
+const savedIds = ['post-3', 'post-5']
+mock('GET', 'me/saved-posts', ({ query }) => {
+  const { rows, fail } = sortPosts(savedIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean), query)
+  return fail ?? page(rows, query, true)
+})
+mock('POST', 'posts/:id/save', ({ params }) => {
+  if (!posts.some((p) => p.id === params.id)) return notFound
+  if (!savedIds.includes(params.id!)) savedIds.unshift(params.id!)
+  return { status: 204, body: null }
+})
+mock('DELETE', 'posts/:id/save', ({ params }) => {
+  const at = savedIds.indexOf(params.id!)
+  if (at >= 0) savedIds.splice(at, 1)
+  return { status: 204, body: null }
 })
 
 mock('GET', 'posts/:id/comments', ({ params, query }) => page(comments[params.id!] ?? [], query))

@@ -58,8 +58,8 @@ const Section = ({
   )
 }
 
-/** `share`: MyProfile has the 공유 button under the name; ProfileDetailMe has it in the header instead. */
-const ProfileTab = ({ share = true }: { share?: boolean }) => {
+/** `share`: MyProfile has the 공유 button under the name; ProfileDetailMe has it in the header instead. `onExport`: ProfileDetailMePdf adds 내보내기 beside 기본 정보 편집 (the profile as a PDF). */
+const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; onExport?: () => void; exporting?: boolean }) => {
   const c = useColors()
   const { data: p, isLoading } = useMyProfile()
   if (isLoading || !p) return <SkeletonRows {...LOADING_ROWS} />
@@ -106,6 +106,7 @@ const ProfileTab = ({ share = true }: { share?: boolean }) => {
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
           <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
+          {onExport ? <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={exporting} onPress={onExport} /> : null}
           {share ? (
             <Button label="공유" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })} />
           ) : null}

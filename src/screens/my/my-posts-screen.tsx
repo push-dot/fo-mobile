@@ -1,25 +1,24 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
-import { POST_CATEGORIES } from '@push/api-client'
+import { POST_CATEGORIES, type MyPostsSort } from '@push/api-client'
 import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
-import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, useMyCommentedPosts, useMyPosts, type PostsView } from '@/features/my'
+import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
   const [view, setView] = useState<PostsView>(box === 'commented' ? 'commented' : 'mine')
-  const mine = useMyPosts()
-  const replies = useMyCommentedPosts()
-  const query = view === 'commented' ? replies : mine
+  const [sort, setSort] = useState<MyPostsSort>('latest')
+  const query = usePostsList(view, sort)
   const posts = query.data?.data ?? []
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
         title={postsTitle(view)}
         onBack={() => router.back()}
-        right={<GlassButton actions={[{ icon: 'more', label: '더 보기', menu: postsMenu(view, setView) }]} />}
+        right={<GlassButton actions={[{ icon: 'more', label: '더 보기', menu: postsMenu({ view, sort }, { view: setView, sort: setSort }) }]} />}
       />
       {query.isLoading ? (
         <ListSkeleton />

@@ -1,4 +1,4 @@
-import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
+import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type MyPostsSort, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
 import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
 import { copyBody, copyVersionBody, profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
@@ -117,9 +117,11 @@ export const fetchFollows = () => api.me.follows(FIRST)
 
 export const fetchFollowers = () => api.me.followers(FIRST)
 
-export const fetchMyPosts = () => api.me.posts(FIRST)
+export const fetchMyPosts = (sort: MyPostsSort = 'latest') => api.me.posts({ ...FIRST, sort })
 
-export const fetchCommentedPosts = () => api.me.commentedPosts(FIRST)
+export const fetchCommentedPosts = (sort: MyPostsSort = 'latest') => api.me.commentedPosts({ ...FIRST, sort })
+
+export const fetchSavedPosts = (sort: MyPostsSort = 'latest') => api.me.savedPosts({ ...FIRST, sort })
 
 export const fetchSource = (id: string) => api.sources.get(id)
 

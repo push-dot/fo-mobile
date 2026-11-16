@@ -1,10 +1,18 @@
 import { router } from 'expo-router'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
-import { ProfileTab } from '@/features/my'
+import { useShareFile } from '@/features/chat'
+import { ProfileTab, useMyProfile } from '@/features/my'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
 import { DetailWebView, Glass, Text, TopBar, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
+
+// ProfileDetailMePdf: 내보내기 downloads the profile as a PDF and opens the share sheet.
+const OwnProfile = () => {
+  const { data: me } = useMyProfile()
+  const share = useShareFile()
+  return <ProfileTab share={false} exporting={share.isPending} onExport={me ? () => share.mutate({ profile: true, name: me.displayName }) : undefined} />
+}
 
 const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
@@ -43,7 +51,7 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
       {self ? (
         // ProfileDetailMe: the own profile is MyProfile's page, edited section by section like the 마이 edit pages.
         <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
-          <ProfileTab share={false} />
+          <OwnProfile />
         </ScrollView>
       ) : (
         <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} />
