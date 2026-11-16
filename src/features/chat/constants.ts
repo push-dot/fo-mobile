@@ -84,10 +84,8 @@ export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 �
 export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
 export const LINK_UNDO = '되돌리기'
 export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
-export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
-export const CONSENT_LATER = '나중에'
 /** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
 export const DEFAULT_DOC = '허브 프로필'
 const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`
