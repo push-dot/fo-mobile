@@ -16,7 +16,10 @@ name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
 - tapOn: "메시지.*"
 - inputText: "홈행확인"
 - tapOn: "보내기"
+- waitForAnimationToEnd
+- takeScreenshot: dbg15-sent
 - tapOn: "뒤로"
+- takeScreenshot: dbg15-home
 - extendedWaitUntil:
     visible: "홈행확인"
     timeout: 15000
