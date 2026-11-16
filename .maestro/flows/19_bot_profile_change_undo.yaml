@@ -17,6 +17,10 @@ name: 봇이 프로필을 고치면 다시 열어도 되돌리기가 보이고, 
 - extendedWaitUntil:
     visible: "프로필을 고쳤어요."
     timeout: 40000
+# The run is over (reply shown) before the chat is left, so the reopen reads the stored turn, not a run still going.
+- extendedWaitUntil:
+    visible: "한 줄 소개를 바꿨어요."
+    timeout: 15000
 - extendedWaitUntil:
     visible: "되돌리기"
     timeout: 15000
