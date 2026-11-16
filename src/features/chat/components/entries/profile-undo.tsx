@@ -20,11 +20,15 @@ const ProfileUndo = ({ changeId }: { changeId: string }) => {
     },
     onError: (error) => {
       // 409: another screen or device already put it back.
-      if (error instanceof ApiError && error.status === 409) return void queryClient.invalidateQueries({ queryKey: key })
+      if (error instanceof ApiError && error.status === 409) {
+        void queryClient.invalidateQueries({ queryKey: key })
+        return void queryClient.invalidateQueries({ queryKey: ['me', 'profile'] })
+      }
       Alert.alert('되돌리지 못했어요', '잠시 뒤에 다시 해 주세요.')
     },
   })
-  if (change.isError) return null
+  // Only a change that is not the caller's is hidden; a failed read (offline) still lets the person try.
+  if (change.error instanceof ApiError && change.error.status === 404 && !undo.isSuccess) return null
   return change.data?.undone || undo.isSuccess ? (
     <Text v="b2" color="t3">
       {UNDONE}
