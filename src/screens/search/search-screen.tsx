@@ -7,14 +7,11 @@ import {
   PersonRow,
   PostingRow,
   PostRow,
-  SEARCH_CLEAR_LABEL,
-  SEARCH_EMPTY_BODY,
   SEARCH_ERROR_LINES,
   SEARCH_RETRY_LABEL,
   SEARCH_SKELETON,
   SEARCH_SORTS,
   SearchBar,
-  searchEmptyTitle,
   TABS,
   useRecentSearches,
   useSearch,
@@ -24,7 +21,7 @@ import {
   type SearchSort,
   type SearchTab,
 } from '@/features/search'
-import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text, emptyNoteStyle } from '@/shared/components'
+import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
@@ -195,13 +192,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
               <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ flex: 1, justifyContent: 'center' }} />
-            ) : (
-              <StatusNote
-                lines={[searchEmptyTitle(q), SEARCH_EMPTY_BODY]}
-                action={{ label: SEARCH_CLEAR_LABEL, onPress: () => search('') }}
-                style={emptyNoteStyle(160)}
-              />
-            )
+            ) : undefined
           }
         />
       )}

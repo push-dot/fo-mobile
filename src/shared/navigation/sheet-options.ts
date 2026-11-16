@@ -17,6 +17,12 @@ export const sheetOptions = (c: Colors, detents: SheetDetents = 'fitToContents')
   }
 }
 
+/** A sheet over scrolling content (the filters): the design's 84% sheet tint keeps the cards behind from colouring the system material. */
+export const tintedSheetOptions = (c: Colors, detents?: SheetDetents): NativeStackNavigationOptions => {
+  const o = sheetOptions(c, detents)
+  return Platform.OS === 'android' ? o : { ...o, contentStyle: { backgroundColor: c.sheet } }
+}
+
 /** A sheet drawn to the top of the screen: iOS attaches it 10pt under the status bar, opaque; Android right under it. */
 export const fullSheetOptions = (c: Colors): NativeStackNavigationOptions => ({ ...sheetOptions(c, [1]), contentStyle: { backgroundColor: c.bg } })
 
