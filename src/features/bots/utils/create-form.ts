@@ -19,7 +19,7 @@ export type CreatePhase =
   | { kind: 'error'; posting: PostingPick }
   | { kind: 'limit' }
 
-export type CreateForm = { phase: CreatePhase; color: BotColor; consent: boolean }
+export type CreateForm = { phase: CreatePhase; color: BotColor }
 
 export type CreateAction = { action: 'none' } | { action: 'create'; posting: PostingPick; color: BotColor }
 
@@ -43,7 +43,6 @@ export const postingOf = (phase: CreatePhase): PostingPick | null => ('posting' 
 export const initialForm = (): CreateForm => ({
   phase: { kind: 'idle' },
   color: BOT_COLORS[0],
-  consent: false,
 })
 
 export const chooseColor = (form: CreateForm, color: BotColor): CreateForm => ({ ...form, color })
@@ -96,7 +95,7 @@ export const onPostingChosen = (existing: { id: string } | null, posting: Postin
   existing ? { type: 'open', botId: existing.id } : { type: 'pick', posting }
 
 export const submitCreate = (form: CreateForm): CreateAction => {
-  if (form.consent || form.phase.kind !== 'picked') return { action: 'none' }
+  if (form.phase.kind !== 'picked') return { action: 'none' }
   return { action: 'create', posting: form.phase.posting, color: form.color }
 }
 
@@ -108,14 +107,11 @@ export const retryCreate = (form: CreateForm): CreateAction => {
 export const beginCreate = (form: CreateForm): CreateForm => {
   const action = form.phase.kind === 'error' ? retryCreate(form) : submitCreate(form)
   if (action.action !== 'create') return form
-  return { ...form, consent: false, phase: { kind: 'creating', posting: action.posting } }
+  return { ...form, phase: { kind: 'creating', posting: action.posting } }
 }
 
-export const dismissConsent = (form: CreateForm): CreateForm => ({ ...form, consent: false })
-
-export const failCreate = (form: CreateForm, reason: 'limit' | 'error' | 'consent'): CreateForm => {
+export const failCreate = (form: CreateForm, reason: 'limit' | 'error'): CreateForm => {
   if (reason === 'limit') return { ...form, phase: { kind: 'limit' } }
-  if (reason === 'consent') return { ...form, consent: true }
   const posting = postingOf(form.phase)
   if (!posting) return form
   return { ...form, phase: { kind: 'error', posting } }

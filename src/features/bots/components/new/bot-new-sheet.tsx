@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { ApiError } from '@push/api-client'
-import { useReferenceConsent } from '@/features/my'
 import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
-import { showConsentModal } from '@/shared/navigation'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
@@ -20,7 +17,6 @@ import {
   chooseColor,
   clearPosting,
   closeSearch,
-  dismissConsent,
   failCreate,
   focusSearch,
   initialForm,
@@ -46,7 +42,6 @@ import BotLimitDelete from './bot-limit-delete'
 import {
   CANCEL_LABEL,
   CLOSE_LABEL,
-  CONSENT_COPY,
   CREATE_LABEL,
   CREATING_LABEL,
   CURRENT_PLAN,
@@ -97,7 +92,6 @@ const FIELD_DIS = 0.55
 const CTA_XL = 64
 const CTA_FONT_XL = 21
 
-const isConsentRequired = (error: unknown) => error instanceof ApiError && error.status === 403 && error.code === 'CONSENT_REQUIRED'
 
 const pickedLine = (posting: PostingPick) => `${posting.company} · ${posting.title}`
 
@@ -225,7 +219,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const limitFrom = useRef<PostingPick | null>(null)
   const bots = useBots()
   const removeBot = useDeleteBot()
-  const consent = useReferenceConsent()
   const { create } = useCreateBot()
   const openRef = useRef(onOpenBot)
   useEffect(() => {
@@ -329,15 +322,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   }, [phase])
 
   const run = async (base: CreateForm) => {
-    const action = base.phase.kind === 'error' ? retryCreate(base) : submitCreate(dismissConsent(base))
+    const action = base.phase.kind === 'error' ? retryCreate(base) : submitCreate(base)
     if (action.action !== 'create') return
     setForm(beginCreate(base))
     try {
       const result = await create({ postingId: action.posting.postingId, color: action.color })
       openRef.current(result.bot.id)
     } catch (error) {
-      if (isConsentRequired(error)) setForm(failCreate(base, 'consent'))
-      else if (botErrorKind(error) === 'limit') {
+      if (botErrorKind(error) === 'limit') {
         limitFrom.current = postingOf(base.phase)
         setForm(failCreate(base, 'limit'))
       }
@@ -359,16 +351,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     ])
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per failure, not per render
   }, [failed])
-
-  // BotNewConsent: the regular modal; 동의하고 시작하기 saves the consent and creates the bot.
-  useEffect(() => {
-    if (!form.consent) return
-    showConsentModal(CONSENT_COPY, {
-      onLater: () => setForm(dismissConsent),
-      onAgree: () => consent.grant(undefined, { onSuccess: () => void run(dismissConsent(form)) }),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per consent request, not per render
-  }, [form.consent])
 
   const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')
   const onDeleteBot = (bot: CompanyBot) =>
