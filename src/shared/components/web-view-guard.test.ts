@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bootScript, loadsInWebView, tokenEventScript } from './detail-url'
+import { bootScript, loadsInWebView, tokenEventScript, webViewNavigation } from './detail-url'
 
 const WEB = 'https://push-fo-web.example.dev'
 
@@ -47,4 +47,26 @@ describe('WebView navigation', () => {
   ])('does not load %s in the token-bearing WebView', (url) => {
     expect(loadsInWebView(url, WEB)).toBe(false)
   })
+})
+
+describe('WebView navigation routing', () => {
+  it.each([`${WEB}/postings/p1?theme=dark`, WEB, 'about:blank'])('loads %s in the WebView', (url) => {
+    expect(webViewNavigation(url, WEB)).toBe('load')
+  })
+
+  it.each([
+    'https://other.example/page',
+    'http://other.example/',
+    'https://push-fo-web.example.dev.attacker.test/',
+    'https://push-fo-web.example.dev@attacker.test/',
+  ])('sends %s to the browser', (url) => {
+    expect(webViewNavigation(url, WEB)).toBe('browser')
+  })
+
+  it.each(['intent://scan#Intent;scheme=zxing;end', 'push://open/settings', 'tel:+821012345678', 'javascript:alert(1)', 'file:///etc/passwd', 'mailto:a@b.test', ''])(
+    'ignores %s',
+    (url) => {
+      expect(webViewNavigation(url, WEB)).toBe('ignore')
+    },
+  )
 })

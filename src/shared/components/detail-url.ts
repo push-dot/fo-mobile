@@ -34,6 +34,10 @@ const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[
 /** Only fo-web itself may load in the WebView: the page gets the session token, and react-native-webview's originWhitelist matches by prefix. */
 export const loadsInWebView = (url: string, base: string) => url === 'about:blank' || originOf(url) === originOf(base)
 
+/** Where a navigation goes: fo-web loads in place, other http(s) pages open in the system browser, everything else (intent:, push:, tel:, javascript:) is dropped. */
+export const webViewNavigation = (url: string, base: string): 'load' | 'browser' | 'ignore' =>
+  loadsInWebView(url, base) ? 'load' : /^https?:\/\//i.test(url) ? 'browser' : 'ignore'
+
 const onWebOrigin = (base: string, script: string) => `if(location.origin===${JSON.stringify(originOf(base))}){${script}}true;`
 
 export const bootScript = (base: string, env: Record<string, unknown>, extra = '') =>
