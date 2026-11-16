@@ -33,7 +33,7 @@ describe('materialRow', () => {
     [posting(day(11, 12)), '도토리증권 · 서버 개발자', '공고 · 마감 11월 12일(D-3) · 북마크 10월 30일'],
     [posting(day(11, 20), '모아페이', '백엔드 엔지니어'), '모아페이 · 백엔드 엔지니어', '공고 · 마감 11월 20일 · 북마크 10월 30일'],
     [posting(null, '누리클라우드', '플랫폼 엔지니어'), '누리클라우드 · 플랫폼 엔지니어', '공고 · 상시 채용 · 북마크 10월 30일'],
-    [link('https://github.com/seojun-kim', 'github'), 'github.com', '링크 · GitHub · 10월 3일 추가'],
+    [link('https://github.com/seojun-kim', 'github'), 'github.com/seojun-kim', '링크 · GitHub · 10월 3일 추가'],
     [link('https://seojun.dev/blog/payment-retry', 'blog'), 'seojun.dev', '링크 · 블로그 · 10월 3일 추가'],
     [link('https://linkedin.com/in/seojun-kim', 'linkedin'), 'linkedin.com', '링크 · LinkedIn · 10월 3일 추가'],
     [link('https://careers.nuricloud.co.kr/jobs/a?utm_source=push', 'job'), 'careers.nuricloud.co.kr', '링크 · 채용 페이지 · 10월 3일 추가'],
@@ -44,7 +44,11 @@ describe('materialRow', () => {
   it.each([
     ['https://www.google.com/search?q=x', 'google.com'],
     ['http://user:pw@seojun.dev:8080/a#b', 'seojun.dev'],
-    ['github.com/seojun-kim', 'github.com'],
+    ['github.com/seojun-kim', 'github.com/seojun-kim'],
+    ['https://www.github.com/cyjoon68/', 'github.com/cyjoon68'],
+    ['https://github.com/cyjoon68/pay-gw?tab=readme', 'github.com/cyjoon68'],
+    ['https://github.com', 'github.com'],
+    ['https://gist.github.com/cyjoon68', 'gist.github.com'],
   ])('reads the host of %s', (url, host) => {
     expect(hostOf(url)).toBe(host)
   })

@@ -2,10 +2,9 @@ import { ApiError } from '@push/api-client'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { View } from 'react-native'
-import { PageModal } from '@/features/chat'
-import { Button, GlassButton, Spinner, Text, askConfirm, showToast } from '@/shared/components'
+import { Button, Sheet, Spinner, Text, askConfirm, showToast } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing, type } from '@/theme'
+import { spacing } from '@/theme'
 import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
 import {
   CITED,
@@ -18,14 +17,11 @@ import {
   UNDO_LABEL,
 } from '../constants'
 import type { Material, MaterialKind } from '../types'
-import { NOUN, deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
+import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
 import MaterialFacts from './material-facts'
 import { useInMaterialsModal } from './in-materials-modal'
 import { sendMaterial } from './send-material'
 import { useSearchRoom } from './materials-search'
-
-// The board's .pname inherits -.02em resolved at the page's 16px (-0.32px), not the h2 token's -0.025em of 22px.
-const TITLE_TRACKING = type.b1.letterSpacing
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
@@ -46,7 +42,7 @@ const open = (m: Material, inModal: boolean) => {
 /** DELETE answers 409 for a file a career row still cites. */
 const cited = (error: unknown) => error instanceof ApiError && error.status === 409
 
-/** MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink, MaterialDetailLong, MaterialDetailDelete: a page pushed inside the 자료 modal. */
+/** MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink, MaterialDetailLong, MaterialDetailDelete: a regular sheet over the 자료 modal (owner 2026-11-16: not a page-style modal). */
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const remove = useDeleteMaterial()
@@ -54,25 +50,24 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   const now = useMemo(() => new Date(), [])
   const toastBottom = useSearchRoom().toast
   const inModal = useInMaterialsModal()
-  const back = <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => router.back() }]} />
 
   const m = detail.data?.material
   if (!m) {
     return (
-      <PageModal title={NOUN[kind]} left={back} page={!inModal} mpage={inModal} scroll={false}>
+      <Sheet>
         {detail.isError ? (
-          <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[6] }}>
+          <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[4] }}>
             <Text v="b2" color="t3">
               {LOAD_ERROR.title}
             </Text>
             <Button label={LOAD_ERROR.retry} variant="secondary" size="sm" onPress={detail.refetch} />
           </View>
         ) : (
-          <View style={{ alignItems: 'center', paddingVertical: spacing[6] }}>
+          <View style={{ alignItems: 'center', paddingVertical: spacing[4] }}>
             <Spinner />
           </View>
         )}
-      </PageModal>
+      </Sheet>
     )
   }
 
@@ -97,39 +92,17 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   const facts = detailFacts(m, detail.data?.usedBy ?? [], now)
 
   return (
-    <PageModal
-      title={NOUN[m.kind]}
-      left={back}
-      page={!inModal}
-      mpage={inModal}
-      right={
-        <GlassButton
-          filled
-          iconSize={21}
-          actions={[
-            {
-              icon: 'delete',
-              label: DELETE_LABEL,
-              color: 'red',
-              onPress: () => askConfirm({ title: copy.title, body: copy.body, confirm: DELETE_CONFIRM, danger: true, onConfirm: onDelete }),
-            },
-          ]}
+    <Sheet title={detailTitle(m)}>
+      <MaterialFacts facts={facts} />
+      <View style={{ gap: spacing[2] }}>
+        <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
+        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
+        <Button
+          label={DELETE_LABEL}
+          variant="secondary"
+          onPress={() => askConfirm({ title: copy.title, body: copy.body, confirm: DELETE_CONFIRM, danger: true, onConfirm: onDelete })}
         />
-      }
-      footer={
-        <View style={{ gap: spacing[2], marginHorizontal: inModal ? 0 : spacing[1] }}>
-          <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
-          <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
-        </View>
-      }
-    >
-      {/* .pname sits 30 above the card: its 14 margin (MaterialFacts) and the page gap of 16. */}
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: spacing[4] }}>
-        <Text v="h2" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30, letterSpacing: TITLE_TRACKING }}>
-          {detailTitle(m)}
-        </Text>
-        <MaterialFacts facts={facts} />
       </View>
-    </PageModal>
+    </Sheet>
   )
 }

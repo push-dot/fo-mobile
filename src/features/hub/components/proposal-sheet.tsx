@@ -53,7 +53,7 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, on
       {postings.length ? (
         <View style={{ gap: spacing[3] }}>
           <Text v="b2" weight="700">
-            함께 보낼 공고 (선택)
+            함께 보낼 우리 회사 공고 (선택)
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: -bleed }} contentContainerStyle={{ gap: spacing[2], paddingRight: bleed }}>
             {postings.map((p) => (
