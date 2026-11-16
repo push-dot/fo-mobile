@@ -55,6 +55,7 @@ import {
   useChatLimit,
   useDraftStore,
   useFind,
+  useReadWhileOpen,
   useUnseen,
   type ChatItem,
 } from '@/features/chat'
@@ -161,6 +162,7 @@ const Thread = ({ id }: { id: string }) => {
     return () => clearTimeout(timer)
   }, [])
   const unseen = useUnseen(chat.items, atBottom)
+  useReadWhileOpen(bot.data, atBottom)
   const reduceMotion = useReduceMotion()
   const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items), attention: !!chat.approval && !inThread })
   const list = useRef<FlatList<ThreadRow>>(null)
