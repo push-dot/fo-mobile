@@ -4,6 +4,7 @@ import { searchHangul } from '@push/shared'
 import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
 import { usePhoneAuth } from '../features/auth/stores'
+import { softPad } from '../features/auth/utils/soft-pad'
 import { MOCK_USER_ID, mock, page } from './server'
 
 // Search-only samples; hub/social own their full fixtures.
@@ -161,3 +162,8 @@ mock('POST', 'auth/phone/verify', ({ body }) => {
   if (!existing) forgetRequiredTerms()
   return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: !existing } }
 })
+
+/** The phone field takes focus without raising the pad, as the boards draw it (links.ts `no-pad`). */
+export const hidePhonePad = () => {
+  softPad.shown = false
+}
