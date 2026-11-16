@@ -45,6 +45,7 @@ export const useApplyPosting = (postingId: string, onApplied: () => void) => {
     onSuccess: () => {
       qc.setQueryData(['postings', 'detail', postingId], (p: PostingDetail | undefined) => (p ? { ...p, applied: true } : p))
       void qc.invalidateQueries({ queryKey: ['postings'] })
+      void qc.invalidateQueries({ queryKey: ['calendar'] })
       onApplied()
     },
   })
