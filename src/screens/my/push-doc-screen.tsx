@@ -11,7 +11,6 @@ import {
   DOC_COPY_COPY,
   deleteConfirm,
   deleteDocCopy,
-  FitRing,
   ListSkeleton,
   FIX_DOC,
   hubProfile,
@@ -34,9 +33,9 @@ import {
 } from '@/features/my'
 import { showChoiceModal } from '@/shared/navigation'
 import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
-import { lineRing, radius, spacing, useColors } from '@/theme'
+import { radius, spacing, useColors } from '@/theme'
 
-const HUB_BADGE = '지원 서류용 프로필(허브형)'
+const HUB_BADGE = '지원용 프로필'
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
 
@@ -137,7 +136,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
-        title={application ? undefined : '지원 서류용 프로필'}
+        title={application ? undefined : '지원용 프로필'}
         onBack={() => router.back()}
         right={
           <GlassButton
@@ -153,43 +152,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: application ? 120 : spacing[6], gap: spacing[6] }}>
-          {application ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`${lines.company} ${lines.title} 공고 보기`}
-              onPress={() => router.push(`/postings/${application.jobId}`)}
-              style={{
-                marginHorizontal: spacing[5],
-                marginTop: spacing[2],
-                borderRadius: radius.card,
-                ...lineRing(c),
-                backgroundColor: c.paper,
-                paddingVertical: spacing[4],
-                paddingLeft: spacing[5],
-                paddingRight: spacing[4],
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing[4],
-              }}
-            >
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
-                  <Text v="h3" weight="800" numberOfLines={1} style={{ flexShrink: 1, letterSpacing: -0.51 }}>
-                    {lines.title}
-                  </Text>
-                  <Text v="c1" weight="600" color="t2" numberOfLines={1}>
-                    {lines.company}
-                  </Text>
-                </View>
-                <Text v="c1" weight="600" color="t2" style={{ marginTop: spacing[1] }}>
-                  공고 보기 ›
-                </Text>
-              </View>
-              {lines.score ? <FitRing score={lines.score} /> : null}
-            </Pressable>
-          ) : null}
-
-          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: application ? 0 : spacing[1] }}>
+          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
             <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl ?? null} size={84} />
             <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
               {me?.displayName}
@@ -213,7 +176,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
                 paddingX={18}
                 disabled={setBase.isPending}
                 onPress={() =>
-                  showChoiceModal({ title: SET_BASE_COPY.action, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.action, onPress: () => setBase.mutate(id) } })
+                  showChoiceModal({ title: SET_BASE_COPY.action, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.confirm, closeLabel: SET_BASE_COPY.close, onPress: () => setBase.mutate(id) } })
                 }
                 style={{ marginTop: PROFILE_ACTIONS_TOP }}
               />
@@ -287,7 +250,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
             onPress={() => void start(FIX_DOC, FIX_DOC, doc.data?.data.title, undefined, undefined, { documentId: id })}
           />
           <Button
-            label={applied ? '지원 완료' : '이 공고에 지원'}
+            label={applied ? '지원 완료' : '이 서류로 지원'}
             pending={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}

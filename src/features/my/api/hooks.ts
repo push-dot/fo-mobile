@@ -131,7 +131,7 @@ export const useConvertDocument = (onDone: (documentId: string, jobId?: string) 
       void qc.invalidateQueries({ queryKey: ['documents'] })
       if (data.documentId) onDone(data.documentId, data.jobId)
     },
-    onError: () => Alert.alert('지원 서류용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('지원용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
 
@@ -364,19 +364,6 @@ export const useResumeDraft = (id: string) =>
     queryKey: ['me', 'sources', id, 'draft'],
     queryFn: () => myApi.resumeDraft(id),
   })
-
-export const useApplyResumeProfile = (onDone: () => void) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (patch: Partial<Profile>) => updateProfile(patch),
-    onSuccess: (p) => {
-      qc.setQueryData(['me', 'profile'], p)
-      onDone()
-      router.dismissTo({ pathname: '/my', params: { tab: 'profile' } })
-    },
-    onError: () => Alert.alert('프로필에 반영하지 못했어요', '잠시 뒤에 다시 반영해 주세요.'),
-  })
-}
 
 type Patch = Partial<Profile> & { avatarKey?: string }
 

@@ -15,8 +15,8 @@ export type ChoiceModalRequest = {
     confirmLabel: (selected: number, on: boolean) => string
     onConfirm: (selected: number, on: boolean) => void
   }
-  /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void }
+  /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. `closeLabel` adds a 닫기 button left of it (DocProfileConfirm, owner 2026-11-16). */
+  confirm?: { label: string; onPress: () => void; closeLabel?: string }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

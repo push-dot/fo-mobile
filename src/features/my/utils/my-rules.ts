@@ -60,9 +60,18 @@ export const SIZE_LIMIT = {
 
 export const profileConvertBody = () => ({})
 
+/** 내 프로필(기본) and 지원용 프로필(Push 서류) are two things: converting a file makes the second and leaves the first as it is (owner rule 50). */
+export const DOC_TO_PROFILE_COPY = {
+  action: '만들기',
+  title: '지원용 프로필로 만들까요?',
+  body: '이 이력서로 지원용 프로필을 새로 만들어요. 내 프로필(기본)은 바뀌지 않아요.',
+} as const
+
 export const SET_BASE_COPY = {
   action: '기본 프로필로 설정',
-  body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
+  close: '닫기',
+  confirm: '적용',
+  body: '허브에 보이는 내 프로필(기본)이 이 지원용 프로필의 내용으로 바뀌어요.',
 } as const
 
 export const setBaseProfilePath = (id: string) => `documents/${id}/base-profile`

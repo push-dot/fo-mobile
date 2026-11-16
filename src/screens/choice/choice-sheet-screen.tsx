@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import { Sheet, Switch, Text } from '@/shared/components'
+import { Button, Sheet, Switch, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
 import { iosSeparator, spacing, useColors, useThemeMode } from '@/theme'
 
@@ -27,10 +27,11 @@ const ChoiceSheetScreen = () => {
     router.back()
     setTimeout(onPress, CHOICE_HANDOFF_MS)
   }
-  const confirm = form ? { label: form.confirmLabel(selected, on), onPress: () => form.onConfirm(selected, on) } : request.confirm
+  const confirm: { label: string; onPress: () => void; closeLabel?: string } | undefined = form ? { label: form.confirmLabel(selected, on), onPress: () => form.onConfirm(selected, on) } : request.confirm
+  const closeLabel = confirm?.closeLabel
   const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
-    <Sheet gap={4} actionGap={10} slimAction action={confirm ? { label: confirm.label, onPress: () => run(confirm.onPress) } : undefined}>
+    <Sheet gap={4} actionGap={10} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress) } : undefined}>
       <View style={{ minHeight: 52, justifyContent: 'center' }}>
         <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {request.title}
@@ -86,6 +87,12 @@ const ChoiceSheetScreen = () => {
               <Switch value={on} onValueChange={setOn} label={form.toggle.label} />
             </View>
           ) : null}
+        </View>
+      ) : null}
+      {confirm && closeLabel ? (
+        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: 10 }}>
+          <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={{ flex: 1, minHeight: 52, borderRadius: 26 }} />
+          <Button label={confirm.label} onPress={() => run(confirm.onPress)} style={{ flex: 1, minHeight: 52, borderRadius: 26 }} />
         </View>
       ) : null}
     </Sheet>
