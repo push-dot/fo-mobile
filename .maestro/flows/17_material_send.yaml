@@ -24,7 +24,7 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     timeout: 15000
 - runFlow: _dismiss_approval.yaml
 - extendedWaitUntil:
-    visible: "김서준_백엔드_이력서"
+    visible: "김서준_백엔드_이력서 첨부 빼기"
     timeout: 15000
 - takeScreenshot: 17_material_send
 - tapOn: "뒤로"

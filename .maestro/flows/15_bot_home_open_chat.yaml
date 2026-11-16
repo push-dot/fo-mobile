@@ -6,13 +6,10 @@ name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
 # The chat asks the company-Bot consent on its first message (ChatConsentCompany); consent-on answers it ahead.
 - openLink: push://bots?mock=consent-on
 - extendedWaitUntil:
-    visible: ".*모아페이 Bot.*"
+    visible: ".*누리클라우드 Bot.*"
     timeout: 10000
-- tapOn: ".*모아페이 Bot.*"
-- extendedWaitUntil:
-    visible: "이 변경을 이력서에 반영할까요?"
-    timeout: 15000
-- runFlow: _dismiss_approval.yaml
+# 모아페이 holds a pending approval whose question the row keeps showing (확인 필요), so this flow uses a Bot with none.
+- tapOn: ".*누리클라우드 Bot.*"
 - extendedWaitUntil:
     visible: "메시지.*"
     timeout: 15000
