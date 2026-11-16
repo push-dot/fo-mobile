@@ -84,6 +84,10 @@ mock('PATCH', 'me/profile', ({ body }) => {
   return { data: profile }
 })
 
+// A Bot profile change kept by the server; the mock keeps none, so the 되돌리기 line of a mock chat is never drawn.
+mock('GET', 'me/profile/changes/:id', () => notFound)
+mock('POST', 'me/profile/changes/:id/undo', () => notFound)
+
 // 서류 (sources)
 const src = (id: string, fileName: string, size: number, createdAt: string): Source => ({
   id,

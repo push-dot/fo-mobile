@@ -16,7 +16,7 @@ export type ChatItem =
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
   /** `card` is the plan that came right after the text, `diff` the edit: the bubble draws them under the text (ChatPh1Feedback, ChatApprove). */
   /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */
-  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem; diff?: Extract<ChatItem, { type: 'diff' }>; result?: Extract<ChatItem, { type: 'result' }>; /** The run saved the profile at once: the line draws 되돌리기 (rule 39). */ undo?: true }
+  | { type: 'agentText'; id: string; text: string; detail?: string; bullets?: string[]; sources?: BotContract.Attachment[]; card?: PlanItem; diff?: Extract<ChatItem, { type: 'diff' }>; result?: Extract<ChatItem, { type: 'result' }>; /** The changeId of a profile the run saved at once: the line draws 되돌리기, read from the server (rule 39). */ undo?: string }
   /** How a run ended badly, drawn as a bubble (ChatInterrupt, ChatVerifyFail). */
   | { type: 'notice'; id: string; notice: Notice }
   | { type: 'think'; id: string; seconds: number }
