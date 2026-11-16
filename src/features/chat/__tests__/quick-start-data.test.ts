@@ -2,6 +2,7 @@ import type { Application, Offer, Posting, Profile } from '@push/api-client'
 import { brandColor } from '@push/shared'
 import { registerMockBrandColors } from '@push/shared/mock-brand'
 import { describe, expect, it, vi } from 'vitest'
+import { QUICK_STARTS } from '../constants'
 import { docMeta, initialPicks, postingMeta, quickStartFrom, startLink } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
@@ -10,6 +11,10 @@ vi.mock('@/features/my', async () => {
 })
 
 const now = new Date('2026-10-21T09:00:00')
+
+it('leads the quick starts with the calendar, the main use', () => {
+  expect(QUICK_STARTS[0]!.key).toBe('calendar')
+})
 const posting = (id: string, deadline: string | null, career = { careerMin: 4, careerMax: 6 as number | null }) =>
   ({ id, company: '모아페이', title: '백엔드', location: '서울 강남구', deadline, ...career }) as Posting
 const person = (userId: string) => ({ userId, displayName: '오지현', headline: '프론트엔드' }) as Profile

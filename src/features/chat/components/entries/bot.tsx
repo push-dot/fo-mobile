@@ -15,6 +15,7 @@ import { Appear } from '../motion'
 import { FindHighlight, FindText, Marked } from '../header/highlight'
 import Detail from './detail'
 import MdTable from './md-table'
+import ProfileUndo from './profile-undo'
 import ResultLine from './result-line'
 import Rich, { plainOf } from './rich'
 
@@ -166,6 +167,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
           </View>
         ),
       )}
+      {item.undo ? <ProfileUndo id={item.id} /> : null}
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}
