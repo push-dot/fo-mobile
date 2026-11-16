@@ -18,6 +18,7 @@ import {
   formatNational,
   mapPhoneAuthError,
   otpErrorAfterInput,
+  otpResendSlot,
   needsTerms,
   phoneFailureLine,
   readConsents,
@@ -111,7 +112,7 @@ const OtpScreen = () => {
   const notice = otpError === 'invalid' ? OTP_INVALID : otpError === 'expired' ? OTP_EXPIRED : error
 
   const status =
-    remaining > 0 ? (
+    otpResendSlot(remaining) === 'countdown' ? (
       <Text v="c1" weight="600" color="t2" style={{ flex: 1, fontVariant: ['tabular-nums'] }}>
         {countdownLabel(remaining)}
       </Text>

@@ -9,6 +9,7 @@ import {
   loginFailureCopy,
   mapPhoneAuthError,
   otpErrorAfterInput,
+  otpResendSlot,
   remainingSeconds,
   showAppleButton,
   toE164,
@@ -96,5 +97,13 @@ describe('otpErrorAfterInput', () => {
 
   it('keeps the error when the same full code comes back unchanged', () => {
     expect(otpErrorAfterInput('invalid', '482111', '482111')).toBe('invalid')
+  })
+})
+
+describe('resend under a wrong code', () => {
+  it('counts down while the server cooldown runs and offers the resend link once it ends, whatever the error', () => {
+    expect([168, 1].map(otpResendSlot)).toEqual(['countdown', 'countdown'])
+    expect(otpResendSlot(remainingSeconds(10_000, 10_000))).toBe('resend')
+    expect(otpResendSlot(remainingSeconds(5_000, 10_000))).toBe('resend')
   })
 })
