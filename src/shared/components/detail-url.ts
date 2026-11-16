@@ -28,3 +28,16 @@ export const HOLD_FIT_SCRIPT =
 /** Mock only (JobDetailStates): the fit card reads `mockFit.score` once the document is known, so a getter that throws turns the fit request into an error and the card says 적합도는 곧 볼 수 있어요 with the document and three dashes. fo-web runs from its dev server, so the mock module has a stable URL and this import gets the page's own instance. */
 export const SOON_FIT_SCRIPT =
   "import(location.origin+'/src/shared/api/mock.ts').then(function(m){Object.defineProperty(m.mockFit,'score',{get:function(){throw new Error('mock fit soon')},configurable:true})});"
+
+const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0] ?? null
+
+/** Only fo-web itself may load in the WebView: the page gets the session token, and react-native-webview's originWhitelist matches by prefix. */
+export const loadsInWebView = (url: string, base: string) => url === 'about:blank' || originOf(url) === originOf(base)
+
+const onWebOrigin = (base: string, script: string) => `if(location.origin===${JSON.stringify(originOf(base))}){${script}}true;`
+
+export const bootScript = (base: string, env: Record<string, unknown>, extra = '') =>
+  onWebOrigin(base, `window.__PUSH__=${JSON.stringify(env)};${extra}`)
+
+export const tokenEventScript = (base: string, token: string | null) =>
+  onWebOrigin(base, `window.dispatchEvent(new CustomEvent('push:token',{detail:{token:${JSON.stringify(token)}}}));`)

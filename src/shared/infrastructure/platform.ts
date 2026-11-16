@@ -5,8 +5,11 @@ import * as ImagePicker from 'expo-image-picker'
 import * as ExpoLinking from 'expo-linking'
 import * as WebBrowser from 'expo-web-browser'
 import { Linking, Platform, Share } from 'react-native'
+import { OPENABLE_URL, WEB_URL } from './constants'
 
-export const openBrowser = (url: string) => WebBrowser.openBrowserAsync(url)
+export const openBrowser = async (url: string) => {
+  if (WEB_URL.test(url)) await WebBrowser.openBrowserAsync(url)
+}
 
 export const openAuthSession = (url: string, redirectUri: string) =>
   WebBrowser.openAuthSessionAsync(url, redirectUri)
@@ -95,7 +98,9 @@ export const hapticNotify = (kind: 'success' | 'warning') =>
 
 export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content)
 
-export const openUrl = (url: string) => Linking.openURL(url)
+export const openUrl = async (url: string) => {
+  if (OPENABLE_URL.test(url)) await Linking.openURL(url)
+}
 
 export const copyText = (text: string) => Clipboard.setStringAsync(text)
 
