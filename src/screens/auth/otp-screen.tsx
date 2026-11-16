@@ -174,13 +174,7 @@ const OtpScreen = () => {
           />
         </View>
         {notice ? (
-          <Text
-            v="c1"
-            weight="600"
-            color="red"
-            accessibilityRole="alert"
-            style={{ marginTop: spacing[3] }}
-          >
+          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[3] }}>
             {notice}
           </Text>
         ) : null}
@@ -204,12 +198,7 @@ const OtpScreen = () => {
         {otpError === 'expired' ? (
           <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
         ) : (
-          <Button
-            label={CONFIRM}
-            disabled={busy || code.length !== 6}
-            onPress={confirm}
-            style={{ flex: 1 }}
-          />
+          <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} style={{ flex: 1 }} />
         )}
       </CtaBar>
     </View>

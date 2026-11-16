@@ -118,7 +118,7 @@ const IosSheet = (props: Props) => {
                 transform: [{ scale: float.scale }],
                 marginBottom: height ? float.marginBottom(height) : 0,
               }
-            : { flex: props.full ? 1 : undefined, }
+            : { flex: props.full ? 1 : undefined }
         }
       >
         <SheetSurface.Provider value={!props.full}>
