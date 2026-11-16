@@ -17,7 +17,6 @@ export const ACCESS_MODES: { key: AccessMode; label: string; row: string; desc: 
   { key: 'BYPASS', label: '바로 실행', row: '바로 변경', desc: '묻지 않고 실행해요' },
 ]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
-export const ACCESS_MODE_TITLE = 'Bot이 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 

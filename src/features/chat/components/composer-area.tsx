@@ -4,7 +4,6 @@ import { View, type TextInputInstance } from 'react-native'
 import { materialPickerPath as botMaterialPath, type BotId } from '@/features/bots'
 import type { PickedFile } from '@/features/my'
 import { spacing } from '../../../theme'
-import { useAccessMode } from '../api/hooks'
 import { Composer } from './composer'
 import { insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import MentionPopover from './mention-popover'
@@ -22,21 +21,18 @@ type Props = {
   /** Floats above the box (StatusRow). */
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
-  /** First screen only (see ComposerProps.roomy). */
-  roomy?: boolean
   disabled?: boolean
   onGrow?: (extra: number) => void
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, roomy, disabled, onGrow }: Props) => {
+export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled, onGrow }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
   const own = useRef<TextInputInstance>(null)
   const ref = inputRef ?? own
   const query = disabled ? null : mentionQuery(text)
-  const access = useAccessMode()
 
   useEffect(() => {
     onTyping?.(text.length > 0)
@@ -58,7 +54,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
       {query !== null ? <MentionPopover query={query} onPick={pick} /> : above}
       <Composer
         inputRef={ref}
-        roomy={roomy}
         value={text}
         onChangeText={change}
         onSend={submit}
@@ -70,7 +65,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}
-        accessMode={access.mode}
         disabled={disabled}
         onGrow={onGrow}
       />
