@@ -5,8 +5,8 @@ import { showToast, TOAST_ABOVE } from '@/shared/components'
 import type { PostCategory } from '@push/api-client'
 import { SAVE_COPY } from '../constants'
 import type { SocialImage } from '../types'
-import { invalidateAfterPostSaveToggle, SAVED_POSTS_KEY } from '../utils/post-save'
-import { createComment, createPost, fetchComments, fetchPost, fetchPosts, fetchSavedPostIds, savePost, unsavePost, uploadPostImage } from './fetchers'
+import { invalidateAfterPostSaveToggle } from '../utils/post-save'
+import { createComment, createPost, fetchComments, fetchPost, fetchPosts, savePost, unsavePost, uploadPostImage } from './fetchers'
 
 export const usePosts = (category: PostCategory | null) =>
   useInfiniteQuery({
@@ -66,16 +66,13 @@ export const useCreatePost = () => {
   })
 }
 
-export const usePostSaved = (id: string) =>
-  useQuery({ queryKey: [...SAVED_POSTS_KEY, 'ids'], queryFn: fetchSavedPostIds, select: (ids) => ids.includes(id) })
-
-/** The server answer decides the state: the menu flips after the invalidated ids refetch, not before. */
+/** The server answer decides the state: the menu flips after the post's refetched `saved`, not before. */
 export const useTogglePostSave = (id: string) => {
   const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: (next: boolean) => (next ? savePost(id) : unsavePost(id)),
     onSuccess: (_data, next) => {
-      void invalidateAfterPostSaveToggle(qc)
+      void invalidateAfterPostSaveToggle(qc, id)
       showToast({
         message: next ? SAVE_COPY.saved : SAVE_COPY.unsaved,
         bottom: TOAST_ABOVE.cta,

@@ -18,11 +18,11 @@ describe('saveMenuAction', () => {
 })
 
 describe('invalidateAfterPostSaveToggle', () => {
-  it('marks the saved ids and every 저장한 글 sort stale, and no other list', async () => {
+  it('marks every 저장한 글 sort and that post stale, and no other post or list', async () => {
     const qc = new QueryClient()
-    for (const key of [['me', 'saved-posts', 'ids'], ['me', 'saved-posts', 'latest'], ['me', 'saved-posts', 'views'], ['me', 'posts', 'latest'], ['post', 'p1'], ['posts', null]]) qc.setQueryData(key, {})
-    await invalidateAfterPostSaveToggle(qc)
+    for (const key of [['me', 'saved-posts', 'latest'], ['me', 'saved-posts', 'views'], ['me', 'posts', 'latest'], ['post', 'p1'], ['post', 'p2'], ['posts', null]]) qc.setQueryData(key, {})
+    await invalidateAfterPostSaveToggle(qc, 'p1')
     const stale = qc.getQueryCache().getAll().filter((q) => q.state.isInvalidated).map((q) => q.queryKey)
-    expect(stale).toEqual([['me', 'saved-posts', 'ids'], ['me', 'saved-posts', 'latest'], ['me', 'saved-posts', 'views']])
+    expect(stale).toEqual([['me', 'saved-posts', 'latest'], ['me', 'saved-posts', 'views'], ['post', 'p1']])
   })
 })

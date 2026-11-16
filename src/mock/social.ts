@@ -47,18 +47,22 @@ export const emptyFeed = () => {
   feedEmpty = true
 }
 
+// Posts the reader saved, newest save first (push-be post_saves); two are saved from the start so 저장한 글 has rows.
+const savedIds = ['post-3', 'post-5']
+const withSaved = (p: Post): Post => ({ ...p, saved: savedIds.includes(p.id) })
+
 mock('GET', 'posts', ({ query }) => {
   const category = query.get('category') as PostCategory | null
   if (feedEmpty) return page([], query)
   const rows = category ? posts.filter((p) => p.category === category) : posts
-  return page(rows, query)
+  return page(rows.map(withSaved), query)
 })
 
 mock('GET', 'posts/:id', ({ params }) => {
   const p = posts.find((x) => x.id === params.id)
   if (!p) return notFound
   p.viewCount += 1
-  return { data: p }
+  return { data: withSaved(p) }
 })
 
 mock('POST', 'posts', ({ body }) => {
@@ -72,16 +76,15 @@ mock('POST', 'posts', ({ body }) => {
     imageUrls: b.imageKeys.map((k) => uploads.get(k) ?? img(k)),
     commentCount: 0,
     viewCount: 0,
+    saved: false,
     createdAt: new Date().toISOString(),
   }
   posts.unshift(p)
   return { status: 201, body: { data: p } }
 })
 
-// Posts the reader saved, newest save first (push-be post_saves); two are saved from the start so 저장한 글 has rows.
-const savedIds = ['post-3', 'post-5']
 mock('GET', 'me/saved-posts', ({ query }) => {
-  const { rows, fail } = sortPosts(savedIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean), query)
+  const { rows, fail } = sortPosts(savedIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean).map(withSaved), query)
   return fail ?? page(rows, query, true)
 })
 mock('POST', 'posts/:id/save', ({ params }) => {
