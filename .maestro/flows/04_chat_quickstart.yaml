@@ -23,7 +23,16 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
 # The edit modal slides up; its one 적용 button answers, the title is not a tap target.
 - waitForAnimationToEnd
 - tapOn: "적용"
+# The run's end asks what to do next in a sheet (ChatDoneNext) that hides the chat from the accessibility tree: wait for it, close it, then read the last message.
+- extendedWaitUntil:
+    visible: "프로필을 다 고쳤어요"
+    timeout: 60000
+- takeScreenshot: 04_chat_quickstart-03-sheet
+- runFlow:
+    file: ../visual/_close_sheet.yaml
+    env:
+      TITLE: "프로필을 다 고쳤어요"
 - extendedWaitUntil:
     visible: "다 됐어요.*"
-    timeout: 60000
+    timeout: 10000
 - takeScreenshot: 04_chat_quickstart-03
