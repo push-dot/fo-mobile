@@ -1,19 +1,37 @@
-import type { MenuSection } from '@/shared/components/menu-action'
+import type { MyPostsSort } from '@push/api-client'
+import type { MenuAction, MenuSection } from '@/shared/components/menu-action'
 
-export type PostsView = 'mine' | 'commented'
+export type PostsView = 'mine' | 'commented' | 'saved'
 
-export const POSTS_VIEWS: { key: PostsView; label: string }[] = [
-  { key: 'mine', label: '내가 쓴 글' },
-  { key: 'commented', label: '댓글 단 글' },
+// The icons follow MyPostsAllMenuFull: pencil, chat, bookmark for 보기 and clock, eye, chat for 정렬.
+export const POSTS_VIEWS: (MenuAction & { key: PostsView })[] = [
+  { key: 'mine', label: '내가 쓴 글', systemImage: 'square.and.pencil', icon: 'edit', onPress: () => {} },
+  { key: 'commented', label: '댓글 단 글', systemImage: 'bubble.left', icon: 'chat', onPress: () => {} },
+  { key: 'saved', label: '저장한 글', systemImage: 'bookmark', icon: 'bookmark', onPress: () => {} },
+]
+
+export const POSTS_SORTS: (MenuAction & { key: MyPostsSort })[] = [
+  { key: 'latest', label: '최신순', systemImage: 'clock', icon: 'clock', onPress: () => {} },
+  { key: 'views', label: '조회 많은 순', systemImage: 'eye', icon: 'eye-2', onPress: () => {} },
+  { key: 'comments', label: '댓글 많은 순', systemImage: 'bubble.left', icon: 'chat', onPress: () => {} },
 ]
 
 export const postsTitle = (view: PostsView) => POSTS_VIEWS.find((v) => v.key === view)!.label
 
-export const postsMenu = (view: PostsView, pick: (v: PostsView) => void): MenuSection[] => [
+export const postsMenu = (
+  current: { view: PostsView; sort: MyPostsSort },
+  pick: { view: (v: PostsView) => void; sort: (s: MyPostsSort) => void },
+): MenuSection[] => [
   {
     key: 'view',
     title: '보기',
     check: 'trailing',
-    actions: POSTS_VIEWS.map((v) => ({ key: v.key, label: v.label, selected: v.key === view, onPress: () => pick(v.key) })),
+    actions: POSTS_VIEWS.map((v) => ({ ...v, selected: v.key === current.view, onPress: () => pick.view(v.key) })),
+  },
+  {
+    key: 'sort',
+    title: '정렬',
+    check: 'trailing',
+    actions: POSTS_SORTS.map((s) => ({ ...s, selected: s.key === current.sort, onPress: () => pick.sort(s.key) })),
   },
 ]

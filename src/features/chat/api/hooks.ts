@@ -26,6 +26,7 @@ import {
   fetchSourceBytes,
   fetchMentionBookmarks,
   fetchMyProfile,
+  fetchProfilePdf,
   pinConversation,
   renameConversation,
   unarchiveConversation,
@@ -168,7 +169,10 @@ export const useOpenArtifact = () =>
     onError: () => Alert.alert('파일을 열지 못했어요', RETRY_LATER),
   })
 
-export type SharedFile = { documentId: string; name?: string } | { sourceId: string; name: string; mimeType?: string }
+export type SharedFile =
+  | { documentId: string; name?: string }
+  | { sourceId: string; name: string; mimeType?: string }
+  | { profile: true; name: string }
 
 /** Shares the file itself: a document through its authenticated PDF export, an upload as its stored bytes. */
 export const useShareFile = () =>
@@ -176,6 +180,7 @@ export const useShareFile = () =>
     mutationFn: (f: SharedFile) =>
       oneShare(async () => {
         if ('sourceId' in f) return shareAs(f.name, await fetchSourceBytes(f.sourceId), f.mimeType)
+        if ('profile' in f) return shareAs(pdfName(f.name), await fetchProfilePdf(), 'application/pdf')
         const pdf = await fetchDocumentPdf(f.documentId)
         return shareAs(pdfName(f.name ?? pdf.title), pdf.bytes, 'application/pdf')
       }),

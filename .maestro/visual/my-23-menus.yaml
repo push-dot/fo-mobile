@@ -57,11 +57,10 @@ tags:
 - waitForAnimationToEnd
 - tapOn: "더 보기"
 - extendedWaitUntil:
-    visible: "댓글 단 글"
+    visible: "저장한 글"
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: MyPostsAllMenu
-# MyPostsAllMenuFull draws 저장한 글 and 정렬, which the server lacks (G32): the app's menu is shot under its name so it is judged against it.
+# The menu has 보기 (내가 쓴 글, 댓글 단 글, 저장한 글) and 정렬 (GET me/posts?sort, me/saved-posts), so it is MyPostsAllMenuFull; MyPostsAllMenu is the same menu without them.
 - takeScreenshot: MyPostsAllMenuFull
 
 # The archive and file delete routes fail from the start: the Push document keeps its failure toast, and an uploaded file comes back to the list with the toast DeleteDocFail draws.

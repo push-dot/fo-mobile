@@ -10,7 +10,7 @@ vi.mock('@/shared/infrastructure', async () => {
 })
 vi.mock('@/features/my', () => ({ myApi: {} }))
 
-const { fetchDocumentPdf, fetchSourceBytes } = await import('../api/fetchers')
+const { fetchDocumentPdf, fetchProfilePdf, fetchSourceBytes } = await import('../api/fetchers')
 const { exclusive, pdfName, shareErrorText } = await import('../utils/share')
 const { FILE_SHARE_FAILED, FILE_SHARE_NOT_FINALIZED } = await import('../constants')
 const head = (bytes: Uint8Array) => String.fromCharCode(...bytes.slice(0, 5))
@@ -22,6 +22,12 @@ describe('result file share', () => {
     expect(pdf.title).toBe('김서준_모아페이_백엔드')
     expect(head(pdf.bytes)).toBe('%PDF-')
     expect(auth).toEqual(['Bearer token', 'Bearer token'])
+  })
+
+  it('downloads my profile as a PDF with the session token', async () => {
+    auth.length = 0
+    expect(head(await fetchProfilePdf())).toBe('%PDF-')
+    expect(auth).toEqual(['Bearer token'])
   })
 
   it('downloads an upload as its stored bytes', async () => {
