@@ -29,7 +29,7 @@ const limit: BotLimit = { plan: 'FREE', max: 3, used: 3, table: { FREE: 3, PRO: 
 
 describe('create form', () => {
   it('starts idle on the first colour', () => {
-    expect(initialForm()).toEqual({ phase: { kind: 'idle' }, color: 'teal', consent: false })
+    expect(initialForm()).toEqual({ phase: { kind: 'idle' }, color: 'teal' })
   })
 
   it('searches, then checks a link, then keeps the found posting unpicked', () => {
@@ -91,14 +91,6 @@ describe('create form', () => {
     expect(failed.color).toBe('pink')
     expect(retryCreate(failed)).toEqual({ action: 'create', posting, color: 'pink' })
     expect(retryCreate(picked).action).toBe('none')
-  })
-
-  it('asks for consent without dropping the posting', () => {
-    const picked = pickPosting(initialForm(), posting)
-    const next = failCreate(picked, 'consent')
-    expect(next.consent).toBe(true)
-    expect(next.phase).toEqual({ kind: 'picked', posting })
-    expect(submitCreate(next).action).toBe('none')
   })
 
   it('clears a pick and closes search back to idle', () => {

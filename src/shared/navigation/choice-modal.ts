@@ -25,7 +25,7 @@ export type ChoiceModalRequest = {
   }
   input?: { placeholder: string; confirm: string; keyboardType?: 'default' | 'url'; onSubmit: (text: string) => void }
   /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void }; closeLabel?: string }
+  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void; /** Runs with the sheet still open (a page pushed over it, as the plan page is). */ stay?: boolean }; closeLabel?: string }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

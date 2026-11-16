@@ -3,17 +3,25 @@ name: BotNewConsent
 tags:
   - visual
 ---
+# The consent modal is the gate in front of the Bot 만들기 page: it opens from the bot home before the page does, never over it.
 - runFlow: ../flows/_login.yaml
-- openLink: push://bots/new?posting=p15
-- extendedWaitUntil:
-    visible: "만들기"
-    timeout: 20000
-- tapOn: "만들기"
+- runFlow:
+    file: ../flows/_tap_tab.yaml
+    env:
+      TAB: "Bot"
+      READY: "계정 · .*"
+- tapOn: "새 회사 Bot 만들기"
 - extendedWaitUntil:
     visible: ".*Bot을 쓰려면.*"
     timeout: 20000
 - extendedWaitUntil:
     visible: "동의하고 시작하기"
     timeout: 10000
+- assertVisible: "자세히 보기"
+- assertNotVisible: "Bot 만들기"
 - waitForAnimationToEnd
 - takeScreenshot: BotNewConsent
+- tapOn: "동의하고 시작하기"
+- extendedWaitUntil:
+    visible: "Bot 만들기"
+    timeout: 20000
