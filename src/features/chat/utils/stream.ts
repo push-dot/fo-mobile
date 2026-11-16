@@ -5,6 +5,7 @@ import {
   ERROR_TEXT,
   FIT_ROWS,
   MULTI_PICK_SUBMIT,
+  PROFILE_SAVED,
   queueBusyMessage,
 } from '../constants'
 import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
@@ -161,6 +162,9 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       return [{ type: 'status', verbs: [ev.text] }]
     case 'tool': {
       const error = ev.state === 'err' && typeof ev.result?.error === 'string' ? ev.result.error : undefined
+      // update_my_profile applies at once (rule 39); the server kept the old values under changeId, so a reopened chat draws 되돌리기 too.
+      const changeId = ev.name === 'update_my_profile' && ev.state === 'ok' && typeof ev.result?.changeId === 'string' ? ev.result.changeId : undefined
+      const line: ChatEvent[] = changeId ? [{ type: 'agentText', id: `undo-${changeId}`, text: PROFILE_SAVED, undo: changeId }] : []
       return [
         {
           type: 'tool',
@@ -174,6 +178,7 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
           ...(ev.extra?.length ? { extra: ev.extra } : {}),
           ...(ev.warning ? { warning: ev.warning } : {}),
         },
+        ...line,
       ]
     }
     case 'approval':

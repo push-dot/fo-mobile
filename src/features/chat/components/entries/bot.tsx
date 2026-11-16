@@ -167,7 +167,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
           </View>
         ),
       )}
-      {item.undo ? <ProfileUndo id={item.id} /> : null}
+      {item.undo ? <ProfileUndo changeId={item.undo} /> : null}
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}

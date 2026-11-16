@@ -127,6 +127,10 @@ export const fetchSource = (id: string) => api.sources.get(id)
 
 export const updateProfile = api.me.updateProfile
 
+export const fetchProfileChange = api.me.profileChange
+
+export const undoProfileChange = api.me.undoProfileChange
+
 export const fetchOffer = (id: string) => api.me.offer(id)
 
 export const acceptOffer = (id: string, reply: string | undefined) => api.me.acceptOffer(id, reply)

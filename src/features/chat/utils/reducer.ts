@@ -28,7 +28,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     case 'token': {
       // Real SSE sends text in pieces: grow the last agent line until something else lands after it.
       const last = s.items[s.items.length - 1]
-      if (last?.type === 'agentText') return { ...s, items: [...s.items.slice(0, -1), { ...last, text: last.text + e.text }] }
+      if (last?.type === 'agentText' && !last.undo) return { ...s, items: [...s.items.slice(0, -1), { ...last, text: last.text + e.text }] }
       return { ...s, items: [...s.items, { type: 'agentText', id: `tok-${s.items.length}`, text: e.text }] }
     }
     case 'sources': {
