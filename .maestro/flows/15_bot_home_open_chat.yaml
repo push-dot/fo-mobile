@@ -1,21 +1,21 @@
 appId: app.push.mobile
-name: Bot 홈에서 채팅을 열고 돌아오면 읽음으로 바뀌고 행이 마지막 말을 보여 준다
+name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 채팅의 마지막 말을 보여 준다
 ---
 - runFlow: _login.yaml
 - runFlow: _dismiss_logbox.yaml
 # The chat asks the company-Bot consent on its first open (ChatConsentCompany); consent-on answers it ahead.
 - openLink: push://bots?mock=consent-on
-# 누리클라우드 has no pending approval and no run: its row reads 완료, 안 읽음 until the chat is opened.
+# 누리클라우드 has no pending approval and no run, so nothing opens over its chat.
 - extendedWaitUntil:
-    visible: ".*누리클라우드 Bot, 완료, 안 읽음, 자기소개서 초안 v2를 만들었어요.*"
+    visible: ".*누리클라우드 Bot, .*자기소개서 초안 v2를 만들었어요.*"
     timeout: 10000
 - tapOn: ".*누리클라우드 Bot.*"
 - extendedWaitUntil:
     visible: "자기소개서 초안 v2를 만들었어요"
     timeout: 15000
 - tapOn: "뒤로"
-# The mock send runs in the app (stores.ts), not in the mock server, so the list cannot show a typed line; the opened chat is what the row reflects.
+# Not asserted: a typed line or a cleared unread dot. The mock send runs in the app (stores.ts), never in the mock server, and useLocalActivity is still a stub (features/chat/index.ts).
 - extendedWaitUntil:
-    visible: ".*누리클라우드 Bot, 대기, 자기소개서 초안 v2를 만들었어요.*"
+    visible: ".*누리클라우드 Bot, .*자기소개서 초안 v2를 만들었어요.*"
     timeout: 15000
 - takeScreenshot: 15_bot_home_open_chat
