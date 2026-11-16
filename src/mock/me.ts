@@ -7,6 +7,7 @@ import type {
   Post,
   OfferPosting,
   Profile,
+  ProfileChange,
   Settings,
   Source,
   UserRef,
@@ -84,9 +85,32 @@ mock('PATCH', 'me/profile', ({ body }) => {
   return { data: profile }
 })
 
-// A Bot profile change kept by the server; the mock keeps none, so the 되돌리기 line of a mock chat is never drawn.
-mock('GET', 'me/profile/changes/:id', () => notFound)
-mock('POST', 'me/profile/changes/:id/undo', () => notFound)
+// A Bot profile change as push-be keeps it: the replaced values under the change id, undone once (409 the second time).
+type Change = { before: Partial<Profile>; undone: boolean; createdAt: string }
+const changes = new Map<string, Change>()
+
+/** What update_my_profile does in a mock run: sets the headline and keeps the old one under a new change id. */
+export const botProfileChange = (headline: string): string => {
+  const id = `chg-${changes.size + 1}`
+  changes.set(id, { before: { headline: profile.headline }, undone: false, createdAt: new Date().toISOString() })
+  profile = { ...profile, headline, updatedAt: new Date().toISOString() }
+  return id
+}
+
+mock('GET', 'me/profile/changes/:id', ({ params }) => {
+  const c = changes.get(params.id!)
+  if (!c) return notFound
+  const data: ProfileChange = { id: params.id!, fields: Object.keys(c.before), undone: c.undone, createdAt: c.createdAt }
+  return { data }
+})
+mock('POST', 'me/profile/changes/:id/undo', ({ params }) => {
+  const c = changes.get(params.id!)
+  if (!c) return notFound
+  if (c.undone) return { status: 409, body: { error: { code: 'CONFLICT', message: 'change already undone' } } }
+  c.undone = true
+  profile = { ...profile, ...c.before, updatedAt: new Date().toISOString() }
+  return { data: profile }
+})
 
 // 서류 (sources)
 const src = (id: string, fileName: string, size: number, createdAt: string): Source => ({

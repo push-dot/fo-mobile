@@ -112,6 +112,9 @@ export const listenMockLinks = () =>
         emptyBot(empty[1]!)
         chat().forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
       }
+      // The open chat's client copy goes, so the next open reads the stored turns (a reopened chat).
+      const reload = /^bot:(.+):reload$/.exec(s)
+      if (reload) chat().forget(fixtureOf(reload[1]!)?.bot.id ?? reload[1]!)
       const from = /^bot:(.+):from:(user|notice|todo|agentText|fit)(?::(\d+|last))?$/.exec(s)
       if (from) chat().showFrom(fixtureOf(from[1]!)?.bot.id ?? from[1]!, from[2] as 'user' | 'notice' | 'todo' | 'agentText' | 'fit', from[3] === 'last' ? 'last' : Number(from[3] ?? 1))
       const late = lateSpec(s)
