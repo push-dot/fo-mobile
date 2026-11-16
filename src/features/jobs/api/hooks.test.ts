@@ -11,6 +11,7 @@ const KEYS = [
   ['search', 'counts', '백엔드'],
   ['search', 'trending'],
   ['me', 'bookmarks'],
+  ['calendar', '2026-11-20T00:00:00.000Z'],
   ['me', 'profile'],
 ]
 
@@ -24,6 +25,6 @@ describe('invalidateAfterPostingBookmarkToggle', () => {
       .getAll()
       .filter((q) => q.state.isInvalidated)
       .map((q) => q.queryKey)
-    expect(stale).toEqual([['postings', 'list', {}], ['postings', 'detail', 'p1'], ['search', 'postings', '백엔드', 'relevance'], ['me', 'bookmarks']])
+    expect(stale).toEqual([['postings', 'list', {}], ['postings', 'detail', 'p1'], ['search', 'postings', '백엔드', 'relevance'], ['me', 'bookmarks'], ['calendar', '2026-11-20T00:00:00.000Z']])
   })
 })
