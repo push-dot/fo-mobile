@@ -1,29 +1,32 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
+import { router } from 'expo-router'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
-import { Badge, Chip, Icon, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Badge, Button, Chip, Icon, RecentList, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'
 import { type QsItem } from '../api/schemas'
 import { useChatDocs, useHubProfileId, useQuickStart, useStartChat } from '../api/hooks'
 import Mark from './mark'
+import PageModal from './page-modal'
 import Pick from './pick'
 import { CALENDAR_TASKS, DEFAULT_DOC, type QuickStart } from '../constants'
 import { initialPicks, startLink } from '../utils/quick-start-data'
+import { quickStartAllPath } from '../utils/sheet-routes'
 
 
-/** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. */
-export const QuickStartSheet = ({ qs, onClose }: { qs: QuickStart | null; onClose: () => void }) => {
-  return qs ? <Body key={qs.key} qs={qs} onClose={onClose} /> : null
+/** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. `all` is its page-style modal with the whole list. */
+export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
+  return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null
 }
 
-const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
+const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?: boolean }) => {
   const c = useColors()
   const bound = useSheetScrollMax(0.55)
   const start = useStartChat()
   const q = useQuickStart(qs.key)
-  const docs = useChatDocs(!!qs.listLabel)
+  const docs = useChatDocs(!!qs.docLabel)
   const d = q.data
   const [seg, setSeg] = useState(0)
   const [sel, setSel] = useState<string[]>([])
@@ -36,7 +39,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
   const [pickingDoc, setPickingDoc] = useState(false)
   const [pickingJob, setPickingJob] = useState(false)
   const [task, setTask] = useState(0)
-  const [custom, setCustom] = useState<string | null>(null)
+  const [custom, setCustom] = useState('')
 
   // Reset the picks when new quick-start data arrives (adjusting state during render, not in an effect).
   const [seen, setSeen] = useState(d)
@@ -44,18 +47,18 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
     setSeen(d)
     setSel(initialPicks(qs, d.items))
     setChips(d.chips ?? [])
-    // Only the quick start with a document list reads another file; every other one reads the hub profile (RULINGS 31), whatever the server seeds.
-    setDoc(d.doc && !qs.listLabel ? DEFAULT_DOC : d.doc)
+    // Only the quick start with a document row reads another file; every other one reads the hub profile (RULINGS 31), whatever the server seeds.
+    setDoc(d.doc && !qs.docLabel ? DEFAULT_DOC : d.doc)
   }
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
   // 지원 현황 lists an active application under both tabs; pick it once.
-  const picked = qs.layout === 'deadline' || qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
-  const hubId = useHubProfileId(!!qs.docLabel)
+  const picked = qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
+  const hubId = useHubProfileId(!!qs.docLabel || !!qs.readsHub)
   const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
   const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
   // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
-  const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!.label, custom: custom ?? '' }
+  const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!, custom }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
@@ -68,20 +71,113 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
     setSel((cur) => (qs.multi ? (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]) : [id]))
 
   const actionLabel = typeof qs.action === 'function' ? qs.action(qs.layout === 'calendar' ? task : picked.length) : qs.action
-  const title = qs.layout === 'deadline' && d ? `${qs.title} ${d.items.length}개` : qs.title
-
   const action = actionLabel ? { label: actionLabel, onPress: () => go(), disabled: !d || !qs.start(input) } : undefined
   const job = qs.listLabel ? picked[0] : undefined
-  const listOpen = !job || pickingJob
-  const docField = (
-    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} picker={!!qs.listLabel} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} />
+  const listOpen = all || !job || pickingJob
+  const seeAll = all ? undefined : () => router.replace(quickStartAllPath(qs.key))
+  const docField = qs.docLabel ? (
+    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} onSeeAll={seeAll} />
+  ) : null
+  const typing = custom.trim() !== ''
+  const content = !d ? (
+    <Text v="b2" color="t3" style={{ paddingVertical: spacing[6], textAlign: 'center' }}>
+      {q.isError ? '불러오지 못했어요. 닫았다가 다시 열어 주세요.' : '불러오는 중이에요'}
+    </Text>
+  ) : (
+    <>
+      {all && qs.description ? (
+        <Text v="b2" color="t3">
+          {qs.description}
+        </Text>
+      ) : null}
+
+      {qs.layout === 'link' ? <LinkInput url={url} setUrl={setUrl} clip={clip} /> : null}
+
+      {qs.layout === 'match' ? (
+        <>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+            {chips.map((ch) => (
+              <Chip key={ch} label={ch} on removable onPress={() => setChips((cur) => cur.filter((x) => x !== ch))} />
+            ))}
+            <AddChip onPress={() => setAdding('')} />
+          </View>
+          {adding !== null ? (
+            <TextField
+              placeholder="예: 판교, Kafka"
+              value={adding}
+              onChangeText={setAdding}
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={() => {
+                if (adding.trim()) setChips((cur) => [...cur, adding.trim()])
+                setAdding(null)
+              }}
+            />
+          ) : null}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
+            <Text v="b2" style={{ flex: 1 }}>
+              적합도 7점 이상인 공고만 보여 드려요
+            </Text>
+            <Switch value={option} onValueChange={setOption} label="적합도 7점 이상인 공고만" />
+          </View>
+        </>
+      ) : null}
+
+      {qs.listLabel ? (
+        <View style={{ gap: spacing[2] }}>
+          {docField}
+          {job && !all ? <PickerRow label={qs.listLabel} value={[job.over, job.title].filter(Boolean).join(' · ')} onPress={() => setPickingJob((v) => !v)} /> : null}
+        </View>
+      ) : null}
+
+      {d.segments && (!qs.listLabel || listOpen) ? (
+        <SegmentedControl items={d.segments.map((label, i) => ({ key: String(i), label }))} value={String(seg)} onChange={(k) => setSeg(Number(k))} />
+      ) : null}
+
+      {qs.layout === 'calendar' ? <Calendar items={d.items} task={task} setTask={setTask} /> : null}
+
+      {qs.layout === 'cards' ? (
+        <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: spacing[3] }}>
+          {qs.grid ? (
+            visible.map((it) => <OptionCard key={it.id} item={it} on={!typing && sel.includes(it.id)} grid onPress={() => (setCustom(''), toggle(it.id))} />)
+          ) : (
+            <RecentList items={visible} keyOf={(it) => it.id} renderItem={(it) => <OptionCard item={it} on={!typing && sel.includes(it.id)} onPress={() => (setCustom(''), toggle(it.id))} />} onSeeAll={seeAll} />
+          )}
+          {qs.custom ? <TextField placeholder={qs.custom} accessibilityLabel={qs.custom} value={custom} onChangeText={setCustom} /> : null}
+        </View>
+      ) : null}
+
+      {['pick', 'status', 'reply'].includes(qs.layout) && listOpen ? (
+        <View>
+          {!visible.length && d.empty?.[seg] ? (
+            <Text v="b2" color="t3" style={{ paddingVertical: spacing[4], textAlign: 'center' }}>
+              {d.empty[seg]}
+            </Text>
+          ) : null}
+          <RecentList
+            items={visible}
+            keyOf={(it) => it.id}
+            onSeeAll={seeAll}
+            renderItem={(it) => (
+              <ItemRow item={it} layout={qs.layout} on={sel.includes(it.id)} onPress={qs.layout === 'reply' ? () => go(it) : () => (toggle(it.id), setPickingJob(false))} />
+            )}
+          />
+        </View>
+      ) : null}
+    </>
   )
+  if (all)
+    return (
+      <PageModal title={qs.title} sheet onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 52, borderRadius: 26 }} /> : undefined}>
+        <View style={{ gap: spacing[3], paddingHorizontal: spacing[4] }}>{content}</View>
+      </PageModal>
+    )
   return (
     <Sheet gap={spacing[3]} actionGap={SHEET_ACTION_GAP.quickStart} action={action} onLayout={bound.onSheetLayout}>
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] }}>
         <View style={{ flex: 1, gap: spacing[1] }}>
           <Text v="h2" accessibilityRole="header">
-            {title}
+            {qs.title}
           </Text>
           {qs.description ? (
             <Text v="b2" color="t3">
@@ -91,118 +187,7 @@ const Body = ({ qs, onClose }: { qs: QuickStart; onClose: () => void }) => {
         </View>
       </View>
       <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled">
-        {!d ? (
-          <Text v="b2" color="t3" style={{ paddingVertical: spacing[6], textAlign: 'center' }}>
-            {q.isError ? '불러오지 못했어요. 닫았다가 다시 열어 주세요.' : '불러오는 중이에요'}
-          </Text>
-        ) : (
-          <>
-            {qs.layout === 'link' ? <LinkInput url={url} setUrl={setUrl} clip={clip} /> : null}
-
-            {qs.layout === 'match' ? (
-              <>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-                  {chips.map((ch) => (
-                    <Chip key={ch} label={ch} on removable onPress={() => setChips((cur) => cur.filter((x) => x !== ch))} />
-                  ))}
-                  <AddChip onPress={() => setAdding('')} />
-                </View>
-                {adding !== null ? (
-                  <TextField
-                    placeholder="예: 판교, Kafka"
-                    value={adding}
-                    onChangeText={setAdding}
-                    autoFocus
-                    returnKeyType="done"
-                    onSubmitEditing={() => {
-                      if (adding.trim()) setChips((cur) => [...cur, adding.trim()])
-                      setAdding(null)
-                    }}
-                  />
-                ) : null}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}>
-                  <Text v="b2" style={{ flex: 1 }}>
-                    적합도 7점 이상인 공고만 보여 드려요
-                  </Text>
-                  <Switch value={option} onValueChange={setOption} label="적합도 7점 이상인 공고만" />
-                </View>
-              </>
-            ) : null}
-
-            {d.segments ? (
-              <SegmentedControl
-                items={d.segments.map((label, i) => ({ key: String(i), label }))}
-                value={String(seg)}
-                onChange={(k) => setSeg(Number(k))}
-              />
-            ) : null}
-
-            {qs.layout === 'calendar' ? (
-              <Calendar items={d.items} task={task} setTask={setTask} />
-            ) : null}
-
-            {qs.layout === 'cards' ? (
-              <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: spacing[3] }}>
-                {visible.map((it) => (
-                  <OptionCard key={it.id} item={it} on={custom === null && sel.includes(it.id)} grid={qs.grid} onPress={() => (setCustom(null), toggle(it.id))} />
-                ))}
-                {qs.custom ? (
-                  custom === null ? (
-                    <Pressable
-                      accessibilityRole="button"
-                      onPress={() => setCustom('')}
-                      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}
-                    >
-                      <Icon name="plus" size={18} color="t3" />
-                      <Text v="b1" weight="600">
-                        {qs.custom}
-                      </Text>
-                    </Pressable>
-                  ) : (
-                    <TextField placeholder={qs.custom} value={custom} onChangeText={setCustom} autoFocus />
-                  )
-                ) : null}
-              </View>
-            ) : null}
-
-            {qs.listLabel ? (
-              <>
-                <View style={{ gap: spacing[2] }}>
-                  {docField}
-                  {job ? (
-                    <PickerRow
-                      label={qs.listLabel}
-                      value={[job.over, job.title].filter(Boolean).join(' · ')}
-                      lead={job.logo ? <Mark text={job.logo.text} color={job.logo.color} size={34} /> : undefined}
-                      onPress={() => setPickingJob((v) => !v)}
-                    />
-                  ) : null}
-                </View>
-              </>
-            ) : null}
-
-            {['pick', 'deadline', 'status', 'reply'].includes(qs.layout) && listOpen ? (
-              <View>
-                {!visible.length && d.empty?.[seg] ? (
-                  <Text v="b2" color="t3" style={{ paddingVertical: spacing[4], textAlign: 'center' }}>
-                    {d.empty[seg]}
-                  </Text>
-                ) : null}
-                {visible.map((it) => (
-                  <ItemRow
-                    key={it.id}
-                    item={it}
-                    layout={qs.layout}
-                    on={sel.includes(it.id)}
-                    onPress={qs.layout === 'reply' ? () => go(it) : qs.layout === 'deadline' ? undefined : () => (toggle(it.id), setPickingJob(false))}
-                  />
-                ))}
-              </View>
-            ) : null}
-
-            {qs.listLabel ? null : docField}
-          </>
-        )}
+        {content}
       </SheetScroll>
     </Sheet>
   )
@@ -288,11 +273,15 @@ const AddChip = ({ onPress }: { onPress: () => void }) => {
   )
 }
 
-const PickerRow = ({ label, value, lead, onPress }: { label: string; value: string; lead?: ReactNode; onPress?: () => void }) => {
+const PickerRow = ({ label, value, onPress }: { label: string; value: string; onPress: () => void }) => {
   const c = useColors()
-  const content = (
-    <>
-      {lead}
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${label} ${value}`}
+      onPress={onPress}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 }}
+    >
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="c2" weight="600" color="t3">
           {label}
@@ -301,44 +290,39 @@ const PickerRow = ({ label, value, lead, onPress }: { label: string; value: stri
           {value}
         </Text>
       </View>
-      {onPress ? <Icon name="chev" size={18} color="t3" /> : null}
-    </>
-  )
-  const style = { flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2 } as const
-  return onPress ? (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${value}`} onPress={onPress} style={style}>
-      {content}
+      <Icon name="chev" size={18} color="t3" />
     </Pressable>
-  ) : (
-    <View style={style}>{content}</View>
   )
 }
 
-/** The hub profile is the only document a quick start reads (RULINGS 31); only 점수 올리기 lets the user pick another one. */
+/** The hub profile is the only document a quick start reads (RULINGS 31); only 점수 올리기 lets the user pick another one, so only it draws this row. */
 const DocField = ({
   label,
   doc,
   picking,
-  picker,
   docs,
   onToggle,
   onPick,
+  onSeeAll,
 }: {
-  label?: string
+  label: string
   doc?: string
   picking: boolean
-  picker: boolean
-  docs?: { id: string; fileName: string }[]
+  docs: { id: string; fileName: string }[]
   onToggle: () => void
   onPick: (name: string) => void
+  onSeeAll?: () => void
 }) =>
-  label && doc ? (
+  doc ? (
     <>
-      <PickerRow label={label} value={displayName(doc)} onPress={picker ? onToggle : undefined} />
-      {picker && picking
-        ? docs?.map((x) => (
+      <PickerRow label={label} value={displayName(doc)} onPress={onToggle} />
+      {picking ? (
+        <RecentList
+          items={docs}
+          keyOf={(x) => x.id}
+          onSeeAll={onSeeAll}
+          renderItem={(x) => (
             <Pressable
-              key={x.id}
               accessibilityRole="radio"
               accessibilityState={{ selected: x.fileName === doc }}
               onPress={() => onPick(x.fileName)}
@@ -349,8 +333,9 @@ const DocField = ({
                 {displayName(x.fileName)}
               </Text>
             </Pressable>
-          ))
-        : null}
+          )}
+        />
+      ) : null}
     </>
   ) : null
 
@@ -389,16 +374,6 @@ const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; 
           </Text>
         ) : null}
       </View>
-      {layout === 'deadline' ? (
-        <View style={{ alignItems: 'flex-end', gap: spacing[1] }}>
-          {item.badge ? <Badge {...item.badge} /> : null}
-          {item.note ? (
-            <Text v="c2" weight="600" color={item.note.ac ? 't1' : 't3'}>
-              {item.note.label}
-            </Text>
-          ) : null}
-        </View>
-      ) : null}
       {status && item.badge ? <Badge {...item.badge} /> : null}
       {layout === 'pick' ? <Pick on={on} /> : null}
     </View>
@@ -486,22 +461,18 @@ const Calendar = ({ items, task, setTask }: { items: QsItem[]; task: number; set
         ))}
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-        {CALENDAR_TASKS.map((t, i) => {
+        {CALENDAR_TASKS.map((label, i) => {
           const on = i === task
           return (
             <Pressable
-              key={t.label}
+              key={label}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               onPress={() => setTask(i)}
-              style={{ flexGrow: 1, flexBasis: '48%', gap: spacing[2], padding: spacing[4] - ring.borderWidth, borderRadius: on ? radius.md : radius.card, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
+              style={{ height: 48, paddingHorizontal: spacing[5] - ring.borderWidth, justifyContent: 'center', borderRadius: radius.pill, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
             >
-              <Icon name={t.icon} size={20} color={on ? 'acText' : 't2'} />
-              <Text v="b2" weight="700">
-                {t.label}
-              </Text>
-              <Text v="c2" color="t3">
-                {t.sub}
+              <Text v="b2" weight="600">
+                {label}
               </Text>
             </Pressable>
           )

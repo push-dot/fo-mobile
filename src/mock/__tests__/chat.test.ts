@@ -82,6 +82,15 @@ describe('chat mock', () => {
     expect(boost.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
+  it('answers 마감 임박 공고 정리 in the chat as a list of bullets and to-dos, with no card', async () => {
+    const events = await run('t-deadline', { text: '북마크한 공고 중 일주일 안에 마감되는 공고와 준비할 일을 알려 주세요', intent: 'deadline_postings' })
+    const text = events.filter((e) => e.type === 'token').map((e) => e.text).join('\n')
+    expect(text).toContain('• 파도AI · 데이터 분석가 · D-2')
+    expect(text).toContain('1. 파도AI는')
+    expect(events.some((e) => e.type === 'approval')).toBe(false)
+    expect(events.at(-1)).toMatchObject({ type: 'done' })
+  })
+
   it('jumps to the quality check without the boost card and applies the recommended fixes without asking; the design is the next turn', async () => {
     const events = await run('t-quality', { text: '품질 검사로 넘어가기' })
     expect(types(events)).not.toContain('fit')

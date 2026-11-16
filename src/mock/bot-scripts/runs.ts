@@ -672,6 +672,13 @@ export const TOKENS: Record<string, Step[]> = {
   '필요한 프로젝트 경험까지 만들어 주세요': ph2xApproach,
 }
 
+const deadlineRun: Step[] = [
+  s(200, status('북마크 마감일 보는 중')),
+  s(900, agent('이번 주 안에 마감되는 북마크가 4개예요.\n• 파도AI · 데이터 분석가 · D-2 · 서류가 없어요\n• 도토리증권 · 서버 개발자 (Go) · D-4 · 서류가 준비됐어요\n• 그린티켓 · 그로스 마케터 · D-6 · 서류가 없어요\n• 새벽마켓 · ML 엔지니어 · D-7 · 초안이 있어요')),
+  s(300, agent('준비할 일이에요.\n1. 파도AI는 이틀 남았으니 오늘 서류부터 만들어요.\n2. 도토리증권은 준비한 서류로 지원만 하면 돼요.\n3. 그린티켓은 서류를 만들고 새벽마켓은 초안을 마무리해요.')),
+  done,
+]
+
 export const pick = (text: string, interrupted: boolean, attachment?: string, intent?: string, run?: string): { steps: Step[]; labels?: string[] } | null => {
   // The Android keyboard capitalizes the first letter of a tour's typed English alias.
   const t = text.trim().toLowerCase()
@@ -681,6 +688,7 @@ export const pick = (text: string, interrupted: boolean, attachment?: string, in
   // 서류 보기 › 봇으로 고치기 sends the file name as its attachment; that is the read-then-fix run below, not an external file.
   if (attachment && t !== '이 서류를 고쳐 줘') return { steps: fileRun() }
   if (intent === 'fit') return { steps: ph1 }
+  if (intent === 'deadline_postings') return { steps: deadlineRun }
   if (intent === 'boost') return { steps: ph3Boost }
   if (intent === 'experience') return { steps: ph2xApproach }
   if (/지원해|^apply$/.test(t)) return { steps: applyRun }

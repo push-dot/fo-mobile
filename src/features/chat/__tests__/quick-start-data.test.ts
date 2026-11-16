@@ -15,14 +15,13 @@ const posting = (id: string, deadline: string | null, career = { careerMin: 4, c
 const person = (userId: string) => ({ userId, displayName: '오지현', headline: '프론트엔드' }) as Profile
 
 describe('quickStartFrom (real mode)', () => {
-  it('lists bookmarks for 갭/적합도 and only the next 7 days for 마감 임박', () => {
+  it('lists bookmarks for 적합도', () => {
     const bookmarks = [posting('a', '2026-10-30'), posting('b', '2026-10-23'), posting('c', '2026-10-20'), posting('d', null)]
     const fit = quickStartFrom('fit', { bookmarks, doc: '이력서.pdf' }, now)
     expect(fit.doc).toBe('이력서.pdf')
     // Same company colour as the job cards and the WebView, not the person-avatar tint.
     expect(fit.items[0]!.logo!.color).toBe(brandColor('모아페이'))
     expect(fit.items.map((i) => [i.id, i.over, !!i.selected])).toEqual([['a', '모아페이', true], ['b', '모아페이', false], ['c', '모아페이', false], ['d', '모아페이', false]])
-    expect(quickStartFrom('deadline', { bookmarks }, now).items.map((i) => [i.id, i.badge])).toEqual([['b', { label: 'D-2', tone: 'red' }]])
   })
 
   it('maps applications and pending offers', () => {
@@ -42,8 +41,8 @@ describe('quickStartFrom (real mode)', () => {
     expect(quickStartFrom('calendar', {}, now)).toEqual({ items: [] })
   })
 
-  it('gap sub joins location and career', () => {
-    const gap = quickStartFrom('gap', { bookmarks: [posting('a', null)], recent: [] }, now)
+  it('fit sub joins location and career', () => {
+    const gap = quickStartFrom('fit', { bookmarks: [posting('a', null)], recent: [] }, now)
     expect(gap.items[0]!.sub).toBe('서울 강남구 · 4–6년')
     expect(gap.segments).toEqual(['북마크 1', '최근 본 공고'])
     expect(gap.empty).toEqual([undefined, '최근 본 공고가 없어요.'])
@@ -69,11 +68,6 @@ describe('quickStartFrom (real mode)', () => {
     const subs = (p?: Profile) => quickStartFrom('hub', { profile: p }, now).items.map((i) => i.sub)
     expect(subs(profile)).toEqual(['한 줄 소개', '3~4문장', '2건', '3개'])
     expect(subs(undefined)).toEqual(['한 줄 소개', '3~4문장', undefined, undefined])
-  })
-
-  it('deadline badge is red within 3 days and grey after', () => {
-    const bookmarks = [posting('a', '2026-10-24'), posting('b', '2026-10-25')]
-    expect(quickStartFrom('deadline', { bookmarks }, now).items.map((i) => i.badge)).toEqual([{ label: 'D-3', tone: 'red' }, { label: 'D-4', tone: 'grey' }])
   })
 
   it('status lists 합격 under 진행 중 but leaves it unchecked', () => {
