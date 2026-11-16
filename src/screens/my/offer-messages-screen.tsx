@@ -6,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -27,9 +26,9 @@ import {
   useOfferMessages,
   type FailedSend,
 } from '@/features/my'
+import { Composer } from '@/features/chat'
 import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
-import { inputReset } from '@/shared/components/text-field-metrics'
-import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
+import { onAccent, radius, spacing, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
 
@@ -101,8 +100,8 @@ const Bubble = ({
 // The board centres the empty line over the whole screen (composer overlaid) with a 120pt lift; here the composer takes its own height.
 const EMPTY_LIFT = 120
 const COMPOSER_HEIGHT = 52
-const SCROLL_PAD_BOTTOM = spacing[5]
 const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
+const SCROLL_PAD_BOTTOM = spacing[5]
 // ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
 const DAY_LABEL_LIFT = 2
 
@@ -163,7 +162,6 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     send.mutate(body, {
       onError: (e) => setFailed((f) => [...f, failedSend(body, e)]),
     })
-  const canSend = !!text.trim()
   const ios = Platform.OS === 'ios'
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
   const closed = composerClosed(failed, o.canSend)
@@ -300,62 +298,16 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             </Text>
           </View>
         ) : (
-          <View
-            style={{
-              borderRadius: COMPOSER_RADIUS,
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              padding: 6,
-              gap: spacing[2],
-              // Flat on both platforms (ProposalChat board, rule 18: glass is for header buttons); iOS bg2 as the chat composer.
-              backgroundColor: ios ? c.bg2 : c.fill,
+          <Composer
+            tools={false}
+            value={text}
+            onChangeText={setText}
+            placeholder="메시지를 입력해 주세요"
+            onSend={() => {
+              post(text.trim())
+              setText('')
             }}
-          >
-            <TextInput
-              accessibilityLabel="메시지"
-              value={text}
-              onChangeText={setText}
-              placeholder="메시지를 입력해 주세요"
-              placeholderTextColor={c.t4}
-              multiline
-              style={[
-                {
-                  flex: 1,
-                  ...inputReset,
-                  minHeight: 40,
-                  maxHeight: 120,
-                  paddingVertical: spacing[2],
-                  paddingHorizontal: spacing[1],
-                  fontSize: type.b1.fontSize,
-                  lineHeight: type.b1.lineHeight,
-                  letterSpacing: type.b1.letterSpacing,
-                  color: c.t1,
-                  textAlignVertical: 'center',
-                },
-                fontFor('400'),
-              ]}
-            />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="보내기"
-              accessibilityState={{ disabled: !canSend }}
-              disabled={!canSend}
-              onPress={() => {
-                post(text.trim())
-                setText('')
-              }}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: radius.pill,
-                backgroundColor: canSend ? c.ac : ios ? c.fill : c.fill2,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name="up" size={20} color={canSend ? onAccent : c.t3} />
-            </Pressable>
-          </View>
+          />
         )}
       </View>
     </KeyboardAvoidingView>

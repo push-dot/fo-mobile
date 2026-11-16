@@ -90,10 +90,11 @@ export const followMatches = <T extends { displayName: string; headline: string 
   )
 }
 
-export const emptyCta = (tab: 'applications' | 'bookmarks' | 'follows' | 'posts') => {
+export const emptyCta = (tab: 'applications' | 'bookmarks' | 'follows' | 'posts' | 'saved') => {
   if (tab === 'follows') {
     return { title: '아직 팔로우한 사람이 없어요.', action: '허브 둘러보기', href: '/hub' as const }
   }
+  if (tab === 'saved') return { title: '아직 저장한 글이 없어요.', action: '소셜 둘러보기', href: '/social' as const }
   if (tab === 'posts') return { title: '아직 쓴 글이 없어요.', action: '글쓰기', href: '/compose' as const }
   if (tab === 'bookmarks') {
     return { title: '북마크한 공고가 없어요.', action: '채용공고 보기', href: '/jobs' as const }

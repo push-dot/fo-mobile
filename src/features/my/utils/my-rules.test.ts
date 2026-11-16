@@ -157,6 +157,11 @@ describe('my screen rules', () => {
       action: '글쓰기',
       href: '/compose',
     })
+    expect(emptyCta('saved')).toEqual({
+      title: '아직 저장한 글이 없어요.',
+      action: '소셜 둘러보기',
+      href: '/social',
+    })
   })
 
   it('shows view counts on my posts and detail, not the feed', () => {
