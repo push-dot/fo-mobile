@@ -193,7 +193,6 @@ mock('GET', 'me/bookmarks', ({ query }) => {
   const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, title: (plainTitles && SHEET_TITLES[p.id]) || p.title, location: p.id === 'p8' ? '성남 판교' : p.location }))
   return page(list, query)
 })
-// The signed-in account works at 모아페이 (me.ts careers), so these are the only postings the 허브 제안 sheet can attach.
 const OWN_COMPANY = '모아페이'
 mock('GET', 'companies/me/postings', ({ query }) => {
   const today = inDays(0)

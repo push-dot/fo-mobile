@@ -23,7 +23,6 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   </Pressable>
 )
 
-/** BotPick: 보내기 from the bot home asks which Bot gets the material, in a regular sheet (one short question, no close button). */
 export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
   const material = useMaterialDetail(kind, id).data?.material
   const bots = useBots().data ?? []

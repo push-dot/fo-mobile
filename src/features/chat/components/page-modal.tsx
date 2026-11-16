@@ -34,7 +34,6 @@ const PageModal = ({
   title: string
   right?: ReactNode
   left?: ReactNode
-  /** The header is the boards' `.topbar.nav` (PlanUltra, PlanUltraNotice): 12 on iOS. A `left` alone keeps 20. */
   nav?: boolean
   children: ReactNode
   footer?: ReactNode

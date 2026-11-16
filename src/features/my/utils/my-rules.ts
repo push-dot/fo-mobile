@@ -60,7 +60,6 @@ export const SIZE_LIMIT = {
 
 export const profileConvertBody = () => ({})
 
-/** 내 프로필(기본) and 지원용 프로필(Push 서류) are two things: converting a file makes the second and leaves the first as it is (owner rule 50). */
 export const DOC_TO_PROFILE_COPY = {
   action: '만들기',
   title: '지원용 프로필로 만들까요?',

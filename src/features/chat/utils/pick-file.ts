@@ -4,7 +4,6 @@ import { pickDocument } from '@/shared/infrastructure'
 import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, isChatAttachment } from '../constants'
 import { attachDraftFile } from '../stores'
 
-/** Opens the system file picker and puts the file in the bot's draft; false when nothing was attached. */
 export const attachPickedFile = async (target: string) => {
   const picked = await pickDocument(Platform.OS === 'android' ? CHAT_ATTACHMENT_OPTIONS_ANDROID : CHAT_ATTACHMENT_OPTIONS)
   const asset = picked.canceled ? undefined : picked.assets[0]

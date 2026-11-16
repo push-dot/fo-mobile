@@ -8,7 +8,6 @@ export const fetchProfileList = (category: JobCategory[], sheet: SheetFilters, c
 
 export const fetchProfileCount = (query: ProfileFilters) => api.profiles.list({ ...query, limit: 1 })
 
-/** Only the sender's own company's open postings can ride along: the server refuses any other (profiles/:id/offer), and answers 404 when the sender belongs to no company. */
 export const fetchOfferPostings = async () => (await api.postings.mine({ limit: OFFER_POSTINGS_LIMIT })).data.filter((p) => p.status === undefined || p.status === 'OPEN')
 
 export const sendProfileOffer = (userId: string, message: string, postingId: string | undefined) =>

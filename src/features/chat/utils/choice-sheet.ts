@@ -7,7 +7,6 @@ export type ChoiceSheet = { title: string; message?: string; items: { index: num
 
 /**
  * A card that is one single pick the bot has no suggestion for, or a permission (a help question, the page-read permission) is a regular modal (RULINGS 35, ChatBotStatusHelp and ChatBotStatusApprove):
- * the question is its title, the card's detail its message, the options its plain rows. Every other card is a regular modal too (see openGate).
  */
 export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined

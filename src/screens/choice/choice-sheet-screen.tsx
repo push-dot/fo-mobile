@@ -26,13 +26,14 @@ const ChoiceSheetScreen = () => {
   }, [onDismiss])
   if (!request) return null
   const run = (onPress: () => void) => {
+    if (picked.current) return
     picked.current = true
     router.back()
     setTimeout(onPress, CHOICE_HANDOFF_MS)
   }
   const input = request.input
   const confirm = form
-    ? { label: form.confirmLabel(selected, on), onPress: () => form.onConfirm(selected, on), disabled: !selected.length }
+    ? { label: form.confirmLabel(selected, on), onPress: () => form.onConfirm(selected, on), disabled: !form.allowEmpty && !selected.length }
     : input
       ? { label: input.confirm, onPress: () => input.onSubmit(text.trim()), disabled: !text.trim() }
       : request.confirm

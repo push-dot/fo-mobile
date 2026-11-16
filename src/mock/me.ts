@@ -381,7 +381,7 @@ const hubContent = {
     docText('paragraph', 'Kotlin, Spring Boot, Kafka, MySQL, Redis'),
   ],
 }
-// 지원용 프로필 made from an uploaded file: the draft the profile tab already shows.
+// 지원 서류용 프로필(허브형) made from an uploaded file: the draft the profile tab already shows.
 const profileContent = {
   type: 'doc',
   content: [

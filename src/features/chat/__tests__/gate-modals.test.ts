@@ -91,6 +91,20 @@ describe('openGate: sections (ChatPh0Input)', () => {
     expect(h.answer).toHaveBeenCalledWith('이력서만 · 자료 2개 · 원래 말투로', [0, 1, 4])
   })
 
+  it('keeps the card detail on the first rows step and does not repeat the step title in the message', () => {
+    const rowsFirst = base({
+      question: '자료를 확인해 주세요',
+      detail: '아래 자료로 만들어요.',
+      submit: '시작하기',
+      sections: [{ kind: 'rows', id: 's1', title: '가져올 자료', items: [{ id: 'a', tag: '', title: '허브 프로필', sub: '기본 서류' }] }],
+    })
+    expect(run(rowsFirst).shown[0]!.message).toBe('아래 자료로 만들어요.\n허브 프로필 · 기본 서류')
+    const second = run(input)
+    second.shown[0]!.form!.onConfirm([0], false)
+    expect(second.shown[1]!.title).toBe('가져올 자료')
+    expect(second.shown[1]!.message).toBe('허브 프로필 · 기본 서류')
+  })
+
   it('opens the material change and shows the same question again when it is done', () => {
     const { shown, h } = run(input)
     shown[0]!.form!.onConfirm([0], false)
@@ -103,6 +117,30 @@ describe('openGate: sections (ChatPh0Input)', () => {
 
   it('shows no modal on a modal: each step is asked only after the one before is answered', () => {
     expect(run(input).shown).toHaveLength(1)
+  })
+})
+
+describe('openGate: a last toggle section with {n} and zeroSubmit', () => {
+  const counted = base({
+    question: '반영할 항목',
+    submit: '{n}개 반영하고 디자인으로',
+    zeroSubmit: '그대로 디자인으로',
+    optionIds: ['submit', 'a', 'b'],
+    sections: [{ kind: 'toggle', selected: [], ids: ['a', 'b'], items: [{ label: '가' }, { label: '나' }] }],
+  })
+
+  it('builds the button label from the picks and allows submitting none', () => {
+    const { shown, h } = run(counted)
+    const form = shown[0]!.form!
+    expect(form.allowEmpty).toBe(true)
+    expect(form.confirmLabel([], false)).toBe('그대로 디자인으로')
+    expect(form.confirmLabel([0, 1], false)).toBe('2개 반영하고 디자인으로')
+    form.onConfirm([], false)
+    expect(h.answer).toHaveBeenCalledWith('그대로 디자인으로', [0])
+  })
+
+  it('needs a pick when the card has no zeroSubmit', () => {
+    expect(run({ ...counted, zeroSubmit: undefined }).shown[0]!.form!.allowEmpty).toBeUndefined()
   })
 })
 

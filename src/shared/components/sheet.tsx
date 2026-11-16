@@ -14,7 +14,7 @@ import { mountSheet, sizeSheet } from './toast-store'
 type Props = {
   title?: string
   description?: string
-  children: ReactNode
+  children?: ReactNode
   action?: { label: string; onPress: () => void; disabled?: boolean; pending?: boolean }
   secondary?: { label: string; onPress: () => void }
   gap?: number

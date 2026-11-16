@@ -232,7 +232,6 @@ const streamed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefin
   const attachments = attachmentsOf(input)
   const body: BotContract.SendBody = {
     text: input.text ?? '',
-    // The mode is fixed to automatic; the app has no control for it.
     accessMode: DEFAULT_ACCESS_MODE,
     ...(intent ? { intent } : {}),
     ...(attachments.length ? { attachments } : {}),

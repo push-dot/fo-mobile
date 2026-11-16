@@ -42,7 +42,6 @@ const open = (m: Material, inModal: boolean) => {
 /** DELETE answers 409 for a file a career row still cites. */
 const cited = (error: unknown) => error instanceof ApiError && error.status === 409
 
-/** MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink, MaterialDetailLong, MaterialDetailDelete: a regular sheet over the 자료 modal (owner 2026-11-16: not a page-style modal). */
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const remove = useDeleteMaterial()

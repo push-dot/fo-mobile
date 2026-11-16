@@ -4,21 +4,16 @@ import type { Approval, ApprovalSection, ChatItem } from '../types'
 import { choiceSheet, confirmModal, designModal } from './choice-sheet'
 import { isStop } from './multi-pick'
 import { isBlueprints, planTable } from './plan-table'
-import { chipSends, sectionLabel, sectionPicks } from './stream-v3'
+import { buttonLabel, chipSends, sectionLabel, sectionPicks } from './stream-v3'
 
 type Row = Extract<ApprovalSection, { kind: 'rows' }>['items'][number]
 type Table = NonNullable<ChoiceModalRequest['table']>
 
 export type GateHooks = {
-  /** The pick or the picks became the card's answer. */
   answer: (text: string, choice: number | number[]) => void
-  /** The modal was swiped away: the floor goes to the composer. */
   say: () => void
-  /** A material row's 변경: the modals that pick another material, then `back` shows the step again. */
   change: (row: Row, back: () => void) => void
-  /** The plan or the change set the question is about, as a table under the question. */
   table?: Table
-  /** What a proposed edit changes (ChatApprove), as 이전 · 이후. */
   review?: Table
 }
 
@@ -26,7 +21,6 @@ export const UNDO_LABEL = '되돌리기'
 export const NEXT_LABEL = '다음'
 export const REVIEW_TITLE = '이렇게 고쳤어요'
 
-/** The last plan (a feedback or a strategy) the bot showed since the user last spoke: the question under it is about that table. Blueprints stay the bubble's list. */
 export const gateTable = (items: readonly ChatItem[]): Table | undefined => {
   for (const item of [...items].reverse()) {
     if (item.type === 'user') return undefined
@@ -36,7 +30,6 @@ export const gateTable = (items: readonly ChatItem[]): Table | undefined => {
   return undefined
 }
 
-/** The lines a proposed edit changes as 이전 · 이후: each removed line against the line added in its place, a lone addition with an empty 이전. */
 export const diffTable = (items: readonly ChatItem[]): Table | undefined => {
   for (const item of [...items].reverse()) {
     if (item.type === 'user') return undefined
@@ -61,7 +54,6 @@ export const diffTable = (items: readonly ChatItem[]): Table | undefined => {
   return undefined
 }
 
-/** Picks out of one list of choices (ChatPh2XPrevent): the stop row is the modal's swipe-away, the button counts the picks. */
 const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined
   if (!approval.submit || section?.kind !== 'choices') return null
@@ -84,10 +76,6 @@ const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | nul
   }
 }
 
-/**
- * A card with sections (ChatPh0Input: what to make, which material, which tone) is one modal per section, shown one after the other (owner rule 46). 다음 moves on,
- * the last one carries the card's own button. A last single pick with no button of its own answers by being tapped.
- */
 const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRequest) => void) => {
   const sel = approval.sections.map((s) => ('selected' in s ? [...s.selected] : []))
   const order = approval.sections.flatMap((s, i) => (s.kind === 'templates' ? [] : [i]))
@@ -96,13 +84,14 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
     const si = order[n]!
     const s = approval.sections[si]!
     const last = n === order.length - 1
-    const label = last ? (approval.submit ?? '확인') : NEXT_LABEL
+    const label = last ? (buttonLabel(approval, sel) || '확인') : NEXT_LABEL
+    const picked = (chosen: number[]) => sel.map((x, i) => (i === si ? chosen : x))
     const next = () => (last ? finish() : show(n + 1))
     const title = n === 0 ? approval.question : s.kind === 'chips' ? (s.title ?? approval.question) : approval.question
     const base = { title, ...(n === 0 && approval.detail ? { message: approval.detail } : {}), onDismiss: h.say }
     if (s.kind === 'rows') {
       const fixed = s.items.filter((r) => r.action !== 'change')
-      const message = [s.title, ...fixed.map((r) => `${displayName(r.title)}${r.sub ? ` · ${r.sub}` : ''}`)].join('\n')
+      const message = [...(n === 0 ? [approval.detail] : []), ...fixed.map((r) => `${displayName(r.title)}${r.sub ? ` · ${r.sub}` : ''}`)].filter(Boolean).join('\n')
       ask({
         ...base,
         title: n === 0 ? approval.question : s.title,
@@ -133,9 +122,10 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
         options,
         selected: sel[si] ?? [],
         multi,
-        confirmLabel: () => label,
-        onConfirm: (picked) => {
-          sel[si] = picked
+        ...(last && approval.zeroSubmit ? { allowEmpty: true } : {}),
+        confirmLabel: (chosen) => (last ? buttonLabel(approval, picked(chosen)) || label : label),
+        onConfirm: (chosen) => {
+          sel[si] = chosen
           next()
         },
       },
@@ -144,10 +134,6 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
   show(0)
 }
 
-/**
- * Every Bot flow gate is a regular modal (owner rule 46): no drawn panel, no numbered bubble in the thread, no page-style modal. One question per modal; a card of several questions
- * is split into one modal each. `ask` shows a modal (showChoiceModal); the gate calls it again for the next question once the one before is answered.
- */
 export const openGate = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRequest) => void) => {
   const design = designModal(approval)
   if (design) {

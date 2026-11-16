@@ -11,14 +11,9 @@ import { diffTable, gateTable, openGate } from '../utils/gate-modals'
 import { attachPickedFile } from '../utils/pick-file'
 import { docMeta, postingMeta } from '../utils/quick-start-data'
 
-// Rule 42: a growable list in a modal shows its 3 most recent rows, and 전체 보기 opens the page-style list.
 const RECENT = 3
 const SEE_ALL = '전체 보기'
 
-/**
- * Opens the bot's question as regular modals (owner rule 46) once per card, while the chat is the focused screen (another sheet over it would be a modal on a modal).
- * Swiping a modal away hands the floor to the composer. A material row's 변경 is a modal of its own for each kind of material, then the question comes back.
- */
 export const useGateModal = (
   botId: string,
   chat: { approval: Approval | null; items: ChatItem[] },
