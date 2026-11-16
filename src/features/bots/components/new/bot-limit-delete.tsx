@@ -1,8 +1,7 @@
 import { Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Text } from '@/shared/components'
-import { platformTheme, radius, spacing, useColors } from '@/theme'
-import { MASCOT_PALETTES } from '@/theme/mascot'
+import { Mascot, Text } from '@/shared/components'
+import { platformTheme, spacing, useColors } from '@/theme'
 import { useBotProfile } from '../../api/hooks'
 import type { CompanyBot } from '../../types'
 import { limitRowMeta } from '../../utils/limit-row'
@@ -18,7 +17,7 @@ const LimitRow = ({ bot, now, onDelete }: { bot: CompanyBot; now: Date; onDelete
   const title = useBotProfile(bot.id).data?.posting?.title
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing[3] }}>
-      <View style={{ width: TILE, height: TILE, borderRadius: radius.sm, backgroundColor: MASCOT_PALETTES[bot.color].body }} />
+      <Mascot size={TILE} color={bot.color} motion={{ mode: 'still' }} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="600" numberOfLines={1}>
           {bot.name}

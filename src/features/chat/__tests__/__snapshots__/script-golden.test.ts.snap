@@ -6662,16 +6662,6 @@ card null
 "
 `;
 
-exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token read-off 1`] = `
-"
-{"text":"read-off","type":"user"}
-{"text":"내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.","type":"readOff"}
-{"seconds":1,"type":"worked"}
-card null
-{"awaiting":null,"interrupted":false,"queue":[],"working":null}
-"
-`;
-
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token resume-doc > start-document: pick 0 1`] = `
 "
 {"text":"resume-doc","type":"user"}

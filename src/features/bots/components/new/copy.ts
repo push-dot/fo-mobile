@@ -17,10 +17,8 @@ export const ORGANIZE_LABEL = 'Bot 삭제하기'
 export const CONSENT_COPY = {
   title: 'Bot을 쓰려면\n동의가 필요해요',
   body: '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 Bot이 참고 자료로 써요.',
-  more: '자세히 보기',
   detail: '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.',
   agree: '동의하고 시작하기',
-  later: '나중에',
 }
 export const SEARCH_DEBOUNCE_MS = 300
 export const LINK_FINDING_AFTER_MS = 1200

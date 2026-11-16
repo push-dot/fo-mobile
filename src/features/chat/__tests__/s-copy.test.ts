@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  ACCESS_MODE_TITLE,
   ACCOUNT_REFERENCE_NOTE,
   ACCOUNT_REFERENCE_TITLE,
   BOOKMARK_EMPTY,
@@ -19,7 +18,6 @@ import { conversationRowMenu, headerMenu } from '../utils/conversation-menu'
 
 describe('agent s copy', () => {
   it('access mode title', () => {
-    expect(ACCESS_MODE_TITLE).toBe('Bot이 어떻게 실행할까요?')
   })
 
   it('consent title and body', () => {
