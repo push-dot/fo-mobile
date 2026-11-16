@@ -18,6 +18,10 @@ name: Bot 홈에서 채팅을 열고 돌아오면 행이 그 말을 보여 준�
     timeout: 10000
 - tapOn: ".*모아페이 Bot.*"
 - extendedWaitUntil:
+    visible: "이 변경을 이력서에 반영할까요?"
+    timeout: 15000
+- runFlow: _dismiss_approval.yaml
+- extendedWaitUntil:
     visible: "메시지.*"
     timeout: 15000
 - tapOn: "메시지.*"
