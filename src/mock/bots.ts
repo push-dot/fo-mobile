@@ -18,6 +18,8 @@ export type MockMessage = {
   text: string
   at: When
   attachments?: BotContract.Attachment[]
+  /** The answer of a turn whose update_my_profile run changed the profile: the stored tool line carries this change id. */
+  changeId?: string
   sources?: BotContract.Attachment[]
   /** What a search hit shows for this message, when a board draws a cut push-be's snippet rule (30 characters before the hit) would not give. */
   snippet?: string
@@ -424,6 +426,15 @@ export const resetBots = () => {
 }
 
 export const fixturesNow = () => fixtures
+/** A run the scripted chat played (chat/runs) is also a stored turn, so the thread reads the same when the chat is reopened. */
+export const recordRun = (address: string, text: string, reply: string, changeId?: string) => {
+  const f = fixtureOf(address)
+  if (!f) return
+  const turn = nextId('t')
+  const at = new Date().toISOString()
+  f.messages.push({ id: nextId('m'), turn, role: 'USER', text, at }, { id: nextId('m'), turn, role: 'ASSISTANT', text: reply, at, ...(changeId ? { changeId } : {}) })
+}
+
 /** A bot by id, or `push` for the Push Bot, as every /bots/{id} route reads its address. */
 export const fixtureOf = (address: string) => fixtures.find((f) => (address === 'push' ? f.bot.kind === 'push' : f.bot.id === address))
 

@@ -4,6 +4,7 @@
 import type { BotContract } from '@push/api-client'
 import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
 import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
+import { PROFILE_CHANGE_HEADLINE } from './bot-scripts/runs'
 import { hasReferenceConsent } from './chat'
 import { findMaterial } from './materials'
 import { readsMyFiles } from './me'
@@ -47,6 +48,7 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
         else if (s.phase) events.push(stamp({ type: 'status', text: s.text, phase: s.phase, since }, job.at))
       }
     }
+    if (bot?.changeId) events.push(stamp({ type: 'tool', name: 'update_my_profile', state: 'ok', summary: '프로필 수정', result: { headline: PROFILE_CHANGE_HEADLINE, changeId: bot.changeId } }, bot.at))
     if (bot) events.push(stamp({ type: 'token', text: bot.text }, bot.at))
     // A finished turn keeps its waiting statuses, so an answered card still has the one it asked with.
     for (const c of cards) {

@@ -483,6 +483,18 @@ export const generic = (text: string): Step[] => [
   ...say('정리했어요. 더 필요한 게 있으면 말해 주세요.'),
 ]
 
+/** The ask that makes the Bot change the headline at once (update_my_profile, rule 39) and leave 되돌리기. */
+// English like the other typed tours: Maestro cannot type Korean, and the Android keyboard capitalizes the first letter.
+export const PROFILE_CHANGE_ASK = 'change headline'
+export const PROFILE_CHANGE_HEADLINE = '결제·정산 시스템을 만드는 시니어 백엔드 개발자'
+export const PROFILE_CHANGE_REPLY = '한 줄 소개를 바꿨어요.'
+/** The tool line's result carries the change id, as push-be's does. */
+export const profileChangeRun = (changeId: string): Step[] => [
+  s(200, status('프로필을 고치는 중')),
+  s(400, { ...tool('update_my_profile', '프로필 수정', undefined, 'ok'), result: { headline: PROFILE_CHANGE_HEADLINE, changeId } }),
+  ...say(PROFILE_CHANGE_REPLY),
+]
+
 /** Approval id → choice → next steps. */
 export const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
   'tailor-apply': (c, l) => (c === 0 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '그대로 뒀어요')), ...say('이 수정은 적용하지 않았어요.')]),

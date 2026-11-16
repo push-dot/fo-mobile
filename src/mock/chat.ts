@@ -4,7 +4,9 @@ import type { ConversationTurn, LinkKind, Message, UserLink } from '@push/api-cl
 import type { ChatDoc, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
-import { fail, generic, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail, WAITING_CHOICES, WAITING_SINCE_MS } from './bot-scripts/runs'
+import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail, WAITING_CHOICES, WAITING_SINCE_MS } from './bot-scripts/runs'
+import { recordRun } from './bots'
+import { botProfileChange } from './me'
 import { mock, page } from './server'
 import { LEGAL_VERSION } from '@push/shared'
 
@@ -145,7 +147,8 @@ const scoped = (f: Frame, prefix: string): Frame => {
   const own = (id: string) => `${prefix}-${id}`
   switch (f.type) {
     case 'tool':
-      return { ...f, name: own(f.name) }
+      // update_my_profile keeps its name: the app finds the change id on the tool line of that name.
+      return { ...f, name: f.name === 'update_my_profile' ? f.name : own(f.name) }
     case 'todo':
       return { ...f, id: own(f.id ?? 'todo') }
     case 'paper':
@@ -209,6 +212,12 @@ const script = (b: RunInput, card: Card | undefined, choice: number | undefined)
     // Fresh ids: the stopped lines stay in the transcript and the resumed work continues below them.
     scenario.set(id, { prefix: `r${++runs}`, labels: TODO_PLUS })
     return tailorResume
+  }
+  if ((b.text ?? '').trim().toLowerCase() === PROFILE_CHANGE_ASK) {
+    const changeId = botProfileChange(PROFILE_CHANGE_HEADLINE)
+    recordRun(id, PROFILE_CHANGE_ASK, PROFILE_CHANGE_REPLY, changeId)
+    scenario.set(id, { prefix: `r${++runs}`, labels: TODO })
+    return profileChangeRun(changeId)
   }
   const p = pick(b.text ?? '', false, b.attachment, b.intent, account.run)!
   // run1: the token served this one message.
