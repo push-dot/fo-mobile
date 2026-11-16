@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_DOC, QUICK_STARTS, type QsInput } from '../constants'
+import { instantRun } from '../utils/quick-start-instant'
 
 const DOC = '11111111-1111-1111-1111-111111111111'
 
@@ -22,7 +23,7 @@ describe('quick start intent payloads', () => {
 
   it('writes the default hub profile with the right particle', () => {
     expect(start('link', { url: 'https://moapay.com/jobs/1', doc: DEFAULT_DOC })?.message).toBe('https://moapay.com/jobs/1 공고에 맞춰 허브 프로필을 고쳐 주세요')
-    expect(start('gap', { picked: [job], doc: DEFAULT_DOC })?.message).toBe('모아페이 백엔드 공고와 허브 프로필을 비교해서 부족한 점을 찾아 주세요')
+    expect(start('fit', { picked: [job], doc: DEFAULT_DOC })?.message).toBe('모아페이 백엔드 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요')
     expect(start('hub', { picked: [{ id: 'headline', title: '헤드라인' }], doc: DEFAULT_DOC })?.message).toBe('허브 프로필의 헤드라인을 다듬어 주세요')
   })
 
@@ -40,13 +41,9 @@ describe('quick start intent payloads', () => {
   })
 
   it('sends the resume intents with the picked document id', () => {
-    expect(start('gap', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
-      intent: 'gaps',
-      message: '모아페이 백엔드 공고와 이력서.pdf를 비교해서 부족한 점을 찾아 주세요',
-      context: { documentId: DOC },
-    })
     expect(start('fit', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
       intent: 'fit',
+      message: '모아페이 백엔드 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요',
       context: { documentId: DOC },
     })
     expect(start('boost', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
@@ -62,11 +59,6 @@ describe('quick start intent payloads', () => {
   })
 
   it('sends each tool intent in the seed sentence and no extra context keys', () => {
-    expect(start('deadline', { picked: [job, { id: 'q', over: '하루랩스', title: 'iOS' }] })).toEqual({
-      title: '마감 임박 공고 정리',
-      message: '마감 임박 공고 2개(모아페이, 하루랩스)의 준비할 일을 정리해 주세요',
-      intent: 'deadline_postings',
-    })
     expect(start('status', { picked: [job] })).toMatchObject({
       intent: 'applications',
       message: '모아페이 지원 현황을 정리하고 다음에 할 일을 알려 주세요',
@@ -95,7 +87,22 @@ describe('quick start intent payloads', () => {
     })
   })
 
-  it('tells the fit sheet that the score leads into a rewrite', () => {
-    expect(QUICK_STARTS.find((q) => q.key === 'fit')!.description).toBe('적합도를 보고, 점수가 오르도록 서류를 고쳐 드려요.')
+  it('merges 부족한 점 찾기 into 적합도 보기, which picks its posting inside its own sheet', () => {
+    expect(QUICK_STARTS.some((q) => q.key === 'gap')).toBe(false)
+    const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
+    expect(fit).toMatchObject({ label: '적합도 보기', listLabel: '공고', readsHub: true })
+    expect(fit.docLabel).toBeUndefined()
+    expect(fit.description).toBe('공고와 내 프로필을 비교해 점수와 부족한 점을 알려 드려요.')
+  })
+
+  it('sends 마감 임박 공고 정리 straight into the chat, with no sheet', () => {
+    const deadline = QUICK_STARTS.find((q) => q.key === 'deadline')!
+    expect(deadline.instant).toBe(true)
+    expect(instantRun('deadline')).toEqual({
+      title: '마감 임박 공고 정리',
+      message: '북마크한 공고 중 일주일 안에 마감되는 공고와 준비할 일을 알려 주세요',
+      intent: 'deadline_postings',
+    })
+    expect(instantRun('fit')).toBeNull()
   })
 })

@@ -289,7 +289,7 @@ export const useMyBookmarks = () => {
   })
   const unbookmark = useMutation({
     mutationFn: unbookmarkPosting,
-    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
+    onSettled: () => Promise.all([qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }), qc.invalidateQueries({ queryKey: ['calendar'] })]),
   })
   return { query, unbookmark }
 }

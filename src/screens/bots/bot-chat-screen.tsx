@@ -47,6 +47,7 @@ import {
   type ThreadRow,
   threadGreeting,
   quickStartPath,
+  instantRun,
   send,
   stop,
   useDoneNext,
@@ -291,7 +292,11 @@ const Thread = ({ id }: { id: string }) => {
               chat.awaiting ? (
                 <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
               ) : empty && kind ? (
-                <QuickStartRow kind={kind} onChip={(key) => router.push(quickStartPath(key))} />
+                <QuickStartRow kind={kind} onChip={(key) => {
+                  const run = instantRun(key)
+                  if (run) send(id, run.message, undefined, run.intent)
+                  else router.push(quickStartPath(key))
+                }} />
               ) : null
             }
           />

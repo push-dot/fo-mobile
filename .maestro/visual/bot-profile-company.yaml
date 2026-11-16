@@ -6,13 +6,12 @@ tags:
 - runFlow:
     file: _login_mock.yaml
     env:
-      MOCK: "push://sign-in?mock=reset,grants:none"
+      MOCK: "push://sign-in?mock=reset"
       READY: "새로 올라온 공고"
 - openLink: push://bots/b-moa/profile
 - extendedWaitUntil:
     visible: "백엔드 엔지니어"
     timeout: 10000
-# BotProfile and BotProfileColor draw 모아페이 without the 허용한 사이트 row, so the grants come only before BotProfileAllowed.
 - waitForAnimationToEnd
 - takeScreenshot: BotProfile
 - tapOn: "Bot 색 바꾸기"
@@ -24,27 +23,6 @@ tags:
 - tapOn: "적용"
 - extendedWaitUntil:
     visible: "백엔드 엔지니어"
-    timeout: 5000
-- openLink: "push://bots/b-moa/profile?mock=grants:seed"
-- extendedWaitUntil:
-    visible: "허용한 사이트.*"
-    timeout: 10000
-- tapOn: "허용한 사이트.*"
-- extendedWaitUntil:
-    visible: "careers.moapay.co.kr 허용 해제"
-    timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: BotProfileAllowed
-- tapOn: "careers.moapay.co.kr 허용 해제"
-- extendedWaitUntil:
-    notVisible: "careers.moapay.co.kr 허용 해제"
-    timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: BotProfileAllowedRevoke
-# BotProfileDelete draws the profile without the 허용한 사이트 row: revoking the last site closes the sheet and drops the row.
-- tapOn: "moapay.notion.site 허용 해제"
-- extendedWaitUntil:
-    notVisible: "허용한 사이트.*"
     timeout: 5000
 - tapOn: "Bot 삭제"
 - extendedWaitUntil:

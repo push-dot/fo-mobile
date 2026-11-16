@@ -18,7 +18,6 @@ export type QsSources = {
   doc?: string
 }
 
-const DAY = 86_400_000
 const ACTIVE = new Set(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER'])
 // 합격 is listed under 진행 중 but starts unchecked: there is nothing left to organize.
 const PRESELECT = new Set(['APPLIED', 'SCREENING', 'INTERVIEW'])
@@ -41,7 +40,7 @@ const person = (id: string, name: string, extra: Partial<QsItem> = {}): QsItem =
 /** Same location · career line as the jobs list card. */
 const where = (p: Posting) => [p.location, cardCareerLabel(p)].filter(Boolean).join(' · ')
 
-/** First segment, plus a second one only when its source loaded (빠른 시작 › 부족한 점 찾기, 커피챗 제안 쓰기). */
+/** First segment, plus a second one only when its source loaded (빠른 시작 › 적합도 보기, 커피챗 제안 쓰기). */
 const segmented = (first: string, items: QsItem[], second?: { label: string; items: QsItem[]; empty: string }): QsData =>
   second
     ? { segments: [first, second.label], items: [...items, ...second.items.map((it) => ({ ...it, seg: 1 }))], empty: [undefined, second.empty] }
@@ -51,7 +50,6 @@ const segmented = (first: string, items: QsItem[], second?: { label: string; ite
 export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsData => {
   const bookmarks = s.bookmarks ?? []
   switch (key) {
-    case 'gap':
     case 'fit': {
       const items = bookmarks.map((p, i) => job(p, { sub: where(p), selected: i === 0 }))
       const recent = s.recent && { label: '최근 본 공고', items: s.recent.map((p) => job(p, { sub: where(p) })), empty: '최근 본 공고가 없어요.' }
@@ -59,16 +57,6 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
     }
     case 'boost':
       return { doc: s.doc, items: bookmarks.map((p, i) => job(p, { sub: where(p), selected: i === 0 })) }
-    case 'deadline':
-      return {
-        items: bookmarks
-          .filter((p) => p.deadline && Date.parse(p.deadline) - now.getTime() <= 7 * DAY && dday(p.deadline, now) !== '마감')
-          .sort((a, b) => a.deadline!.localeCompare(b.deadline!))
-          .map((p) => {
-            const label = dday(p.deadline!, now)
-            return job(p, { badge: { label, tone: label === 'D-Day' || Number(label.slice(2)) <= 3 ? 'red' : 'grey' } })
-          }),
-      }
     case 'status': {
       const all = (s.applications ?? []).map((a) => ({
         active: ACTIVE.has(a.stage),
@@ -129,10 +117,8 @@ export const postingMeta = (p: Posting, now = new Date()) =>
 
 export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   link: ['doc'],
-  gap: ['bookmarks', 'recent', 'doc'],
   fit: ['bookmarks', 'recent', 'doc'],
   boost: ['bookmarks', 'doc'],
-  deadline: ['bookmarks'],
   status: ['applications'],
   calendar: [],
   hub: ['doc', 'profile'],

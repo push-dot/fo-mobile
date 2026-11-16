@@ -13,7 +13,7 @@ tags:
     visible: "Push Bot"
     timeout: 10000
 - extendedWaitUntil:
-    visible: "허용한 사이트.*"
+    visible: "자료.*"
     timeout: 10000
 # The 회사 row needs the bot list, which loads after the profile.
 - extendedWaitUntil:
@@ -32,14 +32,5 @@ tags:
 - tapOn:
     point: "8%,10%"
 - extendedWaitUntil:
-    visible: "허용한 사이트.*"
+    visible: "회사.*"
     timeout: 5000
-- tapOn: "허용한 사이트.*"
-- extendedWaitUntil:
-    visible: "Bot이 묻지 않고 읽는 사이트예요.*"
-    timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: BotProfileChiefAllowed
-# The sheet has no close button; a tap on the dimmed area above it closes it.
-- tapOn:
-    point: "50%,10%"
