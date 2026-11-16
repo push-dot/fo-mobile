@@ -2,7 +2,7 @@ import { ApiError } from '@push/api-client'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { View } from 'react-native'
-import { Button, Sheet, Spinner, Text, askConfirm, showToast } from '@/shared/components'
+import { Button, Spinner, Text, askConfirm, showToast } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing } from '@/theme'
 import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
@@ -20,6 +20,7 @@ import type { Material, MaterialKind } from '../types'
 import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
 import MaterialFacts from './material-facts'
 import { useInMaterialsModal } from './in-materials-modal'
+import { MaterialPage } from './material-page'
 import { sendMaterial } from './send-material'
 import { useSearchRoom } from './materials-search'
 
@@ -53,7 +54,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   const m = detail.data?.material
   if (!m) {
     return (
-      <Sheet>
+      <MaterialPage title="">
         {detail.isError ? (
           <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[4] }}>
             <Text v="b2" color="t3">
@@ -66,7 +67,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
             <Spinner />
           </View>
         )}
-      </Sheet>
+      </MaterialPage>
     )
   }
 
@@ -91,9 +92,9 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   const facts = detailFacts(m, detail.data?.usedBy ?? [], now)
 
   return (
-    <Sheet title={detailTitle(m)}>
-      <MaterialFacts facts={facts} />
-      <View style={{ gap: spacing[2] }}>
+    <MaterialPage title={detailTitle(m)}>
+      <View style={{ paddingHorizontal: spacing[5], gap: spacing[2] }}>
+        <MaterialFacts facts={facts} />
         <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
         <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
         <Button
@@ -102,6 +103,6 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
           onPress={() => askConfirm({ title: copy.title, body: copy.body, confirm: DELETE_CONFIRM, danger: true, onConfirm: onDelete })}
         />
       </View>
-    </Sheet>
+    </MaterialPage>
   )
 }

@@ -1,11 +1,12 @@
 import { Pressable, View } from 'react-native'
 import { useBots, type Bot } from '@/features/bots'
-import { Icon, Mascot, Sheet, Text } from '@/shared/components'
+import { Icon, Mascot, Text } from '@/shared/components'
 import { radius, spacing } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
 import { SEND_PICK_HINT } from '../constants'
 import type { MaterialKind } from '../types'
 import { toAttachment } from '../utils/material-row'
+import { MaterialPage } from './material-page'
 import { sendToBot } from './send-material'
 
 const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
@@ -28,8 +29,15 @@ export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) =>
   const bots = useBots().data ?? []
   const attachment = material ? toAttachment(material) : null
   return (
-    <Sheet title={SEND_PICK_HINT} description={attachment?.title} gap={spacing[2]}>
-      <View>{attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}</View>
-    </Sheet>
+    <MaterialPage title={SEND_PICK_HINT}>
+      <View style={{ paddingHorizontal: spacing[3], gap: spacing[2] }}>
+        {attachment ? (
+          <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[2] }}>
+            {attachment.title}
+          </Text>
+        ) : null}
+        {attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}
+      </View>
+    </MaterialPage>
   )
 }
