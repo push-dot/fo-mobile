@@ -189,6 +189,8 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
         if (event.type === 'approval' && pending) event.approval.pendingNote = pending
         return [event]
       }
+      // The profile is already saved when the server sends the result gate with auto set (rule 39): nothing was picked, so no line says it was.
+      if (ev.gate === 'present') return []
       const picked = autoPicks(ev)
       return picked ? [{ type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked}` }] : []
     }

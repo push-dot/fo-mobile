@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type BotContract, type ChatIntent } from '@push/api-client'
 import type { Attachment, AttachmentKind, BotId } from '@/features/bots'
-import { myApi } from '@/features/my/api/fetchers'
+import { fetchMyProfile, myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
@@ -12,6 +12,7 @@ import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_
 import { applyEvent, emptyChat } from './utils/reducer'
 import { createTokenBatch } from './utils/token-batch'
 import { isConsentRequired } from './utils/consent'
+import { holdProfile, keepUndo, restorePatch, takeHeld } from './utils/profile-undo'
 import { errorText, fromStream, type StreamEnd } from './utils/stream'
 import { openPieceId, restoreBotTurns } from './utils/turns'
 import { fromFirst, prependOlder } from './utils/find'
@@ -175,7 +176,26 @@ const tokenBatch = createTokenBatch(
   schedule,
 )
 
+// update_my_profile runs without asking (rule 39): the line after it says so and puts the old values back on 되돌리기.
+const PROFILE_SAVED = '프로필을 고쳤어요.'
+let undoCount = 0
+
+const trackProfile = (id: string, e: ChatEvent) => {
+  if (e.type === 'start') return holdProfile(id, queryClient.getQueryData(['me', 'profile']))
+  if (e.type !== 'tool' || e.name !== 'update_my_profile' || e.state !== 'ok') return
+  const before = takeHeld(id)
+  if (!before) return
+  void queryClient.fetchQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile, staleTime: 0 }).then((after) => {
+    const patch = restorePatch(before, after)
+    if (!Object.keys(patch).length) return
+    const itemId = `undo-${++undoCount}`
+    keepUndo(itemId, patch)
+    setChatEvent(id, { type: 'agentText', id: itemId, text: PROFILE_SAVED, undo: true })
+  }, () => undefined)
+}
+
 const dispatch = (id: string, e: ChatEvent) => {
+  trackProfile(id, e)
   if (e.type === 'token') {
     tokenBatch.push(id, e.text)
     return
