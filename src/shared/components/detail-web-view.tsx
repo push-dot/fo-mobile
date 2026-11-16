@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { spacing, useColors, useThemeMode } from '../../theme'
-import { bootScript, detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript, tokenEventScript, webViewNavigation, type DetailFrom } from './detail-url'
+import { bootScript, detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, mockFitSoonOn, mockFitThreeOn, mockWebPlanOf, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import Text from './text'
@@ -44,11 +44,7 @@ const DetailWebView = ({ path, from, onBridge }: Props) => {
     if (applyZoom) ref.current?.injectJavaScript(applyZoom)
   }, [applyZoom])
 
-  const onNavigate = ({ url }: { url: string }) => {
-    const target = webViewNavigation(url, WEB_BASE_URL)
-    if (target === 'browser') void openBrowser(url)
-    return target === 'load'
-  }
+  const onNavigate = ({ url }: { url: string }) => routeNavigation(url, WEB_BASE_URL, openBrowser)
 
   const onMessage = (e: WebViewMessageEvent) => {
     let m: { type?: string; path?: unknown; url?: unknown; status?: unknown } & Record<string, unknown>

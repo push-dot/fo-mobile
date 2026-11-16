@@ -29,7 +29,7 @@ export const HOLD_FIT_SCRIPT =
 export const SOON_FIT_SCRIPT =
   "import(location.origin+'/src/shared/api/mock.ts').then(function(m){Object.defineProperty(m.mockFit,'score',{get:function(){throw new Error('mock fit soon')},configurable:true})});"
 
-const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0] ?? null
+const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0].toLowerCase() ?? null
 
 /** Only fo-web itself may load in the WebView: the page gets the session token, and react-native-webview's originWhitelist matches by prefix. */
 export const loadsInWebView = (url: string, base: string) => url === 'about:blank' || originOf(url) === originOf(base)
@@ -37,6 +37,13 @@ export const loadsInWebView = (url: string, base: string) => url === 'about:blan
 /** Where a navigation goes: fo-web loads in place, other http(s) pages open in the system browser, everything else (intent:, push:, tel:, javascript:) is dropped. */
 export const webViewNavigation = (url: string, base: string): 'load' | 'browser' | 'ignore' =>
   loadsInWebView(url, base) ? 'load' : /^https?:\/\//i.test(url) ? 'browser' : 'ignore'
+
+/** Whether the WebView loads the navigation; an http(s) page elsewhere goes to `open`, and a browser that fails to open shows nothing. */
+export const routeNavigation = (url: string, base: string, open: (url: string) => Promise<void>) => {
+  const target = webViewNavigation(url, base)
+  if (target === 'browser') open(url).catch(() => undefined)
+  return target === 'load'
+}
 
 const onWebOrigin = (base: string, script: string) => `if(location.origin===${JSON.stringify(originOf(base))}){${script}}true;`
 
