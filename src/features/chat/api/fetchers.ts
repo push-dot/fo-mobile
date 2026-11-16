@@ -2,7 +2,8 @@ import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
-import { DEFAULT_DOC, MICRO_CREDITS_PER_CREDIT } from '../constants'
+import { DEFAULT_DOC } from '../constants'
+import { accountFromBilling } from '../utils/account'
 import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
@@ -44,9 +45,7 @@ export const chatApi = {
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
-    const total = Math.round(b.monthlyMicroCredits / MICRO_CREDITS_PER_CREDIT)
-    const used = Math.round(b.spentMicroCredits / MICRO_CREDITS_PER_CREDIT)
-    return { email: me.email || null, plan: b.plan ?? 'FREE', credits: total > 0 ? { used, total } : null, paymentsEnabled: b.paymentsEnabled, creditsRefillAt: b.creditsRefillAt }
+    return accountFromBilling(b, me.email)
   },
   // shortcut: push-be has no chat/quick-starts; real mode assembles each sheet from existing lists (quickStartFrom).
   quickStart: async (key: string): Promise<QsData> => {
