@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, KeyboardAvoidingView, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
-import { accountPath, materialPickerPath as botMaterialPath, useBot, useBotProfile, type BotId } from '@/features/bots'
+import { accountPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
   AWAITING_TEXT,
   ApprovalPanel,
@@ -188,10 +188,6 @@ const Thread = ({ id }: { id: string }) => {
   const onView = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
     router.push(`/docs/push/${card.documentId}`)
   }, [])
-  const onReadOff = useCallback(
-    (action: 'attach' | 'settings') => router.push(action === 'attach' ? botMaterialPath(id as BotId) : '/settings'),
-    [id],
-  )
   const onUsage = useCallback((action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
@@ -208,11 +204,11 @@ const Thread = ({ id }: { id: string }) => {
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
         ) : (
-          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onReadOff={onReadOff} />
+          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} />
         )}
       </RowMotion.Provider>
     ),
-    [onView, onUsage, onReadOff, working, id, color, live],
+    [onView, onUsage, working, id, color, live],
   )
 
   return (

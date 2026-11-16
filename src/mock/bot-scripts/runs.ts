@@ -2,7 +2,7 @@
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 // Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
-import { GATED_STEP, HINTLESS_GATES, READ_OFF_TEXT } from '../../features/chat/constants'
+import { GATED_STEP, HINTLESS_GATES } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
 import { DRAFT_V1_MD, PAGE_READ_OPTIONS } from './cards'
@@ -564,7 +564,7 @@ const awaitReply: Step[] = [
 ]
 export const fail = (code: string, details?: Record<string, unknown>): Step[] => [s(300, { type: 'error', error: { code, message: code, ...(details ? { details } : {}) } })]
 
-// The company-bot status boards (ChatBotStatus*, ChatBotReadOff): one status line held, one card, or one finished answer.
+// The company-bot status boards (ChatBotStatus*): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
 // ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
 // so no line depends on how long Maestro takes to read the screen (its waits end early or late).
@@ -646,8 +646,6 @@ export const TOKENS: Record<string, Step[]> = {
   'st-long': held('공고 읽는 중'),
   'st-help': statusHelp,
   'st-approve': statusApprove,
-  // The stream mapper reads a notice frame at runtime (notices.ts), though the scripted frame type does not list one.
-  'read-off': [s(300, { type: 'notice', text: READ_OFF_TEXT } as unknown as Frame), done],
   'tailor hold': [...tailorRead, ...tailorFit(TODO, -1, HOLD)],
   // ChatStates.4 in one conversation: the file card, then the apply record, then (busy below) the 혼잡 error.
   'states-file': statesFile,

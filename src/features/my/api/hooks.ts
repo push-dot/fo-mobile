@@ -56,6 +56,7 @@ import {
   setDocumentBaseProfile,
   unfollowProfile,
   unbookmarkPosting,
+  grantReferenceAccess,
   updateProfile,
   updateMarketingConsent,
   updateReferenceConsent,
@@ -80,7 +81,15 @@ export const useReferenceConsent = () => {
     onSuccess: (data) => qc.setQueryData(['me', 'consents'], data),
     onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
-  return { data: q.data, save: m.mutate, saving: m.isPending }
+  const grant = useMutation({
+    mutationFn: grantReferenceAccess,
+    onSuccess: (data) => {
+      qc.setQueryData(['me', 'consents'], data)
+      void qc.invalidateQueries({ queryKey: ['me', 'settings'] })
+    },
+    onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+  return { data: q.data, save: m.mutate, grant: grant.mutate, saving: m.isPending }
 }
 
 export const useMarketingConsent = () => {

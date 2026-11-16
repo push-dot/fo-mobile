@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Alert } from 'react-native'
-import { updateReferenceConsent } from '@/features/my/api/fetchers'
+import { grantReferenceAccess } from '@/features/my/api/fetchers'
 import { showConsentModal } from '@/shared/navigation'
 import { CONSENT_AGREE, CONSENT_BODY, CONSENT_DETAIL, CONSENT_TITLE } from '../constants'
 import { grantConsent, laterConsent, useConsentPrompt } from '../stores'
@@ -17,8 +17,8 @@ export const ConsentPromptListener = () => {
     showConsentModal(COPY, {
       onLater: laterConsent,
       onAgree: () =>
-        updateReferenceConsent(true).then(
-          (data) => (qc.setQueryData(['me', 'consents'], data), grantConsent()),
+        grantReferenceAccess().then(
+          (data) => (qc.setQueryData(['me', 'consents'], data), void qc.invalidateQueries({ queryKey: ['me', 'settings'] }), grantConsent()),
           () => (Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'), laterConsent()),
         ),
     })

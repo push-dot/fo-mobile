@@ -19,8 +19,6 @@ export type MockMessage = {
   at: When
   attachments?: BotContract.Attachment[]
   sources?: BotContract.Attachment[]
-  /** The bot's whole turn is a notice (ChatBotReadOff), not text. */
-  notice?: true
   /** What a search hit shows for this message, when a board draws a cut push-be's snippet rule (30 characters before the hit) would not give. */
   snippet?: string
 }

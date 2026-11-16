@@ -83,6 +83,12 @@ export const updateMarketingConsent = (marketing: boolean) => api.me.updateMarke
 
 export const updateSettings = api.me.updateSettings
 
+export const grantReferenceAccess = async () => {
+  const consents = await updateReferenceConsent(true)
+  await updateSettings({ allowAiReadMyFiles: true })
+  return consents
+}
+
 export const fetchBookmarkList = () => api.me.bookmarks({ limit: 100 })
 
 export const fetchLinks = () => api.me.links(undefined, { limit: 100 })

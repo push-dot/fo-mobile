@@ -224,7 +224,7 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
     }
     default: {
       // push-be #224: a type this build does not know must not stop the stream.
-      const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; code?: string; seq?: number }, turn) : null
+      const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; seq?: number }) : null
       return notice ? [notice] : []
     }
   }

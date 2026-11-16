@@ -365,7 +365,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     if (!form.consent) return
     showConsentModal(CONSENT_COPY, {
       onLater: () => setForm(dismissConsent),
-      onAgree: () => consent.save(true, { onSuccess: () => void run(dismissConsent(form)) }),
+      onAgree: () => consent.grant(undefined, { onSuccess: () => void run(dismissConsent(form)) }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per consent request, not per render
   }, [form.consent])
