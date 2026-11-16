@@ -13,6 +13,10 @@ export const countdownLabel = (totalSeconds: number) => `${formatCountdown(total
 // The boards keep a code error up while the code is edited; a newly completed code is a fresh attempt.
 export const otpErrorAfterInput = <E>(error: E | null, prev: string, next: string) => (next.length === OTP_LENGTH && next !== prev ? null : error)
 
+export type OtpResendSlot = 'countdown' | 'resend'
+
+export const otpResendSlot = (remainingSec: number): OtpResendSlot => (remainingSec > 0 ? 'countdown' : 'resend')
+
 export const remainingSeconds = (endsAtMs: number, nowMs: number) => Math.max(0, Math.ceil((endsAtMs - nowMs) / 1000))
 
 export type PhoneAuthFailure =

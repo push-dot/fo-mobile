@@ -3,7 +3,8 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ApiError } from '@push/api-client'
 import { useReferenceConsent } from '@/features/my'
-import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, showConsentAlert, useKeyboardHeight, WordClampText } from '@/shared/components'
+import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
+import { showConsentModal } from '@/shared/navigation'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
@@ -359,12 +360,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per failure, not per render
   }, [failed])
 
-  // BotNewConsent: the platform's own alert; 동의하고 시작하기 saves the consent and creates the bot.
+  // BotNewConsent: the regular modal; 동의하고 시작하기 saves the consent and creates the bot.
   useEffect(() => {
     if (!form.consent) return
-    showConsentAlert(CONSENT_COPY, {
+    showConsentModal(CONSENT_COPY, {
       onLater: () => setForm(dismissConsent),
-      onAgree: () => consent.save(true, { onSuccess: () => void run(dismissConsent(form)) }),
+      onAgree: () => consent.grant(undefined, { onSuccess: () => void run(dismissConsent(form)) }),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per consent request, not per render
   }, [form.consent])

@@ -5,11 +5,19 @@ const platform = vi.hoisted(() => ({ OS: 'ios' }))
 vi.mock('react-native', () => ({ Platform: platform }))
 vi.mock('expo-secure-store', () => ({}))
 
-const { fullSheetOptions, modalOptions, sheetOptions } = await import('./sheet-options')
+const { fullSheetOptions, modalOptions, sheetOptions, tintedSheetOptions } = await import('./sheet-options')
 const c = palette.light
 
 beforeEach(() => {
   platform.OS = 'ios'
+})
+
+describe('tintedSheetOptions', () => {
+  it('lays the design sheet tint over the iOS material and keeps the plain Android surface', () => {
+    expect(tintedSheetOptions(c).contentStyle).toEqual({ backgroundColor: c.sheet })
+    platform.OS = 'android'
+    expect(tintedSheetOptions(c).contentStyle).toEqual({ backgroundColor: c.bg })
+  })
 })
 
 describe('sheetOptions', () => {

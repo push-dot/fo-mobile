@@ -46,8 +46,8 @@ beforeEach(() => {
 })
 
 describe('ConsentPromptListener', () => {
-  it('shows the platform alert, not a route, when the prompt opens while the chat tab stays unfocused', () => {
-    expect(listenerSource).toContain('showConsentAlert(')
+  it('opens the choice modal, not its own route, when the prompt opens while the chat tab stays unfocused', () => {
+    expect(listenerSource).toContain('showConsentModal(')
     expect(listenerSource).not.toContain('router')
     expect(stackLayoutSource).not.toContain('name="consent"')
   })

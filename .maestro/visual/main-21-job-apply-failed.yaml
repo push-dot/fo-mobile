@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 # The ApplySheet boards draw the fit card with three parts (G74), so the page opens under `fit-three`.
-# POST apply answers 500, so the sheet shows the error line and the button is back.
+# POST apply answers 500, so the error is a native alert over the sheet; 닫기 puts the button back in reach.
 - runFlow:
     file: _login_mock.yaml
     env:
@@ -45,4 +45,5 @@ tags:
       platform: iOS
     commands:
       - takeScreenshot: JobDetailStates.3
+- tapOn: "닫기"
 - openLink: push://?mock=reset

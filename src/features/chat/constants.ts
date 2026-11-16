@@ -17,16 +17,11 @@ export const ACCESS_MODES: { key: AccessMode; label: string; row: string; desc: 
   { key: 'BYPASS', label: '바로 실행', row: '바로 변경', desc: '묻지 않고 실행해요' },
 ]
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
-export const ACCESS_MODE_TITLE = 'Bot이 어떻게 실행할까요?'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
 export const CHOICE_QUESTION = '어떻게 할까요?'
 export const MULTI_PICK_SUBMIT = '이대로 진행'
-/** push-be material_access.REFUSED: the notice a tool sends when 내 자료 읽기 허용 is off (ChatBotReadOff). */
-export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
-export const READ_OFF_CODE = 'read_switch_off'
-export const READ_OFF_ACTIONS = { attach: '서류 첨부', settings: '설정 열기' } as const
 export const HINTLESS_GATES = ['validate_cap']
 
 /** The in-progress phrase while the cancel request is out (ChatBotStatusStopped, rule 29: a status is the step under way, the result is a bubble). */
@@ -84,10 +79,8 @@ export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 �
 export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
 export const LINK_UNDO = '되돌리기'
 export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
-export const CONSENT_MORE = '자세히 보기'
 export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
-export const CONSENT_LATER = '나중에'
 /** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
 export const DEFAULT_DOC = '허브 프로필'
 const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`

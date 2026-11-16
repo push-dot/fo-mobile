@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ScrollView } from 'react-native'
+import { Alert, ScrollView } from 'react-native'
 import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
 import { Sheet, TOAST_ABOVE, showToast } from '@/shared/components'
 
@@ -24,6 +24,10 @@ const ApplySheetScreen = () => {
     if (!postingId) router.back()
   }, [postingId])
 
+  useEffect(() => {
+    if (apply.isError) Alert.alert('지원하지 못했어요', '잠시 후 다시 눌러 주세요.', [{ text: '닫기', style: 'cancel' }])
+  }, [apply.isError])
+
   if (!postingId) return null
 
   const p = posting.data
@@ -46,7 +50,6 @@ const ApplySheetScreen = () => {
           extraIds={extraIds}
           onPick={setPicked}
           onToggleExtra={(id) => setExtraIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))}
-          error={apply.isError}
         />
       </ScrollView>
     </Sheet>

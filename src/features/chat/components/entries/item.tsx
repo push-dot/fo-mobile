@@ -5,7 +5,6 @@ import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
-import ReadOff, { type ReadOffAction } from './read-off'
 import UserBubble, { useBubbleMax } from './user'
 import { radius, spacing, type as typography, useColors, type Colors } from '../../../../theme'
 import { Button, Icon, Text } from '@/shared/components'
@@ -301,13 +300,11 @@ const ItemComponent = ({
   writing,
   onUsage,
   onView,
-  onReadOff,
 }: {
   item: ChatItem
   writing?: boolean
   onUsage?: (action: 'plan' | 'credits') => void
   onView?: (item: Of<'result'>) => void
-  onReadOff?: (action: ReadOffAction) => void
 }) => {
   switch (item.type) {
     case 'user':
@@ -316,8 +313,6 @@ const ItemComponent = ({
       return <BotText item={item} onView={onView} />
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
-    case 'readOff':
-      return <ReadOff item={item} onAction={onReadOff} />
     case 'tool':
       // Tool lines are not drawn, except a failed step that says why: the red line of ChatErrors ("자격 요건"을 읽지 못했어요 · …).
       return item.state === 'err' && item.error ? <ErrorLine id={item.id} text={item.error} /> : null

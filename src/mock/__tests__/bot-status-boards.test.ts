@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createBotApi, createClient } from '@push/api-client'
-import { GATED_STEP, READ_OFF_TEXT } from '../../features/chat/constants'
+import { GATED_STEP } from '../../features/chat/constants'
 import { splitBotText } from '../../features/chat/utils/bot-text'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import { pick } from '../bot-scripts/runs'
@@ -38,10 +38,6 @@ describe('company-bot status board tokens', () => {
   it('stops at a card that waits for an answer', () => {
     expect(frames('st-help').map((f) => f.type)).toEqual(['choice', 'done'])
     expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '채용 페이지 열기', summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?' })
-  })
-
-  it('refuses with the read-off notice', () => {
-    expect(frames('read-off')[0]).toEqual({ type: 'notice', text: READ_OFF_TEXT })
   })
 
   it('answers the Android alias in its capitalized form', () => {

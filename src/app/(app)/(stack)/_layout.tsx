@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router'
 import { View } from 'react-native'
 import { ConsentPromptListener } from '@/features/chat'
-import { fullPageOptions, modalOptions, sheetOptions } from '@/shared/navigation'
+import { fullPageOptions, modalOptions, sheetOptions, tintedSheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
@@ -35,7 +35,6 @@ const SignedInStack = () => {
       <Stack.Screen name="activity/follows" />
       <Stack.Screen name="activity/posts" />
       <Stack.Screen name="activity/applications/[id]" />
-      <Stack.Screen name="access-mode" options={sheetOptions(c)} />
       <Stack.Screen name="choice" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
       <Stack.Screen name="terms-view" />
@@ -54,9 +53,9 @@ const SignedInStack = () => {
       <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="account-usage" />
       <Stack.Screen name="plan" options={fullPageOptions()} />
-      <Stack.Screen name="job-filter" options={sheetOptions(c)} />
+      <Stack.Screen name="job-filter" options={tintedSheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
-      <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
+      <Stack.Screen name="hub-filter" options={tintedSheetOptions(c)} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
       <Stack.Screen name="activity/calendar" options={sheetOptions(c)} />

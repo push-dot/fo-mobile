@@ -1,19 +1,9 @@
 import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
-import { READ_OFF_TEXT } from '../constants'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { noticeBubble } from '../utils/status-line'
-import { fromStream, mapEvent } from '../utils/stream'
+import { mapEvent } from '../utils/stream'
 import { restoreBotTurns } from '../utils/turns'
-
-const frames = async function* (list: { type: string; seq: number; turn: string; text?: string; code?: string }[]) {
-  yield* list
-}
-const collect = async (source: ReturnType<typeof fromStream>) => {
-  const out = []
-  for await (const e of source) out.push(e)
-  return out
-}
 
 describe('ChatPh3Review moved line', () => {
   const diff = (hunks: { line: number | null; sign: '+' | '-' | ''; text: string }[]) => mapEvent({ type: 'diff', documentId: 'd', revisionId: 'r', hunks } as StreamEvent)
@@ -52,24 +42,13 @@ describe('ChatPh0Input', () => {
   })
 })
 
-describe('ChatBotReadOff', () => {
-  const notice = { type: 'notice', seq: 2, turn: 't1', text: READ_OFF_TEXT }
-
-  it('draws the refusal as one bubble per turn, with or without the code', async () => {
-    const live = await collect(fromStream(frames([notice, { ...notice, seq: 3, text: 'x', code: 'read_switch_off' }]), async function* () {}))
-    expect(live).toEqual([
-      { type: 'readOff', id: 'read-off-t1', text: READ_OFF_TEXT },
-      { type: 'readOff', id: 'read-off-t1', text: READ_OFF_TEXT },
-    ])
-    expect(live.reduce(applyEvent, emptyChat).items).toHaveLength(1)
-  })
-
-  it('draws any other notice as a failed-step line and keeps the same entry id after a reopen', () => {
+describe('notices', () => {
+  it('draws a notice as a failed-step line and keeps the same entry id after a reopen', () => {
     expect(mapEvent({ type: 'notice', text: '방향 검증에서 문제가 생겼어요', seq: 1 } as unknown as StreamEvent)).toEqual([
       { type: 'notice', id: 'notice-1', notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요' } },
     ])
-    const stored = restoreBotTurns([{ id: 't1', status: 'DONE', createdAt: '', user: null, answer: null, assistant: null, events: [{ type: 'notice', text: READ_OFF_TEXT, seq: 9, at: '' }] } as never])
-    expect(stored.items).toEqual([{ type: 'readOff', id: 'read-off-t1', text: READ_OFF_TEXT }])
+    const stored = restoreBotTurns([{ id: 't1', status: 'DONE', createdAt: '', user: null, answer: null, assistant: null, events: [{ type: 'notice', text: '방향 검증에서 문제가 생겼어요', seq: 9, at: '' }] } as never])
+    expect(stored.items).toEqual([{ type: 'notice', id: 'notice-9', notice: { kind: 'failed', text: '방향 검증에서 문제가 생겼어요' } }])
   })
 })
 
