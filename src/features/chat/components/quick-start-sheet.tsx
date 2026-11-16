@@ -16,7 +16,6 @@ import { initialPicks, startLink } from '../utils/quick-start-data'
 import { quickStartAllPath } from '../utils/sheet-routes'
 
 
-/** Ingredient sheet for one quick start (Qs*.html). Collects what the task needs, then starts the conversation. `all` is its page-style modal with the whole list. */
 export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
   return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null
 }
@@ -36,7 +35,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   const [adding, setAdding] = useState<string | null>(null)
   const [option, setOption] = useState(true)
   const [doc, setDoc] = useState<string>()
-  const [pickingDoc, setPickingDoc] = useState(false)
+  const [pickingDoc, setPickingDoc] = useState(!!all)
   const [pickingJob, setPickingJob] = useState(false)
   const [task, setTask] = useState(0)
   const [custom, setCustom] = useState('')
@@ -47,7 +46,6 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
     setSeen(d)
     setSel(initialPicks(qs, d.items))
     setChips(d.chips ?? [])
-    // Only the quick start with a document row reads another file; every other one reads the hub profile (RULINGS 31), whatever the server seeds.
     setDoc(d.doc && !qs.docLabel ? DEFAULT_DOC : d.doc)
   }
 
@@ -295,7 +293,6 @@ const PickerRow = ({ label, value, onPress }: { label: string; value: string; on
   )
 }
 
-/** The hub profile is the only document a quick start reads (RULINGS 31); only 점수 올리기 lets the user pick another one, so only it draws this row. */
 const DocField = ({
   label,
   doc,

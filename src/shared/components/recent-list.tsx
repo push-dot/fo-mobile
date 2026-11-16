@@ -14,7 +14,7 @@ type Props<T> = {
 }
 
 const RecentList = <T,>({ items, keyOf, renderItem, onSeeAll, limit }: Props<T>) => {
-  const shown = recent(items, limit)
+  const shown = onSeeAll ? recent(items, limit) : items
   return (
     <View>
       {shown.map((item) => (
