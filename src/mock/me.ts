@@ -13,6 +13,7 @@ import type {
 } from '@push/api-client'
 import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
+import { deadlineEvents } from './calendar-deadlines'
 import { removeChatDoc } from './chat'
 import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
 
@@ -500,7 +501,7 @@ const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', 
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
   const to = query.get('to') ?? '9999'
-  const inWindow = events.filter((e) => e.startsAt >= from && e.startsAt < to)
+  const inWindow = [...events, ...deadlineEvents()].filter((e) => e.startsAt >= from && e.startsAt < to)
   return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))

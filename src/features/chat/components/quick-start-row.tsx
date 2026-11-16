@@ -3,7 +3,7 @@ import { radius, spacing, useColors } from '../../../theme'
 import { Icon3D, Text } from '@/shared/components'
 import { QUICK_STARTS } from '../constants'
 
-const COMPANY_CHIP_KEYS = ['fit', 'gap', 'boost', 'exp'] as const
+const COMPANY_CHIP_KEYS = ['fit', 'boost', 'exp'] as const
 
 export const quickStartsFor = (kind: 'push' | 'company') =>
   kind === 'push'

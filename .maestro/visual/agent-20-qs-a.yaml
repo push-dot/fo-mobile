@@ -18,14 +18,8 @@ tags:
 - runFlow:
     file: _qs.yaml
     env:
-      LABEL: "부족한 점 찾기"
-      WAIT: "기준"
-      SHOT: QsGap
-- runFlow:
-    file: _qs.yaml
-    env:
       LABEL: "적합도 보기"
-      WAIT: "기준"
+      WAIT: ".*공고 모아페이.*"
       SHOT: QsFit
 - runFlow:
     file: _qs.yaml

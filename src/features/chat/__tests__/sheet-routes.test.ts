@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { materialPickerPath, quickStartPath } from '../utils/sheet-routes'
+import { materialPickerPath, quickStartAllPath, quickStartPath } from '../utils/sheet-routes'
 
 const STACK = join(__dirname, '../../../app/(app)/(stack)')
 const layout = readFileSync(join(STACK, '_layout.tsx'), 'utf8')
@@ -21,5 +21,11 @@ describe('chat sheet routes', () => {
     const route = routeOf(href, param)
     expect(existsSync(join(STACK, `${route}.tsx`))).toBe(true)
     expect(layout).toContain(`name="${route}"`)
+  })
+
+  it('the full-list page of a quick start is a page-style modal route', () => {
+    expect(quickStartAllPath('fit')).toBe('/quick-start/fit/all')
+    expect(existsSync(join(STACK, 'quick-start/[key]/all.tsx'))).toBe(true)
+    expect(layout).toMatch(/name="quick-start\/\[key\]\/all" options=\{modalOptions\(c\)\}/)
   })
 })

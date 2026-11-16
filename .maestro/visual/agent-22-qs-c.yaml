@@ -29,3 +29,36 @@ tags:
       LABEL: "커리어 글 쓰기"
       WAIT: "직접 주제 정하기"
       SHOT: QsPost
+# 전체 보기 opens the page-style modal with the whole list; its close button leaves it.
+- runFlow:
+    file: _pill.yaml
+    env:
+      LABEL: "제안 답장 쓰기"
+      DIR: left
+- tapOn: "제안 답장 쓰기"
+- extendedWaitUntil:
+    visible: "전체 보기"
+    timeout: 15000
+- tapOn: "전체 보기"
+- extendedWaitUntil:
+    visible: ".*강민호.*"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: QsReplyAll
+- tapOn: "닫기"
+- waitForAnimationToEnd
+- runFlow:
+    file: _pill.yaml
+    env:
+      LABEL: "커리어 글 쓰기"
+      DIR: left
+- tapOn: "커리어 글 쓰기"
+- extendedWaitUntil:
+    visible: "전체 보기"
+    timeout: 15000
+- tapOn: "전체 보기"
+- extendedWaitUntil:
+    visible: ".*면접에서 받은 질문 정리.*"
+    timeout: 15000
+- waitForAnimationToEnd
+- takeScreenshot: QsPostAll

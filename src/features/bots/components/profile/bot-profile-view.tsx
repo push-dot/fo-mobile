@@ -1,32 +1,24 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
-import { Button, GlassPressable, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
+import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
 import { isXlScale } from '@/shared/components/xl-chrome'
-import { platformTheme, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
 import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
 import type { Bot, BotAddress } from '../../types'
 import {
-  ALLOWED_SHEET_LABEL,
   COLOR_A11Y,
   PROFILE_ERROR_BODY,
   PROFILE_ERROR_TITLE,
   PROFILE_LOADING_LABEL,
   RETRY_LABEL,
-  REVOKE_LABEL,
-  allowedSheetTitle,
-  GRANT_INTRO,
-  grantMeta,
   profileGroups,
-  revokeA11y,
   type ProfileRow,
 } from './profile-rows'
 import { companyNames } from './companies'
 import { confirmDeleteBot } from './confirm-delete-bot'
-import { SheetCard } from './sheet-card'
-import { useRevokeSiteGrant, useSiteGrants } from './use-site-grants'
 
 // BotProfile boards: `.pnav` is 60 high with 16pt edges, the chat header's measure. Android keeps its own bar.
 const IOS = Platform.OS === 'ios'
@@ -157,12 +149,9 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const mode = useThemeMode()
   const profile = useBotProfile(address)
   const listed = useBot(address)
-  const { grants, count } = useSiteGrants(address)
-  const revoke = useRevokeSiteGrant(address)
   const setMuted = useSetBotMuted()
   const remove = useDeleteBot()
   const companies = companyNames(useBots().data)
-  const [sheet, setSheet] = useState<'allowed' | null>(null)
   const [deleting, setDeleting] = useState(false)
   if (profile.isLoading) return <Loading />
   if (profile.isError || !profile.data) return <Failed bot={listed.data} onRetry={() => void profile.refetch()} />
@@ -173,25 +162,14 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     posting: posting && { deadline: posting.deadline },
     fitScore: profile.data.fitScore,
     materialCount: profile.data.materialCount,
-    grantCount: count,
     companyCount: companies.length,
   })
   const open = (row: ProfileRow) => {
     if ((row.id === 'posting' || row.id === 'fit') && posting) router.push(`/postings/${posting.id}`)
     if (row.id === 'materials') router.push(materialsPath(bot.id))
-    if (row.id === 'allowed') setSheet('allowed')
     if (row.id === 'companies') router.push(botCompaniesPath(bot.id))
     if (row.id === 'color' && bot.kind === 'company') router.push(botColorPath(bot.id))
     if (row.id === 'delete' && bot.kind === 'company') confirmDeleteBot(bot.name, () => void onDelete())
-  }
-  const onRevoke = async (host: string) => {
-    const left = grants.filter((grant) => grant.host !== host).length
-    try {
-      await revoke.mutateAsync(host)
-    } catch {
-      return
-    }
-    if (left === 0) setSheet(null)
   }
   const onDelete = async () => {
     if (bot.kind !== 'company' || deleting) return
@@ -243,7 +221,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     if (row.id === 'delete') {
       return <SettingsRow key={row.id} label={row.label} danger onPress={() => open(row)} right={<View />} />
     }
-    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed' || row.id === 'companies') {
+    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'companies') {
       const dead = row.id === 'fit' && !posting
       return <SettingsRow key={row.id} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
     }
@@ -260,52 +238,6 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
           </View>
         ))}
       </ScrollView>
-      {sheet === 'allowed' ? (
-        <SheetCard label={ALLOWED_SHEET_LABEL} title={allowedSheetTitle(grants.length)} onClose={() => setSheet(null)}>
-          <Text v="b2" color="t2">
-            {GRANT_INTRO}
-          </Text>
-          <View style={{ marginTop: spacing[2] }}>
-            {grants.map((grant) => (
-              <View
-                key={grant.host}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: spacing[3],
-                  minHeight: 64,
-                  borderTopWidth: 1,
-                  borderTopColor: c.line,
-                }}
-              >
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text v="b1" weight="600" numberOfLines={1}>
-                    {grant.host}
-                  </Text>
-                  <Text v="c1" color="t3">
-                    {grantMeta(grant.grantedAt, grant.kind)}
-                  </Text>
-                </View>
-                <GlassPressable
-                  accessibilityRole="button"
-                  accessibilityLabel={revokeA11y(grant.host)}
-                  disabled={revoke.isPending}
-                  onPress={() => void onRevoke(grant.host)}
-                  glass={false}
-                  fill="fill"
-                  // BotProfileAllowedRevoke: 81x42 (text 14/700 = 53 + 14 each side).
-                  style={{ minHeight: 42, borderRadius: platformTheme.buttonSmRadius }}
-                  contentStyle={{ paddingHorizontal: 14 }}
-                >
-                  <Text v="c1" weight="700" style={{ fontSize: 14 }}>
-                    {REVOKE_LABEL}
-                  </Text>
-                </GlassPressable>
-              </View>
-            ))}
-          </View>
-        </SheetCard>
-      ) : null}
     </View>
   )
 }

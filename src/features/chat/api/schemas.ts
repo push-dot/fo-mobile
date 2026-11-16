@@ -24,7 +24,6 @@ export type QsItem = {
   logo?: { text: string; color: string }
   avatar?: { text: string; color: string }
   badge?: { label: string; tone: 'ac' | 'grey' | 'red' | 'green' | 'orange' }
-  note?: { label: string; ac?: boolean }
   meta?: string
   /** Message preview under the person line (제안 답장). */
   body?: string

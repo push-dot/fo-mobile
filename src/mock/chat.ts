@@ -389,6 +389,7 @@ const JOBS = [
   job('p-moa', '모아페이', '백엔드 엔지니어 (Kotlin·Spring)', '서울 강남구 · 4–6년', '모', '#1F3A8A'),
   job('p-raon', '라온헬스', '안드로이드 개발자', '서울 강남구 · 1–3년', '라', '#364FC7'),
   job('p-star', '별빛게임즈', 'DevOps 엔지니어', '성남 판교 · 4–6년', '별', '#1864AB'),
+  job('p-sae', '새벽마켓', 'ML 엔지니어', '서울 성수동 · 4–6년', '새', '#C2255C'),
 ]
 const RECENT = [
   job('r-nuri', '누리클라우드', '프론트엔드 개발자', '서울 마포구 · 1–3년', '누', '#2B8A3E', { seg: 1 }),
@@ -401,17 +402,8 @@ const person = (id: string, name: string, given: string, color: string, sub: str
 const quick: Record<string, QsData> = {
   link: { items: [], doc: RESUME },
   match: { items: [], chips: ['개발 · 백엔드', '경력 4–6년', '서울', 'Kotlin', 'Spring Boot'] },
-  gap: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
-  fit: { segments: ['북마크 4', '최근 본 공고'], items: [JOBS[0]!, { ...JOBS[1]!, selected: true }, JOBS[2]!, ...RECENT], doc: RESUME },
+  fit: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
   boost: { items: [{ ...JOBS[0]!, selected: true }], doc: RESUME },
-  deadline: {
-    items: [
-      job('d-pado', '파도AI', '데이터 분석가', '', '파', '#862E9C', { badge: { label: 'D-2', tone: 'red' }, note: { label: '서류 없음' } }),
-      job('d-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: 'D-4', tone: 'grey' }, note: { label: '서류 준비됨', ac: true } }),
-      job('d-green', '그린티켓', '그로스 마케터', '', '그', '#E67700', { badge: { label: 'D-6', tone: 'grey' }, note: { label: '서류 없음' } }),
-      job('d-saebyuk', '새벽마켓', 'ML 엔지니어', '', '새', '#C2255C', { badge: { label: 'D-7', tone: 'grey' }, note: { label: '초안 있음' } }),
-    ],
-  },
   status: {
     segments: ['진행 중 4', '전체 6'],
     items: [
@@ -457,6 +449,8 @@ const quick: Record<string, QsData> = {
       person('o1', '오지현', '지현', '#E8590C', '모아페이 · 결제 플랫폼팀 채용 담당', { badge: { label: '새 제안', tone: 'ac' }, meta: '2시간 전', body: '결제 플랫폼팀 시니어 포지션으로 커피챗 어떠세요?' }),
       person('o2', '박도윤', '도윤', '#0C8599', '하루랩스 · iOS 개발자', { badge: { label: '새 제안', tone: 'ac' }, meta: '어제', body: '주말 사이드 프로젝트를 같이 하실 백엔드 개발자를…' }),
       person('o3', '최지우', '지우', '#5F3DC4', '파도AI · 데이터 엔지니어', { meta: '10월 14일', body: '정산 데이터 파이프라인 경험을 듣고 싶어요.' }),
+      person('o4', '윤서아', '서아', '#C2255C', '그린티켓 · 플랫폼팀 리드', { meta: '10월 9일', body: '플랫폼 엔지니어 포지션을 같이 이야기해 보고 싶어요.' }),
+      person('o5', '강민호', '민호', '#2B8A3E', '누리클라우드 · 인프라 엔지니어', { meta: '10월 2일', body: '쿠버네티스 운영 경험이 궁금해요.' }),
     ],
   },
   coffee: {
@@ -474,6 +468,8 @@ const quick: Record<string, QsData> = {
       { id: 'p1', title: '결제 승인 API p95를 절반 아래로 줄인 이야기', sub: '개발 · 이력서 경력에서', selected: true },
       { id: 'p2', title: '4년차 백엔드 이직 준비 후기', sub: '커리어 · 지원 현황에서' },
       { id: 'p3', title: 'Kafka 정산 파이프라인 만들어 본 후기', sub: '개발 · 역량 보완 프로젝트에서' },
+      { id: 'p4', title: '결제 장애 대응 매뉴얼을 만든 이유', sub: '개발 · 이력서 경력에서' },
+      { id: 'p5', title: '면접에서 받은 질문 정리', sub: '커리어 · 지원 현황에서' },
     ],
   },
 }

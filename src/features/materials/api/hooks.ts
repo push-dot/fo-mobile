@@ -44,7 +44,7 @@ export const useMaterialDetail = (kind: MaterialKind, id: string) => {
 }
 
 // The 마이 tabs list the same files, documents, bookmarks, and links, so they reload after a change made here.
-const MY_LISTS = [['me'], ['documents']] as const
+const MY_LISTS = [['me'], ['documents'], ['calendar']] as const
 
 /** Lists reload after a material is added elsewhere (a link, an upload) or comes back. */
 export const useRefreshMaterials = () => {

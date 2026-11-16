@@ -96,7 +96,7 @@ export const CHAT_ATTACHMENT_OPTIONS_ANDROID = { type: [...CHAT_ATTACHMENT_TYPES
 export const isChatAttachment = (name: string) => /\.(pdf|docx|txt|md)$/i.test(name)
 export const CHAT_DOC_OPTIONS = { type: CHAT_DOC_TYPES, copyToCacheDirectory: true }
 
-export type QsLayout = 'link' | 'match' | 'pick' | 'deadline' | 'status' | 'calendar' | 'cards' | 'reply'
+export type QsLayout = 'link' | 'match' | 'pick' | 'status' | 'calendar' | 'cards' | 'reply'
 
 /** What the sheet collected; `start` turns it into the conversation title and first message. */
 export type QsInput = { picked: QsItem[]; url: string; chips: string[]; option: boolean; doc?: string; documentId?: string; task: string; custom: string }
@@ -114,8 +114,10 @@ export type QuickStart = {
   multi?: boolean
   grid?: boolean
   docLabel?: string
+  readsHub?: boolean
   listLabel?: string
   custom?: string
+  instant?: boolean
   start: (i: QsInput) => { title: string; message: string; intent: ChatIntent; context?: { documentId: string } } | null | undefined
 }
 
@@ -132,7 +134,7 @@ const host = (url: string) => url.replace(/^https?:\/\//, '').split(/[/?#]/)[0] 
 // Order per feature-spec 15.1: what people do most first, social tasks last.
 export const QUICK_STARTS: QuickStart[] = [
   {
-    key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', docLabel: '기본 서류',
+    key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', readsHub: true,
     title: '어떤 공고에 맞출까요?', description: '공고 링크를 붙여넣으면 내 서류를 그 공고에 맞춰 고쳐요.',
     start: (i) => (/^https?:\/\/\S+\.\S+/.test(i.url.trim()) ? opened(`${host(i.url)} 공고 맞춤`, `${i.url.trim()} 공고에 맞춰 ${eulReul(i.doc)} 고쳐 주세요`, 'match_posting', i.documentId) : null),
   },
@@ -142,14 +144,9 @@ export const QUICK_STARTS: QuickStart[] = [
     start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
-    key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '부족한 점 찾기', docLabel: '기준',
-    title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해 부족한 점을 찾아요.',
-    start: (i) => one(i) && opened(`${one(i)!.over} 공고 갭 분석`, `${one(i)!.over} ${one(i)!.title} 공고와 ${eulReul(i.doc)} 비교해서 부족한 점을 찾아 주세요`, 'gaps', i.documentId),
-  },
-  {
-    key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', docLabel: '기준',
-    title: '어떤 공고로 볼까요?', description: '적합도를 보고, 점수가 오르도록 서류를 고쳐 드려요.',
-    start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고 기준으로 ${i.doc} 적합도를 봐 주세요`, 'fit', i.documentId),
+    key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
+    title: '어떤 공고로 볼까요?', description: '공고와 내 프로필을 비교해 점수와 부족한 점을 알려 드려요.',
+    start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {
     key: 'boost', label: '점수 올리기', icon: 'qs-boost', layout: 'pick', action: '점수 올리기 시작', docLabel: '올릴 서류', listLabel: '공고',
@@ -160,9 +157,9 @@ export const QUICK_STARTS: QuickStart[] = [
     },
   },
   {
-    key: 'deadline', label: '마감 임박 공고 정리', icon: 'qs-deadline', layout: 'deadline', action: '준비할 일 정리하기',
-    title: '마감 임박 공고', description: '북마크한 공고 중 일주일 안에 마감돼요. 준비할 일을 정리해 드려요.',
-    start: (i) => opened('마감 임박 공고 정리', `마감 임박 공고 ${i.picked.length}개(${i.picked.map((p) => p.over).join(', ')})의 준비할 일을 정리해 주세요`, 'deadline_postings'),
+    key: 'deadline', label: '마감 임박 공고 정리', icon: 'qs-deadline', layout: 'pick', instant: true,
+    title: '마감 임박 공고 정리', description: '',
+    start: () => opened('마감 임박 공고 정리', '북마크한 공고 중 일주일 안에 마감되는 공고와 준비할 일을 알려 주세요', 'deadline_postings'),
   },
   {
     key: 'status', label: '지원 현황 정리', icon: 'qs-status', layout: 'status', multi: true, action: (n) => `${n}개 정리하기`,
@@ -170,12 +167,12 @@ export const QUICK_STARTS: QuickStart[] = [
     start: (i) => (i.picked.length ? opened('지원 현황 정리', `${i.picked.map((p) => p.over).join(', ')} 지원 현황을 정리하고 다음에 할 일을 알려 주세요`, 'applications') : null),
   },
   {
-    key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!.label,
+    key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!,
     title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗 일정을 한 캘린더에서 정리해요.',
     start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
   },
   {
-    key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', docLabel: '기본 서류',
+    key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', readsHub: true,
     title: '어떤 부분을 다듬을까요?', description: '내 서류를 바탕으로 허브 프로필을 고쳐요. 바꾸기 전에 보여 드려요.',
     start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `허브 프로필의 ${eulReul(i.picked.map((p) => p.title).join(', '))} 다듬어 주세요`, 'hub_profile', i.documentId) : null),
   },
@@ -207,12 +204,7 @@ export const QUICK_STARTS: QuickStart[] = [
   },
 ]
 
-export const CALENDAR_TASKS = [
-  { label: '이번 주 정리하기', sub: '일정마다 준비할 일까지', icon: 'clock' },
-  { label: '마감일 넣기', sub: '북마크·지원한 공고 마감일', icon: 'flame' },
-  { label: '면접·커피챗 잡기', sub: '시간 골라 일정 등록', icon: 'people' },
-  { label: '준비 알림 만들기', sub: '면접 전날, 마감 3일 전', icon: 'bell' },
-] as const
+export const CALENDAR_TASKS = ['이번 주 정리하기', '면접·커피챗 잡기', '준비 알림 만들기'] as const
 
 /** Board `.kw-ok:before` / `.kw-miss:before`: the glyph's right margin differs (3px / 4px). */
 export const KEYWORD_GLYPH = {

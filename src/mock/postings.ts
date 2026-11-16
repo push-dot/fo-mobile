@@ -1,4 +1,5 @@
 import type { Posting, PostingDetail } from '@push/api-client'
+import { dropDeadlineEvent, putDeadlineEvent } from './calendar-deadlines'
 import { mock, page } from './server'
 
 const base = (p: Partial<Posting> & Pick<Posting, 'id' | 'company' | 'title' | 'location' | 'careerMin'>): Posting => ({
@@ -170,6 +171,8 @@ const setBookmark = (id: string, on: boolean) => {
   const p = postings.find((x) => x.id === id)
   if (!p) return
   p.bookmarked = on
+  if (on) putDeadlineEvent(p)
+  else dropDeadlineEvent(id)
   const rest = bookmarkOrder.filter((x) => x !== id)
   bookmarkOrder.splice(0, bookmarkOrder.length, ...(on ? [id, ...rest] : rest))
 }
@@ -193,6 +196,9 @@ mock('GET', 'me/bookmarks', ({ query }) => {
 })
 mock('POST', 'postings/:id/apply', ({ params }) => {
   const p = postings.find((x) => x.id === params.id)
-  if (p) p.applied = true
+  if (p) {
+    p.applied = true
+    putDeadlineEvent(p, true)
+  }
   return { status: 201, body: { data: { id: `a-${params.id}`, stage: 'APPLIED' } } }
 })
