@@ -35,6 +35,7 @@ import {
   pushCardLines,
   profileConvertBody,
   pushSeeAll,
+  DOC_TO_PROFILE_COPY,
   SET_BASE_COPY,
   setBaseProfilePath,
   showViewCount,
@@ -102,10 +103,16 @@ describe('my screen rules', () => {
     expect(Object.keys(profileConvertBody())).not.toContain('target')
   })
 
+  it('says a converted file becomes a separate application profile and leaves the base profile alone', () => {
+    expect(DOC_TO_PROFILE_COPY.body).toContain('내 프로필(기본)은 바뀌지 않아요')
+  })
+
   it('asks before setting the application profile as the base profile', () => {
     expect(SET_BASE_COPY).toEqual({
       action: '기본 프로필로 설정',
-      body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
+      close: '닫기',
+      confirm: '적용',
+      body: '허브에 보이는 내 프로필(기본)이 이 지원용 프로필의 내용으로 바뀌어요.',
     })
     expect(setBaseProfilePath('doc-1')).toBe('documents/doc-1/base-profile')
   })

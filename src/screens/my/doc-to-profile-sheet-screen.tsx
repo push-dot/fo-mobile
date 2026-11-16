@@ -1,114 +1,24 @@
-import { useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
-import { Pressable, View } from 'react-native'
-import {
-  ListSkeleton,
-  overwriteWarning,
-  profilePatch,
-  profileSections,
-  replacedLabels,
-  RETRY_LABEL,
-  useApplyResumeProfile,
-  useMyProfile,
-  useResumeDraft,
-  type ProfileSectionKey,
-} from '@/features/my'
-import { Icon, Sheet, Text } from '@/shared/components'
-import { onAccent, spacing, useColors } from '@/theme'
-
-const BOX = 24
-
-const CheckRow = ({ label, sub, on, onPress }: { label: string; sub: string; on: boolean; onPress: () => void }) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: on }}
-      onPress={onPress}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: 52 }}
-    >
-      <View
-        style={{
-          width: BOX,
-          height: BOX,
-          borderRadius: 8,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: on ? c.ac : undefined,
-          borderWidth: on ? 0 : 2,
-          borderColor: c.t4,
-        }}
-      >
-        {on ? <Icon name="check" size={14} color={onAccent} /> : null}
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text v="b1" weight="600">
-          {label}
-        </Text>
-        {sub ? (
-          <Text v="c1" color="t3" numberOfLines={1}>
-            {sub}
-          </Text>
-        ) : null}
-      </View>
-    </Pressable>
-  )
-}
+import { router, useLocalSearchParams } from 'expo-router'
+import { useEffect, useRef } from 'react'
+import { Sheet } from '@/shared/components'
+import { DOC_TO_PROFILE_COPY, useConvertDocument } from '@/features/my'
 
 const DocToProfileSheetScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const query = useResumeDraft(id)
-  const draft = query.data?.profile
-  const { data: me } = useMyProfile()
-  const apply = useApplyResumeProfile(() => undefined)
-  const sections = draft ? profileSections(draft, query.data?.mainSkills) : []
-  const [picked, setPicked] = useState<ProfileSectionKey[] | null>(null)
-  if (!draft)
-    return (
-      <Sheet
-        title="이 이력서로 프로필을 채울까요?"
-        action={query.isPending ? undefined : { label: RETRY_LABEL, onPress: () => void query.refetch() }}
-      >
-        {query.isPending ? <ListSkeleton count={3} /> : null}
-      </Sheet>
-    )
-  const chosen = picked ?? sections.filter((s) => s.on).map((s) => s.key)
-  const toggle = (key: ProfileSectionKey) => setPicked(chosen.includes(key) ? chosen.filter((k) => k !== key) : [...chosen, key])
-  const warning = overwriteWarning(replacedLabels(draft, me, chosen))
+  const mounted = useRef(true)
+  useEffect(() => () => {
+    mounted.current = false
+  }, [])
+  const convert = useConvertDocument((documentId, jobId) => {
+    if (mounted.current) router.back()
+    router.push({ pathname: '/docs/push/[id]', params: { id: documentId, ...(jobId ? { jobId } : {}) } })
+  })
   return (
     <Sheet
-      title="이 이력서로 프로필을 채울까요?"
-      description="고른 항목만 허브 프로필에 반영돼요. 반영한 뒤에도 섹션별로 고칠 수 있어요."
-      action={{
-        label: `${chosen.length}개 항목 반영하기`,
-        onPress: () => apply.mutate(profilePatch(draft, chosen)),
-        disabled: chosen.length === 0 || apply.isPending,
-      }}
-    >
-      <View>
-        {sections.map((s) => (
-          <CheckRow key={s.key} label={s.label} sub={s.sub} on={chosen.includes(s.key)} onPress={() => toggle(s.key)} />
-        ))}
-      </View>
-      {warning ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            // DocToProfile: the note is one 18pt line, 14 (the sheet gap) from the rows and from the CTA, 6 between "!" and the text.
-            gap: 6,
-            paddingHorizontal: spacing[1],
-          }}
-        >
-          <Text v="c1" weight="800" color="orange">
-            !
-          </Text>
-          <Text v="c1" color="t2" style={{ flex: 1 }}>
-            {warning}
-          </Text>
-        </View>
-      ) : null}
-    </Sheet>
+      title={DOC_TO_PROFILE_COPY.title}
+      description={DOC_TO_PROFILE_COPY.body}
+      action={{ label: DOC_TO_PROFILE_COPY.action, onPress: () => convert.mutate(id), pending: convert.isPending }}
+    />
   )
 }
 

@@ -157,6 +157,10 @@ export const sectionLabel = (approval: Approval, sel: number[][]): string => {
         return labels.length ? [s.multi && labels.length === 1 ? `${labels[0]}만` : labels.join(', ')] : []
       })
       .join(' · ')
+  return buttonLabel(approval, sel)
+}
+
+export const buttonLabel = (approval: Approval, sel: number[][]): string => {
   const ti = approval.sections.findIndex((s) => s.kind === 'templates')
   const tpl = approval.sections[ti]
   const templateId = tpl?.kind === 'templates' ? tpl.items[sel[ti]?.[0] ?? -1]?.id : undefined

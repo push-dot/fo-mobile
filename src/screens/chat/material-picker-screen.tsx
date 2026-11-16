@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Alert, Platform, View } from 'react-native'
-import { CHAT_ATTACHMENT_OPTIONS, CHAT_ATTACHMENT_OPTIONS_ANDROID, PageModal, isChatAttachment, appendDraftText, attachDraftFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
+import { View } from 'react-native'
+import { PageModal, appendDraftText, attachPickedFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
 import { GroupTitle, MaterialNavRow, MaterialPickRow, SECTION_LABEL } from '@/features/materials'
-import { MAX_BYTES, SIZE_LIMIT, useBookmarkList } from '@/features/my'
-import { pickDocument } from '@/shared/infrastructure'
+import { useBookmarkList } from '@/features/my'
 import { displayName } from '@/shared/utility/display-name'
 import { Button, TextField } from '@/shared/components'
 import { spacing } from '@/theme'
@@ -32,19 +31,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
   const add = () => done(sections.flatMap((s) => s.rows).filter((r) => picks.includes(r.id)).map((r) => r.title).join(', '))
   const submit = () => text.trim() && done(text.trim())
   const pickFile = async () => {
-    const picked = await pickDocument(Platform.OS === 'android' ? CHAT_ATTACHMENT_OPTIONS_ANDROID : CHAT_ATTACHMENT_OPTIONS)
-    const asset = picked.canceled ? undefined : picked.assets[0]
-    if (!asset) return
-    if (!isChatAttachment(asset.name)) {
-      Alert.alert('올릴 수 없는 파일이에요', 'PDF, Word, 텍스트 파일만 올릴 수 있어요.')
-      return
-    }
-    if ((asset.size ?? 0) > MAX_BYTES) {
-      Alert.alert(SIZE_LIMIT.title, SIZE_LIMIT.body)
-      return
-    }
-    attachDraftFile(target, { uri: asset.uri, name: asset.name, mimeType: asset.mimeType, size: asset.size })
-    onClose()
+    if (await attachPickedFile(target)) onClose()
   }
   // MaterialsLinkAdd sorts a pasted link by itself, so one row covers GitHub and posting links.
   const others: [string, () => void][] = [

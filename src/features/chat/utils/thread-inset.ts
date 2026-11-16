@@ -6,8 +6,6 @@ const APPROVAL_GAP = { ios: 46, android: 25 }
 export const BUBBLE_GAP = 18
 const KEYBOARD_GAP = spacing[2]
 const THREAD_GAP = spacing[4]
-// ChatPh1Fit* draw the thread edge 30 above the approval sheet when no waiting line sits between them.
-const PANEL_GAP = 30
 // The boards lift the thread 42pt for the status row on both platforms; the row stack is 36+8 on iOS and 28+8 on Android, so the gap is 14 and 22.
 const STATUS_GAP = { ios: 14, android: 22 }
 
@@ -30,5 +28,4 @@ export const threadInset = ({ bottomH, keyboard, navBar, approval, android, stat
   return bottomH + lift + extraGap(approval, keyboard, status, platform)
 }
 
-/** Last thread line to the composer in the room: 8 plus the field's growth with the keyboard up (ChatKeyboardIOS.2 draws 32 over a 2-line field), 16 at rest, 30 to an approval sheet with no waiting line. */
-export const threadBottomGap = (keyboard: number, grow = 0, bareSheet = false) => (keyboard ? KEYBOARD_GAP + grow : bareSheet ? PANEL_GAP : THREAD_GAP)
+export const threadBottomGap = (keyboard: number, grow = 0) => (keyboard ? KEYBOARD_GAP + grow : THREAD_GAP)

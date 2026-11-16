@@ -1,5 +1,5 @@
 export { Item, Queued, ToolLine } from './item'
-export { default as ChoiceBubble } from './choice-bubble'
+export { default as MdTable } from './md-table'
 export { default as Rich } from './rich'
 export { default as UserBubble } from './user'
 export { default as BotText } from './bot'

@@ -15,10 +15,10 @@ describe('isStopping', () => {
 })
 
 describe('statusLineView', () => {
-  it('draws the waiting state as the idle mascot alone (rule 29)', () => {
+  it('draws the waiting state as an in-progress line (ChatBotStatusQueue, rule 51)', () => {
     const since = at(161_000 - 12_000)
-    for (const ahead of [0, 1])
-      expect(run({ kind: 'run', phase: 'queued', since, ahead })).toEqual({ mascot: 'idle', tone: 'neutral', text: '', tail: null, accessibilityLabel: '대기 중' })
+    expect(run({ kind: 'run', phase: 'queued', since, ahead: 0 })).toMatchObject({ mascot: 'think', tone: 'neutral', text: '순서를 기다리는 중', tail: '12초' })
+    expect(run({ kind: 'run', phase: 'queued', since, ahead: 2 })).toMatchObject({ text: '순서를 기다리는 중 · 앞에 작업 2개', tail: '12초' })
   })
 
   it('draws stopping as a grey line that counts nothing (ChatBotStatusStopped)', () => {

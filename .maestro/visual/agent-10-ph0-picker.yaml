@@ -18,17 +18,23 @@ tags:
 - waitForAnimationToEnd
 - tapOn: ".*이력서부터 쓸게요"
 - extendedWaitUntil:
-    visible: "새 작업"
+    visible: "어떤 산출물을 만들까요?"
     timeout: 30000
 - waitForAnimationToEnd
-# The row's button is labelled "<material> 변경" for VoiceOver, and a Maestro text is a whole-label match.
-- tapOn:
-    text: ".*변경"
-    index: 0
+- tapOn: "다음"
 - extendedWaitUntil:
-    visible: "자료 고르기"
+    visible: "가져올 자료"
+    timeout: 15000
+- waitForAnimationToEnd
+# A row that can change opens a modal per kind of material: the kinds first, then the list of that kind (3 most recent rows).
+- tapOn: "백엔드 엔지니어.*"
+- extendedWaitUntil:
+    visible: "어떤 자료로 바꿀까요?"
     timeout: 10000
 - waitForAnimationToEnd
-- tapOn: ".*2\\.4MB.*"
-- tapOn: ".*모아페이 · 백엔드 엔지니어.*"
+- tapOn: "내 서류에서"
+- extendedWaitUntil:
+    visible: "내 서류"
+    timeout: 10000
+- waitForAnimationToEnd
 - takeScreenshot: ChatPh0Picker

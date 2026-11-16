@@ -15,10 +15,9 @@ describe('headerInset', () => {
 describe('PageModal nav prop', () => {
   const read = (f: string) => readFileSync(path.join(import.meta.dirname, f), 'utf8')
 
-  it('picks the nav inset from an explicit prop, not from `left` (usage keeps 20, ChatAccountUsage padding 20)', () => {
+  it('picks the nav inset from an explicit prop, not from `left`', () => {
     expect(read('page-modal.tsx')).toContain('headerInset(ios, !!nav)')
     expect(read('page-modal.tsx')).not.toContain('left != null')
-    expect(read('usage-page.tsx')).not.toMatch(/<PageModal[^>]*\bnav\b/)
   })
 
   it('marks only the plan page (PlanUltra, PlanUpgrade) as nav', () => {

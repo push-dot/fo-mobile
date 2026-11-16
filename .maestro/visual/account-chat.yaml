@@ -26,14 +26,6 @@ tags:
     timeout: 5000
 - assertNotVisible: "ULTRA로 업그레이드"
 - waitForAnimationToEnd
+# The usage is plain text with no access-mode row (rule 48): no row opens a page, so there is nothing to tap here.
+- assertNotVisible: "실행 방식"
 - takeScreenshot: ChatAccount
-# The usage row opens ChatAccountUsage, one page deeper.
-- tapOn: "이번 달 사용량 64%"
-- extendedWaitUntil:
-    visible: "크레딧 구매"
-    timeout: 5000
-- extendedWaitUntil:
-    visible: ".*월 1일에 다시 채워져요."
-    timeout: 5000
-- waitForAnimationToEnd
-- takeScreenshot: ChatAccountUsage

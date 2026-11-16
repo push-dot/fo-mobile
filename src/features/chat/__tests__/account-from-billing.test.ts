@@ -16,21 +16,8 @@ const billing = (more: Partial<BillingStatus> = {}): BillingStatus => ({
 })
 
 describe('accountFromBilling', () => {
-  it('turns micro credits into credits, per Bot as well', () => {
-    const account = accountFromBilling(
-      billing({ usageByBot: [{ id: 'b1', name: '모아페이', usedMicroCredits: 1800 * M }, { id: 'b2', name: 'Push Bot', usedMicroCredits: 1400 * M + 2000 }] }),
-      'a@b.c',
-    )
-    expect(account.credits).toEqual({ used: 3200, total: 5000 })
-    expect(account.usageByBot).toEqual([
-      { id: 'b1', name: '모아페이', used: 1800 },
-      { id: 'b2', name: 'Push Bot', used: 1400 },
-    ])
-  })
-
-  it('leaves usageByBot out when the server sends none, and keeps an empty list empty', () => {
-    expect(accountFromBilling(billing(), 'a@b.c').usageByBot).toBeUndefined()
-    expect(accountFromBilling(billing({ usageByBot: [] }), 'a@b.c').usageByBot).toEqual([])
+  it('turns micro credits into credits', () => {
+    expect(accountFromBilling(billing(), 'a@b.c').credits).toEqual({ used: 3200, total: 5000 })
   })
 
   it('carries plan, email, payments and refill date as before', () => {

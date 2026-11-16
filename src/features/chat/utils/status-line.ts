@@ -16,7 +16,7 @@ export type Notice =
 export type NoticeBubble = { text: string; detail?: string }
 
 export type StatusLineView = {
-  mascot: 'think' | 'work' | 'help' | 'idle'
+  mascot: 'think' | 'work' | 'help'
   tone: 'neutral' | 'help' | 'quiet'
   text: string
   tail: string | null
@@ -40,7 +40,6 @@ export const STATUS_STEPS = [
 ] as const
 
 const QUEUE_TEXT = '순서를 기다리는 중'
-const QUEUE_LABEL = '대기 중'
 const THINK_TEXT = '생각 중'
 const STOP_RESUMABLE_TEXT = '작업을 중지했어요. 어떻게 할지 알려 주세요.'
 const STOP_DROPPED_TEXT = '중지했어요. 고치던 내용은 반영하지 않았어요.'
@@ -68,7 +67,7 @@ const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], te
 export const isStopping = (working: { verbs: readonly string[] } | null) => working?.verbs[0] === STOPPING_TEXT
 
 export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
-  if (line.kind === 'run' && line.phase === 'queued') return view('idle', 'neutral', '', null, QUEUE_LABEL)
+  if (line.kind === 'run' && line.phase === 'queued') return view('think', 'neutral', line.ahead > 0 ? `${QUEUE_TEXT} · 앞에 작업 ${line.ahead}개` : QUEUE_TEXT, elapsedText(line.since, now))
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
   if (line.kind === 'run' && line.text === STOPPING_TEXT) return view('work', 'quiet', line.text, null)
   if (line.kind === 'run') return view('work', 'neutral', line.text, elapsedText(line.since, now))

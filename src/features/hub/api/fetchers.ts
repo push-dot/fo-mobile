@@ -1,6 +1,6 @@
 import { type JobCategory, type ProfileFilters } from '@push/api-client'
 import { api } from '../../../shared/infrastructure'
-import { OFFER_BOOKMARKS_LIMIT } from '../constants'
+import { OFFER_POSTINGS_LIMIT } from '../constants'
 import { profileQuery, type SheetFilters } from '../utils'
 
 export const fetchProfileList = (category: JobCategory[], sheet: SheetFilters, cursor: string | undefined) =>
@@ -8,7 +8,7 @@ export const fetchProfileList = (category: JobCategory[], sheet: SheetFilters, c
 
 export const fetchProfileCount = (query: ProfileFilters) => api.profiles.list({ ...query, limit: 1 })
 
-export const fetchOfferBookmarks = () => api.me.bookmarks({ limit: OFFER_BOOKMARKS_LIMIT })
+export const fetchOfferPostings = async () => (await api.postings.mine({ limit: OFFER_POSTINGS_LIMIT })).data.filter((p) => p.status === undefined || p.status === 'OPEN')
 
 export const sendProfileOffer = (userId: string, message: string, postingId: string | undefined) =>
   api.profiles.offer(userId, { message, postingId })

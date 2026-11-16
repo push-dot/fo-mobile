@@ -1,7 +1,7 @@
 appId: app.push.mobile
 tags:
   - subflow
-# A pending approval opens its modal when the chat opens (approval-panel.tsx), which hides the composer.
+# A pending approval opens its modal when the chat opens (use-gate-modal.ts) over the chat.
 # Swiping it away hands the floor to the composer; the scrim's 팝업 닫기 is the tap that does the same.
 ---
 - tapOn: "팝업 닫기"

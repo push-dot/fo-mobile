@@ -15,35 +15,20 @@ tags:
     timeout: 10000
 - tapOn: "김서준_백엔드_이력서_2026"
 - extendedWaitUntil:
-    visible: "내 프로필로 전환"
+    visible: "지원용 프로필로 전환"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: DocViewer
 
-- tapOn: "내 프로필로 전환"
+- tapOn: "지원용 프로필로 전환"
 - extendedWaitUntil:
-    visible: "이 이력서로 프로필을 채울까요?"
+    visible: "지원용 프로필로 만들까요?"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: DocToProfile
 
-# Applying the picked sections lands on the 프로필 tab; the 지원 서류용 프로필 detail only opens from the chat result card.
-- tapOn: "3개 항목 반영하기"
-- extendedWaitUntil:
-    visible: "기본 정보 편집"
-    timeout: 15000
-- runFlow: _agent_tab.yaml
-- runFlow:
-    file: _say_run.yaml
-    env:
-      RUN: "ext-done"
-      BOT: "push"
-      KO: "이 이력서 더 좋게 고쳐 줘"
-      EN: "Make this resume better"
-- extendedWaitUntil:
-    visible: "프로필로 전환"
-    timeout: 30000
-- tapOn: "프로필로 전환"
+# 만들기 converts the file into a 지원용 프로필 (Push 서류) and opens it; the 내 프로필(기본) stays as it was until 기본 프로필로 설정.
+- tapOn: "만들기"
 - extendedWaitUntil:
     visible: "기본 프로필로 설정"
     timeout: 15000
@@ -52,14 +37,12 @@ tags:
 
 - tapOn: "기본 프로필로 설정"
 - extendedWaitUntil:
-    visible: "허브에 보이는 내 프로필이 이 내용으로 바뀌어요."
+    visible: "허브에 보이는 내 프로필\\(기본\\)이 이 지원용 프로필의 내용으로 바뀌어요."
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: DocProfileConfirm
 
-# The modal's CTA carries the same label as the button under it, so tap it by position (its centre is at 92% of the screen height).
-- tapOn:
-    point: "50%,92%"
+- tapOn: "적용"
 - extendedWaitUntil:
     notVisible: "기본 프로필로 설정"
     timeout: 10000

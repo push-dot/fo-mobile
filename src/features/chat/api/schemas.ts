@@ -13,8 +13,6 @@ export type Account = {
   paymentsEnabled?: boolean
   /** GET billing creditsRefillAt: when the monthly allowance is granted again. */
   creditsRefillAt?: string
-  /** Credits each Bot used this month (ChatAccountUsage 'Bot별'), from GET billing usageByBot. The section stays hidden without it. */
-  usageByBot?: { id: string; name: string; used: number }[]
 }
 
 export type QsItem = {

@@ -13,6 +13,5 @@ export const accountFromBilling = (b: BillingStatus, email: string | null | unde
     credits: total > 0 ? { used: credits(b.spentMicroCredits), total } : null,
     paymentsEnabled: b.paymentsEnabled,
     creditsRefillAt: b.creditsRefillAt,
-    usageByBot: b.usageByBot?.map((x) => ({ id: x.id, name: x.name, used: credits(x.usedMicroCredits) })),
   }
 }

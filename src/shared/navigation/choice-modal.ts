@@ -5,18 +5,27 @@ import { create } from 'zustand'
 export type ChoiceModalRequest = {
   title: string
   message?: string
+  table?: { head: string[]; rows: string[][] }
   /** A choice: one plain row per option; the modal closes first, then the option runs. */
-  items?: { label: string; destructive?: boolean; /** The row opens something next: a grey › at its right edge. */ chevron?: boolean; onPress: () => void }[]
-  /** One pick out of rows, an optional switch row, and a button that names the pick (ChatPh4Design). */
+  items?: {
+    label: string
+    sub?: string
+    destructive?: boolean
+    chevron?: boolean
+    onPress: () => void
+  }[]
   form?: {
     options: { label: string; sub?: string }[]
-    selected: number
+    selected: number[]
+    multi?: boolean
+    allowEmpty?: boolean
     toggle?: { label: string; on: boolean }
-    confirmLabel: (selected: number, on: boolean) => string
-    onConfirm: (selected: number, on: boolean) => void
+    confirmLabel: (selected: number[], on: boolean) => string
+    onConfirm: (selected: number[], on: boolean) => void
   }
+  input?: { placeholder: string; confirm: string; keyboardType?: 'default' | 'url'; onSubmit: (text: string) => void }
   /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void }
+  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void }; closeLabel?: string }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

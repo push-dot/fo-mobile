@@ -5,9 +5,9 @@ import { spacing } from '../../../theme'
 import { Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
-import { useAccessMode, useChatAccount, useMe } from '../api/hooks'
-import { ACCESS_MODES, ACCOUNT_REFERENCE_NOTE, DEFAULT_DOC, ACCOUNT_REFERENCE_TITLE } from '../constants'
-import { accessMenu, currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
+import { useChatAccount, useMe } from '../api/hooks'
+import { ACCOUNT_REFERENCE_NOTE, DEFAULT_DOC, ACCOUNT_REFERENCE_TITLE } from '../constants'
+import { currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import GroupTitle from './group-title'
 import Mark from './mark'
 import Note from './note'
@@ -24,7 +24,7 @@ export const AccountModal = () => {
   )
 }
 
-const AccountRow = ({ label, value, bold, onPress }: { label: string; value?: string; bold?: boolean; onPress?: () => void }) => {
+const AccountRow = ({ label, value, bold, plain, onPress }: { label: string; value?: string; bold?: boolean; plain?: boolean; onPress?: () => void }) => {
   const body = (
     <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
       <Text v="b1" weight={bold ? '700' : undefined} style={{ flex: 1 }}>
@@ -36,7 +36,7 @@ const AccountRow = ({ label, value, bold, onPress }: { label: string; value?: st
             {value}
           </Text>
         ) : null}
-        <Icon name="chev" size={16} color="t3" />
+        {plain ? null : <Icon name="chev" size={16} color="t3" />}
       </View>
     </View>
   )
@@ -57,8 +57,6 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
   const me = useMe()
   const settings = useMySettings(true)
   const save = useUpdateSettings()
-  const access = useAccessMode()
-  const mode = ACCESS_MODES.find((m) => m.key === access.mode)!
   const toMy = () => router.navigate('/my')
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
   const usage = usagePercent(account?.credits)
@@ -74,7 +72,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
       <View style={GROUP}>
         <SettingsGroup>
           <AccountRow label={account?.plan ?? ' '} bold onPress={onPlan} />
-          {usage == null ? null : <AccountRow label={`이번 달 사용량 ${usage}%`} onPress={() => router.push('/account-usage')} />}
+          {usage == null ? null : <AccountRow label={`이번 달 사용량 ${usage}%`} plain />}
         </SettingsGroup>
       </View>
       <GroupTitle style={TITLE}>{ACCOUNT_REFERENCE_TITLE}</GroupTitle>
@@ -92,11 +90,6 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
           <Menu stretch accessibilityLabel="말투" actions={toneMenu(tone?.key, (defaultTone) => save.mutate({ defaultTone }))}>
             <View>
               <AccountRow label={toneLabel(tone)} />
-            </View>
-          </Menu>
-          <Menu stretch accessibilityLabel="실행 방식" actions={accessMenu(mode.key, access.pick)}>
-            <View>
-              <AccountRow label={mode.row} />
             </View>
           </Menu>
         </SettingsGroup>

@@ -1,12 +1,12 @@
 import { create } from 'zustand'
-import { ApiError, QueueBusyError, type AccessMode, type BotContract, type ChatIntent } from '@push/api-client'
+import { ApiError, QueueBusyError, type BotContract, type ChatIntent } from '@push/api-client'
 import type { Attachment, AttachmentKind, BotId } from '@/features/bots'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
-import { chatApi, updateAiAccessMode } from './api/fetchers'
+import { chatApi } from './api/fetchers'
 import type { RunInput } from './api/schemas'
 import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
 import { applyEvent, emptyChat } from './utils/reducer'
@@ -21,8 +21,6 @@ import type { ChatEvent, ChatItem, ChatState } from './types'
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
 export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
-
-export const usePrefs = create<{ accessMode: AccessMode }>(() => ({ accessMode: DEFAULT_ACCESS_MODE }))
 
 export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
 
@@ -146,17 +144,6 @@ export const grantConsent = () => {
   } else if (open) openChat?.(open)
 }
 
-export const pickAccessMode = async (mode: AccessMode) => {
-  const prev = usePrefs.getState().accessMode
-  usePrefs.setState({ accessMode: mode })
-  try {
-    return await updateAiAccessMode(mode)
-  } catch (err) {
-    usePrefs.setState({ accessMode: prev })
-    throw err
-  }
-}
-
 const get = (id: string) => useChatStore.getState().chats[id] ?? emptyChat
 const runs = new Map<string, AbortController>()
 
@@ -245,7 +232,7 @@ const streamed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefin
   const attachments = attachmentsOf(input)
   const body: BotContract.SendBody = {
     text: input.text ?? '',
-    accessMode: usePrefs.getState().accessMode,
+    accessMode: DEFAULT_ACCESS_MODE,
     ...(intent ? { intent } : {}),
     ...(attachments.length ? { attachments } : {}),
   }

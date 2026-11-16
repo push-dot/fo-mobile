@@ -18,7 +18,6 @@ vi.mock('../api/fetchers', () => ({
   followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
   resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string])),
   streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
-  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast }))
 

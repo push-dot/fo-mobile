@@ -40,9 +40,4 @@ describe('threadBottomGap', () => {
     expect(threadBottomGap(336, 24)).toBe(32)
     expect(threadBottomGap(0, 24)).toBe(16)
   })
-
-  it('sits 30 above an approval sheet with no waiting line, and 8 once the keyboard is up (ChatPh1FitUltraOpen)', () => {
-    expect(threadBottomGap(0, 0, true)).toBe(30)
-    expect(threadBottomGap(336, 0, true)).toBe(8)
-  })
 })

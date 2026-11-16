@@ -431,7 +431,7 @@ mock('POST', 'documents/:id/profile', ({ params, body }) => {
       id: `d${Date.now()}`,
       revision: 1,
       applicationId: null,
-      title: source?.fileName ?? '지원 서류용 프로필',
+      title: source?.fileName ?? '지원용 프로필',
       kind: 'HUB_PROFILE',
       status: 'DRAFT',
       latestVersionId: 'v1',

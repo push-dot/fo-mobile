@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { ProposalSheet, proposalSubtitle, useOfferBookmarks, useProfile, useSendOffer } from '@/features/hub'
+import { ProposalSheet, proposalSubtitle, useOfferPostings, useProfile, useSendOffer } from '@/features/hub'
 import { Sheet } from '@/shared/components'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
@@ -9,7 +9,7 @@ const param = (value: string | string[] | undefined) => (Array.isArray(value) ? 
 const ProposalSheetScreen = () => {
   const userId = param(useLocalSearchParams<{ userId?: string }>().userId)
   const profile = useProfile(userId ?? '')
-  const bookmarks = useOfferBookmarks(!!userId)
+  const ownPostings = useOfferPostings(!!userId)
   const [message, setMessage] = useState('')
   const [postingId, setPostingId] = useState<string>()
   const [error, setError] = useState<string | null>(null)
@@ -33,7 +33,7 @@ const ProposalSheetScreen = () => {
           subtitle={p ? proposalSubtitle(p) : ''}
           message={message}
           postingId={postingId}
-          postings={bookmarks.data?.data ?? []}
+          postings={ownPostings.data ?? []}
           error={error}
           onMessage={setMessage}
           onPosting={setPostingId}

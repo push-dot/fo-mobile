@@ -6,7 +6,6 @@ import {
   followState,
   monthGrid,
   offerBadge,
-  overwriteWarning,
   dateToYm,
   fromDayParam,
   parseYm,
@@ -91,20 +90,6 @@ describe('my lib', () => {
     expect(offerBadge({ status: 'SENT' }, 'received')).toEqual({ label: '새 제안', tone: 'ac' })
     expect(offerBadge({ status: 'READ' }, 'sent').label).toBe('읽음')
     expect(offerBadge({ status: 'ACCEPTED' }, 'sent').tone).toBe('green')
-  })
-
-  it('writes the overwrite warning with the right particles', () => {
-    expect(overwriteWarning(['소개', '경력'])).toBe(
-      '지금 프로필의 소개와 경력은 이 내용으로 바뀌어요.',
-    )
-    expect(overwriteWarning(['기술 스택'])).toBe('지금 프로필의 기술 스택은 이 내용으로 바뀌어요.')
-    expect(overwriteWarning(['경력', '기본 정보'])).toBe(
-      '지금 프로필의 경력과 기본 정보는 이 내용으로 바뀌어요.',
-    )
-    expect(overwriteWarning(['기본 정보', '소개', '경력'])).toBe(
-      '지금 프로필의 기본 정보, 소개와 경력은 이 내용으로 바뀌어요.',
-    )
-    expect(overwriteWarning([])).toBeNull()
   })
 
   it('ymToDate parses 2022.03 to March 2022', () => {

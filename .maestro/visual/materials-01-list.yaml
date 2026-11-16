@@ -23,29 +23,35 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsBookmarks
-# The detail pages are pushed inside the modal and 뒤로 returns to the list tab they opened from; MaterialDetailBookmark opens from 북마크, not 전체.
+# The detail is a regular sheet over the modal and closing it returns to the list tab it opened from; MaterialDetailBookmark opens from 북마크, not 전체.
 - tapOn: "모아페이 · 백엔드 엔지니어 자세히"
 - extendedWaitUntil:
     visible: "공고로 이동"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailBookmark
-- tapOn: "뒤로"
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "공고로 이동"
 - waitForAnimationToEnd
 - tapOn: "링크"
 - extendedWaitUntil:
-    visible: "github.com 자세히"
+    visible: "github.com/cyjoon68 자세히"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLinks
-# A link row is named by its host, and two rows are github.com: the first is the newest (김서준 GitHub, 10월 3일), the board's.
-- tapOn: "github.com 자세히"
+# A link row is named by its host (a GitHub link adds its owner), and several rows are github.com/<user>: the first is the newest (김서준 GitHub, 10월 3일), the board's.
+- tapOn: "github.com/cyjoon68 자세히"
 - extendedWaitUntil:
     visible: "바로가기"
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailLink
-- tapOn: "뒤로"
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "바로가기"
 - waitForAnimationToEnd
 - tapOn: "전체"
 - extendedWaitUntil:
@@ -64,7 +70,10 @@ tags:
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailDelete
 - tapOn: "취소"
-- tapOn: "뒤로"
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "서류로 들어가기"
 - waitForAnimationToEnd
 - tapOn: "자료 추가"
 - extendedWaitUntil:

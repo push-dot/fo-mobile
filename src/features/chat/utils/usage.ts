@@ -4,7 +4,6 @@ import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem, ChatState } from '../types'
 import { foldBubbleCards } from './bubble-card'
-import { choiceInThread } from './choice-sheet'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
@@ -126,7 +125,7 @@ export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => 
 
 export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'> & Partial<Pick<ChatState, 'approval'>>, name?: string, chipKind?: AttachmentKind) => {
   if (chipKind) return chipPlaceholder(chipKind)
-  if (chat.approval && choiceInThread(chat.approval)) return COMPOSER_PLACEHOLDER.choice
+  if (chat.approval && !chat.approval.confirm) return COMPOSER_PLACEHOLDER.choice
   // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
   if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
   if (name) return holdsResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)

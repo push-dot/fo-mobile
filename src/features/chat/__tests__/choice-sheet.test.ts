@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { choiceInThread, choiceMulti, choiceSheet, designModal } from '../utils/choice-sheet'
-import { composerPlaceholder } from '../utils/usage'
+import { choiceSheet, designModal } from '../utils/choice-sheet'
 import type { Approval } from '../types'
 
 const card = (patch: Partial<Approval>): Approval => ({
@@ -10,14 +9,6 @@ const card = (patch: Partial<Approval>): Approval => ({
   optionIds: ['approve', 'approve_always', 'reject'],
   ...patch,
 })
-
-const gate = (patch: Partial<Approval> = {}): Approval =>
-  card({
-    question: '이 전략대로 초안을 쓸까요?',
-    sections: [{ kind: 'choices', selected: [0], items: [{ label: '초안 쓸게요' }, { label: '피드백만 볼게요' }, { label: '닫기' }] }],
-    optionIds: ['0', '1', '2'],
-    ...patch,
-  })
 
 describe('choiceSheet', () => {
   it('turns the permission card into a title, its detail as the message, and a plain 거절 (the board draws it black)', () => {
@@ -43,40 +34,6 @@ describe('choiceSheet', () => {
     expect(choiceSheet(card({ submit: '보내기' }))).toBeNull()
     expect(choiceSheet(card({ sections: [{ kind: 'choices', selected: [], multi: true, items: [{ label: 'a' }] }] }))).toBeNull()
     expect(choiceSheet(card({ sections: [{ kind: 'chips', selected: [], options: ['a'] }] }))).toBeNull()
-  })
-})
-
-describe('choiceInThread', () => {
-  it('draws a flow gate with a suggested option as the numbered bubble, with the composer asking to pick or say', () => {
-    expect(choiceInThread(gate())).toBe(true)
-    expect(composerPlaceholder({ items: [], working: null, approval: gate() }, '모아페이')).toBe('골라 주시거나 직접 말해 주세요')
-  })
-
-  it('keeps a permission and a help question with no suggestion as the modal', () => {
-    expect(choiceInThread(card({ confirm: true }))).toBe(false)
-    expect(choiceInThread(card({ confirm: undefined }))).toBe(false)
-    expect(composerPlaceholder({ items: [], working: null, approval: card({ confirm: true }) }, '모아페이')).not.toBe('골라 주시거나 직접 말해 주세요')
-  })
-
-  it('keeps multi picks and confirm-button cards out of the thread', () => {
-    expect(choiceInThread(gate({ submit: '보내기' }))).toBe(false)
-  })
-})
-
-describe('choiceMulti (ChatPh2XPrevent)', () => {
-  const prevent = gate({
-    question: '어떤 문제를 예방할까요?',
-    submit: '이대로 진행',
-    sections: [{ kind: 'choices', selected: [3, 5], multi: true, items: [{ label: '성능' }, { label: '보안' }, { label: '확장성' }, { label: '안정성' }, { label: '유지보수' }, { label: '데이터 무결성' }, { label: '닫기' }] }],
-  })
-
-  it('is a checklist in the thread, not the bottom panel', () => {
-    expect(choiceMulti(prevent)).toBe(true)
-    expect(choiceInThread(prevent)).toBe(true)
-  })
-
-  it('leaves a multi card with other sections to the panel', () => {
-    expect(choiceMulti({ ...prevent, sections: [...prevent.sections, { kind: 'chips', selected: [], options: ['a'] }] })).toBe(false)
   })
 })
 
