@@ -9,10 +9,11 @@ import { spacing, useColors } from '@/theme'
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
-  const [view, setView] = useState<PostsView>(box === 'commented' ? 'commented' : 'mine')
+  const [view, setView] = useState<PostsView>(box === 'commented' || box === 'saved' ? box : 'mine')
   const [sort, setSort] = useState<MyPostsSort>('latest')
   const query = usePostsList(view, sort)
   const posts = query.data?.data ?? []
+  const empty = view === 'mine' ? emptyCta('posts') : view === 'saved' ? emptyCta('saved') : null
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
@@ -27,13 +28,7 @@ const MyPostsScreen = () => {
           <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: 6, paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? posts.length}개
           </Text>
-          {posts.length === 0 && view === 'mine' ? (
-            <Empty
-              text={emptyCta('posts').title}
-              action={emptyCta('posts').action}
-              onAction={() => router.push(emptyCta('posts').href)}
-            />
-          ) : null}
+          {posts.length === 0 && empty ? <Empty text={empty.title} action={empty.action} onAction={() => router.push(empty.href)} /> : null}
           {posts.map((p) => (
             <Pressable
               key={p.id}
