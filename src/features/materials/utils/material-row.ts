@@ -37,14 +37,23 @@ export const madeByLabel = (madeBy: MadeBy): string => {
   return madeBy.bot.kind === 'push' ? `${madeBy.bot.name}이 만듦` : `${madeBy.bot.name} Bot이 만듦`
 }
 
-/** A link shows its host only: "https://www.google.com/search?q=x" reads google.com (MaterialDetailLong). */
-export const hostOf = (url: string) =>
+const bareHost = (url: string) =>
   url
     .trim()
     .replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
     .replace(/^[^/?#@]*@/, '')
     .split(/[/?#:]/)[0]!
     .replace(/^www\./i, '')
+
+const PROFILE_HOSTS = new Set(['github.com'])
+
+/** A link shows its host only ("https://www.google.com/search?q=x" reads google.com); a GitHub link keeps its first path segment so the profile shows: github.com/cyjoon68. */
+export const hostOf = (url: string) => {
+  const host = bareHost(url)
+  if (!PROFILE_HOSTS.has(host.toLowerCase())) return host
+  const owner = url.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/^[^/?#]*/, '').split(/[?#]/)[0]!.split('/').find((part) => part !== '')
+  return owner === undefined ? host : `${host}/${owner}`
+}
 
 /** The row's first line, also the title an attachment keeps. */
 export const materialTitle = (m: Material): string =>

@@ -96,7 +96,7 @@ describe('detail sheet', () => {
   it('prints MaterialDetailLink', () => {
     expect(detailTitle(github)).toBe('김서준 GitHub')
     expect(detailFacts(github, [moapay], now)).toEqual([
-      { label: '주소', value: 'github.com' },
+      { label: '주소', value: 'github.com/seojun-kim' },
       { label: '종류', value: 'GitHub' },
       { label: '추가', value: '10월 3일' },
     ])

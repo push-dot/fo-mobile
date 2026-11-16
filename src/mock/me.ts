@@ -381,7 +381,7 @@ const hubContent = {
     docText('paragraph', 'Kotlin, Spring Boot, Kafka, MySQL, Redis'),
   ],
 }
-// 지원 서류용 프로필(허브형) made from an uploaded file: the draft the profile tab already shows.
+// 지원용 프로필 made from an uploaded file: the draft the profile tab already shows.
 const profileContent = {
   type: 'doc',
   content: [
@@ -431,7 +431,7 @@ mock('POST', 'documents/:id/profile', ({ params, body }) => {
       id: `d${Date.now()}`,
       revision: 1,
       applicationId: null,
-      title: source?.fileName ?? '지원 서류용 프로필',
+      title: source?.fileName ?? '지원용 프로필',
       kind: 'HUB_PROFILE',
       status: 'DRAFT',
       latestVersionId: 'v1',

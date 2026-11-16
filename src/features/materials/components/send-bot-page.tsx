@@ -1,14 +1,11 @@
-import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
 import { useBots, type Bot } from '@/features/bots'
-import { PageModal } from '@/features/chat'
-import { GlassButton, Icon, Mascot, Text } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { Icon, Mascot, Sheet, Text } from '@/shared/components'
+import { radius, spacing } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
-import { SEND_PICK_HINT, SEND_PICK_TITLE } from '../constants'
+import { SEND_PICK_HINT } from '../constants'
 import type { MaterialKind } from '../types'
 import { toAttachment } from '../utils/material-row'
-import { useInMaterialsModal } from './in-materials-modal'
 import { sendToBot } from './send-material'
 
 const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
@@ -26,33 +23,14 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   </Pressable>
 )
 
-/** BotPick: 보내기 from the bot home asks which bot gets the material, on a page inside the 자료 modal. */
+/** BotPick: 보내기 from the bot home asks which Bot gets the material, in a regular sheet (one short question, no close button). */
 export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
-  const c = useColors()
   const material = useMaterialDetail(kind, id).data?.material
   const bots = useBots().data ?? []
   const attachment = material ? toAttachment(material) : null
-  const inModal = useInMaterialsModal()
   return (
-    <PageModal
-      title={SEND_PICK_TITLE}
-      left={<GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => router.back() }]} />}
-      page={!inModal}
-      mpage={inModal}
-    >
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[3], gap: spacing[4] }}>
-        <Text v="b2" color="t3">
-          {SEND_PICK_HINT}
-        </Text>
-        {attachment ? (
-          <View style={{ alignSelf: 'flex-start', maxWidth: 270, padding: 6, borderRadius: 14, backgroundColor: c.bg2 }}>
-            <Text v="c1" weight="600" numberOfLines={1}>
-              {attachment.title}
-            </Text>
-          </View>
-        ) : null}
-        <View>{attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}</View>
-      </View>
-    </PageModal>
+    <Sheet title={SEND_PICK_HINT} description={attachment?.title} gap={spacing[2]}>
+      <View>{attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}</View>
+    </Sheet>
   )
 }

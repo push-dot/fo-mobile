@@ -64,7 +64,7 @@ const bookmarks = (): Material[] => [
 ]
 
 const links = (): Material[] => [
-  link('l1', 'https://github.com/seojun-kim', 'github', '2026-10-03T02:00:00Z', '김서준 GitHub', yesterday()),
+  link('l1', 'https://github.com/cyjoon68', 'github', '2026-10-03T02:00:00Z', '김서준 GitHub', yesterday()),
   link('l2', 'https://seojun.dev/blog/payment-retry', 'blog', '2026-09-21T02:00:00Z'),
   link('l3', 'https://linkedin.com/in/seojun-kim', 'other', '2026-09-02T02:00:00Z'),
   link('l4', 'https://seojun.dev', 'portfolio', '2026-08-30T02:00:00Z'),

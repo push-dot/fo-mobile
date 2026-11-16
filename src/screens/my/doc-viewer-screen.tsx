@@ -179,7 +179,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           variant="secondary"
           onPress={() => void start(FIX_DOC, FIX_DOC, s?.fileName, undefined, undefined, { evidenceIds: [id] })}
         />
-        <Button label="내 프로필로 전환" disabled={!d} onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
+        <Button label="지원용 프로필로 전환" onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
       </CtaBar>
     </View>
   )

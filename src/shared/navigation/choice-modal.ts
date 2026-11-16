@@ -28,8 +28,8 @@ export type ChoiceModalRequest = {
   }
   /** One line of text, and a button that sends it (a pasted link). */
   input?: { placeholder: string; confirm: string; keyboardType?: 'default' | 'url'; onSubmit: (text: string) => void }
-  /** A confirmation: one primary button, and an optional plain second button that sets the proposal aside (ChatApprove 되돌리기). A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void } }
+  /** A confirmation: one primary button, and an optional plain second button that sets the proposal aside (ChatApprove 되돌리기). A regular modal has no 취소 (owner rule 35); swiping it away is the way out. `closeLabel` adds a 닫기 button left of the primary one (DocProfileConfirm). */
+  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void }; closeLabel?: string }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

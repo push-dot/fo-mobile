@@ -75,9 +75,9 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         accessibilityRole="button"
         accessibilityLabel={`${displayName(doc.fileName)} 더 보기`}
         onPress={openMenu}
-        style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
+        style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Icon name="more" size={20} color="t3" />
+        <Icon name="sort" size={22} color="t1" />
       </Pressable>
     </Row>
   )
