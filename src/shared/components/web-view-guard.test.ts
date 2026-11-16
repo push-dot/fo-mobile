@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bootScript, loadsInWebView, tokenEventScript, webViewNavigation } from './detail-url'
+import { bootScript, loadsInWebView, routeNavigation, tokenEventScript, webViewNavigation } from './detail-url'
 
 const WEB = 'https://push-fo-web.example.dev'
 
@@ -69,4 +69,34 @@ describe('WebView navigation routing', () => {
       expect(webViewNavigation(url, WEB)).toBe('ignore')
     },
   )
+})
+
+describe('WebView navigation, written differently', () => {
+  it.each(['HTTPS://PUSH-FO-WEB.EXAMPLE.DEV/postings/p1', 'https://Push-Fo-Web.Example.Dev/x'])('loads %s in place', (url) => {
+    expect(webViewNavigation(url, WEB)).toBe('load')
+  })
+
+  it('still sends another origin to the browser however it is cased', () => {
+    expect(webViewNavigation('HTTPS://ATTACKER.TEST/x', WEB)).toBe('browser')
+    expect(webViewNavigation('https://push-fo-web.example.dev.attacker.test', WEB)).toBe('browser')
+  })
+
+  it('does not raise when the system browser fails to open', async () => {
+    const seen: unknown[] = []
+    const onRejection = (reason: unknown) => seen.push(reason)
+    process.on('unhandledRejection', onRejection)
+    const open = () => Promise.reject(new Error('no browser'))
+    expect(routeNavigation('https://other.example/a', WEB, open)).toBe(false)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    process.off('unhandledRejection', onRejection)
+    expect(seen).toEqual([])
+  })
+
+  it('opens the browser once and keeps fo-web in place', () => {
+    const opened: string[] = []
+    const open = (url: string) => (opened.push(url), Promise.resolve())
+    expect(routeNavigation('https://other.example/a', WEB, open)).toBe(false)
+    expect(routeNavigation(`${WEB}/postings/p1`, WEB, open)).toBe(true)
+    expect(opened).toEqual(['https://other.example/a'])
+  })
 })
