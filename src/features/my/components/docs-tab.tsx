@@ -3,7 +3,6 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
-import { botChatPath } from '@/features/bots'
 import { Button, Icon, Spinner, Text } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../theme'
@@ -23,7 +22,7 @@ const RETRY_H = 32
 const PROGRESS_H = 6
 const EMPTY_INSET = 40
 
-const openChat = () => router.push(botChatPath('push'))
+const openChat = () => router.push('/bots/push')
 
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
   const c = useColors()

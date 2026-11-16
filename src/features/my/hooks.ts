@@ -2,7 +2,6 @@ import { router, useIsFocused } from 'expo-router'
 import { useEffect, useEffectEvent } from 'react'
 import { TOAST_ABOVE, askConfirm, showActionSheet, showToast, type ConfirmRequest } from '@/shared/components'
 import { showChoiceModal } from '@/shared/navigation'
-import { botChatPath } from '@/features/bots'
 import { pickDocument } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'
 import { MAX_BYTES, RESUME_DOCUMENT_OPTIONS, SHEET_SWAP_MS } from './constants'
@@ -75,7 +74,7 @@ export const showImportMenu = (fromModal = false) => {
     title: '서류 가져오기',
     items: [
       { label: '파일에서 고르기', chevron: true, onPress: () => useDocImport.setState({ requested: true }) },
-      { label: 'Bot 채팅에서 새로 만들기', chevron: true, onPress: () => router.push(botChatPath('push')) },
+      { label: 'Bot 채팅에서 새로 만들기', chevron: true, onPress: () => router.push('/bots/push') },
     ],
   }
   return fromModal ? showActionSheet(request) : showChoiceModal(request)

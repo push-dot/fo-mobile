@@ -5,7 +5,7 @@ import { fullPageOptions, modalOptions, sheetOptions } from '@/shared/navigation
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
-export const unstable_settings = { initialRouteName: '(tabs)' }
+export const unstable_settings = { anchor: '(tabs)' }
 
 const SignedInStack = () => {
   const c = useColors()
