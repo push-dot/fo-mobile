@@ -37,10 +37,6 @@ tags:
 - extendedWaitUntil:
     visible: "인증번호를 입력해 주세요"
     timeout: 10000
-- inputText: "482"
-- runFlow: _hide_kbd.yaml
-- waitForAnimationToEnd
-- takeScreenshot: PhoneCode
 # PhoneInput: the phone screen as it opens after a Google sign-in (the native sign-in cannot run here). The mock link
 # seeds the pending sign-in, then the route opens with its account pill, the field filled and the pad down like PhoneInputDirect.
 - openLink: "push://sign-in?mock=phone-social"
@@ -52,3 +48,12 @@ tags:
 - inputText: "01012345678"
 - waitForAnimationToEnd
 - takeScreenshot: PhoneInput
+# PhoneCode: the code screen after a Google sign-in keeps the account pill, as the owner asked on 2026-11-16.
+- tapOn: "인증번호 받기"
+- extendedWaitUntil:
+    visible: "인증번호를 입력해 주세요"
+    timeout: 10000
+- inputText: "482"
+- runFlow: _hide_kbd.yaml
+- waitForAnimationToEnd
+- takeScreenshot: PhoneCode
