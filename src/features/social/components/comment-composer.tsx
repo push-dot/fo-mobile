@@ -31,7 +31,6 @@ const CommentComposer = ({
 
   const box = (
     <Composer
-      layout="inline"
       tools={false}
       label="댓글"
       maxLength={MAX_COMMENT}

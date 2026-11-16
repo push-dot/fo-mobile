@@ -11,6 +11,7 @@ import { composerWeight } from '../utils/composer-weight'
 export const COMPOSER_MAX_LINES = 5
 
 const ROW_HEIGHT = 44
+const PILL_PAD = 4
 
 export type ComposerProps = {
   value: string
@@ -25,7 +26,6 @@ export type ComposerProps = {
   attachment?: string
   onClearAttachment?: () => void
   inputRef?: Ref<TextInputInstance>
-  layout?: 'stack' | 'inline'
   tools?: boolean
   maxLength?: number
   label?: string
@@ -36,47 +36,17 @@ export type ComposerProps = {
   onGrow?: (extra: number) => void
 }
 
-/** One row: + 첨부, the glass input, @ 언급, send or stop. Shared by both platforms. */
-export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
+/** One glass pill, one row inside it: + 첨부, the text, @ 언급, send or stop. It grows inside the pill as the text wraps. Shared by both platforms. */
+export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const c = useColors()
   const { fontScale } = useWindowDimensions()
   const typed = p.value.trim()
   const hasText = typed.length > 0
   // A bare "@" only opens the suggestions; there is nothing to send yet.
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
-  const inline = p.layout === 'inline'
-  const showTools = !inline && (p.tools ?? true)
-  const round = { width: inline ? 40 : ROW_HEIGHT, height: inline ? 40 : ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
-  const textType = inline ? type.b1 : type.h3
-  if (inline) {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6, minHeight: 52, padding: 6 }}>
-        <TextInput
-          ref={inputRef}
-          value={p.value}
-          onChangeText={p.onChangeText}
-          placeholder={p.placeholder}
-          placeholderTextColor={c.t4}
-          multiline
-          lineBreakStrategyIOS="hangul-word"
-          maxLength={p.maxLength}
-          accessibilityLabel={p.label ?? '메시지'}
-          style={[{ flex: 1, fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale + spacing[2] * 2, ...inputReset, paddingHorizontal: spacing[1], paddingVertical: spacing[2], minHeight: 40, textAlignVertical: 'center' }, fontFor('400')]}
-        />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="보내기"
-          accessibilityState={{ disabled: !canSend }}
-          disabled={!canSend}
-          onPress={p.onSend}
-          hitSlop={hitSlopTo(40, 40)}
-          style={[round, { backgroundColor: canSend ? c.ac : c.fill2 }]}
-        >
-          {p.sending ? <ActivityIndicator color={c.t3} /> : <Icon name="up" size={20} color={canSend ? onAccent : c.t4} />}
-        </Pressable>
-      </View>
-    )
-  }
+  const showTools = p.tools ?? true
+  const round = { width: ROW_HEIGHT, height: ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
+  const textType = type.h3
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, gap: spacing[2] }}>
       {p.attachment ? (
@@ -95,13 +65,13 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
           </View>
         </Pressable>
       ) : null}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] }}>
+      <GlassField style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PILL_PAD, borderRadius: (ROW_HEIGHT + PILL_PAD * 2) / 2 }}>
         {showTools ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={[round, { backgroundColor: c.fill }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
             <Icon name="plus" size={20} />
           </Pressable>
         ) : null}
-        <GlassField style={{ flex: 1, minHeight: ROW_HEIGHT, borderRadius: ROW_HEIGHT / 2, paddingHorizontal: spacing[4], justifyContent: 'center' }}>
+        <View style={{ flex: 1, minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: showTools ? spacing[1] : spacing[3] }}>
           {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
           <View
             onLayout={(e) => {
@@ -127,9 +97,9 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
               style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
             />
           </View>
-        </GlassField>
+        </View>
         {showTools ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="언급" onPress={p.onMention} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={[round, { backgroundColor: c.fill }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="언급" onPress={p.onMention} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
             <Icon name="at" size={20} />
           </Pressable>
         ) : null}
@@ -156,7 +126,7 @@ export const ComposerBody = ({ inputRef, ...p }: ComposerProps) => {
             {p.sending ? <ActivityIndicator color={c.t3} /> : <Icon name="up" size={20} color={canSend ? onAccent : c.t4} />}
           </Pressable>
         )}
-      </View>
+      </GlassField>
     </View>
   )
 }
