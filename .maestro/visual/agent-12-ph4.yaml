@@ -6,7 +6,7 @@ tags:
 - runFlow: ../flows/_login.yaml
 - runFlow: _company_tab.yaml
 - runFlow: _fresh_company.yaml
-# An earlier turn of the flow (its to-do card): the composer says 작업 중에도 말할 수 있어요 on ChatPh5 because the thread holds the flow's cards.
+# An earlier turn of the flow (its to-do card): ChatPh5 holds the flow's cards.
 - runFlow:
     file: _say_run.yaml
     env:
@@ -51,8 +51,7 @@ tags:
     timeout: 40000
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh4Design
-# ChatPh5 runs in the thread that came here through the review and the design modal: the composer says 작업 중에도 말할 수 있어요 only
-# while a document flow works, and that is known from the flow's cards above the line, so the modal's own button answers (its answer
+# ChatPh5 runs in the thread that came here through the review and the design modal: the modal's own button answers (its answer
 # line is 클래식으로 만들기, as the board's). No keyboard is up (nothing was typed).
 - tapOn: "클래식으로 만들기"
 - extendedWaitUntil:

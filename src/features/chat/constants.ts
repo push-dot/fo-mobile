@@ -3,7 +3,6 @@ import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
 import { ERROR_TEXT } from './error-text'
 
-export { COMPOSER_PLACEHOLDER } from './composer-placeholder'
 export { ERROR_TEXT } from './error-text'
 
 // Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.

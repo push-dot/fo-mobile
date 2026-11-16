@@ -80,7 +80,7 @@ export const fetchArtifactBytes = (downloadUrl: string) => bytesOf(c.raw('GET', 
 
 export const fetchSourceBytes = (id: string) => bytesOf(api.sources.content(id))
 
-export const fetchProfilePdf = () => bytesOf(api.me.profilePdf())
+export const fetchProfilePdf = (photo = false) => bytesOf(api.me.profilePdf(photo))
 
 export const fetchDocumentPdf = async (id: string) => {
   if (!id) throw new Error('no document to export')

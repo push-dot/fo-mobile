@@ -1,8 +1,6 @@
-import { COMPOSER_PLACEHOLDER } from '../composer-placeholder'
 import type { IconName } from '@push/design-system'
 import type { MenuAction } from '@/shared/components/menu-action'
-import type { AttachmentKind } from '@/features/bots'
-import type { ChatItem, ChatState } from '../types'
+import type { ChatItem } from '../types'
 import { foldBubbleCards } from './bubble-card'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
@@ -10,13 +8,6 @@ const BOT_SUFFIX = /(?:봇|Bot)$/
 export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} Bot`)
 
 export const askPlaceholder = (name: string) => `${botSpokenName(name)}에게 물어보기`
-
-/** A run that ended on its result card (ChatDone): the box invites the next ask instead of a first one. */
-export const talkPlaceholder = (name: string) => `${botSpokenName(name)}에게 말하기`
-
-const CHIP_NOUN: Record<AttachmentKind, string> = { file: '서류', document: '서류', posting: '공고', link: '링크' }
-
-export const chipPlaceholder = (kind: AttachmentKind) => `이 ${CHIP_NOUN[kind]}로 무엇을 할까요?`
 
 export type HeaderMenuId = 'profile' | 'find' | 'clear' | 'delete'
 
@@ -105,31 +96,5 @@ export const threadRows = (items: readonly ChatItem[], working: boolean): Thread
   return working ? [...drawn, { type: 'running', id: 'running' }] : drawn
 }
 
-const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
-
-// A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
-const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
-
-// ChatStates.4: a thread that holds a finished result keeps the talking box through the lines after it (apply record, busy error).
-// A thread that starts at its result (the run above it is older turns: ChatPh6Result, ChatPh6ResultFile) asks like any other; ChatDone* draw the flow's own cards above the result.
-const holdsResult = (items: ChatItem[]) => {
-  const at = items.findLastIndex((i) => i.type === 'result')
-  return at >= 0 && (inDocumentFlow(items) || items.slice(at + 1).some((i) => i.type !== 'worked'))
-}
-
-// The server's status lines cannot tell the two apart (the flow's 13 steps and the tool loop's PROGRESS lines share '공고 요건을 읽는 중', '서류를 읽는 중', '적합도를 계산하는 중', and phase is 'working' for both). What only the document flow leaves in a thread is its cards:
-// the 할 일 list (analysis), the 수정 전략 plan, the draft paper, the review diff (not the result card: it ends the flow, so a question after it is a plain turn). Every phase after the analysis has at least one of them above it.
-const FLOW_CARDS: ReadonlySet<string> = new Set(['todo', 'plan', 'paper', 'diff'])
-// A file sent with the first line starts the flow too: DocAgentNew draws 작업 중에도 말할 수 있어요 right under the file chip, before any card.
-export const inDocumentFlow = (items: readonly ChatItem[]) => items.some((i) => FLOW_CARDS.has(i.type) || (i.type === 'user' && !!i.attachment))
-
-export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'> & Partial<Pick<ChatState, 'approval'>>, name?: string, chipKind?: AttachmentKind) => {
-  if (chipKind) return chipPlaceholder(chipKind)
-  if (chat.approval && !chat.approval.confirm) return COMPOSER_PLACEHOLDER.choice
-  // ChatPh1/ChatPh3/ChatPh5/ChatInterrupt: a document flow takes input while it works; a plain tool-loop turn asks the named bot (ChatBotStatusWork).
-  if (chat.working && inDocumentFlow(chat.items)) return COMPOSER_PLACEHOLDER.working
-  if (name) return holdsResult(chat.items) && !chat.working ? talkPlaceholder(name) : askPlaceholder(name)
-  if (chat.working) return COMPOSER_PLACEHOLDER.working
-  if (hasWork(chat.items)) return COMPOSER_PLACEHOLDER.followUp
-  return COMPOSER_PLACEHOLDER.first
-}
+/** Every state of the chat box asks the same line, so the box never changes its words under the person (the name falls back to Bot until the bot loads). */
+export const composerPlaceholder = (name?: string) => askPlaceholder(name ?? 'Bot')

@@ -49,7 +49,6 @@ import {
   useSaveFailAlert,
   useChat,
   useChatLimit,
-  useDraftStore,
   useFind,
   useReadWhileOpen,
   useUnseen,
@@ -130,11 +129,8 @@ const Thread = ({ id }: { id: string }) => {
   const convert = useConvertDocument((documentId) => {
     router.push(`/docs/push/${documentId}`)
   })
-  const [sayingFor, setSayingFor] = useState<string>()
   const input = useRef<TextInputInstance>(null)
-  const saying = !!chat.approval && sayingFor === chat.approval.id
-  const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
-  const placeholder = composerPlaceholder(chat, name, chipKind)
+  const placeholder = composerPlaceholder(name)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
@@ -188,7 +184,7 @@ const Thread = ({ id }: { id: string }) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
   })
-  useGateModal(id, chat, (text, choice) => answer(id, text, choice), () => (setSayingFor(chat.approval?.id), setTimeout(() => input.current?.focus(), 50)))
+  useGateModal(id, chat, (text, choice) => answer(id, text, choice), () => setTimeout(() => input.current?.focus(), 50))
   const working = chat.working
   const renderItem = useCallback(
     ({ item, index }: { item: ThreadRow; index: number }) => (
@@ -262,7 +258,7 @@ const Thread = ({ id }: { id: string }) => {
         <ComposerArea
           botId={id}
           inputRef={input}
-          placeholder={saying ? '어떻게 할지 말해 주세요' : placeholder}
+          placeholder={placeholder}
           working={!!chat.working && !isStopping(chat.working)}
           disabled={!!limit.banner}
           onGrow={setGrow}

@@ -36,76 +36,10 @@ describe('usage exhausted copy', () => {
 })
 
 describe('composerPlaceholder', () => {
-  const run = (items: ChatItem[], working = false) => composerPlaceholder({ items, working: working ? { verbs: [], startedAt: 0 } : null })
-  const user: ChatItem = { type: 'user', id: 'u', text: '모아페이' }
-  const error = (code: string): ChatItem => ({ type: 'error', id: 'e', text: '', code })
-
-  it('asks for a link on an empty chat and after a failed first run', () => {
-    expect(run([])).toBe('공고 링크를 붙여넣어 보세요')
-    expect(run([user, error('UNKNOWN')])).toBe('공고 링크를 붙여넣어 보세요')
-    expect(run([user, { type: 'agentText', id: 'a', text: '좋아요' }, { type: 'tool', id: 't', action: '이력서 읽기', state: 'ok' }, error('UNKNOWN')])).toBe('공고 링크를 붙여넣어 보세요')
-  })
-
-  it('keeps the follow-up line when a later run fails in a chat that already has work', () => {
-    expect(run([user, { type: 'agentText', id: 'a', text: '다 됐어요' }, { type: 'worked', id: 'w', seconds: 3 }, user, error('UNKNOWN')])).toBe('더 고칠 부분이 있으면 말해 주세요')
-  })
-
-  it('keeps the follow-up line after work and after the usage card', () => {
-    expect(run([user, { type: 'agentText', id: 'a', text: '다 됐어요' }, { type: 'worked', id: 'w', seconds: 3 }])).toBe('더 고칠 부분이 있으면 말해 주세요')
-    expect(run([user, error('INSUFFICIENT_CREDITS')])).toBe('더 고칠 부분이 있으면 말해 주세요')
-  })
-
-  it('counts a reopened chat, whose turns carry no worked row, as work', () => {
-    expect(run([user, { type: 'agentText', id: 'a', text: '자료 분석을 마쳤어요.' }, user, error('UNKNOWN')])).toBe('더 고칠 부분이 있으면 말해 주세요')
-  })
-
-  it('lets the person talk while the agent works', () => {
-    expect(run([user], true)).toBe('작업 중에도 말할 수 있어요')
-  })
-
-  it('asks the named bot on an empty chat, while working, and after work', () => {
-    expect(composerPlaceholder({ items: [], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [], working: null }, 'Push Bot')).toBe('Push Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user], working: { verbs: [], startedAt: 0 } }, 'Push Bot')).toBe('Push Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user, { type: 'agentText', id: 'a', text: '다 됐어요' }], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    const result: ChatItem = { type: 'result', id: 'r', source: 'external', checklist: [], actions: [], documentId: 'd', fileName: 'a.pdf', pageLine: 'A4 1쪽' }
-    const worked: ChatItem = { type: 'worked', id: 'w', seconds: 3 }
-    const flowCard: ChatItem = { type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'done' }] }
-    // ChatDone*: the flow's own cards sit above the result, so the finished run keeps the talking box; ChatPh6Result starts at its result and asks.
-    expect(composerPlaceholder({ items: [user, flowCard, result, worked], working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
-    expect(composerPlaceholder({ items: [result, worked], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    expect(composerPlaceholder({ items: [user, result], working: { verbs: [], startedAt: 0 } }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    // ChatStates.4: the lines after the result (apply record, busy error) keep the talking box.
-    const later: ChatItem[] = [user, result, { type: 'agentText', id: 'rec', text: '지원했어요. [이동하기](/my)' }, user, { type: 'error', id: 'e', text: '지금 요청이 많아요.', code: 'QUEUE_BUSY' }]
-    expect(composerPlaceholder({ items: later, working: null }, '모아페이')).toBe('모아페이 Bot에게 말하기')
-  })
-
-  it('says the run takes input too while a document flow with a to-do card works, named bot or not', () => {
-    const todo: ChatItem = { type: 'todo', id: 't', items: [{ label: '이력서 읽기', state: 'now' }] }
-    const working = { verbs: [], startedAt: 0 }
-    expect(composerPlaceholder({ items: [user, todo], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
-    expect(composerPlaceholder({ items: [user, todo], working }, 'Push Bot')).toBe('작업 중에도 말할 수 있어요')
-    // Any card only a document flow leaves counts, so a later phase (draft, review, save) says it too.
-    for (const card of [
-      { type: 'plan', id: 'p', title: '수정 전략', meta: '', rows: [], keywords: [] },
-      { type: 'paper', id: 'pp', label: '초안', heading: '', lines: [] },
-      { type: 'diff', id: 'd', lines: [] },
-    ] as ChatItem[])
-      expect(composerPlaceholder({ items: [user, card], working }, '모아페이')).toBe('작업 중에도 말할 수 있어요')
-    // A plain run with tool lines only (ChatBotStatusWork) asks the bot.
-    const tool: ChatItem = { type: 'tool', id: 'tl', action: '공고 읽기', state: 'run' }
-    expect(composerPlaceholder({ items: [user, tool], working }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-    // Idle again: the bot's own line.
-    expect(composerPlaceholder({ items: [user, todo], working: null }, '모아페이')).toBe('모아페이 Bot에게 물어보기')
-  })
-
-  it('asks what to do with the attached material, by its kind, over the bot name', () => {
-    const chat = { items: [], working: null }
-    expect(composerPlaceholder(chat, '모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')
-    expect(composerPlaceholder(chat, '모아페이', 'document')).toBe('이 서류로 무엇을 할까요?')
-    expect(composerPlaceholder(chat, '모아페이', 'posting')).toBe('이 공고로 무엇을 할까요?')
-    expect(composerPlaceholder(chat, 'Push Bot', 'link')).toBe('이 링크로 무엇을 할까요?')
+  it('asks the named bot in every state of the box', () => {
+    expect(composerPlaceholder('모아페이')).toBe('모아페이 Bot에게 물어보기')
+    expect(composerPlaceholder('Push Bot')).toBe('Push Bot에게 물어보기')
+    expect(composerPlaceholder()).toBe('Bot에게 물어보기')
   })
 
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
