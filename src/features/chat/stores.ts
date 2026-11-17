@@ -109,12 +109,19 @@ const withUpload = async (input: Outgoing): Promise<RunInput | undefined> => {
 
 const pendingConsent = new Map<string, RunInput>()
 let pendingOpen: PendingOpen | null = null
+let pendingRetry: (() => void) | null = null
 let openChat: ((p: PendingOpen) => void) | null = null
 
 export const askConsent = (force = false) => {
   const s = useConsentPrompt.getState()
   if (!(force || !s.dismissed) || s.open) return
   useConsentPrompt.setState({ open: true })
+}
+
+/** Asks for consent, then runs `retry` once it is granted (BotNew: creating a Bot needs 내 자료 읽기). */
+export const askConsentThen = (retry: () => void) => {
+  pendingRetry = retry
+  askConsent(true)
 }
 
 export const holdOpen = (p: PendingOpen) => {
@@ -128,6 +135,7 @@ export const bindOpenChat = (fn: (p: PendingOpen) => void) => {
 export const laterConsent = () => {
   pendingConsent.clear()
   pendingOpen = null
+  pendingRetry = null
   useConsentPrompt.setState({ open: false, dismissed: true })
 }
 
@@ -139,6 +147,9 @@ export const grantConsent = () => {
   pendingConsent.clear()
   const open = pendingOpen
   pendingOpen = null
+  const retry = pendingRetry
+  pendingRetry = null
+  retry?.()
   if (held.length) {
     for (const next of held) void startRun(next)
   } else if (open) openChat?.(open)
