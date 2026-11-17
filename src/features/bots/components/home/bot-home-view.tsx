@@ -1,13 +1,13 @@
 import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { FlatList, Platform, View, useWindowDimensions } from 'react-native'
+import { FlatList, Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useKeyboardHeight, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
-import { isXlScale } from '@/shared/components/xl-chrome'
+import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
@@ -72,7 +72,7 @@ const BotHomeView = ({
   const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
-  const xl = isXlScale(useWindowDimensions().fontScale)
+  const xl = useXlBoardText()
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
@@ -136,83 +136,85 @@ const BotHomeView = ({
   ) : null
 
   return (
-    <View style={screen}>
-      <BotHomeHeader
-        chrome={chrome}
-        topInset={insets.top}
-        label={accountLabel(accountName, plan)}
-        name={accountName}
-        onAccount={() => router.push(accountPath())}
-        onNew={() => void openBotNew()}
-      />
-      {searching ? (
-        <BotHomeSearch
-          query={query}
-          data={found.data}
-          pending={found.isLoading}
-          local={local}
-          now={now}
+    <XlBoardChrome>
+      <View style={screen}>
+        <BotHomeHeader
           chrome={chrome}
-          top={insets.top + chrome.searchTop}
-          bottom={lift + chrome.control}
-          bots={bots ?? []}
-          onOpenBot={openChat}
-          onOpenMessage={(id, messageId) => router.push(botChatAtPath(id as Bot['id'], messageId))}
+          topInset={insets.top}
+          label={accountLabel(accountName, plan)}
+          name={accountName}
+          onAccount={() => router.push(accountPath())}
+          onNew={() => void openBotNew()}
         />
-      ) : loading && !bots ? (
-        <BotHomeLoading chrome={chrome} top={top} />
-      ) : (
-        <FlatList
-          data={home.companies}
-          keyExtractor={(bot) => bot.id}
-          extraData={scrolling ? 'scroll' : visible ? [...visible].join('|') : 'open'}
-          contentContainerStyle={listPad}
-          keyboardDismissMode="on-drag"
-          viewabilityConfig={VIEWABILITY}
-          onViewableItemsChanged={onViewableItemsChanged}
-          onScrollBeginDrag={() => setScrolling(true)}
-          onScrollEndDrag={() => setScrolling(false)}
-          onMomentumScrollEnd={() => setScrolling(false)}
-          ListHeaderComponent={
-            <View>
-              {hero}
-              {error && !bots ? <BotHomeError onRetry={onRetry} /> : null}
-            </View>
-          }
-          renderItem={({ item, index }) => {
-            const held = scrolling || (visible ? !visible.has(item.id) : index >= FIRST_SCREEN)
-            return (
-              <BotHomeRow
-                row={botRow(item, local[item.id], now)}
-                chrome={chrome}
-                index={index}
-                held={held}
-                actions={item.kind === 'company' ? actionsFor(item) : []}
-                onPress={() => openChat(item)}
-              />
-            )
-          }}
+        {searching ? (
+          <BotHomeSearch
+            query={query}
+            data={found.data}
+            pending={found.isLoading}
+            local={local}
+            now={now}
+            chrome={chrome}
+            top={insets.top + chrome.searchTop}
+            bottom={lift + chrome.control}
+            bots={bots ?? []}
+            onOpenBot={openChat}
+            onOpenMessage={(id, messageId) => router.push(botChatAtPath(id as Bot['id'], messageId))}
+          />
+        ) : loading && !bots ? (
+          <BotHomeLoading chrome={chrome} top={top} />
+        ) : (
+          <FlatList
+            data={home.companies}
+            keyExtractor={(bot) => bot.id}
+            extraData={scrolling ? 'scroll' : visible ? [...visible].join('|') : 'open'}
+            contentContainerStyle={listPad}
+            keyboardDismissMode="on-drag"
+            viewabilityConfig={VIEWABILITY}
+            onViewableItemsChanged={onViewableItemsChanged}
+            onScrollBeginDrag={() => setScrolling(true)}
+            onScrollEndDrag={() => setScrolling(false)}
+            onMomentumScrollEnd={() => setScrolling(false)}
+            ListHeaderComponent={
+              <View>
+                {hero}
+                {error && !bots ? <BotHomeError onRetry={onRetry} /> : null}
+              </View>
+            }
+            renderItem={({ item, index }) => {
+              const held = scrolling || (visible ? !visible.has(item.id) : index >= FIRST_SCREEN)
+              return (
+                <BotHomeRow
+                  row={botRow(item, local[item.id], now)}
+                  chrome={chrome}
+                  index={index}
+                  held={held}
+                  actions={item.kind === 'company' ? actionsFor(item) : []}
+                  onPress={() => openChat(item)}
+                />
+              )
+            }}
+          />
+        )}
+        {ios && keyboard > 0 ? null : (
+          <LinearGradient
+            pointerEvents="none"
+            colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
+            locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]}
+            style={fade}
+          />
+        )}
+        <BotHomeBar
+          chrome={chrome}
+          lift={lift}
+          searching={searching}
+          query={query ?? ''}
+          onSearch={() => setQuery('')}
+          onMaterials={openMaterials}
+          onChange={setQuery}
+          onClose={() => setQuery(null)}
         />
-      )}
-      {ios && keyboard > 0 ? null : (
-        <LinearGradient
-          pointerEvents="none"
-          colors={ios ? [`${c.bg}00`, `${c.bg}B3`, `${c.bg}EB`] : [`${c.bg}00`, c.bg, c.bg]}
-          locations={ios ? [0, 0.45, 1] : [0, 0.42, 1]}
-          style={fade}
-        />
-      )}
-      <BotHomeBar
-        chrome={chrome}
-        lift={lift}
-        searching={searching}
-        query={query ?? ''}
-        onSearch={() => setQuery('')}
-        onMaterials={openMaterials}
-        onChange={setQuery}
-        onClose={() => setQuery(null)}
-      />
-    </View>
+      </View>
+    </XlBoardChrome>
   )
 }
 

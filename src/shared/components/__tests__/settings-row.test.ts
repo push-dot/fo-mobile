@@ -4,7 +4,7 @@ import { findAll } from './native-stubs'
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Pressable: 'Pressable', View: 'View' }))
 vi.mock('../../../theme', async () => {
   const tokens = await import('../../../theme/tokens')
-  return { spacing: tokens.spacing, type: tokens.type }
+  return { largeType: tokens.largeType, spacing: tokens.spacing, type: tokens.type }
 })
 vi.mock('../icon', () => ({ default: 'Icon' }))
 vi.mock('../text', () => ({ default: 'Text' }))
@@ -34,5 +34,12 @@ describe('SettingsRow', () => {
     expect(chevron({ label: '고객센터', onPress: vi.fn() })).toMatchObject({ color: 't1' })
     expect(chevron({ label: '약관 및 정책', onPress: vi.fn() })).toMatchObject({ color: 't1' })
     expect(chevron({ label: '이력서', value: '3개', onPress: vi.fn() })).toMatchObject({ color: 't3' })
+  })
+
+  it('draws the BotProfileXL row: 64 high, a 21 pt label and an 18 pt value in fixed pixels', () => {
+    const tree = SettingsRow({ label: '공고', value: '11월 20일 마감', onPress: vi.fn(), xl: true })
+    expect((findAll(tree, 'View')[0]?.props.style as { minHeight: number }).minHeight).toBe(64)
+    expect(findAll(tree, 'Text')[0]?.props).toMatchObject({ allowFontScaling: false, style: { fontSize: 21, lineHeight: 28 } })
+    expect(findAll(tree, 'Text')[1]?.props).toMatchObject({ allowFontScaling: false, style: { fontSize: 18 } })
   })
 })

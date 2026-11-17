@@ -39,3 +39,10 @@ describe('XlBoardChrome', () => {
     expect((el.props as { value: string }).value).toBe('board')
   })
 })
+
+describe('isXlBoardText rounding', () => {
+  it('flips at the whole percent the web zoom sends', () => {
+    expect(isXlBoardText(1.195)).toBe(true)
+    expect(isXlBoardText(1.194)).toBe(false)
+  })
+})

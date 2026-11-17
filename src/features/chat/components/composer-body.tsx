@@ -3,8 +3,9 @@ import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, typ
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
+import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
-import { emptyFieldHeight } from '../utils/composer-geometry'
+import { composerFontScale, emptyFieldHeight } from '../utils/composer-geometry'
 import { composerWeight } from '../utils/composer-weight'
 
 
@@ -41,7 +42,9 @@ export type ComposerProps = {
 /** One glass pill, one row inside it: + 첨부, the text, @ 언급, send or stop. It grows inside the pill as the text wraps. Shared by both platforms. */
 export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const c = useColors()
-  const { fontScale } = useWindowDimensions()
+  const xl = useXlBoardText()
+  const { fontScale: system } = useWindowDimensions()
+  const fontScale = composerFontScale(xl, system)
   const typed = p.value.trim()
   const hasText = typed.length > 0
   // A bare "@" only opens the suggestions; there is nothing to send yet.
@@ -85,7 +88,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             }}
           >
             {p.value ? null : (
-              <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+              <Text v="h3" weight="400" color="t4" numberOfLines={1} allowFontScaling={!xl} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
                 {p.placeholder}
               </Text>
             )}
@@ -94,6 +97,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
               value={p.value}
               onChangeText={p.onChangeText}
               multiline
+              allowFontScaling={!xl}
               lineBreakStrategyIOS="hangul-word"
               editable={!p.disabled}
               accessibilityLabel={p.label ?? '메시지'}

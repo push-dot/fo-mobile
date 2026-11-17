@@ -67,17 +67,17 @@ const BotHomeSearch = ({
   return (
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={pad}>
       {hint ? (
-        <Text color="t3" style={center}>
+        <Text allowFontScaling={chrome.noScale} color="t3" style={center}>
           {SEARCH_HINT}
         </Text>
       ) : null}
       {empty ? (
-        <Text color="t3" style={center}>
+        <Text allowFontScaling={chrome.noScale} color="t3" style={center}>
           {SEARCH_EMPTY}
         </Text>
       ) : null}
       {botTitle ? (
-        <Text weight="700" color="t3" style={sect}>
+        <Text allowFontScaling={chrome.noScale} weight="700" color="t3" style={sect}>
           {botTitle}
         </Text>
       ) : null}
@@ -88,7 +88,7 @@ const BotHomeSearch = ({
           })
         : null}
       {messageTitle ? (
-        <Text weight="700" color="t3" style={botTitle ? [sect, { paddingTop: 14 }] : sect}>
+        <Text allowFontScaling={chrome.noScale} weight="700" color="t3" style={botTitle ? [sect, { paddingTop: 14 }] : sect}>
           {messageTitle}
         </Text>
       ) : null}
@@ -107,14 +107,14 @@ const BotHomeSearch = ({
                   </View>
                   <View style={body}>
                     <View style={topRow}>
-                      <Text weight="700" numberOfLines={chrome.nameLines} style={name}>
+                      <Text allowFontScaling={chrome.noScale} weight="700" numberOfLines={chrome.nameLines} style={name}>
                         <Highlight text={message.bot.name} q={trimmed} />
                       </Text>
-                      <Text color="t3" style={time}>
+                      <Text allowFontScaling={chrome.noScale} color="t3" style={time}>
                         {when}
                       </Text>
                     </View>
-                    <Text color="t3" numberOfLines={chrome.msgLines} style={line}>
+                    <Text allowFontScaling={chrome.noScale} color="t3" numberOfLines={chrome.msgLines} style={line}>
                       <Highlight text={message.snippet} q={trimmed} />
                     </Text>
                   </View>

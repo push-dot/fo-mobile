@@ -25,6 +25,13 @@ describe('detail url', () => {
   it('text size rule is important so it beats the page body rule', () => {
     expect(textSizeScript(130)).toContain('html,body{-webkit-text-size-adjust:130%!important}')
   })
+
+  it('takes the JobDetailXL sizes from the harness XL size up, and only then', () => {
+    expect(textSizeScript(124)).toContain('html.push-xl .frow{font-size:17px;line-height:24px;grid-template-columns:110px minmax(0,1fr) 40px;-webkit-text-size-adjust:100%!important}')
+    expect(textSizeScript(124)).toContain("classList.toggle('push-xl',true)")
+    expect(textSizeScript(112)).not.toContain('.frow')
+    expect(textSizeScript(112)).toContain("classList.toggle('push-xl',false)")
+  })
 })
 
 describe('mock fit hold script (JobFit)', () => {
