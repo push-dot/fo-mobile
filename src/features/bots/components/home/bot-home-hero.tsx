@@ -28,7 +28,7 @@ const BotHomeHero = ({
     <Pressable accessibilityRole="button" accessibilityLabel={heroLabel(unread)} onPress={onPress} style={wrap}>
       <Mascot size={chrome.hero} state={state} color="push" motion={motion} />
       <View style={nameRow}>
-        <Text allowFontScaling={chrome.xl ? false : undefined} weight="700" style={name}>
+        <Text allowFontScaling={chrome.noScale} weight="700" style={name}>
           {HERO_NAME}
         </Text>
         {unread ? <View style={dot} /> : null}

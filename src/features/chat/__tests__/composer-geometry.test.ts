@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { creditBannerMarginBottom, emptyFieldHeight, mentionListMarginBottom, quickStartMarginBottom } from '../utils/composer-geometry'
+import { creditBannerMarginBottom, emptyFieldHeight, mentionListMarginBottom, quickStartMarginBottom, composerFontScale } from '../utils/composer-geometry'
 
 describe('composer geometry (v489 boards)', () => {
   it('keeps the quick start chips 70 above the box with the area gap of 8', () => {
@@ -18,5 +18,12 @@ describe('composer geometry (v489 boards)', () => {
     expect(emptyFieldHeight('', 22, 1)).toBe(22)
     expect(emptyFieldHeight('', 22, 1.5)).toBe(33)
     expect(emptyFieldHeight('안녕', 22, 1)).toBeUndefined()
+  })
+})
+
+describe('composerFontScale', () => {
+  it('ignores the system size in the XL board only', () => {
+    expect(composerFontScale(true, 1.235)).toBe(1)
+    expect(composerFontScale(false, 1.235)).toBe(1.235)
   })
 })

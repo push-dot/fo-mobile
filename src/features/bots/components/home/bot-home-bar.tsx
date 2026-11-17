@@ -70,7 +70,7 @@ const BotHomeBar = ({
             <View style={fill}>
               <Icon name="search" size={20} color="t3" />
               <TextInput
-                allowFontScaling={chrome.xl ? false : undefined}
+                allowFontScaling={chrome.noScale}
                 autoFocus
                 value={query}
                 onChangeText={onChange}
@@ -85,7 +85,7 @@ const BotHomeBar = ({
         : shell(
             <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_LABEL} onPress={onSearch} style={fill}>
               <Icon name="search" size={20} color="t3" />
-              <Text allowFontScaling={chrome.xl ? false : undefined} color="t3" style={hint}>
+              <Text allowFontScaling={chrome.noScale} color="t3" style={hint}>
                 {SEARCH_LABEL}
               </Text>
             </Pressable>,

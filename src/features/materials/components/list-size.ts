@@ -24,4 +24,6 @@ const SIZES = {
 } as const
 
 /** From the harness XL size (iOS extra-extra-large) up the list draws MaterialsXL. */
-export const useListSize = () => SIZES[isXlBoardText(useWindowDimensions().fontScale) ? 'large' : 'normal']
+export const listSizeFor = (fontScale: number) => SIZES[isXlBoardText(fontScale) ? 'large' : 'normal']
+
+export const useListSize = () => listSizeFor(useWindowDimensions().fontScale)

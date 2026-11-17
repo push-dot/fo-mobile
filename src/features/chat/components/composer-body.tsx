@@ -5,7 +5,7 @@ import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
-import { emptyFieldHeight } from '../utils/composer-geometry'
+import { composerFontScale, emptyFieldHeight } from '../utils/composer-geometry'
 import { composerWeight } from '../utils/composer-weight'
 
 
@@ -43,9 +43,8 @@ export type ComposerProps = {
 export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const c = useColors()
   const xl = useXlBoardText()
-  // ChatBotStatusXL, ChatBotHeaderXL: the board draws the box text at 17 pt whatever the system size, so the placeholder keeps its whole line.
   const { fontScale: system } = useWindowDimensions()
-  const fontScale = xl ? 1 : system
+  const fontScale = composerFontScale(xl, system)
   const typed = p.value.trim()
   const hasText = typed.length > 0
   // A bare "@" only opens the suggestions; there is nothing to send yet.

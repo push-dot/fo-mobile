@@ -137,22 +137,22 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
 
   return (
     <XlBoardChrome>
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
-        <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
-          {MATERIALS_TITLE}
-        </Text>
-        <GlassButton circle actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+          <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
+          <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
+            {MATERIALS_TITLE}
+          </Text>
+          <GlassButton circle actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
+        </View>
+        <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+          <MaterialsTabs value={tab} onChange={setTab} />
+        </View>
+        <View style={{ flex: 1 }}>{body}</View>
+        <MaterialsSearch value={text} onChange={setText} />
+        {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
+        {ios ? <ToastHost /> : null}
       </View>
-      <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
-        <MaterialsTabs value={tab} onChange={setTab} />
-      </View>
-      <View style={{ flex: 1 }}>{body}</View>
-      <MaterialsSearch value={text} onChange={setText} />
-      {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
-      {ios ? <ToastHost /> : null}
-    </View>
     </XlBoardChrome>
   )
 }

@@ -21,9 +21,13 @@ type RowProps = {
   xl?: boolean
 }
 
+/** BotProfileXL `.grp .it`: the label is the b1 size on the b2 line, the value has no type token. Fixed pixels, so no system scaling. */
+export const XL_ROW_LABEL = { fontSize: largeType.b1.fontSize, lineHeight: largeType.b2.lineHeight }
+export const XL_ROW_VALUE = { fontSize: 18 }
+
 const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker, xl }: RowProps) => {
-  const labelSize = xl ? { fontSize: 21, lineHeight: largeType.b2.lineHeight } : { lineHeight: type.b2.lineHeight }
-  const valueSize = xl ? { fontSize: 18 } : undefined
+  const labelSize = xl ? XL_ROW_LABEL : { lineHeight: type.b2.lineHeight }
+  const valueSize = xl ? XL_ROW_VALUE : undefined
   const body = (
     <View
       style={{

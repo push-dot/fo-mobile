@@ -4,4 +4,5 @@
  * Home, Bot Profile, Materials) share one `.xl` rule set and read this gate; the Main and JobDetail boards draw no `.xl` chrome and keep XL_TEXT_SCALE.
  */
 export const XL_BOARD_TEXT_SCALE = 1.2
-export const isXlBoardText = (fontScale: number) => fontScale >= XL_BOARD_TEXT_SCALE
+/** Compared in whole percent, the way the WebView zoom is sent, so native text and the job detail page flip at the same system size. */
+export const isXlBoardText = (fontScale: number) => Math.round(fontScale * 100) >= Math.round(XL_BOARD_TEXT_SCALE * 100)

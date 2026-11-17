@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
-import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
+import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, XL_ROW_LABEL } from '@/shared/components'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
-import { largeType, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
 import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
@@ -201,7 +201,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
               paddingVertical: spacing[2],
             }}
           >
-            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? { fontSize: 21, lineHeight: largeType.b2.lineHeight } : { lineHeight: type.b2.lineHeight }]}>
+            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? XL_ROW_LABEL : { lineHeight: type.b2.lineHeight }]}>
               {row.label}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
@@ -231,17 +231,17 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   }
   return (
     <XlBoardChrome>
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
-      <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
-        <ProfileHead name={bot.name} color={color} sub={posting?.title} />
-        {groups.map((group, index) => (
-          <View key={group.map((row) => row.id).join('-')} style={{ marginHorizontal: spacing[5], marginTop: index > 0 ? spacing[3] : 0 }}>
-            <SettingsGroup>{group.map(rowOf)}</SettingsGroup>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <TopBar circleBack chat={IOS} onBack={() => router.back()} />
+        <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+          <ProfileHead name={bot.name} color={color} sub={posting?.title} />
+          {groups.map((group, index) => (
+            <View key={group.map((row) => row.id).join('-')} style={{ marginHorizontal: spacing[5], marginTop: index > 0 ? spacing[3] : 0 }}>
+              <SettingsGroup>{group.map(rowOf)}</SettingsGroup>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
     </XlBoardChrome>
   )
 }
