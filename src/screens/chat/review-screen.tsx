@@ -137,6 +137,7 @@ const ReviewScreen = () => {
     <PageModal
       title={REVIEW_TITLE}
       sheet
+      closeFilled
       fadeAbove={56}
       footer={
         request.apply ? (

@@ -29,6 +29,7 @@ const PageModal = ({
   mpage,
   sheet,
   white,
+  closeFilled,
   fadeAbove = 0,
   scroll = true,
 }: {
@@ -47,6 +48,8 @@ const PageModal = ({
   /** An iOS pageSheet on the system sheet fill (`--iSheet`), not the page background. */
   sheet?: boolean
   white?: boolean
+  /** The close X is a filled circle (ChatApprove); every other page keeps the plain glass X. */
+  closeFilled?: boolean
   fadeAbove?: number
   scroll?: boolean
 }) => {
@@ -60,7 +63,7 @@ const PageModal = ({
   return (
     <View style={{ flex: 1, backgroundColor: fill, paddingTop: iosSheet ? SHEET.top : modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: iosSheet ? SHEET.header : undefined, paddingHorizontal: iosSheet ? SHEET.side : modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: iosSheet ? 0 : modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
-        {left ?? <GlassButton filled={iosSheet && !white} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
+        {left ?? <GlassButton filled={iosSheet && !!closeFilled} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
         </Text>

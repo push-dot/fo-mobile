@@ -26,7 +26,7 @@ const ConsentSheetScreen = () => {
     setTimeout(request.onAgree, CHOICE_HANDOFF_MS)
   }
   return (
-    <Sheet gap={12} actionGap={12} action={{ label: request.agree, onPress: agree }} secondary={{ label: CONSENT_LATER_LABEL, onPress: () => router.back() }}>
+    <Sheet gap={12} actionGap={12} secondaryGap={8} action={{ label: request.agree, onPress: agree }} secondary={{ label: CONSENT_LATER_LABEL, onPress: () => router.back() }}>
       <View style={{ gap: spacing[3] }}>
         <Text v="h2" accessibilityRole="header">
           {request.title}

@@ -17,6 +17,8 @@ type Props = {
   children?: ReactNode
   action?: { label: string; onPress: () => void; disabled?: boolean; pending?: boolean }
   secondary?: { label: string; onPress: () => void }
+  /** The space between the action and the secondary button when a board draws it tighter than the sheet gap. */
+  secondaryGap?: number
   gap?: number
   /** Extra space above the action: the boards add 6 (filters) or 4 (quick starts) to the sheet gap. */
   actionGap?: number
@@ -37,7 +39,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, secondaryGap, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -93,7 +95,7 @@ const Body = ({ title, description, children, action, secondary, gap = SHEET_GAP
       ) : null}
       {children}
       {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && SLIM_ACTION]} /> : null}
-      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} /> : null}
+      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} style={secondaryGap === undefined ? undefined : { marginTop: secondaryGap - gap }} /> : null}
     </View>
   )
 }
