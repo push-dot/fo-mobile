@@ -35,7 +35,7 @@ export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows
 /** The boards' `--iFill` (iOS system fill): translucent, so a field greys whatever sheet it sits on (FilterSkill's `.isearch`, #E3E3E9 on the board). */
 export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' } as const
 
-/** The boards' `--iSheet`: the system fill of an iOS pageSheet (ChatPh0Picker, ChatPh0Input), systemGray6. */
+/** The boards' `--iSheet`: the system fill of an iOS pageSheet (ChatPh0Input), systemGray6. */
 export const iosSheetFill = { light: '#F2F2F7', dark: '#1C1C1E' } as const
 
 /** A white A4 page in DocViewer: the board's 1pt ring, and the ring plus a soft drop under the first page. */
