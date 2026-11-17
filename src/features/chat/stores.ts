@@ -26,7 +26,7 @@ export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(()
 
 export const LOCAL_DRAFT = 'local'
 
-type Draft = { text: string; file?: PickedFile; chip?: string; chipKind?: AttachmentKind }
+type Draft = { text: string; file?: PickedFile; chip?: string; chipKind?: AttachmentKind; chipId?: string }
 
 const EMPTY_DRAFT: Draft = { text: '' }
 
@@ -62,14 +62,14 @@ export const appendDraftText = (id: string, text: string) => {
 export const attachDraftFile = (id: string, file: PickedFile) => {
   useDraftStore.setState((s) => {
     const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined, chipKind: undefined } } }
+    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined, chipKind: undefined, chipId: undefined } } }
   })
 }
 
-export const attachDraftChip = (id: string, chip: string, chipKind: AttachmentKind) => {
+export const attachDraftChip = (id: string, chip: string, chipKind: AttachmentKind, chipId?: string) => {
   useDraftStore.setState((s) => {
     const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, chip, chipKind, file: undefined } } }
+    return { byBot: { ...s.byBot, [id]: { ...current, chip, chipKind, chipId, file: undefined } } }
   })
 }
 
@@ -87,7 +87,7 @@ export const detachDraft = (id: string) => {
 
 export const clearDraft = (id: string) => writeDraft(id, undefined)
 
-export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title, attachment.kind)
+export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title, attachment.kind, attachment.id)
 
 type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
@@ -166,6 +166,7 @@ const botIntent = (intent?: ChatIntent): BotContract.Intent | undefined =>
 
 const attachmentsOf = (input: RunInput): BotContract.AttachmentRef[] => [
   ...(input.context?.documentId ? [{ kind: 'document' as const, id: input.context.documentId }] : []),
+  ...(input.context?.materials ?? []),
   ...(input.context?.evidenceIds ?? []).map((id) => ({ kind: 'file' as const, id })),
 ]
 
@@ -364,7 +365,15 @@ const fileOf = (attachment?: string | PickedFile) => (typeof attachment === 'str
 
 const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' ? attachment : attachment?.name)
 
+/** The composer chip's material, read while the draft still holds it (the composer clears the draft right after onSend). */
+const chipMaterial = (id: string, attachment?: string | PickedFile): BotContract.AttachmentRef | undefined => {
+  const d = useDraftStore.getState().byBot[id]
+  return typeof attachment === 'string' && d?.chip === attachment && d.chipId && d.chipKind ? { kind: d.chipKind, id: d.chipId } : undefined
+}
+
 export const send = (id: string, text: string, attachment?: string | PickedFile, intent?: ChatIntent, context?: RunInput['context']) => {
+  const material = chipMaterial(id, attachment)
+  if (material) context = { ...context, materials: [...(context?.materials ?? []), material] }
   const s = get(id)
   if (s.working || runs.has(id) || (heldQueues.get(id)?.length ?? 0) > 0) {
     const file = fileOf(attachment)

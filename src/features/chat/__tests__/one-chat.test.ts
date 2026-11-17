@@ -1,5 +1,6 @@
 import { ApiError, type BotContract } from '@push/api-client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { BotId } from '@/features/bots'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream } from '../utils/stream'
 import { THREAD_MOUNT_CAP } from '../constants'
@@ -31,7 +32,7 @@ vi.mock('../api/fetchers', () => ({
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 
-const { askConsentThen, grantConsent, laterConsent, openBot, send, stop, useChatStore, useConsentPrompt } = await import('../stores')
+const { askConsentThen, attach, grantConsent, laterConsent, openBot, send, stop, useChatStore, useConsentPrompt, useDraftStore } = await import('../stores')
 const { restoreBotTurns } = await import('../utils/turns')
 
 const chat = (id: string) => useChatStore.getState().chats[id]!
@@ -331,6 +332,17 @@ describe('one chat per bot', () => {
     askConsentThen(retry)
     grantConsent()
     expect(retry).toHaveBeenCalledTimes(1)
+  })
+
+  it('sends the composer chip material as an attachment ref', async () => {
+    botApi.bots.send.mockImplementation(async function* () {
+      yield live('t', 1, '', 'done')
+    })
+    attach('b-mat' as BotId, { kind: 'posting', id: 'p-9', title: '모아페이 · 서버' })
+    send('b-mat', '이 공고 봐 줘', '모아페이 · 서버')
+    await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalled())
+    expect(botApi.bots.send.mock.calls.at(-1)![1]).toMatchObject({ attachments: [{ kind: 'posting', id: 'p-9' }] })
+    useDraftStore.setState({ byBot: {} })
   })
 
   it('mounts fewer than 40 rows of a long thread', () => {
