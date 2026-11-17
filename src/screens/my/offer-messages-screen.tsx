@@ -28,6 +28,7 @@ import {
 } from '@/features/my'
 import { Composer } from '@/features/chat'
 import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { composerPadding } from '@/shared/utility'
 import { onAccent, radius, spacing, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
@@ -275,9 +276,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       <View
         onLayout={(e) => setComposerH(e.nativeEvent.layout.height)}
         style={{
-          paddingHorizontal: ios ? spacing[4] : spacing[3],
-          paddingTop: ios ? 6 : spacing[2],
-          paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : (keyboardUp ? 0 : insets.bottom) + spacing[2],
+          ...composerPadding(ios, insets.bottom, keyboardUp),
           backgroundColor: ios ? undefined : c.bg,
         }}
       >
