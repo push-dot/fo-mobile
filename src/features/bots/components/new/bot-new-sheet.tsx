@@ -6,6 +6,7 @@ import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeM
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
+import { askConsentThen, isConsentRequired } from '@/features/chat'
 import { botErrorKind } from '../../api/errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -329,6 +330,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       const result = await create({ postingId: action.posting.postingId, color: action.color })
       openRef.current(result.bot.id)
     } catch (error) {
+      if (isConsentRequired(error)) {
+        // BotNewConsent: ask again, then create with the same form.
+        setForm(base)
+        askConsentThen(() => void run(base))
+        return
+      }
       if (botErrorKind(error) === 'limit') {
         limitFrom.current = postingOf(base.phase)
         setForm(failCreate(base, 'limit'))

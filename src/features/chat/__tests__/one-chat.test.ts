@@ -31,7 +31,7 @@ vi.mock('../api/fetchers', () => ({
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 
-const { grantConsent, openBot, send, stop, useChatStore } = await import('../stores')
+const { askConsentThen, grantConsent, laterConsent, openBot, send, stop, useChatStore, useConsentPrompt } = await import('../stores')
 const { restoreBotTurns } = await import('../utils/turns')
 
 const chat = (id: string) => useChatStore.getState().chats[id]!
@@ -319,6 +319,18 @@ describe('one chat per bot', () => {
       ['b-a', '하나'],
       ['b-b', '둘'],
     ])
+  })
+
+  it('runs the held retry once consent is granted, and drops it on 나중에', () => {
+    const retry = vi.fn()
+    askConsentThen(retry)
+    expect(useConsentPrompt.getState().open).toBe(true)
+    laterConsent()
+    grantConsent()
+    expect(retry).not.toHaveBeenCalled()
+    askConsentThen(retry)
+    grantConsent()
+    expect(retry).toHaveBeenCalledTimes(1)
   })
 
   it('mounts fewer than 40 rows of a long thread', () => {
