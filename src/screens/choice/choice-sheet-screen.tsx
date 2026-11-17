@@ -2,9 +2,20 @@ import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Platform, Pressable, useWindowDimensions, View } from 'react-native'
 import { MdTable } from '@/features/chat'
-import { Button, Sheet, Switch, Text, TextField } from '@/shared/components'
+import { Button, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
-import { iosSeparator, spacing, useColors, useThemeMode } from '@/theme'
+import { iosSeparator, onAccent, spacing, useColors, useThemeMode } from '@/theme'
+
+const MARK = 24
+
+const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => {
+  const c = useColors()
+  return (
+    <View style={{ width: MARK, height: MARK, borderRadius: MARK / 2, borderWidth: checked ? 0 : 2, borderColor: c.t3, backgroundColor: checked ? c.ac : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+      {checked ? multi ? <Icon name="check" size={MARK - 10} color={onAccent} /> : <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: onAccent }} /> : null}
+    </View>
+  )
+}
 
 // .pm8: title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
@@ -95,6 +106,7 @@ const ChoiceSheetScreen = () => {
               onPress={() => toggleOption(i)}
               style={row(i === form.options.length - 1 && !form.toggle)}
             >
+              <Mark checked={selected.includes(i)} multi={!!form.multi} />
               <View style={{ flex: 1 }}>
                 <Text v="h3" weight="400">
                   {option.label}
@@ -105,11 +117,6 @@ const ChoiceSheetScreen = () => {
                   </Text>
                 ) : null}
               </View>
-              {selected.includes(i) ? (
-                <Text v="h3" weight="700" color="acText">
-                  ✓
-                </Text>
-              ) : null}
             </Pressable>
           ))}
           {form.toggle ? (

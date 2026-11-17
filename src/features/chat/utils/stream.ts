@@ -31,6 +31,7 @@ type Ask = {
   question: string
   options: StreamOption[]
   multiple?: boolean
+  submit?: string
   warning?: string
   recommended?: string
   /** Set for a card with a lifetime. `foot` replaces the pick hint, `detail` sits under the question. */
@@ -56,14 +57,14 @@ const autoPicks = (ev: Extract<StreamEvent, { type: 'choice' }>) => {
   return labels.length ? labels.join(', ') : (ev.submit.zeroLabel ?? recommended)
 }
 
-const ask = ({ id, question, options, multiple, warning, recommended, tool, since, detail }: Ask): ChatEvent => {
+const ask = ({ id, question, options, multiple, submit, warning, recommended, tool, since, detail }: Ask): ChatEvent => {
   const first = Math.max(0, options.findIndex((o) => o.id === recommended))
   const approval: Approval = {
     id,
     question,
     warning,
     ...(detail && since !== undefined && recommended === undefined && !multiple ? { detail } : {}),
-    submit: multiple ? MULTI_PICK_SUBMIT : undefined,
+    submit: multiple ? MULTI_PICK_SUBMIT : submit,
     optionIds: options.map((o) => o.id),
     sections: [{ kind: 'choices', selected: multiple || tool?.detail || (since !== undefined && recommended === undefined) ? [] : [first], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
     ...(tool ? { confirm: true as const, ...tool } : since === undefined ? {} : { openedAt: since }),
@@ -190,7 +191,7 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       if (!ev.auto) {
         const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
         const since = askedAt(ev)
-        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, recommended: ev.recommended, since, detail: ev.detail })
+        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, submit: ev.submit?.label, recommended: ev.recommended, since, detail: ev.detail })
         if (event.type === 'approval' && pending) event.approval.pendingNote = pending
         return [event]
       }

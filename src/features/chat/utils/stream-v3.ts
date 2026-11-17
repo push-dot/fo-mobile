@@ -1,3 +1,4 @@
+import { displayName } from '@/shared/utility/display-name'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
 import { closeLabel } from './close-label'
 import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
@@ -152,6 +153,7 @@ export const sectionLabel = (approval: Approval, sel: number[][]): string => {
     return approval.sections
       .flatMap((s, si) => {
         if (s.kind === 'rows') return s.items.length ? [`자료 ${s.items.length}개`] : []
+        if (s.kind === 'toggle' && s.id === 'materials') return (sel[si] ?? []).length ? [(sel[si] ?? []).map((i) => displayName(s.items[i]!.label)).join(' · ')] : []
         if (s.kind !== 'chips') return []
         const labels = (sel[si] ?? []).map((i) => s.options[i]!)
         return labels.length ? [s.multi && labels.length === 1 ? `${labels[0]}만` : labels.join(', ')] : []

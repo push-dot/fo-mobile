@@ -7,7 +7,7 @@ import { displayName } from '@/shared/utility/display-name'
 import { useChatDocs } from '../api/hooks'
 import { appendDraftText } from '../stores'
 import type { Approval, ChatItem } from '../types'
-import { diffTable, gateTable, openGate } from '../utils/gate-modals'
+import { diffTable, openGate } from '../utils/gate-modals'
 import { attachPickedFile } from '../utils/pick-file'
 import { docMeta, postingMeta } from '../utils/quick-start-data'
 
@@ -69,7 +69,6 @@ export const useGateModal = (
       {
         answer: (text, choice) => now().onAnswer(text, choice),
         say,
-        table: gateTable(now().items),
         review: diffTable(now().items),
         change: (row, back) => {
           const kinds = () =>
