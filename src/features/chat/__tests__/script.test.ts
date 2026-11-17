@@ -85,14 +85,14 @@ describe('scripted runs (mock)', () => {
   it('fit check, feedback only, then the feedback card', async () => {
     let s = await reachFit('fit1')
     expect(s.approval?.question).toBe('이 공고에 맞춰 이력서를 고칠까요?')
-    expect(choiceLabels(s)).toEqual(['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])
+    expect(choiceLabels(s)).toEqual(['고치기', '피드백만 받기', '점수만 보기'])
     s = await reply(s, 'fit1', 'ph1-fit', '1')
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({
       text: '이 공고 기준으로 고칠 점이에요.',
     })
     expect(s.items.find((i) => i.type === 'plan')).toMatchObject({ rows: expect.arrayContaining([expect.objectContaining({ tag: '키워드' })]) })
     expect(s.approval?.question).toBe('피드백을 반영해서 수정할까요?')
-    expect(choiceLabels(s)).toEqual(['반영해서 수정할게요', '닫기'])
+    expect(choiceLabels(s)).toEqual(['수정하기', '그대로 둘게요', '닫기'])
     s = await reply(s, 'fit1', 'feedback', '1')
     expect(s.approval).toBeNull()
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '알겠어요. 필요할 때 다시 불러 주세요.' })
@@ -101,7 +101,7 @@ describe('scripted runs (mock)', () => {
   it('an in-progress document asks to continue', async () => {
     let s = play(emptyChat, await run({ conversationId: 'c-dotori', text: '이어서 봐 주세요' }))
     expect(s.approval?.question).toBe('이어서 작성할까요?')
-    expect(choiceLabels(s)).toEqual(['이어서 작성하기', '닫기'])
+    expect(choiceLabels(s)).toEqual(['이어서 작성하기', '새로 시작하기'])
     s = await reply(s, 'c-dotori', 'start-document', '0')
     expect(s.approval).toBeNull()
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({ text: '멈춘 곳부터 이어서 할게요.' })
