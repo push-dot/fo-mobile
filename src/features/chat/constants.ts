@@ -143,8 +143,13 @@ export const QUICK_STARTS: QuickStart[] = [
     start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
+    key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
+    title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
+    start: (i) => one(i) && opened(`${one(i)!.over} 부족한 점`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
+  },
+  {
     key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
-    title: '어떤 공고로 볼까요?', description: '공고 요건과 내 서류를 비교해요.',
+    title: '어떤 공고로 볼까요?', description: '점수가 오르도록 서류를 고쳐 드려요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {

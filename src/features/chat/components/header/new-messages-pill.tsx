@@ -15,7 +15,7 @@ export const NewMessagesPill = ({ count, onPress }: { count: number; onPress: ()
         contentStyle={{ gap: 6 }}
       >
         <Icon name="down" size={18} color={c.t1} />
-        <Text v="c1" weight="700" color="t1" style={{ fontSize: 14 }}>
+        <Text v="c1" weight="600" color="t1" style={{ fontSize: 14 }}>
           {`새 메시지 ${count}개`}
         </Text>
       </GlassPressable>

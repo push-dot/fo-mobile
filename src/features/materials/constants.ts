@@ -46,6 +46,7 @@ export const LOAD_ERROR = { title: '자료를 불러오지 못했어요', body: 
 export const OPEN_LABEL: Record<MaterialKind, string> = { file: '서류로 들어가기', document: '서류로 들어가기', posting: '공고로 이동', link: '바로가기' }
 export const CANCEL_LABEL = '취소'
 export const DELETE_CONFIRM = '삭제'
+export const DELETE_ACTION = 'delete'
 export const UNDO_LABEL = '되돌리기'
 /** The words 마이 › 서류 uses for the same two failures. */
 export const CITED = '경력 기록에서 쓰고 있어 지울 수 없어요'
