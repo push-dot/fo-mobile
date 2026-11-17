@@ -149,10 +149,14 @@ tags:
     commands:
       - setClipboard: "제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요."
       - pasteText
-- tapOn: "수락하고 보내기"
-- extendedWaitUntil:
-    visible: ".*목요일 저녁 7시.*"
-    timeout: 20000
+# The first tap on a sheet button under the Korean keyboard is sometimes swallowed on the device, so tap again until the thread opens.
+- retry:
+    maxRetries: 2
+    commands:
+      - tapOn: "수락하고 보내기"
+      - extendedWaitUntil:
+          visible: ".*목요일 저녁 7시.*"
+          timeout: 10000
 - tapOn: "메시지.*"
 - runFlow:
     when:
