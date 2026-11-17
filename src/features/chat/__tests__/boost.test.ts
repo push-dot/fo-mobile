@@ -16,7 +16,7 @@ describe('점수 올리기', () => {
     expect(qs).toMatchObject({
       label: '점수 올리기',
       title: '어떤 서류의 점수를 올릴까요?',
-      description: '공고에 맞춰 서류를 여러 번 고치며 적합도 점수를 올려요. 최대 5번까지 해요.',
+      description: '공고에 맞춰 최대 5번까지 고쳐요.',
       action: '점수 올리기 시작',
       docLabel: '올릴 서류',
       listLabel: '공고',

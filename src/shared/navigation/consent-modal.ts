@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { showChoiceModal } from './choice-modal'
 
-type Copy = { title: string; body: string; detail: string; agree: string }
+type Copy = { title: string; body: string; agree: string }
 
 const DETAIL_LABEL = '자세히 보기'
 
@@ -9,7 +9,7 @@ const DETAIL_LABEL = '자세히 보기'
 export const showConsentModal = (copy: Copy, { onAgree, onLater }: { onAgree: () => void; onLater: () => void }) =>
   showChoiceModal({
     title: copy.title,
-    message: `${copy.body}\n\n${copy.detail}`,
+    message: copy.body,
     confirm: {
       label: copy.agree,
       onPress: onAgree,

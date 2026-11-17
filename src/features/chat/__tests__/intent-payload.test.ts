@@ -92,7 +92,7 @@ describe('quick start intent payloads', () => {
     const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
     expect(fit).toMatchObject({ label: '적합도 보기', listLabel: '공고', readsHub: true })
     expect(fit.docLabel).toBeUndefined()
-    expect(fit.description).toBe('공고와 내 프로필을 비교해 점수와 부족한 점을 알려 드려요.')
+    expect(fit.description).toBe('공고 요건과 내 서류를 비교해요.')
   })
 
   it('sends 마감 임박 공고 정리 straight into the chat, with no sheet', () => {

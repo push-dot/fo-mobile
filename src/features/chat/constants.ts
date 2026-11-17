@@ -56,8 +56,8 @@ export const THREAD_BATCH = 8
 export const THREAD_WINDOW = 2
 export const THREAD_MOUNT_CAP = THREAD_INITIAL_RENDER + THREAD_BATCH * THREAD_WINDOW
 
-export const CONSENT_TITLE = 'Bot을 쓰려면\n동의가 필요해요'
-export const CONSENT_BODY = '내 서류와 평가 결과를 가공해 다른 사용자와 기업의 Bot이 참고 자료로 써요.'
+export const CONSENT_TITLE = 'Bot을 쓰려면 동의가 필요해요'
+export const CONSENT_BODY = '내 서류를 다른 Bot이 참고 자료로 써요.'
 export const PLAN_HEADER = '플랜마다\n쓸 수 있는 양이 달라요'
 export const ACCOUNT_REFERENCE_TITLE = 'Bot이 참고하는 내 정보'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'
@@ -72,7 +72,6 @@ export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라
 export const LINK_UNDO = '되돌리기'
 export const PROFILE_SAVED = '프로필을 고쳤어요.'
 export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
-export const CONSENT_DETAIL = '회사명, 이름, 숫자는 지우고, 원문 문장은 남기지 않아요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 /** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
 export const DEFAULT_DOC = '허브 프로필'
@@ -135,7 +134,7 @@ const host = (url: string) => url.replace(/^https?:\/\//, '').split(/[/?#]/)[0] 
 export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', readsHub: true,
-    title: '어떤 공고에 맞출까요?', description: '공고 링크를 붙여넣으면 내 서류를 그 공고에 맞춰 고쳐요.',
+    title: '어떤 공고에 맞출까요?', description: '링크를 붙여넣으면 서류를 맞춰 고쳐요.',
     start: (i) => (/^https?:\/\/\S+\.\S+/.test(i.url.trim()) ? opened(`${host(i.url)} 공고 맞춤`, `${i.url.trim()} 공고에 맞춰 ${eulReul(i.doc)} 고쳐 주세요`, 'match_posting', i.documentId) : null),
   },
   {
@@ -145,12 +144,12 @@ export const QUICK_STARTS: QuickStart[] = [
   },
   {
     key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
-    title: '어떤 공고로 볼까요?', description: '공고와 내 프로필을 비교해 점수와 부족한 점을 알려 드려요.',
+    title: '어떤 공고로 볼까요?', description: '공고 요건과 내 서류를 비교해요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {
     key: 'boost', label: '점수 올리기', icon: 'qs-boost', layout: 'pick', action: '점수 올리기 시작', docLabel: '올릴 서류', listLabel: '공고',
-    title: '어떤 서류의 점수를 올릴까요?', description: '공고에 맞춰 서류를 여러 번 고치며 적합도 점수를 올려요. 최대 5번까지 해요.',
+    title: '어떤 서류의 점수를 올릴까요?', description: '공고에 맞춰 최대 5번까지 고쳐요.',
     start: (i) => {
       const job = one(i)
       return job && i.doc ? opened(`${job.over} 점수 올리기`, `${job.over} ${job.title} 공고에 맞춰 ${i.doc} 점수를 올려 주세요`, 'boost', i.documentId) : null
@@ -168,17 +167,17 @@ export const QUICK_STARTS: QuickStart[] = [
   },
   {
     key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!,
-    title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗 일정을 한 캘린더에서 정리해요.',
+    title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗을 한곳에서 정리해요.',
     start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
   },
   {
     key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', readsHub: true,
-    title: '어떤 부분을 다듬을까요?', description: '내 서류를 바탕으로 허브 프로필을 고쳐요. 바꾸기 전에 보여 드려요.',
+    title: '어떤 부분을 다듬을까요?', description: '바꾸기 전에 먼저 보여 드려요.',
     start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `허브 프로필의 ${eulReul(i.picked.map((p) => p.title).join(', '))} 다듬어 주세요`, 'hub_profile', i.documentId) : null),
   },
   {
     key: 'exp', label: '경험 만들기', icon: 'qs-experience', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기',
-    title: '어떤 경험을 만들까요?', description: '최근 갭 분석에서 부족했던 경험이에요. 작은 프로젝트로 근거를 만들어요.',
+    title: '어떤 경험을 만들까요?', description: '갭 분석에서 부족했던 경험이에요.',
     start: (i) => {
       const topic = i.custom.trim() || one(i)?.title
       return topic ? opened(`${topic} 프로젝트`, `${topic}을 보여 줄 작은 프로젝트를 기획해 주세요`, 'experience', i.documentId) : null
