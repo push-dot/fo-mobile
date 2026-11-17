@@ -4,7 +4,7 @@ import { CELL, tableColumns } from '../utils/table-columns'
 import { planTable } from '../utils/plan-table'
 import type { PlanItem } from '../types'
 
-// The bot bubble inside is (402 - 40) * 0.88 - 30 wide on the boards' 402 pt viewport; the boards' column starts are read from the v489 boards (`.mdt` pads every column but the last 14, ChatPh2 x74 and x176, ChatPh1Feedback x87 and x190).
+// v489 boards at 402 pt: bubble inner width, `.mdt` column starts (ChatPh2 x74/x176, ChatPh1Feedback x87/x190).
 const INNER = (402 - 40) * 0.88 - 30
 const starts = (widths: number[]) => widths.reduce<number[]>((all, w) => [...all, all[all.length - 1]! + w], [35]).slice(0, -1)
 
