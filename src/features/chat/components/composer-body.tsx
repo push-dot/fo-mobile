@@ -1,5 +1,5 @@
-import type { ReactNode, Ref } from 'react'
-import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type StyleProp, type TextInputInstance, type ViewStyle } from 'react-native'
+import type { Ref } from 'react'
+import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
@@ -10,9 +10,9 @@ import { composerWeight } from '../utils/composer-weight'
 /** The box stops growing at five lines and scrolls inside (ChatKeyboardIOS). */
 export const COMPOSER_MAX_LINES = 5
 
-// The glass pill (chat) and the flat bar (ProposalChat, PostDetail boards: bg2, 6pt padding, 40pt discs, 16pt text) are both 52pt tall.
-const GLASS = { row: 44, pad: 4, disc: 36 }
-const FLAT = { row: 40, pad: 6, disc: 40 }
+const ROW_HEIGHT = 44
+const PILL_PAD = 4
+const DISC = 36
 
 export type ComposerProps = {
   value: string
@@ -28,8 +28,6 @@ export type ComposerProps = {
   onClearAttachment?: () => void
   inputRef?: Ref<TextInputInstance>
   tools?: boolean
-  /** ProposalChat: a flat bg2 bar instead of the glass pill, and an empty send disc is a grey fill, not a dimmed accent. */
-  flat?: boolean
   maxLength?: number
   label?: string
   sending?: boolean
@@ -38,8 +36,6 @@ export type ComposerProps = {
   /** Height the text field has grown past its first line, so the thread can lift with it (ChatKeyboardIOS.2). */
   onGrow?: (extra: number) => void
 }
-
-const FlatField = ({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) => <View style={[{ backgroundColor: useColors().bg2 }, style]}>{children}</View>
 
 /** One glass pill, one row inside it: + 첨부, the text, @ 언급, send or stop. It grows inside the pill as the text wraps. Shared by both platforms. */
 export const Composer = ({ inputRef, ...p }: ComposerProps) => {
@@ -50,12 +46,9 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   // A bare "@" only opens the suggestions; there is nothing to send yet.
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const showTools = p.tools ?? true
-  const { row: ROW_HEIGHT, pad: PILL_PAD, disc: DISC } = p.flat ? FLAT : GLASS
-  const Surface = p.flat ? FlatField : GlassField
   const round = { width: ROW_HEIGHT, height: ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
   const disc = { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: 'center', justifyContent: 'center' } as const
-  const textV = p.flat ? 'b1' : 'h3'
-  const textType = type[textV]
+  const textType = type.h3
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, gap: spacing[2] }}>
       {p.attachment ? (
@@ -74,7 +67,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           </View>
         </Pressable>
       ) : null}
-      <Surface style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PILL_PAD, borderRadius: (ROW_HEIGHT + PILL_PAD * 2) / 2 }}>
+      <GlassField style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PILL_PAD, borderRadius: (ROW_HEIGHT + PILL_PAD * 2) / 2 }}>
         {showTools ? (
           <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
             <View style={[disc, { backgroundColor: c.fill2 }]}>
@@ -91,7 +84,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             }}
           >
             {p.value ? null : (
-              <Text v={textV} weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+              <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
                 {p.placeholder}
               </Text>
             )}
@@ -138,12 +131,12 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)}
             style={round}
           >
-            <View style={[disc, p.flat && !canSend && !p.sending ? { backgroundColor: c.fill } : { backgroundColor: c.ac, opacity: canSend || p.sending ? 1 : 0.4 }]}>
-              {p.sending ? <ActivityIndicator color={onAccent} /> : <Icon name="up" size={p.flat ? 20 : 18} color={p.flat && !canSend ? 't3' : onAccent} />}
+            <View style={[disc, { backgroundColor: canSend || p.sending ? c.ac : c.fill2 }]}>
+              {p.sending ? <ActivityIndicator color={onAccent} /> : <Icon name="up" size={18} color={canSend ? onAccent : 't4'} />}
             </View>
           </Pressable>
         )}
-      </Surface>
+      </GlassField>
     </View>
   )
 }
