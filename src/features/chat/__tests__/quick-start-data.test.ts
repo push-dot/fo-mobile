@@ -13,7 +13,7 @@ vi.mock('@/features/my', async () => {
 const now = new Date('2026-10-21T09:00:00')
 
 it('keeps the previous design order, with the calendar after the application status', () => {
-  expect(QUICK_STARTS.map((q) => q.key)).toEqual(['link', 'match', 'fit', 'boost', 'deadline', 'status', 'calendar', 'hub', 'exp', 'reply', 'coffee', 'post'])
+  expect(QUICK_STARTS.map((q) => q.key)).toEqual(['link', 'match', 'gap', 'fit', 'boost', 'deadline', 'status', 'calendar', 'hub', 'exp', 'reply', 'coffee', 'post'])
 })
 const posting = (id: string, deadline: string | null, career = { careerMin: 4, careerMax: 6 as number | null }) =>
   ({ id, company: '모아페이', title: '백엔드', location: '서울 강남구', deadline, ...career }) as Posting

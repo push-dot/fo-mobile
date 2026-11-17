@@ -63,17 +63,19 @@ tags:
     timeout: 10000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailDoc
-- tapOn: "자료 삭제"
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "서류로 들어가기"
+- waitForAnimationToEnd
+# MaterialDetailDelete: the delete is a native alert over the list, asked by a long press on the row.
+- longPressOn: "김서준_백엔드_이력서 자세히"
 - extendedWaitUntil:
     visible: "‘김서준_백엔드_이력서’를 삭제할까요?"
     timeout: 5000
 - waitForAnimationToEnd
 - takeScreenshot: MaterialDetailDelete
 - tapOn: "취소"
-- runFlow:
-    file: _close_sheet.yaml
-    env:
-      TITLE: "서류로 들어가기"
 - waitForAnimationToEnd
 - tapOn: "자료 추가"
 - extendedWaitUntil:
@@ -90,8 +92,11 @@ tags:
 - tapOn: "GitHub"
 - waitForAnimationToEnd
 - takeScreenshot: MaterialsLinkAdd
-# 링크 추가 is a page inside the modal: 뒤로 returns to the list.
-- tapOn: "뒤로"
+# 링크 추가 is a regular sheet over the modal: closing it returns to the list.
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "추가하기"
 - waitForAnimationToEnd
 - tapOn: "자료 검색"
 - inputText: "회고 발표"

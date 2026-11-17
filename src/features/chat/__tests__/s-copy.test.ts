@@ -21,8 +21,8 @@ describe('agent s copy', () => {
   })
 
   it('consent title and body', () => {
-    expect(CONSENT_TITLE).toBe('Bot을 쓰려면\n동의가 필요해요')
-    expect(CONSENT_BODY).toBe('내 서류와 평가 결과를 가공해 다른 사용자와 기업의 Bot이 참고 자료로 써요.')
+    expect(CONSENT_TITLE).toBe('Bot을 쓰려면 동의가 필요해요')
+    expect(CONSENT_BODY).toBe('내 서류를 다른 Bot이 참고 자료로 써요.')
     expect(CONSENT_BODY).not.toContain('기업의 AI')
   })
 

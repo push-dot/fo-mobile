@@ -1,35 +1,23 @@
-import { ApiError } from '@push/api-client'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { View } from 'react-native'
-import { Button, Spinner, Text, askConfirm, showToast } from '@/shared/components'
+import { Button, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing } from '@/theme'
-import { useDeleteMaterial, useMaterialDetail, useRestoreMaterial } from '../api/hooks'
-import {
-  CITED,
-  DELETE_CONFIRM,
-  DELETE_LABEL,
-  LOAD_ERROR,
-  OPEN_LABEL,
-  RESTORE_FAILED,
-  SEND_LABEL,
-  UNDO_LABEL,
-} from '../constants'
+import { useMaterialDetail } from '../api/hooks'
+import { LOAD_ERROR, OPEN_LABEL, SEND_LABEL } from '../constants'
 import type { Material, MaterialKind } from '../types'
-import { deleteCopy, detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
+import { detailFacts, detailTitle, sendContextOf } from '../utils/material-view'
 import MaterialFacts from './material-facts'
 import { useInMaterialsModal } from './in-materials-modal'
-import { MaterialPage } from './material-page'
 import { sendMaterial } from './send-material'
-import { useSearchRoom } from './materials-search'
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
   KINDS.includes(value as MaterialKind)
 
 /**
- * 서류로 들어가기, 공고로 이동, 바로가기. A link opens in the browser over the page. The others close the page and the modal
+ * MaterialDetail*: a regular sheet over the 자료 modal. 서류로 들어가기, 공고로 이동, 바로가기. A link opens in the browser over the page. The others close the page and the modal
  * first, as the drawer's lists did: a full screen pushed inside a modal would draw under its top inset.
  */
 const open = (m: Material, inModal: boolean) => {
@@ -40,21 +28,16 @@ const open = (m: Material, inModal: boolean) => {
   else router.push(`/docs/${m.id}`)
 }
 
-/** DELETE answers 409 for a file a career row still cites. */
-const cited = (error: unknown) => error instanceof ApiError && error.status === 409
-
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
-  const remove = useDeleteMaterial()
-  const restore = useRestoreMaterial()
   const now = useMemo(() => new Date(), [])
-  const toastBottom = useSearchRoom().toast
+  const bound = useSheetScrollMax(0.55)
   const inModal = useInMaterialsModal()
 
   const m = detail.data?.material
   if (!m) {
     return (
-      <MaterialPage title="">
+      <Sheet>
         {detail.isError ? (
           <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[4] }}>
             <Text v="b2" color="t3">
@@ -67,42 +50,29 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
             <Spinner />
           </View>
         )}
-      </MaterialPage>
+      </Sheet>
     )
   }
 
-  const copy = deleteCopy(m)
-  const onDelete = () => {
-    router.back()
-    remove(m.kind, m.id).then(
-      () =>
-        showToast({
-          message: copy.done,
-          bottom: toastBottom,
-          action: {
-            label: UNDO_LABEL,
-            onPress: () =>
-              void restore(m.kind, m.id).catch(() => showToast({ message: RESTORE_FAILED, alert: true, bottom: toastBottom })),
-          },
-        }),
-      (error: unknown) => showToast({ message: cited(error) ? CITED : copy.failed, alert: true, bottom: toastBottom }),
-    )
+  const context = sendContextOf(forBot)
+  // BotPick is a page of the 자료 modal, so the sheet leaves before it opens.
+  const send = () => {
+    if (context.from === 'home') router.back()
+    sendMaterial(context, m)
   }
-
-  const facts = detailFacts(m, detail.data?.usedBy ?? [], now)
 
   return (
-    <MaterialPage title={detailTitle(m)}>
-      <View style={{ paddingHorizontal: spacing[5], gap: spacing[2] }}>
-        <MaterialFacts facts={facts} />
-        <Button label={SEND_LABEL} onPress={() => sendMaterial(sendContextOf(forBot), m)} />
-        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} />
-        <Button
-          label={DELETE_LABEL}
-          variant="secondary"
-          onPress={() => askConfirm({ title: copy.title, body: copy.body, confirm: DELETE_CONFIRM, danger: true, onConfirm: onDelete })}
-        />
+    <Sheet onLayout={bound.onSheetLayout}>
+      <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
+        {detailTitle(m)}
+      </Text>
+      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+        <MaterialFacts facts={detailFacts(m, detail.data?.usedBy ?? [], now)} />
+      </SheetScroll>
+      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+        <Button label={SEND_LABEL} onPress={send} style={{ flex: 1 }} />
+        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={{ flex: 1 }} />
       </View>
-    </MaterialPage>
+    </Sheet>
   )
 }

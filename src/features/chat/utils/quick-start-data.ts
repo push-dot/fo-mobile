@@ -50,6 +50,7 @@ const segmented = (first: string, items: QsItem[], second?: { label: string; ite
 export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsData => {
   const bookmarks = s.bookmarks ?? []
   switch (key) {
+    case 'gap':
     case 'fit': {
       const items = bookmarks.map((p, i) => job(p, { sub: where(p), selected: i === 0 }))
       const recent = s.recent && { label: '최근 본 공고', items: s.recent.map((p) => job(p, { sub: where(p) })), empty: '최근 본 공고가 없어요.' }
@@ -117,6 +118,7 @@ export const postingMeta = (p: Posting, now = new Date()) =>
 
 export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   link: ['doc'],
+  gap: ['bookmarks', 'recent', 'doc'],
   fit: ['bookmarks', 'recent', 'doc'],
   boost: ['bookmarks', 'doc'],
   status: ['applications'],

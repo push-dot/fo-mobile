@@ -2,29 +2,34 @@ import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import { spacing, type, useColors } from '@/theme'
 import { Icon, Text } from '@/shared/components'
-import { PICKED_LABEL, PICK_LABEL, SECTION_LABEL, SEND_LABEL } from '../constants'
+import { DELETE_ACTION, DELETE_CONFIRM, PICKED_LABEL, PICK_LABEL, SECTION_LABEL, SEND_LABEL } from '../constants'
 import type { Material, MaterialSection } from '../types'
 import { materialRow } from '../utils/material-row'
 import { useListSize } from './list-size'
 
-/** Materials: one row, `.mrow`. The text opens the detail sheet, 보내기 sends. Memoised: a list holds hundreds. */
+/** Materials: one row, `.mrow`. The text opens the detail sheet, a long press (or the 삭제 accessibility action) asks to delete, 보내기 sends. Memoised: a list holds hundreds. */
 export const MaterialItem = memo(function MaterialItem({
   material,
   now,
   onOpen,
   onSend,
+  onDelete,
 }: {
   material: Material
   now: Date
   onOpen: (m: Material) => void
   onSend: (m: Material) => void
+  onDelete: (m: Material) => void
 }) {
   const c = useColors()
   const size = useListSize()
   const row = materialRow(material, now)
   return (
     <View style={{ flexDirection: 'row', gap: spacing[3], minHeight: 68, ...size.row }}>
-      <Pressable accessibilityRole="link" accessibilityLabel={`${row.title} 자세히`} onPress={() => onOpen(material)} style={{ flex: 1, minWidth: 0, gap: 2 }}>
+      <Pressable accessibilityRole="link" accessibilityLabel={`${row.title} 자세히`} onPress={() => onOpen(material)} onLongPress={() => onDelete(material)}
+        accessibilityActions={[{ name: DELETE_ACTION, label: DELETE_CONFIRM }]}
+        onAccessibilityAction={(e) => e.nativeEvent.actionName === DELETE_ACTION && onDelete(material)}
+        style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <Text v="b1" weight="600" numberOfLines={size.titleLines} style={{ lineHeight: type.b2.lineHeight }}>
           {row.title}
         </Text>

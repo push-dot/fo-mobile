@@ -1,6 +1,6 @@
 import type { MaterialKind, MaterialSection, MaterialTab } from './types'
 
-// Copy of the Bot - 자료 boards (design version 412), word for word.
+// Copy of the Bot - 자료 boards (design version 444), word for word.
 
 export const MATERIALS_TITLE = '자료'
 
@@ -44,8 +44,9 @@ export const LOAD_ERROR = { title: '자료를 불러오지 못했어요', body: 
 
 /** The detail sheet's second button (MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink). */
 export const OPEN_LABEL: Record<MaterialKind, string> = { file: '서류로 들어가기', document: '서류로 들어가기', posting: '공고로 이동', link: '바로가기' }
-export const DELETE_LABEL = '자료 삭제'
+export const CANCEL_LABEL = '취소'
 export const DELETE_CONFIRM = '삭제'
+export const DELETE_ACTION = 'delete'
 export const UNDO_LABEL = '되돌리기'
 /** The words 마이 › 서류 uses for the same two failures. */
 export const CITED = '경력 기록에서 쓰고 있어 지울 수 없어요'
@@ -54,9 +55,6 @@ export const RESTORE_FAILED = '되돌리지 못했어요'
 /** MaterialsLinkAdd. */
 export const LINK_ADD = {
   title: '링크 추가',
-  hint: '링크를 붙여넣으면 종류를 알아서 골라요.',
-  kind: '종류',
-  note: '추가하면 Bot이 README와 커밋을 읽어 둬요',
   submit: '추가하기',
 }
 

@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
@@ -10,6 +10,7 @@ import { useMaterials, useRefreshMaterials } from '../api/hooks'
 import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, type AddAction } from '../constants'
 import type { Material, MaterialTab } from '../types'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
+import { useConfirmDeleteMaterial } from './confirm-delete-material'
 import { sendMaterial } from './send-material'
 import { MaterialItem, SectionTitle } from './material-item'
 import { MaterialsTabs } from './materials-tabs'
@@ -88,9 +89,15 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
 
   const onOpen = useCallback((m: Material) => router.push(materialDetailPath(m.kind, m.id, bot)), [bot])
   const onSend = useCallback((m: Material) => sendMaterial(context, m), [context])
+  const confirmDelete = useConfirmDeleteMaterial(room.toast)
+  const confirmRef = useRef(confirmDelete)
+  useEffect(() => {
+    confirmRef.current = confirmDelete
+  })
+  const onDelete = useCallback((m: Material) => confirmRef.current(m), [])
   const renderItem = useCallback<ListRenderItem<ListRow>>(
-    ({ item }) => (item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} />),
-    [now, onOpen, onSend],
+    ({ item }) => (item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} onDelete={onDelete} />),
+    [now, onOpen, onSend, onDelete],
   )
 
   const addMenu: MenuAction[] = [

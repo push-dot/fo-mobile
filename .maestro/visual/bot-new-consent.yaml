@@ -12,7 +12,7 @@ tags:
       READY: "계정 · .*"
 - tapOn: "새 회사 Bot 만들기"
 - extendedWaitUntil:
-    visible: ".*Bot을 쓰려면.*"
+    visible: ".*동의가 필요해요.*"
     timeout: 20000
 - extendedWaitUntil:
     visible: "동의하고 시작하기"

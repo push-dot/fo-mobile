@@ -87,12 +87,13 @@ describe('quick start intent payloads', () => {
     })
   })
 
-  it('merges 부족한 점 찾기 into 적합도 보기, which picks its posting inside its own sheet', () => {
-    expect(QUICK_STARTS.some((q) => q.key === 'gap')).toBe(false)
+  it('opens 부족한 점 찾기 and 적합도 보기 in their own sheets, each with the copy of its board (QsGap, QsFit)', () => {
+    const gap = QUICK_STARTS.find((q) => q.key === 'gap')!
     const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
-    expect(fit).toMatchObject({ label: '적합도 보기', listLabel: '공고', readsHub: true })
+    expect(gap).toMatchObject({ label: '부족한 점 찾기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', action: '부족한 점 찾기', listLabel: '공고', readsHub: true })
+    expect(fit).toMatchObject({ label: '적합도 보기', title: '어떤 공고로 볼까요?', description: '점수가 오르도록 서류를 고쳐 드려요.', listLabel: '공고', readsHub: true })
     expect(fit.docLabel).toBeUndefined()
-    expect(fit.description).toBe('공고와 내 프로필을 비교해 점수와 부족한 점을 알려 드려요.')
+    expect(gap.docLabel).toBeUndefined()
   })
 
   it('sends 마감 임박 공고 정리 straight into the chat, with no sheet', () => {

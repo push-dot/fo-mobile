@@ -45,7 +45,7 @@ describe('bot profile rows', () => {
 
   it('labels the delete question from the boards', () => {
     expect(deleteTitle('모아페이')).toBe('모아페이 Bot을 삭제할까요?')
-    expect(DELETE_BODY).toBe('이 Bot과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.')
+    expect(DELETE_BODY).toBe('기록이 지워지고 되돌릴 수 없어요.')
     expect(colorA11y(0)).toBe('색 1')
   })
 })
