@@ -14,7 +14,7 @@ const LegalScreen = () => {
       <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5] }}>
         <SegmentedControl items={LEGAL_TABS} value={tab} onChange={setTab} />
       </View>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[6], paddingTop: spacing[6], paddingBottom: HIT_TARGET, gap: spacing[6] }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[6], paddingTop: spacing[4], paddingBottom: HIT_TARGET, gap: spacing[6] }}>
         <LegalDocument document={APP_LEGAL_DOCUMENTS[tab]} />
       </ScrollView>
     </View>

@@ -3,6 +3,7 @@ import { Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Composer } from '@/features/chat'
 import { Icon, Text, useKeyboardHeight } from '../../../shared/components'
+import { composerPadding } from '../../../shared/utility'
 import { spacing, useColors } from '../../../theme'
 import { useCreateComment } from '../api/hooks'
 import { MAX_COMMENT } from '../constants'
@@ -46,9 +47,7 @@ const CommentComposer = ({
   return (
     <View
       style={{
-        paddingHorizontal: spacing[3],
-        paddingTop: ios ? 6 : spacing[2],
-        paddingBottom: ios ? (keyboardUp ? Math.max(insets.bottom - 6, spacing[2]) : insets.bottom + 6) : (keyboardUp ? 0 : insets.bottom) + spacing[2],
+        ...composerPadding(ios, insets.bottom, keyboardUp),
         backgroundColor: ios ? 'transparent' : c.bg,
         gap: spacing[2],
       }}
