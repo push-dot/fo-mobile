@@ -25,14 +25,30 @@ tags:
       NEXT: "병목 강도를 어느 정도로 할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XLevel
-# The first pick fails verification in the mock (a bubble, then the 어떻게 할까요? modal); 다시 시도 passes and goes on to the blueprints.
+# The first pick fails verification in the mock: the failed check, then the 어떻게 할까요? modal (the next block shoots it on a short thread).
 - runFlow:
     file: _pick.yaml
     env:
       ASK: "병목 강도를 어느 정도로 할까요?"
       PICK: ".*중간 제약"
-      NEXT: ".*검증을 통과하지 못했어요.*"
+      NEXT: "어떻게 할까요?"
 - waitForAnimationToEnd
+# ChatVerifyFail draws the failed check under the 중간 제약으로 line alone, so it jumps there in a fresh conversation (mock token).
+- runFlow: _fresh_company.yaml
+- runFlow:
+    file: _say.yaml
+    env:
+      KO: "중간 제약으로"
+      EN: "verify-fail"
+# The modal hides the thread from the accessibility tree: wait for the modal, not for the bubble under it.
+- extendedWaitUntil:
+    visible: "어떻게 할까요?"
+    timeout: 30000
+- waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
+- takeScreenshot: ChatVerifyFail
+# ChatPh2XBlueprints draws the same short thread (the 중간 제약으로 line, the failed check passed on the second try) with the project modal on it.
 - runFlow:
     file: _pick.yaml
     env:
@@ -41,17 +57,3 @@ tags:
       NEXT: "어떤 프로젝트를 구현할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XBlueprints
-# ChatVerifyFail draws the failed check under the 중간 제약으로 line alone, so it jumps there in a fresh conversation (mock token).
-- runFlow: _fresh_company.yaml
-- runFlow:
-    file: _say.yaml
-    env:
-      KO: "중간 제약으로"
-      EN: "verify-fail"
-- extendedWaitUntil:
-    visible: ".*검증을 통과하지 못했어요.*"
-    timeout: 30000
-- waitForAnimationToEnd
-- runFlow:
-    file: _chat_kbd_down.yaml
-- takeScreenshot: ChatVerifyFail
