@@ -28,6 +28,7 @@ export const filterMentions = (groups: MentionGroup[], query: string) =>
     })
     .filter((g) => g.items.length > 0)
 
-const MENTION_RESERVE = 56 + 8 + 130
+// ChatMention's list starts 163 from the top on a 874 screen: header, a 8 gap, and the greeting's first lines stay above it.
+const MENTION_RESERVE = 56 + 8 + 97
 
 export const mentionMaxHeight = (windowHeight: number, insetTop: number, below: number) => Math.max(160, windowHeight - insetTop - below - MENTION_RESERVE)

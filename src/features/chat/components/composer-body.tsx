@@ -50,7 +50,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const disc = { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: 'center', justifyContent: 'center' } as const
   const textType = type.h3
   return (
-    <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, gap: spacing[2] }}>
+    <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ gap: spacing[2] }}>
       {p.attachment ? (
         // MaterialsSendHere / BotPickSent (.achip): a white capsule with a 1px line ring, no file icon, 6pt padding, a 28pt round × on the right.
         <Pressable
@@ -97,8 +97,9 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
               editable={!p.disabled}
               accessibilityLabel={p.label ?? '메시지'}
               maxLength={p.maxLength}
+              // iOS keeps a multiline field at the height of the last sent text; an empty field is one line again (ChatErrOther).
               // The board's typed line inherits the page's -0.02em ("@모아" 47.1 pt tracked, 48.1 without) and is 600 only while a mention is being typed.
-              style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
+              style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, ...(p.value ? null : { height: textType.lineHeight * fontScale }), ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
             />
           </View>
         </View>

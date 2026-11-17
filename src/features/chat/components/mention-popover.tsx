@@ -25,7 +25,7 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
   const toTop = () => scroll.current?.scrollTo({ y: 0, animated: false })
   useEffect(toTop, [query])
   return (
-    <Appear duration={250} style={{ marginBottom: spacing[2] }}>
+    <Appear duration={250} style={{ marginBottom: -(spacing[2] + 2) }}>
       <View style={[ios ? shadow.pop : { boxShadow: toBoxShadow(shadow.pop) }, { borderRadius: ios ? 26 : radius.lg, backgroundColor: ios ? c.bg : c.card, borderWidth: 1, borderColor: c.line, overflow: 'hidden' }]}>
         <ScrollView ref={scroll} onLayout={toTop} style={{ maxHeight }} contentContainerStyle={{ padding: spacing[2] }} keyboardShouldPersistTaps="always">
           {groups.length === 0 ? (
