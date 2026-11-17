@@ -46,7 +46,7 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder('모아페이', 'document')).toBe('이 서류로 무엇을 할까요?')
     expect(composerPlaceholder('모아페이', 'posting')).toBe('이 공고로 무엇을 할까요?')
     expect(composerPlaceholder('모아페이', 'link')).toBe('이 링크로 무엇을 할까요?')
-    expect(composerPlaceholder('모아페이', 'file')).toBe('이 파일로 무엇을 할까요?')
+    expect(composerPlaceholder('모아페이', 'file')).toBe('이 서류로 무엇을 할까요?')
   })
 
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
