@@ -54,6 +54,6 @@ export type RunInput = {
   after?: number
   piece?: string
   intent?: ChatIntent
-  context?: { documentId?: string; evidenceIds?: string[] }
+  context?: { documentId?: string; evidenceIds?: string[]; materials?: { kind: 'file' | 'document' | 'posting' | 'link'; id: string }[] }
 }
 
