@@ -47,8 +47,8 @@ const SignedInStack = () => {
       <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
       <Stack.Screen name="bots/new" options={modalOptions(c)} />
       <Stack.Screen name="materials/index" options={modalOptions(c)} />
-      <Stack.Screen name="materials/[kind]/[id]" />
-      <Stack.Screen name="materials/link-add" />
+      <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
       <Stack.Screen name="materials/pick" />
       <Stack.Screen name="account" options={modalOptions(c)} />
       <Stack.Screen name="plan" options={fullPageOptions()} />

@@ -7,24 +7,26 @@ import type { Material, MaterialSection } from '../types'
 import { materialRow } from '../utils/material-row'
 import { useListSize } from './list-size'
 
-/** Materials: one row, `.mrow`. The text opens the detail sheet, 보내기 sends. Memoised: a list holds hundreds. */
+/** Materials: one row, `.mrow`. The text opens the detail sheet, a long press asks to delete, 보내기 sends. Memoised: a list holds hundreds. */
 export const MaterialItem = memo(function MaterialItem({
   material,
   now,
   onOpen,
   onSend,
+  onDelete,
 }: {
   material: Material
   now: Date
   onOpen: (m: Material) => void
   onSend: (m: Material) => void
+  onDelete: (m: Material) => void
 }) {
   const c = useColors()
   const size = useListSize()
   const row = materialRow(material, now)
   return (
     <View style={{ flexDirection: 'row', gap: spacing[3], minHeight: 68, ...size.row }}>
-      <Pressable accessibilityRole="link" accessibilityLabel={`${row.title} 자세히`} onPress={() => onOpen(material)} style={{ flex: 1, minWidth: 0, gap: 2 }}>
+      <Pressable accessibilityRole="link" accessibilityLabel={`${row.title} 자세히`} onPress={() => onOpen(material)} onLongPress={() => onDelete(material)} style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <Text v="b1" weight="600" numberOfLines={size.titleLines} style={{ lineHeight: type.b2.lineHeight }}>
           {row.title}
         </Text>
