@@ -50,7 +50,7 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
-/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
+/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality, and the closing summaries of ChatDone*, ChatPh6Apply). */
 export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: string; hitsBefore?: number[] }) => {
   const c = useColors()
   // A row's text is measured against the row's width before the dot and the gap are taken off, then shrunk without a re-wrap, so its lines ran into the bubble's padding:

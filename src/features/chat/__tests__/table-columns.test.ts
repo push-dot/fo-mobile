@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { tableColumns } from '../utils/table-columns'
+import { textWidth } from '@/shared/utility/text-width'
+import { CELL, tableColumns } from '../utils/table-columns'
 import { planTable } from '../utils/plan-table'
 import type { PlanItem } from '../types'
 
@@ -24,6 +25,11 @@ describe('tableColumns', () => {
     expect(b).toBeCloseTo(86.8, 0)
     expect(c).toBeCloseTo(190.4, 0)
     expect(widths.reduce((x, y) => x + y, 0)).toBeCloseTo(INNER, 5)
+  })
+
+  it('wraps 숫자가 부족해요 inside its column like the board, which draws it on two lines (ChatPh1Feedback)', () => {
+    const widths = tableColumns(['항목', '지금', '고칠 점'], [['키워드', 'Kafka, 정산 배치가 없어요', '경험 문장에 직접 넣기'], ['도메인', '정산 경험이 약해요', 'payment-retry-lab을 정산 맥락으로'], ['성과', '숫자가 부족해요', '승인 API 개선을 수치로']], INNER)
+    expect(textWidth('숫자가 부족해요', CELL.body, 'regular', -0.02 * CELL.body)).toBeGreaterThan(widths[1]! - CELL.padRight)
   })
 })
 
