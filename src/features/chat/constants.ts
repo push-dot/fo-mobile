@@ -131,13 +131,8 @@ const opened = (title: string, message: string, intent: ChatIntent, documentId?:
 const one = (i: QsInput) => i.picked[0]
 const host = (url: string) => url.replace(/^https?:\/\//, '').split(/[/?#]/)[0] ?? url
 
-// Order per feature-spec 15.1: what people do most first (the calendar, QsInterview, is the main use), social tasks last.
+// Order of the previous design's quick-start row (Push 앱 › 이전 버전): the job tasks first, the calendar after the application status, social tasks last.
 export const QUICK_STARTS: QuickStart[] = [
-  {
-    key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!,
-    title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗 일정을 한 캘린더에서 정리해요.',
-    start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
-  },
   {
     key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', readsHub: true,
     title: '어떤 공고에 맞출까요?', description: '공고 링크를 붙여넣으면 내 서류를 그 공고에 맞춰 고쳐요.',
@@ -170,6 +165,11 @@ export const QUICK_STARTS: QuickStart[] = [
     key: 'status', label: '지원 현황 정리', icon: 'qs-status', layout: 'status', multi: true, action: (n) => `${n}개 정리하기`,
     title: '어떤 지원을 정리할까요?', description: '단계별로 지금 상황과 다음에 할 일을 정리해요.',
     start: (i) => (i.picked.length ? opened('지원 현황 정리', `${i.picked.map((p) => p.over).join(', ')} 지원 현황을 정리하고 다음에 할 일을 알려 주세요`, 'applications') : null),
+  },
+  {
+    key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!,
+    title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗 일정을 한 캘린더에서 정리해요.',
+    start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
   },
   {
     key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', readsHub: true,
