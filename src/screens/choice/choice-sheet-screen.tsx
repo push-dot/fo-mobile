@@ -70,7 +70,14 @@ const ChoiceSheetScreen = () => {
           <MdTable table={{ kind: 'table', head: request.table.head, rows: request.table.rows }} width={width - spacing[4] * 2 - spacing[1] * 2} />
         </View>
       ) : null}
-      {request.items ? (
+      {request.items && request.buttons ? (
+        <View style={{ gap: spacing[2], marginTop: spacing[3] }}>
+          {request.items.map((item, i) => (
+            <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={{ minHeight: 52, borderRadius: 26 }} />
+          ))}
+        </View>
+      ) : null}
+      {request.items && !request.buttons ? (
         <View style={{ gap: 6 }}>
           {request.items.map((item, i) => (
             <Pressable key={item.label} accessibilityRole="button" accessibilityLabel={item.label} onPress={() => run(item.onPress)} style={row(i === request.items!.length - 1)}>
