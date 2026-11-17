@@ -37,7 +37,7 @@ describe('company-bot status board tokens', () => {
 
   it('stops at a card that waits for an answer', () => {
     expect(frames('st-help').map((f) => f.type)).toEqual(['choice', 'done'])
-    expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '채용 페이지 열기', summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?' })
+    expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '채용 페이지 열기', summary: 'careers.moapay.co.kr를 열어도 될까요?' })
   })
 
   it('answers the Android alias in its capitalized form', () => {

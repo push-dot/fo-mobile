@@ -11,7 +11,7 @@ tags:
       KO: "필요한 프로젝트 경험까지 만들어 주세요"
       EN: "ph2x"
 - extendedWaitUntil:
-    visible: "어떤 접근 방식으로 진행할까요?"
+    visible: "어떤 방식으로 경험을 만들까요?"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow:
@@ -20,8 +20,8 @@ tags:
 - runFlow:
     file: _pick.yaml
     env:
-      ASK: "어떤 접근 방식으로 진행할까요?"
-      PICK: ".*병목을 만들게요"
+      ASK: "어떤 방식으로 경험을 만들까요?"
+      PICK: ".*병목 만들기"
       NEXT: "병목 강도를 어느 정도로 할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XLevel
@@ -30,13 +30,13 @@ tags:
     file: _pick.yaml
     env:
       ASK: "병목 강도를 어느 정도로 할까요?"
-      PICK: ".*중간 제약으로"
-      NEXT: "검증을 통과하지 못했어요.*"
+      PICK: ".*중간 제약"
+      NEXT: ".*검증을 통과하지 못했어요.*"
 - waitForAnimationToEnd
 - runFlow:
     file: _pick.yaml
     env:
-      ASK: "검증을 통과하지 못했어요.*"
+      ASK: ".*검증을 통과하지 못했어요.*"
       PICK: ".*다시 고르기"
       NEXT: "병목 강도를 어느 정도로 할까요?"
 - waitForAnimationToEnd
@@ -44,7 +44,7 @@ tags:
     file: _pick.yaml
     env:
       ASK: "병목 강도를 어느 정도로 할까요?"
-      PICK: ".*중간 제약으로"
+      PICK: ".*중간 제약"
       NEXT: "어떤 프로젝트를 구현할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XBlueprints
@@ -56,7 +56,7 @@ tags:
       KO: "중간 제약으로"
       EN: "verify-fail"
 - extendedWaitUntil:
-    visible: "검증을 통과하지 못했어요.*"
+    visible: ".*검증을 통과하지 못했어요.*"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow:

@@ -33,7 +33,11 @@ export const useGateModal = (
     latest.current = { onAnswer, onSay, docs: docs.data, bookmarks: bookmarks.data?.data, items: chat.items }
   })
   useEffect(() => {
-    if (!focused || !approval || opened.current === approval.id) return
+    if (!approval) {
+      opened.current = undefined
+      return
+    }
+    if (!focused || opened.current === approval.id) return
     opened.current = approval.id
     const now = () => latest.current
     const say = () => now().onSay()

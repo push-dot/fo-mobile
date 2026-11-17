@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { applyEvent, emptyChat, formatElapsed } from '../utils/reducer'
 import type { ChatEvent, ChatState } from '../types'
 
@@ -24,6 +24,14 @@ describe('applyEvent', () => {
     s = applyEvent(s, { type: 'answer', text: '네, 반영해 주세요' })
     expect(s.approval).toBeNull()
     expect(s.items.at(-1)).toMatchObject({ type: 'user', text: '네, 반영해 주세요' })
+  })
+
+  it('starts the clock now for a status frame that no start event stamped (a reopened or reset chat)', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(5_000)
+    const s = run([{ type: 'status', verbs: ['점수 올리는 중…'] }])
+    expect(s.working).toEqual({ verbs: ['점수 올리는 중…'], startedAt: 5_000 })
+    expect(applyEvent(s, { type: 'status', verbs: ['키워드를 넣는 중…'] }).working?.startedAt).toBe(5_000)
+    vi.restoreAllMocks()
   })
 
   it('appends streamed tokens to the last agent line only', () => {

@@ -110,7 +110,9 @@ export const listenMockLinks = () =>
       if (empty) {
         // A company chat has no clear-chat menu, so the open chat's client copy goes too: the next message draws on a bare thread.
         emptyBot(empty[1]!)
-        chat().forget(fixtureOf(empty[1]!)?.bot.id ?? empty[1]!)
+        const id = fixtureOf(empty[1]!)?.bot.id ?? empty[1]!
+        chat().dropRun(id)
+        chat().forget(id)
       }
       // The open chat's client copy goes, so the next open reads the stored turns (a reopened chat).
       const reload = /^bot:(.+):reload$/.exec(s)

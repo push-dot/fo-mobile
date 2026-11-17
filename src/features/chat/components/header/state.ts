@@ -33,9 +33,9 @@ const monthDay = (at: Date) => `${at.getMonth() + 1}월 ${at.getDate()}일`
 
 /** Under the header once the monthly allowance is spent (ChatBotHeaderLimit, ChatBotHeaderLimitUltra). */
 export const creditBanner = (input: { plan: 'FREE' | 'PRO' | 'ULTRA' | undefined; refillAt: Date | null; paymentsEnabled: boolean }): CreditBanner | null => {
-  const first = '이번 달 사용량을 모두 썼어요.'
+  const first = '사용량을 모두 썼어요'
   if (input.plan === undefined) return { lines: [first], action: null }
-  if (input.plan === 'ULTRA') return { lines: [first, '크레딧을 사면 바로 이어서 쓸 수 있어요.'], action: input.paymentsEnabled ? 'credits' : null }
-  const lines = input.refillAt ? [first, `${monthDay(input.refillAt)}에 다시 채워져요.`] : [first]
+  if (input.plan === 'ULTRA') return { lines: [first], action: input.paymentsEnabled ? 'credits' : null }
+  const lines = input.refillAt ? [first, `${monthDay(input.refillAt)}에 채워져요`] : [first]
   return { lines, action: input.paymentsEnabled ? 'plan' : null }
 }

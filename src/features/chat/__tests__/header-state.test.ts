@@ -46,28 +46,28 @@ describe('creditBanner', () => {
   const refillAt = new Date(2026, 11, 1)
 
   it('shows the line without a button before the account loads', () => {
-    expect(creditBanner({ plan: undefined, refillAt, paymentsEnabled: true })).toEqual({ lines: ['이번 달 사용량을 모두 썼어요.'], action: null })
+    expect(creditBanner({ plan: undefined, refillAt, paymentsEnabled: true })).toEqual({ lines: ['사용량을 모두 썼어요'], action: null })
   })
 
   it('tells FREE and PRO when the allowance returns and offers the plan page', () => {
     for (const plan of ['FREE', 'PRO'] as const) {
-      expect(creditBanner({ plan, refillAt, paymentsEnabled: true })).toEqual({ lines: ['이번 달 사용량을 모두 썼어요.', '12월 1일에 다시 채워져요.'], action: 'plan' })
+      expect(creditBanner({ plan, refillAt, paymentsEnabled: true })).toEqual({ lines: ['사용량을 모두 썼어요', '12월 1일에 채워져요'], action: 'plan' })
     }
   })
 
   it('leaves the refill sentence out when the server sends no date', () => {
-    expect(creditBanner({ plan: 'FREE', refillAt: null, paymentsEnabled: true })).toEqual({ lines: ['이번 달 사용량을 모두 썼어요.'], action: 'plan' })
+    expect(creditBanner({ plan: 'FREE', refillAt: null, paymentsEnabled: true })).toEqual({ lines: ['사용량을 모두 썼어요'], action: 'plan' })
   })
 
   it('offers ULTRA a credit purchase', () => {
     expect(creditBanner({ plan: 'ULTRA', refillAt, paymentsEnabled: true })).toEqual({
-      lines: ['이번 달 사용량을 모두 썼어요.', '크레딧을 사면 바로 이어서 쓸 수 있어요.'],
+      lines: ['사용량을 모두 썼어요'],
       action: 'credits',
     })
   })
 
   it('puts each sentence on its own line so the date never breaks', () => {
-    expect(bannerText(creditBanner({ plan: 'FREE', refillAt, paymentsEnabled: true })!)).toBe('이번 달 사용량을 모두 썼어요.\n12월 1일에 다시 채워져요.')
+    expect(bannerText(creditBanner({ plan: 'FREE', refillAt, paymentsEnabled: true })!)).toBe('사용량을 모두 썼어요\n12월 1일에 채워져요')
   })
 
   it('offers no button while payments are closed', () => {

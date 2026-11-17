@@ -11,12 +11,12 @@ tags:
       KO: "필요한 프로젝트 경험까지 만들어 주세요"
       EN: "ph2x"
 - extendedWaitUntil:
-    visible: "어떤 접근 방식으로 진행할까요?"
+    visible: "어떤 방식으로 경험을 만들까요?"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow:
     file: _chat_kbd_down.yaml
-- tapOn: ".*문제를 예방할게요"
+- tapOn: ".*문제 예방하기"
 - extendedWaitUntil:
     visible: "어떤 문제를 예방할까요?"
     timeout: 20000
