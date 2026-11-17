@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useMemo } from 'react'
-import { ScrollView, View } from 'react-native'
-import { Button, Sheet, Spinner, Text } from '@/shared/components'
+import { View } from 'react-native'
+import { Button, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
@@ -31,6 +31,7 @@ const open = (m: Material, inModal: boolean) => {
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const now = useMemo(() => new Date(), [])
+  const bound = useSheetScrollMax(0.55)
   const inModal = useInMaterialsModal()
 
   const m = detail.data?.material
@@ -61,17 +62,17 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   }
 
   return (
-    <ScrollView>
-      <Sheet>
-        <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
-          {detailTitle(m)}
-        </Text>
+    <Sheet onLayout={bound.onSheetLayout}>
+      <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
+        {detailTitle(m)}
+      </Text>
+      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
         <MaterialFacts facts={detailFacts(m, detail.data?.usedBy ?? [], now)} />
-        <View style={{ flexDirection: 'row', gap: spacing[2] }}>
-          <Button label={SEND_LABEL} onPress={send} style={{ flex: 1 }} />
-          <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={{ flex: 1 }} />
-        </View>
-      </Sheet>
-    </ScrollView>
+      </SheetScroll>
+      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+        <Button label={SEND_LABEL} onPress={send} style={{ flex: 1 }} />
+        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={{ flex: 1 }} />
+      </View>
+    </Sheet>
   )
 }
