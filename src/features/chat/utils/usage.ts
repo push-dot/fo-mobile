@@ -1,6 +1,6 @@
 import type { IconName } from '@push/design-system'
 import type { MenuAction } from '@/shared/components/menu-action'
-import type { AttachmentKind } from '@/features/bots/types'
+import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem } from '../types'
 import { foldBubbleCards } from './bubble-card'
 
