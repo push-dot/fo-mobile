@@ -55,6 +55,7 @@ const sectionOf = (raw: ChoiceSection | { kind: string }, recommended?: string):
       return {
         id: s.id,
         kind: 'toggle',
+        ...(s.title ? { title: s.title } : {}),
         items: s.options.map(toggleChoiceOf),
         ids: s.options.map((o) => o.id),
         selected: picked(s.options.map((o) => o.id), s.selected),

@@ -34,6 +34,19 @@ describe('openGate: a single pick (ChatPh0)', () => {
     expect(h.say).toHaveBeenCalledOnce()
   })
 
+  it('draws a gate choice as stacked buttons, and the permission card (it has a detail) as rows', () => {
+    expect(run(ph0).shown[0]!.buttons).toBe(true)
+    const site = base({ confirm: true, detail: 'careers.moapay.co.kr를 열어도 될까요?', sections: [{ kind: 'choices', selected: [], items: [{ label: '한 번 허용' }, { label: '거절' }] }] })
+    expect(run(site).shown[0]!.buttons).toBeUndefined()
+  })
+
+  it('shows the apply card as the company question, the role under it and one 지원하기 button (ChatPh6Apply)', () => {
+    const apply = base({ confirm: true, question: '모아페이 · 백엔드 엔지니어에 지원해요', sections: [{ kind: 'choices', selected: [0], items: [{ label: '지원하기' }, { label: '닫기' }] }] })
+    const { shown } = run(apply)
+    expect(shown[0]).toMatchObject({ title: '모아페이에 지원할까요?', message: '백엔드 엔지니어', buttons: true })
+    expect(shown[0]!.items!.map((i) => i.label)).toEqual(['지원하기'])
+  })
+
   it('keeps 거절 on a permission card', () => {
     const { shown } = run(base({ confirm: true, sections: [{ kind: 'choices', selected: [], items: [{ label: '한 번 허용' }, { label: '거절' }] }] }))
     expect(shown[0]!.items!.map((i) => i.label)).toEqual(['한 번 허용', '거절'])
@@ -66,7 +79,7 @@ describe('openGate: sections (ChatPh0Input)', () => {
     optionIds: ['submit', 's0.0', 's0.1', 'm_a', 'm_b', 's2.0', 's2.1', 'cancel'],
     sections: [
       { kind: 'chips', id: 's0', title: '만들 것', options: ['이력서', '포트폴리오'], ids: ['s0.0', 's0.1'], selected: [0], multi: true },
-      { kind: 'toggle', id: 'materials', items: [{ label: '허브 프로필', desc: '기본 서류' }, { label: '백엔드 엔지니어', desc: '모아페이' }], ids: ['m_a', 'm_b'], selected: [0, 1] },
+      { kind: 'toggle', id: 'materials', title: '가져올 자료를 골라 주세요', items: [{ label: '허브 프로필', desc: '기본 서류' }, { label: '백엔드 엔지니어', desc: '모아페이' }], ids: ['m_a', 'm_b'], selected: [0, 1] },
       { kind: 'chips', id: 's2', title: '말투', options: ['전문적으로', '원래 말투로'], ids: ['s2.0', 's2.1'], selected: [1] },
     ],
   })
@@ -77,6 +90,7 @@ describe('openGate: sections (ChatPh0Input)', () => {
     expect(shown[0]!.form!.confirmLabel([0], false)).toBe('다음')
     shown[0]!.form!.onConfirm([0], false)
     expect(shown).toHaveLength(2)
+    expect(shown[1]!.title).toBe('가져올 자료를 골라 주세요')
     expect(shown[1]!.form!.multi).toBe(true)
     expect(shown[1]!.form!.selected).toEqual([0, 1])
     expect(shown[1]!.form!.confirmLabel([0, 1], false)).toBe('2개로 시작하기')

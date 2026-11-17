@@ -61,7 +61,7 @@ describe('bot:<id>:resume', () => {
     expect(page.page.nextCursor).not.toBeNull()
     expect((await api.bots.transcript('b-moa', { cursor: page.page.nextCursor! })).data).toEqual([])
     const offer = page.data[0]!.events.find((e) => e.type === 'choice')
-    expect(offer).toMatchObject({ options: [{ label: '이어서 작성하기' }, { label: '그만하기' }], recommended: '0' })
+    expect(offer).toMatchObject({ options: [{ label: '이어서 작성하기' }, { label: '새로 시작하기' }], recommended: '0' })
     emptyBot('b-moa')
     expect((await api.bots.transcript('b-moa')).page.nextCursor).toBeNull()
   })

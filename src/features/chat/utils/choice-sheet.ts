@@ -1,6 +1,9 @@
 import type { Approval, Choice } from '../types'
 import { sectionLabel, sectionPicks } from './stream-v3'
 
+/** push-be names the posting an apply card is about: "{company} · {title}에 지원해요" (the board: the company in the question, the role under it). */
+const APPLY_QUESTION = /^(.+?) · (.+?)에 지원(?:해요|할까요)\??$/
+
 export const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
 
 export type ChoiceSheet = { title: string; message?: string; items: { index: number; label: string }[] }
@@ -13,6 +16,8 @@ export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   if (approval.submit || section?.kind !== 'choices' || section.multi) return null
   const items = section.items.flatMap((c, index) => (isSay(c) ? [] : [{ index, label: c.label }]))
   const message = [approval.detail, approval.warning].filter(Boolean).join('\n\n')
+  const apply = approval.confirm ? APPLY_QUESTION.exec(approval.question) : null
+  if (apply) return { title: `${apply[1]}에 지원할까요?`, message: apply[2]!, items }
   return { title: approval.question, ...(message ? { message } : {}), items }
 }
 

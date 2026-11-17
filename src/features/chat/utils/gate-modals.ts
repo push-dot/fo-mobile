@@ -53,7 +53,7 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
     const picked = (chosen: number[]) => sel.map((x, i) => (i === si ? chosen : x))
     const confirmLabel = (chosen: number[]) => (last ? buttonLabel(approval, picked(chosen)) || label : s.kind === 'toggle' && s.id === MATERIALS ? `${chosen.length}개로 시작하기` : label)
     const next = () => (last ? finish() : show(n + 1))
-    const title = n === 0 ? approval.question : s.kind === 'chips' ? (s.title ?? approval.question) : approval.question
+    const title = n === 0 ? approval.question : s.kind === 'chips' || s.kind === 'toggle' ? (s.title ?? approval.question) : approval.question
     const base = { title, ...(n === 0 && approval.detail ? { message: approval.detail } : {}), onDismiss: h.say }
     if (s.kind === 'rows') {
       const fixed = s.items.filter((r) => r.action !== 'change')
@@ -72,6 +72,7 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
     if (last && chipSends(approval)) {
       ask({
         ...base,
+        buttons: true,
         items: options.map((o, i) => ({
           label: o.label,
           onPress: () => {
@@ -143,11 +144,12 @@ export const openGate = (approval: Approval, h: GateHooks, ask: (request: Choice
   if (!sheet) return
   const items = sheet.items.filter((i) => {
     const section = approval.sections[0]
-    return section?.kind !== 'choices' || approval.confirm || !isStop(section.items[i.index]!)
+    return section?.kind !== 'choices' || !isStop(section.items[i.index]!)
   })
   ask({
     title: sheet.title,
     ...(sheet.message ? { message: sheet.message } : {}),
+    ...(approval.detail ? {} : { buttons: true }),
     items: items.map((i) => ({ label: i.label, onPress: () => h.answer(i.label, i.index) })),
     onDismiss: h.say,
   })
