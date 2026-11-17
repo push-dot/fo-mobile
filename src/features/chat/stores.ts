@@ -492,7 +492,7 @@ export const forget = (id: string) => {
   })
 }
 
-const dropRun = (id: string) => {
+export const dropRun = (id: string) => {
   runs.get(id)?.abort()
   runs.delete(id)
   heldQueues.delete(id)

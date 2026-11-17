@@ -234,10 +234,11 @@ const ph0Input: Step[] = [
           { id: 'm_file', label: '허브 프로필', sub: '기본 서류' },
           { id: 'm_posting', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 공고' },
           { id: 'm_github', label: 'github.com/seojun-kim', sub: '링크' },
+          { id: 'm_resume', label: '김서준_백엔드_이력서_2026', sub: '파일' },
         ],
         selected: ['m_file', 'm_posting'],
       },
-      { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
+      { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '원래 말투로' }, { id: 's2.1', label: '전문적으로' }, { id: 's2.2', label: '자신 있게' }, { id: 's2.3', label: '짧게' }, { id: 's2.4', label: '기술 중심으로' }, { id: 's2.5', label: '협업 중심으로' }], selected: ['s2.0'] },
     ],
     submit: { label: '이 말투로 쓰기' },
   }),
@@ -385,7 +386,7 @@ const QUALITY_HOLD = 10_000
 const DESIGN_ASK = ask({
   type: 'choice',
   id: 'ph4-design',
-  title: '디자인',
+  title: '어떤 디자인으로 만들까요?',
   options: [{ id: 'cancel', label: '그만하기' }],
   recommended: 't0',
   sections: [
@@ -430,10 +431,10 @@ const ph2xApproach: Step[] = [
   s(300, tool('jd', '공고 분석', MOA, 'run', '필수 스택을 뽑는 중')),
   s(1300, tool('jd', '공고 분석', MOA, 'ok', '필수 스택 5개 · 서비스 도메인: 결제·정산')),
   s(400, agent('공고에 필요한 경험을 만들 방향을 골라 주세요.')),
-  ask(numbered('ph2x-approach', '어떤 접근 방식으로 진행할까요?', ['병목을 만들게요', '문제를 예방할게요', '그만하기'])),
+  ask(numbered('ph2x-approach', '어떤 방식으로 경험을 만들까요?', ['병목 만들기', '문제 예방하기', '그만하기'])),
 ]
 const ph2xLevel: Step[] = [
-  ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약으로', '중간 제약으로', '강한 제약으로', '그만하기'], 1)),
+  ask(numbered('ph2x-level', '병목 강도를 어느 정도로 할까요?', ['가벼운 제약', '중간 제약', '강한 제약', '그만하기'], 1)),
 ]
 const noPosting: Step[] = [
   s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')),
@@ -600,7 +601,7 @@ const statusApprove: Step[] = [
     id: 'st-approve',
     kind: 'TOOL_ACTION',
     title: '채용 페이지 열기',
-    summary: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?',
+    summary: 'careers.moapay.co.kr를 열어도 될까요?',
     options: PAGE_READ_OPTIONS,
   }),
   awaitingDone,
@@ -620,7 +621,7 @@ export const TOKENS: Record<string, Step[]> = {
   // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
   'ph0-input': ph0Input,
-  '이력서만 · 자료 3개 · 말투 그대로': ph0Start,
+  '이력서 · 자료 2개 · 말투 그대로': ph0Start,
   'ph0-start': ph0Start,
   'feedback only': feedbackOnly,
   // ChatDoneProfile: the finished profile run without the 확인했어요 gate, so one elapsed line and no answer bubbles.

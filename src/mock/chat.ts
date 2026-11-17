@@ -410,6 +410,7 @@ const quick: Record<string, QsData> = {
   link: { items: [], doc: RESUME },
   match: { items: [], chips: ['개발 · 백엔드', '경력 4–6년', '서울', 'Kotlin', 'Spring Boot'] },
   fit: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
+  gap: { segments: ['북마크 4', '최근 본 공고'], items: [{ ...JOBS[0]!, selected: true }, ...JOBS.slice(1), ...RECENT], doc: RESUME },
   boost: { items: [{ ...JOBS[0]!, selected: true }], doc: RESUME },
   status: {
     segments: ['진행 중 4', '전체 6'],

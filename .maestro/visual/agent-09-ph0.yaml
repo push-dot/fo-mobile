@@ -46,7 +46,7 @@ tags:
 - runFlow:
     file: _say.yaml
     env:
-      KO: "이력서만 · 허브 프로필 · 모아페이 공고 · 말투 그대로"
+      KO: "이력서 · 자료 2개 · 말투 그대로"
       EN: "ph0-start"
 - extendedWaitUntil:
     visible: "이대로 분석을 시작할까요?"

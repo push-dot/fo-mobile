@@ -24,6 +24,23 @@ describe('chat mock', () => {
     expect(kept).toHaveLength(3)
   })
 
+  it('draws the 가져올 자료 board: four rows with the first two on, and 원래 말투로 first and on', async () => {
+    const events = await run('t-ph0', { text: 'ph0-input' })
+    const card = events.find((e) => e.type === 'approval')
+    const sections = card?.type === 'approval' ? card.approval.sections : []
+    const materials = sections.find((s) => s.kind === 'toggle')
+    const tone = sections.find((s) => s.kind === 'chips' && s.title === '어떤 말투로 쓸까요?')
+    expect(materials).toMatchObject({ items: [{ label: '허브 프로필' }, { label: '백엔드 엔지니어 (Kotlin·Spring)' }, { label: 'github.com/seojun-kim' }, { label: '김서준_백엔드_이력서_2026', desc: '파일' }], selected: [0, 1] })
+    expect(tone).toMatchObject({ options: ['원래 말투로', '전문적으로', '자신 있게', '짧게', '기술 중심으로', '협업 중심으로'], selected: [0] })
+  })
+
+  it('lists the bookmarks and recent postings in the 부족한 점 찾기 sheet like 적합도 보기', async () => {
+    const gap = (await call('GET', 'chat/quick-starts/gap')).data as { segments: string[]; items: { over?: string }[] }
+    const fit = (await call('GET', 'chat/quick-starts/fit')).data
+    expect(gap).toEqual(fit)
+    expect(gap.items.some((i) => i.over === '모아페이')).toBe(true)
+  })
+
   it('serves one conversation by id, also when it is archived', async () => {
     expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ id: 'c-moa', revision: 1 })
     expect((await call('GET', 'conversations/a-toss')).data).toMatchObject({ title: '토스 백엔드 이력서' })
@@ -63,7 +80,7 @@ describe('chat mock', () => {
   it('stamps a tool card with the time it was asked (ChatBotStatusApprove)', async () => {
     const events = await run('t-approve-stamp', { text: 'st-approve' })
     const approval = events.find((e) => e.type === 'approval')
-    expect(approval).toMatchObject({ approval: { confirm: true, question: '채용 페이지 열기', detail: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?' } })
+    expect(approval).toMatchObject({ approval: { confirm: true, question: '채용 페이지 열기', detail: 'careers.moapay.co.kr를 열어도 될까요?' } })
     expect((approval as Extract<ChatEvent, { type: 'approval' }>).approval.openedAt).toBeTypeOf('number')
   })
 
@@ -99,7 +116,7 @@ describe('chat mock', () => {
     const design = await run('t-design', { text: '2개 반영하고 디자인으로' })
     const sentences = design.filter((e) => e.type === 'token').map((e) => e.text)
     expect(sentences).toEqual(['템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.', '검증을 마쳤어요. 디자인을 골라 주세요.'])
-    expect(design.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design' && e.approval.question === '디자인')).toBe(true)
+    expect(design.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design' && e.approval.question === '어떤 디자인으로 만들까요?')).toBe(true)
   })
 
   it('selects 중간 제약으로 in the 병목 강도 gate', async () => {

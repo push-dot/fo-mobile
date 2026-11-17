@@ -14,9 +14,9 @@ const card = (patch: Partial<Approval>): Approval => ({
 
 describe('choiceSheet', () => {
   it('turns the permission card into a title, its detail as the message, and a plain 거절 (the board draws it black)', () => {
-    expect(choiceSheet(card({ question: '채용 페이지 열기', detail: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?', confirm: true }))).toEqual({
+    expect(choiceSheet(card({ question: '채용 페이지 열기', detail: 'careers.moapay.co.kr를 열어도 될까요?', confirm: true }))).toEqual({
       title: '채용 페이지 열기',
-      message: '모아페이 채용 페이지(careers.moapay.co.kr)를 열어도 될까요?',
+      message: 'careers.moapay.co.kr를 열어도 될까요?',
       items: [
         { index: 0, label: '한 번 허용' },
         { index: 1, label: '항상 허용' },

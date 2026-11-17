@@ -24,7 +24,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     case 'start':
       return { ...s, runStartedAt: e.at, interrupted: false, approval: null, awaiting: null, working: { verbs: ['생각하는 중…'], startedAt: e.at } }
     case 'status':
-      return { ...s, working: { verbs: e.verbs, startedAt: s.working?.startedAt ?? s.runStartedAt ?? 0 } }
+      return { ...s, working: { verbs: e.verbs, startedAt: s.working?.startedAt ?? s.runStartedAt ?? Date.now() } }
     case 'token': {
       // Real SSE sends text in pieces: grow the last agent line until something else lands after it.
       const last = s.items[s.items.length - 1]
