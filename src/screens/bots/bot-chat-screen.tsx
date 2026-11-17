@@ -45,6 +45,7 @@ import {
   send,
   stop,
   useDoneNext,
+  useDraftStore,
   useGateModal,
   useChat,
   useChatLimit,
@@ -129,7 +130,8 @@ const Thread = ({ id }: { id: string }) => {
     router.push(`/docs/push/${documentId}`)
   })
   const input = useRef<TextInputInstance>(null)
-  const placeholder = composerPlaceholder(name)
+  const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
+  const placeholder = composerPlaceholder(name, chipKind)
   const empty = chat.items.length === 0 && chat.queue.length === 0
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
