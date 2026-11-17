@@ -1,5 +1,6 @@
 export * from './asset-url'
 export * from './box-shadow'
+export * from './composer-padding'
 export * from './keep-words'
 export * from './picker-date'
 export * from './recent'
