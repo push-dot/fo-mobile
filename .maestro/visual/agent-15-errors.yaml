@@ -61,6 +61,9 @@ tags:
 - takeScreenshot: ChatErrors
 # ChatBotHeaderLimit draws the 모아페이 chat (the finished thread) under the credit banner, with the composer shut, not the Push Bot.
 # It runs last because the 모아페이 chat has no clear-chat menu for _fresh_chat; reset first clears the Push Bot's run rule and the thread.
+# Leave the Push Bot chat first: a link opened over it stacks the 모아페이 chat as a card.
+- openLink: push://?mock=reset
+- waitForAnimationToEnd
 - openLink: push://bots/b-moa?mock=reset,consent-on,bot:b-moa:thread,credits-out
 - extendedWaitUntil:
     visible: ".*경력 섹션 3줄을 고쳤어요.*"
