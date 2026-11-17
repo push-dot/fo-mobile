@@ -54,7 +54,8 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const Surface = p.flat ? FlatField : GlassField
   const round = { width: ROW_HEIGHT, height: ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
   const disc = { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: 'center', justifyContent: 'center' } as const
-  const textType = p.flat ? { ...type.h3, fontSize: 16 } : type.h3
+  const textV = p.flat ? 'b1' : 'h3'
+  const textType = type[textV]
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, gap: spacing[2] }}>
       {p.attachment ? (
@@ -90,7 +91,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             }}
           >
             {p.value ? null : (
-              <Text v="h3" weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+              <Text v={textV} weight="400" color="t4" numberOfLines={1} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
                 {p.placeholder}
               </Text>
             )}
