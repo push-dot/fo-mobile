@@ -14,8 +14,7 @@ tags:
 - extendedWaitUntil:
     visible: ".*Google 계정으로 로그인.*"
     timeout: 10000
-# The v489 board shows the 차단한 사람 row with ink centre 591 in the 402x874 side-by-side. scrollUntilVisible + centerElement stops with the row at
-# y≈503.7, and a slow swipe moves the list ~0.857 of its travel, so the list goes down 87pt: 12% of 874 = 105pt of travel -> 90pt -> row centre ≈ 594 (board 591) (run 17 stopped at 538 with a 4% swipe).
+# Board ink centre is 591; a slow swipe moves the list ~0.857 of its travel, so 12% of 874 (105pt) lands the row near 594.
 - scrollUntilVisible:
     element: "차단한 사람.*"
     centerElement: true
