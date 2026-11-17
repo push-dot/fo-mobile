@@ -174,7 +174,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   )
   if (all)
     return (
-      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 56, borderRadius: 28 }} /> : undefined}>
+      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 56, borderRadius: radius.buttonIos }} /> : undefined}>
         <View style={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>{content}</View>
       </PageModal>
     )
