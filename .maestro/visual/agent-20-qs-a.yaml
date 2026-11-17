@@ -19,7 +19,7 @@ tags:
     file: _qs.yaml
     env:
       LABEL: "적합도 보기"
-      WAIT: ".*공고 모아페이.*"
+      WAIT: ".*어떤 공고와 비교할까요.*"
       SHOT: QsFit
 - runFlow:
     file: _qs.yaml

@@ -6449,6 +6449,45 @@ card {"id":"ph2x-approach","question":"어떤 방식으로 경험을 만들까�
 "
 `;
 
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token ph2x-blueprints > ph2x-bp: pick 0 1`] = `
+"
+{"text":"ph2x-blueprints","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
+{"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과"}],"title":"프로젝트 기획서","type":"plan"}
+{"text":"구현하기","type":"user"}
+{"text":"좋아요. 고른 프로젝트로 이어갈게요.","type":"agentText"}
+{"seconds":1,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token ph2x-blueprints > ph2x-bp: say 이렇게 해 주세요 1`] = `
+"
+{"text":"ph2x-blueprints","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
+{"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과"}],"title":"프로젝트 기획서","type":"plan"}
+{"text":"이렇게 해 주세요","type":"user"}
+{"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
+{"seconds":1,"type":"worked"}
+card null
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token ph2x-blueprints 1`] = `
+"
+{"text":"ph2x-blueprints","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
+{"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과"}],"title":"프로젝트 기획서","type":"plan"}
+card {"id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"결제 승인 재시도 큐"},{"label":"정산 배치 병렬화"},{"label":"결제 이벤트 아웃박스"},{"label":"가맹점 API 레이트 리미터"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"submit":"구현하기"}
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
 exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token ph3-write 1`] = `
 "
 {"text":"ph3-write","type":"user"}
@@ -6843,6 +6882,17 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
 {"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+{"awaiting":null,"interrupted":false,"queue":[],"working":null}
+"
+`;
+
+exports[`every scripted run (golden) > leaves the same chat on screen at every card and at the end > token 기획서 보여 줘 1`] = `
+"
+{"text":"기획서 보여 줘","type":"user"}
+{"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
+{"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
+{"keywords":[],"meta":"4개","rows":[{"label":"결제 승인 재시도 큐","note":"안정성 · Kotlin, Kafka","tag":"통과"},{"label":"정산 배치 병렬화","note":"데이터 무결성 · Spring Batch","tag":"통과"},{"label":"결제 이벤트 아웃박스","note":"무결성 · Kafka, JPA","tag":"조건부"},{"label":"가맹점 API 레이트 리미터","note":"안정성 · Redis","tag":"통과"}],"title":"프로젝트 기획서","type":"plan"}
+card {"id":"ph2x-bp","question":"어떤 프로젝트를 구현할까요?","sections":[{"items":[{"label":"결제 승인 재시도 큐"},{"label":"정산 배치 병렬화"},{"label":"결제 이벤트 아웃박스"},{"label":"가맹점 API 레이트 리미터"},{"label":"닫기"}],"kind":"choices","selected":[0]}],"submit":"구현하기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
