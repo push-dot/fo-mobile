@@ -25,7 +25,7 @@ tags:
       NEXT: "병목 강도를 어느 정도로 할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XLevel
-# The first pick fails verification in the mock; picking again passes.
+# The first pick fails verification in the mock (a bubble, then the 어떻게 할까요? modal); 다시 시도 passes and goes on to the blueprints.
 - runFlow:
     file: _pick.yaml
     env:
@@ -36,15 +36,8 @@ tags:
 - runFlow:
     file: _pick.yaml
     env:
-      ASK: ".*검증을 통과하지 못했어요.*"
-      PICK: ".*다시 고르기"
-      NEXT: "병목 강도를 어느 정도로 할까요?"
-- waitForAnimationToEnd
-- runFlow:
-    file: _pick.yaml
-    env:
-      ASK: "병목 강도를 어느 정도로 할까요?"
-      PICK: ".*중간 제약"
+      ASK: "어떻게 할까요?"
+      PICK: ".*다시 시도"
       NEXT: "어떤 프로젝트를 구현할까요?"
 - waitForAnimationToEnd
 - takeScreenshot: ChatPh2XBlueprints
