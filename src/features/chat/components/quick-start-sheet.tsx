@@ -162,7 +162,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
           <RecentList
             items={visible}
             keyOf={(it) => it.id}
-            moreGap={spacing[3]}
+            moreGap={qs.layout === 'reply' ? 0 : spacing[3]}
             onSeeAll={seeAll}
             renderItem={(it) => (
               <ItemRow item={it} layout={qs.layout} on={sel.includes(it.id)} onPress={qs.layout === 'reply' ? () => go(it) : () => (toggle(it.id), setPickingJob(false))} />
@@ -174,7 +174,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   )
   if (all)
     return (
-      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 56, borderRadius: radius.buttonIos }} /> : undefined}>
+      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} /> : undefined}>
         <View style={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>{content}</View>
       </PageModal>
     )
