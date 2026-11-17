@@ -50,8 +50,7 @@ describe('chat mock', () => {
     await run('t-verify', { text: 'ph2x' })
     await answer('t-verify', 'ph2x-approach', '0')
     const first = await answer('t-verify', 'ph2x-level', '1')
-    await answer('t-verify', 'ph2x-verify', '0')
-    const second = await answer('t-verify', 'ph2x-level', '1')
+    const second = await answer('t-verify', 'ph2x-verify', '0')
     expect(first.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
     expect(types(second)).toContain('plan')
   })
@@ -117,7 +116,7 @@ describe('chat mock', () => {
     expect(verify.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
   })
 
-  it('holds the writing state with the draft card, while the run to the review gate has no draft card', async () => {
+  it('holds the writing state with the draft card, while the run to the boost gate has no draft card', async () => {
     const writing = await steps('t-write', { text: '네, 써 주세요' })
     const paper = writing.findIndex((st) => st.frame.type === 'paper')
     expect(paper).toBeGreaterThan(-1)
@@ -126,7 +125,8 @@ describe('chat mock', () => {
     const review = await answer('t-draft', 'ph2', '0')
     expect(types(review)).not.toContain('paper')
     expect(types(review)).not.toContain('file')
-    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(true)
+    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(false)
+    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
   it('draws the result boards as the closing line and the card alone, with no bullets and no gate to answer', async () => {

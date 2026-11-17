@@ -1,35 +1,24 @@
 import { displayName } from '@/shared/utility/display-name'
 import type { ChoiceModalRequest } from '@/shared/navigation'
-import type { Approval, ApprovalSection, ChatItem, DiffLine } from '../types'
+import type { Approval, ApprovalSection, DiffLine } from '../types'
 import type { ReviewPageRequest } from '../review-page'
 import { choiceSheet, confirmModal, designModal } from './choice-sheet'
 import { isStop } from './multi-pick'
-import { isBlueprints, planTable } from './plan-table'
 import { buttonLabel, chipSends, sectionLabel, sectionPicks } from './stream-v3'
 
 type Row = Extract<ApprovalSection, { kind: 'rows' }>['items'][number]
-type Table = NonNullable<ChoiceModalRequest['table']>
 
 export type GateHooks = {
   answer: (text: string, choice: number | number[]) => void
   say: () => void
   change: (row: Row, back: () => void) => void
-  table?: Table
   /** The changed lines of the edit under review, and how to open the page that draws them. */
   review?: { lines: DiffLine[]; open: (request: ReviewPageRequest) => void }
 }
 
 export const UNDO_LABEL = '되돌리기'
 export const NEXT_LABEL = '다음'
-
-export const gateTable = (items: readonly ChatItem[]): Table | undefined => {
-  for (const item of [...items].reverse()) {
-    if (item.type === 'user') return undefined
-    const plan = item.type === 'plan' ? item : item.type === 'agentText' ? item.card : undefined
-    if (plan) return isBlueprints(plan) ? undefined : { head: planTable(plan).head, rows: planTable(plan).rows }
-  }
-  return undefined
-}
+const MATERIALS = 'materials'
 
 const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined
@@ -38,7 +27,6 @@ const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | nul
   return {
     title: approval.question,
     ...(approval.detail ? { message: approval.detail } : {}),
-    ...(h.table ? { table: h.table } : {}),
     form: {
       options: rows.map(({ label, sub }) => ({ label, ...(sub ? { sub } : {}) })),
       selected: section.selected.flatMap((i) => (rows.findIndex((r) => r.index === i) >= 0 ? [rows.findIndex((r) => r.index === i)] : [])),
@@ -63,6 +51,7 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
     const last = n === order.length - 1
     const label = last ? (buttonLabel(approval, sel) || '확인') : NEXT_LABEL
     const picked = (chosen: number[]) => sel.map((x, i) => (i === si ? chosen : x))
+    const confirmLabel = (chosen: number[]) => (last ? buttonLabel(approval, picked(chosen)) || label : s.kind === 'toggle' && s.id === MATERIALS ? `${chosen.length}개로 시작하기` : label)
     const next = () => (last ? finish() : show(n + 1))
     const title = n === 0 ? approval.question : s.kind === 'chips' ? (s.title ?? approval.question) : approval.question
     const base = { title, ...(n === 0 && approval.detail ? { message: approval.detail } : {}), onDismiss: h.say }
@@ -100,7 +89,7 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
         selected: sel[si] ?? [],
         multi,
         ...(last && approval.zeroSubmit ? { allowEmpty: true } : {}),
-        confirmLabel: (chosen) => (last ? buttonLabel(approval, picked(chosen)) || label : label),
+        confirmLabel,
         onConfirm: (chosen) => {
           sel[si] = chosen
           next()
@@ -159,7 +148,6 @@ export const openGate = (approval: Approval, h: GateHooks, ask: (request: Choice
   ask({
     title: sheet.title,
     ...(sheet.message ? { message: sheet.message } : {}),
-    ...(h.table ? { table: h.table } : {}),
     items: items.map((i) => ({ label: i.label, onPress: () => h.answer(i.label, i.index) })),
     onDismiss: h.say,
   })

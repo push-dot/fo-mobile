@@ -33,8 +33,8 @@ const numbered = (id: string, title: string, labels: string[], selected = 0): Ch
   options: labels.map((label, i) => ({ id: String(i), label })),
   ...(selected ? { recommended: String(selected) } : {}),
 })
-/** A tool asking permission: the server's line under the options ("지원하면 취소할 수 없어요") replaces the hint. */
-const confirm = (card: Choice, foot: string): Card => ({ type: 'approval', id: card.id, kind: 'TOOL_ACTION', title: card.title!, options: card.options, foot })
+/** A tool asking permission: the server's line under the options, when it has one, replaces the hint. */
+const confirm = (card: Choice, foot?: string): Card => ({ type: 'approval', id: card.id, kind: 'TOOL_ACTION', title: card.title!, options: card.options, ...(foot ? { foot } : {}) })
 /** The closing line above a result card. The app bolds the score change it reads from fitFrom and fitTo. */
 const closing = (text: string, bullets?: string[]) => {
   const change = /\*\*(\d+\.\d) → (\d+\.\d)\*\*/.exec(text)
@@ -211,7 +211,7 @@ const say = (text: string): Step[] => [s(600, agent(text)), done]
 const ph0: Step[] = [
   s(300, status('생각하는 중…')),
   s(600, agent('좋아요! 시작하기 전에 하나만 여쭤볼게요.')),
-  ask(numbered('ph0', '어떤 방식으로 진행할까요?', ['이력서부터 쓸게요', '경험부터 정리할게요', '그만하기'])),
+  ask(numbered('ph0', '어떤 방식으로 진행할까요?', ['이력서부터 쓰기', '경험부터 정리하기', '그만하기'])),
 ]
 const ph0Input: Step[] = [
   s(500, agent('Push에 있는 자료부터 찾아볼게요.')),
@@ -225,14 +225,15 @@ const ph0Input: Step[] = [
     sections: [
       { kind: 'chips', id: 's0', title: '만들 것', multiple: true, options: [{ id: 's0.0', label: '이력서' }, { id: 's0.1', label: '포트폴리오' }, { id: 's0.2', label: '자기소개서' }], selected: ['s0.0'] },
       {
-        kind: 'rows',
-        id: 's1',
-        title: '가져올 자료',
+        kind: 'toggle',
+        id: 'materials',
+        title: '가져올 자료를 골라 주세요',
         options: [
-          { id: 's1.0', label: '허브 프로필', sub: '기본 서류' },
-          { id: 's1.1', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 · 홈 › 북마크 공고', action: 'change' },
-          { id: 'm_github', label: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요', action: 'change' },
+          { id: 'm_file', label: '허브 프로필', sub: '기본 서류' },
+          { id: 'm_posting', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 공고' },
+          { id: 'm_github', label: 'github.com/seojun-kim', sub: '링크' },
         ],
+        selected: ['m_file', 'm_posting'],
       },
       { kind: 'chips', id: 's2', title: '말투', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
     ],
@@ -241,7 +242,7 @@ const ph0Input: Step[] = [
 ]
 const ph0Start: Step[] = [
   s(400, tool('input', '입력 정리', undefined, 'ok', `이력서 **${RESUME}**\n공고 **${MOA}**\nGitHub **github.com/seojun-kim** · 말투 **그대로**`)),
-  ask(numbered('ph0-start', '이대로 분석을 시작할까요?', ['네, 시작해 주세요', '자료를 바꿀래요', '그만할게요'])),
+  ask(numbered('ph0-start', '이대로 분석을 시작할까요?', ['시작하기', '자료 바꾸기', '그만할게요'])),
 ]
 // The analysis card by plan: FREE locks the part rows, PRO teases ULTRA, ULTRA unfolds the projection.
 const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
@@ -257,7 +258,7 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
       { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
     ],
   }),
-  { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['네, 맞춰서 고쳐 주세요', '피드백만 받을게요', '점수만 보고 끝낼게요'])), wait: gateWait },
+  { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['고치기', '피드백만 받기', '점수만 보기'])), wait: gateWait },
 ]
 const ph1Plan = (plan: 'FREE' | 'ULTRA', gateWait?: number): Step[] => [
   s(200, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
@@ -301,12 +302,12 @@ const feedbackOnly: Step[] = [
     ],
     keywords: [],
   }),
-  ask(numbered('feedback', '피드백을 반영해서 수정할까요?', ['반영해서 수정할게요', '그만하기'])),
+  ask(numbered('feedback', '피드백을 반영해서 수정할까요?', ['수정하기', '그대로 둘게요', '그만하기'])),
 ]
 export const startDocument: Step[] = [
   s(400, agent('작성 중인 이력서 초안(v1)이 있어요.')),
   s(100, agent(`\n${DRAFT_V1_MD}`)),
-  ask(numbered('start-document', '이어서 작성할까요?', ['이어서 작성하기', '그만하기'])),
+  ask(numbered('start-document', '이어서 작성할까요?', ['이어서 작성하기', '새로 시작하기'])),
 ]
 const ph2: Step[] = [
   s(200, status('궁리하는 중…')),
@@ -326,7 +327,7 @@ const ph2: Step[] = [
     ],
     keywords: ['결제 승인', '정산 배치', 'Kafka', '장애 대응'],
   }),
-  ask(numbered('ph2', '이 전략대로 초안을 쓸까요?', ['초안 쓸게요', '피드백만 볼게요', '그만하기'])),
+  ask(numbered('ph2', '이 전략대로 초안을 쓸까요?', ['초안 쓰기', '피드백만 보기', '그만하기'])),
 ]
 const PH3 = ['요약', '경력', '프로젝트', '기술 스택', '학력']
 const ph3Open: Step[] = [
@@ -353,12 +354,8 @@ const ph3Rest = (wait: number): Step[] => [
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
   s(300, agent(DRAFT_REVIEW_MD)),
-  ask(numbered('ph3-review', '첫 번째 초안(v1)이에요. 이대로 검토할까요?', ['검토할게요', '그만하기'])),
+  s(300, status('초안을 검토하는 중')),
 ]
-// ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between.
-const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL)]
-// ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
-const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD)]
 const ph3Boost: Step[] = [
   s(200, status('점수 올리는 중…')),
   s(200, tool('boost1', '점수 올리기 1회', '키워드', 'run', '키워드를 넣는 중')),
@@ -376,6 +373,10 @@ const ph3Boost: Step[] = [
   }),
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
+// ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between, and the review goes on by itself (a gate with one option is not asked).
+const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), s(DWELL, status('초안을 검토하는 중')), ...ph3Boost]
+// ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
+const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD), ...ph3Boost]
 // ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.
 const QUALITY_HOLD = 10_000
 // The card's title is the modal's (ChatPh4Design); the sentence under the bot's line is its own bubble, which a tool frame keeps from merging into the one above.
@@ -459,7 +460,7 @@ const ph2xBlueprints: Step[] = [
     ],
     keywords: [],
   }),
-  ask(numbered('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['기획만 볼게요', '그만하기'])),
+  ask({ ...numbered('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['결제 승인 재시도 큐', '정산 배치 병렬화', '결제 이벤트 아웃박스', '가맹점 API 레이트 리미터', '그만하기']), submit: { label: '구현하기' } }),
 ]
 
 const applyRun: Step[] = [
@@ -467,7 +468,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', `${MOA}(Kotlin·Spring)에 지원할까요?`, ['지원하기', '취소']), '지원하면 취소할 수 없어요')),
+  ask(confirm(numbered('apply', `${MOA}(Kotlin·Spring)에 지원할까요?`, ['지원하기', '닫기']))),
 ]
 
 export const generic = (text: string): Step[] => [
@@ -504,7 +505,6 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
   feedback: (c) => (c === 0 ? ph2 : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'start-document': (c) => (c === 0 ? say('멈춘 곳부터 이어서 할게요.') : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   ph2: (c) => (c === 0 ? ph3 : c === 1 ? say('피드백만 정리해 드릴게요. 초안은 쓰지 않았어요.') : say('알겠어요. 필요할 때 다시 불러 주세요.')),
-  'ph3-review': (c) => (c === 0 ? ph3Boost : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph3-boost': (c) =>
     c === 0
       ? [s(400, agent('최대 5번까지 올렸어요.')), done]
@@ -512,11 +512,11 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
         ? ph4Quality
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
   'ph4-design': (c) => (c === -1 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1', '으로')]),
-  'ph2x-verify': (c) => (c === 0 ? ph2xLevel : say('알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph2x-verify': (c) => (c === 0 ? ph2xBlueprints : c === 1 ? ph2xApproach : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-level': (c) => (c === 3 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
   'ph2x-prevent': (c) => (c === 6 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
-  'ph2x-bp': (c) => (c === 0 ? say('기획서 4개를 만들었어요.') : say('알겠어요. 필요할 때 다시 불러 주세요.')),
+  'ph2x-bp': (c) => (c === 4 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : say('좋아요. 고른 프로젝트로 이어갈게요.')),
   apply: (c) =>
     c === 0
       ? [s(300, tool('apply', '지원하기', MOA, 'ok', '지원했어요')), ...say('지원했어요. 내 활동에서 진행 상황을 볼 수 있어요.')]
@@ -529,7 +529,7 @@ export const verifyFail: Step[] = [
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
   // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
   s(200, { type: 'notice', text: '방향 검증에서 문제가 생겼어요.' } as unknown as Frame),
-  ask({ ...numbered('ph2x-verify', '검증을 통과하지 못했어요. 다른 방향으로 다시 고를까요?', ['다시 고르기', '그만하기']), gate: HINTLESS_GATES[0] }),
+  ask({ ...numbered('ph2x-verify', '어떻게 할까요?', ['다시 시도', '방향 바꾸기', '그만하기']), gate: HINTLESS_GATES[0] }),
 ]
 const autoPick: Step[] = [
   s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개')),

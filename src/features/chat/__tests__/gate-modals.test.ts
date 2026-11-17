@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ChoiceModalRequest } from '@/shared/navigation'
-import { gateTable, openGate, type GateHooks } from '../utils/gate-modals'
-import type { Approval, DiffLine, PlanItem } from '../types'
+import { openGate, type GateHooks } from '../utils/gate-modals'
+import type { Approval, DiffLine } from '../types'
 import type { ReviewPageRequest } from '../review-page'
 
 const base = (patch: Partial<Approval>): Approval => ({ id: 'a1', question: '어떤 방식으로 진행할까요?', sections: [], optionIds: [], ...patch })
@@ -38,11 +38,6 @@ describe('openGate: a single pick (ChatPh0)', () => {
     const { shown } = run(base({ confirm: true, sections: [{ kind: 'choices', selected: [], items: [{ label: '한 번 허용' }, { label: '거절' }] }] }))
     expect(shown[0]!.items!.map((i) => i.label)).toEqual(['한 번 허용', '거절'])
   })
-
-  it('shows the plan the question is about as a table (ChatPh1Feedback)', () => {
-    const table = { head: ['항목', '지금', '고칠 점'], rows: [['키워드', 'Kafka 없음', '경험 문장에 넣기']] }
-    expect(run(ph0, { table }).shown[0]!.table).toBe(table)
-  })
 })
 
 describe('openGate: several picks (ChatPh2XPrevent)', () => {
@@ -68,10 +63,10 @@ describe('openGate: sections (ChatPh0Input)', () => {
     question: '어떤 산출물을 만들까요?',
     submit: '시작하기',
     secondary: '닫기',
-    optionIds: ['submit', 's0.0', 's0.1', 's2.0', 's2.1', 'cancel'],
+    optionIds: ['submit', 's0.0', 's0.1', 'm_a', 'm_b', 's2.0', 's2.1', 'cancel'],
     sections: [
       { kind: 'chips', id: 's0', title: '만들 것', options: ['이력서', '포트폴리오'], ids: ['s0.0', 's0.1'], selected: [0], multi: true },
-      { kind: 'rows', id: 's1', title: '가져올 자료', items: [{ id: 'a', tag: '', title: '허브 프로필', sub: '기본 서류' }, { id: 'b', tag: '', title: '백엔드 엔지니어', sub: '모아페이', action: 'change' }] },
+      { kind: 'toggle', id: 'materials', items: [{ label: '허브 프로필', desc: '기본 서류' }, { label: '백엔드 엔지니어', desc: '모아페이' }], ids: ['m_a', 'm_b'], selected: [0, 1] },
       { kind: 'chips', id: 's2', title: '말투', options: ['전문적으로', '원래 말투로'], ids: ['s2.0', 's2.1'], selected: [1] },
     ],
   })
@@ -82,15 +77,18 @@ describe('openGate: sections (ChatPh0Input)', () => {
     expect(shown[0]!.form!.confirmLabel([0], false)).toBe('다음')
     shown[0]!.form!.onConfirm([0], false)
     expect(shown).toHaveLength(2)
-    expect(shown[1]!.confirm!.label).toBe('다음')
-    expect(shown[1]!.items!.map((i) => i.label)).toEqual(['백엔드 엔지니어'])
-    shown[1]!.confirm!.onPress()
+    expect(shown[1]!.form!.multi).toBe(true)
+    expect(shown[1]!.form!.selected).toEqual([0, 1])
+    expect(shown[1]!.form!.confirmLabel([0, 1], false)).toBe('2개로 시작하기')
+    shown[1]!.form!.onConfirm([0, 1], false)
     expect(shown).toHaveLength(3)
     expect(shown[2]!.form!.confirmLabel([1], false)).toBe('시작하기')
     expect(h.answer).not.toHaveBeenCalled()
     shown[2]!.form!.onConfirm([1], false)
-    expect(h.answer).toHaveBeenCalledWith('이력서만 · 자료 2개 · 원래 말투로', [0, 1, 4])
+    expect(h.answer).toHaveBeenCalledWith('이력서만 · 허브 프로필 · 백엔드 엔지니어 · 원래 말투로', [0, 1, 3, 4, 6])
   })
+
+  const withRows: Approval = { ...input, sections: [input.sections[0]!, { kind: 'rows' as const, id: 's1', title: '가져올 자료', items: [{ id: 'a', tag: '', title: '허브 프로필', sub: '기본 서류' }, { id: 'b', tag: '', title: '백엔드 엔지니어', sub: '모아페이', action: 'change' }] }, input.sections[2]!] }
 
   it('keeps the card detail on the first rows step and does not repeat the step title in the message', () => {
     const rowsFirst = base({
@@ -100,14 +98,14 @@ describe('openGate: sections (ChatPh0Input)', () => {
       sections: [{ kind: 'rows', id: 's1', title: '가져올 자료', items: [{ id: 'a', tag: '', title: '허브 프로필', sub: '기본 서류' }] }],
     })
     expect(run(rowsFirst).shown[0]!.message).toBe('아래 자료로 만들어요.\n허브 프로필 · 기본 서류')
-    const second = run(input)
+    const second = run(withRows)
     second.shown[0]!.form!.onConfirm([0], false)
     expect(second.shown[1]!.title).toBe('가져올 자료')
     expect(second.shown[1]!.message).toBe('허브 프로필 · 기본 서류')
   })
 
   it('opens the material change and shows the same question again when it is done', () => {
-    const { shown, h } = run(input)
+    const { shown, h } = run(withRows)
     shown[0]!.form!.onConfirm([0], false)
     shown[1]!.items![0]!.onPress()
     expect(h.change).toHaveBeenCalledOnce()
@@ -203,17 +201,5 @@ describe('openGate: the design card (ChatPh4Design)', () => {
     )
     expect(shown[0]!.form!.selected).toEqual([0])
     expect(shown[0]!.form!.toggle).toEqual({ label: '사진', on: true })
-  })
-})
-
-describe('gateTable', () => {
-  const plan: PlanItem = { type: 'plan', id: 's-feedback', title: '피드백', meta: '', keywords: [], rows: [{ tag: '키워드', label: 'Kafka 없음', note: '경험 문장에 넣기' }] }
-  it('reads the plan the bot showed since the user last spoke', () => {
-    expect(gateTable([{ type: 'user', id: 'u', text: 'a' }, plan])).toEqual({ head: ['항목', '지금', '고칠 점'], rows: [['키워드', 'Kafka 없음', '경험 문장에 넣기']] })
-    expect(gateTable([plan, { type: 'user', id: 'u', text: 'a' }])).toBeUndefined()
-  })
-
-  it('leaves the blueprints to the bubble list', () => {
-    expect(gateTable([{ ...plan, id: 'bp', rows: [{ tag: '통과', label: '큐', note: '' }] }])).toBeUndefined()
   })
 })

@@ -22,7 +22,10 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
 - extendedWaitUntil:
     visible: "적용"
     timeout: 15000
-- runFlow: _dismiss_approval.yaml
+- runFlow:
+    file: ../visual/_close_sheet.yaml
+    env:
+      TITLE: "적용"
 - extendedWaitUntil:
     visible: "김서준_백엔드_이력서 첨부 빼기"
     timeout: 15000
