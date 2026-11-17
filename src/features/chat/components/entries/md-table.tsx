@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import type { TableBlock } from '../../utils/bot-text'
-import { CELL, tableColumns } from '../../utils/table-columns'
+import { CELL, cellPadRight, tableColumns } from '../../utils/table-columns'
 import Rich from './rich'
 
 /** A markdown table inside a bot bubble (the boards' `.mdt`): auto-sized columns that fill `width`, the head in grey, a hairline under every row but the last, 2 above and below (`margin:2px 0`), no fill of its own (rule 38). */
@@ -12,7 +12,7 @@ const MdTable = ({ table, width }: { table: TableBlock; width: number }) => {
   const row = (cells: string[], head: boolean, key: string, last: boolean) => (
     <View key={key} style={{ flexDirection: 'row', paddingVertical: CELL.padY, borderBottomWidth: last ? 0 : 1, borderBottomColor: c.line }}>
       {columns.map((w, col) => (
-        <View key={col} style={{ width: w, paddingRight: CELL.padRight }}>
+        <View key={col} style={{ width: w, paddingRight: cellPadRight(col, columns.length) }}>
           {head ? (
             <Text v="c1" weight="600" color="t3" style={{ lineHeight: CELL.line }}>
               {cells[col]}

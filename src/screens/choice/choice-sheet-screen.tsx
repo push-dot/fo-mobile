@@ -16,7 +16,7 @@ const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => {
   )
 }
 
-// .pm8: title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
+// .pm8: a marked row is `.pm-row.cr` (52 high, 14 gap); title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
@@ -48,7 +48,7 @@ const ChoiceSheetScreen = () => {
       : request.confirm
   const closeLabel = request.confirm?.closeLabel
   const toggleOption = (i: number) => setSelected((cur) => (form?.multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i]))
-  const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
+  const row = (last: boolean, mark = false) => ({ minHeight: mark ? 52 : 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: mark ? 14 : spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
     <Sheet gap={4} actionGap={10} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
       secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => run(request.confirm!.secondary!.onPress) } : undefined}
@@ -104,7 +104,7 @@ const ChoiceSheetScreen = () => {
               accessibilityRole={form.multi ? 'checkbox' : 'radio'}
               accessibilityState={form.multi ? { checked: selected.includes(i) } : { selected: selected.includes(i) }}
               onPress={() => toggleOption(i)}
-              style={row(i === form.options.length - 1 && !form.toggle)}
+              style={row(i === form.options.length - 1 && !form.toggle, true)}
             >
               <Mark checked={selected.includes(i)} multi={!!form.multi} />
               <View style={{ flex: 1 }}>
