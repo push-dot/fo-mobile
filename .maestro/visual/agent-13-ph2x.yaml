@@ -50,6 +50,12 @@ tags:
 - takeScreenshot: ChatVerifyFail
 # ChatPh2XBlueprints draws the blueprints right under the user's line, so it shoots a fresh conversation without the failed check before them (mock token).
 - runFlow: _fresh_company.yaml
+# The board starts at the user's line: the greeting is an older turn (opened on the empty thread, before the message is sent).
+- runFlow:
+    file: _from.yaml
+    env:
+      BOT: "b-moa"
+      FROM: "user:last"
 - runFlow:
     file: _say.yaml
     env:
