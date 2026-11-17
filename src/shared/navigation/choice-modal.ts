@@ -5,10 +5,9 @@ import { create } from 'zustand'
 export type ChoiceModalRequest = {
   title: string
   message?: string
-  table?: { head: string[]; rows: string[][] }
-  /** A choice: one plain row per option; the modal closes first, then the option runs. */
   /** Gate choices are drawn as stacked buttons (the first is the main one), not as rows. */
   buttons?: boolean
+  /** A choice: one plain row per option; the modal closes first, then the option runs. */
   items?: {
     label: string
     sub?: string
@@ -27,7 +26,7 @@ export type ChoiceModalRequest = {
   }
   input?: { placeholder: string; confirm: string; keyboardType?: 'default' | 'url'; onSubmit: (text: string) => void }
   /** A confirmation: one primary button. A regular modal has no 취소 (owner rule 35); swiping it away is the way out. */
-  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void; /** Runs with the sheet still open (a page pushed over it, as the plan page is). */ stay?: boolean }; closeLabel?: string }
+  confirm?: { label: string; onPress: () => void; secondary?: { label: string; onPress: () => void }; closeLabel?: string }
   /** The sheet was swiped away without a pick. */
   onDismiss?: () => void
 }

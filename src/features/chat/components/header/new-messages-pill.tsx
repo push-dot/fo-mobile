@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import { GlassPressable, Icon, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../../theme'
 
-/** Bot lines landed below the fold. Floats at the bottom of the thread as interactive glass (ChatBotHeaderNew). */
+/** Bot lines landed below the fold. Floats at the bottom of the thread as glass. */
 export const NewMessagesPill = ({ count, onPress }: { count: number; onPress: () => void }) => {
   const c = useColors()
   return (

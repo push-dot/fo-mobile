@@ -331,7 +331,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
       openRef.current(result.bot.id)
     } catch (error) {
       if (isConsentRequired(error)) {
-        // BotNewConsent: ask again, then create with the same form.
         setForm(base)
         askConsentThen(() => void run(base))
         return

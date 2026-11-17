@@ -148,13 +148,15 @@ const endsOnChip = (approval: Approval) => {
 /** ...unless the card has a confirm button of its own (ChatPh0Input 시작하기): then the chips only pick. */
 export const chipSends = (approval: Approval) => endsOnChip(approval) && !approval.submit
 
+export const MATERIALS_SECTION = 'materials'
+
 /** The user bubble after a section card: ChatPh0Input "이력서만 · 자료 3개 · 원래 말투로", else the button label. */
 export const sectionLabel = (approval: Approval, sel: number[][]): string => {
   if (endsOnChip(approval))
     return approval.sections
       .flatMap((s, si) => {
         if (s.kind === 'rows') return s.items.length ? [`자료 ${s.items.length}개`] : []
-        if (s.kind === 'toggle' && s.id === 'materials') return (sel[si] ?? []).length ? [(sel[si] ?? []).map((i) => displayName(s.items[i]!.label)).join(' · ')] : []
+        if (s.kind === 'toggle' && s.id === MATERIALS_SECTION) return (sel[si] ?? []).length ? [(sel[si] ?? []).map((i) => displayName(s.items[i]!.label)).join(' · ')] : []
         if (s.kind !== 'chips') return []
         const labels = (sel[si] ?? []).map((i) => s.options[i]!)
         return labels.length ? [s.multi && labels.length === 1 ? `${labels[0]}만` : labels.join(', ')] : []

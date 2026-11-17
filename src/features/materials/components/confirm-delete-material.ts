@@ -9,7 +9,7 @@ import { deleteCopy } from '../utils/material-view'
 /** DELETE answers 409 for a file a career row still cites. */
 const cited = (error: unknown) => error instanceof ApiError && error.status === 409
 
-/** MaterialDetailDelete: a native alert over the list. A long press on a row asks it; the detail sheet has no delete. */
+/** A long press on a row asks it in a native alert; the detail sheet has no delete. */
 export const useConfirmDeleteMaterial = (toastBottom: number) => {
   const remove = useDeleteMaterial()
   const restore = useRestoreMaterial()

@@ -1,14 +1,13 @@
 import { router } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { View } from 'react-native'
-import { PageModal, REVIEW_TITLE, reviewRows, useReviewPage, type ReviewRow } from '@/features/chat'
+import { PageModal, REVIEW_TITLE, UNDO_LABEL, reviewRows, useReviewPage, type ReviewRow } from '@/features/chat'
 import { Button, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS } from '@/shared/navigation'
 import { iosMaterial, iosSystemFill, radius, spacing, type, useColors, useThemeMode } from '@/theme'
 
 const BUTTON = { flex: 1, minHeight: 52, borderRadius: 26 } as const
 const BODY = { fontSize: 14, lineHeight: 21 } as const
-const UNDO = '되돌리기'
 const APPLY = '적용'
 
 const Parts = ({ row, strike }: { row: ReviewRow; strike?: boolean }) => {
@@ -24,7 +23,6 @@ const Parts = ({ row, strike }: { row: ReviewRow; strike?: boolean }) => {
   )
 }
 
-/** A changed line: the old one on light red, struck through with "−"; the new one on light violet with a bar at the left and "+". */
 const Changed = ({ row, pull }: { row: ReviewRow; pull: boolean }) => {
   const c = useColors()
   const added = row.sign === '+'
@@ -102,7 +100,6 @@ const Plain = ({ row }: { row: ReviewRow }) => {
   }
 }
 
-/** ChatApprove: the changed Push 프로필 as a page-style modal. Old lines struck on red, new lines on violet; 되돌리기 and 적용 at the bottom, fading document above them. */
 const ReviewScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
@@ -142,7 +139,7 @@ const ReviewScreen = () => {
       footer={
         request.apply ? (
           <View style={{ flexDirection: 'row', gap: spacing[2] }}>
-            <Button label={UNDO} variant="secondary" onPress={() => run(request.undo)} style={[BUTTON, { backgroundColor: iosSystemFill[dark ? 'dark' : 'light'] }]} />
+            <Button label={UNDO_LABEL} variant="secondary" onPress={() => run(request.undo)} style={[BUTTON, { backgroundColor: iosSystemFill[dark ? 'dark' : 'light'] }]} />
             <Button label={APPLY} onPress={() => run(request.apply)} style={BUTTON} />
           </View>
         ) : undefined

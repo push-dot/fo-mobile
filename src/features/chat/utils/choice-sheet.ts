@@ -1,7 +1,7 @@
 import type { Approval, Choice } from '../types'
 import { sectionLabel, sectionPicks } from './stream-v3'
 
-/** push-be names the posting an apply card is about: "{company} · {title}에 지원해요" (the board: the company in the question, the role under it). */
+/** push-be names the posting in the apply card question: "{company} · {title}에 지원해요". */
 const APPLY_QUESTION = /^(.+?) · (.+?)에 지원(?:해요|할까요)\??$/
 
 export const isSay = (c: Choice) => c.label === '직접 말하기' || c.hint === '직접 말하기'
@@ -21,7 +21,6 @@ export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   return { title: approval.question, ...(message ? { message } : {}), items }
 }
 
-/** An edit card (one 적용 button): the page of the changed document (ChatApprove). With no lines to draw it is a plain confirm; swiping it away hands the floor to the composer. */
 export const confirmModal = (approval: Approval) => (approval.submit && !approval.sections.length ? { title: approval.question, confirm: approval.answer ?? approval.submit } : null)
 
 /**

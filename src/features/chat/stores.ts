@@ -118,7 +118,6 @@ export const askConsent = (force = false) => {
   useConsentPrompt.setState({ open: true })
 }
 
-/** Asks for consent, then runs `retry` once it is granted (BotNew: creating a Bot needs 내 자료 읽기). */
 export const askConsentThen = (retry: () => void) => {
   pendingRetry = retry
   askConsent(true)
@@ -365,7 +364,7 @@ const fileOf = (attachment?: string | PickedFile) => (typeof attachment === 'str
 
 const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' ? attachment : attachment?.name)
 
-/** The composer chip's material, read while the draft still holds it (the composer clears the draft right after onSend). */
+/** Read while the draft still holds the chip, because the composer clears it right after onSend. */
 const chipMaterial = (id: string, attachment?: string | PickedFile): BotContract.AttachmentRef | undefined => {
   const d = useDraftStore.getState().byBot[id]
   return typeof attachment === 'string' && d?.chip === attachment && d.chipId && d.chipKind ? { kind: d.chipKind, id: d.chipId } : undefined
