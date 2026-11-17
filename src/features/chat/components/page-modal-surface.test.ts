@@ -17,4 +17,18 @@ describe('sheet pages follow their boards', () => {
     expect(page).toContain('KIND_GAP = 6')
     expect(page).toContain('padding: spacing[3], height: 36')
   })
+
+  it('spaces the quick-start cards and lists as QsPost, QsPostAll and QsGap draw them', () => {
+    const sheet = read('features/chat/components/quick-start-sheet.tsx')
+    expect(sheet).toContain('gap={all ? spacing[2] : spacing[3]}')
+    expect(sheet).toContain('flat={all}')
+    expect(sheet).toContain('moreGap={spacing[3]}')
+    expect(sheet).toContain("moreGap={qs.layout === 'reply' ? 0 : spacing[3]}")
+    expect(sheet).toContain('paddingHorizontal: spacing[5]')
+    expect(sheet).toContain('<Button label={action.label} disabled={action.disabled} onPress={action.onPress} />')
+    expect(sheet).toContain('qs.listLabel && (docField ||')
+    const list = read('shared/components/recent-list.tsx')
+    expect(list).toContain('gap = 0, moreGap = 0')
+    expect(list).toContain('style={{ gap: moreGap }}')
+  })
 })

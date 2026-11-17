@@ -11,15 +11,19 @@ type Props<T> = {
   renderItem: (item: T) => ReactNode
   onSeeAll?: () => void
   limit?: number
+  gap?: number
+  moreGap?: number
 }
 
-const RecentList = <T,>({ items, keyOf, renderItem, onSeeAll, limit }: Props<T>) => {
+const RecentList = <T,>({ items, keyOf, renderItem, onSeeAll, limit, gap = 0, moreGap = 0 }: Props<T>) => {
   const shown = onSeeAll ? recent(items, limit) : items
   return (
-    <View>
-      {shown.map((item) => (
-        <View key={keyOf(item)}>{renderItem(item)}</View>
-      ))}
+    <View style={{ gap: moreGap }}>
+      <View style={{ gap }}>
+        {shown.map((item) => (
+          <View key={keyOf(item)}>{renderItem(item)}</View>
+        ))}
+      </View>
       {onSeeAll && items.length > shown.length ? (
         <Pressable accessibilityRole="button" onPress={onSeeAll} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], minHeight: 48 }}>
           <Text v="b2" color="t3" style={{ flex: 1 }}>
