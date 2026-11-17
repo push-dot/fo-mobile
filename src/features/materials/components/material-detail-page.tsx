@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { Platform, View } from 'react-native'
-import { Button, PM8, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
+import { Button, PM8, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing, useThemeMode } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
@@ -12,7 +12,7 @@ import MaterialFacts from './material-facts'
 import { useInMaterialsModal } from './in-materials-modal'
 import { sendMaterial } from './send-material'
 
-const SLIM = { flex: 1, minHeight: 52, borderRadius: 26 } as const
+const SLIM = { flex: 1, ...PM8_SLIM_ACTION } as const
 
 const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>

@@ -6,3 +6,10 @@ export const PM8 = { gap: spacing[1], topGap: 0, actionGap: 10, buttonsTop: 10, 
 
 /** The secondary button fill of an iOS light sheet; other modes keep the plain fill. */
 export const pm8SecondaryFill = (ios: boolean, dark: boolean) => (ios && !dark ? iosSheetButtonFill : undefined)
+
+/** `.pm8 .pm-f .btn`: 52 high, fully rounded. */
+export const PM8_SLIM_ACTION = { minHeight: 52, borderRadius: 26 } as const
+
+/** `.pm8.mdet .pm-h .nt`: the large left title of the material sheets, 22/30 weight 700 inset 24 with padding 4/8. */
+export const PM8_MDET_TITLE = { fontSize: 22, lineHeight: 30, weight: '700' } as const
+export const PM8_MDET_HEAD = { minHeight: 52, paddingTop: 4, paddingBottom: 8 } as const

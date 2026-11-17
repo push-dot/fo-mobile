@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import { useBots, type Bot } from '@/features/bots'
-import { Icon, Mascot, PM8, Sheet, SheetScroll, Text, useSheetScrollMax } from '@/shared/components'
-import { radius, spacing, type } from '@/theme'
+import { Icon, Mascot, PM8, PM8_MDET_HEAD, PM8_MDET_TITLE, Sheet, SheetScroll, Text, useSheetScrollMax } from '@/shared/components'
+import { radius, spacing } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
 import { SEND_PICK_HINT } from '../constants'
 import type { MaterialKind } from '../types'
@@ -23,7 +23,7 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   </Pressable>
 )
 
-/** BotPick: a regular sheet over the 자료 modal (RULINGS 53), the title large and left like the .pm8 board. */
+/** RULINGS 53 */
 export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
   const material = useMaterialDetail(kind, id).data?.material
   const bots = useBots().data ?? []
@@ -31,8 +31,8 @@ export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) =>
   const bound = useSheetScrollMax(0.75)
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout}>
-      <View style={{ minHeight: 52, justifyContent: 'center', gap: spacing[1], paddingHorizontal: spacing[2] }}>
-        <Text v="h2" weight="400" accessibilityRole="header" style={{ fontSize: 22, lineHeight: type.h2.lineHeight }}>
+      <View style={{ ...PM8_MDET_HEAD, justifyContent: 'center', gap: spacing[1], paddingHorizontal: spacing[2] }}>
+        <Text v="h2" weight={PM8_MDET_TITLE.weight} accessibilityRole="header" style={{ fontSize: PM8_MDET_TITLE.fontSize, lineHeight: PM8_MDET_TITLE.lineHeight }}>
           {SEND_PICK_HINT}
         </Text>
         {attachment ? (
