@@ -20,7 +20,7 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     timeout: 10000
 - tapOn: "모아페이"
 - extendedWaitUntil:
-    visible: "이 변경을 이력서에 반영할까요?"
+    visible: "되돌리기"
     timeout: 15000
 - runFlow: _dismiss_approval.yaml
 - extendedWaitUntil:

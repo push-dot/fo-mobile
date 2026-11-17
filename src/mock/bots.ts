@@ -174,7 +174,7 @@ const home = (): BotFixture[] => [
       messages: [said('m-moa-1', 't-moa-2', '좋아요. 첫 번째부터 고쳐서 Push 프로필로 보여 주세요', 12, 'USER')],
       cards: [
         {
-          id: 'card-moa-edit', turn: 't-moa-2', for: 'confirm', title: '이 변경을 이력서에 반영할까요?', status: 'PENDING', at: 10, expiresAt: null,
+          id: 'card-moa-edit', turn: 't-moa-2', for: 'confirm', title: '고친 Push 프로필을 확인해 주세요', status: 'PENDING', at: 10, expiresAt: null,
           options: [{ id: 'approve', label: '반영하기' }, { id: 'reject', label: '그대로 두기' }],
         },
       ],

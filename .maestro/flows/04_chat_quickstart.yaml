@@ -17,21 +17,21 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
     env:
       TEXT: "맞추기 시작"
 - extendedWaitUntil:
-    visible: "이렇게 고쳤어요"
+    visible: "되돌리기"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-02
-# The edit modal slides up; its one 적용 button answers, the title is not a tap target.
+# The changed Push 프로필 opens as a page-style modal (ChatApprove): 되돌리기 and 적용 at the bottom; 적용 answers.
 - waitForAnimationToEnd
 - tapOn: "적용"
 # The run's end asks what to do next in a sheet (ChatDoneNext) that hides the chat from the accessibility tree: wait for it, close it, then read the last message.
 - extendedWaitUntil:
-    visible: "프로필을 다 고쳤어요"
+    visible: "다음으로 무엇을 할까요?"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-03-sheet
 - runFlow:
     file: ../visual/_close_sheet.yaml
     env:
-      TITLE: "프로필을 다 고쳤어요"
+      TITLE: "다음으로 무엇을 할까요?"
 - extendedWaitUntil:
     visible: "다 됐어요.*"
     timeout: 10000

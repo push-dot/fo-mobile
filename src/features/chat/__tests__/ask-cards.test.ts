@@ -47,13 +47,14 @@ describe('the edit card (ChatApprove)', () => {
     options: [{ id: 'apply', label: '적용' }, { id: 'keep', label: '그대로 두기' }],
   }
 
-  it('is the modal: the title, the server summary as its message and 적용 as its one button', () => {
+  it('is one 적용 button and draws no sentence about the change, even when the server sends a summary', () => {
     const card = approvalOf({ ...edit, title: '수정 적용', summary: '경력 섹션 3줄을 고쳤어요.' })
-    expect(confirmModal(card)).toEqual({ title: '수정 적용', message: '경력 섹션 3줄을 고쳤어요.', confirm: '적용' })
+    expect(confirmModal(card)).toEqual({ title: '수정 적용', confirm: '적용' })
+    expect(card.detail).toBeUndefined()
   })
 
-  it('has no message without a summary', () => {
-    expect(confirmModal(approvalOf(edit))).toEqual({ title: '이 수정을 적용할까요?', confirm: '적용' })
+  it('keeps the second option as 되돌리기', () => {
+    expect(approvalOf(edit).secondary).toBe('그대로 두기')
   })
 })
 

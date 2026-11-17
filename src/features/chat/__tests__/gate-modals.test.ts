@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ChoiceModalRequest } from '@/shared/navigation'
-import { diffTable, gateTable, openGate, type GateHooks } from '../utils/gate-modals'
-import type { Approval, ChatItem, PlanItem } from '../types'
+import { gateTable, openGate, type GateHooks } from '../utils/gate-modals'
+import type { Approval, DiffLine, PlanItem } from '../types'
+import type { ReviewPageRequest } from '../review-page'
 
 const base = (patch: Partial<Approval>): Approval => ({ id: 'a1', question: '어떤 방식으로 진행할까요?', sections: [], optionIds: [], ...patch })
 
@@ -155,17 +156,33 @@ describe('openGate: a last single pick with no button of its own', () => {
 
 describe('openGate: a proposed edit (ChatApprove)', () => {
   const edit = base({ question: '수정 적용', detail: '경력 섹션 3줄을 고쳤어요.', submit: '적용', secondary: '그대로 두기', optionIds: ['apply', 'keep'] })
+  const lines: DiffLine[] = [{ sign: '-', text: '결제 API 개발' }, { sign: '+', text: '결제 승인 API 재설계' }]
 
-  it('is a review with 적용 and 되돌리기, the changes as a table', () => {
-    const review = { head: ['이전', '이후'], rows: [['결제 API 개발', '결제 승인 API 재설계']] }
-    const { shown, h } = run(edit, { review })
-    const modal = shown[0]!
-    expect(modal.table).toBe(review)
-    expect(modal.confirm!.label).toBe('적용')
-    expect(modal.confirm!.secondary!.label).toBe('되돌리기')
-    modal.confirm!.onPress()
+  it('opens the page of the changed document, not a sentence or a confirm modal', () => {
+    const opened: ReviewPageRequest[] = []
+    const { shown, h } = run(edit, { review: { lines, open: (r) => opened.push(r) } })
+    expect(shown).toEqual([])
+    expect(opened).toHaveLength(1)
+    expect(opened[0]!.lines).toBe(lines)
+    opened[0]!.apply!()
     expect(h.answer).toHaveBeenLastCalledWith('적용', 0)
-    modal.confirm!.secondary!.onPress()
+    opened[0]!.undo!()
+    expect(h.answer).toHaveBeenLastCalledWith('되돌리기', 1)
+    opened[0]!.onDismiss!()
+    expect(h.say).toHaveBeenCalledOnce()
+  })
+
+  it('has no 되돌리기 when the server sent no second option', () => {
+    const opened: ReviewPageRequest[] = []
+    run({ ...edit, secondary: undefined }, { review: { lines, open: (r) => opened.push(r) } })
+    expect(opened[0]!.undo).toBeUndefined()
+  })
+
+  it('falls back to a plain confirm that names no message when no lines came', () => {
+    const { shown, h } = run(edit, { review: { lines: [], open: vi.fn() } })
+    expect(shown[0]!.message).toBeUndefined()
+    expect(shown[0]!.confirm!.label).toBe('적용')
+    shown[0]!.confirm!.secondary!.onPress()
     expect(h.answer).toHaveBeenLastCalledWith('되돌리기', 1)
   })
 })
@@ -189,7 +206,7 @@ describe('openGate: the design card (ChatPh4Design)', () => {
   })
 })
 
-describe('gateTable and diffTable', () => {
+describe('gateTable', () => {
   const plan: PlanItem = { type: 'plan', id: 's-feedback', title: '피드백', meta: '', keywords: [], rows: [{ tag: '키워드', label: 'Kafka 없음', note: '경험 문장에 넣기' }] }
   it('reads the plan the bot showed since the user last spoke', () => {
     expect(gateTable([{ type: 'user', id: 'u', text: 'a' }, plan])).toEqual({ head: ['항목', '지금', '고칠 점'], rows: [['키워드', 'Kafka 없음', '경험 문장에 넣기']] })
@@ -198,20 +215,5 @@ describe('gateTable and diffTable', () => {
 
   it('leaves the blueprints to the bubble list', () => {
     expect(gateTable([{ ...plan, id: 'bp', rows: [{ tag: '통과', label: '큐', note: '' }] }])).toBeUndefined()
-  })
-
-  it('pairs each removed line with the line added in its place', () => {
-    const diff: ChatItem = {
-      type: 'diff',
-      id: 'd',
-      lines: [
-        { sign: '', text: '모아페이' },
-        { sign: '-', text: '결제 API 개발' },
-        { sign: '+', text: '결제 승인 API 재설계' },
-        { sign: '+', text: 'Kafka 파이프라인' },
-        { sign: '', text: '장애 대응' },
-      ],
-    }
-    expect(diffTable([diff])).toEqual({ head: ['이전', '이후'], rows: [['결제 API 개발', '결제 승인 API 재설계'], ['', 'Kafka 파이프라인']] })
   })
 })
