@@ -44,7 +44,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어 (Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -54,7 +54,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"apply","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"confirm":true,"id":"apply","openedAt":250,"question":"모아페이 · 백엔드 엔지니어 (Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -390,7 +390,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이 공고에 지원해 줘","type":"user"}
 {"action":"내 서류에 저장","state":"ok","type":"tool"}
 {"action":"지원하기","result":"확인을 기다리는 중","state":"wait","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
-card {"confirm":true,"id":"apply","openedAt":10250,"question":"모아페이 · 백엔드 엔지니어(Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
+card {"confirm":true,"id":"apply","openedAt":10250,"question":"모아페이 · 백엔드 엔지니어 (Kotlin·Spring)에 지원할까요?","sections":[{"items":[{"label":"지원하기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -741,7 +741,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1204,7 +1204,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1725,7 +1725,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료 바꾸기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1805,7 +1805,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료 바꾸기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1865,7 +1865,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이력서부터 쓰기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -1880,7 +1880,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -1903,7 +1903,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -1926,7 +1926,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -1946,7 +1946,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -1970,7 +1970,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -1994,7 +1994,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2018,7 +2018,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2041,7 +2041,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2064,7 +2064,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2084,7 +2084,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2111,7 +2111,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2138,7 +2138,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2162,7 +2162,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2185,7 +2185,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2208,7 +2208,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2228,7 +2228,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2250,7 +2250,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2272,7 +2272,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -2291,7 +2291,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"닫기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2310,7 +2310,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -2329,7 +2329,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2345,7 +2345,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2361,7 +2361,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -2931,7 +2931,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3370,7 +3370,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3842,7 +3842,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료 바꾸기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3894,7 +3894,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"1번, 지금 이력서로 할게요","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -3905,7 +3905,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4409,7 +4409,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4544,7 +4544,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -4813,7 +4813,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5041,7 +5041,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"ph0-input","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5212,7 +5212,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5531,7 +5531,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -5841,7 +5841,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -5862,7 +5862,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -5883,7 +5883,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -5901,7 +5901,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -5923,7 +5923,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -5945,7 +5945,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -5967,7 +5967,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -5988,7 +5988,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6009,7 +6009,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6027,7 +6027,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6052,7 +6052,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6077,7 +6077,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6099,7 +6099,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6120,7 +6120,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6141,7 +6141,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6159,7 +6159,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6179,7 +6179,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6199,7 +6199,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -6216,7 +6216,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"닫기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -6233,7 +6233,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -6250,7 +6250,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -6264,7 +6264,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -6278,7 +6278,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"병목을 만들게요","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -6841,7 +6841,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"verify-fail","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -6989,7 +6989,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7252,7 +7252,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7503,7 +7503,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -7906,7 +7906,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"이제 디자인을 고를게요.템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.","type":"agentText"}
 {"action":"디자인 고르기","state":"ok","type":"tool"}
 {"text":"검증을 마쳤어요. 디자인을 골라 주세요.","type":"agentText"}
-card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]},{"items":[{"label":"프로필 사진 넣기"}],"kind":"toggle","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
+card {"id":"ph4-design","question":"디자인","secondary":"닫기","sections":[{"items":[{"label":"클래식","layout":"classic","recommended":true},{"label":"모던","layout":"modern"},{"label":"컴팩트","layout":"compact"},{"label":"ATS","layout":"ats"}],"kind":"templates","selected":[0]}],"submit":"클래식으로 만들기","submitLabels":{"t0":"클래식으로 만들기","t1":"모던으로 만들기","t2":"컴팩트로 만들기","t3":"ATS로 만들기"}}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8337,7 +8337,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료 바꾸기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8397,7 +8397,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 {"text":"자료 바꾸기","type":"user"}
 {"text":"Push에 있는 자료부터 찾아볼게요.","type":"agentText"}
 {"action":"자료 찾기","result":"이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개","state":"ok","target":"마이 › 서류 · 북마크 공고","type":"tool"}
-card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1]},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"말투"}],"submit":"시작하기"}
+card {"id":"ph0-input","question":"어떤 산출물을 만들까요?","secondary":"닫기","sections":[{"kind":"chips","multi":true,"options":["이력서","포트폴리오","자기소개서"],"selected":[0],"title":"만들 것"},{"items":[{"desc":"기본 서류","label":"허브 프로필"},{"desc":"모아페이 공고","label":"백엔드 엔지니어 (Kotlin·Spring)"},{"desc":"링크","label":"github.com/seojun-kim"}],"kind":"toggle","selected":[0,1],"title":"가져올 자료를 골라 주세요"},{"kind":"chips","options":["전문적으로","자신 있게","짧게","기술 중심으로","협업 중심으로","원래 말투로"],"selected":[5],"title":"어떤 말투로 쓸까요?"}],"submit":"이 말투로 쓰기"}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
 `;
@@ -8451,7 +8451,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -8468,7 +8468,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -8485,7 +8485,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -8499,14 +8499,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"다시 시도","type":"user"}
 {"action":"방향 검증","result":"공고 연관성·임팩트·실현 가능성 모두 통과","state":"ok","target":"5개 기준","type":"tool"}
 {"text":"프로젝트 기획서 4개를 만들었어요.","type":"agentText"}
@@ -8520,14 +8520,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8540,14 +8540,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"닫기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -8560,14 +8560,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -8580,14 +8580,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"가벼운 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -8597,14 +8597,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -8614,14 +8614,14 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
 {"text":"병목을 만들게요","type":"user"}
 {"text":"강한 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "
@@ -8631,7 +8631,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8648,7 +8648,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8665,7 +8665,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8679,7 +8679,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8700,7 +8700,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8721,7 +8721,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8739,7 +8739,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8756,7 +8756,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8773,7 +8773,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8787,7 +8787,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8803,7 +8803,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8819,7 +8819,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"방향 바꾸기","type":"user"}
 {"action":"공고 분석","result":"필수 스택 5개 · 서비스 도메인: 결제·정산","state":"ok","target":"모아페이 · 백엔드 엔지니어","type":"tool"}
 {"text":"공고에 필요한 경험을 만들 방향을 골라 주세요.","type":"agentText"}
@@ -8832,7 +8832,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"닫기","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -8845,7 +8845,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 {"text":"이렇게 해 주세요","type":"user"}
 {"text":"알겠어요. 필요할 때 다시 불러 주세요.","type":"agentText"}
 {"seconds":1,"type":"worked"}
@@ -8858,7 +8858,7 @@ exports[`every scripted run (golden) > leaves the same chat on screen at every c
 "
 {"text":"중간 제약으로","type":"user"}
 {"action":"방향 검증","state":"err","target":"5개 기준","type":"tool"}
-{"notice":{"kind":"failed","text":"방향 검증에서 문제가 생겼어요."},"type":"notice"}
+{"notice":{"kind":"failed","text":"방향 검증을 통과하지 못했어요."},"type":"notice"}
 card {"id":"ph2x-verify","question":"어떻게 할까요?","sections":[{"items":[{"label":"다시 시도"},{"label":"방향 바꾸기"},{"label":"닫기"}],"kind":"choices","selected":[0]}]}
 {"awaiting":null,"interrupted":false,"queue":[],"working":null}
 "

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { choiceSheet, designModal } from '../utils/choice-sheet'
+import type { StreamEvent } from '@push/api-client'
 import type { Approval } from '../types'
+import { mapEvent } from '../utils/stream'
 
 const card = (patch: Partial<Approval>): Approval => ({
   id: 'a1',
@@ -66,5 +68,12 @@ describe('designModal', () => {
 
   it('is not a template card without templates or a confirm button', () => {
     expect(designModal(card({}))).toBeNull()
+  })
+
+  it('splits the apply card of push-be: its title names the posting, its summary is generic', () => {
+    const [event] = mapEvent({ type: 'approval', id: 'a', kind: 'TOOL_ACTION', toolName: 'apply_to_posting', title: '모아페이 · 백엔드 엔지니어에 지원해요', summary: '이 공고에 지원해요', options: [{ id: 'approve', label: '지원하기' }, { id: 'reject', label: '닫기' }] } as unknown as StreamEvent)
+    expect(event).toMatchObject({ type: 'approval' })
+    const sheet = choiceSheet((event as { approval: Approval }).approval)
+    expect(sheet).toMatchObject({ title: '모아페이에 지원할까요?', message: '백엔드 엔지니어', apply: true })
   })
 })

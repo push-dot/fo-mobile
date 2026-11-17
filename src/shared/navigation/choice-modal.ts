@@ -7,6 +7,8 @@ export type ChoiceModalRequest = {
   message?: string
   table?: { head: string[]; rows: string[][] }
   /** A choice: one plain row per option; the modal closes first, then the option runs. */
+  /** Gate choices are drawn as stacked buttons (the first is the main one), not as rows. */
+  buttons?: boolean
   items?: {
     label: string
     sub?: string

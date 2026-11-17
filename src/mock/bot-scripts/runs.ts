@@ -60,6 +60,8 @@ const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 �
 const listed = (text: string) => `${text}\n${BULLETS.map((line) => `• ${line}`).join('\n')}`
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
+// ChatPh3Review: the review line stays this long before the boost card, so the shot of the board catches it and the tour has left the chat before the next gate opens.
+const REVIEW_HOLD = 60_000
 const JD_RUN_HOLD = 20_000
 // ChatPh4Quality: the card opens after the tour has typed the line and lowered the keyboard (a card that opens over the raised keyboard comes up blank).
 const QUALITY_LATER = 15_000
@@ -235,9 +237,9 @@ const ph0Input: Step[] = [
         ],
         selected: ['m_file', 'm_posting'],
       },
-      { kind: 'chips', id: 's2', title: '말투', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
+      { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '전문적으로' }, { id: 's2.1', label: '자신 있게' }, { id: 's2.2', label: '짧게' }, { id: 's2.3', label: '기술 중심으로' }, { id: 's2.4', label: '협업 중심으로' }, { id: 's2.5', label: '원래 말투로' }], selected: ['s2.5'] },
     ],
-    submit: { label: '시작하기' },
+    submit: { label: '이 말투로 쓰기' },
   }),
 ]
 const ph0Start: Step[] = [
@@ -374,7 +376,7 @@ const ph3Boost: Step[] = [
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
 // ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between, and the review goes on by itself (a gate with one option is not asked).
-const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), s(DWELL, status('초안을 검토하는 중')), ...ph3Boost]
+const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), s(REVIEW_HOLD, status('초안을 검토하는 중')), ...ph3Boost]
 // ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
 const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD), ...ph3Boost]
 // ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.
@@ -388,7 +390,6 @@ const DESIGN_ASK = ask({
   recommended: 't0',
   sections: [
     { kind: 'thumbnails', id: 's0', options: [{ id: 't0', label: '클래식' }, { id: 't1', label: '모던' }, { id: 't2', label: '컴팩트' }, { id: 't3', label: 'ATS' }], selected: ['t0'] },
-    { kind: 'toggle', id: 's1', options: [{ id: 'photo', label: '프로필 사진 넣기' }], selected: ['photo'] },
   ],
   submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
 })
@@ -468,7 +469,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', `${MOA}(Kotlin·Spring)에 지원할까요?`, ['지원하기', '닫기']))),
+  ask(confirm(numbered('apply', `${MOA} (Kotlin·Spring)에 지원할까요?`, ['지원하기', '닫기']))),
 ]
 
 export const generic = (text: string): Step[] => [
@@ -528,7 +529,7 @@ export const verifyFail: Step[] = [
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
   // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
-  s(200, { type: 'notice', text: '방향 검증에서 문제가 생겼어요.' } as unknown as Frame),
+  s(200, { type: 'notice', text: '방향 검증을 통과하지 못했어요.' } as unknown as Frame),
   ask({ ...numbered('ph2x-verify', '어떻게 할까요?', ['다시 시도', '방향 바꾸기', '그만하기']), gate: HINTLESS_GATES[0] }),
 ]
 const autoPick: Step[] = [

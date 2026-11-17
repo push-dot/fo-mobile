@@ -89,7 +89,7 @@ export type ApprovalSection =
   | { id?: string; kind: 'chips'; title?: string; options: string[]; selected: number[]; multi?: boolean; ids?: string[] }
   | { id?: string; kind: 'rows'; title: string; items: { id?: string; tag: string; title: string; sub: string; ac?: boolean; action?: 'change' }[] }
   | { id?: string; kind: 'templates'; items: { id?: string; label: string; layout?: TemplateLayout; recommended?: boolean }[]; selected: number[] }
-  | { id?: string; kind: 'toggle'; items: Choice[]; selected: number[]; ids: string[] }
+  | { id?: string; kind: 'toggle'; title?: string; items: Choice[]; selected: number[]; ids: string[] }
 
 export type Approval = {
   id: string
