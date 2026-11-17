@@ -41,7 +41,7 @@ export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) =>
           </Text>
         ) : null}
       </View>
-      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ paddingHorizontal: spacing[1], gap: 6 }}>
+      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: 6 }}>
         {attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}
       </SheetScroll>
     </Sheet>
