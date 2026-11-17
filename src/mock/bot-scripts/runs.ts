@@ -359,7 +359,7 @@ const ph3Rest = (wait: number): Step[] => [
   s(1200, todo('todo3', PH3, 5)),
   s(300, tool('draft', '초안 쓰기', '이력서 v1', 'ok', '1쪽 · 섹션 5개 · 말투 그대로')),
   s(300, agent(DRAFT_REVIEW_MD)),
-  s(wait, status('초안을 검토하는 중')),
+  s(300, status('초안을 검토하는 중')),
 ]
 const ph3Boost: Step[] = [
   s(200, status('점수 올리는 중…')),
@@ -379,7 +379,7 @@ const ph3Boost: Step[] = [
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
 // ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between, and the review goes on by itself (a gate with one option is not asked).
-const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), ...ph3Boost]
+const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), s(DWELL, status('초안을 검토하는 중')), ...ph3Boost]
 // ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
 const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD), ...ph3Boost]
 // ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.

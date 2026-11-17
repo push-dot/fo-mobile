@@ -32,7 +32,7 @@ tags:
 - runFlow:
     file: _chat_kbd_down.yaml
 - takeScreenshot: ChatPh2
-- tapOn: ".*초안 쓸게요"
+- tapOn: ".*초안 쓰기"
 - extendedWaitUntil:
     visible: "첫 번째 초안.v1.을 만들었어요.*"
     timeout: 40000
