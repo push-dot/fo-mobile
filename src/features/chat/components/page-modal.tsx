@@ -13,7 +13,7 @@ const GLASS_BUTTON = 44
 /** The 자료 modal's pages (`.bsh-h` and `.mpage`): 14 above the header, 4 under it, 16 beside it, a 52 spacer when no button sits right, a body that follows the header, and 20 around the actions. */
 const MPAGE = { top: 14, below: 4, side: 16, spacer: 52, inset: 20 }
 
-/** A pageSheet drawn as the boards' `.isheet.pm8` (ChatPh0Picker): 17 above the 52 high header (8 + the 5 grabber + 4), 16 beside it, 4 under the foot button. */
+/** A pageSheet drawn as the boards' `.isheet.pm8`: 17 above the 52 high header (8 + the 5 grabber + 4), 16 beside it, 4 under the foot button. */
 const SHEET = { top: 17, header: 52, side: 16, bottom: 4 }
 
 const PageModal = ({

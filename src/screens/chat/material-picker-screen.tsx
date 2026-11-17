@@ -12,7 +12,7 @@ type Row = { id: string; title: string; meta: string }
 const ADD_BUTTON = { minHeight: 52, borderRadius: 26 }
 const OTHER_TITLE = '다른 곳에서'
 
-/** ChatPh0Picker: 자료 고르기 is a page-style modal (a close button, one 추가 button), also opened inside the approval form's own modal. */
+/** 자료 고르기 is a page-style modal (a close button, one 추가 button), also opened inside the approval form's own modal. */
 const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: () => void }) => {
   const [pasting, setPasting] = useState(false)
   const [text, setText] = useState('')
