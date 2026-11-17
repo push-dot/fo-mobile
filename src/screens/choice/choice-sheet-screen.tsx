@@ -71,7 +71,7 @@ const ChoiceSheetScreen = () => {
         </View>
       ) : null}
       {request.items && request.buttons ? (
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: spacing[2] }}>
           {request.items.map((item, i) => (
             <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={{ minHeight: 52, borderRadius: 26 }} />
           ))}
