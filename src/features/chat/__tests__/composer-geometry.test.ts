@@ -10,8 +10,8 @@ describe('composer geometry (v489 boards)', () => {
     expect(creditBannerMarginBottom).toBe(7)
   })
 
-  it('draws the @ list 2 above the box, the 12 it sits at without a margin less 10', () => {
-    expect(12 + mentionListMarginBottom).toBe(2)
+  it('pulls the @ list 10 down from the area gap so the board shows it 2 above the box', () => {
+    expect(mentionListMarginBottom).toBe(-10)
   })
 
   it('makes an empty field one line high and leaves a typed field to grow', () => {

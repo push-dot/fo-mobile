@@ -11,7 +11,6 @@ const LINE = { fontSize: 14, lineHeight: 20 } as const
 /**
  * The monthly allowance is spent (ChatBotHeaderLimit, ChatBotHeaderLimitUltra). The boards' `.limitbar` after the audit layer:
  * one grey `bg2` bar, regular `t1` text, a `t2` icon and a black button (rules 3, 15, 18): no red, no bold.
- * It sits 7 above the box, as the v489 Ultra board draws it.
  */
 export const CreditBanner = ({ banner, onAction }: { banner: Banner; onAction: (action: 'plan' | 'credits') => void }) => {
   const c = useColors()
