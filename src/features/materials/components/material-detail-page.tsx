@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import { Platform, View } from 'react-native'
-import { Button, PM8, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
+import { Button, PM8, PM8_MDET_HEAD, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { spacing, useThemeMode } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
@@ -66,7 +66,7 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
 
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout}>
-      <View style={{ minHeight: 52, justifyContent: 'center' }}>
+      <View style={{ minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' }}>
         <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {detailTitle(m)}
         </Text>

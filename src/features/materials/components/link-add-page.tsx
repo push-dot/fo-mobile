@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { View } from 'react-native'
 import { fullLinkUrl, LINK_KIND_LABEL, kindOf } from '@/features/chat'
 import { useAddLink } from '@/features/my'
-import { Chip, PM8, Sheet, SheetScroll, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Chip, PM8, PM8_MDET_HEAD, Sheet, SheetScroll, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { spacing } from '@/theme'
 import { useRefreshMaterials } from '../api/hooks'
 import { LINK_ADD } from '../constants'
@@ -28,7 +28,7 @@ export const MaterialLinkAddPage = () => {
   })
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout} action={{ label: LINK_ADD.submit, onPress: () => add.mutate({ url: full, kind: kind ?? undefined, aiRead: true }), disabled: !valid || add.isPending, pending: add.isPending }}>
-      <View style={{ minHeight: 52, justifyContent: 'center' }}>
+      <View style={{ minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' }}>
         <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
           {LINK_ADD.title}
         </Text>
