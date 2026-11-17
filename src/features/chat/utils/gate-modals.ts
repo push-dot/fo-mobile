@@ -144,7 +144,7 @@ export const openGate = (approval: Approval, h: GateHooks, ask: (request: Choice
   if (!sheet) return
   const items = sheet.items.filter((i) => {
     const section = approval.sections[0]
-    return section?.kind !== 'choices' || !isStop(section.items[i.index]!)
+    return section?.kind !== 'choices' || (approval.confirm && !sheet.apply) || !isStop(section.items[i.index]!)
   })
   ask({
     title: sheet.title,
