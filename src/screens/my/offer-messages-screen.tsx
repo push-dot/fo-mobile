@@ -300,6 +300,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         ) : (
           <Composer
             tools={false}
+            flat
             value={text}
             onChangeText={setText}
             placeholder="메시지를 입력해 주세요"
