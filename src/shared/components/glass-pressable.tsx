@@ -16,6 +16,8 @@ type Props = Omit<PressableProps, 'style' | 'children'> & {
   dimOpacity?: number
 }
 
+export const dbgLog: string[] = []
+export const dbg = (m: string) => { dbgLog.push(`${Date.now() % 100000}:${m}`) }
 const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
 
 // iOS glass answers presses natively (isInteractive); a JS scale around it would move the shape apart from its glass.
@@ -29,7 +31,7 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
   if (native) {
     return (
       <Glass interactive tint={tint} style={style}>
-        <Pressable {...press} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
+        <Pressable {...press} onPressIn={(e) => { dbg(`pin:${disabled ? 'dis' : 'en'}`); press.onPressIn?.(e) }} onTouchStart={() => dbg('ts')} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
           {children}
         </Pressable>
       </Glass>
@@ -38,6 +40,8 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
   return (
     <Pressable
       {...press}
+      onPressIn={(e) => { dbg(`pin2:${disabled ? 'dis' : 'en'}`); press.onPressIn?.(e) }}
+      onTouchStart={() => dbg('ts2')}
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
