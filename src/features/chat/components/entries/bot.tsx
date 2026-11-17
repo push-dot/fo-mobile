@@ -9,7 +9,10 @@ import { radius, spacing, useColors } from '../../../../theme'
 import type { ChatItem, PlanItem } from '../../types'
 import { splitBotText, type BotTextBlock } from '../../utils/bot-text'
 import { hitsBefore } from '../../utils/find'
-import { diffLinesDetail } from '../../utils/bubble-detail'
+import { SAVE_RETRY_LABEL } from '../../utils/result-card'
+import { REVIEW_TITLE } from '../../utils/review-doc'
+import { showReviewPage } from '../../review-page'
+import BubbleLink from './bubble-link'
 import { blueprintList, isBlueprints, planGap, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindHighlight, FindText, Marked } from '../header/highlight'
@@ -110,16 +113,15 @@ export const PlanBlock = ({ item }: { item: PlanItem }) => {
   )
 }
 
-const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => {
-  const view = diffLinesDetail(item.lines)
-  return <Detail text={view.text} more={view.more} />
-}
+export const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => (
+  <BubbleLink label={REVIEW_TITLE} accessibilityLabel={`${REVIEW_TITLE} 열기`} onPress={() => showReviewPage({ lines: item.lines })} />
+)
 
 /** The lines of a block that draw find marks, in render order. */
 const markedLines = (block: BotTextBlock): string[] =>
   block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' || block.kind === 'bullets' || block.kind === 'list' ? block.items : []
 
-const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void }) => {
+const BotText = ({ item, onView, onRetry }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void; onRetry?: () => void }) => {
   const c = useColors()
   const tableWidth = useTableWidth()
   const xl = useXlBoardText()
@@ -168,6 +170,7 @@ const BotText = ({ item, onView }: { item: Extract<ChatItem, { type: 'agentText'
         ),
       )}
       {item.undo ? <ProfileUndo changeId={item.undo} /> : null}
+      {item.retry && onRetry ? <BubbleLink label={SAVE_RETRY_LABEL} onPress={onRetry} /> : null}
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}

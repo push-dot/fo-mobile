@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
 import { describe, expect, it } from 'vitest'
-import { applyText, doneNextActions, doneNextCopy, profileSaveCopy, SAVE_FAIL_MESSAGE, SAVE_FAIL_TITLE, SAVE_RETRY_TEXT, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle, saveFailed } from '../utils/result-card'
+import { applyText, DONE_NEXT_TITLE, doneNextActions, profileSaveCopy, SAVE_FAIL_TEXT, SAVE_RETRY_LABEL, SAVE_RETRY_TEXT, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle, saveFailed } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -66,12 +66,11 @@ describe('agent result cards', () => {
     expect(meta).not.toContain('내 서류에 자동 저장됨')
   })
 
-  it('asks the next step in an action sheet with apply and convert, never 프로필 보기 (ChatDoneNext)', () => {
+  it('asks the next step in a regular modal, apply as the primary button and convert as the grey one,, never 프로필 보기 (ChatDoneNext)', () => {
     expect(doneNextActions(file).map((a) => a.id)).toEqual(['apply', 'convert'])
     expect(doneNextActions(profile).map((a) => a.id)).toEqual(['apply'])
     expect(doneNextActions({ ...profile, pendingNote: 'x' })).toEqual([])
-    expect(doneNextCopy(file)).toEqual({ title: '이력서를 다 고쳤어요' })
-    expect(doneNextCopy(profile).title).toBe('프로필을 다 고쳤어요')
+    expect(DONE_NEXT_TITLE).toBe('다음으로 무엇을 할까요?')
   })
 
   it('hides the buttons while the card waits on an approval, or while a profile save is pending', () => {
@@ -92,11 +91,10 @@ describe('agent result cards', () => {
   })
 })
 
-describe('the save-failed alert', () => {
-  it('says what failed and what to do, and 다시 시도 asks the bot to save again', () => {
-    expect(SAVE_FAIL_TITLE).toBe('내 서류에 저장하지 못했어요')
-    expect(SAVE_FAIL_MESSAGE).toBe('네트워크를 확인하고 다시 시도해 주세요.')
+describe('the save-failed bubble (ChatPh6ResultFail)', () => {
+  it('says what failed in the bot\'s own line with 다시 저장하기, which asks the bot to save again', () => {
+    expect(SAVE_FAIL_TEXT).toBe('내 서류에 저장하지 못했어요. 네트워크를 확인해 주세요.')
+    expect(SAVE_RETRY_LABEL).toBe('다시 저장하기')
     expect(SAVE_RETRY_TEXT).toMatch(/저장해/)
   })
 })
-

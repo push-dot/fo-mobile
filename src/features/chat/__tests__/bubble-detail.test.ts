@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { diffBubble, diffLinesDetail, fitBubble, todoLines } from '../utils/bubble-detail'
+import { fitBubble, todoLines } from '../utils/bubble-detail'
 import { splitBotText } from '../utils/bot-text'
 
 describe('fitBubble', () => {
@@ -38,24 +38,6 @@ describe('fitBubble of a score boost (ChatPh3Boost, ChatPh3BoostStop)', () => {
       { label: '경력 · 모아페이', line: '7.5 → 8.0 · 승인 API 성과를 숫자로 보여 줬어요' },
     ]
     expect(fitBubble({ ...boost, rounds }).list).toEqual(['키워드: 정산 배치, 장애 대응을 경력 문장에 넣었어요', '경력 · 모아페이: 승인 API 성과를 숫자로 보여 줬어요'])
-  })
-})
-
-describe('diffBubble', () => {
-  it('counts the changed lines and keeps every line in the long form', () => {
-    const view = diffBubble({
-      type: 'diff', id: 'd',
-      lines: [{ n: 12, sign: '', text: '모아페이' }, { n: 13, sign: '-', text: '결제 API 개발' }, { n: 13, sign: '+', text: 'Kotlin 재설계' }],
-    })
-    expect(view.text).toBe('수정안이에요')
-    expect(view.detail).toEqual({ text: '+1줄 · −1줄', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계' })
-  })
-})
-
-describe('diffLinesDetail', () => {
-  it('counts the changed lines as "바뀐 내용 N줄 보기" and opens to every line (ChatApprove)', () => {
-    const lines = [{ n: 12, sign: '' as const, text: '모아페이' }, { n: 13, sign: '-' as const, text: '결제 API 개발' }, { n: 13, sign: '+' as const, text: 'Kotlin 재설계' }, { n: 14, sign: '+' as const, text: 'Kafka' }]
-    expect(diffLinesDetail(lines)).toEqual({ text: '바뀐 내용 3줄 보기 ›', more: '  모아페이\n− 결제 API 개발\n+ Kotlin 재설계\n+ Kafka' })
   })
 })
 

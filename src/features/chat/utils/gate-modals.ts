@@ -1,48 +1,24 @@
 import { displayName } from '@/shared/utility/display-name'
 import type { ChoiceModalRequest } from '@/shared/navigation'
-import type { Approval, ApprovalSection, ChatItem } from '../types'
+import type { Approval, ApprovalSection, DiffLine } from '../types'
+import type { ReviewPageRequest } from '../review-page'
 import { choiceSheet, confirmModal, designModal } from './choice-sheet'
 import { isStop } from './multi-pick'
 import { buttonLabel, chipSends, sectionLabel, sectionPicks } from './stream-v3'
 
 type Row = Extract<ApprovalSection, { kind: 'rows' }>['items'][number]
-type Table = NonNullable<ChoiceModalRequest['table']>
 
 export type GateHooks = {
   answer: (text: string, choice: number | number[]) => void
   say: () => void
   change: (row: Row, back: () => void) => void
-  review?: Table
+  /** The changed lines of the edit under review, and how to open the page that draws them. */
+  review?: { lines: DiffLine[]; open: (request: ReviewPageRequest) => void }
 }
 
 export const UNDO_LABEL = '되돌리기'
 export const NEXT_LABEL = '다음'
 const MATERIALS = 'materials'
-export const REVIEW_TITLE = '이렇게 고쳤어요'
-
-export const diffTable = (items: readonly ChatItem[]): Table | undefined => {
-  for (const item of [...items].reverse()) {
-    if (item.type === 'user') return undefined
-    const diff = item.type === 'diff' ? item : item.type === 'agentText' ? item.diff : undefined
-    if (!diff) continue
-    const rows: string[][] = []
-    let removed: string[] = []
-    let added: string[] = []
-    const flush = () => {
-      for (let i = 0; i < Math.max(removed.length, added.length); i++) rows.push([removed[i] ?? '', added[i] ?? ''])
-      removed = []
-      added = []
-    }
-    for (const line of diff.lines) {
-      if (line.sign === '-') removed.push(line.text)
-      else if (line.sign === '+' || line.sign === '~') added.push(line.text)
-      else flush()
-    }
-    flush()
-    return rows.length ? { head: ['이전', '이후'], rows } : undefined
-  }
-  return undefined
-}
 
 const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined
@@ -141,18 +117,17 @@ export const openGate = (approval: Approval, h: GateHooks, ask: (request: Choice
     return
   }
   const edit = confirmModal(approval)
-  if (edit) {
-    ask({
-      title: REVIEW_TITLE,
-      ...(edit.message ? { message: edit.message } : {}),
-      ...(h.review ? { table: h.review } : {}),
-      confirm: {
-        label: edit.confirm,
-        onPress: () => h.answer(edit.confirm, 0),
-        ...(approval.secondary ? { secondary: { label: UNDO_LABEL, onPress: () => h.answer(UNDO_LABEL, 1) } } : {}),
-      },
+  if (edit && h.review?.lines.length) {
+    h.review.open({
+      lines: h.review.lines,
+      apply: () => h.answer(edit.confirm, 0),
+      ...(approval.secondary ? { undo: () => h.answer(UNDO_LABEL, 1) } : {}),
       onDismiss: h.say,
     })
+    return
+  }
+  if (edit) {
+    ask({ title: edit.title, confirm: { label: edit.confirm, onPress: () => h.answer(edit.confirm, 0), ...(approval.secondary ? { secondary: { label: UNDO_LABEL, onPress: () => h.answer(UNDO_LABEL, 1) } } : {}) }, onDismiss: h.say })
     return
   }
   const form = choicesForm(approval, h)

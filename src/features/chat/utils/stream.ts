@@ -95,7 +95,7 @@ const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id
   return { question: ev.summary || ev.title, options: ev.options, warning: ev.foot, tool: times }
 }
 
-/** The edit card: preview of the change, then 그대로 두기 · 적용 side by side. */
+/** The edit card: the changed document opens as a page with 되돌리기 · 적용 (ChatApprove); the server's one-line summary is not drawn. */
 const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] => {
   const [apply, keep] = ev.options
   const approval: Approval = {
@@ -103,7 +103,6 @@ const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] =>
     question: ev.title,
     optionIds: ev.options.map((o) => o.id),
     sections: [],
-    ...(ev.summary ? { detail: ev.summary } : {}),
     ...(apply ? { submit: apply.label } : {}),
     ...(keep ? { secondary: keep.label } : {}),
   }

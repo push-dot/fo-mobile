@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { Animated, Platform, Pressable, View } from 'react-native'
-import BotText, { BulletList, Bubble, NumberMark, PlanBlock } from './bot'
+import BotText, { BulletList, Bubble, DiffDetail, NumberMark, PlanBlock } from './bot'
 import Detail from './detail'
 import { Dot } from './glyph'
 import Rich from './rich'
@@ -12,7 +12,7 @@ import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
 import { usePop } from '../../hooks'
-import { diffBubble, fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
+import { fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
@@ -300,17 +300,19 @@ const ItemComponent = ({
   writing,
   onUsage,
   onView,
+  onRetry,
 }: {
   item: ChatItem
   writing?: boolean
   onUsage?: (action: 'plan' | 'credits') => void
   onView?: (item: Of<'result'>) => void
+  onRetry?: () => void
 }) => {
   switch (item.type) {
     case 'user':
       return <UserBubble item={item} />
     case 'agentText':
-      return <BotText item={item} onView={onView} />
+      return <BotText item={item} onView={onView} onRetry={onRetry} />
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
     case 'tool':
@@ -325,7 +327,11 @@ const ItemComponent = ({
     case 'plan':
       return <Plan item={item} />
     case 'diff':
-      return <BubbleDetailText id={item.id} view={diffBubble(item)} />
+      return (
+        <Bubble>
+          <DiffDetail item={item} />
+        </Bubble>
+      )
     case 'fit':
       return <FitCard item={item} onPlan={onUsage ? () => onUsage('plan') : undefined} />
     case 'file':

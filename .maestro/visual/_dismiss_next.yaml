@@ -1,14 +1,14 @@
 appId: app.push.mobile
 tags:
   - subflow
-# A finished run asks "이력서를 다 고쳤어요" (the title, no sentence under it) in a regular modal (ChatDoneNext, no 취소); swipe it away to see the chat behind.
+# A finished run asks "다음으로 무엇을 할까요?" in a regular modal (ChatDoneNext, no 취소); swipe it away to see the chat behind.
 ---
 - runFlow:
     when:
-      visible: "(이력서를|프로필을) 다 고쳤어요"
+      visible: "다음으로 무엇을 할까요?"
     commands:
       - runFlow:
           file: _close_sheet.yaml
           env:
-            TITLE: "(이력서를|프로필을) 다 고쳤어요"
+            TITLE: "다음으로 무엇을 할까요?"
       - waitForAnimationToEnd

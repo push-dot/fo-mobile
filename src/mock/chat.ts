@@ -5,6 +5,7 @@ import type { ChatDoc, ConversationRow, QsData, RunInput, Step } from '@/feature
 import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
 import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail, WAITING_CHOICES, WAITING_SINCE_MS } from './bot-scripts/runs'
+import { PROFILE_REVIEW_HUNKS } from './bot-scripts/review-doc'
 import { recordRun } from './bots'
 import { botProfileChange } from './me'
 import { mock, page } from './server'
@@ -29,7 +30,7 @@ const conv = (id: string, title: string, min: number, lastLine: string, status: 
 })
 
 const conversations: ConversationRow[] = [
-  { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '이 변경을 이력서에 반영할까요?', 'NEEDS_APPROVAL'), company: '모아페이' },
+  { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '고친 Push 프로필을 확인해 주세요', 'NEEDS_APPROVAL'), company: '모아페이' },
   // ChatResume opens this one and draws 모아페이 in the header pill.
   { ...conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'), company: '모아페이' },
   // ChatListPress draws this row pinned.
@@ -266,12 +267,9 @@ const storedTurns: Record<string, ConversationTurn['events']> = {
     },
     { type: 'token', text: '경력 섹션부터 공고에 맞게 고쳐 볼게요.', seq: 6 },
     {
-      type: 'approval', id: 'moa-edit', kind: 'DOCUMENT_EDIT', title: '이 수정을 적용할까요?', documentId: 'd1',
+      type: 'approval', id: 'moa-edit', kind: 'DOCUMENT_EDIT', title: '수정 적용', documentId: 'd1',
       options: [{ id: 'apply', label: '적용' }, { id: 'skip', label: '그대로 두기' }],
-      hunks: [
-        { line: 13, sign: '-', text: '결제 API 개발 및 운영' },
-        { line: 13, sign: '+', text: '결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms' },
-      ],
+      hunks: PROFILE_REVIEW_HUNKS,
       resolution: { status: 'PENDING', optionId: null },
       seq: 7,
     },

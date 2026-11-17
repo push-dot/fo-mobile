@@ -16,9 +16,8 @@ export const choiceSheet = (approval: Approval): ChoiceSheet | null => {
   return { title: approval.question, ...(message ? { message } : {}), items }
 }
 
-/** An edit card (title, message, one 적용 button): the regular modal with a single confirm, swiping it away hands the floor to the composer (ChatApprove). */
-export const confirmModal = (approval: Approval) =>
-  approval.submit && !approval.sections.length ? { title: approval.question, ...(approval.detail ? { message: approval.detail } : {}), confirm: approval.answer ?? approval.submit } : null
+/** An edit card (one 적용 button): the page of the changed document (ChatApprove). With no lines to draw it is a plain confirm; swiping it away hands the floor to the composer. */
+export const confirmModal = (approval: Approval) => (approval.submit && !approval.sections.length ? { title: approval.question, confirm: approval.answer ?? approval.submit } : null)
 
 /**
  * The template card (ChatPh4Design) is a regular modal too: its question is the title, the templates are rows (the recommended one carries 추천), the toggle is a switch row,

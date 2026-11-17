@@ -46,7 +46,6 @@ import {
   stop,
   useDoneNext,
   useGateModal,
-  useSaveFailAlert,
   useChat,
   useChatLimit,
   useFind,
@@ -179,7 +178,7 @@ const Thread = ({ id }: { id: string }) => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }, [])
-  useSaveFailAlert(chat, () => send(id, SAVE_RETRY_TEXT))
+  const onRetry = useCallback(() => send(id, SAVE_RETRY_TEXT), [id])
   useDoneNext(chat, (action, card) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
@@ -192,11 +191,11 @@ const Thread = ({ id }: { id: string }) => {
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
         ) : (
-          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} />
+          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onRetry={onRetry} />
         )}
       </RowMotion.Provider>
     ),
-    [onView, onUsage, working, id, color, live],
+    [onView, onUsage, onRetry, working, id, color, live],
   )
 
   return (

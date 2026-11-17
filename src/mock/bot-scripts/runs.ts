@@ -6,6 +6,7 @@ import { GATED_STEP, HINTLESS_GATES } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
 import { DRAFT_V1_MD, PAGE_READ_OPTIONS } from './cards'
+import { PROFILE_REVIEW_COUNTS, PROFILE_REVIEW_HUNKS } from './review-doc'
 
 type Frame = Step['frame']
 type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
@@ -95,23 +96,17 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(400, todo('todo', labels, 3, added)),
   s(500, agent('경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.')),
   s(300, status('끄적이는 중…')),
-  s(1200, tool('edit', '이력서 수정', '경력 · 모아페이', 'wait', '2줄 추가, 1줄 삭제')),
+  s(1200, tool('edit', '이력서 수정', '경력 · 모아페이', 'wait', `${PROFILE_REVIEW_COUNTS.added}줄 추가, ${PROFILE_REVIEW_COUNTS.removed}줄 삭제`)),
   s(200, {
     type: 'diff', documentId: DOC, revisionId: 'diff',
-    hunks: [
-      { line: 12, sign: '', text: '모아페이 · 백엔드 엔지니어 · 2022.03–현재' },
-      { line: 13, sign: '-', text: '결제 API 개발 및 운영' },
-      { line: 13, sign: '+', text: '결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms' },
-      { line: 14, sign: '+', text: 'Kafka 이벤트 파이프라인으로 정산 지연을 하루에서 10분으로 단축' },
-      { line: 15, sign: '', text: '결제 장애 대응 매뉴얼 작성' },
-    ],
+    hunks: PROFILE_REVIEW_HUNKS,
   }),
   ask({
     type: 'approval',
     id: 'tailor-apply',
     kind: 'DOCUMENT_EDIT',
     title: '수정 적용',
-    summary: '경력 섹션 3줄을 공고에 맞게 고쳤어요. 적용하면 적합도가 6.9에서 8.1로 올라요.',
+    summary: `${PROFILE_REVIEW_COUNTS.added + PROFILE_REVIEW_COUNTS.removed}줄을 고쳤어요. 적용하면 문서에 바로 반영돼요.`,
     documentId: DOC,
     options: [{ id: 'apply', label: '적용' }, { id: 'keep', label: '그대로 두기' }],
   }),
