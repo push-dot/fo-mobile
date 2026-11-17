@@ -11,7 +11,9 @@ describe('quickStartsFor', () => {
     expect(chips.find((c) => c.label === '부족한 점 찾기')).toMatchObject({ key: 'fit', icon: 'qs-gap' })
   })
 
-  it('keeps the company Bot chips to 적합도 보기, 점수 올리기, 경험 만들기', () => {
-    expect(quickStartsFor('company').map((c) => c.key)).toEqual(['fit', 'boost', 'exp'])
+  it('lists the company Bot chips as in ChatBotOnboard: 적합도 보기, 부족한 점 찾기, 점수 올리기, 경험 만들기', () => {
+    const chips = quickStartsFor('company')
+    expect(chips.map((c) => c.label)).toEqual(['적합도 보기', '부족한 점 찾기', '점수 올리기', '경험 만들기'])
+    expect(chips[1]).toMatchObject({ key: 'fit', icon: 'qs-gap' })
   })
 })
