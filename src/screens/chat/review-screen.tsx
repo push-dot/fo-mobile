@@ -28,7 +28,7 @@ const Parts = ({ row, strike }: { row: ReviewRow; strike?: boolean }) => {
 const Changed = ({ row }: { row: ReviewRow }) => {
   const c = useColors()
   const added = row.sign === '+'
-  const plain = row.parts.map((p) => p.text).join('')
+  const plain = [...row.parts.map((p) => p.text), row.date].filter(Boolean).join(' ')
   return (
     <View
       accessible
@@ -48,8 +48,15 @@ const Changed = ({ row }: { row: ReviewRow }) => {
       <Text v="b2" color={added ? 'acText' : 'red'} weight="600" style={[BODY, { width: 14, textAlign: 'center' }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {added ? '+' : '−'}
       </Text>
-      <View style={{ flex: 1 }}>
-        <Parts row={row} strike={!added} />
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing[2] }}>
+        <View style={{ flexShrink: 1 }}>
+          <Parts row={row} strike={!added} />
+        </View>
+        {row.date ? (
+          <Text v="c2" color="t3" style={!added ? { textDecorationLine: 'line-through', textDecorationColor: c.red } : undefined}>
+            {row.date}
+          </Text>
+        ) : null}
       </View>
     </View>
   )
@@ -97,16 +104,23 @@ const ReviewScreen = () => {
   const dark = useThemeMode() === 'dark'
   const request = useReviewPage((s) => s.request)
   const picked = useRef(false)
-  const onDismiss = request?.onDismiss
+  const latest = useRef(request)
+  useEffect(() => {
+    latest.current = request
+  }, [request])
+  const mounted = useRef(false)
   useEffect(() => {
     if (!request) router.back()
   }, [request])
-  useEffect(
-    () => () => {
-      if (!picked.current) onDismiss?.()
-    },
-    [onDismiss],
-  )
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      queueMicrotask(() => {
+        if (!mounted.current && !picked.current) latest.current?.onDismiss?.()
+      })
+    }
+  }, [])
   if (!request) return null
   const run = (onPress?: () => void) => {
     if (picked.current || !onPress) return

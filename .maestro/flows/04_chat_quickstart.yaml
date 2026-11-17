@@ -17,7 +17,7 @@ name: 봇 → 빠른 시작(공고 링크) → 변경 적용 → 완료
     env:
       TEXT: "맞추기 시작"
 - extendedWaitUntil:
-    visible: "되돌리기"
+    visible: "적용"
     timeout: 60000
 - takeScreenshot: 04_chat_quickstart-02
 # The changed Push 프로필 opens as a page-style modal (ChatApprove): 되돌리기 and 적용 at the bottom; 적용 answers.

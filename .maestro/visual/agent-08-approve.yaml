@@ -17,7 +17,7 @@ tags:
       KO: "모아페이 백엔드 공고에 맞춰 이력서 고쳐 주세요"
       EN: "tailor resume"
 - extendedWaitUntil:
-    visible: "되돌리기"
+    visible: "적용"
     timeout: 60000
 # The changed Push 프로필 opens as a page-style modal: old lines struck on red, new lines on violet, 되돌리기 and 적용 at the bottom.
 - waitForAnimationToEnd
