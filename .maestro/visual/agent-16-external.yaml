@@ -43,6 +43,8 @@ tags:
     visible: "다시 저장하기"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
 - takeScreenshot: ChatDoneSaveFail
 - runFlow: _fresh_company.yaml
 - runFlow:
@@ -81,6 +83,8 @@ tags:
     visible: "다시 저장하기"
     timeout: 30000
 - waitForAnimationToEnd
+- runFlow:
+    file: _chat_kbd_down.yaml
 - takeScreenshot: ChatPh6ResultFail
 - extendedWaitUntil:
     visible: "김서준_모아페이_백엔드.*"
@@ -105,7 +109,7 @@ tags:
       EN: "Make this resume better"
 # The finished run asks ChatDoneNext at once and the action sheet hides the thread from the accessibility tree: wait for either, then close it.
 - extendedWaitUntil:
-    visible: "(다음으로 무엇을 할까요?|.*김서준_백엔드_이력서_수정본.*)"
+    visible: "(다음으로 무엇을 할까요\\?|.*김서준_백엔드_이력서_수정본.*)"
     timeout: 30000
 - waitForAnimationToEnd
 - runFlow: _dismiss_next.yaml

@@ -45,10 +45,9 @@ beforeEach(() => {
 })
 
 describe('ConsentPromptListener', () => {
-  it('opens the choice modal, not its own route, when the prompt opens while the chat tab stays unfocused', () => {
+  it('opens the consent sheet, not a route of its own, when the prompt opens while the chat tab stays unfocused', () => {
     expect(listenerSource).toContain('showConsentModal(')
     expect(listenerSource).not.toContain('router')
-    expect(stackLayoutSource).not.toContain('name="consent"')
   })
 
   it('does not read consents or settings on cold start', () => {

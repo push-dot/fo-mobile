@@ -9,6 +9,8 @@ import { spacing } from '@/theme'
 import { useRefreshMaterials } from '../api/hooks'
 import { LINK_ADD } from '../constants'
 
+const KIND_CHIP = { padding: spacing[3], height: 36 }
+const KIND_GAP = 6
 const KINDS = Object.keys(LINK_KIND_LABEL) as LinkKind[]
 
 /** MaterialsLinkAdd: a regular sheet over the 자료 modal with the five kinds. LinkedIn is not one: the list marks it from the host. */
@@ -31,9 +33,9 @@ export const MaterialLinkAddPage = () => {
       </Text>
       <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
         <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" minHeight={54} autoFocus accessibilityLabel="링크 주소" />
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: KIND_GAP }}>
           {KINDS.map((k) => (
-            <Chip key={k} label={LINK_KIND_LABEL[k]} on={kind === k} onPress={() => setPicked(k)} />
+            <Chip key={k} label={LINK_KIND_LABEL[k]} on={kind === k} fit={KIND_CHIP} onPress={() => setPicked(k)} />
           ))}
         </View>
       </SheetScroll>

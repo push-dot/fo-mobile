@@ -22,15 +22,16 @@ type Props = {
   leadInset?: number
   /** iOS filter sheets (.ich): 36 high, 15 regular on a white chip, a 16pt check that takes 4 off the left padding. Other platforms draw the normal chip. */
   sheet?: boolean
+  fit?: { padding: number; height: number }
 }
 
 const CHIP_HEIGHT = 34
 const SHEET_CHIP_HEIGHT = 36
 
-const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, icon, chevron, leadInset = 5, sheet }: Props) => {
+const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, icon, chevron, leadInset = 5, sheet, fit }: Props) => {
   const c = useColors()
   const ich = !!sheet && Platform.OS === 'ios'
-  const height = ich ? SHEET_CHIP_HEIGHT : CHIP_HEIGHT
+  const height = fit?.height ?? (ich ? SHEET_CHIP_HEIGHT : CHIP_HEIGHT)
   const fg = on ? c.bg : Platform.OS === 'ios' ? c.t1 : c.t2
   return (
     <GlassPressable
@@ -42,7 +43,7 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, i
       glass={false}
       fill={on ? 't1' : ich ? 'paper' : 'fill'}
       style={{ minHeight: height, borderRadius: ich ? height / 2 : radius.chip, maxWidth: '100%' }}
-      contentStyle={{ paddingLeft: lead ? leadInset : ich && on && check === true ? 10 : 14, paddingRight: 14, gap: lead || removable ? spacing[2] : spacing[1] }}
+      contentStyle={{ paddingLeft: lead ? leadInset : ich && on && check === true ? 10 : (fit?.padding ?? 14), paddingRight: fit?.padding ?? 14, gap: lead || removable ? spacing[2] : spacing[1] }}
     >
       {lead}
       {icon ? <Icon name={icon} size={16} color={fg} /> : null}

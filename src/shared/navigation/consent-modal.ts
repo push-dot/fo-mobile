@@ -1,19 +1,22 @@
 import { router } from 'expo-router'
-import { showChoiceModal } from './choice-modal'
+import { Keyboard } from 'react-native'
+import { create } from 'zustand'
 
-type Copy = { title: string; body: string; agree: string }
+export type ConsentModalRequest = {
+  title: string
+  body: string
+  agree: string
+  onAgree: () => void
+  onLater: () => void
+}
 
-const DETAIL_LABEL = '자세히 보기'
+export const CONSENT_DETAIL_LABEL = '자세히 보기'
+export const CONSENT_LATER_LABEL = '나중에'
 
-/** The consent modal: one agree button, 자세히 보기 reads the policy over the open modal, and there is no 나중에 (swiping it down is the way out). */
-export const showConsentModal = (copy: Copy, { onAgree, onLater }: { onAgree: () => void; onLater: () => void }) =>
-  showChoiceModal({
-    title: copy.title,
-    message: copy.body,
-    confirm: {
-      label: copy.agree,
-      onPress: onAgree,
-      secondary: { label: DETAIL_LABEL, stay: true, onPress: () => router.push({ pathname: '/(app)/(stack)/terms-view', params: { term: 'privacyPolicy' } }) },
-    },
-    onDismiss: onLater,
-  })
+export const useConsentModal = create<{ request: ConsentModalRequest | null }>(() => ({ request: null }))
+
+export const showConsentModal = ({ title, body, agree }: Pick<ConsentModalRequest, 'title' | 'body' | 'agree'>, { onAgree, onLater }: Pick<ConsentModalRequest, 'onAgree' | 'onLater'>) => {
+  Keyboard.dismiss()
+  useConsentModal.setState({ request: { title, body, agree, onAgree, onLater } })
+  router.push('/consent')
+}
