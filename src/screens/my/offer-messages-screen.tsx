@@ -275,9 +275,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       <View
         onLayout={(e) => setComposerH(e.nativeEvent.layout.height)}
         style={{
-          paddingHorizontal: ios ? spacing[4] : spacing[3],
+          paddingHorizontal: spacing[3],
           paddingTop: ios ? 6 : spacing[2],
-          paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : (keyboardUp ? 0 : insets.bottom) + spacing[2],
+          paddingBottom: ios ? (keyboardUp ? Math.max(insets.bottom - 6, spacing[2]) : insets.bottom + 6) : (keyboardUp ? 0 : insets.bottom) + spacing[2],
           backgroundColor: ios ? undefined : c.bg,
         }}
       >
