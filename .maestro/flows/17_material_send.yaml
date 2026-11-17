@@ -20,12 +20,12 @@ name: 봇 홈에서 자료를 회사 봇에게 보내면 그 입력창에 붙고
     timeout: 10000
 - tapOn: "모아페이"
 - extendedWaitUntil:
-    visible: "적용"
+    visible: "고친 Push 프로필을 확인해 주세요"
     timeout: 15000
 - runFlow:
     file: ../visual/_close_sheet.yaml
     env:
-      TITLE: "적용"
+      TITLE: "고친 Push 프로필을 확인해 주세요"
 - extendedWaitUntil:
     visible: "김서준_백엔드_이력서 첨부 빼기"
     timeout: 15000
