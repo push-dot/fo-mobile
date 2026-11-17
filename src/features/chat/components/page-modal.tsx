@@ -28,6 +28,9 @@ const PageModal = ({
   page,
   mpage,
   sheet,
+  white,
+  closeFilled,
+  fadeAbove = 0,
   scroll = true,
 }: {
   onClose?: () => void
@@ -44,6 +47,10 @@ const PageModal = ({
   mpage?: boolean
   /** An iOS pageSheet on the system sheet fill (`--iSheet`), not the page background. */
   sheet?: boolean
+  white?: boolean
+  /** The close X is a filled circle (ChatApprove); every other page keeps the plain glass X. */
+  closeFilled?: boolean
+  fadeAbove?: number
   scroll?: boolean
 }) => {
   const c = useColors()
@@ -52,11 +59,11 @@ const PageModal = ({
   const modalPage = !!mpage && ios
   const iosSheet = !!sheet && ios
   const mode = useThemeMode()
-  const fill = iosSheet ? iosSheetFill[mode] : c.bg
+  const fill = iosSheet && !white ? iosSheetFill[mode] : c.bg
   return (
     <View style={{ flex: 1, backgroundColor: fill, paddingTop: iosSheet ? SHEET.top : modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: iosSheet ? SHEET.header : undefined, paddingHorizontal: iosSheet ? SHEET.side : modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: iosSheet ? 0 : modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
-        {left ?? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
+        {left ?? <GlassButton filled={iosSheet && !!closeFilled} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
         </Text>
@@ -75,7 +82,14 @@ const PageModal = ({
             ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
           ]}
         >
-          {ios ? <LinearGradient pointerEvents="none" colors={[fill, fill, `${fill}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} /> : null}
+          {ios && fadeAbove ? (
+            <>
+              <View pointerEvents="none" style={{ position: 'absolute', inset: 0, backgroundColor: fill }} />
+              <LinearGradient pointerEvents="none" colors={[`${fill}00`, fill]} style={{ position: 'absolute', left: 0, right: 0, top: -fadeAbove, height: fadeAbove }} />
+            </>
+          ) : ios ? (
+            <LinearGradient pointerEvents="none" colors={[fill, fill, `${fill}00`]} locations={[0, 0.72, 1]} start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }} style={{ position: 'absolute', inset: 0 }} />
+          ) : null}
           {footer}
         </View>
       ) : null}

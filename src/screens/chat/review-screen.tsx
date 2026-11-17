@@ -4,10 +4,10 @@ import { View } from 'react-native'
 import { PageModal, REVIEW_TITLE, reviewRows, useReviewPage, type ReviewRow } from '@/features/chat'
 import { Button, Text } from '@/shared/components'
 import { CHOICE_HANDOFF_MS } from '@/shared/navigation'
-import { iosMaterial, radius, spacing, useColors, useThemeMode } from '@/theme'
+import { iosMaterial, iosSystemFill, radius, spacing, type, useColors, useThemeMode } from '@/theme'
 
 const BUTTON = { flex: 1, minHeight: 52, borderRadius: 26 } as const
-const BODY = { fontSize: 14, lineHeight: 20 } as const
+const BODY = { fontSize: 14, lineHeight: 21 } as const
 const UNDO = '되돌리기'
 const APPLY = '적용'
 
@@ -25,7 +25,7 @@ const Parts = ({ row, strike }: { row: ReviewRow; strike?: boolean }) => {
 }
 
 /** A changed line: the old one on light red, struck through with "−"; the new one on light violet with a bar at the left and "+". */
-const Changed = ({ row }: { row: ReviewRow }) => {
+const Changed = ({ row, pull }: { row: ReviewRow; pull: boolean }) => {
   const c = useColors()
   const added = row.sign === '+'
   const plain = [...row.parts.map((p) => p.text), row.date].filter(Boolean).join(' ')
@@ -34,21 +34,21 @@ const Changed = ({ row }: { row: ReviewRow }) => {
       accessible
       accessibilityLabel={`${added ? '새 줄' : '이전 줄'}, ${plain}`}
       style={{
-        flexDirection: 'row',
-        gap: 6,
-        marginHorizontal: -spacing[3],
-        paddingVertical: spacing[2],
-        paddingHorizontal: 9,
-        borderRadius: 10,
+        marginHorizontal: -spacing[2],
+        marginTop: pull ? -2 : 0,
+        paddingVertical: 3,
+        paddingLeft: spacing[6],
+        paddingRight: spacing[2],
+        borderRadius: radius.xs,
+        overflow: 'hidden',
         backgroundColor: added ? c.acSoft : c.redSoft,
-        borderLeftWidth: added ? 3 : 0,
-        borderLeftColor: c.ac,
       }}
     >
-      <Text v="b2" color={added ? 'acText' : 'red'} weight="600" style={[BODY, { width: 14, textAlign: 'center' }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      {added ? <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: c.ac }} /> : null}
+      <Text v="b2" color={added ? 'acText' : 'red'} weight="700" style={[BODY, { position: 'absolute', left: 9, top: 3 }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {added ? '+' : '−'}
       </Text>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing[2] }}>
         <View style={{ flexShrink: 1 }}>
           <Parts row={row} strike={!added} />
         </View>
@@ -66,19 +66,19 @@ const Plain = ({ row }: { row: ReviewRow }) => {
   switch (row.kind) {
     case 'title':
       return (
-        <Text v="h2" style={{ fontSize: 22, lineHeight: 30 }}>
+        <Text v="h2" style={{ fontSize: 22, lineHeight: type.h2.lineHeight }}>
           {row.parts[0]!.text}
         </Text>
       )
     case 'headline':
       return (
-        <Text v="c1" color="t3">
+        <Text v="c1" color="t3" style={{ marginTop: -2, marginBottom: spacing[1] }}>
           {row.parts[0]!.text}
         </Text>
       )
     case 'section':
       return (
-        <Text v="c2" color="t3" weight="600" style={{ marginTop: spacing[4] }}>
+        <Text v="c2" color="t3" weight="600" style={{ marginTop: spacing[3] }}>
           {row.parts[0]!.text}
         </Text>
       )
@@ -94,7 +94,11 @@ const Plain = ({ row }: { row: ReviewRow }) => {
         </View>
       )
     default:
-      return <Parts row={row} />
+      return (
+        <View style={{ paddingVertical: 2 }}>
+          <Parts row={row} />
+        </View>
+      )
   }
 }
 
@@ -133,17 +137,19 @@ const ReviewScreen = () => {
     <PageModal
       title={REVIEW_TITLE}
       sheet
+      closeFilled
+      fadeAbove={56}
       footer={
         request.apply ? (
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <Button label={UNDO} variant="secondary" onPress={() => run(request.undo)} style={BUTTON} />
+          <View style={{ flexDirection: 'row', gap: spacing[2] }}>
+            <Button label={UNDO} variant="secondary" onPress={() => run(request.undo)} style={[BUTTON, { backgroundColor: iosSystemFill[dark ? 'dark' : 'light'] }]} />
             <Button label={APPLY} onPress={() => run(request.apply)} style={BUTTON} />
           </View>
         ) : undefined
       }
     >
-      <View style={{ marginHorizontal: spacing[4], paddingVertical: spacing[5], paddingHorizontal: 22, borderRadius: radius.card, gap: 6, backgroundColor: dark ? iosMaterial.dark : c.card }}>
-        {rows.map((row, i) => (row.sign ? <Changed key={i} row={row} /> : <Plain key={i} row={row} />))}
+      <View style={{ marginHorizontal: spacing[4], paddingTop: spacing[5], paddingBottom: 60, paddingHorizontal: 18, borderRadius: 14, gap: spacing[1], backgroundColor: dark ? iosMaterial.dark : c.card }}>
+        {rows.map((row, i) => (row.sign ? <Changed key={i} row={row} pull={row.sign === '+' && rows[i - 1]?.sign === '-'} /> : <Plain key={i} row={row} />))}
       </View>
     </PageModal>
   )
