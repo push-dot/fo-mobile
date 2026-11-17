@@ -4,7 +4,7 @@ import { findAll } from './native-stubs'
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Pressable: 'Pressable', View: 'View' }))
 vi.mock('../../../theme', async () => {
   const tokens = await import('../../../theme/tokens')
-  return { spacing: tokens.spacing, type: tokens.type }
+  return { largeType: tokens.largeType, spacing: tokens.spacing, type: tokens.type }
 })
 vi.mock('../icon', () => ({ default: 'Icon' }))
 vi.mock('../text', () => ({ default: 'Text' }))

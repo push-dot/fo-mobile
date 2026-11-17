@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
-import { spacing, type } from '../../theme'
+import { largeType, spacing, type } from '../../theme'
 import Icon from './icon'
 import Text from './text'
 
@@ -22,7 +22,7 @@ type RowProps = {
 }
 
 const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker, xl }: RowProps) => {
-  const labelSize = xl ? { fontSize: 21, lineHeight: 28 } : { lineHeight: type.b2.lineHeight }
+  const labelSize = xl ? { fontSize: 21, lineHeight: largeType.b2.lineHeight } : { lineHeight: type.b2.lineHeight }
   const valueSize = xl ? { fontSize: 18 } : undefined
   const body = (
     <View

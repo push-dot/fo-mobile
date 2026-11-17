@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
-import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { largeType, radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
 import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
@@ -201,7 +201,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
               paddingVertical: spacing[2],
             }}
           >
-            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? { fontSize: 21, lineHeight: 28 } : { lineHeight: type.b2.lineHeight }]}>
+            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? { fontSize: 21, lineHeight: largeType.b2.lineHeight } : { lineHeight: type.b2.lineHeight }]}>
               {row.label}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
