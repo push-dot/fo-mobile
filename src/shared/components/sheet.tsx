@@ -6,6 +6,7 @@ import { spacing, useColors } from '../../theme'
 import Button from './button'
 import { GRABBER } from './constants'
 import { SheetSurface } from './glass'
+import { PM8_SLIM_ACTION } from './pm8'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
 import Text from './text'
@@ -37,7 +38,6 @@ type Props = {
 
 const SHEET_GAP = 14
 // .ifoot .btn is 52 high (radius 26) and the sheet ends 26 under it: 4 less than the shared 56, 6 more below.
-const SLIM_ACTION = { minHeight: 52, borderRadius: 26 } as const
 const SLIM_ACTION_BOTTOM = 6
 const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
@@ -98,7 +98,7 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
         </View>
       ) : null}
       {children}
-      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && SLIM_ACTION]} /> : null}
+      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && PM8_SLIM_ACTION]} /> : null}
       {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} style={[secondaryGap === undefined ? null : { marginTop: secondaryGap - gap }, secondaryFill ? { backgroundColor: secondaryFill } : null]} /> : null}
     </View>
   )
