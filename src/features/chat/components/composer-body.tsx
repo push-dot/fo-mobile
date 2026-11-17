@@ -12,6 +12,7 @@ export const COMPOSER_MAX_LINES = 5
 
 const ROW_HEIGHT = 44
 const PILL_PAD = 4
+const DISC = 36
 
 export type ComposerProps = {
   value: string
@@ -46,6 +47,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const showTools = p.tools ?? true
   const round = { width: ROW_HEIGHT, height: ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
+  const disc = { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: 'center', justifyContent: 'center' } as const
   const textType = type.h3
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ opacity: p.disabled ? 0.5 : 1, gap: spacing[2] }}>
@@ -68,7 +70,9 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
       <GlassField style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PILL_PAD, borderRadius: (ROW_HEIGHT + PILL_PAD * 2) / 2 }}>
         {showTools ? (
           <Pressable accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
-            <Icon name="plus" size={20} />
+            <View style={[disc, { backgroundColor: c.fill2 }]}>
+              <Icon name="plus" size={18} />
+            </View>
           </Pressable>
         ) : null}
         <View style={{ flex: 1, minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: showTools ? spacing[1] : spacing[3] }}>
@@ -100,7 +104,9 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
         </View>
         {showTools ? (
           <Pressable accessibilityRole="button" accessibilityLabel="언급" onPress={p.onMention} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
-            <Icon name="at" size={20} />
+            <View style={[disc, { backgroundColor: c.fill2 }]}>
+              <Icon name="at" size={18} />
+            </View>
           </Pressable>
         ) : null}
         {p.working && !hasText ? (
@@ -109,9 +115,11 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             accessibilityLabel="중지"
             onPress={p.onStop}
             hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)}
-            style={({ pressed }) => [round, { backgroundColor: c.t1, transform: [{ scale: pressed ? 0.92 : 1 }] }]}
+            style={({ pressed }) => [round, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
           >
-            <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c.bg }} />
+            <View style={[disc, { backgroundColor: c.t1 }]}>
+              <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c.bg }} />
+            </View>
           </Pressable>
         ) : (
           <Pressable
@@ -121,9 +129,11 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
             disabled={!canSend}
             onPress={p.onSend}
             hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)}
-            style={[round, { backgroundColor: canSend ? c.ac : c.fill2 }]}
+            style={round}
           >
-            {p.sending ? <ActivityIndicator color={c.t3} /> : <Icon name="up" size={20} color={canSend ? onAccent : c.t4} />}
+            <View style={[disc, { backgroundColor: c.ac, opacity: canSend || p.sending ? 1 : 0.4 }]}>
+              {p.sending ? <ActivityIndicator color={onAccent} /> : <Icon name="up" size={18} color={onAccent} />}
+            </View>
           </Pressable>
         )}
       </GlassField>
