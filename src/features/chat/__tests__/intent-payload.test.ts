@@ -90,7 +90,8 @@ describe('quick start intent payloads', () => {
   it('opens 부족한 점 찾기 and 적합도 보기 in their own sheets, each with the copy of its board (QsGap, QsFit)', () => {
     const gap = QUICK_STARTS.find((q) => q.key === 'gap')!
     const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
-    expect(gap).toMatchObject({ label: '부족한 점 찾기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', action: '부족한 점 찾기', listLabel: '공고', readsHub: true })
+    expect(gap).toMatchObject({ openList: true, label: '부족한 점 찾기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', action: '부족한 점 찾기', listLabel: '공고', readsHub: true })
+    expect(fit!.openList).toBe(true)
     expect(fit).toMatchObject({ label: '적합도 보기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', listLabel: '공고', readsHub: true })
     expect(fit.docLabel).toBeUndefined()
     expect(gap.docLabel).toBeUndefined()

@@ -71,7 +71,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   const actionLabel = typeof qs.action === 'function' ? qs.action(qs.layout === 'calendar' ? task : picked.length) : qs.action
   const action = actionLabel ? { label: actionLabel, onPress: () => go(), disabled: !d || !qs.start(input) } : undefined
   const job = qs.listLabel ? picked[0] : undefined
-  const listOpen = all || !job || pickingJob
+  const listOpen = all || !job || pickingJob || !!qs.openList
   const seeAll = all ? undefined : () => router.replace(quickStartAllPath(qs.key))
   const docField = qs.docLabel ? (
     <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} onSeeAll={seeAll} />
@@ -124,7 +124,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
       {qs.listLabel ? (
         <View style={{ gap: spacing[2] }}>
           {docField}
-          {job && !all ? <PickerRow label={qs.listLabel} value={[job.over, job.title].filter(Boolean).join(' · ')} onPress={() => setPickingJob((v) => !v)} /> : null}
+          {job && !all && !qs.openList ? <PickerRow label={qs.listLabel} value={[job.over, job.title].filter(Boolean).join(' · ')} onPress={() => setPickingJob((v) => !v)} /> : null}
         </View>
       ) : null}
 

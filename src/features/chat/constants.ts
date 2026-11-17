@@ -115,6 +115,8 @@ export type QuickStart = {
   docLabel?: string
   readsHub?: boolean
   listLabel?: string
+  /** The list of postings is open from the start (QsGap, QsFit: 3 recent and 전체 보기); the others show the picked row and open the list on a tap. */
+  openList?: boolean
   custom?: string
   instant?: boolean
   start: (i: QsInput) => { title: string; message: string; intent: ChatIntent; context?: { documentId: string } } | null | undefined
@@ -143,12 +145,12 @@ export const QUICK_STARTS: QuickStart[] = [
     start: (i) => i.chips.length ? opened('나에게 맞는 공고', `${i.chips.join(' · ')} 조건으로 공고를 찾아 주세요${i.option ? '. 적합도 7점 이상인 공고만 보여 주세요' : ''}`, 'find_postings', i.documentId) : null,
   },
   {
-    key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '부족한 점 찾기', listLabel: '공고', readsHub: true,
+    key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '부족한 점 찾기', listLabel: '공고', openList: true, readsHub: true,
     title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 부족한 점`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {
-    key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
+    key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', openList: true, readsHub: true,
     title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
