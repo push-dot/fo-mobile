@@ -149,7 +149,7 @@ export const QUICK_STARTS: QuickStart[] = [
   },
   {
     key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', readsHub: true,
-    title: '어떤 공고로 볼까요?', description: '점수가 오르도록 서류를 고쳐 드려요.',
+    title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {
