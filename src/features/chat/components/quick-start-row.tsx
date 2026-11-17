@@ -1,17 +1,7 @@
 import { Pressable, ScrollView } from 'react-native'
 import { radius, spacing, useColors } from '../../../theme'
 import { Icon3D, Text } from '@/shared/components'
-import { QUICK_STARTS } from '../constants'
-
-const COMPANY_CHIP_KEYS = ['fit', 'boost', 'exp'] as const
-
-export const quickStartsFor = (kind: 'push' | 'company') =>
-  kind === 'push'
-    ? QUICK_STARTS
-    : COMPANY_CHIP_KEYS.flatMap((key) => {
-        const row = QUICK_STARTS.find((item) => item.key === key)
-        return row ? [row] : []
-      })
+import { quickStartsFor } from '../utils/quick-start-chips'
 
 /** One line of plain pills with their 3D icon right above the input (ChatBotOnboardPush, ChatBotOnboard): no glass. */
 const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (key: string) => void }) => {
@@ -28,7 +18,7 @@ const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (ke
     >
       {quickStartsFor(kind).map((item) => (
         <Pressable
-          key={item.key}
+          key={item.label}
           accessibilityRole="button"
           onPress={() => onChip(item.key)}
           style={{ height: 52, paddingLeft: spacing[3], paddingRight: spacing[5], gap: spacing[2], borderRadius: radius.pill, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center' }}
