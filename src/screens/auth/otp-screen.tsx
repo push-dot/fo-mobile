@@ -175,7 +175,7 @@ const OtpScreen = () => {
           />
         </View>
         {notice ? (
-          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[3] }}>
+          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[4] }}>
             {notice}
           </Text>
         ) : null}
@@ -184,7 +184,7 @@ const OtpScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing[3],
-            marginTop: notice ? spacing[2] : spacing[4],
+            marginTop: notice ? 10 : spacing[4],
           }}
         >
           {status}

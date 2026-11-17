@@ -13,7 +13,7 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, ChipRow, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Badge, Button, Chip, ChipRow, GlassField, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
 const SEARCH_PILL = { height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] } as const
@@ -38,18 +38,18 @@ const HubScreen = () => {
   const header = useMemo(
     () => (
     <View>
-      <View style={{ paddingHorizontal: spacing[5] }}>
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
         <Pressable
           accessibilityRole="search"
           accessibilityLabel="이름, 직무, 기술 검색"
           onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
         >
-          <View style={[SEARCH_PILL, { backgroundColor: c.fill }]}>
+          <GlassField style={SEARCH_PILL}>
             <Icon name="search" size={20} color="t3" />
             <Text v="b1" color="t3">
               이름, 직무, 기술 검색
             </Text>
-          </View>
+          </GlassField>
         </Pressable>
       </View>
       <ChipRow paddingTop={spacing[4]}>
@@ -65,7 +65,7 @@ const HubScreen = () => {
       </View>
     </View>
     ),
-    [c.fill, category, setCategory, summary, viewerId, emptyList],
+    [category, setCategory, summary, viewerId, emptyList],
   )
 
   const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])

@@ -10,8 +10,8 @@ const BotCompaniesScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar circleBack chat={Platform.OS === 'ios'} onBack={() => router.back()} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[6], gap: spacing[3] }}>
-        <Text v="h2" accessibilityRole="header">
+      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[6] }}>
+        <Text v="h2" weight="700" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30, paddingTop: 6, paddingBottom: spacing[3] }}>
           {companiesTitle(names.length)}
         </Text>
         <SettingsGroup>
