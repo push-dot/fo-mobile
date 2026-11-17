@@ -44,15 +44,15 @@ const BotHomeRow = ({
       </View>
       <View style={body}>
         <View style={top}>
-          <Text weight="700" numberOfLines={chrome.nameLines} style={name}>
+          <Text allowFontScaling={chrome.xl ? false : undefined} weight="700" numberOfLines={chrome.nameLines} style={name}>
             <Highlight text={row.name} q={q} />
           </Text>
-          <Text color="t3" style={time}>
+          <Text allowFontScaling={chrome.xl ? false : undefined} color="t3" style={time}>
             {row.time}
           </Text>
         </View>
         {row.line ? (
-          <Text color="t3" numberOfLines={chrome.msgLines} style={line}>
+          <Text allowFontScaling={chrome.xl ? false : undefined} color="t3" numberOfLines={chrome.msgLines} style={line}>
             <Highlight text={row.line} q={q} />
           </Text>
         ) : null}

@@ -17,13 +17,17 @@ type RowProps = {
   mutedChevron?: boolean
   /** A value row that opens a picker (v415 Settings): the label is the value itself; only the up-down selector sits on the right. */
   picker?: boolean
+  /** BotProfileXL: the board's `.grp .it` is 64 high with 21 pt labels and 18 pt values, drawn in fixed pixels. */
+  xl?: boolean
 }
 
-const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker }: RowProps) => {
+const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker, xl }: RowProps) => {
+  const labelSize = xl ? { fontSize: 21, lineHeight: 28 } : { lineHeight: type.b2.lineHeight }
+  const valueSize = xl ? { fontSize: 18 } : undefined
   const body = (
     <View
       style={{
-        minHeight: 56,
+        minHeight: xl ? 64 : 56,
         flexDirection: 'row',
         alignItems: 'center',
         gap: spacing[3],
@@ -31,7 +35,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text v="b1" color={danger ? 'red' : 't1'} style={{ lineHeight: type.b2.lineHeight }}>
+        <Text v="b1" color={danger ? 'red' : 't1'} allowFontScaling={xl ? false : undefined} style={labelSize}>
           {label}
         </Text>
         {sub ? (
@@ -46,14 +50,14 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
         ) : onPress || chevron ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
             {value ? (
-              <Text v="b2" color="t3">
+              <Text v="b2" color="t3" allowFontScaling={xl ? false : undefined} style={valueSize}>
                 {value}
               </Text>
             ) : null}
             <Icon name="chev" size={16} color={mutedChevron || value ? 't3' : 't1'} />
           </View>
         ) : value ? (
-          <Text v="b2" color="t3">
+          <Text v="b2" color="t3" allowFontScaling={xl ? false : undefined} style={valueSize}>
             {value}
           </Text>
         ) : null)}

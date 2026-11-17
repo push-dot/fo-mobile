@@ -1,3 +1,5 @@
+import { isXlBoardText } from './xl-scale'
+
 /** Which list opened the page: the same fo-web route draws a different board for each. */
 export type DetailFrom = 'following' | 'bookmark'
 
@@ -17,9 +19,27 @@ export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', m
   return `${base}${path}?${query.toString()}`
 }
 
-/** fo-web sets text-size-adjust on body, so an inline value on html never reached the text. */
+/** The `.xl` text rules of the job detail boards (JobDetailXL): drawn in fixed pixels, so each rule also drops the system inflation for its own element. */
+const XL_BOARD_RULES = [
+  '.h1{font-size:34px;line-height:44px}',
+  '.h2{font-size:26px;line-height:34px}',
+  '.h3{font-size:22px;line-height:30px}',
+  '.b1{font-size:21px;line-height:30px}',
+  '.b2{font-size:20px;line-height:28px}',
+  '.c1{font-size:17px;line-height:24px}',
+  '.c2{font-size:16px;line-height:22px}',
+  '.btn{height:auto;min-height:56px;padding:12px 20px;font-size:22px;line-height:30px}',
+  '.btn.sm{min-height:44px;font-size:18px}',
+  '.chip{height:auto;min-height:40px;padding:8px 16px;font-size:18px;line-height:24px}',
+  '.badge{height:auto;min-height:26px;padding:2px 8px;font-size:15px;line-height:22px}',
+  '.frow{font-size:17px;line-height:24px;grid-template-columns:110px minmax(0,1fr) 40px}',
+]
+  .map((rule) => `html.push-xl ${rule.slice(0, -1)};-webkit-text-size-adjust:100%!important}`)
+  .join('')
+
+/** fo-web sets text-size-adjust on body, so an inline value on html never reached the text. From the harness XL size the page also takes the board's `.xl` sizes. */
 export const textSizeScript = (percent: number) =>
-  `(function(){var s=document.getElementById('push-text-size');if(!s){s=document.createElement('style');s.id='push-text-size';document.documentElement.appendChild(s)}s.textContent='html,body{-webkit-text-size-adjust:${percent}%!important}'})();true;`
+  `(function(){var s=document.getElementById('push-text-size');if(!s){s=document.createElement('style');s.id='push-text-size';document.documentElement.appendChild(s)}s.textContent='html,body{-webkit-text-size-adjust:${percent}%!important}${isXlBoardText(percent / 100) ? XL_BOARD_RULES : ''}';document.documentElement.classList.toggle('push-xl',${isXlBoardText(percent / 100)})})();true;`
 
 /** Mock only (JobFit): fo-web answers the fit in a WebView after `setTimeout(resolve, 0)` set from fit-card.tsx, so a zero-delay timer set by that file waits 60 s (fo-web runs unminified from its dev server, so the file is in the stack). Timers set deeper, such as the mock data loader's, are left alone: holding those blanks the whole page. */
 export const HOLD_FIT_SCRIPT =

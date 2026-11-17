@@ -1,6 +1,7 @@
 import { spacing } from '../../../../theme'
 
 export const homeChrome = (xl: boolean) => ({
+  xl,
   header: xl ? 68 : 60,
   searchTop: 68,
   avatar: xl ? 52 : 44,

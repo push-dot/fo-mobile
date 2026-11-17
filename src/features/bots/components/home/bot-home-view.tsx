@@ -1,13 +1,13 @@
 import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { FlatList, Platform, View, useWindowDimensions } from 'react-native'
+import { FlatList, Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useKeyboardHeight, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
-import { isXlScale } from '@/shared/components/xl-chrome'
+import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
@@ -72,7 +72,7 @@ const BotHomeView = ({
   const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
-  const xl = isXlScale(useWindowDimensions().fontScale)
+  const xl = useXlBoardText()
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
@@ -136,6 +136,7 @@ const BotHomeView = ({
   ) : null
 
   return (
+    <XlBoardChrome>
     <View style={screen}>
       <BotHomeHeader
         chrome={chrome}
@@ -213,6 +214,7 @@ const BotHomeView = ({
         onClose={() => setQuery(null)}
       />
     </View>
+    </XlBoardChrome>
   )
 }
 

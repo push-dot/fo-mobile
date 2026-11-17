@@ -1,8 +1,8 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Platform, Pressable, ScrollView, View, useWindowDimensions } from 'react-native'
+import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar } from '@/shared/components'
-import { isXlScale } from '@/shared/components/xl-chrome'
+import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
@@ -81,7 +81,7 @@ const Loading = () => {
 }
 
 const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typeof Mascot>[0]['color']; sub?: string }) => {
-  const xl = isXlScale(useWindowDimensions().fontScale)
+  const xl = useXlBoardText()
   const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
   return (
     <View
@@ -99,6 +99,7 @@ const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typ
       <Text
         weight="800"
         numberOfLines={2}
+        allowFontScaling={xl ? false : undefined}
         style={{
           textAlign: 'center',
           maxWidth: 330,
@@ -109,7 +110,7 @@ const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typ
         {name}
       </Text>
       {sub ? (
-        <Text color="t3" numberOfLines={1} style={{ textAlign: 'center', fontSize: size.sub, lineHeight: size.subLine }}>
+        <Text color="t3" numberOfLines={1} allowFontScaling={xl ? false : undefined} style={{ textAlign: 'center', fontSize: size.sub, lineHeight: size.subLine }}>
           {sub}
         </Text>
       ) : null}
@@ -153,6 +154,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const remove = useDeleteBot()
   const companies = companyNames(useBots().data)
   const [deleting, setDeleting] = useState(false)
+  const xl = useXlBoardText()
   if (profile.isLoading) return <Loading />
   if (profile.isError || !profile.data) return <Failed bot={listed.data} onRetry={() => void profile.refetch()} />
   const { bot, posting } = profile.data
@@ -184,7 +186,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const rowOf = (row: ProfileRow) => {
     if (row.id === 'notify') {
       return (
-        <SettingsRow key={row.id} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />} />
+        <SettingsRow key={row.id} xl={xl} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />} />
       )
     }
     if (row.id === 'color' && bot.kind === 'company') {
@@ -192,14 +194,14 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
         <Pressable key={row.id} accessibilityRole="button" accessibilityLabel={COLOR_A11Y} onPress={() => open(row)}>
           <View
             style={{
-              minHeight: 56,
+              minHeight: xl ? 64 : 56,
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing[3],
               paddingVertical: spacing[2],
             }}
           >
-            <Text v="b1" style={{ flex: 1, lineHeight: type.b2.lineHeight }}>
+            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? { fontSize: 21, lineHeight: 28 } : { lineHeight: type.b2.lineHeight }]}>
               {row.label}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
@@ -219,15 +221,16 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
       )
     }
     if (row.id === 'delete') {
-      return <SettingsRow key={row.id} label={row.label} danger onPress={() => open(row)} right={<View />} />
+      return <SettingsRow key={row.id} xl={xl} label={row.label} danger onPress={() => open(row)} right={<View />} />
     }
     if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'companies') {
       const dead = row.id === 'fit' && !posting
-      return <SettingsRow key={row.id} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
+      return <SettingsRow key={row.id} xl={xl} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
     }
     return null
   }
   return (
+    <XlBoardChrome>
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
@@ -239,6 +242,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
         ))}
       </ScrollView>
     </View>
+    </XlBoardChrome>
   )
 }
 

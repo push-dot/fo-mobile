@@ -5,6 +5,7 @@ import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/
 import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
 import { Button, GlassButton, Skeleton, Text, ToastHost, type MenuAction } from '@/shared/components'
+import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
 import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, type AddAction } from '../constants'
@@ -135,6 +136,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   })()
 
   return (
+    <XlBoardChrome>
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
         <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
@@ -151,5 +153,6 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
       {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
     </View>
+    </XlBoardChrome>
   )
 }
