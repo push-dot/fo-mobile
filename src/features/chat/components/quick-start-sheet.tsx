@@ -121,7 +121,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
         </>
       ) : null}
 
-      {qs.listLabel ? (
+      {qs.listLabel && (docField || (job && !all && !qs.openList)) ? (
         <View style={{ gap: spacing[2] }}>
           {docField}
           {job && !all && !qs.openList ? <PickerRow label={qs.listLabel} value={[job.over, job.title].filter(Boolean).join(' · ')} onPress={() => setPickingJob((v) => !v)} /> : null}
@@ -139,7 +139,14 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
           {qs.grid ? (
             visible.map((it) => <OptionCard key={it.id} item={it} on={!typing && sel.includes(it.id)} grid onPress={() => (setCustom(''), toggle(it.id))} />)
           ) : (
-            <RecentList items={visible} keyOf={(it) => it.id} renderItem={(it) => <OptionCard item={it} on={!typing && sel.includes(it.id)} onPress={() => (setCustom(''), toggle(it.id))} />} onSeeAll={seeAll} />
+            <RecentList
+              items={visible}
+              keyOf={(it) => it.id}
+              gap={all ? spacing[2] : spacing[3]}
+              moreGap={spacing[3]}
+              renderItem={(it) => <OptionCard item={it} flat={all} on={!typing && sel.includes(it.id)} onPress={() => (setCustom(''), toggle(it.id))} />}
+              onSeeAll={seeAll}
+            />
           )}
           {qs.custom ? <TextField placeholder={qs.custom} accessibilityLabel={qs.custom} value={custom} onChangeText={setCustom} /> : null}
         </View>
@@ -155,6 +162,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
           <RecentList
             items={visible}
             keyOf={(it) => it.id}
+            moreGap={spacing[3]}
             onSeeAll={seeAll}
             renderItem={(it) => (
               <ItemRow item={it} layout={qs.layout} on={sel.includes(it.id)} onPress={qs.layout === 'reply' ? () => go(it) : () => (toggle(it.id), setPickingJob(false))} />
@@ -166,8 +174,8 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   )
   if (all)
     return (
-      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 52, borderRadius: 26 }} /> : undefined}>
-        <View style={{ gap: spacing[3], paddingHorizontal: spacing[4] }}>{content}</View>
+      <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} style={{ minHeight: 56, borderRadius: 28 }} /> : undefined}>
+        <View style={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>{content}</View>
       </PageModal>
     )
   return (
@@ -387,7 +395,7 @@ const ItemRow = ({ item, layout, on, onPress }: { item: QsItem; layout: string; 
   )
 }
 
-const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; grid?: boolean; onPress: () => void }) => {
+const OptionCard = ({ item, on, grid, flat, onPress }: { item: QsItem; on: boolean; grid?: boolean; flat?: boolean; onPress: () => void }) => {
   const c = useColors()
   const ring = selectedRing(c)
   return (
@@ -406,7 +414,7 @@ const OptionCard = ({ item, on, grid, onPress }: { item: QsItem; on: boolean; gr
       }}
     >
       <Pick on={on} square />
-      <View style={{ flex: 1, gap: spacing[1], paddingBottom: item.meta ? 0 : spacing[1] }}>
+      <View style={{ flex: 1, gap: spacing[1], paddingBottom: item.meta || flat ? 0 : spacing[1] }}>
         <Text v="b1" weight="700">
           {item.title}
         </Text>
