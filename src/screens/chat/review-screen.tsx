@@ -145,7 +145,8 @@ const ReviewScreen = () => {
         ) : undefined
       }
     >
-      <View style={{ marginHorizontal: spacing[4], paddingTop: spacing[5], paddingBottom: 60, paddingHorizontal: 18, borderRadius: 14, gap: spacing[1], backgroundColor: dark ? iosMaterial.dark : c.card }}>
+      {/* `.pm-b` pads 4 above its content (ChatApprove). */}
+      <View style={{ marginHorizontal: spacing[4], marginTop: spacing[1], paddingTop: spacing[5], paddingBottom: 60, paddingHorizontal: 18, borderRadius: 14, gap: spacing[1], backgroundColor: dark ? iosMaterial.dark : c.card }}>
         {rows.map((row, i) => (row.sign ? <Changed key={i} row={row} pull={row.sign === '+' && rows[i - 1]?.sign === '-'} /> : <Plain key={i} row={row} />))}
       </View>
     </PageModal>

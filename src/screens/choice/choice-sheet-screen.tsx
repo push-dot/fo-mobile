@@ -4,6 +4,7 @@ import { Platform, Pressable, View } from 'react-native'
 import { Button, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
 import { iosSeparator, onAccent, spacing, useColors, useThemeMode } from '@/theme'
+import { PM8, pm8Row, pm8SecondaryFill } from './choice-sheet-layout'
 
 const MARK = 24
 
@@ -16,7 +17,7 @@ const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => {
   )
 }
 
-// .pm8: title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
+// .pm8: a marked row is `.pm-row.cr` (52 high, 14 gap); title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
@@ -48,9 +49,11 @@ const ChoiceSheetScreen = () => {
       : request.confirm
   const closeLabel = request.confirm?.closeLabel
   const toggleOption = (i: number) => setSelected((cur) => (form?.multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i]))
-  const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
+  const secondaryFill = pm8SecondaryFill(Platform.OS === 'ios', dark)
+  const secondaryStyle = secondaryFill ? { backgroundColor: secondaryFill } : null
+  const row = (last: boolean, mark = false) => ({ ...pm8Row(mark), flexDirection: 'row' as const, alignItems: 'center' as const, paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
-    <Sheet gap={4} actionGap={10} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
+    <Sheet gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} secondaryFill={secondaryFill} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
       secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => run(request.confirm!.secondary!.onPress) } : undefined}
     >
       <View style={{ minHeight: 52, justifyContent: 'center' }}>
@@ -64,9 +67,9 @@ const ChoiceSheetScreen = () => {
         </Text>
       ) : null}
       {request.items && request.buttons ? (
-        <View style={{ gap: spacing[2], marginTop: spacing[3] }}>
+        <View style={{ gap: spacing[2], marginTop: PM8.buttonsTop }}>
           {request.items.map((item, i) => (
-            <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={{ minHeight: 52, borderRadius: 26 }} />
+            <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={[{ minHeight: 52, borderRadius: 26 }, i === 0 ? null : secondaryStyle]} />
           ))}
         </View>
       ) : null}
@@ -104,7 +107,7 @@ const ChoiceSheetScreen = () => {
               accessibilityRole={form.multi ? 'checkbox' : 'radio'}
               accessibilityState={form.multi ? { checked: selected.includes(i) } : { selected: selected.includes(i) }}
               onPress={() => toggleOption(i)}
-              style={row(i === form.options.length - 1 && !form.toggle)}
+              style={row(i === form.options.length - 1 && !form.toggle, true)}
             >
               <Mark checked={selected.includes(i)} multi={!!form.multi} />
               <View style={{ flex: 1 }}>
@@ -131,7 +134,7 @@ const ChoiceSheetScreen = () => {
       ) : null}
       {confirm && closeLabel ? (
         <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: 10 }}>
-          <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={{ flex: 1, minHeight: 52, borderRadius: 26 }} />
+          <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={[{ flex: 1, minHeight: 52, borderRadius: 26 }, secondaryStyle]} />
           <Button label={confirm.label} onPress={() => run(confirm.onPress)} style={{ flex: 1, minHeight: 52, borderRadius: 26 }} />
         </View>
       ) : null}

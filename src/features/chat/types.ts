@@ -12,7 +12,7 @@ export type PlanItem = { type: 'plan'; id: string; title: string; meta: string; 
 
 export type ChatItem =
   | { type: 'user'; id: string; text: string; attachment?: string }
-  /** `text` supports **bold**; `bullets` render as a t2 list under it. */
+  /** `text` supports **bold**; `bullets` render as the dotted list (`ul.mdul`) under it. */
   /** `sources` is the 출처 row of a bot answer (ChatBotHeader). */
   /** `card` is the plan that came right after the text, `diff` the edit: the bubble draws them under the text (ChatPh1Feedback, ChatApprove). */
   /** `detail` is grey sub-text under the text; a tap expands it (rule 30). */

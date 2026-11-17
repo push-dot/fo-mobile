@@ -50,7 +50,7 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
-/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality). */
+/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality, and the closing summaries of ChatDone*, ChatPh6Apply). */
 export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: string; hitsBefore?: number[] }) => {
   const c = useColors()
   // A row's text is measured against the row's width before the dot and the gap are taken off, then shrunk without a re-wrap, so its lines ran into the bubble's padding:
@@ -174,8 +174,8 @@ const BotText = ({ item, onView, onRetry }: { item: Extract<ChatItem, { type: 'a
       {item.detail ? <Detail text={item.detail} /> : null}
       {item.card ? <PlanBlock item={item.card} /> : null}
       {item.diff ? <DiffDetail item={item.diff} /> : null}
-      {/* A closing line's summary is grey 15 text with "•" in it, not the dotted list (ChatDone, ChatKeyboardIOS). */}
-      {item.bullets?.length ? <Rich v="b2" color="t2" text={item.bullets.map((line) => `• ${line}`).join('\n')} markId={item.id} /> : null}
+      {/* The closing line's summary is the dotted list of the v489 boards (ChatDone, ChatDoneNext, ChatDoneProfile, ChatDoneNoJob, ChatDoneSaveFail). */}
+      {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
       {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>

@@ -22,5 +22,15 @@ tags:
     visible: "이 공고에 맞춰 이력서를 고칠까요?"
     timeout: 20000
 - waitForAnimationToEnd
+# ChatPh1FitClosed draws the thread with the modal swiped away, the 답을 기다리고 있어요 line and the keyboard up.
+- runFlow:
+    file: _close_sheet.yaml
+    env:
+      TITLE: "이 공고에 맞춰 이력서를 고칠까요?"
+- tapOn: ".*에게 물어보기"
+- extendedWaitUntil:
+    visible: "답을 기다리고 있어요"
+    timeout: 10000
+- waitForAnimationToEnd
 - takeScreenshot: ChatPh1FitClosed
 - openLink: push://?mock=reset

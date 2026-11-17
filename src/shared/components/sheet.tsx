@@ -24,6 +24,10 @@ type Props = {
   actionGap?: number
   /** iOS filter sheets (.ifoot .btn): a 52 high CTA with 26 under it instead of 56 with 20, the same 78 of footer. */
   slimAction?: boolean
+  /** Space between the grabber and the first block when a board draws it other than the sheet gap (the .pm8 title sits 17 under the top: gap 0). */
+  topGap?: number
+  /** A board that tints its secondary button other than the plain fill (the .pm8 iOS light sheet: systemFill over the sheet). */
+  secondaryFill?: string
   /** iOS: extra space under the action, for a board that draws the sheet taller than the 26 under a slim CTA (PushDocRename: 38). */
   bottomExtra?: number
   onLayout?: ViewProps['onLayout']
@@ -39,7 +43,7 @@ const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, secondaryGap, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, secondaryGap, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, topGap = gap, secondaryFill, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -64,7 +68,7 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
       }}
       style={{
         flex: full ? 1 : undefined,
-        paddingTop: android ? spacing[3] : spacing[3] + GRABBER.ios.height + gap,
+        paddingTop: android ? spacing[3] : spacing[3] + GRABBER.ios.height + topGap,
         paddingHorizontal: android || full ? spacing[5] : spacing[4],
         paddingBottom: android
           ? insets.bottom + spacing[3]
@@ -95,7 +99,7 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
       ) : null}
       {children}
       {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && SLIM_ACTION]} /> : null}
-      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} style={secondaryGap === undefined ? undefined : { marginTop: secondaryGap - gap }} /> : null}
+      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} style={[secondaryGap === undefined ? null : { marginTop: secondaryGap - gap }, secondaryFill ? { backgroundColor: secondaryFill } : null]} /> : null}
     </View>
   )
 }
