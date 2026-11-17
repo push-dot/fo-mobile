@@ -63,6 +63,15 @@ describe('chat mock', () => {
     expect(fit).toMatchObject({ plan: 'FREE' })
   })
 
+  it('draws the blueprints alone, with no failed check before them, for the ChatPh2XBlueprints shot', async () => {
+    for (const text of ['ph2x-blueprints', '기획서 보여 줘']) {
+      const events = await run(`t-bp-${text}`, { text })
+      expect(types(events)).toContain('plan')
+      expect(events.some((e) => e.type === 'notice')).toBe(false)
+      expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-bp')).toBe(true)
+    }
+  })
+
   it('fails the first 병목 강도 pick and passes the second', async () => {
     await run('t-verify', { text: 'ph2x' })
     await answer('t-verify', 'ph2x-approach', '0')

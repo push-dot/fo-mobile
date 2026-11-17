@@ -635,6 +635,9 @@ export const TOKENS: Record<string, Step[]> = {
   ph5: [...ph5, ...finish('6.9 → 8.1', '으로')],
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
+  // ChatPh2XBlueprints: the blueprints alone under the user's line, without the failed check before them.
+  'ph2x-blueprints': ph2xBlueprints,
+  '기획서 보여 줘': ph2xBlueprints,
   // ChatPh6Result: the closing line with its list and the profile link, with no task lines above it.
   'profile-result': [...profileDone(300, '6.9 → 8.1', '으로', undefined, true), done],
   'ph1-free': ph1Plan('FREE'),
