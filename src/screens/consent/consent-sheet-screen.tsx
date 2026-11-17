@@ -28,7 +28,7 @@ const ConsentSheetScreen = () => {
   return (
     <Sheet gap={12} actionGap={12} secondaryGap={8} action={{ label: request.agree, onPress: agree }} secondary={{ label: CONSENT_LATER_LABEL, onPress: () => router.back() }}>
       <View style={{ gap: spacing[3] }}>
-        <Text v="h2" accessibilityRole="header" style={{ paddingTop: 4 }}>
+        <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {request.title}
         </Text>
         <Text v="b2" color="t2">
