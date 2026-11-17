@@ -84,7 +84,6 @@ export const reviewRows = (lines: readonly DiffLine[]): ReviewRow[] => {
   return rows.map((row, i) => (row.kind === 'text' && row.sign === '+' ? { ...row, parts: strongParts(row.parts[0]!.text, removedBefore(rows, i)) } : row))
 }
 
-/** The removed lines right before the added run that row i belongs to. */
 const removedBefore = (rows: ReviewRow[], i: number) => {
   let at = i
   while (at > 0 && rows[at - 1]!.sign === '+') at--

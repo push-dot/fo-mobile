@@ -37,13 +37,11 @@ export const resultButtons = (card: Pick<ResultFields, 'actions'>) => resultActi
 export const doneNextActions = (card: Pick<ResultFields, 'actions'> & { pendingNote?: string }) =>
   resultActionsFor(card).filter((action) => action.id !== 'view')
 
-/** ChatDoneNext: a regular modal asking what comes next, the first action as the primary button and the second as the grey one. */
 export const DONE_NEXT_TITLE = '다음으로 무엇을 할까요?'
 
 /** The server sends savedLine with an external file it saved; no line means the save failed (ChatPh6ResultFail). */
 export const saveFailed = (card: Pick<ResultFields, 'source' | 'savedLine'>) => card.source === 'external' && !card.savedLine
 
-/** ChatPh6ResultFail: the bot says it in a bubble of its own, with the link 다시 저장하기 ›, not an alert. */
 export const SAVE_FAIL_TEXT = '내 서류에 저장하지 못했어요. 네트워크를 확인해 주세요.'
 export const SAVE_RETRY_LABEL = '다시 저장하기'
 /** What 다시 저장하기 sends: the bot saves the file it just made. */

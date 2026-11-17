@@ -4,7 +4,7 @@ import type { Approval, ApprovalSection, DiffLine } from '../types'
 import type { ReviewPageRequest } from '../review-page'
 import { choiceSheet, confirmModal, designModal } from './choice-sheet'
 import { isStop } from './multi-pick'
-import { buttonLabel, chipSends, sectionLabel, sectionPicks } from './stream-v3'
+import { buttonLabel, chipSends, MATERIALS_SECTION, sectionLabel, sectionPicks } from './stream-v3'
 
 type Row = Extract<ApprovalSection, { kind: 'rows' }>['items'][number]
 
@@ -18,8 +18,6 @@ export type GateHooks = {
 
 export const UNDO_LABEL = '되돌리기'
 export const NEXT_LABEL = '다음'
-const MATERIALS = 'materials'
-
 const choicesForm = (approval: Approval, h: GateHooks): ChoiceModalRequest | null => {
   const section = approval.sections.length === 1 ? approval.sections[0] : undefined
   if (!approval.submit || section?.kind !== 'choices') return null
@@ -51,7 +49,7 @@ const sections = (approval: Approval, h: GateHooks, ask: (request: ChoiceModalRe
     const last = n === order.length - 1
     const label = last ? (buttonLabel(approval, sel) || '확인') : NEXT_LABEL
     const picked = (chosen: number[]) => sel.map((x, i) => (i === si ? chosen : x))
-    const confirmLabel = (chosen: number[]) => (last ? buttonLabel(approval, picked(chosen)) || label : s.kind === 'toggle' && s.id === MATERIALS ? `${chosen.length}개로 시작하기` : label)
+    const confirmLabel = (chosen: number[]) => (last ? buttonLabel(approval, picked(chosen)) || label : s.kind === 'toggle' && s.id === MATERIALS_SECTION ? `${chosen.length}개로 시작하기` : label)
     const next = () => (last ? finish() : show(n + 1))
     const title = n === 0 ? approval.question : s.kind === 'chips' || s.kind === 'toggle' ? (s.title ?? approval.question) : approval.question
     const base = { title, ...(n === 0 && approval.detail ? { message: approval.detail } : {}), onDismiss: h.say }

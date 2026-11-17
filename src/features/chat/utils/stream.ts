@@ -93,7 +93,7 @@ const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id
     return { question: ev.title, options: ev.options, tool: { ...times, ...(ev.summary ? { detail: ev.summary } : {}), ...(ev.foot ? { foot: ev.foot } : {}) } }
   }
   // push-be words the apply card's summary generically ("이 공고에 지원해요") and puts the posting in its title: "{company} · {title}에 지원해요".
-  const posting = (ev as { toolName?: string }).toolName === 'apply_to_posting'
+  const posting = ev.toolName === 'apply_to_posting'
   return { question: posting ? ev.title : ev.summary || ev.title, options: ev.options, warning: ev.foot, tool: times }
 }
 

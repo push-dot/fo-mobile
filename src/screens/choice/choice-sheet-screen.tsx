@@ -1,7 +1,6 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Platform, Pressable, useWindowDimensions, View } from 'react-native'
-import { MdTable } from '@/features/chat'
+import { Platform, Pressable, View } from 'react-native'
 import { Button, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
 import { iosSeparator, onAccent, spacing, useColors, useThemeMode } from '@/theme'
@@ -27,7 +26,6 @@ const ChoiceSheetScreen = () => {
   const [selected, setSelected] = useState(form?.selected ?? [])
   const [on, setOn] = useState(form?.toggle?.on ?? false)
   const [text, setText] = useState('')
-  const { width } = useWindowDimensions()
   const onDismiss = request?.onDismiss
   useEffect(() => {
     if (!request) router.back()
@@ -53,7 +51,7 @@ const ChoiceSheetScreen = () => {
   const row = (last: boolean) => ({ minHeight: 50, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[3], paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
     <Sheet gap={4} actionGap={10} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
-      secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => (request.confirm!.secondary!.stay ? request.confirm!.secondary!.onPress() : run(request.confirm!.secondary!.onPress)) } : undefined}
+      secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => run(request.confirm!.secondary!.onPress) } : undefined}
     >
       <View style={{ minHeight: 52, justifyContent: 'center' }}>
         <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
@@ -64,11 +62,6 @@ const ChoiceSheetScreen = () => {
         <Text v={request.items ? 'b2' : 'b1'} color="t2" style={{ paddingHorizontal: spacing[1], marginBottom: request.items || form ? 2 : 0 }}>
           {request.message}
         </Text>
-      ) : null}
-      {request.table ? (
-        <View style={{ paddingHorizontal: spacing[1] }}>
-          <MdTable table={{ kind: 'table', head: request.table.head, rows: request.table.rows }} width={width - spacing[4] * 2 - spacing[1] * 2} />
-        </View>
       ) : null}
       {request.items && request.buttons ? (
         <View style={{ gap: spacing[2], marginTop: spacing[3] }}>
