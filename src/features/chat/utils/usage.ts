@@ -1,5 +1,6 @@
 import type { IconName } from '@push/design-system'
 import type { MenuAction } from '@/shared/components/menu-action'
+import type { AttachmentKind } from '@/features/bots/types'
 import type { ChatItem } from '../types'
 import { foldBubbleCards } from './bubble-card'
 
@@ -96,5 +97,11 @@ export const threadRows = (items: readonly ChatItem[], working: boolean): Thread
   return working ? [...drawn, { type: 'running', id: 'running' }] : drawn
 }
 
-/** Every state of the chat box asks the same line, so the box never changes its words under the person (the name falls back to Bot until the bot loads). */
-export const composerPlaceholder = (name?: string) => askPlaceholder(name ?? 'Bot')
+const CHIP_NOUN: Record<AttachmentKind, string> = { document: '서류', posting: '공고', link: '링크', file: '파일' }
+
+/**
+ * The box asks the same line in every state (the name falls back to Bot until the bot loads), except while a material chip is attached:
+ * MaterialsSendHere and BotPickSent draw `이 서류로 무엇을 할까요?`. Only the 서류 line is drawn; the other kinds follow its pattern.
+ */
+export const composerPlaceholder = (name?: string, chipKind?: AttachmentKind) =>
+  chipKind ? `이 ${CHIP_NOUN[chipKind]}로 무엇을 할까요?` : askPlaceholder(name ?? 'Bot')

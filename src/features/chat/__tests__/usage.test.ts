@@ -42,6 +42,13 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder()).toBe('Bot에게 물어보기')
   })
 
+  it('asks what to do with the attached material', () => {
+    expect(composerPlaceholder('모아페이', 'document')).toBe('이 서류로 무엇을 할까요?')
+    expect(composerPlaceholder('모아페이', 'posting')).toBe('이 공고로 무엇을 할까요?')
+    expect(composerPlaceholder('모아페이', 'link')).toBe('이 링크로 무엇을 할까요?')
+    expect(composerPlaceholder('모아페이', 'file')).toBe('이 파일로 무엇을 할까요?')
+  })
+
   it('never asks to upgrade on PLAN_REQUIRED while payments are closed or the account is unknown', () => {
     expect(planRequired('FREE', true)).toBe('플랜을 올리면 쓸 수 있어요.')
     expect(planRequired('FREE', false)).toBe('지금 플랜에서는 쓸 수 없어요.')
