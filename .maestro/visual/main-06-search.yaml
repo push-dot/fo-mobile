@@ -48,10 +48,10 @@ tags:
           visible: "‘백엔드’ 사람.*"
           timeout: 10000
       - waitForAnimationToEnd
-      - takeScreenshot: HomeStates.3
+      - takeScreenshot: HomeStates.2
       - tapOn: "게시글.*"
       - extendedWaitUntil:
           visible: "‘백엔드’ 게시글.*"
           timeout: 10000
       - waitForAnimationToEnd
-      - takeScreenshot: HomeStates.4
+      - takeScreenshot: HomeStates.3
