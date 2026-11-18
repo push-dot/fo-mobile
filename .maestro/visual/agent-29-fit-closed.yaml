@@ -27,7 +27,11 @@ tags:
     file: _close_sheet.yaml
     env:
       TITLE: "이 공고에 맞춰 이력서를 고칠까요?"
+# The tap only opens the paste menu, so type and erase one character to raise the keyboard with the empty field and its caret, as the board draws it.
 - tapOn: ".*에게 물어보기"
+- inputText: "a"
+- eraseText: 1
+- waitForAnimationToEnd
 - extendedWaitUntil:
     visible: ".*답을 기다리고 있어요.*"
     timeout: 10000

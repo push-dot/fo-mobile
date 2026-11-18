@@ -31,13 +31,12 @@ describe('threadInset', () => {
 })
 
 describe('threadBottomGap', () => {
-  it('sits 8 above the composer with the keyboard up and 16 at rest', () => {
+  it('sits 8 above the composer with the keyboard up at any composer height and 16 at rest', () => {
     expect(threadBottomGap(336)).toBe(8)
     expect(threadBottomGap(0)).toBe(16)
   })
 
-  it('adds the 2-line field growth with the keyboard up (ChatKeyboardIOS.2 draws 32), not at rest', () => {
-    expect(threadBottomGap(336, 24)).toBe(32)
-    expect(threadBottomGap(0, 24)).toBe(16)
+  it('takes only the keyboard height, so composer growth cannot move the gap (the list already shrinks with KeyboardAvoidingView)', () => {
+    expect(threadBottomGap).toHaveLength(1)
   })
 })
