@@ -31,7 +31,7 @@ tags:
       - waitForAnimationToEnd
       - takeScreenshot: ChatKeyboardIOS.2
       - takeScreenshot: ChatComposerLong.2
-      - inputText: ". 승인 API 개선 성과는 맨 앞에 두고, Kafka 경험은 한 줄로 줄여 줘. 동아리 활동은 빼도 돼. 자기소개서는 다음에 따로 부탁할게"
+      - inputText: ". 승인 API 개선 성과는 맨 앞에 두고, Kafka 경험은 한 줄로 줄여 줘. 동아리 활동은 빼도 돼. 자기소개서는 다음에 따로 부탁할게. 지원 동기는 누리클라우드 서비스에 맞춰 두 문장으로 다시 써 주고, 마지막에 바뀐 점만 짧게 정리해 줘"
       - waitForAnimationToEnd
       - takeScreenshot: ChatKeyboardIOS.3
       - takeScreenshot: ChatComposerLong.3
