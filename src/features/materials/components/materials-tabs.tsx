@@ -1,5 +1,8 @@
-import { Pressable, useWindowDimensions, View } from 'react-native'
+import { Picker, Text as SwiftText } from '@expo/ui/swift-ui'
+import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
+import { Platform, Pressable, useWindowDimensions, View } from 'react-native'
 import { Text } from '@/shared/components'
+import NativeHost from '@/shared/components/native-host'
 import { isXlBoardText } from '@/shared/components/xl-chrome'
 import { cssShadow, spacing, useColors, useThemeMode } from '@/theme'
 import { TABS } from '../constants'
@@ -10,11 +13,25 @@ const HEIGHT = 44
 const HEIGHT_XL = 52
 const INSET = spacing[1]
 
+type Props = { value: MaterialTab; onChange: (tab: MaterialTab) => void }
+
+/** iOS: the system segmented control (UISegmentedControl), not a drawing of one. */
+const NativeTabs = ({ value, onChange }: Props) => (
+  <NativeHost style={{ height: HEIGHT }}>
+    <Picker label="자료 종류" selection={value} onSelectionChange={onChange} modifiers={[pickerStyle('segmented')]}>
+      {TABS.map((tab) => (
+        <SwiftText key={tab.key} modifiers={[tag(tab.key)]}>
+          {tab.label}
+        </SwiftText>
+      ))}
+    </Picker>
+  </NativeHost>
+)
+
 /**
- * The boards' `.seg button.on`: the selected tab is a raised `bg` pill (dark: `fill2`) at weight 800 on both platforms.
- * The shared SegmentedControl fills it with `fill` on iOS, which the Materials boards do not draw.
+ * Android: the boards' `.seg button.on`, the selected tab is a raised `bg` pill (dark: `fill2`) at weight 800.
  */
-export const MaterialsTabs = ({ value, onChange }: { value: MaterialTab; onChange: (tab: MaterialTab) => void }) => {
+const DrawnTabs = ({ value, onChange }: Props) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
   const height = isXlBoardText(useWindowDimensions().fontScale) ? HEIGHT_XL : HEIGHT
@@ -49,3 +66,5 @@ export const MaterialsTabs = ({ value, onChange }: { value: MaterialTab; onChang
   )
   return <View style={[track, { backgroundColor: c.fill }]}>{row}</View>
 }
+
+export const MaterialsTabs = (props: Props) => (Platform.OS === 'ios' ? <NativeTabs {...props} /> : <DrawnTabs {...props} />)

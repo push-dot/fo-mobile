@@ -21,7 +21,7 @@ export const MaterialLinkAddPage = () => {
   const kind = picked ?? (url.trim() ? kindOf(url) : null)
   const full = fullLinkUrl(url, picked)
   const valid = /^https?:\/\/[^\s@/]+\.[^\s@]+$/.test(full)
-  const bound = useSheetScrollMax(0.55)
+  const bound = useSheetScrollMax()
   const add = useAddLink(() => {
     refresh()
     router.back()

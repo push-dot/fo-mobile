@@ -33,7 +33,7 @@ const open = (m: Material, inModal: boolean) => {
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const now = useMemo(() => new Date(), [])
-  const bound = useSheetScrollMax(0.55)
+  const bound = useSheetScrollMax()
   const inModal = useInMaterialsModal()
   const secondaryFill = pm8SecondaryFill(Platform.OS === 'ios', useThemeMode() === 'dark')
 

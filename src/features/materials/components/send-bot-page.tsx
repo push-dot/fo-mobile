@@ -8,7 +8,7 @@ import type { MaterialKind } from '../types'
 import { toAttachment } from '../utils/material-row'
 import { sendToBot } from './send-material'
 
-const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
+export const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   <Pressable
     accessibilityRole="button"
     accessibilityLabel={bot.name}
@@ -23,27 +23,31 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   </Pressable>
 )
 
-/** BotPick: `.pick` rows (gap 12, padding 10/8, radius 16). RULINGS 53 */
-export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
-  const material = useMaterialDetail(kind, id).data?.material
+/** BotPick: `.pick` rows (gap 12, padding 10/8, radius 16), under a title and an optional line. RULINGS 53 */
+export const BotPickSheet = ({ title, subtitle, onPick }: { title: string; subtitle?: string; onPick: ((bot: Bot) => void) | null }) => {
   const bots = useBots().data ?? []
-  const attachment = material ? toAttachment(material) : null
-  const bound = useSheetScrollMax(0.75)
+  const bound = useSheetScrollMax()
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout}>
       <View style={{ ...PM8_MDET_HEAD, justifyContent: 'center', gap: spacing[1], paddingHorizontal: spacing[2] }}>
         <Text v="h2" weight={PM8_MDET_TITLE.weight} accessibilityRole="header" style={{ fontSize: PM8_MDET_TITLE.fontSize, lineHeight: PM8_MDET_TITLE.lineHeight }}>
-          {SEND_PICK_HINT}
+          {title}
         </Text>
-        {attachment ? (
+        {subtitle ? (
           <Text v="b2" color="t3">
-            {attachment.title}
+            {subtitle}
           </Text>
         ) : null}
       </View>
       <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: 6 }}>
-        {attachment ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => sendToBot(bot, attachment)} />) : null}
+        {onPick ? bots.map((bot) => <PickRow key={bot.id} bot={bot} onPress={() => onPick(bot)} />) : null}
       </SheetScroll>
     </Sheet>
   )
+}
+
+export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
+  const material = useMaterialDetail(kind, id).data?.material
+  const attachment = material ? toAttachment(material) : null
+  return <BotPickSheet title={SEND_PICK_HINT} subtitle={attachment?.title} onPick={attachment ? (bot) => sendToBot(bot, attachment) : null} />
 }
