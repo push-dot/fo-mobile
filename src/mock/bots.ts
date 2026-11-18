@@ -646,13 +646,16 @@ mock('DELETE', 'bots/:id', ({ params }) => {
   return undefined
 })
 
-mock('DELETE', 'bots/:id/allowed-sites/:siteId', ({ params }) => {
+const revokeSiteGrant = ({ params }: { params: Record<string, string | undefined> }) => {
   const f = fixtureOf(params.id!)
-  const site = f?.detail.allowed?.find((s) => s.id === params.siteId)
+  const site = f?.detail.allowed?.find((s) => s.host === decodeURIComponent(params.host!))
   if (!f || !site) return notFound()
   f.detail.allowed = f.detail.allowed!.filter((s) => s !== site)
   return undefined
-})
+}
+mock('DELETE', 'bots/:id/site-grants/:host', revokeSiteGrant)
+// The path push-fe's api-client used before push-fe#298. Drop it once that is in develop.
+mock('DELETE', 'bots/:id/allowed-sites/:host', revokeSiteGrant)
 
 mock('POST', 'bots/:id/read', ({ params }) => {
   const f = fixtureOf(params.id!)

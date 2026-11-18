@@ -55,7 +55,7 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
               variant="secondary"
               size="sm"
               onPress={() => {
-                if (bot) void revoke(bot, site.id).catch(() => undefined)
+                if (bot) void revoke(bot, site.host).catch(() => undefined)
               }}
             />
           </View>

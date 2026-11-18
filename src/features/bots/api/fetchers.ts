@@ -26,6 +26,6 @@ export const updateBot = async (id: BotId, body: { expectedRevision: number; not
 
 export const deleteBot = (id: BotId) => botApi.bots.remove(id)
 
-export const revokeAllowedSite = (id: BotId, siteId: string) => botApi.bots.revokeSite(id, siteId)
+export const revokeAllowedSite = (id: BotId, host: string) => botApi.bots.revokeSite(id, host)
 
 export const markBotRead = (address: BotAddress) => botApi.bots.markRead(address)
