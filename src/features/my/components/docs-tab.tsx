@@ -9,7 +9,7 @@ import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
 import { pickResume, showImportMenu, useFileMenu, useImportRequest, useUndoRemove } from '../hooks'
-import type { HubDocument, MySource } from '../types'
+import type { HubDocument, MySource, ScrollUnderBar } from '../types'
 import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, UPLOADS_TITLE } from '../utils'
 import { TAB_EMPTY_LIFT } from './empty'
 import FitRing from './fit-ring'
@@ -124,7 +124,7 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
   )
 }
 
-const DocsTab = () => {
+const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
   const c = useColors()
   const focused = useIsFocused()
   const apps = useMyApplications()
@@ -167,7 +167,8 @@ const DocsTab = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: spacing[6] }}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: top, paddingBottom: spacing[6] }}>
+        {lead}
         {preview.length > 0 ? (
           <>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: spacing[6], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>

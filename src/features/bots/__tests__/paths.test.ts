@@ -54,7 +54,8 @@ const layout = readFileSync(join(STACK, '_layout.tsx'), 'utf8')
 describe('bot and material routes', () => {
   // Route file, and how the stack presents it (routes.ts in the design).
   it.each([
-    [botChatPath(id), 'bots/[botId]/index', null],
+    // A redirect opens the chat with no slide, so the route reads `instantNone` from its params.
+    [botChatPath(id), 'bots/[botId]/index', '{instantNone}'],
     [botProfilePath(id), 'bots/[botId]/profile', null],
     [botColorPath(id), 'bots/[botId]/color', '{sheetOptions(c)}'],
     [botNewPath('p1'), 'bots/new', '{modalOptions(c)}'],

@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, ScrollView } from 'react-native'
+import { Alert } from 'react-native'
 import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
-import { Sheet, TOAST_ABOVE, showToast } from '@/shared/components'
+import { Sheet, SheetScroll, TOAST_ABOVE, showToast, useSheetScrollMax } from '@/shared/components'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
 
@@ -11,6 +11,7 @@ const ApplySheetScreen = () => {
   const posting = usePosting(postingId ?? '')
   const docs = useApplyDocs(!!postingId).data ?? []
   const { main, extras } = splitApplyDocs(docs)
+  const bound = useSheetScrollMax()
   const [picked, setPicked] = useState<string>()
   const [extraIds, setExtraIds] = useState<string[]>([])
   const doc = main.find((d) => d.id === picked) ?? main[0]
@@ -33,6 +34,7 @@ const ApplySheetScreen = () => {
   const p = posting.data
   return (
     <Sheet
+      onLayout={bound.onSheetLayout}
       title="어떤 서류로 지원할까요?"
       description={p ? `${p.company} · ${p.title}` : undefined}
       action={{
@@ -42,7 +44,7 @@ const ApplySheetScreen = () => {
         pending: apply.isPending,
       }}
     >
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <SheetScroll keyboardShouldPersistTaps="handled" style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
         <ApplySheet
           main={main}
           extras={extras}
@@ -51,7 +53,7 @@ const ApplySheetScreen = () => {
           onPick={setPicked}
           onToggleExtra={(id) => setExtraIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))}
         />
-      </ScrollView>
+      </SheetScroll>
     </Sheet>
   )
 }

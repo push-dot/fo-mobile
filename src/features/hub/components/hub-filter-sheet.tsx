@@ -12,7 +12,7 @@ type Props = {
 }
 
 const exploreChip = (draft: SheetFilters, key: Explore, label: string, onChange: (sheet: SheetFilters) => void) => (
-  <Chip sheet key={key} label={label} check on={draft.explore === key} onPress={() => onChange({ ...draft, explore: key })} />
+  <Chip sheet key={key} label={label} check on={draft.explore === key} onPress={() => onChange({ ...draft, explore: draft.explore === key ? null : key })} />
 )
 
 const HubFilterSheet = ({ draft, sent, onChange }: Props) => {

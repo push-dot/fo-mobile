@@ -1,13 +1,12 @@
 import { useEffect } from 'react'
-import { ScrollView, View } from 'react-native'
-import { Button, Sheet, Text } from '@/shared/components'
+import { View } from 'react-native'
+import { Button, Sheet, SheetScroll, Text, useSheetScrollMax } from '@/shared/components'
 import { spacing, useColors } from '../../../../theme'
 import { useBotProfile, useRevokeAllowedSite } from '../../api/hooks'
 import type { BotAddress } from '../../types'
 import { ALLOWED_BODY, REVOKE_LABEL, allowedLine, allowedTitle } from './profile-rows'
 
 const ROW_MIN = 64
-const LIST_MAX = ROW_MIN * 5
 
 // BotProfileAllowed, BotProfileAllowedRevoke, BotProfileChiefAllowed: `.sheet2` with the title and the one-line promise,
 // then one `min-height: 64` row per site. 허용 해제 acts at once; the list shrinks (Revoke shows the 1 left of 2).
@@ -15,6 +14,7 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
   const c = useColors()
   const profile = useBotProfile(address)
   const revoke = useRevokeAllowedSite()
+  const bound = useSheetScrollMax()
   const sites = profile.data?.allowedSites ?? []
   const bot = profile.data?.bot
   const loaded = profile.data !== undefined
@@ -22,14 +22,14 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
     if (loaded && sites.length === 0) onClose()
   }, [loaded, sites.length, onClose])
   return (
-    <Sheet gap={spacing[2]}>
+    <Sheet gap={spacing[2]} onLayout={bound.onSheetLayout}>
       <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
         {allowedTitle(sites.length)}
       </Text>
       <Text v="b2" color="t2">
         {ALLOWED_BODY}
       </Text>
-      <ScrollView style={{ marginTop: spacing[2], maxHeight: LIST_MAX }}>
+      <SheetScroll style={{ marginTop: spacing[2], maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
         {sites.map((site) => (
           <View
             key={site.id}
@@ -60,7 +60,7 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
             />
           </View>
         ))}
-      </ScrollView>
+      </SheetScroll>
     </Sheet>
   )
 }

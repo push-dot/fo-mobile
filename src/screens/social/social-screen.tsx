@@ -3,19 +3,22 @@ import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
-import { Chip, ChipRow, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
+import { Chip, ChipRow, FloatingHeader, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const SocialScreen = () => {
   const c = useColors()
   const [category, setCategory] = useState<PostCategory | null>(null)
   const q = usePosts(category)
+  const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   const posts = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
   const renderItem = useCallback(({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />, [])
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
       <TopBar
+        transparent
         left={
           <Text v="h1" accessibilityRole="header">
             소셜
@@ -36,13 +39,7 @@ const SocialScreen = () => {
           </>
         }
       />
-      <View style={{ marginBottom: spacing[1] }}>
-        <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>
-          {POST_CATEGORIES.map((cat) => (
-            <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
-          ))}
-        </ChipRow>
-      </View>
+      </FloatingHeader>
       <FlatList
         data={posts}
         keyExtractor={(p) => p.id}
@@ -53,9 +50,21 @@ const SocialScreen = () => {
         onEndReachedThreshold={0.5}
         refreshing={q.isRefetching && !q.isFetchingNextPage}
         onRefresh={() => q.refetch()}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: inset }}
+        onScroll={onScroll}
+        scrollEventThrottle={64}
         // SocialStates: the empty feed draws no scroll bar
         showsVerticalScrollIndicator={posts.length > 0}
+        // The chips scroll away with the feed; only the title bar stays up.
+        ListHeaderComponent={
+        <View style={{ marginBottom: spacing[1] }}>
+          <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>
+            {POST_CATEGORIES.map((cat) => (
+              <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
+            ))}
+          </ChipRow>
+        </View>
+        }
         ListEmptyComponent={
           q.isPending ? (
             <PostListSkeleton />

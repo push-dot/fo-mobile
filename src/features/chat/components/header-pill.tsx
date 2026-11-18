@@ -1,6 +1,7 @@
-import { router } from 'expo-router'
+import { Redirect, router } from 'expo-router'
+import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import { botProfilePath, type BotId } from '@/features/bots'
+import { botHomePath, botProfilePath, type BotId } from '@/features/bots'
 import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { largeType, spacing, useColors } from '../../../theme'
@@ -18,6 +19,7 @@ const HeaderPill = ({
   kind,
   color = 'push',
   light = 'none',
+  leading = 'back',
   onFind,
 }: {
   botId?: string
@@ -25,8 +27,11 @@ const HeaderPill = ({
   kind?: 'push' | 'company'
   color?: MascotColor
   light?: HeaderLight
+  /** 'back' goes back. 'none' draws nothing (the chat was opened by a redirect, so back would go to the page that redirected). 'botHome' redirects to the Bot home. */
+  leading?: 'back' | 'none' | 'botHome'
   onFind?: () => void
 }) => {
+  const [toBotHome, setToBotHome] = useState(false)
   const run = (id: HeaderMenuId) => {
     if (!botId || !kind || !name) return
     if (id === 'profile') openProfile(botId)
@@ -52,6 +57,8 @@ const HeaderPill = ({
   const ios = Platform.OS === 'ios'
   const { xl, button } = useXlChrome()
   const spoken = name ? botSpokenName(name) : ''
+  // The Bot home button is a redirect, like the one that opened this chat.
+  if (toBotHome) return <Redirect href={botHomePath} />
   const nameButton =
     name && botId ? (
       <Pressable
@@ -73,7 +80,10 @@ const HeaderPill = ({
     <TopBar
       translucent
       chat
-      onBack={() => router.back()}
+      onBack={leading === 'back' ? () => router.back() : leading === 'botHome' ? () => setToBotHome(true) : undefined}
+      backIcon={leading === 'botHome' ? 'menu' : undefined}
+      backLabel={leading === 'botHome' ? 'Bot 홈' : undefined}
+      reserveBack={leading === 'none'}
       left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
       right={
         kind && botId && name ? (

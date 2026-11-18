@@ -22,7 +22,7 @@ export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; o
 
 const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?: boolean }) => {
   const c = useColors()
-  const bound = useSheetScrollMax(0.55)
+  const bound = useSheetScrollMax()
   const start = useStartChat()
   const q = useQuickStart(qs.key)
   const docs = useChatDocs(!!qs.docLabel)

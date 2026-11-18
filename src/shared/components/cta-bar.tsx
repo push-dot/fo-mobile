@@ -6,7 +6,8 @@ import { spacing, useColors } from '../../theme'
 
 const ios = Platform.OS === 'ios'
 
-const CtaBar = ({ children }: { children: ReactNode }) => {
+/** `light`: only a faint fade behind the buttons, so a page scrolling under the bar stays visible (the web detail pages). */
+const CtaBar = ({ children, light = false }: { children: ReactNode; light?: boolean }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   return (
@@ -29,8 +30,8 @@ const CtaBar = ({ children }: { children: ReactNode }) => {
     >
       {ios ? (
         <LinearGradient
-          colors={[c.bg, c.bg, `${c.bg}00`]}
-          locations={[0, 0.72, 1]}
+          colors={light ? [`${c.bg}B3`, `${c.bg}66`, `${c.bg}00`] : [c.bg, c.bg, `${c.bg}00`]}
+          locations={light ? [0, 0.6, 1] : [0, 0.72, 1]}
           start={{ x: 0, y: 1 }}
           end={{ x: 0, y: 0 }}
           style={{ position: 'absolute', inset: 0 }}

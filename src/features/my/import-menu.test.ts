@@ -4,7 +4,7 @@ const showChoiceModal = vi.fn()
 vi.mock('expo-router', () => ({ router: { push: vi.fn() }, useIsFocused: () => true }))
 vi.mock('@/shared/components', () => ({ TOAST_ABOVE: {}, askConfirm: vi.fn(), showActionSheet: vi.fn(), showToast: vi.fn() }))
 vi.mock('@/shared/navigation', () => ({ showChoiceModal }))
-vi.mock('@/features/bots', () => ({ botChatPath: (id: string) => `/bots/${id}` }))
+vi.mock('@/features/bots', () => ({ botChatPath: (id: string) => `/bots/${id}`, materialCreateBotPath: () => '/materials/create-pick' }))
 vi.mock('@/shared/infrastructure', () => ({ pickDocument: vi.fn() }))
 vi.mock('./stores', () => ({ deleteWithUndo: vi.fn(), useDocDelete: vi.fn(), useDocImport: vi.fn(), usePendingDelete: vi.fn() }))
 

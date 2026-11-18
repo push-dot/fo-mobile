@@ -27,6 +27,12 @@ describe('hub filters', () => {
     expect(profileQuery([], { ...EMPTY_SHEET, explore: 'received' }).explore).toBe('received')
   })
 
+  it('turning 탐색 off lists everyone and counts as a filter', () => {
+    const all = { ...EMPTY_SHEET, explore: null }
+    expect('explore' in profileQuery([], all) && profileQuery([], all).explore).toBeUndefined()
+    expect(appliedCount(all)).toBe(1)
+  })
+
   it('proposalSubtitle joins career line and status', () => {
     expect(proposalSubtitle({ jobCategory: 'dev', tenureYears: 4, careerStatus: 'seeking' })).toBe('개발 · 4년차 · 이직/구직중')
   })

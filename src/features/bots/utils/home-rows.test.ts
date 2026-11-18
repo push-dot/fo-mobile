@@ -64,7 +64,7 @@ describe('companyMenu', () => {
   it('lists the board actions and never offers delete on Push Bot', () => {
     expect(companyMenu('company').map((a) => a.key)).toEqual(['profile', 'find', 'read', 'mute', 'delete'])
     expect(companyMenu('company').map((a) => a.label)).toEqual(['Bot 프로필 보기', '채팅에서 찾기', '읽음으로 표시', '알림 끄기', '삭제'])
-    expect(companyMenu('push')).toEqual([])
+    expect(companyMenu('push').map((a) => a.key)).toEqual(['find', 'read'])
   })
 
   it('keeps the board mute phrase when the bot is already muted', () => {

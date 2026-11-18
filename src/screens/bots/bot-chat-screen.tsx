@@ -54,7 +54,7 @@ import {
   useUnseen,
   type ChatItem,
 } from '@/features/chat'
-import { useConvertDocument } from '@/features/my'
+import { useConvertDocument, useReferenceConsent } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
@@ -79,7 +79,18 @@ const BotChatScreen = () => {
   )
 }
 
+/**
+ * Opened by the Bot tab's redirect (consent still missing): back would return to the page that redirected, so there is no back button until the
+ * consent is given, then a button to the Bot home. The loading header needs the same answer, or a back button shows until the Bot has loaded.
+ */
+const useLeading = () => {
+  const redirected = !!useLocalSearchParams<{ instant?: string }>().instant
+  const consented = useReferenceConsent().data?.referenceData === true
+  return redirected ? (consented ? 'botHome' : 'none') : 'back'
+}
+
 const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) => {
+  const leading = useLeading()
   const [id, setId] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
 
@@ -102,7 +113,7 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
   if (id) return <Thread id={id} />
   return (
     <View style={{ flex: 1 }}>
-      <HeaderPill />
+      <HeaderPill leading={leading} />
       {failed ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: spacing[5] }}>
           <Text v="c1" color="t2" style={{ flex: 1 }}>
@@ -116,6 +127,7 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
 }
 
 const Thread = ({ id }: { id: string }) => {
+  const leading = useLeading()
   const bot = useBot(id as BotId)
   const profile = useBotProfile(id as BotId)
   const chat = useChat(id)
@@ -207,7 +219,7 @@ const Thread = ({ id }: { id: string }) => {
         {find.open ? (
           <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
         ) : (
-          <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} onFind={find.show} />
+          <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} leading={leading} onFind={find.show} />
         )}
       </View>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
@@ -281,7 +293,7 @@ const Thread = ({ id }: { id: string }) => {
           }
         />
       </View>
-      <ConsentSheet />
+      <ConsentSheet kind={kind} />
       </KeyboardAvoidingView>
     </View>
   )

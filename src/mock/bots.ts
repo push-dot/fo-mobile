@@ -317,6 +317,43 @@ const homeLimit = (): BotFixture[] => {
   ]
 }
 
+/** More company bots than the board draws, to check lists that must scroll (BotPick). */
+const homeMany = (): BotFixture[] => [
+  ...home(),
+  company(
+    { id: 'b-bluesky', name: '블루스카이', color: 'blue', postingId: null },
+    { readAt: '2026-10-20T05:00:00Z', messages: [said('m-bluesky-1', 't-bluesky-1', '지원 서류를 정리했어요', '2026-10-20T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-viola', name: '비올라랩스', color: 'violet', postingId: null },
+    { readAt: '2026-10-19T05:00:00Z', messages: [said('m-viola-1', 't-viola-1', '지원 서류를 정리했어요', '2026-10-19T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-redwood', name: '레드우드', color: 'red', postingId: null },
+    { readAt: '2026-10-18T05:00:00Z', messages: [said('m-redwood-1', 't-redwood-1', '지원 서류를 정리했어요', '2026-10-18T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-amber', name: '앰버소프트', color: 'amber', postingId: null },
+    { readAt: '2026-10-17T05:00:00Z', messages: [said('m-amber-1', 't-amber-1', '지원 서류를 정리했어요', '2026-10-17T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-brown', name: '브라운커머스', color: 'brown', postingId: null },
+    { readAt: '2026-10-16T05:00:00Z', messages: [said('m-brown-1', 't-brown-1', '지원 서류를 정리했어요', '2026-10-16T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-gray', name: '그레이로보틱스', color: 'gray', postingId: null },
+    { readAt: '2026-10-15T05:00:00Z', messages: [said('m-gray-1', 't-gray-1', '지원 서류를 정리했어요', '2026-10-15T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-teal2', name: '청록데이터', color: 'teal', postingId: null },
+    { readAt: '2026-10-14T05:00:00Z', messages: [said('m-teal2-1', 't-teal2-1', '지원 서류를 정리했어요', '2026-10-14T05:00:00Z')] },
+  ),
+  company(
+    { id: 'b-sky2', name: '하늘핀테크', color: 'sky', postingId: null },
+    { readAt: '2026-10-13T05:00:00Z', messages: [said('m-sky2-1', 't-sky2-1', '지원 서류를 정리했어요', '2026-10-13T05:00:00Z')] },
+  ),
+]
+
 type Plan = BotContract.BotLimit['plan']
 const LIMITS: BotContract.BotLimit['table'] = { FREE: 3, PRO: 20, ULTRA: null }
 
@@ -327,9 +364,9 @@ let seq = 0
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 /** Tour switches (links.ts). */
-export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit') => {
+export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit' | 'many') => {
   fixtures =
-    set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null, unread: true })] : home()
+    set === 'many' ? homeMany() : set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null, unread: true })] : home()
 }
 export const setBotPlan = (next: Plan) => {
   plan = next

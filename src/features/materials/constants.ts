@@ -59,3 +59,4 @@ export const LINK_ADD = {
 }
 
 export const SEND_PICK_HINT = '어느 Bot한테 보낼까요?'
+export const CREATE_PICK_HINT = '어느 Bot에서 만들까요?'

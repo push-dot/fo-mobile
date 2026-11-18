@@ -22,7 +22,7 @@ const ios = Platform.OS === 'ios'
 /** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
 const runAdd = (action: AddAction) => {
   if (action === 'link') return router.push(materialLinkAddPath())
-  if (action === 'upload') return showImportMenu(true)
+  if (action === 'upload') return showImportMenu()
   router.back()
   router.push('/jobs')
 }

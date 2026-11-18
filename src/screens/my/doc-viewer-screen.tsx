@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { ScrollView, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useShareFile, useStartChat } from '@/features/chat'
+import { botPickPath } from '@/features/bots'
+import { useShareFile } from '@/features/chat'
 import {
-  FIX_DOC,
   PREVIEW_HEADINGS,
   useResumeDraft,
   useFileMenu,
@@ -11,7 +11,7 @@ import {
   useUndoRemove,
   type ResumeDraft,
 } from '@/features/my'
-import { CtaBar, Button, GlassButton, Skeleton, Text, TopBar } from '@/shared/components'
+import { CtaBar, Button, FloatingHeader, GlassButton, Skeleton, Text, TopBar, useFloatingHeader } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { counterPill, onAccent, palette, paperPage, spacing, useColors } from '@/theme'
 
@@ -22,7 +22,6 @@ const PAGE_PAD_X = 24
 const PAGE_PAD_Y = 30
 // The gate device lays the board's A4 box out at the screen width (568.3 pt at 402), not at the 390 pt card width.
 const A4 = 1.414
-const TITLE_MAX_WIDTH = 168
 // The page counter floats over the paper, centred above the CTA bar (DocViewer: 28pt pill, 92pt over the home indicator).
 const COUNTER_BOTTOM = 92
 const COUNTER_HEIGHT = 28
@@ -116,7 +115,7 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
 const DocViewerScreen = ({ id }: { id: string }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
-  const start = useStartChat()
+  const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   const doc = useSource(id)
   const share = useShareFile()
   const draft = useResumeDraft(id)
@@ -127,12 +126,10 @@ const DocViewerScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg2 }}>
+      <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
       <TopBar
-        left={
-          <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ alignSelf: 'center', maxWidth: TITLE_MAX_WIDTH }}>
-            {s ? displayName(s.fileName) : '서류 보기'}
-          </Text>
-        }
+        transparent
+        title={s ? displayName(s.fileName) : '서류 보기'}
         onBack={() => router.back()}
         right={
           <GlassButton
@@ -143,7 +140,8 @@ const DocViewerScreen = ({ id }: { id: string }) => {
           />
         }
       />
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+      </FloatingHeader>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: inset, paddingBottom: 120 }}>
         {d ? (
           <Paper d={d} />
         ) : draft.isPending ? (
@@ -177,7 +175,7 @@ const DocViewerScreen = ({ id }: { id: string }) => {
         <Button
           label="Bot한테 보내기"
           variant="secondary"
-          onPress={() => void start(FIX_DOC, FIX_DOC, s?.fileName, undefined, undefined, { evidenceIds: [id] })}
+          onPress={() => router.push(botPickPath({ kind: 'file', id }))}
         />
         <Button label="지원용 프로필로 전환" onPress={() => router.push(`/docs/${id}/to-profile`)} style={{ flex: 1 }} />
       </CtaBar>

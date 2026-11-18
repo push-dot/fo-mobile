@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import type { Application, ApplicationStage, Profile, SourceItem, UserRef } from '@push/api-client'
 
 export type CalendarEventType = 'INTERVIEW' | 'DEADLINE' | 'FOLLOW_UP' | 'COFFEE_CHAT' | 'CUSTOM'
@@ -76,3 +78,6 @@ export type ProfileSection = 'basic' | 'intro' | 'career' | 'skills'
 export type ActivitySub = 'applications' | 'calendar' | 'bookmarks' | 'follows' | 'posts'
 
 export type OfferPerson = UserRef & { companyName?: string | null; headline?: string; kind?: 'PERSON' | 'COMPANY' }
+
+/** A tab scrolling under the floating header of the 마이 screen: `top` clears it, `onScroll` tells it when to draw the fade. */
+export type ScrollUnderBar = { top?: number; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void; /** Scrolls with the content, above it (the 마이 tab row). */ lead?: ReactNode }

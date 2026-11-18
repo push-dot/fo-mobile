@@ -77,6 +77,7 @@ const BotHomeView = ({
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
   const [scrolling, setScrolling] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [visible, setVisible] = useState<ReadonlySet<string> | null>(null)
   const searching = query !== null
   const found = useBotSearch(query ?? '')
@@ -102,10 +103,11 @@ const BotHomeView = ({
   const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
   const openMaterials = () => router.push(materialsPath())
 
-  const run = (key: HomeMenuKey, bot: CompanyBot) => {
-    if (key === 'profile') router.push(botProfilePath(bot.id))
-    if (key === 'find') router.push(botChatPath(bot.id))
+  const run = (key: HomeMenuKey, bot: Bot) => {
+    if (key === 'find') openChat(bot)
     if (key === 'read') onRead(bot)
+    if (bot.kind !== 'company') return
+    if (key === 'profile') router.push(botProfilePath(bot.id))
     if (key === 'mute') onMute(bot, !bot.muted)
     if (key === 'delete')
       confirmDeleteBot(bot.name, () => {
@@ -115,7 +117,7 @@ const BotHomeView = ({
       })
   }
 
-  const actionsFor = (bot: CompanyBot): MenuAction[] =>
+  const actionsFor = (bot: Bot): MenuAction[] =>
     companyMenu(bot.kind, bot.muted).map((item) => ({
       key: item.key,
       label: item.label,
@@ -131,6 +133,8 @@ const BotHomeView = ({
       state={botRow(push, local[push.id], now).mascot}
       unread={botRow(push, local[push.id], now).unreadDot}
       motion={rowMotion(botRow(push, local[push.id], now).mascot, 0, false)}
+      row={botRow(push, local[push.id], now)}
+      actions={actionsFor(push)}
       onPress={() => openChat(push)}
     />
   ) : null
@@ -145,6 +149,7 @@ const BotHomeView = ({
           name={accountName}
           onAccount={() => router.push(accountPath())}
           onNew={() => void openBotNew()}
+          scrolled={scrolled}
           hideNew={searching && !ios}
         />
         {searching ? (
@@ -172,6 +177,8 @@ const BotHomeView = ({
             keyboardDismissMode="on-drag"
             viewabilityConfig={VIEWABILITY}
             onViewableItemsChanged={onViewableItemsChanged}
+            onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
+            scrollEventThrottle={64}
             onScrollBeginDrag={() => setScrolling(true)}
             onScrollEndDrag={() => setScrolling(false)}
             onMomentumScrollEnd={() => setScrolling(false)}
@@ -189,7 +196,7 @@ const BotHomeView = ({
                   chrome={chrome}
                   index={index}
                   held={held}
-                  actions={item.kind === 'company' ? actionsFor(item) : []}
+                  actions={actionsFor(item)}
                   onPress={() => openChat(item)}
                 />
               )

@@ -13,7 +13,7 @@ import {
   useMyPosts,
 } from '../api/hooks'
 import { FOLLOW_PREVIEW, POST_PREVIEW } from '../constants'
-import type { ActivitySub } from '../types'
+import type { ActivitySub, ScrollUnderBar } from '../types'
 import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
 import CalendarView from './calendar-view'
 import Empty, { TAB_EMPTY_LIFT } from './empty'
@@ -73,7 +73,7 @@ const Applications = () => {
   )
 }
 
-const Bookmarks = () => {
+export const Bookmarks = () => {
   const c = useColors()
   const { query, unbookmark } = useMyBookmarks()
   const { data, isLoading } = query
@@ -259,10 +259,11 @@ const Posts = () => {
   )
 }
 
-const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub) => void }) => {
+const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub; onSub: (s: ActivitySub) => void } & ScrollUnderBar) => {
   const c = useColors()
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ flexGrow: 1, paddingBottom: LIST_PAD }}>
+    <ScrollView style={{ backgroundColor: c.bg }} contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ flexGrow: 1, paddingTop: top, paddingBottom: LIST_PAD }}>
+      {lead}
       <ChipRow paddingTop={spacing[4]}>
         {SUBS.map((s) => (
           <Chip key={s.key} label={s.label} on={s.key === sub} onPress={() => onSub(s.key)} />

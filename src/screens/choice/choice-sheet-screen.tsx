@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import { Button, Icon, Sheet, Switch, Text, TextField } from '@/shared/components'
+import { Button, Icon, Sheet, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
 import { iosSeparator, onAccent, spacing, useColors, useThemeMode } from '@/theme'
 import { PM8, pm8Row, pm8SecondaryFill } from './choice-sheet-layout'
@@ -22,6 +22,7 @@ const ChoiceSheetScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
   const request = useChoiceModal((s) => s.request)
+  const bound = useSheetScrollMax()
   const picked = useRef(false)
   const form = request?.form
   const [selected, setSelected] = useState(form?.selected ?? [])
@@ -53,7 +54,7 @@ const ChoiceSheetScreen = () => {
   const secondaryStyle = secondaryFill ? { backgroundColor: secondaryFill } : null
   const row = (last: boolean, mark = false) => ({ ...pm8Row(mark), flexDirection: 'row' as const, alignItems: 'center' as const, paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
   return (
-    <Sheet gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} secondaryFill={secondaryFill} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
+    <Sheet onLayout={bound.onSheetLayout} gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} secondaryFill={secondaryFill} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
       secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => run(request.confirm!.secondary!.onPress) } : undefined}
     >
       <View style={{ minHeight: 52, justifyContent: 'center' }}>
@@ -61,6 +62,7 @@ const ChoiceSheetScreen = () => {
           {request.title}
         </Text>
       </View>
+      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: PM8.gap }} keyboardShouldPersistTaps="handled">
       {request.message ? (
         <Text v={request.items ? 'b2' : 'b1'} color="t2" style={{ paddingHorizontal: spacing[1], marginBottom: request.items || form ? 2 : 0 }}>
           {request.message}
@@ -132,6 +134,7 @@ const ChoiceSheetScreen = () => {
           ) : null}
         </View>
       ) : null}
+      </SheetScroll>
       {confirm && closeLabel ? (
         <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: 10 }}>
           <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={[{ flex: 1, minHeight: 52, borderRadius: 26 }, secondaryStyle]} />

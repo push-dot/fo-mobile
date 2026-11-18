@@ -1,19 +1,30 @@
 import { router } from 'expo-router'
+import { useState } from 'react'
 import { View } from 'react-native'
-import { openPostingBot } from '@/features/bots'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { botPickPath } from '@/features/bots'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
-import { Button, CtaBar, DetailWebView, GlassButton, TopBar, type DetailFrom } from '@/shared/components'
+import { Button, CtaBar, DetailWebView, FloatingHeader, GlassButton, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
+
+// CtaBar: 14 above the buttons, 56 for them, 6 below plus the home-indicator inset.
+const CTA_HEIGHT = 14 + 56 + 6
 
 const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
   const { data: p } = usePosting(id)
   const toggleBookmark = useToggleBookmark()
+  const { onHeight, inset } = useFloatingHeader()
+  const [offset, setOffset] = useState(0)
+  const { top, bottom } = useSafeAreaInsets()
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
+      <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
       <TopBar
+        transparent
         onBack={() => router.back()}
         right={
           p ? (
@@ -26,12 +37,12 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
           ) : null
         }
       />
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} />
-      <CtaBar>
+      </FloatingHeader>
+      <CtaBar light>
         <Button
           label="Bot한테 보내기"
           variant="secondary"
-          onPress={() => openPostingBot(id)}
+          onPress={() => router.push(botPickPath({ kind: 'posting', id }))}
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}

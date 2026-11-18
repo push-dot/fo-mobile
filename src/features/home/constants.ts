@@ -11,6 +11,6 @@ export const SECTION_SKELETON_CARD_WIDTH = 200
 
 export const SHORTCUTS: { label: string; icon: Icon3DName; glow: string; opacity: number; href: Href }[] = [
   { label: '채용공고', icon: 'brief', glow: glow.ac, opacity: 0.3, href: '/jobs' },
-  { label: '북마크', icon: 'bookmark', glow: glow.orange, opacity: 0.28, href: { pathname: '/(app)/(stack)/(tabs)/(my)/my', params: { tab: 'activity', sub: 'bookmarks' } } },
-  { label: '내 활동', icon: 'chart', glow: glow.green, opacity: 0.26, href: { pathname: '/(app)/(stack)/(tabs)/(my)/my', params: { tab: 'activity', sub: 'applications' } } },
+  { label: '북마크', icon: 'bookmark', glow: glow.orange, opacity: 0.28, href: '/bookmarks' },
+  { label: '내 활동', icon: 'chart', glow: glow.green, opacity: 0.26, href: '/my-activity' },
 ]

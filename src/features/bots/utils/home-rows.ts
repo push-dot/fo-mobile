@@ -34,8 +34,14 @@ export const heroLabel = (unread: boolean) => (unread ? 'Push Bot 대화 열기,
 
 export const accountLabel = (name: string, plan: string | undefined) => (plan ? `계정 · ${name}, ${plan}` : `계정 · ${name}`)
 
+// Push Bot has no profile, mute or delete: it keeps the two actions that only read the chat.
+const PUSH_KEYS: readonly HomeMenuKey[] = ['find', 'read']
+
 export const companyMenu = (kind: 'push' | 'company', muted = false) =>
-  kind === 'push' ? [] : MENU.map((item) => ({ ...item, label: item.key === 'mute' && muted ? '알림 끄기' : item.label }))
+  MENU.filter((item) => kind === 'company' || PUSH_KEYS.includes(item.key)).map((item) => ({
+    ...item,
+    label: item.key === 'mute' && muted ? '알림 끄기' : item.label,
+  }))
 
 export const dropDeleted = <T extends { id: string }>(rows: readonly T[], id: string, forget: (id: string) => void) => {
   forget(id)

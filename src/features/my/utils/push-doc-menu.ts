@@ -1,17 +1,16 @@
 import type { MenuAction, MenuSection } from '@/shared/components/menu-action'
 
-export type PushDocAction = 'posting' | 'export' | 'rename' | 'duplicate' | 'delete'
+export type PushDocAction = 'posting' | 'rename' | 'duplicate' | 'delete'
 
 const ITEMS: Record<PushDocAction, Omit<MenuAction, 'key' | 'onPress'>> = {
   posting: { label: '공고 보기', systemImage: 'doc.text.magnifyingglass', icon: 'ext' },
-  export: { label: '내보내기', systemImage: 'square.and.arrow.up', icon: 'download-pdf' },
   rename: { label: '이름 바꾸기', systemImage: 'pencil.line', icon: 'edit' },
   duplicate: { label: '복제하기', systemImage: 'doc.on.doc', icon: 'copy' },
   delete: { label: '삭제하기', systemImage: 'trash', icon: 'delete', destructive: true },
 }
 
 const GROUPS: { key: string; actions: PushDocAction[] }[] = [
-  { key: 'doc', actions: ['posting', 'export', 'rename', 'duplicate'] },
+  { key: 'doc', actions: ['posting', 'rename', 'duplicate'] },
   { key: 'danger', actions: ['delete'] },
 ]
 

@@ -3,14 +3,17 @@ import { useEffect } from 'react'
 import { useReferenceConsent } from '@/features/my'
 import { askConsent } from '../stores'
 
-/** When the chat stack is focused, loads consent and nudges the sheet if reference data is still off. */
-export const ConsentSheet = () => {
+/**
+ * Consent is taken once, in Push Bot's onboarding, and it cannot be skipped: with it off no Bot can be made or used.
+ * Push Bot asks whenever it is opened with consent off; the Bot home sends a person without consent to it.
+ */
+export const ConsentSheet = ({ kind }: { kind: 'push' | 'company' | undefined }) => {
   const focused = useIsFocused()
-  const consent = useReferenceConsent()
+  const off = useReferenceConsent().data?.referenceData === false
 
   useEffect(() => {
-    if (focused && consent.data?.referenceData === false) askConsent(false)
-  }, [focused, consent.data?.referenceData])
+    if (focused && off && kind === 'push') askConsent(true)
+  }, [focused, off, kind])
 
   return null
 }

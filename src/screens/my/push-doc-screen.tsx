@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
-import { useShareFile, useStartChat } from '@/features/chat'
+import { botPickPath } from '@/features/bots'
+import { useShareFile } from '@/features/chat'
 import { usePosting } from '@/features/jobs'
 import {
   Avatar,
@@ -12,7 +13,6 @@ import {
   deleteConfirm,
   deleteDocCopy,
   ListSkeleton,
-  FIX_DOC,
   hubProfile,
   type ProfileSection,
   PROFILE_ACTIONS_TOP,
@@ -82,7 +82,6 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   }, [making, refetchVersions])
   const apps = useMyApplications()
   const me = useMyProfile().data
-  const start = useStartChat()
   const share = useShareFile()
   const deleteCopy = deleteDocCopy(doc.data?.data.title ?? '')
   const archive = useArchiveDocument(doc.data?.data)
@@ -113,7 +112,6 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
     { hasPosting: !!application },
     {
       posting: () => router.push(`/postings/${application?.jobId}`),
-      export: () => share.mutate({ documentId: id }),
       rename: () => router.push(`/docs/push/${id}/rename`),
       duplicate: () => {
         if (duplicate.isPending) return
@@ -142,7 +140,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
-              // DocProfile / DocProfileConfirm draw only share: the menu (공고 보기, 내보내기, 이름 변경, 삭제) belongs to a 지원 서류
+              // DocProfile / DocProfileConfirm draw only share: the menu (공고 보기, 이름 변경, 삭제) belongs to a 지원 서류
               ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
             ]}
           />
@@ -167,7 +165,10 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
+                <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
+                <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={share.isPending} onPress={() => share.mutate({ documentId: id })} />
+              </View>
             ) : null}
             {application || based ? null : (
               <Button
@@ -247,7 +248,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           <Button
             label="Bot한테 보내기"
             variant="secondary"
-            onPress={() => void start(FIX_DOC, FIX_DOC, doc.data?.data.title, undefined, undefined, { documentId: id })}
+            onPress={() => router.push(botPickPath({ kind: 'document', id }))}
           />
           <Button
             label={applied ? '지원 완료' : '이 서류로 지원'}

@@ -1,9 +1,11 @@
 import { router } from 'expo-router'
+import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile } from '@/features/chat'
 import { ProfileTab, useMyProfile } from '@/features/my'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
-import { DetailWebView, Glass, Text, TopBar, type DetailFrom } from '@/shared/components'
+import { DetailWebView, FloatingHeader, Glass, Text, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
 
@@ -21,6 +23,9 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const follow = useFollow(id)
   const following = follow.isPending ? follow.variables : !!p?.following
   const self = me === id
+  const { onHeight, inset } = useFloatingHeader()
+  const [offset, setOffset] = useState(0)
+  const { top } = useSafeAreaInsets()
 
   const actions = (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing[1] }}>
@@ -44,18 +49,20 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar
-        onBack={() => router.back()}
-        right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
-      />
+      {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
+      <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
+        <TopBar
+          transparent
+          onBack={() => router.back()}
+          right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
+        />
+      </FloatingHeader>
       {self ? (
         // ProfileDetailMe: the own profile is MyProfile's page, edited section by section like the 마이 edit pages.
-        <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+        <ScrollView contentContainerStyle={{ paddingTop: inset + top, paddingBottom: spacing[6] }}>
           <OwnProfile />
         </ScrollView>
-      ) : (
-        <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} />
-      )}
+      ) : null}
     </View>
   )
 }

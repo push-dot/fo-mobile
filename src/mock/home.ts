@@ -22,7 +22,7 @@ const person = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenure
   ...p,
 })
 const people: Profile[] = [
-  person({ userId: 'u1', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
+  person({ userId: 'u-taeyoon', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
   person({ userId: 'u-subin', displayName: '이수빈', headline: '3년차 백엔드 · Node.js', tenureYears: 3, skills: ['Node.js'] }),
   person({ userId: 'u-hyunwoo', displayName: '윤현우', headline: '백엔드 · 대용량 트래픽 경험', tenureYears: 7 }),
   person({ userId: 'u4', displayName: '최지우', headline: '데이터 파이프라인 · 백엔드 협업', tenureYears: 5, skills: ['Spark'] }),
@@ -58,7 +58,7 @@ const BOARD_QUERY = '백엔드'
 const BOARD_TOTALS = { postings: 24, people: 8, posts: 13 }
 const BOARD_ORDER = {
   postings: ['p1', 'p9', 'p10', 'p3', 'p11', 'p12'],
-  people: ['u1', 'u-subin', 'u-hyunwoo', 'u4'],
+  people: ['u-taeyoon', 'u-subin', 'u-hyunwoo', 'u4'],
   posts: ['post-1', 's2', 's3', 's4'],
 }
 const onlyOrdered = <T,>(items: T[], idOf: (t: T) => string, order: string[]) => order.flatMap((id) => items.filter((t) => idOf(t) === id))

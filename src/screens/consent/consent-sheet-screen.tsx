@@ -1,17 +1,23 @@
-import { router } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { Pressable, View } from 'react-native'
-import { Sheet, Text } from '@/shared/components'
+import { Sheet, SheetScroll, Text, useSheetScrollMax } from '@/shared/components'
 import { spacing } from '@/theme'
 import { CHOICE_HANDOFF_MS, CONSENT_DETAIL_LABEL, CONSENT_LATER_LABEL, useConsentModal } from '@/shared/navigation'
 
 const ConsentSheetScreen = () => {
   const request = useConsentModal((s) => s.request)
+  const bound = useSheetScrollMax()
   const agreed = useRef(false)
   const onLater = request?.onLater
+  const required = !!request && !onLater
+  const navigation = useNavigation()
   useEffect(() => {
     if (!request) router.back()
   }, [request])
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: !required })
+  }, [navigation, required])
   useEffect(
     () => () => {
       if (!agreed.current) onLater?.()
@@ -26,14 +32,16 @@ const ConsentSheetScreen = () => {
     setTimeout(request.onAgree, CHOICE_HANDOFF_MS)
   }
   return (
-    <Sheet gap={12} actionGap={12} secondaryGap={8} action={{ label: request.agree, onPress: agree }} secondary={{ label: CONSENT_LATER_LABEL, onPress: () => router.back() }}>
+    <Sheet onLayout={bound.onSheetLayout} gap={12} actionGap={12} secondaryGap={8} action={{ label: request.agree, onPress: agree }} secondary={required ? undefined : { label: CONSENT_LATER_LABEL, onPress: () => router.back() }}>
       <View style={{ gap: spacing[3] }}>
         <Text v="h2" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
           {request.title}
         </Text>
-        <Text v="b2" color="t2">
-          {request.body}
-        </Text>
+        <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+          <Text v="b2" color="t2">
+            {request.body}
+          </Text>
+        </SheetScroll>
       </View>
       <Pressable
         accessibilityRole="link"

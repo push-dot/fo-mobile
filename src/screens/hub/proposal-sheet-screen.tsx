@@ -1,8 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ScrollView } from 'react-native'
 import { ProposalSheet, proposalSubtitle, useOfferPostings, useProfile, useSendOffer } from '@/features/hub'
-import { Sheet } from '@/shared/components'
+import { Sheet, useSheetScrollMax } from '@/shared/components'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
 
@@ -15,6 +14,7 @@ const ProposalSheetScreen = () => {
   const [error, setError] = useState<string | null>(null)
   const send = useSendOffer(userId ?? '', message, postingId, () => router.back(), setError)
   const p = profile.data
+  const bound = useSheetScrollMax()
 
   useEffect(() => {
     if (!userId) router.back()
@@ -23,24 +23,22 @@ const ProposalSheetScreen = () => {
   if (!userId) return null
 
   return (
-    // The sheet is taller than the space above the keyboard, so it scrolls to reach 제안 보내기 and a drag hides the keyboard.
-    <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
-      <Sheet
-        action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}
-      >
+    // Past the common max height the body scrolls under the title; the keyboard counts in that bound, so 제안 보내기 stays in reach.
+    <Sheet onLayout={bound.onSheetLayout} action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}>
         <ProposalSheet
           name={p?.displayName ?? ''}
           subtitle={p ? proposalSubtitle(p) : ''}
           message={message}
           postingId={postingId}
           postings={ownPostings.data ?? []}
+          maxHeight={bound.maxHeight}
+          onScrollLayout={bound.onScrollLayout}
           error={error}
           onMessage={setMessage}
           onPosting={setPostingId}
           onError={setError}
         />
-      </Sheet>
-    </ScrollView>
+    </Sheet>
   )
 }
 
