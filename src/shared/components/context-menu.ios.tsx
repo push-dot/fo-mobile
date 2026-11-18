@@ -12,7 +12,8 @@ import NativeHost from './native-host'
 const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => {
   const { width } = useWindowDimensions()
   return (
-    <NativeHost matchContents={{ vertical: true }} seedColor={useColors().t1}>
+    // Without ignoreSafeArea the hosted row stops at the status bar while the list keeps scrolling, so a header row (Push Bot) overlaps the first row.
+    <NativeHost matchContents={{ vertical: true }} ignoreSafeArea="all" seedColor={useColors().t1}>
       <SwiftContextMenu>
         <SwiftContextMenu.Items>
           <MenuButtons actions={actions} />
