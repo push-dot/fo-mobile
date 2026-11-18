@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Platform, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassButton, Text, ToastHost } from '@/shared/components'
+import { COMPOSE } from '../constants'
 import { headerInset } from './header-inset'
 import { sheetHeaderTop } from '@/shared/navigation'
 import { iosSheetFill, spacing, useColors, useThemeMode } from '@/theme'
@@ -58,11 +59,12 @@ const PageModal = ({
   const ios = Platform.OS === 'ios'
   const modalPage = !!mpage && ios
   const iosSheet = !!sheet && ios
+  const geo = white ? COMPOSE : SHEET
   const mode = useThemeMode()
   const fill = iosSheet && !white ? iosSheetFill[mode] : c.bg
   return (
-    <View style={{ flex: 1, backgroundColor: fill, paddingTop: iosSheet ? SHEET.top : modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: iosSheet ? SHEET.header : undefined, paddingHorizontal: iosSheet ? SHEET.side : modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: iosSheet ? 0 : modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
+    <View style={{ flex: 1, backgroundColor: fill, paddingTop: iosSheet ? geo.top : modalPage ? MPAGE.top : ios ? (page ? insets.top + 6 : spacing[4]) : sheetHeaderTop(Platform.OS, true, insets.top, GLASS_BUTTON) }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: iosSheet ? geo.header : undefined, paddingHorizontal: iosSheet ? geo.side : modalPage ? MPAGE.side : headerInset(ios, !!nav), paddingBottom: iosSheet ? 0 : modalPage ? MPAGE.below : tight ? 0 : spacing[2] }}>
         {left ?? <GlassButton filled={iosSheet && !!closeFilled} actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} />}
         <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
           {title}
@@ -77,7 +79,7 @@ const PageModal = ({
       {footer ? (
         <View
           style={[
-            { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: modalPage ? MPAGE.inset : spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (iosSheet ? SHEET.bottom : modalPage ? MPAGE.inset : ios ? 6 : 10) },
+            { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: modalPage ? MPAGE.inset : iosSheet ? geo.side : spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (iosSheet ? geo.bottom : modalPage ? MPAGE.inset : ios ? 6 : 10) },
             // The boards' `.and .ctabar`: a solid `bg` bar with a 1px line on top, no fade.
             ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
           ]}

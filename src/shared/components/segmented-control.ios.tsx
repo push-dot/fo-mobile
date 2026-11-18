@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native'
 import { cssShadow, spacing, useColors, useThemeMode } from '../../theme'
 import Glass, { useReduceTransparency } from './glass'
 import type { SegmentedControlProps } from './segmented-control.android'
-import { COMPACT_HEIGHT, COMPACT_WIDTH } from './segmented-control.compact'
+import { COMPACT_HEIGHT, COMPACT_WIDTH, SLIM_HEIGHT } from './segmented-control.compact'
 import Text from './text'
 
 const INSET = spacing[1]
@@ -10,6 +10,7 @@ const INSET = spacing[1]
 // The boards draw the full-width control as a tab list and Settings' compact theme picker as a radio group.
 const VARIANT = {
   regular: { height: 44, width: undefined, group: 'tablist', item: 'tab', state: (on: boolean) => ({ selected: on }) },
+  slim: { height: SLIM_HEIGHT, width: undefined, group: 'tablist', item: 'tab', state: (on: boolean) => ({ selected: on }) },
   compact: { height: COMPACT_HEIGHT, width: COMPACT_WIDTH, group: 'radiogroup', item: 'radio', state: (on: boolean) => ({ checked: on }) },
 } as const
 
@@ -17,11 +18,11 @@ const VARIANT = {
  * iOS: the boards' `.ios .seg`, a glass track whose selected segment is filled. UISegmentedControl draws the reverse.
  * Reduce Transparency turns Glass into an opaque `bg2` view, on which a `fill` segment does not show, so it paints their plain `.seg`.
  */
-const SegmentedControl = <K extends string,>({ items, value, onChange, compact }: SegmentedControlProps<K>) => {
+const SegmentedControl = <K extends string,>({ items, value, onChange, compact, slim }: SegmentedControlProps<K>) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
   const plain = useReduceTransparency()
-  const variant = VARIANT[compact ? 'compact' : 'regular']
+  const variant = VARIANT[compact ? 'compact' : slim ? 'slim' : 'regular']
   const segment = variant.height - 2 * INSET
   const selected = plain ? (dark ? c.fill2 : c.bg) : c.fill
   return (
