@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useRef } from 'react'
 import { Pressable, View, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, useShadow, type Colors } from '../../theme'
 import { toBoxShadow } from '../utility'
@@ -24,6 +25,7 @@ const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justify
 // iOS glass answers presses natively (isInteractive); a JS scale around it would move the shape apart from its glass.
 const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fill = 'fill', pressedFill, disabled, dimOpacity = DISABLED_OPACITY, ...press }: Props) => {
   const c = useColors()
+  const box = useRef<View>(null)
   const native = useGlassSurface() && glass
   const sheetFill = useSheetGlassFill()
   const sheetGlass = glass ? sheetFill : null
@@ -42,7 +44,14 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
     <Pressable
       {...press}
       onPressIn={(e) => { dbg(`pin2:${disabled ? 'dis' : 'en'}`); press.onPressIn?.(e) }}
-      onTouchStart={() => dbg('ts2')}
+      ref={box}
+      onTouchStart={(e) => {
+        const t = e.nativeEvent
+        dbg(`ts2 p=${Math.round(t.pageX)},${Math.round(t.pageY)}`)
+        box.current?.measureInWindow((x, y, w, h) => dbg(`box ${Math.round(x)},${Math.round(y)},${Math.round(w)}x${Math.round(h)}`))
+      }}
+      onTouchEnd={() => dbg('te')}
+      onTouchCancel={() => dbg('tc')}
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
