@@ -15,6 +15,7 @@ import {
   Logo,
   RETRY_LABEL,
   PostingSection,
+  postingTitleLines,
   StageTracker,
   useApplication,
   useDocuments,
@@ -71,7 +72,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               </Text>
             </View>
             <Text v="h1" accessibilityRole="header">
-              {item.title}
+              {postingTitleLines(item.title).join('\n')}
             </Text>
             {p ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>

@@ -25,7 +25,6 @@ import Row from './row'
 import SectionHead from './section-head'
 
 const LIST_PAD = 40
-const HEAD_TOP = spacing[3]
 const EMPTY_LIFT = TAB_EMPTY_LIFT - LIST_PAD
 
 const SUBS: { key: ActivitySub; label: string }[] = [
@@ -50,7 +49,7 @@ const Applications = () => {
           onAction={() => router.push(emptyCta('applications').href)}
         />
       ) : (
-        <ListTitle top={HEAD_TOP} title="지원한 공고" count={data?.page.total ?? list.length} />
+        <ListTitle title="지원한 공고" count={data?.page.total ?? list.length} />
       )}
       {list.map((a) => (
         <Row
@@ -92,7 +91,7 @@ const Bookmarks = () => {
           onAction={() => router.push(emptyCta('bookmarks').href)}
         />
       ) : (
-        <ListTitle top={HEAD_TOP} title="북마크한 공고" count={data?.page.total ?? list.length} />
+        <ListTitle title="북마크한 공고" count={data?.page.total ?? list.length} />
       )}
       {list.map((p) => (
         <Pressable
@@ -174,7 +173,6 @@ const Follows = () => {
         />
       ) : (
         <SectionHead
-          top={HEAD_TOP}
           title="팔로잉"
           link={followSeeAll(followingCount)}
           onLink={() => router.push({ pathname: '/activity/follows', params: { box: 'following' } })}
@@ -213,7 +211,6 @@ const Posts = () => {
         />
       ) : (
         <SectionHead
-          top={HEAD_TOP}
           title="내가 쓴 글"
           link={postsSeeAll(postCount)}
           onLink={() => router.push({ pathname: '/activity/posts', params: { box: 'mine' } })}

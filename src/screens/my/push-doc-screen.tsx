@@ -152,7 +152,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: application ? 120 : spacing[6], gap: spacing[6] }}>
-          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
+          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: application ? 0 : spacing[1] }}>
             <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl ?? null} size={84} />
             <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
               {me?.displayName}
