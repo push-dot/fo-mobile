@@ -100,6 +100,12 @@ export type QsLayout = 'link' | 'match' | 'pick' | 'status' | 'calendar' | 'card
 /** What the sheet collected; `start` turns it into the conversation title and first message. */
 export type QsInput = { picked: QsItem[]; url: string; chips: string[]; option: boolean; doc?: string; documentId?: string; task: string; custom: string }
 
+/** QsPostAll, QsReplyAll (`.compose`). The CTA sits 8 above the home inset. */
+export const COMPOSE = { top: 16, header: 44, side: 20, bottom: 8 }
+/** The description's margin-top -10 under the board's 16 gap. */
+export const ALL_DESCRIPTION_TOP = 6
+export const ALL_FIELD_HEIGHT = 52
+
 export type QuickStart = {
   key: string
   label: string

@@ -11,13 +11,10 @@ import { useChatDocs, useHubProfileId, useQuickStart, useStartChat } from '../ap
 import Mark from './mark'
 import PageModal from './page-modal'
 import Pick from './pick'
-import { CALENDAR_TASKS, DEFAULT_DOC, type QuickStart } from '../constants'
+import { ALL_DESCRIPTION_TOP, ALL_FIELD_HEIGHT, CALENDAR_TASKS, DEFAULT_DOC, type QuickStart } from '../constants'
 import { initialPicks, startLink } from '../utils/quick-start-data'
 import { quickStartAllPath } from '../utils/sheet-routes'
 
-/** QsPostAll and QsReplyAll (`.compose`): the description sits 6 under the header (margin-top -10 under the 16 gap), the free-topic field is 52 high. */
-const ALL_DESCRIPTION_TOP = 6
-const ALL_FIELD_HEIGHT = 52
 
 export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
   return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null

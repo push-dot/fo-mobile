@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Platform, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GlassButton, Text, ToastHost } from '@/shared/components'
+import { COMPOSE } from '../constants'
 import { headerInset } from './header-inset'
 import { sheetHeaderTop } from '@/shared/navigation'
 import { iosSheetFill, spacing, useColors, useThemeMode } from '@/theme'
@@ -15,9 +16,6 @@ const MPAGE = { top: 14, below: 4, side: 16, spacer: 52, inset: 20 }
 
 /** A pageSheet drawn as the boards' `.isheet.pm8`: 17 above the 52 high header (8 + the 5 grabber + 4), 16 beside it, 4 under the foot button. */
 const SHEET = { top: 17, header: 52, side: 16, bottom: 4 }
-
-/** A white pageSheet drawn as `.compose` (QsPostAll, QsReplyAll): 16 above the 44 high header, 20 beside it, the CTA 8 above the home inset. */
-const COMPOSE = { top: 16, header: 44, side: 20, bottom: 8 }
 
 const PageModal = ({
   onClose = () => router.back(),
