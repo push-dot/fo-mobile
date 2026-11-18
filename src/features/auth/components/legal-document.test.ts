@@ -34,11 +34,11 @@ describe('LegalDocument spacing follows the v489 boards', () => {
     expect(wrapper).toBeDefined()
   })
 
-  it('spaces list items by 10 and right-aligns a 28 wide marker with 4pt before the text', () => {
+  it('spaces items by 10 and right-aligns the marker 13pt before the text', () => {
     const nodes = render([{ kind: 'list', ordered: true, items: ['a', 'b'] }])
     expect(nodes.some((n) => flat(n.props.style).gap === 10)).toBe(true)
     const marker = nodes.find((n) => n.props.children === '1.')
-    expect(flat(marker?.props.style)).toMatchObject({ width: 28, paddingRight: 4, textAlign: 'right' })
+    expect(flat(marker?.props.style)).toMatchObject({ width: 48, marginLeft: -20, paddingRight: 13, textAlign: 'right' })
   })
 
   it('pads the card by 4 and sets the row title b2 over a 21pt detail line', () => {
