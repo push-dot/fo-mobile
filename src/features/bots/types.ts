@@ -68,6 +68,9 @@ export type Bot = PushBot | CompanyBot
 /** Enough to draw a bot's mascot and name where the bot itself is not loaded. */
 export type BotRef = { id: BotId; kind: BotKind; name: string; color: BotColor | null }
 
+/** A site the bot reads without asking (BotProfileAllowed). `kind` is what the user allowed it for. */
+export type AllowedSite = { id: string; host: string; allowedAt: Date; kind: 'posting' | 'company' }
+
 /** The profile's extra facts. Each null hides its row. */
 export type BotProfile = {
   bot: Bot
@@ -75,6 +78,8 @@ export type BotProfile = {
   fitScore: number | null
   /** Materials this bot made or was sent. Null until the server counts them. */
   materialCount: number | null
+  /** Null until the server lists them. Null or empty hides the 허용한 사이트 row. */
+  allowedSites: AllowedSite[] | null
 }
 
 /** What the create sheet submits. A company bot always starts from a posting in Push. */

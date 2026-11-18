@@ -11,7 +11,7 @@ const SHEET_INSET = Platform.OS === 'ios' ? spacing[2] : 0
 const ROW_PAD = SHEET_INSET ? spacing[3] : 0
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
-/** The board's MyCalendarModal body: a month with prev/next, one grey dot per day that has events. */
+/** The board's MyCalendarModal body: a month with prev/next, one t2 dot per day that has events. */
 const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date) => void }) => {
   const c = useColors()
   const today = useMemo(() => new Date(), [])
@@ -59,13 +59,13 @@ const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date)
             >
               <View style={{ width: DAY_SIZE, height: DAY_SIZE, alignItems: 'center', justifyContent: 'center' }}>
                 {isSel ? <View style={{ position: 'absolute', inset: 0, borderRadius: DAY_SIZE / 2, backgroundColor: c.t1 }} /> : null}
-                <Text v="b2" weight={isSel || isToday ? '800' : '600'} style={{ color: isSel ? c.bg : inMonth ? c.t1 : c.t4 }}>
+                <Text v="b2" weight={isSel || isToday ? '800' : '600'} style={{ fontSize: 14, color: isSel ? c.bg : inMonth ? c.t1 : c.t4 }}>
                   {d.getDate()}
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', gap: spacing[1], height: 5 }}>
                 {Array.from({ length: Math.min(count, 3) }, (_, i) => (
-                  <View key={i} style={{ width: 5, height: 5, borderRadius: radius.pill, backgroundColor: c.t4 }} />
+                  <View key={i} style={{ width: 5, height: 5, borderRadius: radius.pill, backgroundColor: c.t2 }} />
                 ))}
               </View>
             </Pressable>

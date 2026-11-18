@@ -8,7 +8,7 @@ const TermCheckbox = ({ checked, size }: { checked: boolean; size: number }) => 
     <View
       style={{ width: size, height: size, borderRadius: 8, borderWidth: checked ? 0 : 2, borderColor: c.t3, backgroundColor: checked ? c.ac : 'transparent', alignItems: 'center', justifyContent: 'center' }}
     >
-      {checked ? <Icon name="check" size={size - 10} color={onAccent} /> : null}
+      {checked ? <Icon name="check" size={14} color={onAccent} /> : null}
     </View>
   )
 }

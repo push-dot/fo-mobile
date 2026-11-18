@@ -28,14 +28,14 @@ const FollowsScreen = () => {
             marginHorizontal: spacing[5],
             marginVertical: spacing[2],
             height: 44,
-            borderRadius: radius.card,
+            borderRadius: radius.pill,
             paddingHorizontal: spacing[4],
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing[2],
           }}
         >
-          <Icon name="search" size={16} color="t3" />
+          <Icon name="search" size={18} color="t3" />
           <TextInput
             accessibilityLabel="이름이나 직무로 찾기"
             value={q}
@@ -50,7 +50,7 @@ const FollowsScreen = () => {
         <ListSkeleton />
       ) : (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: 6, paddingHorizontal: spacing[5] }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? people.length}명
           </Text>
           {people.length === 0 && following ? (

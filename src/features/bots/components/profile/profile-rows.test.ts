@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   DELETE_BODY,
+  allowedLine,
+  allowedTitle,
   colorA11y,
   deleteTitle,
   profileGroups,
@@ -47,5 +49,19 @@ describe('bot profile rows', () => {
     expect(deleteTitle('모아페이')).toBe('모아페이 Bot을 삭제할까요?')
     expect(DELETE_BODY).toBe('기록이 지워지고 되돌릴 수 없어요.')
     expect(colorA11y(0)).toBe('색 1')
+  })
+})
+
+describe('bot profile allowed sites', () => {
+  it('draws the row between the materials and the companies, and hides it at 0', () => {
+    expect(ids('push', { companyCount: 6, allowedCount: 2 })).toEqual(['posting', 'fit', 'materials', 'allowed', 'companies', 'notify'])
+    expect(ids('company', { allowedCount: 0 })).not.toContain('allowed')
+    expect(ids('company', { allowedCount: null })).not.toContain('allowed')
+  })
+
+  it('words the sheet', () => {
+    expect(allowedTitle(2)).toBe('허용한 사이트 2')
+    expect(allowedLine(new Date(2026, 10, 3), 'posting')).toBe('11월 3일 허용 · 채용 공고')
+    expect(allowedLine(new Date(2026, 10, 5), 'company')).toBe('11월 5일 허용 · 회사 소개')
   })
 })

@@ -485,7 +485,6 @@ export const generic = (text: string): Step[] => [
 ]
 
 /** The ask that makes the Bot change the headline at once (update_my_profile, rule 39) and leave 되돌리기. */
-// English like the other typed tours: Maestro cannot type Korean, and the Android keyboard capitalizes the first letter.
 export const PROFILE_CHANGE_ASK = 'change headline'
 export const PROFILE_CHANGE_HEADLINE = '결제·정산 시스템을 만드는 시니어 백엔드 개발자'
 export const PROFILE_CHANGE_REPLY = '한 줄 소개를 바꿨어요.'
@@ -579,7 +578,7 @@ export const fail = (code: string, details?: Record<string, unknown>): Step[] =>
 // The company-bot status boards (ChatBotStatus*): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
 // ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
-// so no line depends on how long Maestro takes to read the screen (its waits end early or late).
+// so no line depends on how long the screen takes to read.
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
 /** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
 export const WAITING_CHOICES = new Set(['st-help'])

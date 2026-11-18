@@ -60,6 +60,8 @@ export const CONSENT_TITLE = 'Bot을 쓰려면 동의가 필요해요'
 export const CONSENT_BODY = '내 서류를 다른 Bot이 참고 자료로 써요.'
 export const PLAN_HEADER = '플랜마다\n쓸 수 있는 양이 달라요'
 export const ACCOUNT_REFERENCE_TITLE = 'Bot이 참고하는 내 정보'
+export const USAGE_TITLE = '사용량'
+export const USAGE_BY_BOT_TITLE = 'Bot별'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'
 export const docAiSub = (ago: string) => `Bot으로 만듦 · ${ago}`
 export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
@@ -228,3 +230,9 @@ export const KEYWORD_GLYPH = {
 } as const
 
 /** The page-style modal a form card (ChatPh0Input) opens in: its title is the sheet's, not the bot's question. */
+
+// ChatBotReadOff: 내 자료 읽기 is off, so a company bot cannot read 마이 › 서류 or the bookmarks. The refused send is a bot line with two ways out.
+export const READ_OFF_CODE = 'FILES_READ_OFF'
+export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
+export const READ_OFF_ATTACH = '서류 첨부'
+export const READ_OFF_SETTINGS = '설정 열기'

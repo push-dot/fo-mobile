@@ -14,12 +14,12 @@ import Note from './note'
 import PageModal from './page-modal'
 
 
-/** 계정 modal (ChatAccount). 플랜 opens as its own page (PlanUpgrade). */
+/** 계정 modal (ChatAccount). 플랜 opens as its own page (PlanUpgrade), 사용량 as another (ChatAccountUsage). */
 export const AccountModal = () => {
   const account = useChatAccount(true)
   return (
     <PageModal title="계정" tight>
-      <AccountPage account={account.data} onPlan={() => router.push('/plan')} />
+      <AccountPage account={account.data} onPlan={() => router.push('/plan')} onUsage={() => router.push('/usage')} />
     </PageModal>
   )
 }
@@ -53,7 +53,7 @@ const AccountRow = ({ label, value, bold, plain, onPress }: { label: string; val
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
 
-const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => void }) => {
+const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: () => void; onUsage: () => void }) => {
   const me = useMe()
   const settings = useMySettings(true)
   const save = useUpdateSettings()
@@ -72,7 +72,7 @@ const AccountPage = ({ account, onPlan }: { account?: Account; onPlan: () => voi
       <View style={GROUP}>
         <SettingsGroup>
           <AccountRow label={account?.plan ?? ' '} bold onPress={onPlan} />
-          {usage == null ? null : <AccountRow label={`이번 달 사용량 ${usage}%`} plain />}
+          {usage == null ? null : <AccountRow label={`이번 달 사용량 ${usage}%`} onPress={onUsage} />}
         </SettingsGroup>
       </View>
       <GroupTitle style={TITLE}>{ACCOUNT_REFERENCE_TITLE}</GroupTitle>

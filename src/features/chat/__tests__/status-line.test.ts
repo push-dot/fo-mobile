@@ -17,12 +17,12 @@ describe('isStopping', () => {
 describe('statusLineView', () => {
   it('draws the waiting state as an in-progress line (ChatBotStatusQueue, rule 51)', () => {
     const since = at(161_000 - 12_000)
-    expect(run({ kind: 'run', phase: 'queued', since, ahead: 0 })).toMatchObject({ mascot: 'think', tone: 'neutral', text: '순서를 기다리는 중', tail: '12초' })
+    expect(run({ kind: 'run', phase: 'queued', since, ahead: 0 })).toMatchObject({ mascot: 'idle', tone: 'neutral', text: '순서를 기다리는 중', tail: '12초' })
     expect(run({ kind: 'run', phase: 'queued', since, ahead: 2 })).toMatchObject({ text: '순서를 기다리는 중 · 앞에 작업 2개', tail: '12초' })
   })
 
   it('draws stopping as a grey line that counts nothing (ChatBotStatusStopped)', () => {
-    expect(run({ kind: 'run', phase: 'working', since: at(NOW.getTime() - 5_000), text: '중지하는 중' })).toMatchObject({ tone: 'quiet', text: '중지하는 중', tail: null })
+    expect(run({ kind: 'run', phase: 'working', since: at(NOW.getTime() - 5_000), text: '중지하는 중' })).toMatchObject({ mascot: 'idle', still: true, tone: 'quiet', text: '중지하는 중', tail: null })
   })
 
   it('prints the server sentence for thinking, working, and waiting', () => {

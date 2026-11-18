@@ -1,5 +1,5 @@
 import { router, useIsFocused } from 'expo-router'
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
@@ -50,7 +50,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
           </Text>
           {reading && !failed ? (
             <View style={{ marginRight: spacing[1] }}>
-              <Spinner color="t3" />
+              <Spinner color="t1" />
             </View>
           ) : null}
           {reading || failed ? (
@@ -77,7 +77,8 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Icon name="sort" size={22} color="t1" />
+        {/* MyResume: iOS draws the three-line menu glyph in t1, Android the three dots in t3 */}
+        {Platform.OS === 'ios' ? <Icon name="sort" size={22} color="t1" /> : <Icon name="more" size={20} color="t3" />}
       </Pressable>
     </Row>
   )
@@ -220,9 +221,10 @@ const DocsTab = () => {
               accessibilityRole="button"
               accessibilityLabel="취소"
               onPress={cancel}
-              style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
+              // Uploading: the 취소 button is a fill circle on iOS only (r6 rule); Android draws the bare glyph. The glyph is 18.
+              style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: Platform.OS === 'ios' ? c.fill : undefined, alignItems: 'center', justifyContent: 'center' }}
             >
-              <Icon name="x" size={20} color="t3" />
+              <Icon name="x" size={18} color="t3" />
             </Pressable>
           </Row>
         ) : null}

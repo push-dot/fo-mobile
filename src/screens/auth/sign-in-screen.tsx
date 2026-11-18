@@ -103,7 +103,7 @@ const SignInScreen = () => {
             style={{ position: 'absolute', top: '100%', left: 0, right: 0, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => signInWithDevToken(devToken)}
           >
-            {/* Dev builds only (__DEV__). The board has no such link, so it is transparent: still in the accessibility tree for the Maestro login flows, never drawn. */}
+            {/* Dev builds only (__DEV__). The board has no such link, so it is transparent: still in the accessibility tree, never drawn. */}
             <Text v="c1" weight="700" style={{ color: 'transparent' }}>
               개발 토큰으로 들어가기
             </Text>

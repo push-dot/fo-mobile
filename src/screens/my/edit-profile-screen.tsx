@@ -93,7 +93,9 @@ const Input = ({
   placeholder,
   multiline,
   keyboardType,
+  invalid,
 }: {
+  invalid?: boolean
   value: string
   onChangeText: (t: string) => void
   label: string
@@ -117,8 +119,10 @@ const Input = ({
           ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
-          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box; neither has a red border (the error is the line of text below)
+          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box
           backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
+          // EditCareerStates 빈 칸 오류: Android rings the empty field in red (1.5 inset); iOS only shows the line of text below
+          ...(invalid && Platform.OS !== 'ios' ? { borderWidth: 1.5, borderColor: c.red } : null),
           paddingHorizontal: spacing[4],
           paddingTop: multiline ? spacing[3] : 0,
           fontSize: font.fontSize,
@@ -490,11 +494,13 @@ const EditCareer = ({ p }: { p: Profile }) => {
                 <View style={{ gap: spacing[2], paddingTop: spacing[2] }}>
                   <Input
                     label="회사"
+                    invalid={tried && !it.company.trim()}
                     value={it.company}
                     onChangeText={(t) => set(i, { company: t })}
                   />
                   <Input
                     label="직무"
+                    invalid={tried && !it.role.trim()}
                     value={it.role}
                     onChangeText={(t) => set(i, { role: t })}
                   />

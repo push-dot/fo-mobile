@@ -45,6 +45,9 @@ import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
 import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
+// Settings: the 연락처 and 말투 rows open a picker sheet; iOS draws the up-down selector, Android a plain t3 chevron (`.and-only` / `.ios-only`). 언어 and 테마 keep the selector on both.
+const IOS_PICKER = Platform.OS === 'ios'
+
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
   const c = useColors()
   return (
@@ -153,7 +156,7 @@ const SettingsScreen = () => {
       <SettingsGroup title="허브 공개">
         <SettingsRow label="프로필 공개" right={sw('profilePublic', '프로필 공개')} />
         <SettingsRow label={careerRowLabel(s.careerStatusVisibility)} onPress={() => router.push('/settings/career')} mutedChevron />
-        <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} picker />
+        <SettingsRow label={contactRowLabel(s.contactVisibility)} onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'contact' } })} picker={IOS_PICKER} mutedChevron />
         <SettingsRow
           label={blockedRowLabel(blocked.data?.page.total)}
           mutedChevron
@@ -165,7 +168,8 @@ const SettingsScreen = () => {
         <SettingsRow
           label={toneRowLabel(TONES.find((t) => t.key === s.defaultTone)?.label ?? '')}
           onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'tone' } })}
-          picker
+          picker={IOS_PICKER}
+          mutedChevron
         />
         <SettingsRow label={READ_FILES_ROW.label} right={sw(READ_FILES_ROW.key, READ_FILES_ROW.label)} />
         <SettingsRow
@@ -188,7 +192,8 @@ const SettingsScreen = () => {
       <SettingsGroup title="기타">
         <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
         <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
-        {Platform.OS === 'ios' ? <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} /> : null}
+        {/* SettingsStates draws 구매 복원 on both platforms. */}
+        <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} />
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
       </SettingsGroup>

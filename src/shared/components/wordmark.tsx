@@ -9,7 +9,8 @@ const BOARD_SIZE = 24
 
 const Wordmark = ({ size = 24 }: { size?: number }) => {
   const c = useColors()
-  const lineHeight = Math.round((size * 7) / 6)
+  // Boards: 24/28 at rest, 20/26 once the home list has scrolled (HomeScrolled `.topbar.sc`).
+  const lineHeight = size === BOARD_SIZE ? 28 : size === 20 ? 26 : Math.round((size * 7) / 6)
   const style = { fontSize: size, lineHeight, letterSpacing: size * TRACK_EM, top: size === BOARD_SIZE ? BOARD_DROP : 0 } as const
   return (
     <Text v="h1" style={{ ...style, position: 'relative' }}>

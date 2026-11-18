@@ -16,7 +16,9 @@ export type Notice =
 export type NoticeBubble = { text: string; detail?: string }
 
 export type StatusLineView = {
-  mascot: 'think' | 'work' | 'help'
+  mascot: 'idle' | 'think' | 'work' | 'help'
+  /** The mascot holds still (ChatBotStatusStopped draws it without a motion class). */
+  still?: boolean
   tone: 'neutral' | 'help' | 'quiet'
   text: string
   tail: string | null
@@ -55,8 +57,9 @@ export const formatElapsed = (seconds: number) => {
 
 const elapsedText = (since: Date, now: Date) => formatElapsed(Math.max(0, Math.floor((now.getTime() - since.getTime()) / 1000)))
 
-const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], text: string, tail: string | null, label = text): StatusLineView => ({
+const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], text: string, tail: string | null, label = text, still = false): StatusLineView => ({
   mascot,
+  ...(still ? { still } : null),
   tone,
   text,
   tail,
@@ -67,9 +70,10 @@ const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], te
 export const isStopping = (working: { verbs: readonly string[] } | null) => working?.verbs[0] === STOPPING_TEXT
 
 export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
-  if (line.kind === 'run' && line.phase === 'queued') return view('think', 'neutral', line.ahead > 0 ? `${QUEUE_TEXT} · 앞에 작업 ${line.ahead}개` : QUEUE_TEXT, elapsedText(line.since, now))
+  // ChatBotStatusQueue draws the idle mascot (m-idle): nothing runs yet, the elapsed time still counts.
+  if (line.kind === 'run' && line.phase === 'queued') return view('idle', 'neutral', line.ahead > 0 ? `${QUEUE_TEXT} · 앞에 작업 ${line.ahead}개` : QUEUE_TEXT, elapsedText(line.since, now))
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
-  if (line.kind === 'run' && line.text === STOPPING_TEXT) return view('work', 'quiet', line.text, null)
+  if (line.kind === 'run' && line.text === STOPPING_TEXT) return view('idle', 'quiet', line.text, null, line.text, true)
   if (line.kind === 'run') return view('work', 'neutral', line.text, elapsedText(line.since, now))
   return view('help', 'help', line.text, line.named ? null : elapsedText(line.since, now))
 }

@@ -70,6 +70,10 @@ export const toBotProfile = (dto: BotContract.BotDetail): BotProfile => ({
   posting: dto.posting && { id: dto.posting.id, title: dto.posting.title, deadline: dayOf(dto.posting.deadline), closed: dto.posting.closed },
   fitScore: dto.fit?.score ?? null,
   materialCount: dto.materialCount ?? null,
+  allowedSites: dto.allowedSites?.flatMap((s) => {
+    const allowedAt = dateOf(s.allowedAt)
+    return allowedAt ? [{ id: s.id, host: s.host, allowedAt, kind: s.kind }] : []
+  }) ?? null,
 })
 
 export const toLinkCheck = (dto: BotContract.LinkPreview): LinkCheck =>

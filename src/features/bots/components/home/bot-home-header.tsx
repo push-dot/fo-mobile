@@ -12,6 +12,7 @@ const BotHomeHeader = ({
   name,
   onAccount,
   onNew,
+  hideNew = false,
 }: {
   chrome: HomeChrome
   topInset: number
@@ -19,6 +20,8 @@ const BotHomeHeader = ({
   name: string
   onAccount: () => void
   onNew: () => void
+  /** AgentHomeSearch*: the Android search header keeps only the account (the + is iOS-only there). */
+  hideNew?: boolean
 }) => {
   const c = useColors()
   const bar = {
@@ -48,11 +51,13 @@ const BotHomeHeader = ({
       <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onAccount}>
         <Avatar name={name} size={chrome.avatar} />
       </Pressable>
-      <Glass interactive style={face}>
-        <Pressable accessibilityRole="button" accessibilityLabel={NEW_BOT_LABEL} onPress={onNew} style={face}>
-          <Icon name="plus" size={22} />
-        </Pressable>
-      </Glass>
+      {hideNew ? null : (
+        <Glass interactive style={face}>
+          <Pressable accessibilityRole="button" accessibilityLabel={NEW_BOT_LABEL} onPress={onNew} style={face}>
+            <Icon name="plus" size={22} />
+          </Pressable>
+        </Glass>
+      )}
     </View>
   )
 }

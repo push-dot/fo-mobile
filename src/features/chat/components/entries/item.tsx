@@ -18,7 +18,8 @@ import { displayName } from '@/shared/utility/display-name'
 import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
 import { fitChrome } from '../../utils/fit-card'
 import { BUBBLE_GAP } from '../../utils/thread-inset'
-import { FIT_LOCKED } from '../../constants'
+import { FIT_LOCKED, READ_OFF_CODE } from '../../constants'
+import ReadOff from './read-off'
 import { Appear } from '../motion'
 import Mark from '../mark'
 import type { ChatItem, ToolState } from '../../types'
@@ -301,12 +302,14 @@ const ItemComponent = ({
   onUsage,
   onView,
   onRetry,
+  onReadOff,
 }: {
   item: ChatItem
   writing?: boolean
   onUsage?: (action: 'plan' | 'credits') => void
   onView?: (item: Of<'result'>) => void
   onRetry?: () => void
+  onReadOff?: (action: 'attach' | 'settings') => void
 }) => {
   switch (item.type) {
     case 'user':
@@ -344,7 +347,9 @@ const ItemComponent = ({
       return null
     case 'error':
       // The credit banner above the composer says it; the refused turn leaves no line of its own.
-      return isUsageExhausted(item.code) ? null : item.code === 'PLAN_REQUIRED' ? (
+      return isUsageExhausted(item.code) ? null : item.code === READ_OFF_CODE && onReadOff ? (
+        <ReadOff text={item.text} onAction={onReadOff} />
+      ) : item.code === 'PLAN_REQUIRED' ? (
         <PlanRequired id={item.id} />
       ) : item.reason ? (
         <Notice id={item.id} notice={{ kind: 'error', code: item.code, reason: item.reason }} />

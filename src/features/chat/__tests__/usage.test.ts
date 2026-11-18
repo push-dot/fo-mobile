@@ -40,6 +40,7 @@ describe('composerPlaceholder', () => {
     expect(composerPlaceholder('모아페이')).toBe('모아페이 Bot에게 물어보기')
     expect(composerPlaceholder('Push Bot')).toBe('Push Bot에게 물어보기')
     expect(composerPlaceholder()).toBe('Bot에게 물어보기')
+    expect(composerPlaceholder('모아페이', undefined, true)).toBe('작업 중에도 말할 수 있어요')
   })
 
   it('asks what to do with the attached material', () => {

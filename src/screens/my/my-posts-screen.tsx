@@ -6,6 +6,7 @@ import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
+// MyPosts, MyPostsAll, MyPostsAllMenuFull and MyPostsSavedEmpty (저장한 글 with no rows: 0개 and 소셜 둘러보기).
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
@@ -25,7 +26,7 @@ const MyPostsScreen = () => {
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: 6, paddingHorizontal: spacing[5] }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? posts.length}개
           </Text>
           {posts.length === 0 && empty ? <Empty text={empty.title} action={empty.action} onAction={() => router.push(empty.href)} /> : null}
