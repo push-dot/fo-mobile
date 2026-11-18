@@ -28,16 +28,12 @@ tags:
     env:
       TITLE: "이 공고에 맞춰 이력서를 고칠까요?"
 # Closing the sheet brings the keyboard back by itself, so the composer is not tapped (a tap on a focused field only opens the paste menu).
-- waitForAnimationToEnd
-- takeScreenshot: Probe29.a
-- extendedWaitUntil:
-    visible: "NOPE-NEVER"
-    timeout: 3000
-    optional: true
-- takeScreenshot: Probe29.b
+# Closing the sheet leaves the field focused with the keyboard down, and a tap on it opens only the paste menu.
+# Typing one character brings the keyboard up; erasing it leaves the empty field with its caret, as the board draws it.
 - tapOn: ".*에게 물어보기"
+- inputText: "a"
+- eraseText: 1
 - waitForAnimationToEnd
-- takeScreenshot: Probe29.c
 - extendedWaitUntil:
     visible: ".*답을 기다리고 있어요.*"
     timeout: 10000
