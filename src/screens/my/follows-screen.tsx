@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
-import { GlassField, Icon, Text, TopBar } from '@/shared/components'
+import { GlassField, Icon, Text, TopBar, inputResponder } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
@@ -37,6 +37,7 @@ const FollowsScreen = () => {
         >
           <Icon name="search" size={16} color="t3" />
           <TextInput
+            {...inputResponder}
             accessibilityLabel="이름이나 직무로 찾기"
             value={q}
             onChangeText={setQ}

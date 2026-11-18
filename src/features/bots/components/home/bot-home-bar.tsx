@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
-import { Glass, GlassField, Icon, Text } from '@/shared/components'
+import { Glass, GlassField, Icon, Text, inputResponder } from '@/shared/components'
 import { fontFor, spacing, type, useColors } from '../../../../theme'
 import { MATERIALS_LABEL, SEARCH_CLOSE, SEARCH_LABEL } from './copy'
 import type { HomeChrome } from './metrics'
@@ -70,6 +70,7 @@ const BotHomeBar = ({
             <View style={fill}>
               <Icon name="search" size={20} color="t3" />
               <TextInput
+                {...inputResponder}
                 allowFontScaling={chrome.noScale}
                 autoFocus
                 value={query}

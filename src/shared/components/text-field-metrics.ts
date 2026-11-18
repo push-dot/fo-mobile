@@ -3,9 +3,6 @@ import { type } from '../../theme/tokens'
 
 const MULTILINE_ROWS = 4
 
-/** RN's iOS TextInput refuses to give up the responder by default, so a focused field can swallow the first tap on a sheet button (the touch starts, onPressIn never fires). */
-export const inputResponder = { rejectResponderTermination: false } as const
-
 /** Android EditText adds theme and font padding where the style sets none (fields drew 64pt, placeholders clipped). */
 export const inputReset = Platform.OS === 'android' ? ({ padding: 0, includeFontPadding: false } as const) : {}
 

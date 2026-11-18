@@ -1,4 +1,5 @@
 import { TextInput, View } from 'react-native'
+import { inputResponder } from '@/shared/components'
 import { OTP_LENGTH } from '../constants'
 import OtpBoxes from './otp-boxes'
 
@@ -6,6 +7,7 @@ const OtpCells = ({ value, onChange, error }: { value: string; onChange: (next: 
   <View style={{ position: 'relative' }}>
     <OtpBoxes value={value} active={value.length < OTP_LENGTH ? value.length : null} error={error} />
     <TextInput
+      {...inputResponder}
       accessibilityLabel="인증번호"
       value={value}
       onChangeText={(next) => onChange(next.replace(/\D/g, '').slice(0, OTP_LENGTH))}

@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Glass, GlassField, Icon, Text } from '../../../shared/components'
+import { Glass, GlassField, Icon, Text, inputResponder } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors, useThemeMode } from '../../../theme'
 
@@ -17,6 +17,7 @@ const SearchBar = ({ value, onChange, onSubmit }: { value: string; onChange: (v:
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: 44, paddingHorizontal: spacing[4] }}>
       <Icon name="search" size={18} color="t3" />
       <TextInput
+        {...inputResponder}
         autoFocus
         value={value}
         onChangeText={onChange}

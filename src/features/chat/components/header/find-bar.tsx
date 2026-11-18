@@ -1,5 +1,5 @@
 import { Platform, TextInput, View } from 'react-native'
-import { Glass, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { Glass, GlassButton, Icon, Text, TopBar, inputResponder } from '@/shared/components'
 import { fontFor, radius, spacing, type, useColors } from '../../../../theme'
 import { useHardwareBack } from '@/shared/utility'
 import type { FindStep } from '../../utils/find'
@@ -16,6 +16,7 @@ export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
     <View style={{ height: 44, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: 14, backgroundColor: ios ? 'transparent' : c.fill }}>
       <Icon name="search" size={18} color="t1" />
       <TextInput
+        {...inputResponder}
         autoFocus
         value={query}
         onChangeText={onQuery}

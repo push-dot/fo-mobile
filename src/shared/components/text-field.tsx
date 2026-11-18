@@ -4,7 +4,8 @@ import type { IconName } from '@push/design-system'
 import { fontFor, iosSystemFill, radius, spacing, type, useColors, useThemeMode } from '../../theme'
 import GlassField from './glass-field'
 import Icon from './icon'
-import { inputMetrics, inputResponder, iosLineBox } from './text-field-metrics'
+import { inputResponder } from './input-responder'
+import { inputMetrics, iosLineBox } from './text-field-metrics'
 import Text from './text'
 
 /** `compact`: the 48pt `.field` some boards draw instead of the 56pt default. `slim`: the iOS filter sheet's 40pt `.isearch` (17pt text, 12pt side padding). */

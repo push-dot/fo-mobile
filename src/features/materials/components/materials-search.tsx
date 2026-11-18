@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { GlassField, Icon, useKeyboardHeight } from '@/shared/components'
+import { GlassField, Icon, useKeyboardHeight, inputResponder } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
 import { SEARCH_PLACEHOLDER } from '../constants'
@@ -31,6 +31,7 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: size.height, paddingLeft: spacing[4], paddingRight: 6 }}>
       <Icon name="search" size={20} color="t3" />
       <TextInput
+        {...inputResponder}
         value={value}
         onChangeText={onChange}
         placeholder={SEARCH_PLACEHOLDER}
