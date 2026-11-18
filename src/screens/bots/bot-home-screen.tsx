@@ -1,6 +1,7 @@
-import { useIsFocused } from 'expo-router'
-import { BotHomeView, useBot, useBots, useDeleteBot, useMarkBotRead, useSetBotMuted } from '@/features/bots'
+import { Redirect, useIsFocused } from 'expo-router'
+import { BotHomeView, botChatPath, useBot, useBots, useDeleteBot, useMarkBotRead, useSetBotMuted } from '@/features/bots'
 import { forget, useChatAccount, useLocalActivity, useMe } from '@/features/chat'
+import { useReferenceConsent } from '@/features/my'
 
 const BotHomeScreen = () => {
   const focused = useIsFocused()
@@ -12,6 +13,10 @@ const BotHomeScreen = () => {
   const markRead = useMarkBotRead()
   const setMuted = useSetBotMuted()
   const local = useLocalActivity()
+  const consent = useReferenceConsent()
+  // Consent is taken in Push Bot's onboarding and no Bot works without it: until then the Bot home is never drawn, it redirects at once.
+  if (!consent.data) return null
+  if (consent.data.referenceData === false) return <Redirect href={`${botChatPath('push')}?instant=1`} />
   return (
     <BotHomeView
       bots={list.data}

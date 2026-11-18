@@ -7,7 +7,8 @@ export type ConsentModalRequest = {
   body: string
   agree: string
   onAgree: () => void
-  onLater: () => void
+  /** Without it the consent is required: no 나중에, and the sheet cannot be swiped away. */
+  onLater?: () => void
 }
 
 export const CONSENT_DETAIL_LABEL = '자세히 보기'

@@ -96,6 +96,7 @@ export const listenMockLinks = () =>
     }
     if (specs.includes('bots:none')) setBots('none')
     if (specs.includes('bots:long')) setBots('long')
+    if (specs.includes('bots:many')) setBots('many')
     if (specs.includes('bots:outcome')) setBots('outcome')
     if (specs.includes('bots:limit')) {
       setBots('limit')

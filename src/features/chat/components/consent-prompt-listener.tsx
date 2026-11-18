@@ -15,7 +15,7 @@ export const ConsentPromptListener = () => {
   useEffect(() => {
     if (!open) return
     showConsentModal(COPY, {
-      onLater: laterConsent,
+      // Consent is required: there is no 나중에.
       onAgree: () =>
         grantReferenceAccess().then(
           (data) => (qc.setQueryData(['me', 'consents'], data), void qc.invalidateQueries({ queryKey: ['me', 'settings'] }), grantConsent()),

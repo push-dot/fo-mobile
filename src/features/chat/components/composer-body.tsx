@@ -1,7 +1,7 @@
-import { useState, type Ref } from 'react'
-import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
+import { useEffect, useRef, useState, type Ref } from 'react'
+import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
-import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
+import { Glass, GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
@@ -55,27 +55,37 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const textType = type.h3
   const [layout, setLayout] = useState(COMPOSER_ROW)
   if (!p.value && layout.box) setLayout(COMPOSER_ROW)
+  // onLayout fires only when the height changes, so deleting text that stays on one line would never leave the box. Settle again on every length change.
+  const lines = useRef(1)
+  useEffect(() => setLayout((l) => settleComposerLayout(l, lines.current, p.value.length)), [p.value.length])
   const box = layout.box
+  // iOS: the + and @ discs are native glass like the header buttons; Android keeps the flat `fill2` disc.
+  const tool = (icon: 'plus' | 'at') =>
+    Platform.OS === 'ios' ? (
+      <Glass interactive style={disc}>
+        <Icon name={icon} size={20} />
+      </Glass>
+    ) : (
+      <View style={[disc, { backgroundColor: c.fill2 }]}>
+        <Icon name={icon} size={20} />
+      </View>
+    )
   const plus = showTools ? (
     <Pressable key="plus" accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
-      <View style={[disc, { backgroundColor: c.fill2 }]}>
-        <Icon name="plus" size={20} />
-      </View>
+      {tool('plus')}
     </Pressable>
   ) : null
   const mention = showTools ? (
     <Pressable key="mention" accessibilityRole="button" accessibilityLabel="언급" onPress={p.onMention} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
-      <View style={[disc, { backgroundColor: c.fill2 }]}>
-        <Icon name="at" size={20} />
-      </View>
+      {tool('at')}
     </Pressable>
   ) : null
   const field = (
     <View key="field" style={box ? { paddingHorizontal: spacing[3], paddingTop: spacing[2] } : { flex: 1, minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: showTools ? spacing[1] : spacing[3] }}>
       <View
         onLayout={(e) => {
-          const lines = Math.max(1, Math.round(e.nativeEvent.layout.height / (textType.lineHeight * fontScale)))
-          setLayout((l) => settleComposerLayout(l, lines, p.value.length))
+          lines.current = Math.max(1, Math.round(e.nativeEvent.layout.height / (textType.lineHeight * fontScale)))
+          setLayout((l) => settleComposerLayout(l, lines.current, p.value.length))
         }}
       >
         {p.value ? null : (
@@ -147,9 +157,11 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           </View>
         </Pressable>
       ) : null}
-      <GlassField style={{ flexDirection: box ? 'column' : 'row', alignItems: box ? 'stretch' : 'flex-end', padding: PILL_PAD, borderRadius: PILL_HEIGHT / 2 }}>
+      {/* The glass sits behind the controls, not around them: glass drawn inside glass loses the + and @ buttons' own glass. */}
+      <View style={{ flexDirection: box ? 'column' : 'row', alignItems: box ? 'stretch' : 'flex-end', padding: PILL_PAD, borderRadius: PILL_HEIGHT / 2 }}>
+        <GlassField style={[StyleSheet.absoluteFill, { borderRadius: PILL_HEIGHT / 2 }]}>{null}</GlassField>
         {box ? [field, <View key="bar" style={{ flexDirection: 'row', alignItems: 'center' }}>{plus}<View style={{ flex: 1 }} />{mention}{action}</View>] : [plus, field, mention, action]}
-      </GlassField>
+      </View>
     </View>
   )
 }
