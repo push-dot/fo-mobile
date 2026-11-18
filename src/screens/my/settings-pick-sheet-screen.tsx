@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Platform, PlatformColor, Pressable, View } from 'react-native'
 import { SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
 import { Sheet, Text, WheelPicker } from '@/shared/components'
-import { spacing, useColors, useThemePreference, type ThemeChoice } from '@/theme'
+import { spacing, type as typeScale, useColors, useThemePreference, type ThemeChoice } from '@/theme'
 
 const ANDROID = Platform.OS === 'android'
 
@@ -57,7 +57,7 @@ const SettingsPickSheetScreen = () => {
     // Android SettingsLanguage (.pm8): a 22/28 regular title, the choices as ✓ rows and a full-width 적용 button.
     <Sheet gap={ANDROID ? undefined : 0} action={ANDROID ? { label: '적용', onPress: confirm } : undefined}>
       {ANDROID ? (
-        <Text v="h2" weight="400" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 28 }}>
+        <Text v="h2" weight="400" accessibilityRole="header" style={{ fontSize: 22, lineHeight: typeScale.h2.lineHeight }}>
           {pick.title}
         </Text>
       ) : null}
