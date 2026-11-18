@@ -19,7 +19,8 @@ type Props = Omit<PressableProps, 'style' | 'children'> & {
 
 export const dbgLog: string[] = []
 export const dbgSubs = new Set<() => void>()
-export const dbg = (m: string) => { dbgLog.push(`${Date.now() % 100000}:${m}`); dbgSubs.forEach((f) => f()) }
+let sgRun = 0
+export const dbg = (m: string) => { if (m === 'sgblock') { if (sgRun++ > 0) return; } else sgRun = 0; dbgLog.push(`${Date.now() % 100000}:${m}`); dbgSubs.forEach((f) => f()) }
 let hbLast = Date.now()
 setInterval(() => { const n = Date.now(); if (n - hbLast > 350) dbg(`stall${n - hbLast}`); hbLast = n }, 100)
 const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }

@@ -61,7 +61,7 @@ const OfferReplySheetScreen = () => {
         style={{ minHeight: 72 }}
         placeholder={`${who.displayName} 님에게 답장을 써 주세요.`}
       />
-      <RNText accessibilityLabel={`DBG ${dbgLog.slice(-24).join(' ')}`}>{`DBG ${dbgLog.slice(-24).join(' ')}`}</RNText>
+      <RNText accessibilityLabel={`DBG ${dbgLog.slice(-40).join(' ')}`}>{`DBG ${dbgLog.slice(-40).join(' ')}`}</RNText>
     </Sheet>
   )
 }

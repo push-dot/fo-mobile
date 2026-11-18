@@ -8,6 +8,7 @@ import { queryClient } from '@/providers'
 import { RootErrorBoundary, ToastHost } from '@/shared/components'
 import SplashGate from '@/shared/infrastructure/splash-gate'
 import { noSelectionGrant } from '@/shared/utility'
+import { dbg } from '@/shared/components/glass-pressable'
 import { useSession } from '@/shared/infrastructure'
 import { useThemeMode, useThemePreference } from '@/theme'
 import { DesignThemeProvider } from '@/theme/provider'
@@ -39,7 +40,7 @@ const RootLayout = () => {
       <QueryClientProvider client={queryClient}>
         <RootErrorBoundary>
           <SplashGate sessionReady={ready} themeReady={themeReady} />
-          <View style={{ flex: 1 }} {...noSelectionGrant}>
+          <View style={{ flex: 1 }} {...noSelectionGrant} onTouchStart={(e) => dbg(`RTs ${Math.round(e.nativeEvent.pageX)},${Math.round(e.nativeEvent.pageY)} n=${e.nativeEvent.touches.length}`)} onTouchEnd={(e) => dbg(`RTe n=${e.nativeEvent.touches.length}`)} onTouchCancel={() => dbg('RTc')}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Protected guard={!!session} redirectTo="/sign-in">
                 <Stack.Screen name="(app)" />
