@@ -3,10 +3,11 @@ import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
-import { Appearance } from 'react-native'
+import { Appearance, View } from 'react-native'
 import { queryClient } from '@/providers'
 import { RootErrorBoundary, ToastHost } from '@/shared/components'
 import SplashGate from '@/shared/infrastructure/splash-gate'
+import { noSelectionGrant } from '@/shared/utility'
 import { useSession } from '@/shared/infrastructure'
 import { useThemeMode, useThemePreference } from '@/theme'
 import { DesignThemeProvider } from '@/theme/provider'
@@ -38,18 +39,20 @@ const RootLayout = () => {
       <QueryClientProvider client={queryClient}>
         <RootErrorBoundary>
           <SplashGate sessionReady={ready} themeReady={themeReady} />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Protected guard={!!session} redirectTo="/sign-in">
-              <Stack.Screen name="(app)" />
-            </Stack.Protected>
-            <Stack.Protected guard={!session}>
-              <Stack.Screen name="sign-in" />
-              <Stack.Screen name="phone" />
-              <Stack.Screen name="verify-phone" />
-              <Stack.Screen name="signup-terms" />
-              <Stack.Screen name="terms-view" />
-            </Stack.Protected>
-          </Stack>
+          <View style={{ flex: 1 }} {...noSelectionGrant}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Protected guard={!!session} redirectTo="/sign-in">
+                <Stack.Screen name="(app)" />
+              </Stack.Protected>
+              <Stack.Protected guard={!session}>
+                <Stack.Screen name="sign-in" />
+                <Stack.Screen name="phone" />
+                <Stack.Screen name="verify-phone" />
+                <Stack.Screen name="signup-terms" />
+                <Stack.Screen name="terms-view" />
+              </Stack.Protected>
+            </Stack>
+          </View>
           <ToastHost />
         </RootErrorBoundary>
         <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
