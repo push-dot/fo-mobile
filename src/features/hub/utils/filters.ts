@@ -1,7 +1,8 @@
 import { CAREER_STATUSES, JOB_CATEGORIES, type CareerStatus, type JobCategory, type Profile, type ProfileFilters, type Tenure } from '@push/api-client'
 
 export type Explore = NonNullable<ProfileFilters['explore']>
-export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: Explore }
+/** `explore: null` is no 탐색 filter at all: every public profile, not only the recommended ones. */
+export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: Explore | null }
 
 export const EMPTY_SHEET: SheetFilters = { tenure: [], status: [], explore: 'recommended' }
 
@@ -49,7 +50,7 @@ export const careerLine = (p: Pick<Profile, 'jobCategory' | 'tenureYears'>) =>
 
 export const profileQuery = (category: JobCategory[], f: SheetFilters): ProfileFilters => ({
   category,
-  explore: f.explore,
+  explore: f.explore ?? undefined,
   tenure: f.tenure,
   status: f.status,
 })
