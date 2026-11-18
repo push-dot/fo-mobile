@@ -17,13 +17,14 @@ type RowProps = {
   mutedChevron?: boolean
   /** A value row that opens a picker (v415 Settings): the label is the value itself; only the up-down selector sits on the right. */
   picker?: boolean
-  /** BotProfileXL: the board's `.grp .it` is 64 high with 21 pt labels and 18 pt values, drawn in fixed pixels. */
+  /** BotProfileXL: the board's `.grp .it` is 80 high (min-height 64 plus 8 padding above and below) with 21 pt labels and 18 pt values, drawn in fixed pixels. */
   xl?: boolean
 }
 
 /** BotProfileXL `.grp .it`: the label is the b1 size on the b2 line, the value has no type token. Fixed pixels, so no system scaling. */
 export const XL_ROW_LABEL = { fontSize: largeType.b1.fontSize, lineHeight: largeType.b2.lineHeight }
 export const XL_ROW_VALUE = { fontSize: 18 }
+export const XL_ROW_HEIGHT = 80
 
 const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, mutedChevron, picker, xl }: RowProps) => {
   const labelSize = xl ? XL_ROW_LABEL : { lineHeight: type.b2.lineHeight }
@@ -31,7 +32,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
   const body = (
     <View
       style={{
-        minHeight: xl ? 64 : 56,
+        minHeight: xl ? XL_ROW_HEIGHT : 56,
         flexDirection: 'row',
         alignItems: 'center',
         gap: spacing[3],

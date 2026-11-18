@@ -4,7 +4,12 @@ tags:
   - visual
 ---
 # Run with the system text size raised (xl/ is a separate run).
-- runFlow: ../../flows/_login.yaml
+# JobDetailXL draws the fit card with three parts like ApplySheet and Applied (G74), so the page opens under `fit-three`.
+- runFlow:
+    file: ../_login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=fit-three"
+      READY: "새로 올라온 공고"
 - runFlow: ../_open_jobs.yaml
 - extendedWaitUntil:
     visible: ".*모아페이.*"
