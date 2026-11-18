@@ -124,7 +124,6 @@ const Thread = ({ id }: { id: string }) => {
   const color = bot.data?.kind === 'company' ? bot.data.color : 'push'
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
-  const [grow, setGrow] = useState(0)
   const purchase = usePersonalPurchase()
   const convert = useConvertDocument((documentId) => {
     router.push(`/docs/push/${documentId}`)
@@ -237,7 +236,7 @@ const Thread = ({ id }: { id: string }) => {
         keyboardShouldPersistTaps="handled"
         // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
         // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard, grow), paddingBottom: spacing[4] }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard), paddingBottom: spacing[4] }}
         ListFooterComponent={<View style={{ height: Math.max(0, headerH - BUBBLE_GAP) }} />}
         ListHeaderComponent={
           chat.queue.length ? (
@@ -262,7 +261,6 @@ const Thread = ({ id }: { id: string }) => {
           placeholder={placeholder}
           working={!!chat.working && !isStopping(chat.working)}
           disabled={!!limit.banner}
-          onGrow={setGrow}
           onStop={() => stop(id)}
           onSend={(text, attachment) => send(id, text, attachment)}
           above={

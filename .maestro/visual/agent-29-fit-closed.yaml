@@ -27,7 +27,12 @@ tags:
     file: _close_sheet.yaml
     env:
       TITLE: "이 공고에 맞춰 이력서를 고칠까요?"
+# Closing the sheet leaves the field focused with the keyboard down, and a tap on a focused field only opens the paste menu, so a gutter tap blurs it first.
+- tapOn:
+    point: "2%,30%"
+- waitForAnimationToEnd
 - tapOn: ".*에게 물어보기"
+- waitForAnimationToEnd
 - extendedWaitUntil:
     visible: ".*답을 기다리고 있어요.*"
     timeout: 10000

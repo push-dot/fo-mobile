@@ -28,4 +28,4 @@ export const threadInset = ({ bottomH, keyboard, navBar, approval, android, stat
   return bottomH + lift + extraGap(approval, keyboard, status, platform)
 }
 
-export const threadBottomGap = (keyboard: number, grow = 0) => (keyboard ? KEYBOARD_GAP + grow : THREAD_GAP)
+export const threadBottomGap = (keyboard: number) => (keyboard ? KEYBOARD_GAP : THREAD_GAP)

@@ -22,11 +22,10 @@ type Props = {
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
   disabled?: boolean
-  onGrow?: (extra: number) => void
 }
 
 /** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled, onGrow }: Props) => {
+export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
@@ -66,7 +65,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}
         disabled={disabled}
-        onGrow={onGrow}
       />
     </View>
   )
