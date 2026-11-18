@@ -646,9 +646,9 @@ mock('DELETE', 'bots/:id', ({ params }) => {
   return undefined
 })
 
-mock('DELETE', 'bots/:id/allowed-sites/:siteId', ({ params }) => {
+mock('DELETE', 'bots/:id/site-grants/:host', ({ params }) => {
   const f = fixtureOf(params.id!)
-  const site = f?.detail.allowed?.find((s) => s.id === params.siteId)
+  const site = f?.detail.allowed?.find((s) => s.host === decodeURIComponent(params.host!))
   if (!f || !site) return notFound()
   f.detail.allowed = f.detail.allowed!.filter((s) => s !== site)
   return undefined

@@ -30,7 +30,7 @@ const BOT_CALLS: Record<keyof BotApi['bots'], () => Promise<unknown>> = {
   get: () => api.bots.get('push'),
   update: () => api.bots.update('b-moa', { expectedRevision: 1, notificationsMuted: true }),
   remove: () => api.bots.remove('b-sodam'),
-  revokeSite: async () => (allowSites('b-moa'), api.bots.revokeSite('b-moa', 's-1')),
+  revokeSite: async () => (allowSites('b-moa'), api.bots.revokeSite('b-moa', 'careers.moapay.co.kr')),
   markRead: () => api.bots.markRead('push'),
   transcript: () => api.bots.transcript('b-moa'),
   clearChat: () => api.bots.clearChat('b-nuri'),

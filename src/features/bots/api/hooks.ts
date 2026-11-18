@@ -130,18 +130,18 @@ export const useDeleteBot = () => {
 export const useRevokeAllowedSite = () => {
   const qc = useQueryClient()
   const m = useMutation({
-    mutationFn: ({ bot, siteId }: { bot: Bot; siteId: string }) => revokeAllowedSite(bot.id, siteId),
-    onMutate: async ({ bot, siteId }) => {
+    mutationFn: ({ bot, host }: { bot: Bot; host: string }) => revokeAllowedSite(bot.id, host),
+    onMutate: async ({ bot, host }) => {
       await qc.cancelQueries({ queryKey: BOTS })
       const before = snapshot(qc)
       qc.setQueriesData<BotProfile>({ queryKey: [...BOTS, 'detail'] }, (prev) =>
-        prev?.bot.id === bot.id && prev.allowedSites ? { ...prev, allowedSites: prev.allowedSites.filter((s) => s.id !== siteId) } : prev,
+        prev?.bot.id === bot.id && prev.allowedSites ? { ...prev, allowedSites: prev.allowedSites.filter((s) => s.host !== host) } : prev,
       )
       return before
     },
     onError: (_error, _vars, before) => before && restore(qc, before),
   })
-  return async (bot: Bot, siteId: string) => void (await m.mutateAsync({ bot, siteId }))
+  return async (bot: Bot, host: string) => void (await m.mutateAsync({ bot, host }))
 }
 
 /** Idempotent. The row loses its unread state at once and gets it back if the server refuses. */
