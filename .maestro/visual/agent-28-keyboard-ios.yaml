@@ -22,7 +22,6 @@ tags:
       - waitForAnimationToEnd
       - runFlow: _dismiss_next.yaml
       - tapOn: "메시지.*"
-      # The boards type Korean on iOS (ChatKeyboardIOS.1 one line, .2 two lines, .3 five lines). ChatComposerLong draws the same three states: one pill, a box with the buttons below, the box at its five-line maximum.
       - inputText: "누리클라우드 공고에도 맞춰 줘"
       - waitForAnimationToEnd
       - takeScreenshot: ChatKeyboardIOS.1

@@ -39,7 +39,7 @@ export type ComposerProps = {
   disabled?: boolean
 }
 
-/** One glass pill, one row inside it: + 첨부, the text, @ 언급, send or stop. Once the text wraps it becomes a box: the text takes the full width on top and the buttons move to their own row below (ChatComposerLong). Shared by both platforms. */
+/** One glass pill: + 첨부, the text, @ 언급, send or stop. Once the text wraps it becomes a box with the buttons on their own row below. Shared by both platforms. */
 export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const c = useColors()
   const xl = useXlBoardText()
@@ -76,7 +76,6 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   ) : null
   const field = (
     <View key="field" style={box ? { paddingHorizontal: spacing[3], paddingTop: spacing[2] } : { flex: 1, minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: showTools ? spacing[1] : spacing[3] }}>
-      {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. The View is the positioning parent of the absolute placeholder. */}
       <View
         onLayout={(e) => {
           const lines = Math.max(1, Math.round(e.nativeEvent.layout.height / (textType.lineHeight * fontScale)))
@@ -98,8 +97,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           editable={!p.disabled}
           accessibilityLabel={p.label ?? '메시지'}
           maxLength={p.maxLength}
-          // iOS keeps a multiline field at the height of the last sent text; an empty field is one line again (ChatErrOther).
-          // The board's typed line inherits the page's -0.02em ("@모아" 47.1 pt tracked, 48.1 without) and is 600 only while a mention is being typed.
+          // iOS keeps a multiline field at its last height after the text is cleared.
           style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, height: emptyFieldHeight(p.value, textType.lineHeight, fontScale), ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
         />
       </View>
