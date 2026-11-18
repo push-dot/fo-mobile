@@ -3,9 +3,11 @@ name: probe offer accept tap loop
 tags:
   - visual
 ---
+- evalScript: ${output.n = 0}
 - repeat:
     times: 12
     commands:
+      - evalScript: ${output.n = output.n + 1}
       - runFlow:
           file: _login_mock.yaml
           env:
@@ -37,5 +39,5 @@ tags:
       - copyTextFrom:
           text: "DBG.*"
           optional: true
-      - evalScript: ${console.log('PROBE copied=' + maestro.copiedText)}
-      - takeScreenshot: probe-iter
+      - evalScript: ${console.log('PROBE ' + output.n + ' copied=' + maestro.copiedText)}
+      - takeScreenshot: probe-${output.n}
