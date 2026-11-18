@@ -8,7 +8,8 @@ const TITLE_GAP = 6
 const TITLE_SIZE = { fontSize: 24, lineHeight: 32 }
 const BODY_LINE = { lineHeight: type.b1.lineHeight }
 const MARKER_WIDTH = 28
-const MARKER_GAP = 4
+const MARKER_GAP = 13
+const MARKER_OVERHANG = 20
 const ROW_PADDING = 14
 const LIST_GAP = 10
 const CARD_LINE = { lineHeight: 21 }
@@ -29,7 +30,7 @@ const Block = ({ block }: { block: LegalBlock }) => {
       <View style={{ gap: LIST_GAP }}>
         {block.items.map((item, index) => (
           <View key={index} style={{ flexDirection: 'row' }}>
-            <Text v="b2" color="t2" style={[BODY_LINE, { width: markerWidth, paddingRight: MARKER_GAP, textAlign: 'right' }]}>
+            <Text v="b2" color="t2" style={[BODY_LINE, { width: markerWidth + MARKER_OVERHANG, marginLeft: -MARKER_OVERHANG, paddingRight: MARKER_GAP, textAlign: 'right' }]}>
               {block.ordered ? `${index + 1}.` : '•'}
             </Text>
             <Body flex>{item}</Body>

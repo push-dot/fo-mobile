@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
-import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, XL_ROW_LABEL } from '@/shared/components'
+import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, XL_ROW_HEIGHT, XL_ROW_LABEL } from '@/shared/components'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
@@ -194,7 +194,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
         <Pressable key={row.id} accessibilityRole="button" accessibilityLabel={COLOR_A11Y} onPress={() => open(row)}>
           <View
             style={{
-              minHeight: xl ? 64 : 56,
+              minHeight: xl ? XL_ROW_HEIGHT : 56,
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing[3],
