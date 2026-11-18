@@ -13,6 +13,8 @@ export type Account = {
   paymentsEnabled?: boolean
   /** GET billing creditsRefillAt: when the monthly allowance is granted again. */
   creditsRefillAt?: string
+  /** ChatAccountUsage: each bot's share of the plan's monthly allowance, in percent of the total. */
+  usageByBot?: { name: string; percent: number }[]
 }
 
 export type QsItem = {

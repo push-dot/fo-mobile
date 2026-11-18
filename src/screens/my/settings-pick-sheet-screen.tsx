@@ -54,7 +54,13 @@ const SettingsPickSheetScreen = () => {
   }
   return (
     // iOS SettingsLanguage: the 52pt .inav starts 17 under the sheet top; the wheel follows 6 under it.
-    <Sheet title={ANDROID ? pick.title : undefined} gap={ANDROID ? undefined : 0}>
+    // Android SettingsLanguage (.pm8): a 22/28 regular title, the choices as ✓ rows and a full-width 적용 button.
+    <Sheet gap={ANDROID ? undefined : 0} action={ANDROID ? { label: '적용', onPress: confirm } : undefined}>
+      {ANDROID ? (
+        <Text v="h2" weight="400" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 28 }}>
+          {pick.title}
+        </Text>
+      ) : null}
       {ANDROID ? null : (
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
           <View style={{ minWidth: 56 }} />
@@ -68,11 +74,6 @@ const SettingsPickSheetScreen = () => {
       <View style={ANDROID ? undefined : { marginTop: 6, marginBottom: spacing[5] }}>
         <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
       </View>
-      {ANDROID ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <TextAction label="적용" bold onPress={confirm} />
-        </View>
-      ) : null}
     </Sheet>
   )
 }

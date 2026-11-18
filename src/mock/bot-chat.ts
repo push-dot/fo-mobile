@@ -122,7 +122,9 @@ const attachable = (ref: BotContract.AttachmentRef) =>
 mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
-  if (!hasReferenceConsent() || !readsMyFiles()) return consentRequired()
+  if (!hasReferenceConsent()) return consentRequired()
+  // ChatBotReadOff: consent is given but 내 자료 읽기 is off; the chat says so with a way out instead of asking for consent again.
+  if (!readsMyFiles()) return error(403, 'FILES_READ_OFF', 'reading my files is off')
   const b = (body ?? {}) as Partial<BotContract.SendBody>
   const extra = Object.keys(b).find((k) => !SEND_FIELDS.includes(k))
   if (extra) return error(400, 'VALIDATION_ERROR', 'unknown field', { field: extra })

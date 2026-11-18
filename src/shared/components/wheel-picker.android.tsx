@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ComponentRef } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
-import { spacing, useColors } from '../../theme'
+import { spacing, type, useColors } from '../../theme'
 import Text from './text'
 
 export type WheelPickerProps = {
@@ -16,16 +16,15 @@ export type WheelPickerProps = {
 
 export const WHEEL_HEIGHT = { full: 180, columns: 150, short: 120 } as const
 
-const RADIO = 20
 const ROW = 38
 const PAD = (WHEEL_HEIGHT.columns - ROW) / 2
 
-/** Android's single-choice list (radio rows), as the settings board draws it. */
+/** Android's single-choice list as SettingsLanguage draws it (.pm8 .pm-row): 50 high rows split by a hairline, a bold accent ✓ after the chosen one. */
 const RadioList = ({ items, value, onChange, accessibilityLabel }: WheelPickerProps) => {
   const c = useColors()
   return (
     <View accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel}>
-      {items.map((it) => {
+      {items.map((it, i) => {
         const on = it.key === value
         return (
           <Pressable
@@ -33,12 +32,23 @@ const RadioList = ({ items, value, onChange, accessibilityLabel }: WheelPickerPr
             accessibilityRole="radio"
             accessibilityState={{ checked: on }}
             onPress={() => onChange(it.key)}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], minHeight: 52, paddingHorizontal: spacing[1] }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing[3],
+              minHeight: 50,
+              borderBottomWidth: i < items.length - 1 ? 1 : 0,
+              borderBottomColor: c.line,
+            }}
           >
-            <View style={{ width: RADIO, height: RADIO, borderRadius: RADIO / 2, borderWidth: on ? 6 : 2, borderColor: on ? c.ac : c.t3 }} />
-            <Text v="b1" style={{ flex: 1 }}>
+            <Text v="h3" weight="400" style={{ flex: 1, lineHeight: type.b2.lineHeight }}>
               {it.label}
             </Text>
+            {on ? (
+              <Text v="h3" weight="700" color="ac" style={{ lineHeight: type.b2.lineHeight }}>
+                ✓
+              </Text>
+            ) : null}
           </Pressable>
         )
       })}

@@ -6,7 +6,7 @@ import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
-import { botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
+import { botAllowedPath, botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
 import type { Bot, BotAddress } from '../../types'
 import {
   COLOR_A11Y,
@@ -165,10 +165,12 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     fitScore: profile.data.fitScore,
     materialCount: profile.data.materialCount,
     companyCount: companies.length,
+    allowedCount: profile.data.allowedSites?.length,
   })
   const open = (row: ProfileRow) => {
     if ((row.id === 'posting' || row.id === 'fit') && posting) router.push(`/postings/${posting.id}`)
     if (row.id === 'materials') router.push(materialsPath(bot.id))
+    if (row.id === 'allowed') router.push(botAllowedPath(bot.id))
     if (row.id === 'companies') router.push(botCompaniesPath(bot.id))
     if (row.id === 'color' && bot.kind === 'company') router.push(botColorPath(bot.id))
     if (row.id === 'delete' && bot.kind === 'company') confirmDeleteBot(bot.name, () => void onDelete())
@@ -223,7 +225,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     if (row.id === 'delete') {
       return <SettingsRow key={row.id} xl={xl} label={row.label} danger onPress={() => open(row)} right={<View />} />
     }
-    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'companies') {
+    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed' || row.id === 'companies') {
       const dead = row.id === 'fit' && !posting
       return <SettingsRow key={row.id} xl={xl} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
     }

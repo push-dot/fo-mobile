@@ -13,7 +13,7 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
     accessibilityRole="button"
     accessibilityLabel={bot.name}
     onPress={onPress}
-    style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingVertical: spacing[3], paddingHorizontal: spacing[2], borderRadius: radius.md }}
+    style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: 10, paddingHorizontal: spacing[2], borderRadius: radius.md }}
   >
     <Mascot size={40} state="idle" color={bot.kind === 'push' ? 'push' : bot.color} />
     <Text v="b1" weight="700" numberOfLines={1} style={{ flex: 1, minWidth: 0 }}>
@@ -23,7 +23,7 @@ const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => (
   </Pressable>
 )
 
-/** RULINGS 53 */
+/** BotPick: `.pick` rows (gap 12, padding 10/8, radius 16). RULINGS 53 */
 export const SendBotPage = ({ kind, id }: { kind: MaterialKind; id: string }) => {
   const material = useMaterialDetail(kind, id).data?.material
   const bots = useBots().data ?? []

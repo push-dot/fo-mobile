@@ -145,6 +145,7 @@ const BotHomeView = ({
           name={accountName}
           onAccount={() => router.push(accountPath())}
           onNew={() => void openBotNew()}
+          hideNew={searching && !ios}
         />
         {searching ? (
           <BotHomeSearch

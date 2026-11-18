@@ -10,6 +10,7 @@ import {
   notificationHref,
   NotificationRow,
   openNotificationSettings,
+  useNotificationSettingsVisible,
   useNotifications,
   useReadNotifications,
 } from '@/features/notifications'
@@ -22,6 +23,8 @@ const NotificationsScreen = () => {
   const q = useNotifications()
   const read = useReadNotifications()
   const { button } = useXlChrome()
+  // NotificationsStates: the 알림 설정 button is drawn only on the board where the OS permission is off.
+  const settingsVisible = useNotificationSettingsVisible()
   const items = q.data?.data ?? []
   const sections = useMemo(() => {
     const rows = q.data?.data ?? []
@@ -85,7 +88,7 @@ const NotificationsScreen = () => {
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingVertical: 60, paddingHorizontal: 32 }}>
                 <StatusNote
                   lines={[NOTIFICATION_EMPTY]}
-                  action={{ label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings }}
+                  action={settingsVisible ? { label: NOTIFICATION_SETTINGS_LABEL, onPress: openNotificationSettings } : undefined}
                 />
               </View>
             )

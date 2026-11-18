@@ -59,14 +59,14 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const plus = showTools ? (
     <Pressable key="plus" accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
       <View style={[disc, { backgroundColor: c.fill2 }]}>
-        <Icon name="plus" size={18} />
+        <Icon name="plus" size={20} />
       </View>
     </Pressable>
   ) : null
   const mention = showTools ? (
     <Pressable key="mention" accessibilityRole="button" accessibilityLabel="언급" onPress={p.onMention} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
       <View style={[disc, { backgroundColor: c.fill2 }]}>
-        <Icon name="at" size={18} />
+        <Icon name="at" size={20} />
       </View>
     </Pressable>
   ) : null
@@ -110,7 +110,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
         style={({ pressed }) => [round, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
       >
         <View style={[disc, { backgroundColor: c.t1 }]}>
-          <View style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c.bg }} />
+          <View style={{ width: 11, height: 11, borderRadius: 3, backgroundColor: c.bg }} />
         </View>
       </Pressable>
     ) : (
@@ -132,12 +132,12 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ gap: spacing[2] }}>
       {p.attachment ? (
-        // MaterialsSendHere / BotPickSent (.achip): a white capsule with a 1px line ring, no file icon, 6pt padding, a 28pt round × on the right.
+        // MaterialsSendHere / BotPickSent (.ncomp > .achip): a 40pt white capsule (14 left, 10 right) with a 1px line ring and a soft drop shadow, no file icon, a 28pt round × on the right, 70% wide at most.
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${displayName(p.attachment)} 첨부 빼기`}
           onPress={p.onClearAttachment ?? (() => undefined)}
-          style={{ alignSelf: 'flex-start', marginLeft: spacing[1], flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: 6, borderRadius: 14, backgroundColor: c.bg, boxShadow: `0 0 0 1px ${c.line}`, maxWidth: 270 }}
+          style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: spacing[2], height: 40, paddingLeft: 14, paddingRight: 10, borderRadius: radius.lg, backgroundColor: c.bg, boxShadow: `0 0 0 1px ${c.line}, 0 4px 14px rgba(0,0,0,.06)`, maxWidth: '70%' }}
         >
           <Text v="c1" weight="600" numberOfLines={1} style={{ flexShrink: 1 }}>
             {displayName(p.attachment)}

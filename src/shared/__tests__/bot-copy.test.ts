@@ -19,19 +19,16 @@ describe('봇 copy', () => {
     expect(renameCopy(before)).toBe(after)
   })
 
-  it('rewrites src and .maestro once and then finds nothing to do', () => {
+  it('rewrites src once and then finds nothing to do', () => {
     const app = mkdtempSync(join(tmpdir(), 'bot-copy-'))
     try {
       mkdirSync(join(app, 'src/features'), { recursive: true })
-      mkdirSync(join(app, '.maestro'))
       writeFileSync(join(app, 'src/features/copy.ts'), `export const A = '${OLD}로 고치기'\nexport const B = '원본'\n`)
-      writeFileSync(join(app, '.maestro/flow.yaml'), `- tapOn: "${OLD}"\n`)
 
       expect(leftovers(app)).toEqual([
         `src/features/copy.ts:1: export const A = '${OLD}로 고치기'`,
-        `.maestro/flow.yaml:1: - tapOn: "${OLD}"`,
       ])
-      expect(rename(app).sort()).toEqual(['.maestro/flow.yaml', 'src/features/copy.ts'])
+      expect(rename(app)).toEqual(['src/features/copy.ts'])
       expect(readFileSync(join(app, 'src/features/copy.ts'), 'utf8')).toBe(
         "export const A = '봇으로 고치기'\nexport const B = '원본'\n",
       )
@@ -42,7 +39,7 @@ describe('봇 copy', () => {
     }
   })
 
-  it('is gone from the app source and the Maestro flows', () => {
+  it('is gone from the app source', () => {
     expect(leftovers()).toEqual([])
   })
 })

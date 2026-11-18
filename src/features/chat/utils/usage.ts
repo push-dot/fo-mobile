@@ -100,5 +100,8 @@ export const threadRows = (items: readonly ChatItem[], working: boolean): Thread
 const CHIP_NOUN: Record<AttachmentKind, string> = { document: '서류', posting: '공고', link: '링크', file: '서류' }
 
 /** A material chip asks `이 서류로 무엇을 할까요?` (MaterialsSendHere, BotPickSent). The boards draw only the 서류 line; a file is a 서류 in the app and the other kinds follow the pattern. */
-export const composerPlaceholder = (name?: string, chipKind?: AttachmentKind) =>
-  chipKind ? `이 ${CHIP_NOUN[chipKind]}로 무엇을 할까요?` : askPlaceholder(name ?? 'Bot')
+export const composerPlaceholder = (name?: string, chipKind?: AttachmentKind, androidWorking = false) =>
+  chipKind ? `이 ${CHIP_NOUN[chipKind]}로 무엇을 할까요?` : androidWorking ? WORKING_PLACEHOLDER : askPlaceholder(name ?? 'Bot')
+
+/** ChatWorking, ChatInterrupt: while a run works the Android field says it still listens; iOS keeps the name. */
+const WORKING_PLACEHOLDER = '작업 중에도 말할 수 있어요'

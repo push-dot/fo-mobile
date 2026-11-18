@@ -13,7 +13,7 @@ const LINE_EPSILON = Platform.OS === 'ios' ? 0.01 : 0
 const BOARD_TRACK_EM = Platform.OS === 'ios' ? 0.0015 : 0
 export const boardTracking = (fontSize: number) => (fontSize < 16 ? -BOARD_TRACK_EM * (16 - fontSize) * fontSize : 0)
 
-/** Joins only flat strings and numbers: Maestro and VoiceOver read the original through `label`; a nested Text keeps its text as written. */
+/** Joins only flat strings and numbers: VoiceOver reads the original through `label`; a nested Text keeps its text as written. */
 export const joinWords = (children: ReactNode): { children: ReactNode; label?: string } => {
   const parts = Array.isArray(children) ? children : [children]
   if (Platform.OS !== 'ios' || !parts.every((n) => typeof n === 'string' || typeof n === 'number')) return { children }

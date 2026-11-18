@@ -48,7 +48,7 @@ const CalendarView = () => {
           onPress={() => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } })}
           style={{ height: 44, paddingHorizontal: spacing[1], justifyContent: 'center' }}
         >
-          <Text v="h3" weight="600" color="acText">
+          <Text v="h3" weight="700" color="ac">
             추가
           </Text>
         </Pressable>

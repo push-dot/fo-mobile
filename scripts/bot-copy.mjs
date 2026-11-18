@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Renames the app's 에이전트 copy to the boards' 봇 wording.
-//   node scripts/bot-copy.mjs           rewrite src and .maestro
+//   node scripts/bot-copy.mjs           rewrite src
 //   node scripts/bot-copy.mjs --check   exit 1 and list every line that still says 에이전트
 // The legal text lives in packages/shared, outside these roots. Its app rendering says 봇; only the web rendering keeps 에이전트.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -21,7 +21,7 @@ export const renameCopy = (text) =>
   text.replace(PATTERN, (_, /** @type {keyof typeof PARTICLES | ''} */ particle) => NEW + (particle ? PARTICLES[particle] : ''))
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..')
-const ROOTS = ['src', '.maestro']
+const ROOTS = ['src']
 
 /** @param {string} dir @returns {string[]} */
 const filesUnder = (dir) =>

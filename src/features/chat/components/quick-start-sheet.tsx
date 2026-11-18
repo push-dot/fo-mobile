@@ -476,7 +476,7 @@ const Calendar = ({ items, task, setTask }: { items: QsItem[]; task: number; set
               onPress={() => setTask(i)}
               style={{ height: 48, paddingHorizontal: spacing[5] - ring.borderWidth, justifyContent: 'center', borderRadius: radius.pill, ...(on ? ring : { backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }) }}
             >
-              <Text v="b2" weight="600">
+              <Text v="b1" weight="600">
                 {label}
               </Text>
             </Pressable>

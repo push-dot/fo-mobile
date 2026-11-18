@@ -38,18 +38,24 @@ const HubScreen = () => {
   const header = useMemo(
     () => (
     <View>
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
+      {/* HubEmpty board: the search pill is a flat fill (r16 `search flat`) with no top padding. */}
+      <View style={{ paddingHorizontal: spacing[5], paddingTop: emptyList ? 0 : spacing[1] }}>
         <Pressable
           accessibilityRole="search"
           accessibilityLabel="이름, 직무, 기술 검색"
           onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
         >
-          <GlassField style={SEARCH_PILL}>
-            <Icon name="search" size={20} color="t3" />
-            <Text v="b1" color="t3">
-              이름, 직무, 기술 검색
-            </Text>
-          </GlassField>
+          {(() => {
+            const pill = (
+              <>
+                <Icon name="search" size={20} color="t3" />
+                <Text v="b1" color="t3">
+                  이름, 직무, 기술 검색
+                </Text>
+              </>
+            )
+            return emptyList ? <View style={[SEARCH_PILL, { backgroundColor: c.fill }]}>{pill}</View> : <GlassField style={SEARCH_PILL}>{pill}</GlassField>
+          })()}
         </Pressable>
       </View>
       <ChipRow paddingTop={spacing[4]}>
@@ -65,7 +71,7 @@ const HubScreen = () => {
       </View>
     </View>
     ),
-    [category, setCategory, summary, viewerId, emptyList],
+    [category, setCategory, summary, viewerId, emptyList, c.fill],
   )
 
   const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])

@@ -380,11 +380,24 @@ let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; ru
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }
 }
+// ChatAccountUsage: the bot shares add up to the 64% the account shows (3200 of 5000, and 12800 of 20000 on ULTRA); a spent account is 100%.
+const USAGE_BY_BOT = [
+  { name: '모아페이', percent: 28 },
+  { name: 'Push Bot', percent: 18 },
+  { name: '도토리증권', percent: 10 },
+  { name: '파도AI', percent: 8 },
+]
+const USAGE_SPENT = [
+  { name: '모아페이', percent: 44 },
+  { name: 'Push Bot', percent: 28 },
+  { name: '도토리증권', percent: 16 },
+  { name: '파도AI', percent: 12 },
+]
 mock('GET', 'chat/account', () => {
   const total = account.ultra ? 20_000 : 5000
   const used = account.spent ? total : account.ultra ? 12_800 : 3200
   const now = new Date()
-  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString() } }
+  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(), usageByBot: account.spent ? USAGE_SPENT : USAGE_BY_BOT } }
 })
 
 // ---------- quick-start ingredients ----------

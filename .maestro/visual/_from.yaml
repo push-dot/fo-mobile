@@ -1,8 +1,0 @@
-appId: app.push.mobile
-tags:
-  - subflow
-# The board's thread starts at its first ${FROM} line, so the greeting and the lines before it are older turns (mock link bot:<id>:from:<type>).
-# Open it on the empty thread, before the message is sent: the thread keeps starting there however many lines arrive after it.
----
-- openLink: push://bots/${BOT}?mock=bot:${BOT}:from:${FROM}
-- waitForAnimationToEnd

@@ -43,13 +43,16 @@ export type MockCard = {
 /** An active chat job. A status without a phase is one an older AI service wrote. */
 export type MockJob = { turn: string; at: When; status: 'QUEUED' | 'RUNNING'; statuses: { phase?: 'queued' | 'thinking' | 'working'; text: string }[] }
 
+/** A site the bot reads without asking (BotProfileAllowed). `at` is the day it was allowed. */
+export type MockAllowedSite = { id: string; host: string; at: string; kind: BotContract.AllowedSite['kind'] }
+
 /** Everything the mock knows about one bot: its row, its profile facts, and its thread. Derived fields are never stored. */
 export type BotFixture = {
   bot: Pick<BotContract.Bot, 'id' | 'kind' | 'displayName' | 'companyName' | 'color' | 'postingId' | 'notificationsMuted' | 'revision'> & { createdAt: When }
   /** `deadlineIn` counts days from today, so a D-day label holds in a capture. */
   // shortcut: materialCount is the profile board's number, not counted from GET /materials?bot= as the server does. Only
   // 모아페이 draws both and they agree; count it there once a board draws another bot's materials.
-  detail: { posting: { id: string; title: string; deadlineIn: number | null; closed: boolean } | null; fit: { score: number } | null; materialCount?: number }
+  detail: { posting: { id: string; title: string; deadlineIn: number | null; closed: boolean } | null; fit: { score: number } | null; materialCount?: number; allowed?: MockAllowedSite[] }
   readAt: When | null
   /** Oldest first. */
   messages: MockMessage[]
@@ -340,6 +343,24 @@ export const muteBot = (id: string) => {
   const f = fixtureOf(id)
   if (f) f.bot.notificationsMuted = true
 }
+/**
+ * BotProfileAllowed / BotProfileChiefAllowed: the bots that board draws have allowed sites (`mock=bot:<id>:allowed`). Only
+ * 모아페이 and the Push Bot have a board, so the other bots keep none and their profiles draw no 허용한 사이트 row.
+ */
+export const allowSites = (id: string) => {
+  const f = fixtureOf(id)
+  if (!f) return
+  f.detail.allowed =
+    f.bot.kind === 'push'
+      ? [
+          { id: 's-1', host: 'careers.moapay.co.kr', at: '2026-11-03T09:00:00+09:00', kind: 'posting' },
+          { id: 's-2', host: 'nuricloud.career.greetinghr.com', at: '2026-10-29T09:00:00+09:00', kind: 'posting' },
+        ]
+      : [
+          { id: 's-1', host: 'careers.moapay.co.kr', at: '2026-11-03T09:00:00+09:00', kind: 'posting' },
+          { id: 's-2', host: 'moapay.notion.site', at: '2026-11-05T09:00:00+09:00', kind: 'company' },
+        ]
+}
 /** The server's expiry of a stored card (contract tests): 모아페이's page-read card has run out. No board draws it any more. */
 export const expireCard = () => {
   const f = fixtureOf('b-moa')
@@ -468,6 +489,7 @@ const detailOf = (f: BotFixture): BotContract.BotDetail => {
     posting: p && { id: p.id, title: p.title, deadline: p.deadlineIn === null ? null : dayIn(p.deadlineIn, now), closed: p.closed },
     fit: f.detail.fit,
     ...(f.detail.materialCount === undefined ? {} : { materialCount: f.detail.materialCount }),
+    ...(f.detail.allowed ? { allowedSites: f.detail.allowed.map((s) => ({ id: s.id, host: s.host, allowedAt: s.at, kind: s.kind })) } : {}),
   }
 }
 
@@ -621,6 +643,14 @@ mock('DELETE', 'bots/:id', ({ params }) => {
   if (!f) return notFound()
   if (f.bot.kind === 'push') return error(403, 'DEFAULT_BOT_PROTECTED', 'the Push Bot cannot be deleted')
   fixtures = fixtures.filter((x) => x !== f)
+  return undefined
+})
+
+mock('DELETE', 'bots/:id/allowed-sites/:siteId', ({ params }) => {
+  const f = fixtureOf(params.id!)
+  const site = f?.detail.allowed?.find((s) => s.id === params.siteId)
+  if (!f || !site) return notFound()
+  f.detail.allowed = f.detail.allowed!.filter((s) => s !== site)
   return undefined
 })
 

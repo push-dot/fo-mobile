@@ -1,9 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, KeyboardAvoidingView, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Platform, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
-import { accountPath, useBot, useBotProfile, type BotId } from '@/features/bots'
+import { accountPath, materialPickerPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
   AWAITING_TEXT,
   AwaitingRow,
@@ -130,7 +130,7 @@ const Thread = ({ id }: { id: string }) => {
   })
   const input = useRef<TextInputInstance>(null)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
-  const placeholder = composerPlaceholder(name, chipKind)
+  const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && !!chat.working && !isStopping(chat.working))
   const empty = chat.items.length === 0 && chat.queue.length === 0
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const greeting: ChatItem[] =
@@ -180,6 +180,8 @@ const Thread = ({ id }: { id: string }) => {
     else buyCredits.current()
   }, [])
   const onRetry = useCallback(() => send(id, SAVE_RETRY_TEXT), [id])
+  // ChatBotReadOff: 서류 첨부 opens the bot's material picker, 설정 열기 the settings.
+  const onReadOff = useCallback((action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings'), [id])
   useDoneNext(chat, (action, card) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
@@ -192,11 +194,11 @@ const Thread = ({ id }: { id: string }) => {
         {item.type === 'running' ? (
           working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
         ) : (
-          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onRetry={onRetry} />
+          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onRetry={onRetry} onReadOff={onReadOff} />
         )}
       </RowMotion.Provider>
     ),
-    [onView, onUsage, onRetry, working, id, color, live],
+    [onView, onUsage, onRetry, onReadOff, working, id, color, live],
   )
 
   return (

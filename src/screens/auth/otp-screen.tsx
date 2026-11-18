@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { router } from 'expo-router'
 import {
   AccountPill,
@@ -174,7 +174,8 @@ const OtpScreen = () => {
             }}
           />
         </View>
-        {notice ? (
+        {/* SignInErrors: iOS stacks the error over the countdown row; Android folds the error into the one row with 번호 바꾸기. */}
+        {notice && Platform.OS === 'ios' ? (
           <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[4] }}>
             {notice}
           </Text>
@@ -184,10 +185,16 @@ const OtpScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing[3],
-            marginTop: notice ? 10 : spacing[4],
+            marginTop: notice && Platform.OS === 'ios' ? 10 : spacing[4],
           }}
         >
-          {status}
+          {notice && Platform.OS === 'android' ? (
+            <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={{ flex: 1 }}>
+              {notice}
+            </Text>
+          ) : (
+            status
+          )}
           <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
             <Text v="c1" weight="600" color="t2">
               {CHANGE_NUMBER}

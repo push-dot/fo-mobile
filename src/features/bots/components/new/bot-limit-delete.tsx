@@ -1,7 +1,8 @@
-import { Pressable, ScrollView, View } from 'react-native'
+import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Mascot, Text } from '@/shared/components'
 import { platformTheme, spacing, useColors } from '@/theme'
+import { MASCOT_PALETTES } from '@/theme/mascot'
 import { useBotProfile } from '../../api/hooks'
 import type { CompanyBot } from '../../types'
 import { limitRowMeta } from '../../utils/limit-row'
@@ -9,6 +10,8 @@ import { rowTime } from '../../utils/row-time'
 import { DELETE_HINT, DELETE_LABEL } from './copy'
 
 const TILE = 44
+// BotNewLimitDelete: Android draws a flat 44pt square of the bot's colour (radius 12) where iOS draws the mascot.
+const ANDROID_TILE_RADIUS = 12
 const SECTION_GAP = 20
 
 const LimitRow = ({ bot, now, onDelete }: { bot: CompanyBot; now: Date; onDelete: (bot: CompanyBot) => void }) => {
@@ -17,7 +20,11 @@ const LimitRow = ({ bot, now, onDelete }: { bot: CompanyBot; now: Date; onDelete
   const title = useBotProfile(bot.id).data?.posting?.title
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing[3] }}>
-      <Mascot size={TILE} color={bot.color} motion={{ mode: 'still' }} />
+      {Platform.OS === 'android' ? (
+        <View style={{ width: TILE, height: TILE, borderRadius: ANDROID_TILE_RADIUS, backgroundColor: MASCOT_PALETTES[bot.color].body }} />
+      ) : (
+        <Mascot size={TILE} color={bot.color} motion={{ mode: 'still' }} />
+      )}
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="600" numberOfLines={1}>
           {bot.name}

@@ -1,10 +1,13 @@
-import { Pressable, View } from 'react-native'
+import { Pressable, useWindowDimensions, View } from 'react-native'
 import { Text } from '@/shared/components'
+import { isXlBoardText } from '@/shared/components/xl-chrome'
 import { cssShadow, spacing, useColors, useThemeMode } from '@/theme'
 import { TABS } from '../constants'
 import type { MaterialTab } from '../types'
 
+/** `.seg` is 44 high, 52 under `.xl` (MaterialsXL: `.xl .mnav .seg`). */
 const HEIGHT = 44
+const HEIGHT_XL = 52
 const INSET = spacing[1]
 
 /**
@@ -14,9 +17,10 @@ const INSET = spacing[1]
 export const MaterialsTabs = ({ value, onChange }: { value: MaterialTab; onChange: (tab: MaterialTab) => void }) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'
-  const track = { height: HEIGHT, borderRadius: HEIGHT / 2 }
+  const height = isXlBoardText(useWindowDimensions().fontScale) ? HEIGHT_XL : HEIGHT
+  const track = { height, borderRadius: height / 2 }
   const row = (
-    <View accessibilityRole="tablist" style={{ flex: 1, flexDirection: 'row', padding: INSET }}>
+    <View accessibilityRole="tablist" accessibilityLabel="자료 종류" style={{ flex: 1, flexDirection: 'row', padding: INSET }}>
       {TABS.map((tab) => {
         const on = tab.key === value
         return (
@@ -30,7 +34,7 @@ export const MaterialsTabs = ({ value, onChange }: { value: MaterialTab; onChang
               flex: 1,
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: (HEIGHT - 2 * INSET) / 2,
+              borderRadius: (height - 2 * INSET) / 2,
               backgroundColor: on ? (dark ? c.fill2 : c.bg) : undefined,
               boxShadow: on ? cssShadow.segment : undefined,
             }}
