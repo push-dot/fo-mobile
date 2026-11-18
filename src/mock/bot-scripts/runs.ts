@@ -578,8 +578,8 @@ const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'd
 // ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
 // so no line depends on how long Maestro takes to read the screen (its waits end early or late).
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
-/** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
-export const WAITING_CHOICES = new Set(['st-help'])
+/** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp, ChatPh1FitClosed); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
+export const WAITING_CHOICES = new Set(['st-help', 'ph1-fit'])
 export const WAITING_SINCE_MS = 72_000
 const statusHelp: Step[] = [
   ask({
