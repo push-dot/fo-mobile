@@ -20,7 +20,7 @@ const JobFilterSheetScreen = () => {
   const count = usePostingCount(draft)
   const total = count.data?.page.total
   const trending = useTrending().data?.skills.map((s) => s.id) ?? []
-  const bound = useSheetScrollMax(kind === 'location' ? 0.45 : 0.6)
+  const bound = useSheetScrollMax()
 
   useEffect(() => {
     if (!kind) router.back()

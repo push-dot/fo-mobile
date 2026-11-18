@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
-import { Platform, ScrollView, View } from 'react-native'
-import { Chip, Text, TextField } from '../../../shared/components'
+import { Platform, ScrollView, View, type LayoutChangeEvent } from 'react-native'
+import { Chip, SheetScroll, Text, TextField } from '../../../shared/components'
 import { onAccent, spacing } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
@@ -13,6 +13,9 @@ type Props = {
   message: string
   postingId?: string
   postings: Posting[]
+  /** From useSheetScrollMax: past this height the body scrolls under the fixed title. */
+  maxHeight: number
+  onScrollLayout: (e: LayoutChangeEvent) => void
   error: string | null
   onMessage: (message: string) => void
   onPosting: (id: string | undefined) => void
@@ -21,12 +24,13 @@ type Props = {
 
 const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
 
-const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, onMessage, onPosting, onError }: Props) => {
+const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, maxHeight, onScrollLayout, onMessage, onPosting, onError }: Props) => {
   return (
     <View style={{ gap: 14 }}>
       <Text v="h2" accessibilityRole="header">
         제안하기
       </Text>
+      <SheetScroll style={{ maxHeight }} onLayout={onScrollLayout} contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
         <Avatar name={name} size={44} />
         <View style={{ flex: 1 }}>
@@ -84,6 +88,7 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, on
           {error}
         </Text>
       ) : null}
+      </SheetScroll>
     </View>
   )
 }
