@@ -11,6 +11,10 @@ export type Account = {
   credits: { used: number; total: number } | null
   /** GET billing paymentsEnabled; false hides every buy button. */
   paymentsEnabled?: boolean
+  /** GET billing creditsRefillAt: when the monthly allowance is granted again. */
+  creditsRefillAt?: string
+  /** ChatAccountUsage: each bot's share of the plan's monthly allowance, in percent of the total. */
+  usageByBot?: { name: string; percent: number }[]
 }
 
 export type QsItem = {
@@ -22,7 +26,6 @@ export type QsItem = {
   logo?: { text: string; color: string }
   avatar?: { text: string; color: string }
   badge?: { label: string; tone: 'ac' | 'grey' | 'red' | 'green' | 'orange' }
-  note?: { label: string; ac?: boolean }
   meta?: string
   /** Message preview under the person line (제안 답장). */
   body?: string
@@ -40,19 +43,19 @@ export type QsData = {
   items: QsItem[]
   doc?: string
   chips?: string[]
-  calendar?: { connected: boolean }
 }
 
 export type RunInput = {
   conversationId: string
   text?: string
   attachment?: string
-  answer?: { approvalId: string; choice: number }
   resolve?: { approvalId: string; optionId: string; optionIds?: string[] }
   interrupted?: boolean
-  /** Reattach to the conversation's running job and replay it from the start. */
+  /** Reattach to the bot's running turn after this seq. */
   follow?: boolean
+  after?: number
+  piece?: string
   intent?: ChatIntent
-  context?: { documentId?: string; evidenceIds?: string[] }
+  context?: { documentId?: string; evidenceIds?: string[]; materials?: { kind: 'file' | 'document' | 'posting' | 'link'; id: string }[] }
 }
 

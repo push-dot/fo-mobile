@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { QUICK_STARTS, type QsInput } from '../constants'
+import { DEFAULT_DOC, QUICK_STARTS, type QsInput } from '../constants'
+import { instantRun } from '../utils/quick-start-instant'
 
 const DOC = '11111111-1111-1111-1111-111111111111'
 
@@ -20,6 +21,12 @@ describe('quick start intent payloads', () => {
     expect(start('link', { url: 'notaurl', doc: '이력서.pdf' })).toBeFalsy()
   })
 
+  it('writes the default hub profile with the right particle', () => {
+    expect(start('link', { url: 'https://moapay.com/jobs/1', doc: DEFAULT_DOC })?.message).toBe('https://moapay.com/jobs/1 공고에 맞춰 허브 프로필을 고쳐 주세요')
+    expect(start('fit', { picked: [job], doc: DEFAULT_DOC })?.message).toBe('모아페이 백엔드 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요')
+    expect(start('hub', { picked: [{ id: 'headline', title: '헤드라인' }], doc: DEFAULT_DOC })?.message).toBe('허브 프로필의 헤드라인을 다듬어 주세요')
+  })
+
   it('sends find_postings in the seed sentence, with a document id only when one is picked', () => {
     expect(start('match', { chips: ['백엔드', '서울'], option: true })).toEqual({
       title: '나에게 맞는 공고',
@@ -34,13 +41,9 @@ describe('quick start intent payloads', () => {
   })
 
   it('sends the resume intents with the picked document id', () => {
-    expect(start('gap', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
-      intent: 'gaps',
-      message: '모아페이 백엔드 공고와 이력서.pdf를 비교해서 부족한 점을 찾아 주세요',
-      context: { documentId: DOC },
-    })
     expect(start('fit', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
       intent: 'fit',
+      message: '모아페이 백엔드 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요',
       context: { documentId: DOC },
     })
     expect(start('boost', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
@@ -56,11 +59,6 @@ describe('quick start intent payloads', () => {
   })
 
   it('sends each tool intent in the seed sentence and no extra context keys', () => {
-    expect(start('deadline', { picked: [job, { id: 'q', over: '하루랩스', title: 'iOS' }] })).toEqual({
-      title: '마감 임박 공고 정리',
-      message: '마감 임박 공고 2개(모아페이, 하루랩스)의 준비할 일을 정리해 주세요',
-      intent: 'deadline_postings',
-    })
     expect(start('status', { picked: [job] })).toMatchObject({
       intent: 'applications',
       message: '모아페이 지원 현황을 정리하고 다음에 할 일을 알려 주세요',
@@ -71,7 +69,7 @@ describe('quick start intent payloads', () => {
     })
     expect(start('hub', { doc: '이력서.pdf', documentId: DOC, picked: [{ id: 'h', title: '헤드라인' }, { id: 's', title: '소개' }] })).toEqual({
       title: '허브 프로필 다듬기',
-      message: '이력서.pdf를 바탕으로 허브 프로필의 헤드라인, 소개을 다듬어 주세요',
+      message: '허브 프로필의 헤드라인, 소개를 다듬어 주세요',
       intent: 'hub_profile',
       context: { documentId: DOC },
     })
@@ -89,7 +87,24 @@ describe('quick start intent payloads', () => {
     })
   })
 
-  it('tells the fit sheet that the score leads into a rewrite', () => {
-    expect(QUICK_STARTS.find((q) => q.key === 'fit')!.description).toBe('적합도를 보고, 점수가 오르도록 서류를 고쳐 드려요.')
+  it('opens 부족한 점 찾기 and 적합도 보기 in their own sheets, each with the copy of its board (QsGap, QsFit)', () => {
+    const gap = QUICK_STARTS.find((q) => q.key === 'gap')!
+    const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
+    expect(gap).toMatchObject({ openList: true, label: '부족한 점 찾기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', action: '부족한 점 찾기', listLabel: '공고', readsHub: true })
+    expect(fit!.openList).toBe(true)
+    expect(fit).toMatchObject({ label: '적합도 보기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', listLabel: '공고', readsHub: true })
+    expect(fit.docLabel).toBeUndefined()
+    expect(gap.docLabel).toBeUndefined()
+  })
+
+  it('sends 마감 임박 공고 정리 straight into the chat, with no sheet', () => {
+    const deadline = QUICK_STARTS.find((q) => q.key === 'deadline')!
+    expect(deadline.instant).toBe(true)
+    expect(instantRun('deadline')).toEqual({
+      title: '마감 임박 공고 정리',
+      message: '북마크한 공고 중 일주일 안에 마감되는 공고와 준비할 일을 알려 주세요',
+      intent: 'deadline_postings',
+    })
+    expect(instantRun('fit')).toBeNull()
   })
 })

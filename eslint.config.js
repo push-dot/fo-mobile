@@ -2,5 +2,6 @@
 const { defineConfig } = require('eslint/config')
 const expoConfig = require('eslint-config-expo/flat')
 const designTokens = require('./eslint/design-tokens')
+const featureBoundaries = require('./eslint/feature-boundaries')
 
-module.exports = defineConfig([expoConfig, { ignores: ['dist/*', 'android/*', 'ios/*'] }, ...designTokens])
+module.exports = defineConfig([expoConfig, { ignores: ['dist/*', 'android/*', 'ios/*'] }, ...designTokens, ...featureBoundaries])

@@ -22,6 +22,9 @@ const LOADING_ROWS = {
   ],
 } as const
 
+/** ProfileDetailMe: the header is a TopBar, not 마이's segmented control, and the board's avatar sits 17pt higher (y168; the page drew it at y185 with 24). */
+const DETAIL_TOP = spacing[6] - 17
+
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
 
 const Section = ({
@@ -55,7 +58,8 @@ const Section = ({
   )
 }
 
-const ProfileTab = () => {
+/** `share`: MyProfile has the 공유 button under the name; ProfileDetailMe has it in the header instead. `onExport`: ProfileDetailMePdf adds 내보내기 beside 기본 정보 편집 (the profile as a PDF). */
+const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; onExport?: () => void; exporting?: boolean }) => {
   const c = useColors()
   const { data: p, isLoading } = useMyProfile()
   if (isLoading || !p) return <SkeletonRows {...LOADING_ROWS} />
@@ -63,7 +67,7 @@ const ProfileTab = () => {
   const status = CAREER_STATUSES.find((s) => s.key === p.careerStatus)?.label ?? ''
 
   return (
-    <View style={{ gap: spacing[6], paddingTop: spacing[6], paddingBottom: spacing[6] }}>
+    <View style={{ gap: spacing[6], paddingTop: share ? spacing[6] : DETAIL_TOP, paddingBottom: spacing[6] }}>
       <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
         <Avatar name={p.displayName} url={p.avatarUrl} size={84} />
         <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
@@ -76,7 +80,7 @@ const ProfileTab = () => {
         ) : null}
         <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] }}>
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
-          {status ? <Badge label={status} tone={p.careerStatus === 'seeking' ? 'ac' : 'grey'} /> : null}
+          {status ? <Badge label={status} tone="grey" /> : null}
         </View>
         <View style={{ flexDirection: 'row', gap: spacing[4], marginTop: spacing[2] }}>
           {(
@@ -101,14 +105,11 @@ const ProfileTab = () => {
           ))}
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
-          <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} />
-          <Button
-            label="공유"
-            icon="share"
-            variant="secondary"
-            size="sm"
-            onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })}
-          />
+          <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
+          {onExport ? <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={exporting} onPress={onExport} /> : null}
+          {share ? (
+            <Button label="공유" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => void shareMessage({ message: profileShareMessage(p.userId, p) })} />
+          ) : null}
         </View>
       </View>
 
@@ -160,7 +161,7 @@ const ProfileTab = () => {
         )}
       </Section>
 
-      <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[2]}>
+      <Section title="기술 스택" onEdit={() => edit('skills')} gap={spacing[3]}>
         {p.skills.length === 0 ? (
           <Text v="b2" color="t3">
             아직 등록한 기술이 없어요.

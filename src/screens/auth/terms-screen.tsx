@@ -91,7 +91,7 @@ const TermsScreen = () => {
         <View style={{ marginTop: spacing[6] }}>
           <TermsAllRow checked={all} onPress={toggleAll} />
         </View>
-        <View style={{ paddingTop: spacing[2] }}>
+        <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[4] }}>
           {TERM_ROWS.map((row) => (
             <TermRow
               key={row.id}
@@ -109,7 +109,7 @@ const TermsScreen = () => {
           onPress={() => openTerm('privacyPolicy')}
           style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}
         >
-          <Text v="c1" color="t2" style={{ textDecorationLine: 'underline' }}>
+          <Text v="c2" color="t2" style={{ textDecorationLine: 'underline' }}>
             {TERMS_PRIVACY_POLICY}
           </Text>
         </Pressable>

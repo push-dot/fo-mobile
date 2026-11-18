@@ -1,0 +1,126 @@
+import { ApiError, type StreamEvent } from '@push/api-client'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const api = vi.hoisted(() => ({
+  conversations: { stream: vi.fn(), follow: vi.fn(), resolveApproval: vi.fn(), messages: vi.fn(), turns: vi.fn() },
+  me: { updateSettings: vi.fn() },
+}))
+const botApi = vi.hoisted(() => ({
+  bots: { cancel: vi.fn(), send: vi.fn(), follow: vi.fn(), get: vi.fn(), transcript: vi.fn(), answer: vi.fn() },
+}))
+vi.mock('@/shared/infrastructure', () => ({
+  api,
+  botApi,
+  http: {},
+  API_MOCK: false,
+  hapticImpactLight: vi.fn(),
+  hapticNotify: vi.fn(),
+}))
+vi.mock('@/features/my/api/fetchers', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('../api/fetchers', () => ({
+  chatApi: {},
+  fetchConversationMessages: (id: string) => api.conversations.messages(id, { limit: 50 }),
+  fetchConversationTurns: (id: string) => api.conversations.turns(id, { limit: 50 }),
+  followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
+  resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string, string?])),
+  streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
+}))
+
+const { answer, send, useChatStore } = await import('../stores')
+const { emptyChat } = await import('../utils/reducer')
+
+async function* frames(...evs: StreamEvent[]) {
+  yield* evs
+}
+const chat = (id: string) => useChatStore.getState().chats[id]!
+const settled = (id: string) => vi.waitFor(() => expect(chat(id).working).toBeNull())
+const pending = (id: string, optionIds: string[]) =>
+  useChatStore.setState({
+    chats: {
+      [id]: {
+        ...emptyChat,
+        approval: { id: 'ap1', question: '메일을 보낼까요?', optionIds, sections: [{ kind: 'choices', items: [{ label: '실행' }, { label: '취소' }], selected: [] }] },
+      },
+    },
+  })
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  botApi.bots.send.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
+  botApi.bots.follow.mockImplementation(() => frames({ type: 'tool', name: 'send_mail', state: 'ok', summary: '메일 보내기' }, { type: 'done', operation: null }))
+  botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'approve' } })
+})
+
+describe('server approvals', () => {
+  it('answer resolves with the option id, then follows the resume job', async () => {
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'approve' } })
+    pending('c2', ['approve', 'reject'])
+    answer('c2', '실행', 0)
+    await settled('c2')
+    expect(botApi.bots.answer).toHaveBeenCalledWith('c2', 'ap1', { optionId: 'approve' })
+    expect(botApi.bots.follow).toHaveBeenCalledWith('c2', undefined, expect.anything())
+    expect(botApi.bots.send).not.toHaveBeenCalled()
+    expect(chat('c2').approval).toBeNull()
+    expect(chat('c2').items).toMatchObject([{ type: 'user', text: '실행' }, { type: 'tool', state: 'ok' }, { type: 'worked' }])
+  })
+
+  it('shows an error line when the approval already expired', async () => {
+    botApi.bots.answer.mockRejectedValue(new ApiError('gone', 'APPROVAL_EXPIRED', 410))
+    pending('c3', ['approve', 'reject'])
+    answer('c3', '취소', 1)
+    await vi.waitFor(() => expect(chat('c3').items.at(-1)).toMatchObject({ type: 'error' }))
+    expect(chat('c3').approval).toBeNull()
+    expect(botApi.bots.follow).not.toHaveBeenCalled()
+  })
+
+  it('a pick with no option id sends nothing and keeps the card open', () => {
+    pending('c6', ['approve', 'reject'])
+    answer('c6', '??', 5)
+    expect(botApi.bots.answer).not.toHaveBeenCalled()
+    expect(botApi.bots.send).not.toHaveBeenCalled()
+    expect(chat('c6').approval).not.toBeNull()
+  })
+
+  it('free text while an approval waits goes out as a normal message', async () => {
+    pending('c4', ['approve', 'reject'])
+    send('c4', '제목만 바꿔 줘')
+    await settled('c4')
+    expect(botApi.bots.answer).not.toHaveBeenCalled()
+    expect(botApi.bots.send).toHaveBeenCalledWith('c4', { text: '제목만 바꿔 줘', accessMode: 'AUTO' }, expect.anything())
+    expect(chat('c4').approval).toBeNull()
+  })
+
+  it.each([
+    ['c-feedback', 'feedback', '반영해서 수정할게요', ['continue', 'cancel'], 0, 'continue'],
+    ['c-continue', 'start-document', '이어서 작성하기', ['continue', 'cancel'], 0, 'continue'],
+    ['c-fit', 'analyze', '피드백만 받을게요', ['continue', 'feedback', 'score'], 1, 'feedback'],
+  ])('answers %s with the server option id', async (id, approvalId, text, optionIds, index, optionId) => {
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: approvalId, status: 'APPROVED', optionId } })
+    useChatStore.setState({
+      chats: {
+        [id]: {
+          ...emptyChat,
+          approval: {
+            id: approvalId,
+            question: text,
+            optionIds,
+            sections: [{ kind: 'choices', items: optionIds.map(() => ({ label: text })), selected: [] }],
+          },
+        },
+      },
+    })
+    answer(id, text, index)
+    await settled(id)
+    expect(botApi.bots.answer).toHaveBeenCalledWith(id, approvalId, { optionId })
+    expect(botApi.bots.send).not.toHaveBeenCalled()
+  })
+
+  it('sends every picked id when the card allows several', async () => {
+    botApi.bots.answer.mockResolvedValue({ resumed: true, answer: { id: 'ap1', status: 'APPROVED', optionId: 'resume' } })
+    pending('c5', ['resume', 'portfolio', 'cover_letter', 'cancel'])
+    answer('c5', '이력서, 포트폴리오', [0, 1])
+    await settled('c5')
+    expect(botApi.bots.answer).toHaveBeenCalledWith('c5', 'ap1', { optionId: 'resume', optionIds: ['resume', 'portfolio'] })
+    expect(botApi.bots.send).not.toHaveBeenCalled()
+  })
+})

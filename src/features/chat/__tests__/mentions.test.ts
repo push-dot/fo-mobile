@@ -10,7 +10,7 @@ const groups: MentionGroup[] = [
       { id: 'd2', kind: 'doc', title: '포트폴리오_결제시스템.pdf', sub: '8월 3일' },
     ],
   },
-  { title: '바로가기', items: [{ id: 's', kind: 'shortcut', title: '캘린더 관리', sub: '' }] },
+  { title: '내 링크', items: [{ id: 'l', kind: 'link', title: '캘린더 관리', sub: '' }] },
 ]
 
 describe('mentions', () => {
@@ -27,8 +27,21 @@ describe('mentions', () => {
     expect(out[1]!.items.map((i) => i.id)).toEqual(['d1'])
   })
 
+  it('keeps the order of the full list while filtering (ChatEmpty: 경력기술서 above 모아페이_맞춤_이력서)', () => {
+    const docs: MentionGroup[] = [
+      {
+        title: '마이 › 서류',
+        items: [
+          { id: 'a', kind: 'doc', title: '경력기술서_모아페이.docx', sub: '9월 28일 · 640KB' },
+          { id: 'b', kind: 'doc', title: '모아페이_맞춤_이력서_v2.pdf', sub: 'Bot으로 만듦 · 10분 전' },
+        ],
+      },
+    ]
+    expect(filterMentions(docs, '모아')[0]!.items.map((i) => i.id)).toEqual(['a', 'b'])
+  })
+
   it('matches choseong while typing', () => {
-    expect(filterMentions(groups, 'ㅋㄹㄷ').map((g) => g.title)).toEqual(['바로가기'])
+    expect(filterMentions(groups, 'ㅋㄹㄷ').map((g) => g.title)).toEqual(['내 링크'])
   })
 
   it('shows everything for a bare @', () => {
@@ -40,8 +53,8 @@ describe('mentions', () => {
   })
 
   it('fills the space above the composer and shrinks for the keyboard', () => {
-    expect(mentionMaxHeight(874, 62, 100)).toBe(510)
-    expect(mentionMaxHeight(874, 62, 336)).toBe(274)
+    expect(mentionMaxHeight(874, 62, 100)).toBe(551)
+    expect(mentionMaxHeight(874, 62, 336)).toBe(315)
     expect(mentionMaxHeight(400, 62, 336)).toBe(160)
   })
 })

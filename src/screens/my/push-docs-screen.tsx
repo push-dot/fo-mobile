@@ -1,11 +1,10 @@
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
-import { Platform, Pressable, ScrollView, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, SHEET_PARAM, useDocuments, useMyApplications } from '@/features/my'
-import { GlassButton, Text } from '@/shared/components'
-import { sheetHeaderTop } from '@/shared/navigation'
-import { radius, spacing, useColors } from '@/theme'
+import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, useDocuments, useMyApplications } from '@/features/my'
+import { Text, TopBar } from '@/shared/components'
+import { lineRing, radius, spacing, type, useColors } from '@/theme'
 import type { HubDocument } from '@/features/my'
 
 const Line = ({ doc }: { doc: HubDocument }) => {
@@ -18,8 +17,8 @@ const Line = ({ doc }: { doc: HubDocument }) => {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, monthDay(doc.updatedAt)].filter(Boolean).join(', ')}
-      onPress={() => router.push({ pathname: '/docs/push/[id]', params: { id: doc.id, sheet: SHEET_PARAM } })}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], borderRadius: radius.card, borderWidth: 1, borderColor: c.line, paddingVertical: spacing[4], paddingLeft: spacing[5], paddingRight: spacing[4] }}
+      onPress={() => router.push({ pathname: '/docs/push/[id]', params: { id: doc.id } })}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], borderRadius: radius.card, ...lineRing(c), paddingVertical: spacing[4], paddingLeft: spacing[5], paddingRight: spacing[4] }}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
@@ -43,27 +42,20 @@ const Line = ({ doc }: { doc: HubDocument }) => {
   )
 }
 
-const HEADER_ROW = 56
-
 const PushDocsScreen = () => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const { data, isLoading } = useDocuments()
   const docs = data?.data ?? []
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, paddingTop: Platform.OS === 'ios' ? 0 : sheetHeaderTop(Platform.OS, true, insets.top, HEADER_ROW) }}>
-      <View style={{ height: HEADER_ROW, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[2] }}>
-        <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
-        <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
-          {PUSH_DOCS_TITLE}
-        </Text>
-        <View style={{ width: 44 }} />
-      </View>
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <TopBar title={PUSH_DOCS_TITLE} onBack={() => router.back()} />
       {isLoading ? (
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingBottom: insets.bottom + spacing[6] }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2] }}>
+          {/* The board's count sits in a 24pt line, 1.7 lower on the baseline: the first card starts 44 under the list top. */}
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2] + 1.7, lineHeight: type.b1.lineHeight, marginBottom: -1.7 }}>
             {data?.page.total ?? docs.length}개
           </Text>
           {docs.map((doc) => (

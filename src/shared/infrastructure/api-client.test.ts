@@ -2,15 +2,20 @@ import type { Session } from '@push/api-client'
 import { ApiError } from '@push/api-client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const set = vi.hoisted(() => vi.fn(async () => undefined))
-const authRefresh = vi.hoisted(() => vi.fn())
-
-const session = {
-  accessToken: 'at',
-  refreshToken: 'rt',
-  expiresIn: 3600,
-  user: { id: 'u1', displayName: '김서준', locale: 'ko' },
-} satisfies Session
+const { set, authRefresh, session, sessionRef } = vi.hoisted(() => {
+  const session = {
+    accessToken: 'at',
+    refreshToken: 'rt',
+    expiresIn: 3600,
+    user: { id: 'u1', displayName: '김서준', locale: 'ko' },
+  } satisfies Session
+  return {
+    set: vi.fn(async () => undefined),
+    authRefresh: vi.fn(),
+    session,
+    sessionRef: { current: session as Session | null },
+  }
+})
 
 vi.hoisted(() => {
   vi.stubEnv('EXPO_PUBLIC_API_MOCK', '0')
@@ -19,7 +24,7 @@ vi.mock('expo-crypto', () => ({ randomUUID: () => 'id', digestStringAsync: async
 vi.mock('expo/fetch', () => ({ fetch: globalThis.fetch }))
 vi.mock('./config', () => ({ API_BASE_URL: 'https://api.example/v1' }))
 vi.mock('./session-store', () => ({
-  useSession: { getState: () => ({ session, set }) },
+  useSession: { getState: () => ({ session: sessionRef.current, set }) },
 }))
 vi.mock('@push/api-client', async (orig) => {
   const actual = await orig<typeof import('@push/api-client')>()
@@ -33,6 +38,7 @@ const { refreshSession } = await import('./api-client')
 
 beforeEach(() => {
   vi.clearAllMocks()
+  sessionRef.current = session
   authRefresh.mockResolvedValue(session)
 })
 
@@ -61,6 +67,16 @@ describe('refreshSession', () => {
     const raced = await Promise.race([done, new Promise((_, reject) => setTimeout(() => reject(new Error('hang')), 200))])
     await expect(raced).toBe(false)
     expect(set).toHaveBeenCalledWith(null)
+  })
+
+  it('runs a new refresh after a call with no refresh token', async () => {
+    sessionRef.current = { ...session, refreshToken: '' }
+    await expect(refreshSession()).resolves.toBe(false)
+    expect(authRefresh).not.toHaveBeenCalled()
+
+    sessionRef.current = session
+    await expect(refreshSession()).resolves.toBe(true)
+    expect(authRefresh).toHaveBeenCalledWith('rt')
   })
 
   it('shares one in-flight refresh across concurrent 401 retries', async () => {

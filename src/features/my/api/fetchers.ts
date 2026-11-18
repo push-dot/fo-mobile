@@ -1,7 +1,7 @@
-import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type Posting } from '@push/api-client'
+import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type MyPostsSort, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
-import type { CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
-import { profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
+import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
+import { copyBody, copyVersionBody, profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
 
 const c = http
 
@@ -9,6 +9,8 @@ const c = http
 const uploaded = new Map<string, string | undefined>()
 
 export const myApi = {
+  // PATCH sources/:id sets the file name of an upload (push-be contracts/spec/documents.ts).
+  renameSource: (id: string, fileName: string) => c.patch<DataEnvelope<MySource>>(`sources/${id}`, { body: { fileName } }),
   // shortcut: first 100 uploads only; page once the docs tab loads more on scroll.
   sources: async (): Promise<ListEnvelope<MySource>> => {
     const r = await api.sources.list({ kind: 'UPLOAD', limit: 100 })
@@ -81,6 +83,12 @@ export const updateMarketingConsent = (marketing: boolean) => api.me.updateMarke
 
 export const updateSettings = api.me.updateSettings
 
+export const grantReferenceAccess = async () => {
+  const consents = await updateReferenceConsent(true)
+  await updateSettings({ allowAiReadMyFiles: true })
+  return consents
+}
+
 export const fetchBookmarkList = () => api.me.bookmarks({ limit: 100 })
 
 export const fetchLinks = () => api.me.links(undefined, { limit: 100 })
@@ -95,6 +103,8 @@ export const fetchMyApplications = () => api.applications.list(FIRST)
 
 export const fetchAppliedApplications = () => api.applications.list({ ...FIRST, applied: true })
 
+export const fetchApplication = async (id: string) => (await c.get<DataEnvelope<ApplicationDetail>>(`applications/${id}`)).data
+
 export const fetchMyBookmarks = () => api.me.bookmarks(FIRST)
 
 export const unbookmarkPosting = (p: Posting) => api.postings.unbookmark(p.id)
@@ -107,13 +117,19 @@ export const fetchFollows = () => api.me.follows(FIRST)
 
 export const fetchFollowers = () => api.me.followers(FIRST)
 
-export const fetchMyPosts = () => api.me.posts(FIRST)
+export const fetchMyPosts = (sort: MyPostsSort = 'latest') => api.me.posts({ ...FIRST, sort })
 
-export const fetchCommentedPosts = () => api.me.commentedPosts(FIRST)
+export const fetchCommentedPosts = (sort: MyPostsSort = 'latest') => api.me.commentedPosts({ ...FIRST, sort })
+
+export const fetchSavedPosts = (sort: MyPostsSort = 'latest') => api.me.savedPosts({ ...FIRST, sort })
 
 export const fetchSource = (id: string) => api.sources.get(id)
 
 export const updateProfile = api.me.updateProfile
+
+export const fetchProfileChange = api.me.profileChange
+
+export const undoProfileChange = api.me.undoProfileChange
 
 export const fetchOffer = (id: string) => api.me.offer(id)
 
@@ -159,6 +175,22 @@ export const archiveDocument = (id: string, expectedRevision: number) =>
 
 export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })
+
+/** push-be has no copy route: a new document under the same posting, then the source's latest version saved into it. */
+export const duplicateDocument = async (id: string) => {
+  const source = (await fetchDocument(id)).data
+  const version = (await fetchDocumentVersions(id)).data[0]
+  const made = (await c.post<DataEnvelope<HubDocument>>('documents', { body: copyBody(source) })).data
+  if (!version?.content) return made
+  try {
+    await c.post(`documents/${made.id}/versions`, { body: copyVersionBody(made.revision, version) })
+  } catch (error) {
+    // A copy without its content is worse than none: drop the empty draft, then report the failure.
+    await archiveDocument(made.id, made.revision).catch(() => undefined)
+    throw error
+  }
+  return made
+}
 
 export const convertDocumentProfile = async (id: string) =>
   (await c.post<DataEnvelope<{ documentId: string; jobId?: string }>>(`documents/${id}/profile`, { body: profileConvertBody() })).data

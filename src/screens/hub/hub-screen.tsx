@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { ActivityIndicator, FlatList, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, FlatList, Platform, View } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -13,8 +13,11 @@ import {
   useProfileList,
   useViewerId,
 } from '@/features/hub'
-import { Badge, Button, Chip, Icon, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { Badge, Button, Chip, ChipRow, FloatingHeader, GlassButton, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
+import { spacing, useColors } from '@/theme'
+
+// Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
+const HEADER_GAP = Platform.OS === 'ios' ? 14 : 6
 
 const HubScreen = () => {
   const c = useColors()
@@ -23,63 +26,55 @@ const HubScreen = () => {
   const setCategory = useHubFilterStore((s) => s.setCategory)
   const reset = useHubFilterStore((s) => s.reset)
 
+  const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   const viewerId = useViewerId()
   const list = useProfileList(category, sheet)
   const items = useMemo(() => list.data?.pages.flatMap((p) => p.data) ?? [], [list.data])
   const summary = filterSummary(sheet)
+  // HubEmpty board: the title row sits 8pt under the chips; every other Hub board keeps 12pt.
+  const emptyList = !list.isPending && !list.isError && items.length === 0
 
   const header = useMemo(
     () => (
     <View>
-      <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1] }}>
-        <Pressable
-          accessibilityRole="search"
-          accessibilityLabel="이름, 직무, 기술 검색"
-          onPress={() => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href)}
-        >
-          <View style={{ height: 48, borderRadius: radius.pill, paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2], backgroundColor: c.fill }}>
-            <Icon name="search" size={20} color="t3" />
-            <Text v="b1" color="t3">
-              이름, 직무, 기술 검색
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[4] }}>
+      <ChipRow paddingTop={spacing[1]}>
+        <Chip label="전체" on={category.length === 0} onPress={() => setCategory([])} />
         {HUB_CATEGORIES.map((k) => (
-          <Chip key={k.key} label={k.label} check on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
+          <Chip key={k.key} label={k.label} on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
         ))}
-      </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[1], gap: spacing[2] }}>
-        <Text v="h2" accessibilityRole="header">
-          추천 프로필
-        </Text>
-        {summary ? <Badge label={summary} tone="ac" /> : null}
+      </ChipRow>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: emptyList ? spacing[2] : spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
+        {summary ? <Badge label={summary} /> : null}
+        <View style={{ flex: 1 }} />
+        <FilterButton onPress={() => router.push('/hub-filter')} />
       </View>
     </View>
     ),
-    [c.fill, category, setCategory, summary, viewerId],
+    [category, setCategory, summary, sheet, emptyList],
   )
 
   const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
       <TopBar
+        transparent
         left={
           <Text v="h1" accessibilityRole="header">
             허브
           </Text>
         }
         right={
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP }}>
             {viewerId ? (
-              <Button label="내 프로필" variant="secondary" size="sm" onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
+              <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}
-            <FilterButton count={appliedCount(sheet)} onPress={() => router.push('/hub-filter')} />
+            <GlassButton actions={[{ icon: 'search', label: '이름, 직무, 기술 검색', onPress: () => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href) }]} />
           </View>
         }
       />
+      </FloatingHeader>
       <FlatList
         data={items}
         keyExtractor={(p) => p.userId}
@@ -103,8 +98,10 @@ const HubScreen = () => {
         onEndReached={() => list.hasNextPage && !list.isFetchingNextPage && list.fetchNextPage()}
         onEndReachedThreshold={0.5}
         ListFooterComponent={list.isFetchingNextPage ? <ActivityIndicator style={{ marginVertical: spacing[4] }} /> : undefined}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: inset }}
         contentInsetAdjustmentBehavior="automatic"
+        onScroll={onScroll}
+        scrollEventThrottle={64}
       />
     </View>
   )

@@ -4,9 +4,8 @@ import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandColor, careerLabel } from '@push/shared'
 import { useToggleBookmark } from '@/features/jobs'
-import { Icon, Text } from '../../../shared/components'
+import { Highlight, Icon, Text } from '../../../shared/components'
 import { onAccent, radius, spacing } from '../../../theme'
-import Highlight from './highlight'
 
 const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => void }) => {
   const toggleBookmark = useToggleBookmark()

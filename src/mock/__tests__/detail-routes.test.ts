@@ -21,8 +21,14 @@ it('follows the people the follow list shows, and keeps the board copy of the fi
   expect((await get('me/offers/o1')).body.data.message).toMatch(/^서준 님, 안녕하세요/)
 })
 
-it('draws 파도AI unmarked in the lists but in the bookmark list, and the short chip title in the offer sheet', async () => {
+it('draws 파도AI unmarked in the lists but in the bookmark list', async () => {
   expect((await get('postings/p2')).body.data.bookmarked).toBe(false)
   expect((await get('me/bookmarks')).body.data.map((p: { id: string }) => p.id)).toEqual(['p1', 'p7', 'p8', 'p2'])
-  expect((await get('me/bookmarks?limit=10')).body.data[0].title).toBe('백엔드 엔지니어')
+})
+
+it('lists only the sender company postings, with the short chip title, for the offer sheet', async () => {
+  const list = (await get('companies/me/postings?limit=10')).body.data as { company: string; title: string }[]
+  expect(list.length).toBeGreaterThan(0)
+  expect(list.every((p) => p.company === '모아페이')).toBe(true)
+  expect(list[0]!.title).toBe('백엔드 엔지니어')
 })

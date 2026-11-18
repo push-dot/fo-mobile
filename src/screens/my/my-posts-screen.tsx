@@ -1,41 +1,35 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
-import { POST_CATEGORIES } from '@push/api-client'
+import { POST_CATEGORIES, type MyPostsSort } from '@push/api-client'
 import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
-import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, useMyCommentedPosts, useMyPosts, type PostsView } from '@/features/my'
+import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
+// MyPosts, MyPostsAll, MyPostsAllMenuFull and MyPostsSavedEmpty (저장한 글 with no rows: 0개 and 소셜 둘러보기).
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
-  const [view, setView] = useState<PostsView>(box === 'commented' ? 'commented' : 'mine')
-  const mine = useMyPosts()
-  const replies = useMyCommentedPosts()
-  const query = view === 'commented' ? replies : mine
+  const [view, setView] = useState<PostsView>(box === 'commented' || box === 'saved' ? box : 'mine')
+  const [sort, setSort] = useState<MyPostsSort>('latest')
+  const query = usePostsList(view, sort)
   const posts = query.data?.data ?? []
+  const empty = view === 'mine' ? emptyCta('posts') : view === 'saved' ? emptyCta('saved') : null
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
         title={postsTitle(view)}
         onBack={() => router.back()}
-        right={<GlassButton actions={[{ icon: 'menu', label: '더 보기', menu: postsMenu(view, setView) }]} />}
+        right={<GlassButton actions={[{ icon: 'more', label: '더 보기', menu: postsMenu({ view, sort }, { view: setView, sort: setSort }) }]} />}
       />
       {query.isLoading ? (
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {/* the board's count block sits on a 16px body line box, about 4pt taller than the label's own line */}
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? posts.length}개
           </Text>
-          {posts.length === 0 && view === 'mine' ? (
-            <Empty
-              text={emptyCta('posts').title}
-              action={emptyCta('posts').action}
-              onAction={() => router.push(emptyCta('posts').href)}
-            />
-          ) : null}
+          {posts.length === 0 && empty ? <Empty text={empty.title} action={empty.action} onAction={() => router.push(empty.href)} /> : null}
           {posts.map((p) => (
             <Pressable
               key={p.id}

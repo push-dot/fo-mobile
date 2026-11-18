@@ -1,31 +1,34 @@
 import { router, useIsFocused } from 'expo-router'
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
-import { Button, GlassPressable, Icon, Icon3D, Spinner, TOAST_ABOVE, Text, showToast } from '@/shared/components'
+import { Button, Icon, Spinner, Text } from '@/shared/components'
+import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
-import { pickResume, useImportRequest, useUndoRemove } from '../hooks'
-import type { HubDocument, MySource } from '../types'
-import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, SIZE_LIMIT, UPLOADS_TITLE } from '../utils'
+import { pickResume, showImportMenu, useFileMenu, useImportRequest, useUndoRemove } from '../hooks'
+import type { HubDocument, MySource, ScrollUnderBar } from '../types'
+import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, UPLOADS_TITLE } from '../utils'
 import { TAB_EMPTY_LIFT } from './empty'
 import FitRing from './fit-ring'
 import ListTitle from './list-title'
 import Row from './row'
 
 const HIT = 44
+const PUSH_CARD_RADIUS = 24
 const RETRY_H = 32
 const PROGRESS_H = 6
-const EMPTY_ART = 88
 const EMPTY_INSET = 40
 
-const openChat = () => router.push('/(app)/(stack)/(tabs)/(chat)/chat')
+const openChat = () => router.push('/bots/push')
 
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
+  const c = useColors()
   const qc = useQueryClient()
   const job = useIngestJob(doc.jobId, live).data
+  const openMenu = useFileMenu(doc)
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
   const retry = () => {
@@ -34,45 +37,48 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
     void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
   }
   return (
-    <Row label={doc.fileName} onPress={() => router.push(`/docs/${doc.id}`)}>
+    <Row label={displayName(doc.fileName)} onPress={() => router.push(`/docs/${doc.id}`)}>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="700" numberOfLines={1}>
-          {doc.fileName}
+          {displayName(doc.fileName)}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text v="c1" color="t3">
             {fileSize(doc.size)}
             {doc.createdAt ? ` · ${monthDay(doc.createdAt)}` : ''}
             {reading || failed ? ' · ' : ''}
           </Text>
-          {reading && !failed ? <Spinner /> : null}
+          {reading && !failed ? (
+            <View style={{ marginRight: spacing[1] }}>
+              <Spinner color="t1" />
+            </View>
+          ) : null}
           {reading || failed ? (
-            <Text v="c1" weight="700" color={failed ? 'red' : 'acText'}>
+            <Text v="c1" weight="700" color={failed ? 'red' : 't1'}>
               {failed ? INGEST_TEXT.failed : INGEST_TEXT.reading}
             </Text>
           ) : null}
         </View>
       </View>
       {failed ? (
-        <GlassPressable
+        <Pressable
           accessibilityRole="button"
           onPress={retry}
-          style={{ height: RETRY_H, borderRadius: RETRY_H / 2 }}
-          contentStyle={{ paddingHorizontal: spacing[3], gap: spacing[1] }}
+          style={{ height: RETRY_H, borderRadius: RETRY_H / 2, paddingHorizontal: spacing[3], justifyContent: 'center', backgroundColor: c.fill }}
         >
-          <Icon name="retry" size={14} color="t1" />
           <Text v="c1" weight="700">
             {RETRY_LABEL}
           </Text>
-        </GlassPressable>
+        </Pressable>
       ) : null}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${doc.fileName} 더 보기`}
-        onPress={() => router.push(`/docs/${doc.id}/more`)}
+        accessibilityLabel={`${displayName(doc.fileName)} 더 보기`}
+        onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Icon name="menu" size={20} color="t3" />
+        {/* MyResume: iOS draws the three-line menu glyph in t1, Android the three dots in t3 */}
+        {Platform.OS === 'ios' ? <Icon name="sort" size={22} color="t1" /> : <Icon name="more" size={20} color="t3" />}
       </Pressable>
     </Row>
   )
@@ -89,11 +95,11 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, date].filter(Boolean).join(', ')}
       onPress={() => router.push(`/docs/push/${doc.id}`)}
-      style={{ width: PUSH_CARD_WIDTH, borderRadius: radius.card, borderWidth: 1, borderColor: c.line, backgroundColor: c.paper, padding: spacing[2] }}
+      style={{ width: PUSH_CARD_WIDTH, borderRadius: PUSH_CARD_RADIUS, borderWidth: 1, borderColor: c.line, backgroundColor: c.paper, padding: spacing[2] }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingTop: spacing[4], paddingHorizontal: spacing[3], paddingBottom: spacing[5] }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text v="h2" weight="800" numberOfLines={1}>
+          <Text v="h2" weight="800" numberOfLines={1} style={{ lineHeight: 27, letterSpacing: -0.6 }}>
             {lines.title}
           </Text>
           {lines.company ? (
@@ -118,14 +124,14 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
   )
 }
 
-const DocsTab = () => {
+const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
   const c = useColors()
   const focused = useIsFocused()
   const apps = useMyApplications()
   const { data, isLoading } = useSources()
   const push = useDocuments()
   const hidden = useUndoRemove()
-  const { upload, start, cancel } = useUpload(() => showToast({ message: '이력서 파일을 올렸어요', tone: 'success', bottom: TOAST_ABOVE.tabs }))
+  const { upload, start, cancel } = useUpload()
   const pickFile = () => void pickResume().then((file) => file && start(file))
   useImportRequest(pickFile)
 
@@ -145,18 +151,15 @@ const DocsTab = () => {
           paddingBottom: TAB_EMPTY_LIFT,
         }}
       >
-        <View style={{ marginBottom: spacing[2] }}>
-          <Icon3D name="paper" size={EMPTY_ART} />
-        </View>
         <Text v="h2" style={{ textAlign: 'center' }}>
-          아직 등록한 서류가 없어요
+          아직 Push 프로필이 없어요
         </Text>
         <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-          {'PDF나 DOCX 파일을 올리거나\n에이전트로 새로 만들어 보세요.'}
+          {'Bot 채팅에서 지원할 공고에 맞춘\nPush 프로필을 만들어 보세요.'}
         </Text>
-        <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: spacing[4] }}>
-          <Button label="파일 등록" onPress={pickFile} />
-          <Button label="에이전트로 만들기" variant="secondary" onPress={openChat} />
+        <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
+          <Button label="Bot 채팅에서 만들기" onPress={openChat} />
+          <Button label="가진 이력서 올리기" variant="secondary" onPress={pickFile} />
         </View>
       </View>
     )
@@ -164,7 +167,8 @@ const DocsTab = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: spacing[6] }}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: top, paddingBottom: spacing[6] }}>
+        {lead}
         {preview.length > 0 ? (
           <>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: spacing[6], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
@@ -177,7 +181,7 @@ const DocsTab = () => {
                 </Text>
               </Pressable>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: spacing[2] }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
               {preview.map((d) => (
                 <PushCard
                   key={d.id}
@@ -193,7 +197,7 @@ const DocsTab = () => {
           <Row>
             <View style={{ flex: 1, minWidth: 0, gap: spacing[2] }}>
               <Text v="b1" weight="700" numberOfLines={1}>
-                {upload.name}
+                {displayName(upload.name)}
               </Text>
               <View
                 accessibilityRole="progressbar"
@@ -218,9 +222,10 @@ const DocsTab = () => {
               accessibilityRole="button"
               accessibilityLabel="취소"
               onPress={cancel}
-              style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
+              // Uploading: the 취소 button is a fill circle on iOS only (r6 rule); Android draws the bare glyph. The glyph is 18.
+              style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: Platform.OS === 'ios' ? c.fill : undefined, alignItems: 'center', justifyContent: 'center' }}
             >
-              <Icon name="x" size={20} color="t3" />
+              <Icon name="x" size={18} color="t3" />
             </Pressable>
           </Row>
         ) : null}
@@ -230,14 +235,10 @@ const DocsTab = () => {
         <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <Button
             label="파일 등록"
-            icon="plus"
-            disabled={!!upload}
-            onPress={() => router.push('/docs/import')}
+            // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
+            onPress={() => !upload && showImportMenu()}
           />
         </View>
-        <Text v="c1" color="t3" style={{ textAlign: 'center', paddingTop: spacing[3] }}>
-          {SIZE_LIMIT.footnote}
-        </Text>
       </ScrollView>
     </View>
   )

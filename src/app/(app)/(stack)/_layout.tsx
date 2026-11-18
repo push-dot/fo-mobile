@@ -1,12 +1,18 @@
 import { Stack } from 'expo-router'
-import { Platform, View } from 'react-native'
-import { ConsentPromptListener } from '@/features/chat/components/consent-prompt-listener'
-import { FULL_SHEET_KIND } from '@/features/jobs'
-import { fullSheetOptions, sheetOptions } from '@/shared/navigation'
+import { View } from 'react-native'
+import { ConsentPromptListener } from '@/features/chat'
+import { fullPageOptions, modalOptions, sheetOptions, tintedSheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
 // A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
-export const unstable_settings = { initialRouteName: '(tabs)' }
+export const unstable_settings = { anchor: '(tabs)' }
+
+// A redirect carries `?instant=1`; nested navigators hand it down as params of params, so look through them.
+const isInstant = (params: unknown): boolean => {
+  const p = params as { instant?: string; params?: unknown } | undefined
+  return !!p && (!!p.instant || isInstant(p.params))
+}
+const instantNone = ({ route }: { route: { params?: unknown } }) => ({ animation: isInstant(route.params) ? ('none' as const) : ('default' as const) })
 
 const SignedInStack = () => {
   const c = useColors()
@@ -14,8 +20,8 @@ const SignedInStack = () => {
     <View style={{ flex: 1 }}>
       <ConsentPromptListener />
       <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="chat/[id]" />
+      {/* The tabs only come in by a replace (the Bot home button after the consent redirect), which must not slide. */}
+      <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
       <Stack.Screen name="postings/[id]" />
       <Stack.Screen name="profiles/[id]" />
       <Stack.Screen name="posts/[id]" />
@@ -27,43 +33,51 @@ const SignedInStack = () => {
       <Stack.Screen name="offers/[id]" />
       <Stack.Screen name="offers/[id]/messages" />
       <Stack.Screen name="settings/index" />
-      <Stack.Screen name="settings/visibility" />
       <Stack.Screen name="settings/blocked" />
+      <Stack.Screen name="settings/career" />
       <Stack.Screen name="settings/legal" />
       <Stack.Screen name="docs/[id]" />
-      <Stack.Screen name="docs/push/index" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="docs/push/index" />
       <Stack.Screen name="docs/push/[id]" />
       <Stack.Screen name="docs/push/[id]/rename" options={sheetOptions(c)} />
+      {/* Opened from the 마이 tab, a profile page and a 지원 서류 alike: a modal over everything, not a screen inside the tab. */}
+      <Stack.Screen name="edit-profile/[section]" options={modalOptions(c)} />
       <Stack.Screen name="activity/follows" />
       <Stack.Screen name="activity/posts" />
       <Stack.Screen name="activity/applications/[id]" />
-      <Stack.Screen name="sidebar/index" options={{ animation: 'slide_from_left' }} />
-      <Stack.Screen name="sidebar/account" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/docs" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/links" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/bookmarks" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="sidebar/conversations" options={{ presentation: 'modal', animation: Platform.OS === 'android' ? 'slide_from_bottom' : 'default' }} />
-      <Stack.Screen name="sidebar/link-add" options={sheetOptions(c)} />
-      <Stack.Screen name="sidebar/rename/[id]" options={sheetOptions(c)} />
-      <Stack.Screen name="access-mode" options={sheetOptions(c)} />
+      <Stack.Screen name="choice" options={sheetOptions(c)} />
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />
-      <Stack.Screen name="terms-view" />
+      <Stack.Screen name="terms-view" options={fullPageOptions()} />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
-      <Stack.Screen name="materials" options={sheetOptions(c)} />
-      <Stack.Screen
-        name="job-filter"
-        options={({ route }) => ((route.params as { kind?: string } | undefined)?.kind === FULL_SHEET_KIND ? fullSheetOptions(c) : sheetOptions(c))}
-      />
+      <Stack.Screen name="quick-start/[key]/all" options={modalOptions(c)} />
+      <Stack.Screen name="material-picker" options={modalOptions(c)} />
+      <Stack.Screen name="review" options={modalOptions(c)} />
+      {/* A redirect (the Bot tab before consent) opens it with no slide: the person never sees the Bot home. */}
+      <Stack.Screen name="bots/[botId]/index" options={instantNone} />
+      <Stack.Screen name="bots/[botId]/profile" />
+      <Stack.Screen name="bots/[botId]/companies" />
+      <Stack.Screen name="bots/[botId]/color" options={sheetOptions(c)} />
+      <Stack.Screen name="bots/[botId]/allowed" options={sheetOptions(c)} />
+      <Stack.Screen name="bots/new" options={modalOptions(c)} />
+      <Stack.Screen name="materials/index" options={modalOptions(c)} />
+      <Stack.Screen name="materials/[kind]/[id]" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/link-add" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/pick" options={sheetOptions(c)} />
+      <Stack.Screen name="materials/create-pick" options={sheetOptions(c)} />
+      <Stack.Screen name="account" options={modalOptions(c)} />
+      <Stack.Screen name="plan" options={fullPageOptions()} />
+      <Stack.Screen name="usage" options={fullPageOptions()} />
+      <Stack.Screen name="job-filter" options={tintedSheetOptions(c)} />
       <Stack.Screen name="apply" options={sheetOptions(c)} />
-      <Stack.Screen name="hub-filter" options={sheetOptions(c, 'fitToContents')} />
+      <Stack.Screen name="hub-filter" options={tintedSheetOptions(c)} />
       <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />
-      <Stack.Screen name="confirm" options={sheetOptions(c)} />
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
+      <Stack.Screen name="activity/calendar" options={sheetOptions(c)} />
       <Stack.Screen name="settings/pick" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/import" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/[id]/to-profile" options={sheetOptions(c)} />
-      <Stack.Screen name="docs/[id]/more" options={sheetOptions(c)} />
+      {/* DocToProfile draws a solid sheet: over the translucent system material the viewer's purple CTA behind it bleeds through the sheet's own CTA. */}
+      <Stack.Screen name="docs/[id]/to-profile" options={{ ...sheetOptions(c), contentStyle: { backgroundColor: c.bg } }} />
+      <Stack.Screen name="docs/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="offers/[id]/reply" options={sheetOptions(c)} />
     </Stack>
     </View>

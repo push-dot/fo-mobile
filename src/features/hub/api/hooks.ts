@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { JobCategory, ProfileFilters } from '@push/api-client'
 import { sendOfferError, type SheetFilters } from '../utils'
-import { fetchOfferBookmarks, fetchProfile, fetchProfileCount, fetchProfileList, followProfile, sendProfileOffer, unfollowProfile } from './fetchers'
+import { fetchOfferPostings, fetchProfile, fetchProfileCount, fetchProfileList, followProfile, sendProfileOffer, unfollowProfile } from './fetchers'
 
 export const useProfileList = (category: JobCategory[], sheet: SheetFilters) =>
   useInfiniteQuery({
@@ -14,10 +14,11 @@ export const useProfileList = (category: JobCategory[], sheet: SheetFilters) =>
 export const useProfileCount = (key: unknown[], query: ProfileFilters, enabled: boolean) =>
   useQuery({ queryKey: ['profiles', 'count', ...key], queryFn: () => fetchProfileCount(query), enabled }).data?.page.total
 
-export const useOfferBookmarks = (visible: boolean) =>
+export const useOfferPostings = (visible: boolean) =>
   useQuery({
-    queryKey: ['me', 'bookmarks', 'offer-pick'],
-    queryFn: fetchOfferBookmarks,
+    queryKey: ['company', 'postings', 'offer-pick'],
+    queryFn: fetchOfferPostings,
+    retry: false,
     enabled: visible,
   })
 
@@ -42,9 +43,4 @@ export const useFollow = (id: string) => {
     mutationFn: (on: boolean) => (on ? followProfile(id) : unfollowProfile(id)),
     onSettled: () => qc.invalidateQueries({ queryKey: ['profiles'] }),
   })
-}
-
-export const useInvalidateProfileDetail = (id: string) => {
-  const qc = useQueryClient()
-  return () => qc.invalidateQueries({ queryKey: ['profiles', 'detail', id] })
 }

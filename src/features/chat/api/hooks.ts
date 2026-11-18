@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { type ChatIntent, type ListEnvelope } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
-import { useMyLinks, useMySettings, type PickedFile } from '@/features/my'
+import { botChatPath, type BotId } from '@/features/bots'
+import { useMyLinks, type PickedFile } from '@/features/my'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
-import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, MENTION_SHORTCUT_KEYS, QUICK_STARTS, docAiSub, linkMentionSub } from '../constants'
+import { displayName } from '@/shared/utility/display-name'
+import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
 import { LINK_KIND_LABEL } from '../utils/links'
 import { cacheName } from '../utils/cache-name'
@@ -14,43 +16,44 @@ import { exclusive, pdfName, shareErrorText } from '../utils/share'
 import type { MentionGroup } from '../utils/mentions'
 import { isConsentRequired } from '../utils/consent'
 import { retryUnlessMissing } from '../utils/retry'
-import { askConsent, bindOpenChat, forget, holdOpen, pickAccessMode, send, usePrefs } from '../stores'
+import { askConsent, bindOpenChat, forget, holdOpen, openBot, send } from '../stores'
 import {
   archiveConversation,
   chatApi,
-  createConversation,
   deleteConversation,
   fetchArtifactBytes,
   fetchDocumentPdf,
   fetchSourceBytes,
   fetchMentionBookmarks,
   fetchMyProfile,
+  fetchProfilePdf,
   pinConversation,
   renameConversation,
   unarchiveConversation,
 } from './fetchers'
 import type { ConversationRow, RunInput } from './schemas'
 
+const RETRY_LATER = '잠시 뒤에 다시 해 주세요.'
+
 export const useStartChat = () => {
-  const qc = useQueryClient()
   const run = useCallback(
     async (title: string, message: string, attachment?: string | PickedFile, replace?: boolean, intent?: ChatIntent, context?: RunInput['context']) => {
       try {
-        const conv = await createConversation(title.slice(0, 300))
-        void qc.invalidateQueries({ queryKey: ['conversations'] })
-        if (replace) router.replace(`/chat/${conv.id}`)
-        else router.push(`/chat/${conv.id}`)
-        send(conv.id, message, attachment, intent, context)
+        const id = await openBot('push')
+        const path = botChatPath(id as BotId)
+        if (replace) router.replace(path)
+        else router.push(path)
+        send(id, message, attachment, intent, context)
       } catch (err) {
         if (isConsentRequired(err)) {
           holdOpen({ title, message, attachment, intent, context })
           askConsent(true)
           return
         }
-        Alert.alert('대화를 시작하지 못했어요', '잠시 뒤에 다시 해 주세요.')
+        Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)
       }
     },
-    [qc],
+    [],
   )
   useEffect(() => {
     bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent, p.context))
@@ -78,7 +81,7 @@ export const useRenameConversation = (id: string, revision: number | undefined) 
       return renameConversation(id, revision, title)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('이름을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('이름을 바꾸지 못했어요', RETRY_LATER),
   })
 }
 
@@ -87,7 +90,7 @@ export const usePinConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => pinConversation(row.id, row.revision, !row.pinned),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('고정을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('고정을 바꾸지 못했어요', RETRY_LATER),
   })
 }
 
@@ -96,7 +99,7 @@ export const useArchiveConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => archiveConversation(row.id, row.revision),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('보관하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -105,7 +108,7 @@ export const useUnarchiveConversation = () => {
   return useMutation({
     mutationFn: (row: ConversationRow) => unarchiveConversation(row.id, row.revision),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관을 해제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('보관을 해제하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -117,7 +120,7 @@ export const useDeleteConversation = () => {
       forget(id)
       void qc.invalidateQueries({ queryKey: ['conversations'] })
     },
-    onError: () => Alert.alert('대화를 삭제하지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('대화를 삭제하지 못했어요', RETRY_LATER),
   })
 }
 
@@ -134,6 +137,8 @@ export const useMe = () => {
 export const useChatDocs = (enabled = true) =>
   useQuery({ queryKey: CHAT_DOCS_KEY, queryFn: chatApi.docs, enabled })
 
+export const useHubProfileId = (enabled = true) => useQuery({ queryKey: ['me', 'hub-profile-id'], queryFn: chatApi.hubProfileId, enabled })
+
 export const useUploadChatDoc = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -145,7 +150,7 @@ export const useUploadChatDoc = () => {
       await chatApi.addDoc(f)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
-    onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : '잠시 뒤에 다시 해 주세요.'),
+    onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : RETRY_LATER),
   })
 }
 
@@ -161,10 +166,13 @@ const shareAs = (name: string, bytes: Uint8Array, mimeType?: string) => shareByt
 export const useOpenArtifact = () =>
   useMutation({
     mutationFn: ({ url, name }: { url: string; name: string }) => oneShare(async () => shareAs(name, await fetchArtifactBytes(url))),
-    onError: () => Alert.alert('파일을 열지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('파일을 열지 못했어요', RETRY_LATER),
   })
 
-export type SharedFile = { documentId: string; name?: string } | { sourceId: string; name: string; mimeType?: string }
+export type SharedFile =
+  | { documentId: string; name?: string }
+  | { sourceId: string; name: string; mimeType?: string }
+  | { profile: true; name: string; photo?: boolean }
 
 /** Shares the file itself: a document through its authenticated PDF export, an upload as its stored bytes. */
 export const useShareFile = () =>
@@ -172,26 +180,12 @@ export const useShareFile = () =>
     mutationFn: (f: SharedFile) =>
       oneShare(async () => {
         if ('sourceId' in f) return shareAs(f.name, await fetchSourceBytes(f.sourceId), f.mimeType)
+        if ('profile' in f) return shareAs(pdfName(f.name), await fetchProfilePdf(f.photo), 'application/pdf')
         const pdf = await fetchDocumentPdf(f.documentId)
         return shareAs(pdfName(f.name ?? pdf.title), pdf.bytes, 'application/pdf')
       }),
     onError: (e) => showToast({ message: shareErrorText(e), bottom: TOAST_ABOVE.tabs }),
   })
-
-export const useAccessMode = () => {
-  const qc = useQueryClient()
-  const server = useMySettings(true).data?.aiAccessMode
-  const mode = usePrefs((s) => s.accessMode)
-  useEffect(() => {
-    if (server) usePrefs.setState({ accessMode: server })
-  }, [server])
-  const save = useMutation({
-    mutationFn: pickAccessMode,
-    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
-    onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
-  })
-  return { mode, pick: save.mutate }
-}
 
 export const useQuickStart = (key: string) =>
   useQuery({ queryKey: ['chat', 'quick-start', key], queryFn: () => chatApi.quickStart(key) })
@@ -208,13 +202,12 @@ export const useMentionGroups = (): MentionGroup[] => {
       },
       {
         title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: d.fileName, sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
+        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: displayName(d.fileName), sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
       },
       {
         title: '내 링크',
         items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
       },
-      { title: '바로가기', items: QUICK_STARTS.filter((q) => (MENTION_SHORTCUT_KEYS as readonly string[]).includes(q.key)).map((q) => ({ id: q.key, kind: 'shortcut' as const, title: q.label, sub: '' })) },
     ],
     [bookmarks.data, docs.data, links.data],
   )

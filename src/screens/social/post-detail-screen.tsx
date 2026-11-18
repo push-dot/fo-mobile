@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
-import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, threadComments, useComments, usePost } from '@/features/social'
+import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
 import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
 import { radius, spacing, useColors } from '@/theme'
@@ -13,6 +13,7 @@ const PostDetailScreen = ({ id }: { id: string }) => {
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null)
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null)
   const post = usePost(id)
+  const toggleSave = useTogglePostSave(id)
   const comments = useComments(id, !!post.data)
   const rows = threadComments(comments.data?.pages.flatMap((p) => p.data) ?? [])
 
@@ -24,22 +25,28 @@ const PostDetailScreen = ({ id }: { id: string }) => {
           <Menu
             accessibilityLabel="더 보기"
             actions={[
-              { key: 'share', label: '공유하기', systemImage: 'square.and.arrow.up', onPress: () => void shareMessage({ message: postShareMessage(id, post.data) }) },
+              { key: 'save', actions: [saveMenuAction(!!post.data?.saved, () => toggleSave.mutate(!post.data?.saved))] },
               {
-                key: 'copy',
-                label: '링크 복사',
-                systemImage: 'link',
-                onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요', bottom: TOAST_ABOVE.cta })),
+                key: 'send',
+                actions: [
+                  { key: 'share', label: '공유하기', systemImage: 'square.and.arrow.up', onPress: () => void shareMessage({ message: postShareMessage(id, post.data) }) },
+                  {
+                    key: 'copy',
+                    label: '링크 복사',
+                    systemImage: 'link',
+                    onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요', bottom: TOAST_ABOVE.cta })),
+                  },
+                ],
               },
             ]}
           >
             {Platform.OS === 'ios' ? (
               <Glass interactive style={moreButton}>
-                <Icon name="menu" size={22} color="t1" />
+                <Icon name="more" size={22} color="t1" />
               </Glass>
             ) : (
               <View style={moreButton}>
-                <Icon name="menu" size={22} color="t1" />
+                <Icon name="more" size={22} color="t1" />
               </View>
             )}
           </Menu>

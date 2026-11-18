@@ -2,7 +2,7 @@ import type { StreamEvent } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream, mapEvent } from '../utils/stream'
-import { isVerdictPlan, planTone, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
+import { chipSends, isVerdictPlan, sectionLabel, sectionPicks, submitLabelFor } from '../utils/stream-v3'
 import type { Approval, ChatItem } from '../types'
 
 const profile = (): ChatItem => ({
@@ -53,8 +53,8 @@ describe('stream v3', () => {
       id: 'strategy',
       keywords: ['결제'],
       rows: [
-        { tag: '강화', tone: 'ac', label: '경력' },
-        { tag: '기타', tone: 'grey', label: '소개' },
+        { tag: '강화', label: '경력' },
+        { tag: '기타', label: '소개' },
       ],
     })
   })
@@ -63,7 +63,6 @@ describe('stream v3', () => {
     expect(isVerdictPlan([{ tag: '통과' }, { tag: '조건부' }])).toBe(true)
     expect(isVerdictPlan([{ tag: '통과' }, { tag: '강화' }])).toBe(false)
     expect(isVerdictPlan([])).toBe(false)
-    expect([planTone('통과'), planTone('조건부')]).toEqual(['green', 'orange'])
   })
 
   it('maps paper', () => {
@@ -82,10 +81,10 @@ describe('stream v3', () => {
     expect(sel({ type: 'choice', id: 'x', options, recommended: 'b' })?.sections[0]).toMatchObject({ selected: [1] })
     const multi = sel({ type: 'choice', id: 'x', options, multiple: true })
     expect(multi?.sections[0]).toMatchObject({ selected: [] })
-    expect(multi?.foot).toBe('여러 개 고를 수 있어요')
+    expect(multi?.foot).toBeUndefined()
   })
 
-  it('a sectioned multi card carries the multi foot; toggle rows put sub on the second line; templates get a layout', () => {
+  it('a sectioned multi card draws no foot (ChatPh0Input); toggle rows put sub on the second line; templates get a layout', () => {
     const [ev] = mapEvent({
       type: 'choice',
       id: 'g',
@@ -97,7 +96,7 @@ describe('stream v3', () => {
       ],
     })
     const a = ev?.type === 'approval' ? ev.approval : undefined
-    expect(a?.foot).toBe('여러 개 고를 수 있어요')
+    expect(a?.foot).toBeUndefined()
     expect(a?.sections[1]).toMatchObject({ items: [{ label: '말투 통일하기', desc: '“~했음”과 “~했습니다”가 섞였어요' }] })
     expect(a?.sections[2]).toMatchObject({ items: [{ layout: 'modern' }, { layout: 'ats' }, { layout: 'compact' }, { layout: 'classic' }] })
   })
@@ -166,6 +165,7 @@ describe('stream v3', () => {
     const approval: Approval = {
       id: 'r',
       question: '디자인',
+      optionIds: ['submit'],
       sections: [],
       submit: '만들기',
       submitLabels: { CLASSIC: '클래식으로 만들기', MODERN: '모던으로 만들기' },
@@ -197,7 +197,7 @@ describe('stream v3', () => {
     if (ev?.type !== 'approval') throw new Error('expected approval')
     const a = ev.approval
     expect(a.optionIds).toEqual(['submit', 'CLASSIC', 'MODERN', 'photo', 'cancel'])
-    expect(a.secondary).toBe('그만하기')
+    expect(a.secondary).toBe('닫기')
     const ids = (sel: number[][]) => sectionPicks(a, sel).map((i) => a.optionIds![i])
     expect(ids([[1], [0]])).toEqual(['submit', 'MODERN', 'photo'])
     expect(ids([[0], []])).toEqual(['submit', 'CLASSIC'])
@@ -261,3 +261,26 @@ describe('stream v3', () => {
     expect(ev.approval.pendingNote).toBeUndefined()
   })
 })
+
+describe('a form that ends on a single-pick chip row', () => {
+  const form = (submit?: string): Approval => ({
+    id: 'f',
+    question: '어떤 산출물을 만들까요?',
+    sections: [
+      { kind: 'rows', title: '가져올 자료', items: [{ tag: 'link', title: 'github.com/seojun-kim', sub: '허브 프로필에서 찾았어요' }] },
+      { kind: 'chips', title: '말투', options: ['전문적으로', '원래 말투로'], selected: [1] },
+    ],
+    ...(submit ? { submit } : {}),
+    optionIds: [],
+  })
+
+  it('is sent by the chip without a button, and only picks when the card has its own button (시작하기)', () => {
+    expect(chipSends(form())).toBe(true)
+    expect(chipSends(form('시작하기'))).toBe(false)
+  })
+
+  it('answers with the summary of the picks either way', () => {
+    expect(sectionLabel(form('시작하기'), [[], [1]])).toBe('자료 1개 · 원래 말투로')
+  })
+})
+

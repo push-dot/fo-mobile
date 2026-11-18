@@ -1,33 +1,107 @@
-import { COMPOSER_PLACEHOLDER } from '../composer-placeholder'
-import type { ChatItem, ChatState } from '../types'
+import type { IconName } from '@push/design-system'
+import type { MenuAction } from '@/shared/components/menu-action'
+import type { AttachmentKind } from '@/features/bots'
+import type { ChatItem } from '../types'
+import { foldBubbleCards } from './bubble-card'
 
-const FREE_BODY = '이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.'
-const ULTRA_BODY = '이번 달 사용량을 다 썼어요. 크레딧을 구매하면 바로 이어서 쓸 수 있어요.'
-const CLOSED_BODY = '이번 달 사용량을 다 썼어요. 결제는 아직 준비 중이에요.'
-const BARE_BODY = '이번 달 사용량을 다 썼어요.'
+const BOT_SUFFIX = /(?:봇|Bot)$/
 
-const PLAN = { id: 'plan', label: '요금제 올리기', variant: 'secondary' } as const
-const CREDITS = { id: 'credits', label: '크레딧 구매', variant: 'primary' } as const
+export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} Bot`)
 
-// plan is undefined until the account loads: say the fact and offer nothing to buy.
-export const usageExhausted = (plan: string | undefined, paymentsOpen = true) =>
-  plan === undefined ? { body: BARE_BODY, actions: [] } : !paymentsOpen ? { body: CLOSED_BODY, actions: [] } : plan === 'ULTRA' ? { body: ULTRA_BODY, actions: [CREDITS] } : { body: FREE_BODY, actions: [PLAN, CREDITS] }
+export const askPlaceholder = (name: string) => `${botSpokenName(name)}에게 물어보기`
 
-const PLAN_OPEN = '요금제를 올리면 쓸 수 있어요.'
-const PLAN_CLOSED = '지금 요금제에서는 쓸 수 없어요. 결제는 아직 준비 중이에요.'
-const PLAN_BARE = '지금 요금제에서는 쓸 수 없어요.'
+export type HeaderMenuId = 'profile' | 'find' | 'clear' | 'delete'
 
-/** PLAN_REQUIRED line, in the same three states as usageExhausted. */
-export const planRequired = (plan: string | undefined, paymentsOpen = true) => (plan === undefined ? PLAN_BARE : !paymentsOpen ? PLAN_CLOSED : PLAN_OPEN)
+/** ChatBotHeaderMenu board: every item leads with an icon (SF Symbol on iOS, design icon on Android). */
+export type HeaderMenuItem = { id: HeaderMenuId; label: string; destructive?: boolean; systemImage: NonNullable<MenuAction['systemImage']>; icon: IconName }
+
+const PROFILE = { id: 'profile', label: '프로필 보기', systemImage: 'person', icon: 'user' } as const
+const FIND = { id: 'find', label: '채팅에서 찾기', systemImage: 'magnifyingglass', icon: 'search' } as const
+const TRASH = { systemImage: 'trash', icon: 'delete', destructive: true } as const
+
+export const botHeaderMenu = (kind: 'push' | 'company'): HeaderMenuItem[] =>
+  kind === 'push'
+    ? [PROFILE, FIND, { id: 'clear', label: '대화 지우기', ...TRASH }]
+    : [PROFILE, FIND, { id: 'delete', label: '삭제', ...TRASH }]
+
+export const headerAction = (id: HeaderMenuId, kind: 'push' | 'company') => {
+  if (id === 'clear') return kind === 'push' ? 'confirm-clear' : 'noop'
+  if (id === 'delete') return kind === 'company' ? 'confirm-delete' : 'noop'
+  return id
+}
+
+export const clearChatConfirm = () => ({
+  title: 'Push Bot과 나눈 대화를 지울까요?',
+  body: '대화 내용이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일과 자료는 그대로 남아요.',
+  cancel: '취소',
+  confirm: '지우기',
+})
+
+export const deleteBotConfirm = (name: string) => ({
+  title: `${botSpokenName(name)}을 삭제할까요?`,
+  body: '이 Bot과 나눈 대화와 작업 기록이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일은 그대로 남아요.',
+  cancel: '취소',
+  confirm: '삭제',
+})
+
+export const onboardingGreeting = (kind: 'push' | 'company', name: string, postingTitle?: string | null) => {
+  if (kind === 'push') return '안녕하세요. Push Bot이에요. 공고 찾기부터 서류, 지원까지 함께 챙길게요. 무엇부터 할까요?'
+  const job = postingTitle ? `${postingTitle} 공고를 기준으로 서류를 챙길게요. ` : ''
+  return `안녕하세요. ${botSpokenName(name)}이에요. ${job}무엇부터 할까요?`
+}
+
+/** The first line that stays above a company bot's thread once the conversation starts (ChatBotStatus*). */
+export const threadGreeting = (name: string, postingTitle?: string | null) =>
+  `안녕하세요. ${botSpokenName(name)}이에요.${postingTitle ? ` 이 회사 ${postingTitle} 공고를 기준으로 서류를 챙길게요.` : ''}`
+
+export type DraftText = { text: string }
+
+export const withMaterial = <T extends DraftText>(drafts: Record<string, T>, id: string, text: string, blank: T): Record<string, T> => {
+  const current = drafts[id] ?? blank
+  return { ...drafts, [id]: { ...current, text: current.text ? `${current.text} ${text}` : text } }
+}
+
+const PLAN_OPEN = '플랜을 올리면 쓸 수 있어요.'
+const PLAN_BARE = '지금 플랜에서는 쓸 수 없어요.'
+
+/** PLAN_REQUIRED line. The plan is undefined until the account loads: say the fact and offer nothing to buy. */
+export const planRequired = (plan: string | undefined, paymentsOpen = true) => {
+  if (plan === undefined) return PLAN_BARE
+  if (!paymentsOpen) return PLAN_BARE
+  return PLAN_OPEN
+}
 
 export const isUsageExhausted = (code?: string) => code === 'FEATURE_DISABLED' || code === 'INSUFFICIENT_CREDITS'
 
-const failed = (i: ChatItem) => i.type === 'error' && !isUsageExhausted(i.code)
+const isFailedStep = (item: Extract<ChatItem, { type: 'tool' }>) => item.state === 'err' && !!item.error
 
-// A run counts as work once it ends on anything but a plain error (the usage card counts, as in ChatNoCredit), so one failed run in a long chat keeps the follow-up line.
-const hasWork = (items: ChatItem[]) => items.some((it, n) => it.type !== 'user' && !failed(it) && (n === items.length - 1 || items[n + 1]!.type === 'user'))
+/**
+ * Whether the room draws a line for this item. The tool, think and worked lines and a refused turn's error are replaced by the status
+ * line and the credit banner (entries/item.tsx returns null for them). A list cell that draws nothing still takes its 18 gap,
+ * so one hidden line made a 36 gap and two made 54 (ChatPh2, ChatPh3Boost, ChatPh3Review): the room never lists them.
+ * The one tool line that is drawn is a failed step that says why: the red line of ChatErrors.
+ */
+export const isDrawn = (item: ChatItem) =>
+  item.type !== 'think' && item.type !== 'worked' && !(item.type === 'tool' && !isFailedStep(item)) && !(item.type === 'error' && isUsageExhausted(item.code))
 
-export const composerPlaceholder = (chat: Pick<ChatState, 'working' | 'items'>) => {
-  if (chat.working) return COMPOSER_PLACEHOLDER.working
-  return hasWork(chat.items) ? COMPOSER_PLACEHOLDER.followUp : COMPOSER_PLACEHOLDER.first
+/** The running line, drawn inside the list under the last line (the boards draw it in the thread, not above the composer). */
+export type RunningRow = { type: 'running'; id: 'running' }
+export type ThreadRow = ChatItem | RunningRow
+
+/**
+ * The list in order, drawn lines only, and while the run works its running line under the last line (ChatBotStatusThink, Work, Long,
+ * Queue, XL, DocAgentNew, and ChatPh3 where it follows the draft that is being written).
+ */
+export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
+  const drawn: ThreadRow[] = foldBubbleCards(items.filter(isDrawn))
+  return working ? [...drawn, { type: 'running', id: 'running' }] : drawn
 }
+
+const CHIP_NOUN: Record<AttachmentKind, string> = { document: '서류', posting: '공고', link: '링크', file: '서류' }
+
+/** A material chip asks `이 서류로 무엇을 할까요?` (MaterialsSendHere, BotPickSent). The boards draw only the 서류 line; a file is a 서류 in the app and the other kinds follow the pattern. */
+export const composerPlaceholder = (name?: string, chipKind?: AttachmentKind, androidWorking = false) =>
+  chipKind ? `이 ${CHIP_NOUN[chipKind]}로 무엇을 할까요?` : androidWorking ? WORKING_PLACEHOLDER : askPlaceholder(name ?? 'Bot')
+
+/** ChatWorking, ChatInterrupt: while a run works the Android field says it still listens; iOS keeps the name. */
+const WORKING_PLACEHOLDER = '작업 중에도 말할 수 있어요'

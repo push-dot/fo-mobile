@@ -1,4 +1,5 @@
 import { router } from 'expo-router'
+import { botChatPath } from '@/features/bots'
 import { useState } from 'react'
 import {
   ActivityIndicator,
@@ -32,6 +33,7 @@ import {
   ymToDate,
   SheetHeader,
   SKILL_CATALOG,
+  skillSuggestions,
   tenureLabel,
   uploadAvatarImage,
   useMyProfile,
@@ -43,6 +45,7 @@ import {
   Button,
   Chip,
   DatePicker,
+  Highlight,
   Icon,
   Menu,
   SegmentedControl,
@@ -52,13 +55,16 @@ import {
   Text,
   TextField,
   ToastHost,
+  useKeyboardHeight,
+  useToastLive,
   type MenuAction,
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
-import { searchHangul } from '@push/shared'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
 
+/** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
+const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
 
@@ -89,13 +95,13 @@ const Input = ({
   keyboardType,
   invalid,
 }: {
+  invalid?: boolean
   value: string
   onChangeText: (t: string) => void
   label: string
   placeholder?: string
   multiline?: boolean
   keyboardType?: 'numbers-and-punctuation'
-  invalid?: boolean
 }) => {
   const c = useColors()
   const font = multiline ? type.b2 : type.b1
@@ -113,9 +119,10 @@ const Input = ({
           ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
-          backgroundColor: c.bg,
-          borderWidth: 1.5,
-          borderColor: invalid ? c.red : 'transparent',
+          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box
+          backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
+          // EditCareerStates 빈 칸 오류: Android rings the empty field in red (1.5 inset); iOS only shows the line of text below
+          ...(invalid && Platform.OS !== 'ios' ? { borderWidth: 1.5, borderColor: c.red } : null),
           paddingHorizontal: spacing[4],
           paddingTop: multiline ? spacing[3] : 0,
           fontSize: font.fontSize,
@@ -156,7 +163,8 @@ const SelectField = ({
           }}
         >
           <Text v="b1">{value}</Text>
-          <Icon name="down" size={18} color="t3" />
+          {/* EditProfileBasic: the select chevron is the field's own black (currentColor), not the muted grey. */}
+          <Icon name="down" size={16} color="t1" />
         </View>
       </Menu>
     </View>
@@ -226,11 +234,11 @@ const EditBasic = ({ p }: { p: Profile }) => {
             <View
               style={{
                 position: 'absolute',
-                right: -2,
-                bottom: -2,
-                width: 24,
-                height: 24,
-                borderRadius: radius.sm,
+                right: -4,
+                bottom: -4,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
                 backgroundColor: c.t1,
                 borderWidth: 2,
                 borderColor: c.bg,
@@ -241,7 +249,7 @@ const EditBasic = ({ p }: { p: Profile }) => {
               {uploading ? (
                 <ActivityIndicator size="small" color={c.bg} />
               ) : (
-                <Icon name="edit" size={12} color={c.bg} />
+                <Icon name="edit" size={13} color={c.bg} />
               )}
             </View>
           </Pressable>
@@ -345,11 +353,10 @@ const EditIntro = ({ p }: { p: Profile }) => {
         />
         {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
-          label="에이전트로 다듬기"
-          icon="spark"
+          label="AI로 다듬기"
           variant="secondary"
           size="md"
-          onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
+          onPress={() => router.push(botChatPath('push'))}
         />
         <Text v="c1" color="t3">
           허브 프로필 맨 위에 보여요. 3~4문장이면 충분해요.
@@ -359,7 +366,12 @@ const EditIntro = ({ p }: { p: Profile }) => {
   )
 }
 
+// Stable keys: index keys let a deleted card's field state leak into the next card and into the restored one.
+let draftSeq = 0
+const draftKey = () => `career-${++draftSeq}`
+
 type CareerDraft = {
+  key: string
   company: string
   role: string
   start: string
@@ -369,6 +381,7 @@ type CareerDraft = {
   saved?: { head: string; period: string }
 }
 const toDraft = (c: Career): CareerDraft => ({
+  key: draftKey(),
   company: c.company,
   role: c.role,
   start: c.startedOn.replace('-', '.'),
@@ -396,24 +409,19 @@ const EditCareer = ({ p }: { p: Profile }) => {
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const [tried, setTried] = useState(false)
+  // DeleteCareer.2 keeps the card listed behind the banner: it leaves the list when 되돌리기 times out, and saving leaves it out from the start.
+  const [pending, setPending] = useState<{ key: string; toast: number } | null>(null)
+  const gone = !useToastLive(pending?.toast ?? null) ? pending?.key : undefined
   const parsed = items.map(toCareer)
-  const removeAt = (i: number, item: CareerDraft) => {
-    setItems((xs) => xs.filter((_, j) => j !== i))
-    setOpen(null)
-    showToast({
+  const kept = parsed.filter((_, i) => items[i]!.key !== pending?.key)
+  const removeAt = (item: CareerDraft) => {
+    const toast = showToast({
       message: careerDeleteCopy.toast,
-      action: {
-        label: careerDeleteCopy.undo,
-        onPress: () => {
-          setItems((xs) => {
-            const next = [...xs]
-            next.splice(i, 0, item)
-            return next
-          })
-          setOpen(i)
-        },
-      },
+      action: { label: careerDeleteCopy.undo, onPress: () => setPending(null) },
     })
+    setPending({ key: item.key, toast })
+    // This toast replaced the last one, so that row's 되돌리기 is gone: it leaves now.
+    if (pending) setItems((xs) => xs.filter((x) => x.key !== pending.key))
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
@@ -433,20 +441,21 @@ const EditCareer = ({ p }: { p: Profile }) => {
       <SheetHeader
         title={TITLES.career}
         saving={save.isPending}
-        onSave={() => (parsed.every(Boolean) ? save.mutate({ careers: parsed as Career[] }) : setTried(true))}
+        onSave={() => (kept.every(Boolean) ? save.mutate({ careers: kept as Career[] }) : setTried(true))}
       />
       <ScrollView
         contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
         {items.map((it, i) => {
+          if (it.key === gone) return null
           const expanded = open === i
           const valid = parsed[i]
           const start = parseYm(it.start)
           const end = it.current ? null : parseYm(it.end)
           const period = it.saved?.period ?? (start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null)
           return (
-            <View key={i} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
+            <View key={it.key} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
                 <Pressable
                   accessibilityRole="button"
@@ -455,7 +464,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   onPress={() => moveUp(i)}
                   hitSlop={spacing[3]}
                 >
-                  <Icon name="drag-handle" size={18} color="t4" />
+                  <Icon name="drag-handle" size={18} color="t3" />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
@@ -485,14 +494,14 @@ const EditCareer = ({ p }: { p: Profile }) => {
                 <View style={{ gap: spacing[2], paddingTop: spacing[2] }}>
                   <Input
                     label="회사"
+                    invalid={tried && !it.company.trim()}
                     value={it.company}
-                    invalid={!valid && !it.company.trim()}
                     onChangeText={(t) => set(i, { company: t })}
                   />
                   <Input
                     label="직무"
+                    invalid={tried && !it.role.trim()}
                     value={it.role}
-                    invalid={!valid && !it.role.trim()}
                     onChangeText={(t) => set(i, { role: t })}
                   />
                   <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
@@ -500,14 +509,14 @@ const EditCareer = ({ p }: { p: Profile }) => {
                       <DatePicker
                         label="시작"
                         mode="month"
-                        surface="bg"
+                        surface={FIELD_SURFACE}
                         value={ymToDate(it.start)}
                         max={new Date()}
                         onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
                     {/* padding on a flex:1 item widens it past the 50/50 split, so it lives on the inner row */}
-                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: c.bg }}>
+                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : c.bg }}>
                       <View
                         style={{
                           minHeight: 48,
@@ -531,7 +540,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     <DatePicker
                       label="종료 (2024.02)"
                       mode="month"
-                      surface="bg"
+                      surface={FIELD_SURFACE}
                       value={ymToDate(it.end)}
                       min={ymToDate(it.start) ?? undefined}
                       max={new Date()}
@@ -552,16 +561,13 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   <Pressable
                     accessibilityRole="button"
                     onPress={() =>
-                      askConfirm(
-                        {
-                          title: careerDeleteCopy.title,
-                          body: careerDeleteBody(it),
-                          confirm: careerDeleteCopy.confirm,
-                          danger: true,
-                          onConfirm: () => removeAt(i, it),
-                        },
-                        '/(app)/(stack)/(tabs)/(my)/confirm',
-                      )
+                      askConfirm({
+                        title: careerDeleteCopy.title,
+                        body: careerDeleteBody(it),
+                        confirm: careerDeleteCopy.confirm,
+                        danger: true,
+                        onConfirm: () => removeAt(it),
+                      })
                     }
                     style={{
                       height: 40,
@@ -581,13 +587,12 @@ const EditCareer = ({ p }: { p: Profile }) => {
         })}
         <Button
           label="경력 추가"
-          icon="plus"
           variant="secondary"
           size="md"
           onPress={() => {
             setItems((xs) => [
               ...xs,
-              { company: '', role: '', start: '', end: '', current: true, description: '' },
+              { key: draftKey(), company: '', role: '', start: '', end: '', current: true, description: '' },
             ])
             setOpen(items.length)
           }}
@@ -604,11 +609,10 @@ const EditSkills = ({ p }: { p: Profile }) => {
   const [q, setQ] = useState('')
   const has = (s: string) => skills.some((x) => x.toLowerCase() === s.toLowerCase())
   const hits = q.trim()
-    ? searchHangul(
+    ? skillSuggestions(
         SKILL_CATALOG.filter((s) => !has(s)),
         q,
-        (s) => [s],
-      ).slice(0, 5)
+      )
     : []
   const add = (s: string) => {
     const v = s.trim()
@@ -644,15 +648,14 @@ const EditSkills = ({ p }: { p: Profile }) => {
         {hits.length ? (
           <View
             style={{
-              marginTop: -spacing[2],
+              marginTop: -6,
               borderRadius: radius.card,
               backgroundColor: c.bg2,
               paddingVertical: spacing[1],
               paddingHorizontal: spacing[2],
             }}
           >
-            {hits.map(({ item, match }, n) => {
-              const [a, b] = match ? [match.start, match.end] : [0, 0]
+            {hits.map(({ item }, n) => {
               return (
                 <Pressable
                   key={item}
@@ -662,26 +665,22 @@ const EditSkills = ({ p }: { p: Profile }) => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: spacing[2],
+                    gap: 10,
                     height: 44,
-                    paddingHorizontal: spacing[3],
+                    paddingHorizontal: 14,
                     borderRadius: radius.sm,
                   }}
                 >
                   <Icon name="plus" size={16} />
                   <Text v="b1" weight={n === 0 ? '700' : undefined}>
-                    {item.slice(0, a)}
-                    <Text v="b1" weight="700" color="acText">
-                      {item.slice(a, b)}
-                    </Text>
-                    {item.slice(b)}
+                    <Highlight text={item} q={q.trim()} weight={n === 0 ? '700' : '400'} />
                   </Text>
                 </Pressable>
               )
             })}
           </View>
         ) : null}
-        <Text v="b2" weight="700" style={{ marginTop: spacing[2] }}>
+        <Text v="b2" weight="700" style={{ marginTop: 6 }}>
           내 기술 {skills.length}개
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
@@ -710,6 +709,7 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   const raw = useSafeAreaInsets()
   // A modal over the tab bar reports the tab bar as part of the bottom inset (home indicator + bar); the modal only has the window's home inset.
   const insets = { ...raw, bottom: Platform.OS === 'ios' ? (initialWindowMetrics?.insets.bottom ?? 0) : raw.bottom }
+  const keyboardUp = useKeyboardHeight() > 0
   const { data: p } = useMyProfile()
   const Form =
     { basic: EditBasic, intro: EditIntro, career: EditCareer, skills: EditSkills }[section] ??
@@ -717,18 +717,20 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   return (
     <View style={{ flex: 1 }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
         style={{
           flex: 1,
           backgroundColor: c.bg,
           paddingTop: Platform.OS === 'android' ? insets.top : 0,
-          paddingBottom: insets.bottom,
+          // Android: the padding behaviour already clears the keyboard (which includes the nav inset).
+          paddingBottom: Platform.OS === 'android' && keyboardUp ? 0 : insets.bottom,
         }}
       >
         {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
       </KeyboardAvoidingView>
+      {/* The modal already starts under the status bar, so the toast sits 2 under the modal's top (DeleteCareer.2: y64), not under the inset again. */}
       {Platform.OS === 'ios' ? (
-        <SafeAreaInsetsContext.Provider value={insets}>
+        <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
           <ToastHost />
         </SafeAreaInsetsContext.Provider>
       ) : null}

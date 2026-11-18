@@ -13,18 +13,19 @@ type Props = Omit<PressableProps, 'style' | 'children'> & {
   tint?: ColorValue
   fill?: keyof Colors | null
   pressedFill?: keyof Colors
+  dimOpacity?: number
 }
 
 const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
 
 // iOS glass answers presses natively (isInteractive); a JS scale around it would move the shape apart from its glass.
-const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fill = 'fill', pressedFill, disabled, ...press }: Props) => {
+const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fill = 'fill', pressedFill, disabled, dimOpacity = DISABLED_OPACITY, ...press }: Props) => {
   const c = useColors()
   const native = useGlassSurface() && glass
   const sheetFill = useSheetGlassFill()
   const sheetGlass = glass ? sheetFill : null
   const boxShadow = toBoxShadow(useShadow().glass)
-  const dim = disabled ? { opacity: DISABLED_OPACITY } : null
+  const dim = disabled ? { opacity: dimOpacity } : null
   if (native) {
     return (
       <Glass interactive tint={tint} style={style}>

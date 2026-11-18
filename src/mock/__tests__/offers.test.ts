@@ -117,3 +117,15 @@ it('makes the session user the recipient of every received offer and the sender 
   expect((await list('received')).every((o) => o.recipient.id === MOCK_USER_ID)).toBe(true)
   expect((await list('sent')).every((o) => o.sender.id === MOCK_USER_ID)).toBe(true)
 })
+
+it('answers an accepted o1 with the one-paragraph opener, like GET', async () => {
+  vi.resetModules()
+  vi.useFakeTimers()
+  await import('../index')
+  const { mockFetch } = await import('../server')
+  const accept = mockFetch('http://x/api/v1/me/offers/o1/accept', { method: 'POST', body: JSON.stringify({}) })
+  await vi.runAllTimersAsync()
+  const { data } = (await (await accept).json()) as { data: { message: string } }
+  vi.useRealTimers()
+  expect(data.message).not.toContain('\n')
+})

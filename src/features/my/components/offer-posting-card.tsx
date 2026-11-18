@@ -1,18 +1,12 @@
 import { router } from 'expo-router'
 import { Platform, Pressable, View } from 'react-native'
 import type { OfferPosting } from '@push/api-client'
-import { careerLabel } from '@push/shared'
 import { Icon, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
-import { usePostingDetail } from '../api/hooks'
-import { dday } from '../utils'
-import Logo from './logo'
 
-const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact?: boolean }) => {
+/** ProposalDetail: the posting that came with the proposal, its title and company only (v425). */
+const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
   const c = useColors()
-  const { data: full } = usePostingDetail(posting.id)
-  const career = full ? careerLabel(full) : null
-  const careerText = !career || career === '신입' ? career : `경력 ${career}`
   return (
     <Pressable
       accessibilityRole="button"
@@ -22,7 +16,7 @@ const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact
       <View
         style={{
           borderRadius: radius.card,
-          paddingVertical: compact ? spacing[3] : spacing[4],
+          paddingVertical: spacing[4],
           paddingHorizontal: spacing[4],
           flexDirection: 'row',
           alignItems: 'center',
@@ -32,7 +26,6 @@ const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact
           borderColor: c.line,
         }}
       >
-        <Logo name={posting.company} size={44} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text v="c1" weight="600" color="t3">
             함께 보낸 공고
@@ -41,7 +34,7 @@ const OfferPostingCard = ({ posting, compact }: { posting: OfferPosting; compact
             {posting.title}
           </Text>
           <Text v="c1" color="t3" numberOfLines={1}>
-            {[full?.location, careerText, full?.deadline ? dday(full.deadline) : null].filter(Boolean).join(' · ')}
+            {posting.company}
           </Text>
         </View>
         <Icon name="chev" size={18} color="t3" />

@@ -1,5 +1,5 @@
 export { API_BASE_URL, WEB_BASE_URL, DEV_AUTH_TOKEN, API_MOCK } from './config'
-export { http, api } from './api-client'
+export { http, api, botApi } from './api-client'
 export { createPkce } from './pkce'
 export { useSession } from './session-store'
 export { signIn, signInWithApple, signOut, deleteAccount, signInWithDevToken } from './auth'
@@ -11,6 +11,22 @@ export {
   openSystemSettings,
   pickDocument,
   pickImage,
+  stubPickImage,
+  stubPickDocument,
+  failMockUploads,
+  mockUploadFailing,
+  holdMockUpload,
+  mockUploadHeldAt,
+  holdMockFit,
+  mockFitHolding,
+  setMockFitSoon,
+  setMockFitThree,
+  mockFitThreeOn,
+  mockFitSoonOn,
+  setMockWebPlan,
+  mockWebPlanOf,
+  failMockApple,
+  mockAppleFailing,
   hapticImpactLight,
   hapticNotify,
   readClipboard,
@@ -18,4 +34,11 @@ export {
 } from './platform'
 export { shareMessage } from './platform'
 export { shareBytes } from './share-file'
-export { readNotificationPermission } from './notification-permission'
+export {
+  readNotificationPermission,
+  requestNotificationPermission,
+  readPushToken,
+  pushPlatform,
+  readLastPushOpen,
+  subscribePushOpens,
+} from './notification-permission'

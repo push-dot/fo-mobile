@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandColor, cardCareerLabel } from '@push/shared'
-import { hitSlopTo, palette, photo, radius, useColors } from '../../theme'
+import { hitSlopTo, photo, radius, useColors } from '../../theme'
 import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
@@ -29,7 +29,7 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
         ) : (
           <>
             <LinearGradient colors={[brand, shade(brand)]} start={{ x: 0.13, y: -0.16 }} end={{ x: 0.87, y: 1.16 }} style={{ position: 'absolute', inset: 0 }} />
-            <Text v="h1" style={{ fontSize: 52, lineHeight: 60, color: photo.ink, letterSpacing: -2 }}>
+            <Text v="h1" style={{ fontSize: 52, lineHeight: 76, color: photo.ink, letterSpacing: -2 }}>
               {[...p.company][0]}
             </Text>
           </>
@@ -41,9 +41,9 @@ const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
           accessibilityState={{ selected: p.bookmarked }}
           onPress={onBookmark}
           hitSlop={hitSlopTo(30)}
-          style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: radius.pill, backgroundColor: photo.button, alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: radius.pill, backgroundColor: c.bg, boxShadow: '0 1px 4px rgba(0,0,0,.14)', alignItems: 'center', justifyContent: 'center' }}
         >
-          <Icon name="bookmark" size={16} color={p.bookmarked ? c.acText : palette.light.t1} filled={p.bookmarked} />
+          <Icon name="bookmark" size={16} color={p.bookmarked ? c.acText : c.t1} filled={p.bookmarked} />
         </Pressable>
       </View>
       <View style={{ gap: 2 }}>

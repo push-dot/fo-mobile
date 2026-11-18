@@ -1,40 +1,41 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
-import { useShareFile, useStartChat } from '@/features/chat'
+import { botPickPath } from '@/features/bots'
+import { useShareFile } from '@/features/chat'
 import { usePosting } from '@/features/jobs'
 import {
   Avatar,
   careerPeriod,
+  DOC_COPY_COPY,
   deleteConfirm,
   deleteDocCopy,
-  FitRing,
   ListSkeleton,
-  FIX_DOC,
   hubProfile,
   type ProfileSection,
   PROFILE_ACTIONS_TOP,
   PROFILE_NAME_TOP,
   RETRY_LABEL,
-  SHEET_SWAP_MS,
   pushCardLines,
   pushDocMenu,
   SET_BASE_COPY,
   tenureLabel,
   useArchiveDocument,
   useDocument,
+  useDuplicateDocument,
   useDocumentVersions,
   useIngestJob,
   useMyApplications,
   useMyProfile,
   useSetBaseProfile,
 } from '@/features/my'
+import { showChoiceModal } from '@/shared/navigation'
 import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
-const HUB_BADGE = '지원 서류용 프로필(허브형)'
+const HUB_BADGE = '지원용 프로필'
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
 
@@ -69,7 +70,7 @@ const Section = ({
   </View>
 )
 
-const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet?: boolean }) => {
+const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   const c = useColors()
   const doc = useDocument(id)
   const versions = useDocumentVersions(id)
@@ -81,15 +82,12 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   }, [making, refetchVersions])
   const apps = useMyApplications()
   const me = useMyProfile().data
-  const start = useStartChat()
   const share = useShareFile()
   const deleteCopy = deleteDocCopy(doc.data?.data.title ?? '')
   const archive = useArchiveDocument(doc.data?.data)
+  const duplicate = useDuplicateDocument()
   const [based, setBased] = useState(false)
-  const setBase = useSetBaseProfile(() => {
-    setBased(true)
-    showToast({ message: SET_BASE_COPY.toast })
-  })
+  const setBase = useSetBaseProfile(() => setBased(true))
   const item = doc.data?.data
   const application = apps.data?.data.find((a) => a.id === item?.applicationId) ?? null
   const posting = usePosting(application?.jobId ?? '')
@@ -105,7 +103,6 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
         showToast({
           message: deleteCopy.failed,
           alert: true,
-          opaque: true,
           bottom: TOAST_ABOVE.tabs,
           action: { label: RETRY_LABEL, onPress: removeDoc },
         }),
@@ -115,9 +112,15 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
     { hasPosting: !!application },
     {
       posting: () => router.push(`/postings/${application?.jobId}`),
-      export: () => share.mutate({ documentId: id }),
       rename: () => router.push(`/docs/push/${id}/rename`),
-      delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, () => setTimeout(removeDoc, SHEET_SWAP_MS))),
+      duplicate: () => {
+        if (duplicate.isPending) return
+        duplicate.mutate(id, {
+          onSuccess: () => showToast({ message: DOC_COPY_COPY.done }),
+          onError: () => showToast({ message: DOC_COPY_COPY.failed, alert: true }),
+        })
+      },
+      delete: () => askConfirm(deleteConfirm({ fileName: item?.title ?? '' }, removeDoc)),
     },
   )
   const editable = (s: ProfileSection) => (application ? () => edit(s) : undefined)
@@ -131,60 +134,22 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar
-        title={application ? undefined : '지원 서류용 프로필'}
+        title={application ? undefined : '지원용 프로필'}
         onBack={() => router.back()}
         right={
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
-              { icon: 'menu', label: '더 보기', menu },
+              // DocProfile / DocProfileConfirm draw only share: the menu (공고 보기, 이름 변경, 삭제) belongs to a 지원 서류
+              ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
             ]}
           />
         }
-        safeTop={!(sheet && Platform.OS === 'ios')}
-        sheet={sheet}
       />
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: application ? 120 : spacing[6], gap: spacing[6] }}>
-          {application ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`${lines.company} ${lines.title} 공고 보기`}
-              onPress={() => router.push(`/postings/${application.jobId}`)}
-              style={{
-                marginHorizontal: spacing[5],
-                marginTop: spacing[2],
-                borderRadius: radius.card,
-                borderWidth: 1,
-                borderColor: c.line,
-                backgroundColor: c.paper,
-                paddingVertical: spacing[4],
-                paddingLeft: spacing[5],
-                paddingRight: spacing[4],
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing[4],
-              }}
-            >
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
-                  <Text v="h3" weight="800" numberOfLines={1} style={{ flexShrink: 1 }}>
-                    {lines.title}
-                  </Text>
-                  <Text v="c1" weight="600" color="t2" numberOfLines={1}>
-                    {lines.company}
-                  </Text>
-                </View>
-                <Text v="c1" weight="600" color="t2" style={{ marginTop: spacing[1] }}>
-                  공고 보기 ›
-                </Text>
-              </View>
-              {lines.score ? <FitRing score={lines.score} /> : null}
-            </Pressable>
-          ) : null}
-
           <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: application ? 0 : spacing[1] }}>
             <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl ?? null} size={84} />
             <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
@@ -200,21 +165,19 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <Button label="기본 정보 편집" icon="edit" variant="secondary" size="sm" onPress={() => edit('basic')} style={{ marginTop: PROFILE_ACTIONS_TOP }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
+                <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
+                <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={share.isPending} onPress={() => share.mutate({ documentId: id })} />
+              </View>
             ) : null}
             {application || based ? null : (
               <Button
                 label={SET_BASE_COPY.action}
                 size="sm"
+                paddingX={18}
                 disabled={setBase.isPending}
                 onPress={() =>
-                  askConfirm({
-                    title: SET_BASE_COPY.title,
-                    body: SET_BASE_COPY.body,
-                    confirm: SET_BASE_COPY.confirm,
-                    cancel: SET_BASE_COPY.cancel,
-                    onConfirm: () => setBase.mutate(id),
-                  })
+                  showChoiceModal({ title: SET_BASE_COPY.action, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.confirm, closeLabel: SET_BASE_COPY.close, onPress: () => setBase.mutate(id) } })
                 }
                 style={{ marginTop: PROFILE_ACTIONS_TOP }}
               />
@@ -283,15 +246,13 @@ const PushDocScreen = ({ id, jobId, sheet }: { id: string; jobId?: string; sheet
       {application ? (
         <CtaBar>
           <Button
-            label="에이전트로 고치기"
-            icon="spark"
+            label="Bot한테 보내기"
             variant="secondary"
-            onPress={() => void start(FIX_DOC, FIX_DOC, undefined, undefined, undefined, { documentId: id })}
+            onPress={() => router.push(botPickPath({ kind: 'document', id }))}
           />
           <Button
-            label={applied ? '지원 완료' : '이 공고에 지원'}
-            icon={applied ? undefined : 'chevron-right-2'}
-            disabled={applied}
+            label={applied ? '지원 완료' : '이 서류로 지원'}
+            pending={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
             style={{ flex: 1 }}
           />

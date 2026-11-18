@@ -10,8 +10,8 @@ export const RESET_FILTERS_LABEL = '필터 초기화'
 export const FILTER_KEYS: FilterKey[] = ['category', 'skills', 'careerYears', 'location', 'employmentType']
 
 export const LONG_FILTER_KINDS: FilterKey[] = ['skills', 'location']
-/** The region picker is drawn as a full-height sheet (FilterRegion). */
-export const FULL_SHEET_KIND: FilterKey = 'location'
+/** Sheets that are a header over one chip group (FilterRole, FilterType, ...): the board draws them with the native sheet's tight header. */
+export const CHIP_FILTER_KINDS: FilterKey[] = ['category', 'careerYears', 'employmentType']
 
 export const POSTING_SORTS: { key: PostingSort; label: string }[] = [
   { key: 'latest', label: '최신순' },
@@ -41,7 +41,5 @@ export const SECTIONS: Record<SectionKind, { title: string; description: string 
   deadline: { title: '마감 임박 공고', description: '일주일 안에 마감되는 공고예요' },
   popular: { title: '이번 주 많이 본 공고', description: '이번 주에 사람들이 많이 본 공고예요' },
 }
-
-export const APPLY_DOC_NOTE = { ai: '에이전트로 맞춘 서류', upload: '원본' } as const
 
 export const APPLY_DOC_LIMIT = 100

@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
-import { Pressable, View } from 'react-native'
-import { GlassButton, Text } from '@/shared/components'
-import { onAccent, radius, spacing, useColors } from '../../../theme'
+import { View } from 'react-native'
+import { Button, GlassButton, Text } from '@/shared/components'
+import { spacing } from '../../../theme'
 
 const SheetHeader = ({
   title,
@@ -14,7 +14,6 @@ const SheetHeader = ({
   saving?: boolean
   canSave?: boolean
 }) => {
-  const c = useColors()
   const disabled = saving || !canSave
   return (
     <View
@@ -30,24 +29,7 @@ const SheetHeader = ({
       <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
         {title}
       </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ disabled, busy: saving }}
-        disabled={disabled}
-        onPress={onSave}
-        style={{
-          height: 44,
-          borderRadius: radius.pill,
-          paddingHorizontal: spacing[5],
-          backgroundColor: c.ac,
-          justifyContent: 'center',
-          opacity: disabled ? 0.45 : 1,
-        }}
-      >
-        <Text v="c1" weight="700" style={{ color: onAccent }}>
-          {saving ? '저장 중' : '저장'}
-        </Text>
-      </Pressable>
+      <Button label={saving ? '저장 중' : '저장'} size="pill" disabled={disabled} onPress={onSave} />
     </View>
   )
 }

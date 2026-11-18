@@ -7,14 +7,16 @@ import type {
   Post,
   OfferPosting,
   Profile,
+  ProfileChange,
   Settings,
   Source,
   UserRef,
 } from '@push/api-client'
-import type { CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
+import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
+import { deadlineEvents } from './calendar-deadlines'
 import { removeChatDoc } from './chat'
-import { MOCK_USER_ID, mock, page, pdfResponse } from './server'
+import { MOCK_USER_ID, mock, page, pdfResponse, sortPosts } from './server'
 
 const ME: UserRef = { id: MOCK_USER_ID, displayName: '김서준', avatarUrl: null }
 const ME_SENDER: Offer['sender'] = { ...ME, avatarUrl: null, companyName: null, headline: '' }
@@ -26,11 +28,6 @@ const on = (m: number, d: number, h = 12, min = 0) => new Date(2026, m - 1, d, h
 const withTotal = <T>(items: T[], query: URLSearchParams, total: number) => {
   const r = page(items, query)
   return { ...r, page: { ...r.page, total } }
-}
-const tomorrowAt = (h: number) => {
-  const d = new Date(Date.now() + D)
-  d.setHours(h, 0, 0, 0)
-  return d.toISOString()
 }
 
 let profile: Profile = {
@@ -71,6 +68,11 @@ let profile: Profile = {
 // Followed people, shared with hub.ts. 이하은 starts unfollowed (프로필 상세 board shows 팔로우); me/follows marks everyone it lists.
 export const following = new Set<string>()
 export const myProfile = () => profile
+/** EditIntro draws two paragraphs while MyProfile draws the first only, so the edit tour switches the longer intro on (`mock=long-intro`) after MyProfile's shot. */
+const INTRO_MORE = '요즘은 Kafka 기반 이벤트 처리와 부하 테스트에 관심이 많아요.'
+export const longIntro = () => {
+  if (!profile.intro.includes(INTRO_MORE)) profile = { ...profile, intro: `${profile.intro}\n\n${INTRO_MORE}` }
+}
 mock('GET', 'me/profile', () => ({ data: profile }))
 mock('PATCH', 'me/profile', ({ body }) => {
   const { avatarKey, ...patch } = body as Partial<Profile> & { avatarKey?: string }
@@ -80,6 +82,33 @@ mock('PATCH', 'me/profile', ({ body }) => {
     ...(avatarKey ? { avatarUrl: `https://picsum.photos/seed/${avatarKey}/200` } : {}),
     updatedAt: new Date().toISOString(),
   }
+  return { data: profile }
+})
+
+// A Bot profile change as push-be keeps it: the replaced values under the change id, undone once (409 the second time).
+type Change = { before: Partial<Profile>; undone: boolean; createdAt: string }
+const changes = new Map<string, Change>()
+
+/** What update_my_profile does in a mock run: sets the headline and keeps the old one under a new change id. */
+export const botProfileChange = (headline: string): string => {
+  const id = `chg-${changes.size + 1}`
+  changes.set(id, { before: { headline: profile.headline }, undone: false, createdAt: new Date().toISOString() })
+  profile = { ...profile, headline, updatedAt: new Date().toISOString() }
+  return id
+}
+
+mock('GET', 'me/profile/changes/:id', ({ params }) => {
+  const c = changes.get(params.id!)
+  if (!c) return notFound
+  const data: ProfileChange = { id: params.id!, fields: Object.keys(c.before), undone: c.undone, createdAt: c.createdAt }
+  return { data }
+})
+mock('POST', 'me/profile/changes/:id/undo', ({ params }) => {
+  const c = changes.get(params.id!)
+  if (!c) return notFound
+  if (c.undone) return { status: 409, body: { error: { code: 'CONFLICT', message: 'change already undone' } } }
+  c.undone = true
+  profile = { ...profile, ...c.before, updatedAt: new Date().toISOString() }
   return { data: profile }
 })
 
@@ -101,9 +130,9 @@ let sources: (Source & { jobId?: string })[] = [
   { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
-// The 지원 서류 sheet lists with no kind filter and reads origin/kind: today's AI résumé first, the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
+// The 지원 서류 sheet lists with no kind filter and reads origin/kind: the AI résumé first (dated like the ApplySheet board), the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
 const applySources = () => [
-  { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, new Date().toISOString()), origin: 'AI' },
+  { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, on(11, 13)), origin: 'AI' },
   ...sources.filter((s) => s.id !== 's2').map((s) => ({ ...s, origin: 'UPLOAD', ...(s.id === 's3' ? { kind: 'PORTFOLIO' } : {}) })),
 ]
 mock('GET', 'sources', ({ query }) => page(query.get('kind') ? sources : applySources(), query))
@@ -133,6 +162,14 @@ mock('GET', 'sources/:id', ({ params }) => {
 mock('GET', 'sources/:id/content', ({ params }) =>
   sources.some((x) => x.id === params.id) ? pdfResponse() : { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } },
 )
+mock('PATCH', 'sources/:id', ({ params, body }) => {
+  const s = sources.find((x) => x.id === params.id)
+  const fileName = typeof (body as { fileName?: unknown })?.fileName === 'string' ? (body as { fileName: string }).fileName.trim() : ''
+  if (!s) return { status: 404, body: { error: { code: 'NOT_FOUND', message: '서류를 찾지 못했어요' } } }
+  if (!fileName || fileName.length > 200) return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: '이름을 확인해 주세요' } } }
+  s.fileName = fileName
+  return { data: s }
+})
 mock('DELETE', 'sources/:id', ({ params }) => {
   sources = sources.filter((x) => x.id !== params.id)
   removeChatDoc(params.id!)
@@ -161,6 +198,7 @@ const draft: ResumeDraft = {
   pageCount: 2,
   email: 'seojun.kim@example.com',
   links: ['github.com/seojun'],
+  mainSkills: ['Kotlin', 'Spring Boot'],
   profile: {
     displayName: '김서준',
     headline: '결제 시스템을 만드는 백엔드 개발자',
@@ -185,7 +223,7 @@ const draft: ResumeDraft = {
         description: '',
       },
     ],
-    skills: ['Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'Redis', 'Java'],
+    skills: ['Kotlin', 'Java', 'Spring Boot', 'JPA', 'MySQL', 'Kafka', 'Redis'],
   },
 }
 mock('GET', 'sources/:id/profile-draft', () => ({ data: draft }))
@@ -233,6 +271,27 @@ mock('GET', 'applications', ({ query }) => {
   const applied = query.get('applied') === 'true'
   return page(applied ? appliedOnly(applications) : applications, query, applied)
 })
+// MyAppliedJob draws the stage dates and the stored fit; its parts are the chat's p1 fit card's.
+const appliedDetail: Record<string, Omit<ApplicationDetail, keyof Application>> = {
+  a1: {
+    stageEnteredAt: { APPLIED: on(10, 14), SCREENING: on(10, 17), INTERVIEW: on(10, 21) },
+    fit: {
+      fitScore: 6.9,
+      parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },
+      topGap: 'Kafka 운영 경험과 부하 테스트 근거가 부족해요',
+      plan: 'PRO',
+      reachable: 8.2,
+      documentId: 'd-a1',
+      documentTitle: '김서준_백엔드_이력서_2026',
+    },
+  },
+}
+mock('GET', 'applications/:id', ({ params }) => {
+  const a = applications.find((x) => x.id === params.id)
+  return a
+    ? { data: { ...a, ...appliedDetail[a.id] } }
+    : { status: 404, body: { error: { code: 'NOT_FOUND', message: '지원 내역을 찾지 못했어요' } } }
+})
 
 const pushDoc = (id: string, applicationId: string, title: string, updatedAt: string): HubDocument => ({
   id,
@@ -257,7 +316,9 @@ const agentDoc: HubDocument = { ...pushDoc('src-upload', '', '김서준_모아�
 const draftDoc: HubDocument = { ...pushDoc('d-draft', '', '모아페이 맞춤 이력서', on(10, 21)), applicationId: null, kind: 'TAILORED' }
 // 내 서류's AI-made row (chat.ts d4) is a Push document too: deleting it archives it.
 const chatAiDoc: HubDocument = { ...pushDoc('d4', '', '모아페이_맞춤_이력서_v2', on(10, 22)), applicationId: null, kind: 'TAILORED' }
-const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc].find((d) => d.id === id)
+// The résumé behind the applied job a1 (its fit's documentId), outside 마이's list.
+const appliedDoc: HubDocument = pushDoc('d-a1', 'a1', '김서준_백엔드_이력서_2026', on(10, 14))
+const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc, appliedDoc].find((d) => d.id === id)
 // push-be exports a HUB_PROFILE's latest version before finalize; no mock document is finalized.
 const exportable = (d: HubDocument | undefined, versionId?: string) => d?.kind === 'HUB_PROFILE' && d.latestVersionId === versionId
 
@@ -301,6 +362,22 @@ mock('PATCH', 'documents/:id', ({ params, body }) => {
   }
   Object.assign(doc!, { revision: doc!.revision + 1, updatedAt: new Date().toISOString() })
   return { data: doc }
+})
+// POST documents (a copy's new draft) and its first version, like push-be: the posting must exist, title 1-300.
+mock('POST', 'documents', ({ body }) => {
+  const b = (body ?? {}) as Record<string, unknown>
+  if (typeof b.applicationId !== 'string' || typeof b.title !== 'string' || !b.title) return docInvalid('title')
+  const doc: HubDocument = { ...pushDoc(`d-copy-${documents.length + 1}`, b.applicationId, b.title, new Date().toISOString()), latestVersionId: null }
+  documents = [doc, ...documents]
+  return { status: 201, body: { data: doc } }
+})
+mock('POST', 'documents/:id/versions', ({ params, body }) => {
+  const b = body as Record<string, unknown> | undefined
+  if (!b || !Number.isInteger(b.expectedRevision) || b.content == null) return docInvalid()
+  const { doc, fail } = docTarget(params.id, b.expectedRevision)
+  if (fail) return fail
+  Object.assign(doc, { revision: doc.revision + 1, latestVersionId: 'v1', updatedAt: new Date().toISOString() })
+  return { status: 201, body: { data: { id: 'v1', blocks: b.blocks ?? [], content: b.content } } }
 })
 mock('POST', 'documents/:id/archive', ({ params, body }) => {
   const b = body as Record<string, unknown> | undefined
@@ -382,7 +459,7 @@ mock('POST', 'documents/:id/profile', ({ params, body }) => {
       id: `d${Date.now()}`,
       revision: 1,
       applicationId: null,
-      title: source?.fileName ?? '지원 서류용 프로필',
+      title: source?.fileName ?? '지원용 프로필',
       kind: 'HUB_PROFILE',
       status: 'DRAFT',
       latestVersionId: 'v1',
@@ -436,20 +513,24 @@ const events: CalendarEvent[] = [
     notes: '받은 제안을 수락해서 잡힌 일정이에요',
   }),
   ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
+  // MyCalendar lists a fourth row on the 21st, the 마감 of 파도AI; the board's date and D-2 follow its own "today" (G43).
+  ev('e16', 'DEADLINE', '파도AI 데이터 분석가', on(10, 21, 23, 59), {
+    notes: '서류 확정이 필요해요',
+  }),
 ]
 // The board lists the 면접 once on the calendar and once on the application, so this one is only
 // served to the application's next-event query. shortcut: told apart by `from`, which is the
 // current time there and a local midnight on the calendar grid; drop when /calendar is real.
-const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', tomorrowAt(15), {
-  endsAt: tomorrowAt(16),
-  notes: 'Google Meet',
+const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', on(10, 21, 15), {
+  endsAt: on(10, 21, 16),
+  location: 'Google Meet',
   applicationId: 'a1',
 })
 mock('GET', 'calendar/events', ({ query }) => {
   const from = query.get('from') ?? ''
   const to = query.get('to') ?? '9999'
-  const list = Date.parse(from) % 60_000 === 0 ? events : [...events, nextInterview]
-  return page(list.filter((e) => e.startsAt >= from && e.startsAt < to), query)
+  const inWindow = [...events, ...deadlineEvents()].filter((e) => e.startsAt >= from && e.startsAt < to)
+  return page(Date.parse(from) % 60_000 === 0 ? inWindow : [...inWindow, nextInterview], query)
 })
 mock('GET', 'integrations/google', () => ({ data: { enabled: true, connected: true, calendarStatus: 'CONNECTED' } }))
 mock('POST', 'calendar/events', ({ body }) => {
@@ -479,7 +560,7 @@ const person = (userId: string, displayName: string, headline: string): Profile 
 // Ids match hub.ts so a row opens that person's hub profile.
 const follows = [
   person('u2', '이하은', 'React로 사용자 경험을 다듬어요'),
-  person('u1', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
+  person('u-taeyoon', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
   person('u4', '최지우', '데이터 파이프라인 · Spark · Airflow'),
   person('u3', '박도윤', 'SwiftUI로 앱을 만드는 iOS 개발자'),
   person('u5', '정민재', '쿠버네티스 운영이 즐거운 DevOps'),
@@ -535,11 +616,15 @@ const commented = [
     displayName: '정민재',
   }),
   post('cp2', 'coffeechat', '판교 근처 백엔드 커피챗 하실 분', 12, 530, on(10, 11), {
-    id: 'u1',
+    id: 'u-taeyoon',
     displayName: '김태윤',
   }),
 ]
-mock('GET', 'me/posts', ({ query }) => page(myPosts, query, true))
+const sortedList = (items: Post[], query: URLSearchParams, total?: number) => {
+  const { rows, fail } = sortPosts(items, query)
+  return fail ?? (total === undefined ? page(rows, query, true) : withTotal(rows, query, total))
+}
+mock('GET', 'me/posts', ({ query }) => sortedList(myPosts, query))
 // social.ts owns `posts/:id` and 404s my ids, so index.ts loads this file first and these patterns
 // (regex, not :params) catch the mp* ids only. shortcut: only mp1 has a body and comments.
 mock('GET', 'posts/mp[0-9]+', ({ path }) => {
@@ -559,7 +644,9 @@ mock('GET', 'posts/mp[0-9]+/comments', ({ path, query }) =>
     query,
   ),
 )
-mock('GET', 'me/commented-posts', ({ query }) => withTotal(commented, query, 9))
+mock('GET', 'me/commented-posts', ({ query }) => sortedList(commented, query, 9))
+// The profile screen as a PDF; the sample file is the same stub the document export serves.
+mock('GET', 'me/profile/pdf', () => pdfResponse())
 
 // 제안함
 // push-be embeds only a posting stub in offers.
@@ -688,7 +775,8 @@ const update = (id: string, patch: Partial<Offer>) => {
   const o = findOffer(id)
   if (!o) return notFound
   Object.assign(o, patch)
-  return { data: o }
+  // The answer reads like GET: an accepted o1 is the thread's one-paragraph opener, not the detail's two paragraphs the app may have cached.
+  return { data: o1View(o) }
 }
 
 // The 받은 제안 board's first row previews the opening line and 2시간 전; the detail keeps the full message and its date.
@@ -860,6 +948,7 @@ let settings: Settings = {
   defaultEffort: 'MEDIUM',
   confirmBeforeEdit: true,
 }
+export const readsMyFiles = () => settings.allowAiReadMyFiles
 mock('DELETE', 'me', () => null)
 mock('GET', 'auth/me', () => ({
   data: {
@@ -878,4 +967,21 @@ mock('GET', 'me/settings', () => ({ data: settings }))
 mock('PATCH', 'me/settings', ({ body }) => {
   settings = { ...settings, ...(body as Partial<Settings>) }
   return { data: settings }
+})
+
+const devices = new Map<string, 'ios' | 'android'>()
+
+mock('POST', 'me/devices', ({ body }) => {
+  const row = body as { token?: unknown; platform?: unknown }
+  const token = row.token
+  const platform = row.platform
+  if (typeof token !== 'string' || token.length === 0 || (platform !== 'ios' && platform !== 'android')) {
+    return { status: 422, body: { error: { code: 'UNPROCESSABLE', message: 'mock: bad device' } } }
+  }
+  devices.set(token, platform)
+  return { status: 201, body: { data: { token, platform } } }
+})
+
+mock('DELETE', 'me/devices/:id', ({ params }) => {
+  devices.delete(params.id ?? '')
 })

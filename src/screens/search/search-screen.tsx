@@ -3,26 +3,25 @@ import { FlatList, Pressable, ScrollView, View } from 'react-native'
 import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
 import {
+  chipCount,
   PersonRow,
   PostingRow,
   PostRow,
-  SEARCH_CLEAR_LABEL,
-  SEARCH_EMPTY_BODY,
   SEARCH_ERROR_LINES,
   SEARCH_RETRY_LABEL,
   SEARCH_SKELETON,
   SEARCH_SORTS,
   SearchBar,
-  searchEmptyTitle,
   TABS,
   useRecentSearches,
   useSearch,
+  useSearchCounts,
   useSearchQuery,
   useTrending,
   type SearchSort,
   type SearchTab,
 } from '@/features/search'
-import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text, emptyNoteStyle } from '@/shared/components'
+import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
@@ -37,6 +36,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
     people: useSearch(q, 'people', sort, tab === 'people'),
     posts: useSearch(q, 'posts', sort, tab === 'posts'),
   }
+  const counts = useSearchCounts(q).data
   const active = results[tab]
   const loading = active.isPending || active.isPlaceholderData
   const pageItems = useMemo(
@@ -124,7 +124,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                 }}
                 style={{ width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3] }}
               >
-                <Text v="b1" weight="700" color="acText" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
+                <Text v="b1" weight="700" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
                   {i + 1}
                 </Text>
                 <Text v="b1" numberOfLines={1} style={{ flex: 1 }}>
@@ -147,7 +147,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             <>
               <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
                 {TABS.map((t) => {
-                  const n = totalOf(t.key)
+                  const n = chipCount(results[t.key], counts?.[t.key])
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>
@@ -192,13 +192,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
               <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ flex: 1, justifyContent: 'center' }} />
-            ) : (
-              <StatusNote
-                lines={[searchEmptyTitle(q), SEARCH_EMPTY_BODY]}
-                action={{ label: SEARCH_CLEAR_LABEL, onPress: () => search('') }}
-                style={emptyNoteStyle(160)}
-              />
-            )
+            ) : undefined
           }
         />
       )}

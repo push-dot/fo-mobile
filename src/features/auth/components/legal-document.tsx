@@ -1,14 +1,18 @@
 import type { ReactNode } from 'react'
 import { StyleSheet, View, useWindowDimensions } from 'react-native'
-import { legalEffectiveLabel, type LegalBlock, type LegalDocument as Document } from '@push/shared'
+import { LEGAL_OPERATOR, legalEffectiveLabel, type LegalBlock, type LegalDocument as Document } from '@push/shared'
 import { Text } from '@/shared/components'
 import { radius, spacing, type, useColors } from '@/theme'
 
 const TITLE_GAP = 6
 const TITLE_SIZE = { fontSize: 24, lineHeight: 32 }
 const BODY_LINE = { lineHeight: type.b1.lineHeight }
-const MARKER_WIDTH = 24
+const MARKER_WIDTH = 28
+const MARKER_GAP = 13
+const MARKER_OVERHANG = 20
 const ROW_PADDING = 14
+const LIST_GAP = 10
+const CARD_LINE = { lineHeight: 21 }
 
 const Body = ({ children, flex }: { children: ReactNode; flex?: boolean }) => (
   <Text v="b2" color="t2" style={[BODY_LINE, flex ? { flex: 1 } : null]}>
@@ -23,10 +27,10 @@ const Block = ({ block }: { block: LegalBlock }) => {
   if (block.kind === 'paragraph') return <Body>{block.text}</Body>
   if (block.kind === 'list')
     return (
-      <View style={{ gap: spacing[2] }}>
+      <View style={{ gap: LIST_GAP }}>
         {block.items.map((item, index) => (
           <View key={index} style={{ flexDirection: 'row' }}>
-            <Text v="b2" color="t2" style={[BODY_LINE, { width: markerWidth }]}>
+            <Text v="b2" color="t2" style={[BODY_LINE, { width: markerWidth + MARKER_OVERHANG, marginLeft: -MARKER_OVERHANG, paddingRight: MARKER_GAP, textAlign: 'right' }]}>
               {block.ordered ? `${index + 1}.` : '•'}
             </Text>
             <Body flex>{item}</Body>
@@ -36,18 +40,18 @@ const Block = ({ block }: { block: LegalBlock }) => {
     )
   const labels = block.columns.slice(1)
   return (
-    <View style={{ borderRadius: radius.md, backgroundColor: c.bg2, paddingHorizontal: spacing[4] }}>
+    <View style={{ borderRadius: radius.md, backgroundColor: c.bg2, paddingHorizontal: spacing[4], paddingVertical: spacing[1] }}>
       {block.rows.map((row, index) => (
         <View
           key={index}
           accessible
           style={{ paddingVertical: ROW_PADDING, gap: spacing[1], borderTopWidth: index ? StyleSheet.hairlineWidth : 0, borderTopColor: c.line }}
         >
-          <Text v="c1" weight="600">
+          <Text v="b2" weight="600">
             {row[0]}
           </Text>
           {row.slice(1).map((value, column) => (
-            <Text key={column} v="c1" color="t2">
+            <Text key={column} v="c1" color="t2" style={CARD_LINE}>
               {labels.length > 1 ? `${labels[column]}: ${value}` : value}
             </Text>
           ))}
@@ -64,14 +68,16 @@ const LegalDocument = ({ document }: { document: Document }) => (
         {document.title}
       </Text>
       <Text v="c1" color="t3">
-        {legalEffectiveLabel(document)}
+        {(document.key === 'termsOfService' || document.key === 'privacyPolicy') && LEGAL_OPERATOR.kind === 'individual'
+          ? `${legalEffectiveLabel(document)} · 운영자 ${LEGAL_OPERATOR.displayName}`
+          : legalEffectiveLabel(document)}
       </Text>
     </View>
     {document.intro.map((block, index) => (
       <Block key={index} block={block} />
     ))}
     {document.articles.map((article) => (
-      <View key={article.heading} style={{ gap: spacing[3] }}>
+      <View key={article.heading} style={{ gap: spacing[2] }}>
         <Text v="h3" accessibilityRole="header">
           {article.heading}
         </Text>

@@ -1,25 +1,11 @@
-import type { BadgeTone } from '@/shared/components'
+import { displayName } from '@/shared/utility/display-name'
 import type { ChoiceSection, ChoiceSubmit, StreamEvent, StreamOption } from '@push/api-client'
-import { MULTI_PICK_FOOT } from '../constants'
-import type { Approval, ApprovalSection, ChatEvent, ChatItem, Choice, TemplateLayout } from '../types'
-
-/** Badge colour for a plan or feedback tag. Unknown tags stay grey. */
-export const PLAN_TAG_TONE: Record<string, BadgeTone> = {
-  강화: 'ac',
-  수정: 'grey',
-  추가: 'green',
-  축소: 'orange',
-  키워드: 'orange',
-  도메인: 'orange',
-  통과: 'green',
-  조건부: 'orange',
-}
+import { closeLabel } from './close-label'
+import type { Approval, ApprovalSection, ChatItem, Choice, TemplateLayout } from '../types'
 
 const VERDICT_TAGS = ['통과', '조건부']
 
 export const isVerdictPlan = (rows: { tag: string }[]) => rows.length > 0 && rows.every((r) => VERDICT_TAGS.includes(r.tag))
-
-export const planTone = (tag: string): BadgeTone => PLAN_TAG_TONE[tag] ?? 'grey'
 
 const toggleChoiceOf = (o: StreamOption): Choice => ({
   label: o.label,
@@ -69,6 +55,7 @@ const sectionOf = (raw: ChoiceSection | { kind: string }, recommended?: string):
       return {
         id: s.id,
         kind: 'toggle',
+        ...(s.title ? { title: s.title } : {}),
         items: s.options.map(toggleChoiceOf),
         ids: s.options.map((o) => o.id),
         selected: picked(s.options.map((o) => o.id), s.selected),
@@ -106,14 +93,12 @@ export const approvalFromSections = (ev: Extract<StreamEvent, { type: 'choice' }
   const submit: ChoiceSubmit | undefined = ev.submit
   const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
   const cancel = ev.options.find((o) => o.id === 'cancel')
-  const multi = sections.some((s) => (s.kind === 'chips' || s.kind === 'choices') && s.multi)
   return {
     id: ev.id,
     question: ev.title ?? '',
-    ...(multi ? { foot: MULTI_PICK_FOOT } : {}),
     sections,
     optionIds: ['submit', ...answerableIds(sections), ...(cancel ? ['cancel'] : [])],
-    ...(cancel ? { secondary: cancel.label } : {}),
+    ...(cancel ? { secondary: closeLabel(cancel.label) } : {}),
     ...(submit ? { submit: submit.label } : {}),
     ...(submit?.optionLabels ? { submitLabels: submit.optionLabels } : {}),
     ...(submit?.zeroLabel ? { zeroSubmit: submit.zeroLabel } : {}),
@@ -132,7 +117,7 @@ export const mapPlan = (ev: Extract<StreamEvent, { type: 'plan' }>): ChatItem =>
   id: ev.id ?? `plan-${ev.seq ?? 0}`,
   title: ev.title,
   meta: ev.meta,
-  rows: ev.rows.map((r) => ({ tag: r.tag, tone: planTone(r.tag), label: r.label, note: r.note })),
+  rows: ev.rows.map((r) => ({ tag: r.tag, label: r.label, note: r.note })),
   keywords: ev.keywords ?? [],
 })
 
@@ -154,23 +139,33 @@ export const submitLabelFor = (approval: Approval, selected: { templateId?: stri
   return base.replaceAll('{n}', String(selected.toggleCount))
 }
 
-/** A card whose last section is a single-pick chip row (ChatPh0Input 말투) is sent by tapping that chip. */
-export const chipSends = (approval: Approval) => {
+/** A card whose last section is a single-pick chip row is sent by tapping that chip... */
+const endsOnChip = (approval: Approval) => {
   const last = approval.sections.at(-1)
   return last?.kind === 'chips' && !last.multi
 }
 
+/** ...unless the card has a confirm button of its own (ChatPh0Input 시작하기): then the chips only pick. */
+export const chipSends = (approval: Approval) => endsOnChip(approval) && !approval.submit
+
+export const MATERIALS_SECTION = 'materials'
+
 /** The user bubble after a section card: ChatPh0Input "이력서만 · 자료 3개 · 원래 말투로", else the button label. */
 export const sectionLabel = (approval: Approval, sel: number[][]): string => {
-  if (chipSends(approval))
+  if (endsOnChip(approval))
     return approval.sections
       .flatMap((s, si) => {
         if (s.kind === 'rows') return s.items.length ? [`자료 ${s.items.length}개`] : []
+        if (s.kind === 'toggle' && s.id === MATERIALS_SECTION) return (sel[si] ?? []).length ? [(sel[si] ?? []).map((i) => displayName(s.items[i]!.label)).join(' · ')] : []
         if (s.kind !== 'chips') return []
         const labels = (sel[si] ?? []).map((i) => s.options[i]!)
         return labels.length ? [s.multi && labels.length === 1 ? `${labels[0]}만` : labels.join(', ')] : []
       })
       .join(' · ')
+  return buttonLabel(approval, sel)
+}
+
+export const buttonLabel = (approval: Approval, sel: number[][]): string => {
   const ti = approval.sections.findIndex((s) => s.kind === 'templates')
   const tpl = approval.sections[ti]
   const templateId = tpl?.kind === 'templates' ? tpl.items[sel[ti]?.[0] ?? -1]?.id : undefined
@@ -209,6 +204,3 @@ export const attachPendingNote = (items: ChatItem[], note: string | undefined): 
 
 export const clearPendingNote = (items: ChatItem[]): ChatItem[] =>
   items.map((it) => (it.type === 'result' && it.source === 'profile' && it.pendingNote ? { ...it, pendingNote: undefined } : it))
-
-export const isSectionChoice = (ev: ChatEvent): ev is Extract<ChatEvent, { type: 'approval' }> =>
-  ev.type === 'approval' && ev.approval.sections.some((s) => s.kind !== 'choices')

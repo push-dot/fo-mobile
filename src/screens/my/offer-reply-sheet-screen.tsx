@@ -15,7 +15,6 @@ const OfferReplySheetScreen = () => {
     return (
       <Sheet
         title={TITLE}
-        onClose={() => router.back()}
         action={offer.isPending ? undefined : { label: RETRY_LABEL, onPress: () => void offer.refetch() }}
       >
         {offer.isPending ? <ListSkeleton count={2} /> : null}
@@ -29,7 +28,7 @@ const OfferReplySheetScreen = () => {
       action={{
         label: accept.isPending ? '보내는 중' : '수락하고 보내기',
         onPress: () => accept.mutate(),
-        disabled: accept.isPending,
+        pending: accept.isPending,
       }}
     >
       <TextField

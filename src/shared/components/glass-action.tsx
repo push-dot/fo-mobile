@@ -1,14 +1,15 @@
 import { Pressable, View } from 'react-native'
 import type { IconName } from '@push/design-system'
-import { onAccent, radius, useColors, type Colors } from '../../theme'
+import { radius, useColors, type Colors } from '../../theme'
 import { PRESS_SCALE } from './constants'
-import Icon from './icon'
+import Icon, { type AppIconName } from './icon'
 import Menu from './menu'
 import type { MenuProps } from './menu-action'
 import Text from './text'
+import { useXlChrome } from './xl-chrome'
 
 export type GlassAction = {
-  icon: IconName
+  icon: IconName | AppIconName
   label: string
   onPress?: () => void
   menu?: MenuProps['actions']
@@ -21,7 +22,8 @@ export type GlassAction = {
 /** `filled`: the button is its own solid chip and answers presses like other solid buttons (ripple, 0.97). */
 const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction; width: number; iconSize?: number; filled?: boolean }) => {
   const c = useColors()
-  const box = { height: 44, minWidth: width, alignItems: 'center', justifyContent: 'center' } as const
+  const { button } = useXlChrome()
+  const box = { height: button, minWidth: width, alignItems: 'center', justifyContent: 'center' } as const
   const face = (
     <>
       <Icon name={a.icon} size={iconSize} color={a.active ? c.acText : c[a.color ?? 't1']} filled={a.active} />
@@ -35,13 +37,13 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
             height: 18,
             paddingHorizontal: 5,
             borderRadius: radius.pill,
-            backgroundColor: c.red,
+            backgroundColor: c.t1,
             boxShadow: `0 0 0 2px ${c.bg}`,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Text v="tab" weight="800" style={{ color: onAccent }}>
+          <Text v="tab" weight="800" style={{ color: c.bg }}>
             {a.badge > 99 ? '99+' : a.badge}
           </Text>
         </View>
@@ -51,7 +53,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
   if (a.menu) {
     return (
       <Menu actions={a.menu} accessibilityLabel={a.label}>
-        <View style={box}>{face}</View>
+        <View style={[box, filled ? { backgroundColor: c.fill, borderRadius: radius.pill } : null]}>{face}</View>
       </Menu>
     )
   }

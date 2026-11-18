@@ -1,5 +1,5 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
-import { palette, radius, spacing, type } from '@/theme/tokens'
+import { cssShadow, palette, radius, spacing, type } from '@/theme/tokens'
 
 type El = ReactElement<Record<string, unknown>>
 
@@ -12,6 +12,8 @@ const modifiers = (names: string[]) => Object.fromEntries(names.map((n) => [n, m
 export const stubs = {
   reactNative: {
     Platform: { OS: 'ios' },
+    Dimensions: { get: () => ({ width: 402 }) },
+    useWindowDimensions: () => ({ width: 402 }),
     View: 'View',
     Pressable: 'Pressable',
     Switch: 'RNSwitch',
@@ -39,11 +41,9 @@ export const stubs = {
     'fixedSize',
   ]),
   compose: {
-    Switch: 'CSwitch',
+    Switch: compound('CSwitch', ['ThumbContent']),
     Text: 'CText',
     Box: 'CBox',
-    SingleChoiceSegmentedButtonRow: 'SegmentedRow',
-    SegmentedButton: compound('SegmentedButton', ['Label']),
     DropdownMenu: compound('DropdownMenu', ['Trigger', 'Items']),
     DropdownMenuItem: compound('DropdownMenuItem', ['Text', 'LeadingIcon', 'TrailingIcon']),
     HorizontalDivider: 'CDivider',
@@ -53,6 +53,7 @@ export const stubs = {
   },
   composeModifiers: modifiers(['semantics', 'fillMaxWidth', 'fillMaxSize', 'weight', 'selectable']),
   theme: {
+    cssShadow,
     palette,
     radius,
     spacing,

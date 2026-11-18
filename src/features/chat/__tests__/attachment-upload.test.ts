@@ -6,8 +6,12 @@ const api = vi.hoisted(() => ({
   me: { updateSettings: vi.fn() },
 }))
 const upload = vi.hoisted(() => vi.fn())
+const botApi = vi.hoisted(() => ({
+  bots: { cancel: vi.fn(), send: vi.fn(), follow: vi.fn(), get: vi.fn(), transcript: vi.fn(), answer: vi.fn() },
+}))
 vi.mock('@/shared/infrastructure', () => ({
   api,
+  botApi,
   http: {},
   API_MOCK: false,
   hapticImpactLight: vi.fn(),
@@ -21,10 +25,9 @@ vi.mock('../api/fetchers', () => ({
   followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
   resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string])),
   streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
-  updateAiAccessMode: (mode: unknown) => api.me.updateSettings({ aiAccessMode: mode }),
 }))
 
-const { send, useChatStore, usePrefs } = await import('../stores')
+const { send, useChatStore } = await import('../stores')
 
 const file = { uri: 'file:///resume.pdf', name: 'resume.pdf', mimeType: 'application/pdf', size: 1200 }
 const sourceId = '11111111-1111-4111-8111-111111111111'
@@ -37,9 +40,8 @@ const chat = (id: string) => useChatStore.getState().chats[id]!
 beforeEach(() => {
   vi.clearAllMocks()
   useChatStore.setState({ chats: {} })
-  usePrefs.setState({ accessMode: 'AUTO' })
-  api.conversations.stream.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
-  api.conversations.follow.mockImplementation(() => frames())
+  botApi.bots.send.mockImplementation(() => frames({ type: 'token', text: '네' }, { type: 'done', operation: null }))
+  botApi.bots.follow.mockImplementation(() => frames())
 })
 
 describe('chat attachment upload', () => {
@@ -53,25 +55,28 @@ describe('chat attachment upload', () => {
     await vi.waitFor(() => expect(chat('c-up').working).toBeNull())
     expect(sending).toBe(true)
     expect(upload).toHaveBeenCalledWith(file)
-    expect(api.conversations.stream).toHaveBeenCalledWith(
+    expect(botApi.bots.send).toHaveBeenCalledWith(
       'c-up',
-      { text: '이 파일 봐 줘', accessMode: 'AUTO', context: { evidenceIds: [sourceId] } },
+      { text: '이 파일 봐 줘', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
-    expect(api.conversations.stream.mock.calls[0]?.[1]).not.toHaveProperty('attachment')
+    expect(botApi.bots.send.mock.calls[0]?.[1]).not.toHaveProperty('attachment')
   })
 
   it('keeps documentId when the file upload adds evidenceIds', async () => {
     upload.mockResolvedValue({ id: sourceId })
     send('c-doc', '공고에 맞춰 줘', file, 'match_posting', { documentId: 'doc-1' })
     await vi.waitFor(() => expect(chat('c-doc').working).toBeNull())
-    expect(api.conversations.stream).toHaveBeenCalledWith(
+    expect(botApi.bots.send).toHaveBeenCalledWith(
       'c-doc',
       {
         text: '공고에 맞춰 줘',
         accessMode: 'AUTO',
         intent: 'match_posting',
-        context: { documentId: 'doc-1', evidenceIds: [sourceId] },
+        attachments: [
+          { kind: 'document', id: 'doc-1' },
+          { kind: 'file', id: sourceId },
+        ],
       },
       expect.anything(),
     )
@@ -81,7 +86,7 @@ describe('chat attachment upload', () => {
     upload.mockRejectedValue(new Error('offline'))
     send('c-fail', '이 파일 봐 줘', file)
     await vi.waitFor(() => expect(chat('c-fail').items.at(-1)).toMatchObject({ type: 'error', text: '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.' }))
-    expect(api.conversations.stream).not.toHaveBeenCalled()
+    expect(botApi.bots.send).not.toHaveBeenCalled()
     expect(chat('c-fail').working).toBeNull()
   })
 
@@ -102,11 +107,11 @@ describe('chat attachment upload', () => {
     expect(upload).toHaveBeenCalledTimes(1)
     expect(chat('c-q').queue).toEqual([{ text: '이어서', file: queued }])
     release()
-    await vi.waitFor(() => expect(api.conversations.stream).toHaveBeenCalledTimes(2))
+    await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalledTimes(2))
     expect(upload).toHaveBeenCalledWith(queued)
-    expect(api.conversations.stream).toHaveBeenLastCalledWith(
+    expect(botApi.bots.send).toHaveBeenLastCalledWith(
       'c-q',
-      { text: '이어서', accessMode: 'AUTO', context: { evidenceIds: [sourceId] } },
+      { text: '이어서', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
   })
@@ -130,8 +135,8 @@ describe('chat attachment upload', () => {
     send('c-q-fail', '이어서', queued)
     release()
     await vi.waitFor(() => expect(chat('c-q-fail').items.some((item) => item.type === 'error')).toBe(true))
-    expect(api.conversations.stream).toHaveBeenCalledTimes(1)
-    expect(api.conversations.stream.mock.calls[0]?.[1]).toMatchObject({ text: '먼저' })
+    expect(botApi.bots.send).toHaveBeenCalledTimes(1)
+    expect(botApi.bots.send.mock.calls[0]?.[1]).toMatchObject({ text: '먼저' })
     expect(chat('c-q-fail').working).toBeNull()
   })
 
@@ -139,9 +144,9 @@ describe('chat attachment upload', () => {
     send('c-src', '이 서류를 고쳐 줘', undefined, undefined, { evidenceIds: [sourceId] })
     await vi.waitFor(() => expect(chat('c-src').working).toBeNull())
     expect(upload).not.toHaveBeenCalled()
-    expect(api.conversations.stream).toHaveBeenCalledWith(
+    expect(botApi.bots.send).toHaveBeenCalledWith(
       'c-src',
-      { text: '이 서류를 고쳐 줘', accessMode: 'AUTO', context: { evidenceIds: [sourceId] } },
+      { text: '이 서류를 고쳐 줘', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
   })
@@ -150,6 +155,6 @@ describe('chat attachment upload', () => {
     send('c-name', '안녕', 'note.pdf')
     await vi.waitFor(() => expect(chat('c-name').working).toBeNull())
     expect(upload).not.toHaveBeenCalled()
-    expect(api.conversations.stream).toHaveBeenCalledWith('c-name', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
+    expect(botApi.bots.send).toHaveBeenCalledWith('c-name', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
   })
 })

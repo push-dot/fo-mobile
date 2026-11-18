@@ -43,3 +43,5 @@ Docs: https://docs.expo.dev/eas/index.md
 ## Workspace install
 
 Pick dependency versions in this directory with `npx expo install`. The lockfile and `patches/expo-router@58.0.24.patch` live in `push-fe`, so run `pnpm install` at the `push-fe` root and commit `pnpm-lock.yaml` there.
+
+App CI runs from the push-fe root with `pnpm install --frozen-lockfile`. A dependency change needs `pnpm-lock.yaml` on a push-fe branch, referenced from the app PR body as a single line `push-fe-ref: <branch-or-sha>`.

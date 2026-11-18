@@ -1,15 +1,15 @@
-import type { Application } from '@push/api-client'
 import { monthDay } from '@push/shared'
 import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { useNextEvent } from '../api/hooks'
+import type { ApplicationDetail } from '../types'
 import { eventWhen, stageFlow, stageSteps } from '../utils'
 
 
-const Steps = ({ a }: { a: Application }) => {
+const Steps = ({ a }: { a: ApplicationDetail }) => {
   const c = useColors()
-  const steps = stageSteps(a.stage, a.appliedAt)
+  const steps = stageSteps(a.stage, a.appliedAt, a.stageEnteredAt)
   return (
     <View style={{ flexDirection: 'row' }}>
       {steps.map((s, i) => {
@@ -67,10 +67,10 @@ const NextEvent = ({ applicationId }: { applicationId: string }) => {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.paper }}>
       <View style={{ width: 40, height: 40, borderRadius: radius.sm, backgroundColor: c.bg2, alignItems: 'center', justifyContent: 'center' }}>
-        <Text v="c2" color="t3">
+        <Text v="tab" weight="400" color="t3">
           {d.getMonth() + 1}월
         </Text>
-        <Text v="b2" weight="700">
+        <Text v="b2" weight="700" style={{ lineHeight: 17, fontVariant: ['tabular-nums'] }}>
           {d.getDate()}
         </Text>
       </View>
@@ -79,14 +79,14 @@ const NextEvent = ({ applicationId }: { applicationId: string }) => {
           {e.title}
         </Text>
         <Text v="c1" color="t3" numberOfLines={1}>
-          {eventWhen(e.startsAt)}
+          {[eventWhen(e.startsAt), e.location].filter(Boolean).join(' · ')}
         </Text>
       </View>
     </View>
   )
 }
 
-const StageTracker = ({ a }: { a: Application }) => {
+const StageTracker = ({ a }: { a: ApplicationDetail }) => {
   const c = useColors()
   const applied = monthDay(a.appliedAt)
   return (
@@ -94,7 +94,7 @@ const StageTracker = ({ a }: { a: Application }) => {
       <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: spacing[1] }}>
         <Text v="h3">{stageFlow(a.stage).headline}</Text>
         {applied ? (
-          <Text v="c1" color="t3">
+          <Text v="c1" weight="600" color="t2">
             {applied} 지원
           </Text>
         ) : null}

@@ -1,4 +1,4 @@
-import { Switch as ComposeSwitch } from '@expo/ui/jetpack-compose'
+import { Box, Switch as ComposeSwitch } from '@expo/ui/jetpack-compose'
 import { semantics } from '@expo/ui/jetpack-compose/modifiers'
 import { onAccent, spacing, useColors } from '../../theme'
 import NativeHost from './native-host'
@@ -28,7 +28,12 @@ const Switch = ({
           uncheckedBorderColor: c.fill2,
         }}
         modifiers={[semantics({ contentDescription: label })]}
-      />
+      >
+        {/* M3 draws the off thumb at 16dp unless the thumb has content; the boards' `.and .sw:after` is 24 in both states. */}
+        <ComposeSwitch.ThumbContent>
+          <Box />
+        </ComposeSwitch.ThumbContent>
+      </ComposeSwitch>
     </NativeHost>
   )
 }

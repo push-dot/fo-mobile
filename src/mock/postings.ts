@@ -1,4 +1,5 @@
 import type { Posting, PostingDetail } from '@push/api-client'
+import { dropDeadlineEvent, putDeadlineEvent } from './calendar-deadlines'
 import { mock, page } from './server'
 
 const base = (p: Partial<Posting> & Pick<Posting, 'id' | 'company' | 'title' | 'location' | 'careerMin'>): Posting => ({
@@ -49,6 +50,10 @@ export const postings: Posting[] = [
   base({ id: 'p23', company: '바다물류', title: '물류 시스템 개발자', location: '경기 수원시', careerMin: 4, careerMax: 6, skills: ['Java', 'Spring Boot'], employmentType: 'dispatch', deadline: inDays(40), createdAt: '2026-10-04T09:00:00Z' }),
   base({ id: 'p24', company: '모아페이', title: '퍼포먼스 마케터', jobCategory: 'marketing', location: '서울 강남구', careerMin: 1, careerMax: 3, deadline: inDays(18), createdAt: '2026-10-03T09:00:00Z' }),
   base({ id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', location: '서울 강남구', careerMin: 5, deadline: inDays(21), createdAt: '2026-10-02T09:00:00Z' }),
+  // BotNewLong's long company name. Its deadline is past, so no list shows it; only `bots/new?posting=p-nuri-long` and GET postings/:id reach it.
+  base({ id: 'p-nuri-long', company: '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', title: '플랫폼 엔지니어', location: '경기 성남시', careerMin: 3, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
+  // BotNewLinkPicked and BotNewXL draw 모아페이 with the short title 백엔드 엔지니어; p1 carries the full one (Kotlin·Spring). Hidden like p-nuri-long: only `bots/new?posting=p-moa-short` reaches it.
+  base({ id: 'p-moa-short', company: '모아페이', title: '백엔드 엔지니어', location: '서울 강남구', careerMin: 4, careerMax: 6, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
 ]
 
 // Tour switch (links.ts): the 마감 임박 공고 board lists 모아페이 백엔드 as its sixth tile, so it closes in 7 days there (D-13 everywhere else).
@@ -135,11 +140,14 @@ mock('GET', 'postings', ({ query }) => {
   return { ...out, page: { ...out.page, total: shownTotal(query, list.length) } }
 })
 
-// Per-district counts for the 지역 sheet (the design's 서울 842 = 214 + 96 + 88 + 71 + 64 + 중구 309).
+// Per-district counts for the 지역 sheet: FilterRegion draws 서울 전체 842 over eleven districts (761); the other 81 are postings
+// that name only 서울, which the sheet counts into 서울 전체 and does not list.
 // shortcut: fixed table, ignores the other filters; the fixtures are too few to give these numbers.
 const LOCATION_COUNTS: [string, number][] = [
-  ['서울 강남구', 214], ['서울 서초구', 96], ['서울 마포구', 88], ['서울 영등포구', 71], ['서울 송파구', 64], ['서울 중구', 309],
+  ['서울 강남구', 214], ['서울 서초구', 96], ['서울 마포구', 88], ['서울 영등포구', 71], ['서울 송파구', 64], ['서울 성동구', 58],
+  ['서울 용산구', 41], ['서울 중구', 39], ['서울 종로구', 33], ['서울 강서구', 30], ['서울 구로구', 27], ['서울', 81],
   ['경기 성남시', 132], ['경기 수원시', 58], ['인천 중구', 47], ['부산 해운대구', 39], ['대전 유성구', 28], ['원격', 63],
+  ['대구 수성구', 31], ['광주 북구', 22], ['울산 남구', 19], ['세종 세종시', 14], ['강원 춘천시', 17], ['제주 제주시', 24],
 ]
 mock('GET', 'postings/locations', () => ({ data: LOCATION_COUNTS.map(([location, count]) => ({ location, count })) }))
 
@@ -163,6 +171,8 @@ const setBookmark = (id: string, on: boolean) => {
   const p = postings.find((x) => x.id === id)
   if (!p) return
   p.bookmarked = on
+  if (on) putDeadlineEvent(p)
+  else dropDeadlineEvent(id)
   const rest = bookmarkOrder.filter((x) => x !== id)
   bookmarkOrder.splice(0, bookmarkOrder.length, ...(on ? [id, ...rest] : rest))
 }
@@ -175,12 +185,22 @@ mock('DELETE', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, 
 // shortcut: the 허브 제안 sheet (the only limit=10 caller) draws the title without its stack suffix; drop when the sheet trims it.
 const SHEET_TITLES: Record<string, string> = { p1: '백엔드 엔지니어' }
 mock('GET', 'me/bookmarks', ({ query }) => {
-  const sheet = query.get('limit') === '10'
-  const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, title: (sheet && SHEET_TITLES[p.id]) || p.title, location: p.id === 'p8' ? '성남 판교' : p.location }))
+  const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, location: p.id === 'p8' ? '성남 판교' : p.location }))
+  return page(list, query)
+})
+const OWN_COMPANY = '모아페이'
+mock('GET', 'companies/me/postings', ({ query }) => {
+  const today = inDays(0)
+  const list = postings
+    .filter((p) => p.company === OWN_COMPANY && p.deadline !== null && p.deadline >= today)
+    .map((p) => ({ ...p, status: 'OPEN' as const, title: SHEET_TITLES[p.id] ?? p.title }))
   return page(list, query)
 })
 mock('POST', 'postings/:id/apply', ({ params }) => {
   const p = postings.find((x) => x.id === params.id)
-  if (p) p.applied = true
+  if (p) {
+    p.applied = true
+    putDeadlineEvent(p, true)
+  }
   return { status: 201, body: { data: { id: `a-${params.id}`, stage: 'APPLIED' } } }
 })

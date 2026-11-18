@@ -18,3 +18,17 @@ describe('menuSections', () => {
     expect(menuSections([])).toEqual([{ key: 'actions', actions: [] }])
   })
 })
+
+describe('menuSections destructive tail', () => {
+  const d = (key: string) => ({ ...a(key), destructive: true })
+
+  it('puts a destructive tail in its own section, so both platforms draw the divider', () => {
+    const s = menuSections([a('profile'), a('find'), d('delete')])
+    expect(s.map((x) => x.actions.map((y) => y.key))).toEqual([['profile', 'find'], ['delete']])
+  })
+
+  it('does not split a list with no destructive item or a destructive first item', () => {
+    expect(menuSections([a('x'), a('y')])).toHaveLength(1)
+    expect(menuSections([d('x'), a('y')])).toHaveLength(1)
+  })
+})

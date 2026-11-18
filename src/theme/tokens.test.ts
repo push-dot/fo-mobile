@@ -2,7 +2,7 @@ import { colors, radius as designRadius } from '@push/design-system'
 import { describe, expect, it } from 'vitest'
 import { nativeShadow } from './native-shadow'
 import { platformTokens } from './platform'
-import { largeType, palette, radius, shadow, spacing, type } from './tokens'
+import { iosMaterial, iosSystemFill, largeType, palette, radius, shadow, spacing, type } from './tokens'
 
 describe('theme tokens', () => {
   it('read every colour from the design system', () => {
@@ -65,5 +65,13 @@ describe('nativeShadow', () => {
 
   it('rejects a shadow it cannot read', () => {
     expect(() => nativeShadow('none')).toThrow('none')
+  })
+
+  it('keeps the board --iFill: system fill at 12% in light, 24% in dark', () => {
+    expect(iosSystemFill).toEqual({ light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' })
+  })
+
+  it('keeps the board --iMat: the iOS banner material', () => {
+    expect(iosMaterial).toEqual({ light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' })
   })
 })

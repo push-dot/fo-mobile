@@ -1,31 +1,38 @@
 import { ContextMenu as SwiftContextMenu, RNHostView } from '@expo/ui/swift-ui'
-import { Pressable } from 'react-native'
+import { Pressable, useWindowDimensions } from 'react-native'
 import type { ContextMenuProps } from './menu-action'
 import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/** iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress. */
-const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => (
-  <NativeHost matchContents={{ vertical: true }} seedColor={useColors().t1}>
-    <SwiftContextMenu>
-      <SwiftContextMenu.Items>
-        <MenuButtons actions={actions} />
-      </SwiftContextMenu.Items>
-      <SwiftContextMenu.Trigger>
-        <RNHostView matchContents={{ vertical: true }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
-            {children}
-          </Pressable>
-        </RNHostView>
-      </SwiftContextMenu.Trigger>
-      {preview ? (
-        <SwiftContextMenu.Preview>
-          <RNHostView matchContents>{preview}</RNHostView>
-        </SwiftContextMenu.Preview>
-      ) : null}
-    </SwiftContextMenu>
-  </NativeHost>
-)
+/**
+ * iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress.
+ * SwiftUI hands the trigger its ideal width, so a long name would push the row past the screen: the hosted row is capped at the window's width.
+ */
+const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => {
+  const { width } = useWindowDimensions()
+  return (
+    // Without ignoreSafeArea the hosted row stops at the status bar while the list keeps scrolling, so a header row (Push Bot) overlaps the first row.
+    <NativeHost matchContents={{ vertical: true }} ignoreSafeArea="all" seedColor={useColors().t1}>
+      <SwiftContextMenu>
+        <SwiftContextMenu.Items>
+          <MenuButtons actions={actions} />
+        </SwiftContextMenu.Items>
+        <SwiftContextMenu.Trigger>
+          <RNHostView matchContents={{ vertical: true }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={{ maxWidth: width }}>
+              {children}
+            </Pressable>
+          </RNHostView>
+        </SwiftContextMenu.Trigger>
+        {preview ? (
+          <SwiftContextMenu.Preview>
+            <RNHostView matchContents>{preview}</RNHostView>
+          </SwiftContextMenu.Preview>
+        ) : null}
+      </SwiftContextMenu>
+    </NativeHost>
+  )
+}
 
 export default ContextMenu

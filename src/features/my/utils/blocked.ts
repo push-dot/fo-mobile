@@ -10,6 +10,8 @@ export const BLOCKED_COPY = {
 
 export const blockedCount = (total: number | undefined) => (total === undefined ? undefined : `${total}명`)
 
+export const blockedRowLabel = (total: number | undefined) => (total === undefined ? BLOCKED_COPY.title : `${BLOCKED_COPY.title} ${blockedCount(total)}`)
+
 const blockedOn = (iso: string, now: Date) => {
   const d = new Date(iso)
   const monthDay = `${d.getMonth() + 1}월 ${d.getDate()}일`

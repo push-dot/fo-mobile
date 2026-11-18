@@ -1,9 +1,12 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
+import { showToast, TOAST_ABOVE } from '@/shared/components'
 import type { PostCategory } from '@push/api-client'
+import { SAVE_COPY } from '../constants'
 import type { SocialImage } from '../types'
-import { createComment, createPost, fetchComments, fetchPost, fetchPosts, uploadPostImage } from './fetchers'
+import { invalidateAfterPostSaveToggle } from '../utils/post-save'
+import { createComment, createPost, fetchComments, fetchPost, fetchPosts, savePost, unsavePost, uploadPostImage } from './fetchers'
 
 export const usePosts = (category: PostCategory | null) =>
   useInfiniteQuery({
@@ -61,4 +64,24 @@ export const useCreatePost = () => {
     },
     onError: () => Alert.alert('글을 올리지 못했어요', '잠시 후 다시 시도해 주세요.'),
   })
+}
+
+/** The server answer decides the state: the menu flips after the post's refetched `saved`, not before. */
+export const useTogglePostSave = (id: string) => {
+  const qc = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (next: boolean) => (next ? savePost(id) : unsavePost(id)),
+    onSuccess: (_data, next) => {
+      void invalidateAfterPostSaveToggle(qc, id)
+      showToast({
+        message: next ? SAVE_COPY.saved : SAVE_COPY.unsaved,
+        bottom: TOAST_ABOVE.cta,
+        action: next
+          ? { label: SAVE_COPY.view, onPress: () => router.push({ pathname: '/activity/posts', params: { box: 'saved' } }) }
+          : { label: SAVE_COPY.undo, onPress: () => mutation.mutate(true) },
+      })
+    },
+    onError: () => showToast({ message: SAVE_COPY.failed, tone: 'error', bottom: TOAST_ABOVE.cta }),
+  })
+  return mutation
 }

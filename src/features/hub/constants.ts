@@ -6,7 +6,7 @@ export const STATUS_TONE: Record<CareerStatus, BadgeTone> = { seeking: 'ac', fee
 
 export const PROPOSAL_MAX = 500
 
-export const OFFER_BOOKMARKS_LIMIT = 10
+export const OFFER_POSTINGS_LIMIT = 10
 
 export const HUB_SKELETON: SkeletonRowsShape = {
   count: 5,

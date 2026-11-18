@@ -1,4 +1,4 @@
-import { createApi, createClient } from '@push/api-client'
+import { createApi, createBotApi, createClient } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
 import { API_BASE_URL } from './config'
@@ -25,9 +25,9 @@ let refreshing: Promise<boolean> | null = null
 const refreshApi = createApi(createClient(clientConfig))
 
 export const refreshSession = () => {
+  const { session, set } = useSession.getState()
+  if (!session?.refreshToken) return Promise.resolve(false)
   refreshing ??= (async () => {
-    const { session, set } = useSession.getState()
-    if (!session?.refreshToken) return false
     try {
       await set(await refreshApi.auth.refresh(session.refreshToken))
       return true
@@ -44,3 +44,5 @@ export const refreshSession = () => {
 export const http = createClient({ ...clientConfig, refresh: refreshSession })
 
 export const api = createApi(http)
+
+export const botApi = createBotApi(http)

@@ -1,3 +1,5 @@
+import type { PushPermission } from './device'
+
 export type NotificationPermissionSnapshot = {
   status: string
   iosStatus?: number
@@ -11,6 +13,12 @@ export const notificationPermissionOff = (snapshot: NotificationPermissionSnapsh
     return snapshot.iosStatus === IOS_NOT_DETERMINED || snapshot.iosStatus === IOS_DENIED
   }
   return snapshot.status !== 'granted'
+}
+
+export const pushPermissionOf = (snapshot: NotificationPermissionSnapshot): PushPermission => {
+  if (!notificationPermissionOff(snapshot)) return 'granted'
+  if (snapshot.iosStatus === IOS_DENIED || snapshot.status === 'denied') return 'denied'
+  return 'undetermined'
 }
 
 export const showNotificationSettings = (snapshot: NotificationPermissionSnapshot | null) =>

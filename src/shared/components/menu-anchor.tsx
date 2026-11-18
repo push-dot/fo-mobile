@@ -42,14 +42,13 @@ const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
                     </Text>
                   </RNHostView>
                 ) : null}
-                {s.actions.map((a, i) => {
+                {s.actions.map((a) => {
                   const ink = a.destructive ? c.red : c.t1
                   const trailing = s.check === 'trailing'
                   const choice = !trailing && s.actions.some((x) => x.selected !== undefined)
                   const pick = () => (onClose(), a.onPress())
                   return (
                     <Fragment key={a.key}>
-                      {sections.length === 1 && a.destructive && i > 0 && !s.actions[i - 1]!.destructive ? <HorizontalDivider color={c.line} /> : null}
                       <DropdownMenuItem
                         onClick={pick}
                         elementColors={{ textColor: ink }}

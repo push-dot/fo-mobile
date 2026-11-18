@@ -18,3 +18,7 @@ export const uploadPostImage = async ({ uri, name: fileName, mimeType }: SocialI
 }
 
 export const createPost = (input: { category: PostCategory; title: string; body: string; imageKeys: string[] }) => api.posts.create(input)
+
+export const savePost = (id: string) => api.posts.save(id)
+
+export const unsavePost = (id: string) => api.posts.unsave(id)

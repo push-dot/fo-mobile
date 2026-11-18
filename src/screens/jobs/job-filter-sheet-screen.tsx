@@ -1,13 +1,16 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { FILTER_KEYS, FULL_SHEET_KIND, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
+import { Platform } from 'react-native'
+import { CHIP_FILTER_KINDS, FILTER_KEYS, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
-import { Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
+import { IOS_FILTER_ACTION_GAP, Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
 
 const kindOf = (value: string | string[] | undefined) => {
   const kind = Array.isArray(value) ? value[0] : value
   return FILTER_KEYS.includes(kind as FilterKey) ? (kind as FilterKey) : null
 }
+
+const CHIP_SHEET_ACTION_GAP = 26
 
 const JobFilterSheetScreen = () => {
   const params = useLocalSearchParams<{ kind?: string }>()
@@ -17,19 +20,24 @@ const JobFilterSheetScreen = () => {
   const count = usePostingCount(draft)
   const total = count.data?.page.total
   const trending = useTrending().data?.skills.map((s) => s.id) ?? []
-  const bound = useSheetScrollMax(0.6)
+  const bound = useSheetScrollMax()
 
   useEffect(() => {
     if (!kind) router.back()
   }, [kind])
 
   if (!kind) return null
-  const full = kind === FULL_SHEET_KIND
+  const compact = CHIP_FILTER_KINDS.includes(kind)
+  // iOS chip and skill sheets (.isheet): the .inav starts 17 under the sheet top, the CTA 20 under the last chips.
+  const isheet = Platform.OS === 'ios' && kind !== 'location'
 
   return (
     <Sheet
-      full={full}
-      actionGap={SHEET_ACTION_GAP.filter}
+      // iOS chip sheets: the head starts 17 under the sheet top, the CTA (52 high, slimAction) sits 20 under the chips and the sheet
+      // ends 26 under it, so FilterRole is 247 high with the CTA centre at 814.
+      gap={compact || isheet ? 0 : undefined}
+      slimAction={isheet}
+      actionGap={isheet ? IOS_FILTER_ACTION_GAP : compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}
       onLayout={bound.onSheetLayout}
       action={{
         label: total === undefined ? '공고 보기' : `공고 ${formatCount(total)}개 보기`,
@@ -44,7 +52,8 @@ const JobFilterSheetScreen = () => {
         draft={draft}
         trending={trending}
         onChange={setDraft}
-        scroll={LONG_FILTER_KINDS.includes(kind) && !full ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
+        compact={compact}
+        scroll={LONG_FILTER_KINDS.includes(kind) ? { maxHeight: bound.maxHeight, onLayout: bound.onScrollLayout } : undefined}
       />
     </Sheet>
   )

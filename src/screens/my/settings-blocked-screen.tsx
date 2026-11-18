@@ -4,6 +4,8 @@ import { Avatar, BLOCKED_COPY, blockedLine, OFFER_MENU_COPY, RETRY_LABEL, useBlo
 import { Button, emptyNoteStyle, SettingsGroup, StatusNote, Text, TopBar } from '@/shared/components'
 import { HIT_TARGET, spacing, useColors } from '@/theme'
 
+const UNBLOCK_HEIGHT = 36
+
 const SettingsBlockedScreen = () => {
   const c = useColors()
   const { data, isPending, refetch } = useBlocked()
@@ -15,9 +17,9 @@ const SettingsBlockedScreen = () => {
       {isPending ? (
         <ActivityIndicator style={{ marginTop: spacing[6] }} />
       ) : !rows ? (
-        <StatusNote lines={[OFFER_MENU_COPY.failed]} action={{ label: RETRY_LABEL, onPress: () => void refetch() }} style={emptyNoteStyle(140)} />
+        <StatusNote lines={[OFFER_MENU_COPY.failed]} action={{ label: RETRY_LABEL, onPress: () => void refetch() }} style={emptyNoteStyle(140, false)} />
       ) : rows.length === 0 ? (
-        <StatusNote lines={[BLOCKED_COPY.empty]} style={emptyNoteStyle(140)} />
+        <StatusNote lines={[BLOCKED_COPY.empty]} style={emptyNoteStyle(140, false)} />
       ) : (
         <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: HIT_TARGET }}>
           <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[1], paddingBottom: spacing[4] }}>
@@ -37,10 +39,10 @@ const SettingsBlockedScreen = () => {
                 </View>
                 <Button
                   label={BLOCKED_COPY.unblock}
-                  variant="secondary"
                   size="sm"
+                  weight="600"
                   disabled={unblock.isPending && unblock.variables === b.user.id}
-                  style={{ minHeight: 36, borderRadius: 18 }}
+                  style={{ height: UNBLOCK_HEIGHT, minHeight: UNBLOCK_HEIGHT, borderRadius: UNBLOCK_HEIGHT / 2, alignSelf: 'center', flexShrink: 0 }}
                   onPress={() => unblock.mutate(b.user.id)}
                 />
               </View>

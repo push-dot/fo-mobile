@@ -114,7 +114,7 @@ describe('harness events', () => {
     const [ap] = await map({ type: 'approval', id: 'ap1', kind: 'TOOL_ACTION', title: '메일을 보낼까요?', options: [{ id: 'approve', label: '실행' }, { id: 'reject', label: '취소' }] })
     expect(ap).toMatchObject({ type: 'approval', approval: { id: 'ap1', question: '메일을 보낼까요?', optionIds: ['approve', 'reject'] } })
     const s = play([ap!])
-    expect(s.approval?.sections[0]).toMatchObject({ kind: 'choices', items: [{ label: '실행' }, { label: '취소' }] })
+    expect(s.approval?.sections[0]).toMatchObject({ kind: 'choices', items: [{ label: '실행' }, { label: '닫기' }] })
     const [ch] = await map({ type: 'choice', id: 'g1', options: [{ id: 'more', label: '더 하기' }, { id: 'cancel', label: '그만하기' }], recommended: 'more' })
     expect(ch).toMatchObject({ type: 'approval', approval: { id: 'g1', optionIds: ['more', 'cancel'] } })
   })
@@ -140,10 +140,10 @@ describe('harness events', () => {
   })
 
   it('explains pre-stream errors', () => {
-    expect(errorText('INSUFFICIENT_CREDITS')).toBe('이번 달 사용량을 다 썼어요. 요금제를 올리거나 크레딧을 구매할 수 있어요.')
+    expect(errorText('INSUFFICIENT_CREDITS')).toBe('이번 달 사용량을 모두 썼어요.')
     expect(errorText('QUEUE_BUSY', 30)).toBe('지금 요청이 많아요. 30초 뒤에 다시 보내 주세요.')
-    expect(errorText('PLAN_REQUIRED')).toContain('요금제')
+    expect(errorText('PLAN_REQUIRED')).toContain('플랜')
     expect(errorText('INTEGRATION_REQUIRED')).toBe('작업을 이어가지 못했어요. 다시 보내 주세요.')
-    expect(errorText('NOT_CONFIGURED')).toBe('지금은 에이전트를 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.')
+    expect(errorText('NOT_CONFIGURED')).toBe('지금은 Bot을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.')
   })
 })

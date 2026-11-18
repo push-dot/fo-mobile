@@ -1,10 +1,9 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { LANGS, MAX_BYTES } from '../constants'
 import {
   AGENT_NOTE,
   AGENT_TITLE,
+  RESTORE_PURCHASES_LABEL,
   CALENDAR_ADD,
   INTERVIEW_PREP,
   NOTIFICATION_ROWS,
@@ -18,6 +17,10 @@ import {
   SIZE_LIMIT,
   THEME_CHOICES,
   WITHDRAW_BODY,
+  careerRowLabel,
+  contactRowLabel,
+  themeRowLabel,
+  toneRowLabel,
   careerDeleteBody,
   careerDeleteCopy,
   commentedSee,
@@ -32,6 +35,7 @@ import {
   pushCardLines,
   profileConvertBody,
   pushSeeAll,
+  DOC_TO_PROFILE_COPY,
   SET_BASE_COPY,
   setBaseProfilePath,
   showViewCount,
@@ -61,7 +65,7 @@ describe('my screen rules', () => {
   it('keeps the application record when a file is deleted, and uses 삭제', () => {
     expect(deleteDocCopy('경력기술서.pdf')).toEqual({
       title: '이 서류를 삭제할까요?',
-      body: '경력기술서.pdf를 서류에서 지워요. 이 서류로 지원한 기록은 남아요.',
+      body: '경력기술서를 서류에서 지워요. 이 서류로 지원한 기록은 남아요.',
       confirm: '삭제',
       cancel: '취소',
       toast: '서류를 삭제했어요',
@@ -90,7 +94,6 @@ describe('my screen rules', () => {
     expect(SIZE_LIMIT).toEqual({
       title: `${mb}MB까지 올릴 수 있어요`,
       body: '크기를 줄여서 다시 올려 주세요.',
-      footnote: 'PDF, DOCX 파일을 20MB까지 올릴 수 있어요.',
     })
     expect(mb).toBe(20)
   })
@@ -100,14 +103,16 @@ describe('my screen rules', () => {
     expect(Object.keys(profileConvertBody())).not.toContain('target')
   })
 
+  it('says a converted file becomes a separate application profile and leaves the base profile alone', () => {
+    expect(DOC_TO_PROFILE_COPY.body).toContain('내 프로필(기본)은 바뀌지 않아요')
+  })
+
   it('asks before setting the application profile as the base profile', () => {
     expect(SET_BASE_COPY).toEqual({
       action: '기본 프로필로 설정',
-      title: '이 프로필을 기본 프로필로 설정할까요?',
-      body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
-      confirm: '설정',
-      cancel: '취소',
-      toast: '기본 프로필로 설정했어요.',
+      close: '닫기',
+      confirm: '적용',
+      body: '허브에 보이는 내 프로필(기본)이 이 지원용 프로필의 내용으로 바뀌어요.',
     })
     expect(setBaseProfilePath('doc-1')).toBe('documents/doc-1/base-profile')
   })
@@ -152,6 +157,11 @@ describe('my screen rules', () => {
       action: '글쓰기',
       href: '/compose',
     })
+    expect(emptyCta('saved')).toEqual({
+      title: '아직 저장한 글이 없어요.',
+      action: '소셜 둘러보기',
+      href: '/social',
+    })
   })
 
   it('shows view counts on my posts and detail, not the feed', () => {
@@ -174,7 +184,7 @@ describe('my screen rules', () => {
   })
 
   it('locks the activity, offer, and calendar labels', () => {
-    expect(INTERVIEW_PREP).toBe('Push 에이전트로 면접 준비')
+    expect(INTERVIEW_PREP).toBe('Bot으로 면접 준비')
     expect(CALENDAR_ADD).toBe('일정 추가하기')
     expect(OFFER_DECLINE).toBe('거절')
     expect(OFFER_FAIL).toBe('잠시 뒤에 다시 보내 주세요.')
@@ -194,13 +204,14 @@ describe('my screen rules', () => {
       '마감 임박 공고',
       '제안 받음',
       '댓글과 답글',
-      '에이전트 작업 완료',
+      'Bot 작업 완료',
       '지원 상태 변경',
     ])
-    expect(AGENT_TITLE).toBe('에이전트')
-    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요.')
+    expect(RESTORE_PURCHASES_LABEL).toBe('구매 복원')
+    expect(AGENT_TITLE).toBe('Bot')
+    expect(AGENT_NOTE).toBe('마이 › 서류와 북마크 공고를 Bot이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.')
     expect(REFERENCE_LABEL).toBe('참고 데이터 제공')
-    expect(REFERENCE_SUB).toBe('에이전트를 쓰려면 켜 두어야 해요')
+    expect(REFERENCE_SUB).toBe('Bot을 쓰려면 켜 두어야 해요')
   })
 
   it('stores light, dark, or system and resolves system from the device', () => {
@@ -225,9 +236,7 @@ describe('my screen rules', () => {
   })
 
   it('says withdrawal does not cancel the store subscription', () => {
-    expect(WITHDRAW_BODY).toBe(
-      '구독은 탈퇴해도 자동으로 해지되지 않아요. App Store나 Google Play에서 직접 해지해 주세요. 30일 안에 다시 로그인하면 계정이 복구되고, 30일이 지나면 이력서·서류·글·댓글이 모두 삭제돼요. 삭제된 뒤에는 되돌릴 수 없어요.',
-    )
+    expect(WITHDRAW_BODY).toBe('30일 안에 다시 로그인하면 복구돼요. 구독은 스토어에서 따로 해지해 주세요.')
   })
 
   it('keeps a project heading on the preview', () => {
@@ -250,11 +259,11 @@ describe('my screen rules', () => {
   })
 })
 
-describe('settings screen', () => {
-  // push-be never reads allowAiReadMyFiles, so the switch would be a dead control (D19).
-  it('hides the 내 자료 읽기 허용 switch until the server enforces it', () => {
-    const screen = readFileSync(join(__dirname, '../../../screens/my/settings-screen.tsx'), 'utf8')
-    expect(screen).not.toContain('allowAiReadMyFiles')
-    expect(screen).not.toContain('내 자료 읽기 허용')
+describe('setting rows', () => {
+  it('names a setting row by its value, with a short name where the value alone is unclear', () => {
+    expect(careerRowLabel('everyone')).toBe('커리어 상태 모두 공개')
+    expect(contactRowLabel('accepted')).toBe('연락처는 제안 수락한 사람만')
+    expect(toneRowLabel('그대로')).toBe('말투 그대로')
+    expect(themeRowLabel('시스템')).toBe('시스템 테마')
   })
 })

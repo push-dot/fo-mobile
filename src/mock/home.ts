@@ -1,7 +1,10 @@
 // Mock routes for the home area (search, notifications). Owned by that area's screens.
 import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
+import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
+import { usePhoneAuth } from '../features/auth/stores'
+import { softPad } from '../features/auth/utils/soft-pad'
 import { MOCK_USER_ID, mock, page } from './server'
 
 // Search-only samples; hub/social own their full fixtures.
@@ -19,7 +22,7 @@ const person = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenure
   ...p,
 })
 const people: Profile[] = [
-  person({ userId: 'u1', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
+  person({ userId: 'u-taeyoon', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, skills: ['Kotlin'] }),
   person({ userId: 'u-subin', displayName: '이수빈', headline: '3년차 백엔드 · Node.js', tenureYears: 3, skills: ['Node.js'] }),
   person({ userId: 'u-hyunwoo', displayName: '윤현우', headline: '백엔드 · 대용량 트래픽 경험', tenureYears: 7 }),
   person({ userId: 'u4', displayName: '최지우', headline: '데이터 파이프라인 · 백엔드 협업', tenureYears: 5, skills: ['Spark'] }),
@@ -55,29 +58,43 @@ const BOARD_QUERY = '백엔드'
 const BOARD_TOTALS = { postings: 24, people: 8, posts: 13 }
 const BOARD_ORDER = {
   postings: ['p1', 'p9', 'p10', 'p3', 'p11', 'p12'],
-  people: ['u1', 'u-subin', 'u-hyunwoo', 'u4'],
+  people: ['u-taeyoon', 'u-subin', 'u-hyunwoo', 'u4'],
   posts: ['post-1', 's2', 's3', 's4'],
 }
 const onlyOrdered = <T,>(items: T[], idOf: (t: T) => string, order: string[]) => order.flatMap((id) => items.filter((t) => idOf(t) === id))
 // The board draws 도토리증권 as 서버·백엔드 under ‘백엔드’; the other boards show the plain title.
 const BOARD_TITLES: Record<string, string> = { p3: '서버·백엔드 개발자 (Go)' }
 
-mock('GET', 'search', ({ query }) => {
-  const q = query.get('q') ?? ''
-  const type = query.get('type') === 'people' ? 'people' : query.get('type') === 'posts' ? 'posts' : 'postings'
+type SearchKind = keyof typeof BOARD_TOTALS
+const SEARCH_KINDS = Object.keys(BOARD_TOTALS) as SearchKind[]
+
+const searchHits = (type: SearchKind, q: string): (Posting | Profile | Post)[] => {
   const board = q.trim() === BOARD_QUERY
   const rank = <T,>(items: T[], fields: (t: T) => string[], idOf: (t: T) => string) => {
     const found = searchHangul(items, q, fields).map((h) => h.item)
     return board ? onlyOrdered(found, idOf, BOARD_ORDER[type]) : found
   }
-  const hits =
-    type === 'people'
-      ? rank(people, (p) => [p.displayName, p.headline, ...p.skills], (p) => p.userId)
-      : type === 'posts'
-        ? rank(posts, (p) => [p.title, p.body], (p) => p.id)
-        : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
+  return type === 'people'
+    ? rank(people, (p) => [p.displayName, p.headline, ...p.skills], (p) => p.userId)
+    : type === 'posts'
+      ? rank(posts, (p) => [p.title, p.body], (p) => p.id)
+      : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
+}
+
+// The tab chips read search/counts and the open tab reads its list's total, so both come from here and agree.
+const searchTotal = (type: SearchKind, q: string, hits = searchHits(type, q)) => (q.trim() === BOARD_QUERY ? BOARD_TOTALS[type] : hits.length)
+
+mock('GET', 'search', ({ query }) => {
+  const q = query.get('q') ?? ''
+  const type = SEARCH_KINDS.find((k) => k === query.get('type')) ?? 'postings'
+  const hits = searchHits(type, q)
   const out = page<Posting | Profile | Post>(hits, query, true)
-  return { ...out, page: { ...out.page, total: board ? BOARD_TOTALS[type] : hits.length } }
+  return { ...out, page: { ...out.page, total: searchTotal(type, q, hits) } }
+})
+
+mock('GET', 'search/counts', ({ query }) => {
+  const q = query.get('q') ?? ''
+  return { data: Object.fromEntries(SEARCH_KINDS.map((k) => [k, searchTotal(k, q)])) }
 })
 
 mock('GET', 'search/trending', () => ({
@@ -100,12 +117,12 @@ const READ = daysAgo(0, 0)
 const morning = () => new Date(Math.max(startOfToday, Math.min(new Date().setHours(9, 0, 0, 0), Date.now() - 181 * 60_000))).toISOString()
 const notifications: AppNotification[] = [
   { id: 'n1', type: 'APPLICATION_STAGE', title: '지원 상태가 바뀌었어요', body: '모아페이 백엔드 엔지니어 · 면접 진행 중', target: { kind: 'activity', id: 'a1' }, readAt: null, createdAt: today(0) },
-  { id: 'n2', type: 'AI_DONE', title: '에이전트 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
+  { id: 'n2', type: 'AI_DONE', title: 'Bot 작업 완료', body: '모아페이 맞춤 이력서를 다 만들었어요. 적합도 6.9 → 8.1', target: { kind: 'conversation', id: 'c1' }, readAt: null, createdAt: today(10) },
   { id: 'n3', type: 'OFFER', title: '제안 받음', body: '오지현 님이 결제 플랫폼팀 커피챗을 제안했어요.', target: { kind: 'offer', id: 'o1' }, readAt: null, createdAt: today(120) },
   { id: 'n4', type: 'DEADLINE', title: '마감 임박 공고', body: '북마크한 파도AI 데이터 분석가 공고가 2일 남았어요.', target: { kind: 'posting', id: 'p2' }, readAt: READ, createdAt: morning() },
   { id: 'n5', type: 'COMMENT', title: '댓글과 답글', body: '박도윤 님이 내 글에 답글을 남겼어요. “저도 같은 고민이었어요!”', target: { kind: 'post', id: 'post-1' }, readAt: READ, createdAt: daysAgo(1, 15) },
   { id: 'n6', type: 'DEADLINE', title: '마감 임박 공고', body: '도토리증권 서버 개발자 (Go) 공고가 3일 남았어요.', target: { kind: 'posting', id: 'p3' }, readAt: READ, createdAt: daysAgo(3, 10) },
-  { id: 'n7', type: 'AI_DONE', title: '에이전트 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
+  { id: 'n7', type: 'AI_DONE', title: 'Bot 작업 완료', body: '도토리증권 공고 갭 분석을 마쳤어요. 적합도 7.8', target: { kind: 'conversation', id: 'c2' }, readAt: READ, createdAt: daysAgo(4, 18) },
   { id: 'n8', type: 'OFFER', title: '제안 받음', body: '한지민 님이 정산팀 채용 제안을 보냈어요.', target: { kind: 'offer', id: 'o2' }, readAt: READ, createdAt: daysAgo(12, 11) },
 ]
 
@@ -124,14 +141,29 @@ mock('POST', 'me/notifications/read', ({ body }) => {
   if (b.all) notifications.splice(0, notifications.length, ...notifications.filter((n) => n.createdAt < new Date(startOfToday).toISOString()))
 })
 
+/** PhoneInput: a Google sign-in that handed back a pending token, so the phone screen shows the account pill (links.ts `phone-social`). */
+export const pendingSocialPhone = () => {
+  const claims = btoa(JSON.stringify({ email: 'seojun.kim@gmail.com' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  usePhoneAuth.getState().beginSocial(`${claims}.mock`, 'seojun.kim@gmail.com', 'google')
+}
+
 // Phone sign-in. The code's tail picks the outcome so the boards' error states can be reached: 482111 wrong, 482222 expired,
-// 482333 too many tries, anything else signs in a new user (who then lands on the terms screen).
-const authError = (status: number, code: string, message: string) => ({ status, body: { error: { code, message } } })
+// 482333 too many tries, 482444 / 482555 / 482666 the number is already verified on a Google / Apple / Google+GitHub account and signs in to it,
+// anything else signs in a new user (who then lands on the terms screen).
+const authError = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
+const EXISTING_ACCOUNT = new Set(['482444', '482555', '482666'])
 mock('POST', 'auth/phone/send', () => ({ data: { cooldownSeconds: 170, expiresAt: new Date(Date.now() + 180_000).toISOString() } }))
 mock('POST', 'auth/phone/verify', ({ body }) => {
   const code = (body as { code?: string } | undefined)?.code
   if (code === '482111') return authError(400, 'PHONE_CODE_INVALID', 'invalid code')
   if (code === '482222') return authError(400, 'PHONE_CODE_EXPIRED', 'expired code')
   if (code === '482333') return authError(429, 'RATE_LIMITED', 'too many attempts')
-  return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: true } }
+  const existing = EXISTING_ACCOUNT.has(code ?? '')
+  if (!existing) forgetRequiredTerms()
+  return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: !existing } }
 })
+
+/** The phone field takes focus without raising the pad, as the boards draw it (links.ts `no-pad`). */
+export const hidePhonePad = () => {
+  softPad.shown = false
+}

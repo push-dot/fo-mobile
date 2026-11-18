@@ -23,14 +23,12 @@ vi.mock('../api/fetchers', () => ({
   followConversation: vi.fn(),
   resolveConversationApproval: vi.fn(),
   streamConversation: vi.fn(),
-  updateAiAccessMode: vi.fn(),
 }))
 
-const { askConsent, useConsentPrompt } = await import('../stores')
-const { routeConsentWhenOpen } = await import('../components/consent-prompt-listener')
+const { useConsentPrompt } = await import('../stores')
 
 const chatTabSource = readFileSync(
-  new URL('../../../app/(app)/(stack)/(tabs)/(chat)/chat.tsx', import.meta.url),
+  new URL('../../../app/(app)/(stack)/(tabs)/(bots)/bots.tsx', import.meta.url),
   'utf8',
 )
 const stackLayoutSource = readFileSync(
@@ -47,22 +45,22 @@ beforeEach(() => {
 })
 
 describe('ConsentPromptListener', () => {
-  it('pushes the consent route when askConsent(true) fires while the chat tab stays unfocused', () => {
-    askConsent(true)
-    routeConsentWhenOpen(useConsentPrompt.getState().open)
-    expect(pushed).toHaveBeenCalledWith('/consent')
+  it('opens the consent sheet through its store, never by pushing a route, and the stack registers the sheet route', () => {
+    expect(listenerSource).toContain('showConsentModal(')
+    expect(listenerSource).not.toContain('router')
+    expect(stackLayoutSource).toContain('name="consent"')
   })
 
   it('does not read consents or settings on cold start', () => {
-    expect(chatTabSource).not.toContain("from '@/screens/chat/chat-home-screen'")
     expect(chatTabSource).toContain('import(')
     expect(listenerSource).not.toContain('useReferenceConsent')
     expect(listenerSource).not.toContain('useMySettings')
     expect(pushed).not.toHaveBeenCalled()
   })
 
-  it('avoids heavy chat and my barrel imports on startup paths', () => {
-    expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat['"]/)
+  it('imports chat through its index and keeps my off the chat startup path', () => {
+    expect(stackLayoutSource).toMatch(/from ['"]@\/features\/chat['"]/)
+    expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat\//)
     expect(storesSource).not.toMatch(/from ['"]@\/features\/my['"]/)
     expect(fetchersSource).not.toMatch(/from ['"]@\/features\/my['"]/)
     expect(storesSource).toContain("@/features/my/api/fetchers")

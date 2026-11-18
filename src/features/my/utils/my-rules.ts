@@ -1,4 +1,5 @@
 import type { Settings } from '@push/api-client'
+import { displayName } from '@/shared/utility/display-name'
 import { MAX_BYTES } from '../constants'
 import { fitTen } from './fit-ten'
 
@@ -9,7 +10,7 @@ const hasBatchim = (word: string) => {
   return code >= 0 && code <= 11171 && code % 28 !== 0
 }
 
-const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
+export const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
 
 export const skillOrderHint = '길게 누르면 앞으로 옮겨요. 앞의 5개가 허브 목록에 보여요.'
 
@@ -23,15 +24,18 @@ export const profileCountLabels = (profile: {
   posts: { count: profile.postCount ?? 0, label: '게시글' },
 })
 
-export const deleteDocCopy = (fileName: string) => ({
-  title: '이 서류를 삭제할까요?',
-  body: `${fileName}${objectParticle(fileName)} 서류에서 지워요. 이 서류로 지원한 기록은 남아요.`,
-  confirm: '삭제',
-  cancel: '취소',
-  toast: '서류를 삭제했어요',
-  undo: '되돌리기',
-  failed: '서류를 삭제하지 못했어요',
-})
+export const deleteDocCopy = (fileName: string) => {
+  const name = displayName(fileName)
+  return {
+    title: '이 서류를 삭제할까요?',
+    body: `${name}${objectParticle(name)} 서류에서 지워요. 이 서류로 지원한 기록은 남아요.`,
+    confirm: '삭제',
+    cancel: '취소',
+    toast: '서류를 삭제했어요',
+    undo: '되돌리기',
+    failed: '서류를 삭제하지 못했어요',
+  }
+}
 
 /** DELETE /sources/:id answers 409 when a career row still cites the upload. */
 export const DELETE_REFERENCED = '경력 기록에서 쓰고 있어 지울 수 없어요'
@@ -52,18 +56,21 @@ export const careerDeleteBody = (career: { company: string; role: string }) => {
 export const SIZE_LIMIT = {
   title: `${MAX_BYTES / MB}MB까지 올릴 수 있어요`,
   body: '크기를 줄여서 다시 올려 주세요.',
-  footnote: 'PDF, DOCX 파일을 20MB까지 올릴 수 있어요.',
 } as const
 
 export const profileConvertBody = () => ({})
 
+export const DOC_TO_PROFILE_COPY = {
+  action: '만들기',
+  title: '지원용 프로필로 만들까요?',
+  body: '이 이력서로 지원용 프로필을 새로 만들어요. 내 프로필(기본)은 바뀌지 않아요.',
+} as const
+
 export const SET_BASE_COPY = {
   action: '기본 프로필로 설정',
-  title: '이 프로필을 기본 프로필로 설정할까요?',
-  body: '허브에 보이는 내 프로필이 이 내용으로 바뀌어요.',
-  confirm: '설정',
-  cancel: '취소',
-  toast: '기본 프로필로 설정했어요.',
+  close: '닫기',
+  confirm: '적용',
+  body: '허브에 보이는 내 프로필(기본)이 이 지원용 프로필의 내용으로 바뀌어요.',
 } as const
 
 export const setBaseProfilePath = (id: string) => `documents/${id}/base-profile`
@@ -83,10 +90,11 @@ export const followMatches = <T extends { displayName: string; headline: string 
   )
 }
 
-export const emptyCta = (tab: 'applications' | 'bookmarks' | 'follows' | 'posts') => {
+export const emptyCta = (tab: 'applications' | 'bookmarks' | 'follows' | 'posts' | 'saved') => {
   if (tab === 'follows') {
     return { title: '아직 팔로우한 사람이 없어요.', action: '허브 둘러보기', href: '/hub' as const }
   }
+  if (tab === 'saved') return { title: '아직 저장한 글이 없어요.', action: '소셜 둘러보기', href: '/social' as const }
   if (tab === 'posts') return { title: '아직 쓴 글이 없어요.', action: '글쓰기', href: '/compose' as const }
   if (tab === 'bookmarks') {
     return { title: '북마크한 공고가 없어요.', action: '채용공고 보기', href: '/jobs' as const }
@@ -106,7 +114,8 @@ export const stageFlow = (stage: string) => {
   return { step: 0, headline: '지원함', labels: STAGE_LABELS }
 }
 
-export const INTERVIEW_PREP = 'Push 에이전트로 면접 준비'
+export const INTERVIEW_PREP = 'Bot으로 면접 준비'
+export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
 export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'
@@ -121,28 +130,31 @@ export const OFFER_ARCHIVED_BADGE = '보관함'
 export { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from '@push/shared'
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
-export const PUSH_DOCS_TITLE = 'Push 서류'
+export const PUSH_DOCS_TITLE = 'Push 프로필'
 export const UPLOADS_TITLE = '올린 파일'
 
 export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | 'notifyOffer' | 'notifyComment' | 'notifyAiDone' | 'notifyApplicationStage'>; label: string }[] = [
   { key: 'notifyDeadline', label: '마감 임박 공고' },
   { key: 'notifyOffer', label: '제안 받음' },
   { key: 'notifyComment', label: '댓글과 답글' },
-  { key: 'notifyAiDone', label: '에이전트 작업 완료' },
+  { key: 'notifyAiDone', label: 'Bot 작업 완료' },
   { key: 'notifyApplicationStage', label: '지원 상태 변경' },
 ]
 
-export const AGENT_TITLE = '에이전트'
-export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 에이전트가 읽어서 이력서를 고쳐요.'
+/** iOS subscriptions need a way to restore a purchase; the plan page no longer carries it (board v412), so settings does. */
+export const RESTORE_PURCHASES_LABEL = '구매 복원'
+export const AGENT_TITLE = 'Bot'
+export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 Bot이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
+export const READ_FILES_ROW: { key: keyof Pick<Settings, 'allowAiReadMyFiles'>; label: string } = { key: 'allowAiReadMyFiles', label: '내 자료 읽기 허용' }
 export const REFERENCE_LABEL = '참고 데이터 제공'
-export const REFERENCE_SUB = '에이전트를 쓰려면 켜 두어야 해요'
+export const REFERENCE_SUB = 'Bot을 쓰려면 켜 두어야 해요'
 
 export { THEME_CHOICES, themeMode, type ThemeChoice } from '../../../theme/mode'
 
 export const hideCompanyLabel = (company: string) => `${company || '지금 다니는 회사'} 사람에게 숨기기`
 
-export const WITHDRAW_BODY =
-  '구독은 탈퇴해도 자동으로 해지되지 않아요. App Store나 Google Play에서 직접 해지해 주세요. 30일 안에 다시 로그인하면 계정이 복구되고, 30일이 지나면 이력서·서류·글·댓글이 모두 삭제돼요. 삭제된 뒤에는 되돌릴 수 없어요.'
+// v415 SettingsStates.2: two short sentences (the owner found the long body too long).
+export const WITHDRAW_BODY = '30일 안에 다시 로그인하면 복구돼요. 구독은 스토어에서 따로 해지해 주세요.'
 
 export const PREVIEW_HEADINGS = ['경력', '프로젝트', '기술 스택'] as const
 
@@ -153,3 +165,13 @@ export const pushCardLines = (
   application
     ? { title: application.title, company: application.company, score: fitTen(application.fitScore), doc: doc.title }
     : { title: doc.title, company: '', score: '', doc: '' }
+
+/**
+ * v415 Settings rows show only the value. Where the value alone is unclear the row keeps a short name with it
+ * ('커리어 상태 모두 공개', as Claude Design drew it). 언어 and 테마 read as the value alone.
+ */
+export const careerRowLabel = (key: Settings['careerStatusVisibility']) =>
+  ({ everyone: '커리어 상태 모두 공개', followers: '커리어 상태 팔로워에게만 공개', private: '커리어 상태 나만 보기' })[key]
+export const contactRowLabel = (key: Settings['contactVisibility']) => (key === 'everyone' ? '연락처는 모두에게' : '연락처는 제안 수락한 사람만')
+export const toneRowLabel = (label: string) => `말투 ${label}`
+export const themeRowLabel = (label: string) => `${label} 테마`

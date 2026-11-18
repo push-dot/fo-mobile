@@ -19,6 +19,7 @@ import {
 import { useSession } from '@/shared/infrastructure'
 import { Button, CtaBar, Text, TopBar, showToast } from '@/shared/components'
 import { marketingResult } from '@/features/my'
+import { useHardwareBack } from '@/shared/utility'
 import { spacing, useColors } from '@/theme'
 
 const TERMS_VIEW_ROUTE = '/(app)/(stack)/terms-view' as const
@@ -53,6 +54,8 @@ const ReconsentTermsScreen = () => {
     router.push({ pathname: TERMS_VIEW_ROUTE, params: { term } })
   }
 
+  // gestureEnabled: false only stops the iOS swipe; the terms must be answered, so Android back does nothing.
+  useHardwareBack(() => undefined)
   const submit = () => {
     if (!session || !requiredOk) return
     setBusy(true)
@@ -98,7 +101,7 @@ const ReconsentTermsScreen = () => {
           onPress={() => openTerm('privacyPolicy')}
           style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}
         >
-          <Text v="c1" color="t2" style={{ textDecorationLine: 'underline' }}>
+          <Text v="c2" color="t2" style={{ textDecorationLine: 'underline' }}>
             {TERMS_PRIVACY_POLICY}
           </Text>
         </Pressable>

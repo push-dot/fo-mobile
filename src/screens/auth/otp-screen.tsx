@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { router } from 'expo-router'
 import {
+  AccountPill,
   CHANGE_NUMBER,
   CONFIRM,
   OTP_EXPIRED,
@@ -17,6 +18,7 @@ import {
   formatNational,
   mapPhoneAuthError,
   otpErrorAfterInput,
+  otpResendSlot,
   needsTerms,
   phoneFailureLine,
   readConsents,
@@ -33,10 +35,11 @@ import { spacing, useColors } from '@/theme'
 const OtpScreen = () => {
   const c = useColors()
   const digits = usePhoneAuth((state) => state.digits)
+  const email = usePhoneAuth((state) => state.email)
+  const provider = usePhoneAuth((state) => state.provider)
   const pendingToken = usePhoneAuth((state) => state.pendingToken)
   const cooldownEndsAt = usePhoneAuth((state) => state.cooldownEndsAt)
   const setCooldown = usePhoneAuth((state) => state.setCooldown)
-  const setProviders = usePhoneAuth((state) => state.setProviders)
   const hold = usePhoneAuth((state) => state.hold)
   const clear = usePhoneAuth((state) => state.clear)
   const remaining = useCountdown(cooldownEndsAt)
@@ -94,11 +97,6 @@ const OtpScreen = () => {
       })
       .catch((caught: unknown) => {
         const mapped = mapPhoneAuthError(caught)
-        if (mapped.kind === 'registered') {
-          setProviders(mapped.providers)
-          router.push('/phone-registered')
-          return
-        }
         if (mapped.kind === 'too-many') {
           setBlocked(true)
           return
@@ -113,21 +111,18 @@ const OtpScreen = () => {
 
   const notice = otpError === 'invalid' ? OTP_INVALID : otpError === 'expired' ? OTP_EXPIRED : error
 
-  const status = notice ? (
-    <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={{ flex: 1 }}>
-      {notice}
-    </Text>
-  ) : remaining > 0 ? (
-    <Text v="c1" weight="600" color="t2" style={{ flex: 1, fontVariant: ['tabular-nums'] }}>
-      {countdownLabel(remaining)}
-    </Text>
-  ) : (
-    <Pressable accessibilityRole="button" disabled={busy} onPress={resend} style={{ flex: 1 }}>
-      <Text v="c1" weight="700" color="acText">
-        {RESEND_CODE}
+  const status =
+    otpResendSlot(remaining) === 'countdown' ? (
+      <Text v="c1" weight="600" color="t2" style={{ flex: 1, fontVariant: ['tabular-nums'] }}>
+        {countdownLabel(remaining)}
       </Text>
-    </Pressable>
-  )
+    ) : (
+      <Pressable accessibilityRole="button" disabled={busy} onPress={resend} style={{ flex: 1 }}>
+        <Text v="c1" weight="700" color="acText">
+          {RESEND_CODE}
+        </Text>
+      </Pressable>
+    )
 
   if (blocked) {
     return (
@@ -155,6 +150,11 @@ const OtpScreen = () => {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
       <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
+        {email ? (
+          <View style={{ marginBottom: 18 }}>
+            <AccountPill email={email} provider={provider} />
+          </View>
+        ) : null}
         <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
           {OTP_TITLE}
         </Text>
@@ -174,8 +174,27 @@ const OtpScreen = () => {
             }}
           />
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], marginTop: spacing[4] }}>
-          {status}
+        {/* SignInErrors: iOS stacks the error over the countdown row; Android folds the error into the one row with 번호 바꾸기. */}
+        {notice && Platform.OS === 'ios' ? (
+          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[4] }}>
+            {notice}
+          </Text>
+        ) : null}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing[3],
+            marginTop: notice && Platform.OS === 'ios' ? 10 : spacing[4],
+          }}
+        >
+          {notice && Platform.OS === 'android' ? (
+            <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={{ flex: 1 }}>
+              {notice}
+            </Text>
+          ) : (
+            status
+          )}
           <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
             <Text v="c1" weight="600" color="t2">
               {CHANGE_NUMBER}

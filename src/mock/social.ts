@@ -1,6 +1,6 @@
 // Mock routes for the social area. Owned by that area's screens.
 import type { Comment, Post, PostCategory, UserRef } from '@push/api-client'
-import { MOCK_USER_ID, mock, page } from './server'
+import { MOCK_USER_ID, mock, page, sortPosts } from './server'
 
 const H = 3600_000
 const at = (hoursAgo: number) => new Date(Date.now() - hoursAgo * H).toISOString()
@@ -47,17 +47,22 @@ export const emptyFeed = () => {
   feedEmpty = true
 }
 
+// Posts the reader saved, newest save first (push-be post_saves); two are saved from the start so 저장한 글 has rows.
+const savedIds = ['post-3', 'post-5']
+const withSaved = (p: Post): Post => ({ ...p, saved: savedIds.includes(p.id) })
+
 mock('GET', 'posts', ({ query }) => {
   const category = query.get('category') as PostCategory | null
   if (feedEmpty) return page([], query)
-  return page(category ? posts.filter((p) => p.category === category) : posts, query)
+  const rows = category ? posts.filter((p) => p.category === category) : posts
+  return page(rows.map(withSaved), query)
 })
 
 mock('GET', 'posts/:id', ({ params }) => {
   const p = posts.find((x) => x.id === params.id)
   if (!p) return notFound
   p.viewCount += 1
-  return { data: p }
+  return { data: withSaved(p) }
 })
 
 mock('POST', 'posts', ({ body }) => {
@@ -71,10 +76,26 @@ mock('POST', 'posts', ({ body }) => {
     imageUrls: b.imageKeys.map((k) => uploads.get(k) ?? img(k)),
     commentCount: 0,
     viewCount: 0,
+    saved: false,
     createdAt: new Date().toISOString(),
   }
   posts.unshift(p)
   return { status: 201, body: { data: p } }
+})
+
+mock('GET', 'me/saved-posts', ({ query }) => {
+  const { rows, fail } = sortPosts(savedIds.map((id) => posts.find((p) => p.id === id)!).filter(Boolean).map(withSaved), query)
+  return fail ?? page(rows, query, true)
+})
+mock('POST', 'posts/:id/save', ({ params }) => {
+  if (!posts.some((p) => p.id === params.id)) return notFound
+  if (!savedIds.includes(params.id!)) savedIds.unshift(params.id!)
+  return { status: 204, body: null }
+})
+mock('DELETE', 'posts/:id/save', ({ params }) => {
+  const at = savedIds.indexOf(params.id!)
+  if (at >= 0) savedIds.splice(at, 1)
+  return { status: 204, body: null }
 })
 
 mock('GET', 'posts/:id/comments', ({ params, query }) => page(comments[params.id!] ?? [], query))

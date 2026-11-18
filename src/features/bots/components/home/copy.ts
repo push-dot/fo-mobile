@@ -1,0 +1,15 @@
+export const LOADING_LABEL = 'Bot 목록을 불러오는 중이에요'
+export const ERROR_TITLE = 'Bot 목록을 불러오지 못했어요'
+export const ERROR_BODY = '인터넷 연결을 확인하고 다시 시도해 주세요.'
+export const RETRY_LABEL = '다시 시도'
+export const NEW_BOT_LABEL = '새 회사 Bot 만들기'
+export const MATERIALS_LABEL = '자료'
+export const SEARCH_LABEL = '검색'
+export const SEARCH_HINT = 'Bot 이름이나 대화 내용으로 찾아보세요'
+export const SEARCH_EMPTY = '검색 결과가 없어요'
+export const SEARCH_CLOSE = '검색 닫기'
+export const HERO_NAME = 'Push Bot'
+export const FIRST_SCREEN = 8
+export const LIST_BOTTOM = 150
+export const TAB_CLEARANCE = 84
+export const SEARCH_MESSAGE_GAP = 16

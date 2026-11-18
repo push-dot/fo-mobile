@@ -31,3 +31,36 @@ const nativeShadows = <T extends Record<string, string>>(theme: T) =>
   Object.fromEntries(Object.entries(theme).map(([k, v]) => [k, nativeShadow(v)])) as { [K in keyof T]: ReturnType<typeof nativeShadow> }
 
 export const shadow = { light: nativeShadows(shadows.light), dark: nativeShadows(shadows.dark) }
+
+/** The boards' `--iFill` (iOS system fill): translucent, so a field greys whatever sheet it sits on (FilterSkill's `.isearch`, #E3E3E9 on the board). */
+export const iosSystemFill = { light: 'rgba(118,118,128,.12)', dark: 'rgba(118,118,128,.24)' } as const
+
+/** The secondary button of an iOS light .pm8 sheet (`.light .isheet.pm8 .pm-f .btn.sec2`): systemFill over the sheet, #E1E1E6 on the board's #F2F2F7. */
+export const iosSheetButtonFill = 'rgba(120,120,128,.14)'
+
+/** The boards' `--iSheet`: the system fill of an iOS pageSheet (ChatPh0Input), systemGray6. */
+export const iosSheetFill = { light: '#F2F2F7', dark: '#1C1C1E' } as const
+
+/** A white A4 page in DocViewer: the board's 1pt ring, and the ring plus a soft drop under the first page. */
+export const paperPage = { ring: 'rgba(0,0,0,0.06) 0px 0px 0px 1px', lifted: 'rgba(0,0,0,0.06) 0px 0px 0px 1px, rgba(0,0,0,0.12) 0px 4px 14px' } as const
+
+/** The 1pt line between rows of a translucent iOS sheet: the board's --line is 6 steps darker than its #F3F3F6 sheet, the device sheet is #EBEBEB, where #EBEDF0 shows nothing, so the line is a tint. */
+export const iosSeparator = { light: 'rgba(118,118,128,0.06)', dark: palette.dark.line } as const
+
+/** The boards' `--iMat`: the iOS banner material (.ibanner). The board blurs what is behind it, RN cannot, so the fill is solid #F6F6F8: the header and the save button never show through. */
+export const iosMaterial = { light: 'rgb(246,246,248)', dark: 'rgb(44,44,46)' } as const
+
+/** The page counter pill over a document (DocViewer's `.num`): dark glass at .72 in both schemes. */
+export const counterPill = 'rgba(28,28,30,.72)'
+
+/** CSS shadows the boards draw inline on one component, outside the design system's set. */
+export const cssShadow = {
+  segment: '0 2px 8px rgba(0,0,0,.08)',
+  approvalSheet: '0 -10px 40px rgba(0,0,0,.12)',
+  /** `.ios .panel` (ChatApprove): the confirm panel's lift; the 1px ring is added in place. */
+  iosPanel: '0 -4px 30px rgba(0,0,0,.12)',
+  toast: '0 8px 24px rgba(0,0,0,.16)',
+  /** .ibanner: the iOS toast. */
+  banner: '0 10px 30px rgba(0,0,0,.14)',
+  toneToast: '0 10px 30px rgba(0,0,0,.18)',
+} as const

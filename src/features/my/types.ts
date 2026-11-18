@@ -1,4 +1,6 @@
-import type { Profile, SourceItem, UserRef } from '@push/api-client'
+import type { ReactNode } from 'react'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import type { Application, ApplicationStage, Profile, SourceItem, UserRef } from '@push/api-client'
 
 export type CalendarEventType = 'INTERVIEW' | 'DEADLINE' | 'FOLLOW_UP' | 'COFFEE_CHAT' | 'CUSTOM'
 
@@ -9,7 +11,24 @@ export type CalendarEvent = {
   startsAt: string
   endsAt: string | null
   notes: string
+  location?: string | null
   applicationId?: string | null
+}
+
+export type FitPartKey = 'techStack' | 'experienceLink' | 'careerLevel' | 'keyword' | 'domain'
+
+/** push-be GET /applications/{id}. `fit` is the stored posting fit of the applied document, absent until one was run. */
+export type ApplicationDetail = Application & {
+  stageEnteredAt?: Partial<Record<ApplicationStage, string>>
+  fit?: {
+    fitScore: number
+    parts: Record<FitPartKey, number>
+    topGap: string
+    plan: string
+    reachable: number
+    documentId: string
+    documentTitle: string | null
+  }
 }
 
 export type ResumeDraft = {
@@ -17,6 +36,7 @@ export type ResumeDraft = {
   email: string | null
   links: string[]
   projects?: string[]
+  mainSkills?: string[]
   profile: Pick<
     Profile,
     'displayName' | 'headline' | 'jobCategory' | 'tenureYears' | 'intro' | 'careers' | 'skills'
@@ -31,6 +51,8 @@ export type HubDocument = {
   applicationId: string | null
   title: string
   kind: string
+  template?: string
+  language?: string
   status: string
   latestVersionId: string | null
   updatedAt: string
@@ -56,3 +78,6 @@ export type ProfileSection = 'basic' | 'intro' | 'career' | 'skills'
 export type ActivitySub = 'applications' | 'calendar' | 'bookmarks' | 'follows' | 'posts'
 
 export type OfferPerson = UserRef & { companyName?: string | null; headline?: string; kind?: 'PERSON' | 'COMPANY' }
+
+/** A tab scrolling under the floating header of the 마이 screen: `top` clears it, `onScroll` tells it when to draw the fade. */
+export type ScrollUnderBar = { top?: number; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void; /** Scrolls with the content, above it (the 마이 tab row). */ lead?: ReactNode }

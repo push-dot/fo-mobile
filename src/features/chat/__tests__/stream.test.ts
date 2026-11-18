@@ -30,7 +30,7 @@ describe('fromStream', () => {
   it('stops on error, on an empty resume, and when there is no seq to resume from', async () => {
     const resume = vi.fn(() => frames())
     const err = await collect(fromStream(frames({ type: 'error', error: { code: 'FEATURE_DISABLED', message: '' } }), resume))
-    expect(err).toMatchObject([{ type: 'error', text: expect.stringContaining('크레딧') }])
+    expect(err).toMatchObject([{ type: 'error', text: '이번 달 사용량을 모두 썼어요.' }])
     expect(resume).not.toHaveBeenCalled()
     expect(await collect(fromStream(frames({ type: 'token', text: 'a', seq: 1 }), resume))).toEqual([{ type: 'token', text: 'a' }])
     expect(resume).toHaveBeenCalledTimes(1)
@@ -63,7 +63,7 @@ describe('fromStream', () => {
         question: '점수를 한 번 더 올릴까요?',
         sections: [
           {
-            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '그만하기' }],
+            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '닫기' }],
           },
         ],
       },

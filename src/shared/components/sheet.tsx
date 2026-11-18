@@ -4,36 +4,46 @@ import { Platform, View, type ViewProps } from 'react-native'
 import { initialWindowMetrics, SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
+import { GRABBER } from './constants'
 import { SheetSurface } from './glass'
+import { PM8_SLIM_ACTION } from './pm8'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
-import GlassButton from './glass-button'
 import Text from './text'
 import { mountSheet, sizeSheet } from './toast-store'
 
 type Props = {
   title?: string
   description?: string
-  children: ReactNode
-  action?: { label: string; onPress: () => void; disabled?: boolean }
+  children?: ReactNode
+  action?: { label: string; onPress: () => void; disabled?: boolean; pending?: boolean }
   secondary?: { label: string; onPress: () => void }
-  /** iOS only: a glass close button left of the title. Android closes by drag or back. */
-  onClose?: () => void
+  /** The space between the action and the secondary button when a board draws it tighter than the sheet gap. */
+  secondaryGap?: number
   gap?: number
   /** Extra space above the action: the boards add 6 (filters) or 4 (quick starts) to the sheet gap. */
   actionGap?: number
+  /** iOS filter sheets (.ifoot .btn): a 52 high CTA with 26 under it instead of 56 with 20, the same 78 of footer. */
+  slimAction?: boolean
+  /** Space between the grabber and the first block when a board draws it other than the sheet gap (the .pm8 title sits 17 under the top: gap 0). */
+  topGap?: number
+  /** A board that tints its secondary button other than the plain fill (the .pm8 iOS light sheet: systemFill over the sheet). */
+  secondaryFill?: string
+  /** iOS: extra space under the action, for a board that draws the sheet taller than the 26 under a slim CTA (PushDocRename: 38). */
+  bottomExtra?: number
   onLayout?: ViewProps['onLayout']
   /** Drawn to the top of the screen (route with fullSheetOptions): fills the sheet and keeps the CTA at the bottom. */
   full?: boolean
 }
 
-const GRAB = { width: 36, height: 5, radius: 3 }
 const SHEET_GAP = 14
+// .ifoot .btn is 52 high (radius 26) and the sheet ends 26 under it: 4 less than the shared 56, 6 more below.
+const SLIM_ACTION_BOTTOM = 6
 const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 }
 // The window's, not the sheet's: a sheet over the tab bar reads the tab bar into its bottom inset (83 for 34).
 const HOME_INSET = initialWindowMetrics?.insets.bottom ?? 0
 
-const Body = ({ title, description, children, action, secondary, onClose, gap = SHEET_GAP, actionGap, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
+const Body = ({ title, description, children, action, secondary, secondaryGap, gap = SHEET_GAP, actionGap, slimAction, bottomExtra = 0, topGap = gap, secondaryFill, onLayout, full, homeInset = 0 }: Props & { homeInset?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const android = Platform.OS === 'android'
@@ -50,7 +60,6 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
     })
     return () => (sub(), close())
   }, [android, id, navigation])
-  const close = onClose && !android ? <GlassButton actions={[{ icon: 'x', label: '닫기', onPress: onClose }]} /> : null
   return (
     <View
       onLayout={(e) => {
@@ -59,20 +68,23 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
       }}
       style={{
         flex: full ? 1 : undefined,
-        paddingTop: android ? spacing[3] : spacing[3] + GRAB.height + gap,
+        paddingTop: android ? spacing[3] : spacing[3] + GRABBER.ios.height + topGap,
         paddingHorizontal: android || full ? spacing[5] : spacing[4],
-        paddingBottom: android ? insets.bottom + spacing[3] : full ? homeInset + spacing[3] : insets.bottom || (homeInset ? 0 : spacing[5]),
+        paddingBottom: android
+          ? insets.bottom + spacing[3]
+          : full
+            ? homeInset + spacing[3]
+            : (insets.bottom || (homeInset ? 0 : spacing[5])) + (slimAction ? SLIM_ACTION_BOTTOM : 0) + bottomExtra,
         gap,
       }}
     >
       {android ? (
-        <View style={{ width: GRAB.width, height: GRAB.height, borderRadius: GRAB.radius, backgroundColor: c.deco, alignSelf: 'center' }} />
+        <View style={{ ...GRABBER.android, backgroundColor: c.deco, alignSelf: 'center' }} />
       ) : null}
-      {title || close ? (
+      {title ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-          {close}
           {title ? (
-            <View style={{ flex: 1, gap: 2 }}>
+            <View style={{ flex: 1, gap: spacing[1] }}>
               <Text v="h2" accessibilityRole="header">
                 {title}
               </Text>
@@ -86,8 +98,8 @@ const Body = ({ title, description, children, action, secondary, onClose, gap = 
         </View>
       ) : null}
       {children}
-      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} style={full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : undefined} /> : null}
-      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} /> : null}
+      {action ? <Button label={action.label} onPress={action.onPress} disabled={action.disabled} pending={action.pending} style={[full ? { marginTop: 'auto' } : actionGap ? { marginTop: actionGap } : null, slimAction && PM8_SLIM_ACTION]} /> : null}
+      {secondary ? <Button label={secondary.label} variant="secondary" onPress={secondary.onPress} style={[secondaryGap === undefined ? null : { marginTop: secondaryGap - gap }, secondaryFill ? { backgroundColor: secondaryFill } : null]} /> : null}
     </View>
   )
 }

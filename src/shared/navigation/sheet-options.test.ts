@@ -5,11 +5,19 @@ const platform = vi.hoisted(() => ({ OS: 'ios' }))
 vi.mock('react-native', () => ({ Platform: platform }))
 vi.mock('expo-secure-store', () => ({}))
 
-const { fullSheetOptions, sheetOptions } = await import('./sheet-options')
+const { fullSheetOptions, modalOptions, sheetOptions, tintedSheetOptions } = await import('./sheet-options')
 const c = palette.light
 
 beforeEach(() => {
   platform.OS = 'ios'
+})
+
+describe('tintedSheetOptions', () => {
+  it('lays the design sheet tint over the iOS material and keeps the plain Android surface', () => {
+    expect(tintedSheetOptions(c).contentStyle).toEqual({ backgroundColor: c.sheet })
+    platform.OS = 'android'
+    expect(tintedSheetOptions(c).contentStyle).toEqual({ backgroundColor: c.bg })
+  })
 })
 
 describe('sheetOptions', () => {
@@ -37,5 +45,11 @@ describe('sheetOptions', () => {
 
   it('draws a full-height sheet opaque on both platforms', () => {
     expect(fullSheetOptions(c)).toMatchObject({ sheetAllowedDetents: [1], contentStyle: { backgroundColor: c.bg } })
+  })
+
+  it('keeps the system modal on iOS and draws the full sheet on Android', () => {
+    expect(modalOptions(c)).toEqual({ presentation: 'modal' })
+    platform.OS = 'android'
+    expect(modalOptions(c)).toMatchObject({ presentation: 'formSheet', sheetAllowedDetents: [1], sheetCornerRadius: radius.sheetTop })
   })
 })

@@ -4,6 +4,7 @@ import { Icon, Text } from '../../../shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { fontFor, spacing, useColors } from '../../../theme'
 import { COUNTRY_CODE, COUNTRY_CODE_LABEL, FIELD_RADIUS } from '../constants'
+import { softPad } from '../utils/soft-pad'
 
 const PhoneField = ({ value, onChange }: { value: string; onChange: (next: string) => void }) => {
   const c = useColors()
@@ -24,6 +25,8 @@ const PhoneField = ({ value, onChange }: { value: string; onChange: (next: strin
         style={{ flex: 1, height: 56, paddingHorizontal: 14, borderRadius: FIELD_RADIUS, backgroundColor: c.bg2, borderWidth: 2, borderColor: focused ? c.ac : 'transparent', justifyContent: 'center' }}
       >
         <TextInput
+          autoFocus
+          showSoftInputOnFocus={softPad.shown}
           accessibilityLabel="휴대폰 번호"
           value={value}
           onChangeText={onChange}

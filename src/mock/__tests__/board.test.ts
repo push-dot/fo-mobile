@@ -49,6 +49,17 @@ describe('mock data drawn on the design boards', () => {
     expect((await fetchJson<Listed>('search?q=데브옵스 인턴&type=postings')).page.total).toBe(0)
   })
 
+  it('counts every search tab without opening it, with the same totals the tabs report', async () => {
+    const counts = (q: string) => fetchJson<{ data: Record<'postings' | 'people' | 'posts', number> }>(`search/counts?q=${encodeURIComponent(q)}`)
+    expect((await counts('백엔드')).data).toEqual({ postings: 24, people: 8, posts: 13 })
+    const q = 'ㅂㅇㄷ'
+    const totals = await Promise.all(
+      (['postings', 'people', 'posts'] as const).map(async (type) => [type, (await fetchJson<Listed>(`search?q=${q}&type=${type}`)).page.total]),
+    )
+    expect((await counts(q)).data).toEqual(Object.fromEntries(totals))
+    expect(Object.values((await counts(q)).data).some((n) => n > 0)).toBe(true)
+  })
+
   it('has three unread notifications', async () => {
     const list = await fetchJson<{ data: { readAt: string | null }[] }>('me/notifications')
     expect(list.data.filter((n) => !n.readAt)).toHaveLength(3)
@@ -56,7 +67,7 @@ describe('mock data drawn on the design boards', () => {
 
   it('lets the phone code pick the outcome', async () => {
     const verify = (code: string) =>
-      fetchJson<{ error?: { code: string }; data?: { accessToken: string } }>('auth/phone/verify', {
+      fetchJson<{ error?: { code: string; details?: unknown }; data?: { accessToken: string; created: boolean } }>('auth/phone/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: '+821012345678', code }),
@@ -64,7 +75,18 @@ describe('mock data drawn on the design boards', () => {
     expect((await verify('482111')).error?.code).toBe('PHONE_CODE_INVALID')
     expect((await verify('482222')).error?.code).toBe('PHONE_CODE_EXPIRED')
     expect((await verify('482333')).error?.code).toBe('RATE_LIMITED')
-    expect((await verify('482915')).data?.accessToken).toBeTruthy()
+    expect((await verify('482666')).data).toMatchObject({ created: false, accessToken: expect.any(String) })
+    expect((await verify('482915')).data).toMatchObject({ created: true, accessToken: expect.any(String) })
+  })
+
+  it('opens the phone screen as after a Google sign-in', async () => {
+    const { pendingSocialPhone } = await import('../home')
+    const { usePhoneAuth } = await import('../../features/auth/stores')
+    const { emailFromPendingToken } = await import('../../features/auth/utils/auth-flow')
+    pendingSocialPhone()
+    const draft = usePhoneAuth.getState()
+    expect(draft).toMatchObject({ mode: 'social', email: 'seojun.kim@gmail.com', provider: 'google' })
+    expect(emailFromPendingToken(draft.pendingToken!)).toBe('seojun.kim@gmail.com')
   })
 
   it('leaves no 오늘 notifications after 모두 읽음', async () => {

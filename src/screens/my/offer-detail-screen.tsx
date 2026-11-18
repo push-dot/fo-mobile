@@ -15,6 +15,7 @@ import {
   useOfferMenu,
   useViewerBox,
 } from '@/features/my'
+import { openPostingBot } from '@/features/bots'
 import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 
@@ -58,7 +59,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
           <GlassButton
             actions={[
               {
-                icon: 'menu',
+                icon: 'more',
                 label: '더 보기',
                 menu: menu ?? [],
               },
@@ -72,7 +73,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
           {who.kind === 'COMPANY' ? (
-            <Logo name={who.companyName ?? who.displayName} size={56} />
+            <Logo name={who.companyName ?? who.displayName} size={56} mono />
           ) : (
             <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
           )}
@@ -114,27 +115,21 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
         {pending && p ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/(app)/(stack)/(tabs)/(chat)/chat')}
+            onPress={() => openPostingBot(p.id)}
             style={{
               paddingVertical: spacing[4],
               paddingHorizontal: spacing[5],
               borderRadius: radius.card,
-              backgroundColor: c.acSoft,
+              backgroundColor: c.bg2,
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing[3],
             }}
           >
-            <Icon name="spark" size={22} color={c.ac} />
-            <View style={{ flex: 1 }}>
-              <Text v="b2" weight="700">
-                답장 전에 이 공고에 맞춰 볼까요?
-              </Text>
-              <Text v="c1" color="t2">
-                에이전트가 적합도를 보고 이력서를 고쳐 드려요
-              </Text>
-            </View>
-            <Icon name="chev" size={18} color={c.ac} />
+            <Text v="b2" weight="700" style={{ flex: 1 }}>
+              Bot한테 이 공고 보내기
+            </Text>
+            <Icon name="chev" size={18} color="t3" />
           </Pressable>
         ) : null}
       </ScrollView>
@@ -147,7 +142,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             disabled={decline.isPending}
             style={{ paddingHorizontal: DECLINE_INSET }}
             onPress={() =>
-              Alert.alert('이 제안을 거절할까요?', `${who.displayName} 님에게 거절했다고 알려요.`, [
+              Alert.alert('이 제안을 거절할까요?', `${o.sender.displayName} 님에게 이번 제안은 정중히 거절한다고 전해요.`, [
                 { text: '취소', style: 'cancel' },
                 { text: OFFER_DECLINE, style: 'destructive', onPress: () => decline.mutate() },
               ])

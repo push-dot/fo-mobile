@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { applyEvent, emptyChat, formatElapsed } from '../utils/reducer'
 import type { ChatEvent, ChatState } from '../types'
 
@@ -18,12 +18,20 @@ describe('applyEvent', () => {
   it('tracks working state from start through approval', () => {
     let s = run([{ type: 'start', at: 1000 }, { type: 'status', verbs: ['맞춰보는 중…'] }])
     expect(s.working).toEqual({ verbs: ['맞춰보는 중…'], startedAt: 1000 })
-    s = applyEvent(s, { type: 'approval', approval: { id: 'ap', question: '바꿀까요?', sections: [] } })
+    s = applyEvent(s, { type: 'approval', approval: { id: 'ap', question: '바꿀까요?', optionIds: [], sections: [] } })
     expect(s.working).toBeNull()
     expect(s.approval?.id).toBe('ap')
     s = applyEvent(s, { type: 'answer', text: '네, 반영해 주세요' })
     expect(s.approval).toBeNull()
     expect(s.items.at(-1)).toMatchObject({ type: 'user', text: '네, 반영해 주세요' })
+  })
+
+  it('starts the clock now for a status frame that no start event stamped (a reopened or reset chat)', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(5_000)
+    const s = run([{ type: 'status', verbs: ['점수 올리는 중…'] }])
+    expect(s.working).toEqual({ verbs: ['점수 올리는 중…'], startedAt: 5_000 })
+    expect(applyEvent(s, { type: 'status', verbs: ['키워드를 넣는 중…'] }).working?.startedAt).toBe(5_000)
+    vi.restoreAllMocks()
   })
 
   it('appends streamed tokens to the last agent line only', () => {
@@ -48,7 +56,7 @@ describe('applyEvent', () => {
     expect(s.items[1]).toMatchObject({ type: 'agentText', text: '안녕' })
   })
 
-  it('stop marks running tools interrupted and remembers it for the next message', () => {
+  it('stop ends the run with one notice line and remembers it for the next message', () => {
     const s = run([
       { type: 'start', at: 0 },
       { type: 'tool', id: 'ok', action: '공고 읽기', state: 'ok' },
@@ -57,8 +65,7 @@ describe('applyEvent', () => {
     ])
     expect(s.working).toBeNull()
     expect(s.interrupted).toBe(true)
-    expect(s.items[0]).toMatchObject({ state: 'ok' })
-    expect(s.items[1]).toMatchObject({ state: 'err', error: '중단됨 · 어떻게 할지 알려 주세요', result: undefined })
+    expect(s.items.at(-1)).toMatchObject({ type: 'notice', notice: { kind: 'stopped', resumable: false } })
     expect(applyEvent(s, { type: 'start', at: 5 }).interrupted).toBe(false)
   })
 
@@ -79,5 +86,25 @@ describe('applyEvent', () => {
     const s = run([{ type: 'start', at: 0 }, { type: 'error', id: 'e', text: '크레딧이 모자라요' }])
     expect(s.working).toBeNull()
     expect(s.items.at(-1)).toMatchObject({ type: 'error', text: '크레딧이 모자라요' })
+  })
+})
+
+describe('boost rounds on the fit bubble', () => {
+  const round = (name: string, target: string, result: string) => ({ type: 'tool' as const, id: name, name, action: '점수 올리기', target, state: 'ok' as const, result })
+  it('carries what the rounds since the last user line raised, and nothing from an earlier turn', () => {
+    let s = emptyChat
+    for (const e of [
+      { type: 'user' as const, id: 'u0', text: '처음' },
+      round('boost1', '이전', '5.0 → 5.5 · 예전'),
+      { type: 'user' as const, id: 'u', text: '좋아요, 계속해 주세요' },
+      round('boost1', '키워드 밀도', '6.9 → 7.8 · 키워드를 넣었어요'),
+      round('boost2', '도메인 경험', '7.8 → 8.3 · 다시 썼어요'),
+      { type: 'fit' as const, id: 'f', score: 8.3, from: 6.9, delta: '+1.4', note: 'x' },
+    ]) s = applyEvent(s, e)
+    expect(s.items.at(-1)).toMatchObject({ type: 'fit', rounds: [{ label: '키워드 밀도', line: '6.9 → 7.8 · 키워드를 넣었어요' }, { label: '도메인 경험', line: '7.8 → 8.3 · 다시 썼어요' }] })
+  })
+  it('leaves an analysis fit with no rounds', () => {
+    const s = applyEvent(emptyChat, { type: 'fit', id: 'f', score: 6.9 })
+    expect(s.items[0]).not.toHaveProperty('rounds')
   })
 })

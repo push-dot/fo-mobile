@@ -20,7 +20,7 @@ const base = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYe
 
 // Sample people from the Claude Design boards (허브, 프로필 상세, 제안하기).
 export const profiles: Profile[] = [
-  base({ userId: 'u1', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, careerStatus: 'seeking', skills: ['Kotlin', 'Spring Boot', 'Kafka'], followerCount: 128 }),
+  base({ userId: 'u-taeyoon', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, careerStatus: 'seeking', skills: ['Kotlin', 'Spring Boot', 'Kafka'], followerCount: 128 }),
   base({
     userId: 'u2',
     displayName: '이하은',

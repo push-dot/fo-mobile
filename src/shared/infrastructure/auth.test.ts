@@ -19,11 +19,12 @@ vi.mock('expo-router', () => ({ router: { push } }))
 vi.mock('./session-store', () => ({ useSession: { getState: () => ({ set: setSession }) } }))
 vi.mock('./api-client', () => ({ api: { me: { consents }, auth: { start: async () => ({ authorizationUrl: 'https://auth.example/start' }), exchange } } }))
 vi.mock('./pkce', () => ({ createPkce: async () => ({ verifier: 'verifier', challenge: 'challenge' }) }))
-vi.mock('./platform', () => ({ openAuthSession: async () => ({ type: 'success', url: 'https://push.app/callback?code=abc' }) }))
+const appleFails = vi.hoisted(() => vi.fn(() => false))
+vi.mock('./platform', () => ({ mockAppleFailing: appleFails, openAuthSession: async () => ({ type: 'success', url: 'https://push.app/callback?code=abc' }) }))
 vi.mock('../../features/auth/utils/auth-flow', () => ({ isAppleCancel: () => false }))
 vi.mock('../../features/auth/stores', () => ({ usePhoneAuth: { getState: () => ({ hold }) } }))
 
-const { signIn } = await import('./auth')
+const { signIn, signInWithApple } = await import('./auth')
 
 const session = {
   accessToken: 'at',
@@ -83,5 +84,11 @@ describe('social sign-in terms gate', () => {
     expect(setSession).not.toHaveBeenCalled()
     expect(hold).not.toHaveBeenCalled()
     expect(push).not.toHaveBeenCalled()
+  })
+
+  it('reports a failed Apple sign-in when the mock says so, without opening the sheet', async () => {
+    appleFails.mockReturnValue(true)
+    await expect(signInWithApple()).resolves.toEqual({ kind: 'failed' })
+    appleFails.mockReturnValue(false)
   })
 })

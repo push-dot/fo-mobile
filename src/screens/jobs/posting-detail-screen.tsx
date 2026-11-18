@@ -1,45 +1,57 @@
 import { router } from 'expo-router'
-import { Platform, View } from 'react-native'
+import { useState } from 'react'
+import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { usePosting } from '@/features/jobs'
-import { Button, DetailWebView, TopBar } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { botPickPath } from '@/features/bots'
+import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
+import { Button, CtaBar, DetailWebView, FloatingHeader, GlassButton, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
+import { shareMessage } from '@/shared/infrastructure'
+import { useColors } from '@/theme'
 
-const PostingDetailScreen = ({ id }: { id: string }) => {
+// CtaBar: 14 above the buttons, 56 for them, 6 below plus the home-indicator inset.
+const CTA_HEIGHT = 14 + 56 + 6
+
+const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const c = useColors()
-  const insets = useSafeAreaInsets()
   const { data: p } = usePosting(id)
-  const android = Platform.OS === 'android'
-  const barBottom = insets.bottom + (android ? 10 : 6)
+  const toggleBookmark = useToggleBookmark()
+  const { onHeight, inset } = useFloatingHeader()
+  const [offset, setOffset] = useState(0)
+  const { top, bottom } = useSafeAreaInsets()
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar onBack={() => router.back()} />
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} />
-      <View
-        style={{
-          flexDirection: 'row',
-          gap: spacing[2],
-          paddingTop: 14,
-          paddingHorizontal: spacing[4],
-          paddingBottom: barBottom,
-          backgroundColor: c.bg,
-          borderTopWidth: android ? 1 : 0,
-          borderTopColor: c.line,
-        }}
-      >
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
+      <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
+      <TopBar
+        transparent
+        onBack={() => router.back()}
+        right={
+          p ? (
+            <GlassButton
+              actions={[
+                { icon: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크', active: p.bookmarked, onPress: () => toggleBookmark(p) },
+                { icon: 'share', label: '공유', onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }) },
+              ]}
+            />
+          ) : null
+        }
+      />
+      </FloatingHeader>
+      <CtaBar light>
         <Button
-          label="에이전트로 맞추기"
+          label="Bot한테 보내기"
           variant="secondary"
-          onPress={() => router.push({ pathname: '/(app)/(stack)/(tabs)/(chat)/chat', params: { postingId: id } })}
+          onPress={() => router.push(botPickPath({ kind: 'posting', id }))}
         />
         <Button
           label={p?.applied ? '지원 완료' : '지원하기'}
-          disabled={!p || p.applied}
+          disabled={!p}
+          pending={p?.applied}
           onPress={() => router.push({ pathname: '/apply', params: { postingId: id } })}
           style={{ flex: 1 }}
         />
-      </View>
+      </CtaBar>
     </View>
   )
 }

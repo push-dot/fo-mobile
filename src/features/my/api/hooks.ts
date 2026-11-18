@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
-import { type LinkKind, type Offer, type Profile, type Settings } from '@push/api-client'
+import { type LinkKind, type MyPostsSort, type Offer, type Profile, type Settings } from '@push/api-client'
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
-import { useSession } from '@/shared/infrastructure'
-import { marketingResult, nextEventFor, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
+import { mockUploadHeldAt, useSession } from '@/shared/infrastructure'
+import { marketingResult, nextEventFor, type PostsView, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
 import {
   acceptOffer,
   addLink,
@@ -19,6 +19,7 @@ import {
   unarchiveOffer,
   declineOffer,
   deleteLink,
+  duplicateDocument,
   restoreLink,
   fetchAuthMe,
   fetchBookmarkList,
@@ -27,9 +28,11 @@ import {
   fetchFollows,
   fetchLinks,
   fetchAppliedApplications,
+  fetchApplication,
   fetchMyApplications,
   fetchMyBookmarks,
   fetchMyPosts,
+  fetchSavedPosts,
   fetchMyProfile,
   fetchOffer,
   fetchOfferMessages,
@@ -54,6 +57,7 @@ import {
   setDocumentBaseProfile,
   unfollowProfile,
   unbookmarkPosting,
+  grantReferenceAccess,
   updateProfile,
   updateMarketingConsent,
   updateReferenceConsent,
@@ -78,7 +82,15 @@ export const useReferenceConsent = () => {
     onSuccess: (data) => qc.setQueryData(['me', 'consents'], data),
     onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
-  return { data: q.data, save: m.mutate, saving: m.isPending }
+  const grant = useMutation({
+    mutationFn: grantReferenceAccess,
+    onSuccess: (data) => {
+      qc.setQueryData(['me', 'consents'], data)
+      void qc.invalidateQueries({ queryKey: ['me', 'settings'] })
+    },
+    onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+  })
+  return { data: q.data, save: m.mutate, grant: grant.mutate, saving: m.isPending }
 }
 
 export const useMarketingConsent = () => {
@@ -120,7 +132,7 @@ export const useConvertDocument = (onDone: (documentId: string, jobId?: string) 
       void qc.invalidateQueries({ queryKey: ['documents'] })
       if (data.documentId) onDone(data.documentId, data.jobId)
     },
-    onError: () => Alert.alert('지원 서류용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
+    onError: () => Alert.alert('지원용 프로필을 만들지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
 
@@ -154,6 +166,8 @@ export const useRenameDocument = (doc: { id: string; revision: number } | undefi
 
 export const useArchiveDocument = (doc: { id: string; revision: number } | undefined) =>
   useDocumentWrite(() => archiveDocument(doc!.id, doc!.revision))
+
+export const useDuplicateDocument = () => useDocumentWrite((id: string) => duplicateDocument(id))
 
 export const useIngestJob = (jobId: string | undefined, enabled = true) =>
   useQuery({ ...ingestJobQuery(jobId), enabled: ingestEnabled(jobId, enabled) })
@@ -256,6 +270,12 @@ export const useMyApplications = () =>
     queryFn: fetchMyApplications,
   })
 
+export const useApplication = (id: string) =>
+  useQuery({
+    queryKey: ['applications', 'detail', id],
+    queryFn: () => fetchApplication(id),
+  })
+
 export const useAppliedApplications = () =>
   useQuery({
     queryKey: ['applications', 'applied-list'],
@@ -270,7 +290,7 @@ export const useMyBookmarks = () => {
   })
   const unbookmark = useMutation({
     mutationFn: unbookmarkPosting,
-    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
+    onSettled: () => Promise.all([qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }), qc.invalidateQueries({ queryKey: ['calendar'] })]),
   })
   return { query, unbookmark }
 }
@@ -294,13 +314,24 @@ export const useMyFollowers = () =>
     queryFn: fetchFollowers,
   })
 
-export const useMyPosts = () => useQuery({ queryKey: ['me', 'posts'], queryFn: fetchMyPosts })
+export const useMyPosts = (sort: MyPostsSort = 'latest') =>
+  useQuery({ queryKey: ['me', 'posts', sort], queryFn: () => fetchMyPosts(sort) })
 
-export const useMyCommentedPosts = () =>
+export const useMyCommentedPosts = (sort: MyPostsSort = 'latest') =>
   useQuery({
-    queryKey: ['me', 'commented-posts'],
-    queryFn: fetchCommentedPosts,
+    queryKey: ['me', 'commented-posts', sort],
+    queryFn: () => fetchCommentedPosts(sort),
   })
+
+const POSTS_LISTS = {
+  mine: { key: 'posts', fetch: fetchMyPosts },
+  commented: { key: 'commented-posts', fetch: fetchCommentedPosts },
+  saved: { key: 'saved-posts', fetch: fetchSavedPosts },
+} as const
+
+/** The list behind the 내가 쓴 글 screen's current 보기 and 정렬; the other views are not fetched. */
+export const usePostsList = (view: PostsView, sort: MyPostsSort) =>
+  useQuery({ queryKey: ['me', POSTS_LISTS[view].key, sort], queryFn: () => POSTS_LISTS[view].fetch(sort) })
 
 export const useCalendarEvents = (from: string, to: string) =>
   useQuery({
@@ -330,26 +361,21 @@ export const useAddCalendarEvent = (onAdded: () => void) => {
 }
 
 export const useSource = (id: string) =>
-  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => fetchSource(id) })
+  useQuery({ queryKey: ['me', 'sources', id], queryFn: () => fetchSource(id), enabled: !!id })
+
+export const useRenameSource = (id: string | undefined) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (fileName: string) => myApi.renameSource(id!, fileName),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
+  })
+}
 
 export const useResumeDraft = (id: string) =>
   useQuery({
     queryKey: ['me', 'sources', id, 'draft'],
     queryFn: () => myApi.resumeDraft(id),
   })
-
-export const useApplyResumeProfile = (onDone: () => void) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (patch: Partial<Profile>) => updateProfile(patch),
-    onSuccess: (p) => {
-      qc.setQueryData(['me', 'profile'], p)
-      onDone()
-      router.dismissTo({ pathname: '/my', params: { tab: 'profile' } })
-    },
-    onError: () => Alert.alert('프로필에 반영하지 못했어요', '잠시 뒤에 다시 반영해 주세요.'),
-  })
-}
 
 type Patch = Partial<Profile> & { avatarKey?: string }
 
@@ -448,7 +474,7 @@ export const useOfferMessages = (offerId: string) => {
 
 type Upload = { name: string; size: number; progress: number }
 
-export const useUpload = (onDone: () => void) => {
+export const useUpload = (onDone?: () => void) => {
   const qc = useQueryClient()
   const [upload, setUpload] = useState<Upload | null>(null)
   const cancelled = useRef(false)
@@ -460,13 +486,13 @@ export const useUpload = (onDone: () => void) => {
     cancelled.current = false
     setUpload({ name: file.name, size, progress: 0.05 })
     timer.current = setInterval(
-      () => setUpload((u) => u && { ...u, progress: u.progress + (0.9 - u.progress) * 0.12 }),
+      () => setUpload((u) => u && { ...u, progress: mockUploadHeldAt() ?? u.progress + (0.9 - u.progress) * 0.12 }),
       200,
     )
     try {
       const s = await myApi.upload(file)
       if (cancelled.current) await myApi.remove(s.id).catch(() => undefined)
-      else onDone()
+      else onDone?.()
     } catch {
       if (!cancelled.current)
         Alert.alert('파일을 올리지 못했어요', '네트워크를 확인하고 다시 올려 주세요.')

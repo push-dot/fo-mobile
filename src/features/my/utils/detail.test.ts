@@ -17,7 +17,7 @@ describe('my detail rules', () => {
     expect(fitTen(undefined)).toBe('')
   })
 
-  it('reads a Push 서류 into profile sections the way push-be does', () => {
+  it('reads a Push 프로필 into profile sections the way push-be does', () => {
     const profile = hubProfile(
       doc(
         h('헤드라인'),
@@ -46,7 +46,7 @@ describe('my detail rules', () => {
     })
   })
 
-  it('treats a Push 서류 without headings as an intro', () => {
+  it('treats a Push 프로필 without headings as an intro', () => {
     expect(hubProfile(doc(p('첫 줄'), p('• 둘째 줄')))).toEqual({
       headline: '',
       intro: '첫 줄\n둘째 줄',
@@ -71,6 +71,14 @@ describe('my detail rules', () => {
       { label: '결과', date: null, state: 'todo' },
     ])
     expect(stageSteps('APPLIED', null).map((s) => s.state)).toEqual(['now', 'todo', 'todo', 'todo'])
+  })
+
+  it('dates each reached stage from when the server says it began', () => {
+    const at = (m: number, d: number) => new Date(2026, m - 1, d, 10).toISOString()
+    const entered = { APPLIED: at(10, 14), SCREENING: at(10, 17), INTERVIEW: at(10, 21) }
+    expect(stageSteps('INTERVIEW', at(10, 14), entered).map((s) => s.date)).toEqual(['10.14', '10.17', '10.21', null])
+    expect(stageSteps('SCREENING', at(10, 14), entered).map((s) => s.date)).toEqual(['10.14', '10.17', null, null])
+    expect(stageSteps('REJECTED', at(10, 14), { ...entered, REJECTED: at(11, 2) }).map((s) => s.date)).toEqual(['10.14', '10.17', '10.21', '11.02'])
   })
 
   it('names when the next event starts', () => {

@@ -1,0 +1,251 @@
+import { router } from 'expo-router'
+import { useState } from 'react'
+import { Platform, Pressable, ScrollView, View } from 'react-native'
+import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, XL_ROW_HEIGHT, XL_ROW_LABEL } from '@/shared/components'
+import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
+import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { mascotPalette } from '../../../../theme/mascot'
+import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
+import { botAllowedPath, botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
+import type { Bot, BotAddress } from '../../types'
+import {
+  COLOR_A11Y,
+  PROFILE_ERROR_BODY,
+  PROFILE_ERROR_TITLE,
+  PROFILE_LOADING_LABEL,
+  RETRY_LABEL,
+  profileGroups,
+  type ProfileRow,
+} from './profile-rows'
+import { companyNames } from './companies'
+import { confirmDeleteBot } from './confirm-delete-bot'
+
+// BotProfile boards: `.pnav` is 60 high with 16pt edges, the chat header's measure. Android keeps its own bar.
+const IOS = Platform.OS === 'ios'
+const HEADER_MASCOT = 104
+const COLOR_DOT = 22
+
+const LOADING_GROUPS: readonly (readonly number[])[] = [[60, 80], [60], [40, 60], [80]]
+const SKELETON_MASCOT_RADIUS = 36
+
+const Loading = () => {
+  const c = useColors()
+  return (
+    <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
+      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
+      <View
+        style={{
+          alignItems: 'center',
+          gap: spacing[1],
+          paddingTop: spacing[1],
+          paddingHorizontal: 28,
+          paddingBottom: spacing[5],
+        }}
+      >
+        <View style={{ marginBottom: 10 }}>
+          <Skeleton width={HEADER_MASCOT} height={HEADER_MASCOT} radius={SKELETON_MASCOT_RADIUS} />
+        </View>
+        <Skeleton width={120} height={22} />
+        <View style={{ marginTop: 6 }}>
+          <Skeleton width={180} height={14} />
+        </View>
+      </View>
+      {LOADING_GROUPS.map((widths, group) => (
+        <View
+          key={group}
+          style={{
+            marginHorizontal: spacing[5],
+            marginTop: group > 0 ? spacing[3] : 0,
+            borderRadius: radius.card,
+            backgroundColor: c.bg2,
+            paddingHorizontal: spacing[4],
+          }}
+        >
+          {widths.map((width, row) => (
+            <View
+              key={row}
+              style={{
+                minHeight: 56,
+                justifyContent: 'center',
+                borderTopWidth: row > 0 ? 1 : 0,
+                borderTopColor: c.line,
+              }}
+            >
+              <Skeleton width={width} height={14} />
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  )
+}
+
+const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typeof Mascot>[0]['color']; sub?: string }) => {
+  const xl = useXlBoardText()
+  const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        gap: spacing[1],
+        paddingTop: spacing[1],
+        paddingHorizontal: 28,
+        paddingBottom: spacing[5],
+      }}
+    >
+      <View style={{ marginBottom: 6 }}>
+        <Mascot size={size.mascot} color={color} motion={{ mode: 'still' }} />
+      </View>
+      <Text
+        weight="800"
+        numberOfLines={2}
+        allowFontScaling={xl ? false : undefined}
+        style={{
+          textAlign: 'center',
+          maxWidth: 330,
+          fontSize: size.name,
+          lineHeight: size.nameLine,
+        }}
+      >
+        {name}
+      </Text>
+      {sub ? (
+        <Text color="t3" numberOfLines={1} allowFontScaling={xl ? false : undefined} style={{ textAlign: 'center', fontSize: size.sub, lineHeight: size.subLine }}>
+          {sub}
+        </Text>
+      ) : null}
+    </View>
+  )
+}
+
+const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void }) => {
+  const c = useColors()
+  return (
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <TopBar circleBack chat={IOS} onBack={() => router.back()} />
+      {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
+      <View
+        accessibilityRole="alert"
+        style={{
+          alignItems: 'center',
+          gap: spacing[2],
+          paddingHorizontal: 36,
+          paddingTop: spacing[6],
+        }}
+      >
+        <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
+          {PROFILE_ERROR_TITLE}
+        </Text>
+        <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+          {PROFILE_ERROR_BODY}
+        </Text>
+        <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={{ marginTop: spacing[3] }} />
+      </View>
+    </View>
+  )
+}
+
+const BotProfileView = ({ address }: { address: BotAddress }) => {
+  const c = useColors()
+  const mode = useThemeMode()
+  const profile = useBotProfile(address)
+  const listed = useBot(address)
+  const setMuted = useSetBotMuted()
+  const remove = useDeleteBot()
+  const companies = companyNames(useBots().data)
+  const [deleting, setDeleting] = useState(false)
+  const xl = useXlBoardText()
+  if (profile.isLoading) return <Loading />
+  if (profile.isError || !profile.data) return <Failed bot={listed.data} onRetry={() => void profile.refetch()} />
+  const { bot, posting } = profile.data
+  const color = bot.kind === 'push' ? 'push' : bot.color
+  const groups = profileGroups({
+    kind: bot.kind,
+    posting: posting && { deadline: posting.deadline },
+    fitScore: profile.data.fitScore,
+    materialCount: profile.data.materialCount,
+    companyCount: companies.length,
+    allowedCount: profile.data.allowedSites?.length,
+  })
+  const open = (row: ProfileRow) => {
+    if ((row.id === 'posting' || row.id === 'fit') && posting) router.push(`/postings/${posting.id}`)
+    if (row.id === 'materials') router.push(materialsPath(bot.id))
+    if (row.id === 'allowed') router.push(botAllowedPath(bot.id))
+    if (row.id === 'companies') router.push(botCompaniesPath(bot.id))
+    if (row.id === 'color' && bot.kind === 'company') router.push(botColorPath(bot.id))
+    if (row.id === 'delete' && bot.kind === 'company') confirmDeleteBot(bot.name, () => void onDelete())
+  }
+  const onDelete = async () => {
+    if (bot.kind !== 'company' || deleting) return
+    setDeleting(true)
+    try {
+      await remove(bot)
+      router.back()
+    } catch {
+      setDeleting(false)
+    }
+  }
+  const rowOf = (row: ProfileRow) => {
+    if (row.id === 'notify') {
+      return (
+        <SettingsRow key={row.id} xl={xl} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />} />
+      )
+    }
+    if (row.id === 'color' && bot.kind === 'company') {
+      return (
+        <Pressable key={row.id} accessibilityRole="button" accessibilityLabel={COLOR_A11Y} onPress={() => open(row)}>
+          <View
+            style={{
+              minHeight: xl ? XL_ROW_HEIGHT : 56,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing[3],
+              paddingVertical: spacing[2],
+            }}
+          >
+            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? XL_ROW_LABEL : { lineHeight: type.b2.lineHeight }]}>
+              {row.label}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <View
+                style={{
+                  width: COLOR_DOT,
+                  height: COLOR_DOT,
+                  borderRadius: COLOR_DOT / 2,
+                  marginRight: spacing[1],
+                  backgroundColor: mascotPalette(bot.color, mode).body,
+                }}
+              />
+              <Icon name="chev" size={16} color="t3" />
+            </View>
+          </View>
+        </Pressable>
+      )
+    }
+    if (row.id === 'delete') {
+      return <SettingsRow key={row.id} xl={xl} label={row.label} danger onPress={() => open(row)} right={<View />} />
+    }
+    if (row.id === 'posting' || row.id === 'fit' || row.id === 'materials' || row.id === 'allowed' || row.id === 'companies') {
+      const dead = row.id === 'fit' && !posting
+      return <SettingsRow key={row.id} xl={xl} label={row.label} value={row.value} onPress={dead ? undefined : () => open(row)} chevron={dead} />
+    }
+    return null
+  }
+  return (
+    <XlBoardChrome>
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <TopBar circleBack chat={IOS} onBack={() => router.back()} />
+        <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+          <ProfileHead name={bot.name} color={color} sub={posting?.title} />
+          {groups.map((group, index) => (
+            <View key={group.map((row) => row.id).join('-')} style={{ marginHorizontal: spacing[5], marginTop: index > 0 ? spacing[3] : 0 }}>
+              <SettingsGroup>{group.map(rowOf)}</SettingsGroup>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    </XlBoardChrome>
+  )
+}
+
+export default BotProfileView

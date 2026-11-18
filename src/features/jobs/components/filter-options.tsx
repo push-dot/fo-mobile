@@ -10,9 +10,9 @@ const FilterOptions = <K extends string>({
   selected: K[]
   onToggle: (k: K) => void
 }) => (
-  <FilterGroup title="여러 개 고를 수 있어요">
+  <FilterGroup>
     {options.map((o) => (
-      <Chip key={o.key} label={o.label} check on={selected.includes(o.key)} onPress={() => onToggle(o.key)} />
+      <Chip sheet key={o.key} label={o.label} check on={selected.includes(o.key)} onPress={() => onToggle(o.key)} />
     ))}
   </FilterGroup>
 )

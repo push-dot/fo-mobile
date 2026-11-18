@@ -1,6 +1,7 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
 import { brandColor, careerLabel, cardCareerLabel } from '@push/shared'
 import { dday, givenName, stageTone, timeAgo } from '@/features/my'
+import { palette } from '../../../theme/tokens'
 import type { ChatDoc, QsData, QsItem } from '../api/schemas'
 import type { QuickStart } from '../constants'
 
@@ -15,10 +16,8 @@ export type QsSources = {
   recommended?: Profile[]
   profile?: Profile
   doc?: string
-  connected?: boolean
 }
 
-const DAY = 86_400_000
 const ACTIVE = new Set(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER'])
 // 합격 is listed under 진행 중 but starts unchecked: there is nothing left to organize.
 const PRESELECT = new Set(['APPLIED', 'SCREENING', 'INTERVIEW'])
@@ -33,14 +32,15 @@ const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem
 const person = (id: string, name: string, extra: Partial<QsItem> = {}): QsItem => ({
   id,
   title: name,
-  avatar: { text: givenName(name), color: brandColor(name) },
+  // QsReply / QsCoffee boards: every person avatar is a black circle (rule 3: no colour where it is not needed).
+  avatar: { text: givenName(name), color: palette.light.t1 },
   ...extra,
 })
 
 /** Same location · career line as the jobs list card. */
 const where = (p: Posting) => [p.location, cardCareerLabel(p)].filter(Boolean).join(' · ')
 
-/** First segment, plus a second one only when its source loaded (빠른 시작 › 부족한 점 찾기, 커피챗 제안 쓰기). */
+/** First segment, plus a second one only when its source loaded (빠른 시작 › 적합도 보기, 커피챗 제안 쓰기). */
 const segmented = (first: string, items: QsItem[], second?: { label: string; items: QsItem[]; empty: string }): QsData =>
   second
     ? { segments: [first, second.label], items: [...items, ...second.items.map((it) => ({ ...it, seg: 1 }))], empty: [undefined, second.empty] }
@@ -58,16 +58,6 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
     }
     case 'boost':
       return { doc: s.doc, items: bookmarks.map((p, i) => job(p, { sub: where(p), selected: i === 0 })) }
-    case 'deadline':
-      return {
-        items: bookmarks
-          .filter((p) => p.deadline && Date.parse(p.deadline) - now.getTime() <= 7 * DAY && dday(p.deadline, now) !== '마감')
-          .sort((a, b) => a.deadline!.localeCompare(b.deadline!))
-          .map((p) => {
-            const label = dday(p.deadline!, now)
-            return job(p, { badge: { label, tone: label === 'D-Day' || Number(label.slice(2)) <= 3 ? 'red' : 'grey' } })
-          }),
-      }
     case 'status': {
       const all = (s.applications ?? []).map((a) => ({
         active: ACTIVE.has(a.stage),
@@ -106,7 +96,7 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
         ],
       }
     case 'calendar':
-      return { items: [], calendar: { connected: !!s.connected } }
+      return { items: [] }
     default:
       return { doc: s.doc, items: [] }
   }
@@ -117,10 +107,10 @@ export const initialPicks = (qs: Pick<QuickStart, 'layout' | 'multi'>, items: Qs
   return chosen.length || qs.layout !== 'cards' || qs.multi ? chosen : items.slice(0, 1).map((i) => i.id)
 }
 
-export const docMeta = (d: Pick<ChatDoc, 'fileName' | 'size' | 'createdAt'>) => {
+export const docMeta = (d: Pick<ChatDoc, 'size' | 'createdAt'>) => {
   const at = new Date(d.createdAt)
   const size = d.size >= 1_000_000 ? `${(d.size / 1_000_000).toFixed(1)}MB` : `${Math.max(1, Math.round(d.size / 1000))}KB`
-  return `${d.fileName.split('.').pop()!.toUpperCase()} · ${size} · ${at.getMonth() + 1}월 ${at.getDate()}일`
+  return `${size} · ${at.getMonth() + 1}월 ${at.getDate()}일`
 }
 
 export const postingMeta = (p: Posting, now = new Date()) =>
@@ -131,10 +121,12 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   gap: ['bookmarks', 'recent', 'doc'],
   fit: ['bookmarks', 'recent', 'doc'],
   boost: ['bookmarks', 'doc'],
-  deadline: ['bookmarks'],
   status: ['applications'],
-  calendar: ['connected'],
+  calendar: [],
   hub: ['doc', 'profile'],
   reply: ['offers'],
   coffee: ['follows', 'recommended'],
 }
+
+/** The link a 공고 링크로 맞추기 starts with: the typed one, or the copied link on offer while the field is empty (QsLink). */
+export const startLink = (typed: string, copied: string) => (typed.trim() ? typed : copied)

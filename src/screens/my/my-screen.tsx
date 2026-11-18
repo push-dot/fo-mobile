@@ -2,7 +2,8 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { ActivityTab, DocsTab, MyHeader, ProfileTab, type ActivitySub } from '@/features/my'
-import { SegmentedControl } from '@/shared/components'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { FloatingHeader, SegmentedControl, useFloatingHeader } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 type Tab = 'profile' | 'docs' | 'activity'
@@ -18,6 +19,13 @@ const asSub = (s?: string): ActivitySub =>
 
 const MyScreen = () => {
   const c = useColors()
+  const { scrolled, onHeight, onScroll: onHeaderScroll, inset } = useFloatingHeader()
+  // The glass tab row is drawn above the header's fade, so it fades itself out over its first 48pt of scroll instead of showing through the title.
+  const [rowOpacity, setRowOpacity] = useState(1)
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    onHeaderScroll(e)
+    setRowOpacity(Math.round(Math.max(0, 1 - e.nativeEvent.contentOffset.y / 48) * 8) / 8)
+  }
   const params = useLocalSearchParams<{ tab?: string; sub?: string }>()
   const [tab, setTab] = useState<Tab>(asTab(params.tab))
   const [sub, setSub] = useState<ActivitySub>(asSub(params.sub))
@@ -30,6 +38,7 @@ const MyScreen = () => {
   }
 
   const pick = (t: Tab) => {
+    setRowOpacity(1)
     setTab(t)
     router.setParams({ tab: t })
   }
@@ -38,19 +47,26 @@ const MyScreen = () => {
     router.setParams({ sub: s })
   }
 
+  // The tab row scrolls away with the content; only the header floats.
+  const lead = (
+    <View pointerEvents={rowOpacity < 0.25 ? 'none' : 'auto'} style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], opacity: rowOpacity }}>
+      <SegmentedControl items={TABS} value={tab} onChange={pick} />
+    </View>
+  )
+
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <MyHeader />
-      <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5] }}>
-        <SegmentedControl items={TABS} value={tab} onChange={pick} />
-      </View>
       {tab === 'profile' ? (
-        <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: inset }}>
+          {lead}
           <ProfileTab />
         </ScrollView>
       ) : null}
-      {tab === 'docs' ? <DocsTab /> : null}
-      {tab === 'activity' ? <ActivityTab sub={sub} onSub={pickSub} /> : null}
+      {tab === 'docs' ? <DocsTab top={inset} onScroll={onScroll} lead={lead} /> : null}
+      {tab === 'activity' ? <ActivityTab sub={sub} onSub={pickSub} top={inset} onScroll={onScroll} lead={lead} /> : null}
+      <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
+        <MyHeader />
+      </FloatingHeader>
     </View>
   )
 }

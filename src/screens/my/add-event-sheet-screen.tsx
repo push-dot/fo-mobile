@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { EVENT_TYPES, fromDayParam, useAddCalendarEvent, type CalendarEventType } from '@/features/my'
 import { Chip, DatePicker, Sheet, Text, TextField } from '@/shared/components'
 import { spacing } from '@/theme'
@@ -28,17 +28,19 @@ const AddEventSheetScreen = () => {
   return (
     <Sheet
       title="어떤 일정을 추가할까요?"
+      // MyCalendarStates: the iOS sheet2 draws gap 16 (the shared sheet's 14 elsewhere).
+      gap={Platform.OS === 'ios' ? spacing[4] : undefined}
       action={{
         label: '일정 추가하기',
         disabled: !title.trim() || add.isPending,
         onPress: () => add.mutate({ type, title: title.trim(), startsAt: withTime(date, time).toISOString() }),
       }}
     >
-      <View style={{ flexDirection: 'row', gap: spacing[2] }}>
-        <View style={{ flex: 1 }}>
+      <View style={{ flexDirection: 'row', gap: Platform.OS === 'ios' ? spacing[3] : spacing[2] }}>
+        <View style={{ flex: Platform.OS === 'ios' ? undefined : 1 }}>
           <DatePicker label="날짜" mode="date" value={date} onChange={setDate} minHeight={52} />
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: Platform.OS === 'ios' ? undefined : 1 }}>
           <DatePicker label="시간" mode="time" value={time} onChange={setTime} minHeight={52} />
         </View>
       </View>

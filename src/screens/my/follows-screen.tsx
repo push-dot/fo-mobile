@@ -2,13 +2,15 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
-import { Icon, Text, TopBar } from '@/shared/components'
+import { GlassField, Icon, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
+import { useXlChrome } from '@/shared/components/xl-chrome'
 import { fontFor, radius, spacing, type, useColors } from '@/theme'
 
 
 const FollowsScreen = () => {
   const c = useColors()
+  const { button } = useXlChrome()
   const { box } = useLocalSearchParams<{ box?: string }>()
   const following = box !== 'followers'
   const [q, setQ] = useState('')
@@ -19,22 +21,21 @@ const FollowsScreen = () => {
   const people = followMatches(query.data?.data ?? [], following ? q : '')
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} />
+      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={{ width: button }} />} />
       {following ? (
-        <View
+        <GlassField
           style={{
             marginHorizontal: spacing[5],
             marginVertical: spacing[2],
             height: 44,
-            borderRadius: radius.card,
-            backgroundColor: c.bg2,
+            borderRadius: radius.pill,
             paddingHorizontal: spacing[4],
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing[2],
           }}
         >
-          <Icon name="search" size={16} color="t3" />
+          <Icon name="search" size={18} color="t3" />
           <TextInput
             accessibilityLabel="이름이나 직무로 찾기"
             value={q}
@@ -43,13 +44,13 @@ const FollowsScreen = () => {
             placeholderTextColor={c.t4}
             style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1, ...inputReset }, fontFor('400')]}
           />
-        </View>
+        </GlassField>
       ) : null}
       {query.isLoading ? (
         <ListSkeleton />
       ) : (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[3], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
             {query.data?.page.total ?? people.length}명
           </Text>
           {people.length === 0 && following ? (

@@ -5,7 +5,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  TextInput,
+  StyleSheet,
   View,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,17 +18,18 @@ import {
   failedLine,
   failedSend,
   OFFER_BLOCKED_COMPOSER,
-  OfferPostingCard,
   personLine,
+  postingSentLine,
   useOffer,
   useOfferMenu,
   useViewerBox,
   useOfferMessages,
   type FailedSend,
 } from '@/features/my'
-import { Glass, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
-import { inputReset } from '@/shared/components/text-field-metrics'
-import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
+import { Composer } from '@/features/chat'
+import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { composerPadding } from '@/shared/utility'
+import { onAccent, radius, spacing, useColors } from '@/theme'
 
 type Box = 'received' | 'sent'
 
@@ -37,16 +38,23 @@ const Bubble = ({
   at,
   mine,
   faded,
+  onPress,
+  posting,
 }: {
   body: string
   at?: string
   mine: boolean
   faded?: boolean
+  onPress?: () => void
+  posting?: { title: string; company: string; onPress: () => void }
 }) => {
   const c = useColors()
   return (
     <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: spacing[1] }}>
-      <View
+      <Pressable
+        accessibilityRole={onPress ? 'button' : undefined}
+        disabled={!onPress}
+        onPress={onPress}
         style={{
           maxWidth: '82%',
           borderRadius: radius.md,
@@ -61,7 +69,26 @@ const Bubble = ({
         <Text v="b2" style={{ color: mine ? onAccent : c.t1 }}>
           {body}
         </Text>
-      </View>
+        {posting ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`함께 보낸 공고 ${posting.company} ${posting.title}`}
+            onPress={posting.onPress}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, paddingVertical: spacing[3], paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: c.bg }}
+          >
+            <View style={{ flexShrink: 1, minWidth: 0 }}>
+              <Text v="b2" weight="700" numberOfLines={1}>
+                {posting.title}
+              </Text>
+              <Text v="c1" color="t3" numberOfLines={1}>
+                {posting.company}
+              </Text>
+            </View>
+            <Icon name="chev" size={16} color="t3" />
+            <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius.md, borderWidth: 1, borderColor: c.line }]} />
+          </Pressable>
+        ) : null}
+      </Pressable>
       {at ? (
         <Text v="c2" color="t3">
           {clock(at)}
@@ -75,10 +102,21 @@ const Bubble = ({
 const EMPTY_LIFT = 120
 const COMPOSER_HEIGHT = 52
 const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
+const SCROLL_PAD_BOTTOM = spacing[5]
+// ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
+const DAY_LABEL_LIFT = 2
+
+const DayLabel = ({ day }: { day: string | null }) =>
+  day ? (
+    <Text v="c2" weight="600" color="t3" style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}>
+      {day}
+    </Text>
+  ) : null
 
 const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
+  const keyboardUp = useKeyboardHeight() > 0
   const [text, setText] = useState('')
   const [composerH, setComposerH] = useState(0)
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
@@ -114,13 +152,18 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       ? [{ id: o.id, senderId: o.sender.id, body: o.message, createdAt: o.createdAt }, ...messages]
       : [],
   )
+  const posted = o.posting ? (
+    <Bubble
+      body={postingSentLine(o.sender.displayName)}
+      mine={o.sender.id === meId}
+      posting={{ title: o.posting.title, company: o.posting.company, onPress: () => router.push(`/postings/${o.posting!.id}`) }}
+    />
+  ) : null
   const post = (body: string) =>
     send.mutate(body, {
       onError: (e) => setFailed((f) => [...f, failedSend(body, e)]),
     })
-  const canSend = !!text.trim()
   const ios = Platform.OS === 'ios'
-  const Composer = ios ? Glass : View
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
   const closed = composerClosed(failed, o.canSend)
 
@@ -154,7 +197,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           </Pressable>
         }
         right={
-          menu ? <GlassButton actions={[{ icon: 'menu', label: '더 보기', menu }]} /> : undefined
+          menu ? <GlassButton actions={[{ icon: 'more', label: '더 보기', menu }]} /> : undefined
         }
       />
       <ScrollView
@@ -165,32 +208,29 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           gap: spacing[4],
           paddingTop: spacing[1],
           paddingHorizontal: spacing[5],
-          paddingBottom: spacing[5],
+          paddingBottom: SCROLL_PAD_BOTTOM,
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {o.posting ? <OfferPostingCard posting={o.posting} compact /> : null}
-        {thread.map((m) => (
+        {thread.map((m, i) => (
           <View key={m.id} style={{ gap: spacing[4] }}>
-            {m.day ? (
-              <Text
-                v="c2"
-                weight="600"
-                color="t3"
-                style={{ textAlign: 'center', paddingTop: spacing[1] }}
-              >
-                {m.day}
-              </Text>
-            ) : null}
+            <DayLabel day={m.day} />
+            {i === 0 ? posted : null}
             <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
           </View>
         ))}
+        {thread.length === 0 && posted ? (
+          <View style={{ gap: spacing[4] }}>
+            <DayLabel day={dayBreaks([{ createdAt: o.createdAt }])[0]!.day} />
+            {posted}
+          </View>
+        ) : null}
         {empty ? (
           <View
             style={{
               flex: 1,
               justifyContent: 'center',
-              paddingBottom: Math.max(EMPTY_LIFT - composerH, 0),
+              paddingBottom: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0),
             }}
           >
             <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
@@ -236,9 +276,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       <View
         onLayout={(e) => setComposerH(e.nativeEvent.layout.height)}
         style={{
-          paddingHorizontal: ios ? spacing[4] : spacing[3],
-          paddingTop: ios ? 6 : spacing[2],
-          paddingBottom: ios ? Math.max(insets.bottom - 6, spacing[2]) : insets.bottom + spacing[2],
+          ...composerPadding(ios, insets.bottom, keyboardUp),
           backgroundColor: ios ? undefined : c.bg,
         }}
       >
@@ -260,59 +298,15 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           </View>
         ) : (
           <Composer
-            style={{
-              borderRadius: COMPOSER_RADIUS,
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              padding: 6,
-              gap: spacing[2],
-              backgroundColor: ios ? undefined : c.fill,
+            tools={false}
+            value={text}
+            onChangeText={setText}
+            placeholder="메시지를 입력해 주세요"
+            onSend={() => {
+              post(text.trim())
+              setText('')
             }}
-          >
-            <TextInput
-              accessibilityLabel="메시지"
-              value={text}
-              onChangeText={setText}
-              placeholder="메시지를 입력해 주세요"
-              placeholderTextColor={c.t4}
-              multiline
-              style={[
-                {
-                  flex: 1,
-                  ...inputReset,
-                  minHeight: 40,
-                  maxHeight: 120,
-                  paddingVertical: spacing[2],
-                  paddingHorizontal: spacing[1],
-                  fontSize: type.b1.fontSize,
-                  lineHeight: type.b1.lineHeight,
-                  color: c.t1,
-                  textAlignVertical: 'center',
-                },
-                fontFor('400'),
-              ]}
-            />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="보내기"
-              accessibilityState={{ disabled: !canSend }}
-              disabled={!canSend}
-              onPress={() => {
-                post(text.trim())
-                setText('')
-              }}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: radius.pill,
-                backgroundColor: canSend ? c.ac : ios ? c.fill : c.fill2,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name="up" size={20} color={canSend ? onAccent : c.t3} />
-            </Pressable>
-          </Composer>
+          />
         )}
       </View>
     </KeyboardAvoidingView>

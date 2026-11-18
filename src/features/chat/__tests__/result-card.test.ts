@@ -1,6 +1,6 @@
 import { brandColor } from '@push/shared'
 import { describe, expect, it } from 'vitest'
-import { RESULT_VARIANT, applyText, profileSaveCopy, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle } from '../utils/result-card'
+import { applyText, DONE_NEXT_TITLE, doneNextActions, profileSaveCopy, SAVE_FAIL_TEXT, SAVE_RETRY_LABEL, SAVE_RETRY_TEXT, resultActionsFor, resultButtons, resultChrome, resultMeta, resultTitle, saveFailed } from '../utils/result-card'
 
 const file = {
   source: 'external' as const,
@@ -33,7 +33,7 @@ const profile = {
 describe('agent result cards', () => {
   it('shows the uploaded file meta and convert button, with no format badge', () => {
     expect(resultTitle(file)).toBe('김서준_모아페이_백엔드.pdf')
-    expect(resultMeta(file)).toBe('A4 1쪽 · 186KB · 내 서류에 자동 저장됨')
+    expect(resultMeta(file)).toBe('A4 1쪽 · 186KB')
     expect(resultButtons(file)).toEqual(['모아페이에 바로 지원하기', '프로필로 전환'])
     expect(resultButtons(file).join(' ')).not.toMatch(/PDF|DOCX|v1/)
     expect(resultChrome(file)).toEqual({ share: true, initials: null, color: null })
@@ -66,8 +66,11 @@ describe('agent result cards', () => {
     expect(meta).not.toContain('내 서류에 자동 저장됨')
   })
 
-  it('picks the button look by action id, so a lone convert stays secondary', () => {
-    expect(RESULT_VARIANT).toEqual({ apply: 'primary', convert: 'secondary', view: 'secondary' })
+  it('asks the next step in a regular modal, apply as the primary button and convert as the grey one,, never 프로필 보기 (ChatDoneNext)', () => {
+    expect(doneNextActions(file).map((a) => a.id)).toEqual(['apply', 'convert'])
+    expect(doneNextActions(profile).map((a) => a.id)).toEqual(['apply'])
+    expect(doneNextActions({ ...profile, pendingNote: 'x' })).toEqual([])
+    expect(DONE_NEXT_TITLE).toBe('다음으로 무엇을 할까요?')
   })
 
   it('hides the buttons while the card waits on an approval, or while a profile save is pending', () => {
@@ -79,5 +82,19 @@ describe('agent result cards', () => {
   it('does not say "에 바로 지원해 줘" without a company', () => {
     expect(applyText('모아페이')).toBe('모아페이에 바로 지원해 줘')
     expect(applyText()).toBe('바로 지원해 줘')
+  })
+
+  it('a file with no savedLine is a failed save', () => {
+    expect(saveFailed(file)).toBe(false)
+    expect(saveFailed({ source: 'external' })).toBe(true)
+    expect(saveFailed({ source: 'profile' })).toBe(false)
+  })
+})
+
+describe('the save-failed bubble (ChatPh6ResultFail)', () => {
+  it('says what failed in the bot\'s own line with 다시 저장하기, which asks the bot to save again', () => {
+    expect(SAVE_FAIL_TEXT).toBe('내 서류에 저장하지 못했어요. 네트워크를 확인해 주세요.')
+    expect(SAVE_RETRY_LABEL).toBe('다시 저장하기')
+    expect(SAVE_RETRY_TEXT).toMatch(/저장해/)
   })
 })

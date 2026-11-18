@@ -6,6 +6,9 @@ import './hub'
 import './me'
 import './social'
 import './chat'
+import './bots'
+import './bot-chat'
+import './materials'
 export { mockFetch } from './server'
 
 // Same board colours as the web mock, so a company keeps one colour across native lists and the WebView detail.

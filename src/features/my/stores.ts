@@ -7,6 +7,9 @@ import { UNDO_MS } from './constants'
 import type { MySource } from './types'
 import { createUndo, DELETE_REFERENCED, deleteDocCopy, RESTORE_FAILED, RETRY_LABEL } from './utils'
 
+/** The day the 캘린더 tab lists; the month sheet sets it. */
+export const useCalendarDay = create<{ day: Date }>(() => ({ day: new Date() }))
+
 export const useDocImport = create<{ requested: boolean }>(() => ({ requested: false }))
 
 export const useDocDelete = create<{ doc: Pick<MySource, 'id' | 'fileName'> | null }>(() => ({ doc: null }))
@@ -26,7 +29,6 @@ const showFailed = () => {
   showToast({
     message: deleteDocCopy('').failed,
     alert: true,
-    opaque: true,
     bottom,
     action: { label: RETRY_LABEL, onPress: () => ids.forEach((id) => remove(id, bottom)) },
   })
@@ -51,7 +53,7 @@ const remove = (id: string, bottom?: number) => {
       return queryClient.invalidateQueries({ queryKey: ['me', 'sources'] }).then(() => true)
     })
     .catch((error: unknown) => {
-      if (referencedByEvidence(error)) showToast({ message: DELETE_REFERENCED, alert: true, opaque: true, bottom })
+      if (referencedByEvidence(error)) showToast({ message: DELETE_REFERENCED, alert: true, bottom })
       else {
         failed = { ids: [...failed.ids, id], bottom }
         showFailed()

@@ -1,11 +1,12 @@
-import type { ReactNode } from 'react'
+import { Children, type ReactNode } from 'react'
 import { View } from 'react-native'
 import { radius, spacing, useColors } from '../../theme'
 import Text from './text'
 
 const SettingsGroup = ({ title, note, children }: { title?: string; note?: string; children: ReactNode }) => {
   const c = useColors()
-  const rows = Array.isArray(children) ? children.filter(Boolean) : [children]
+  // toArray flattens a mapped list (NOTIFICATION_ROWS.map) so every row gets its own separator, and drops null/false rows
+  const rows = Children.toArray(children)
   return (
     <View>
       {title ? (
@@ -21,7 +22,7 @@ const SettingsGroup = ({ title, note, children }: { title?: string; note?: strin
         ))}
       </View>
       {note ? (
-        <Text v="c2" color="t3" style={{ paddingHorizontal: spacing[1], paddingTop: spacing[2] }}>
+        <Text v="c2" color="t3" style={{ paddingHorizontal: spacing[1], paddingTop: spacing[2], lineHeight: 17 }}>
           {note}
         </Text>
       ) : null}

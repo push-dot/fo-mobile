@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatEvent, Step } from '@/features/chat'
+import { applyEvent, emptyChat } from '../../features/chat/utils/reducer'
+import { mapEvent } from '../../features/chat/utils/stream'
 import { mockFetch } from '../server'
+import '../bots'
 import { setAccount } from '../chat'
 
 const call = async (method: string, path: string, body?: unknown) => {
   const res = await mockFetch(new Request(`http://x/api/v1/${path}`, { method, body: body === undefined ? undefined : JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }))
   return (await res.json()) as { data: unknown }
 }
-const run = async (conversationId: string, extra: object) => ((await call('POST', 'chat/runs', { conversationId, ...extra })).data as Step[]).map((s) => s.event)
+const steps = async (conversationId: string, extra: object) => (await call('POST', 'chat/runs', { conversationId, ...extra })).data as Step[]
+/** A run as the screen gets it: its frames through the live stream's mapper. */
+const run = async (conversationId: string, extra: object) => (await steps(conversationId, extra)).flatMap((s) => mapEvent(s.frame))
+const answer = (conversationId: string, approvalId: string, optionId: string) => run(conversationId, { resolve: { approvalId, optionId } })
 const types = (events: ChatEvent[]) => events.map((e) => e.type)
 
 describe('chat mock', () => {
@@ -16,6 +22,23 @@ describe('chat mock', () => {
     const kept = (await call('GET', 'conversations?archived=true')).data as { id: string }[]
     expect(live.map((c) => c.id)).toEqual(['c-moa', 'c-dotori', 'c-career', 'c-pado', 'c-nuri'])
     expect(kept).toHaveLength(3)
+  })
+
+  it('draws the 가져올 자료 board: four rows with the first two on, and 원래 말투로 first and on', async () => {
+    const events = await run('t-ph0', { text: 'ph0-input' })
+    const card = events.find((e) => e.type === 'approval')
+    const sections = card?.type === 'approval' ? card.approval.sections : []
+    const materials = sections.find((s) => s.kind === 'toggle')
+    const tone = sections.find((s) => s.kind === 'chips' && s.title === '어떤 말투로 쓸까요?')
+    expect(materials).toMatchObject({ items: [{ label: '허브 프로필' }, { label: '백엔드 엔지니어 (Kotlin·Spring)' }, { label: 'github.com/seojun-kim' }, { label: '김서준_백엔드_이력서_2026', desc: '파일' }], selected: [0, 1] })
+    expect(tone).toMatchObject({ options: ['원래 말투로', '전문적으로', '자신 있게', '짧게', '기술 중심으로', '협업 중심으로'], selected: [0] })
+  })
+
+  it('lists the bookmarks and recent postings in the 부족한 점 찾기 sheet like 적합도 보기', async () => {
+    const gap = (await call('GET', 'chat/quick-starts/gap')).data as { segments: string[]; items: { over?: string }[] }
+    const fit = (await call('GET', 'chat/quick-starts/fit')).data
+    expect(gap).toEqual(fit)
+    expect(gap.items.some((i) => i.over === '모아페이')).toBe(true)
   })
 
   it('serves one conversation by id, also when it is archived', async () => {
@@ -28,7 +51,7 @@ describe('chat mock', () => {
     expect((await call('GET', 'conversations/c-dotori')).data).toMatchObject({ company: '모아페이' })
   })
 
-  it('starts 에이전트로 고치기 by reading the file, with no todo yet', async () => {
+  it('starts Bot으로 고치기 by reading the file, with no todo yet', async () => {
     const events = await run('t-fixdoc', { text: '이 서류를 고쳐 줘' })
     expect(types(events).slice(0, 2)).toEqual(['status', 'tool'])
     expect(events.some((e) => e.type === 'todo')).toBe(false)
@@ -40,12 +63,43 @@ describe('chat mock', () => {
     expect(fit).toMatchObject({ plan: 'FREE' })
   })
 
+  it('draws the blueprints alone, with no failed check before them, for the ChatPh2XBlueprints shot', async () => {
+    for (const text of ['ph2x-blueprints', '기획서 보여 줘']) {
+      const events = await run(`t-bp-${text}`, { text })
+      expect(types(events)).toContain('plan')
+      expect(events.some((e) => e.type === 'notice')).toBe(false)
+      expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-bp')).toBe(true)
+    }
+  })
+
   it('fails the first 병목 강도 pick and passes the second', async () => {
     await run('t-verify', { text: 'ph2x' })
-    const first = await run('t-verify', { answer: { approvalId: 'ph2x-level', choice: 1 } })
-    const second = await run('t-verify', { answer: { approvalId: 'ph2x-level', choice: 1 } })
+    await answer('t-verify', 'ph2x-approach', '0')
+    const first = await answer('t-verify', 'ph2x-level', '1')
+    const second = await answer('t-verify', 'ph2x-verify', '0')
     expect(first.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
     expect(types(second)).toContain('plan')
+  })
+
+  it('draws the failed check of the first 병목 강도 pick as a red line under the user line (ChatVerifyFail)', async () => {
+    const events = await run('t-verify-notice', { text: 'verify-fail' })
+    expect(events.find((e) => e.type === 'notice')).toMatchObject({ notice: { kind: 'failed', text: '방향 검증을 통과하지 못했어요.' } })
+  })
+
+  it('stamps a tool card with the time it was asked (ChatBotStatusApprove)', async () => {
+    const events = await run('t-approve-stamp', { text: 'st-approve' })
+    const approval = events.find((e) => e.type === 'approval')
+    expect(approval).toMatchObject({ approval: { confirm: true, question: '채용 페이지 열기', detail: 'careers.moapay.co.kr를 열어도 될까요?' } })
+    expect((approval as Extract<ChatEvent, { type: 'approval' }>).approval.openedAt).toBeTypeOf('number')
+  })
+
+  it('plays a run1 token for one natural line only, then the normal route', async () => {
+    setAccount({ run: 'ext-done', once: true })
+    const first = await run('t-once', { text: '이 이력서 더 좋게 고쳐 줘' })
+    expect(first.some((e) => e.type === 'result')).toBe(true)
+    const second = await run('t-once-2', { text: '모아페이에 바로 지원해 줘' })
+    expect(second.some((e) => e.type === 'result')).toBe(false)
+    expect(second.some((e) => e.type === 'approval')).toBe(true)
   })
 
   it('maps quick-start intents to their scenario', async () => {
@@ -53,15 +107,30 @@ describe('chat mock', () => {
     expect(boost.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
-  it('jumps to the quality check without the boost card', async () => {
+  it('answers 마감 임박 공고 정리 in the chat as a list of bullets and to-dos, with no card', async () => {
+    const events = await run('t-deadline', { text: '북마크한 공고 중 일주일 안에 마감되는 공고와 준비할 일을 알려 주세요', intent: 'deadline_postings' })
+    const text = events.filter((e) => e.type === 'token').map((e) => e.text).join('\n')
+    expect(text).toContain('• 파도AI · 데이터 분석가 · D-2')
+    expect(text).toContain('1. 파도AI는')
+    expect(events.some((e) => e.type === 'approval')).toBe(false)
+    expect(events.at(-1)).toMatchObject({ type: 'done' })
+  })
+
+  it('jumps to the quality check without the boost card and applies the recommended fixes without asking; the design is the next turn', async () => {
     const events = await run('t-quality', { text: '품질 검사로 넘어가기' })
     expect(types(events)).not.toContain('fit')
-    expect(events.some((e) => e.type === 'approval' && e.approval.id === 'ph4-quality')).toBe(true)
+    expect(events.some((e) => e.type === 'token' && e.text.includes('추천 수정까지 반영했어요'))).toBe(true)
+    expect(events.some((e) => e.type === 'approval')).toBe(false)
+    expect(events.at(-1)).toMatchObject({ type: 'done' })
+    const design = await run('t-design', { text: '2개 반영하고 디자인으로' })
+    const sentences = design.filter((e) => e.type === 'token').map((e) => e.text)
+    expect(sentences).toEqual(['템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.', '검증을 마쳤어요. 디자인을 골라 주세요.'])
+    expect(design.some((e) => e.type === 'approval' && e.approval.id === 'ph4-design' && e.approval.question === '어떤 디자인으로 만들까요?')).toBe(true)
   })
 
   it('selects 중간 제약으로 in the 병목 강도 gate', async () => {
     const events = await run('t-level', { text: 'ph2x' })
-    const gate = (await run('t-level', { answer: { approvalId: 'ph2x-approach', choice: 0 } })).find((e) => e.type === 'approval')
+    const gate = (await answer('t-level', 'ph2x-approach', '0')).find((e) => e.type === 'approval')
     expect(events).not.toHaveLength(0)
     expect(gate).toMatchObject({ approval: { id: 'ph2x-level', sections: [{ selected: [1] }] } })
   })
@@ -73,22 +142,23 @@ describe('chat mock', () => {
     expect(verify.some((e) => e.type === 'approval' && e.approval.id === 'ph2x-verify')).toBe(true)
   })
 
-  it('holds the writing state with the draft card, while the run to the review gate has no draft card', async () => {
-    const writing = (await call('POST', 'chat/runs', { conversationId: 't-write', text: '네, 써 주세요' })).data as Step[]
-    const paper = writing.findIndex((st) => st.event.type === 'paper')
+  it('holds the writing state with the draft card, while the run to the boost gate has no draft card', async () => {
+    const writing = await steps('t-write', { text: '네, 써 주세요' })
+    const paper = writing.findIndex((st) => st.frame.type === 'paper')
     expect(paper).toBeGreaterThan(-1)
     expect(writing[paper + 1]!.wait).toBeGreaterThan(30_000)
     await run('t-draft', { text: 'ph2' })
-    const review = await run('t-draft', { answer: { approvalId: 'ph2', choice: 0 } })
+    const review = await answer('t-draft', 'ph2', '0')
     expect(types(review)).not.toContain('paper')
     expect(types(review)).not.toContain('file')
-    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(true)
+    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-review')).toBe(false)
+    expect(review.some((e) => e.type === 'approval' && e.approval.id === 'ph3-boost')).toBe(true)
   })
 
-  it('draws the result gates as the closing line and the card alone, with no bullets or elapsed footer', async () => {
-    for (const text of ['profile-gate', 'ext-ok', 'ext-fail']) {
-      const events = await run(`t-gate-${text}`, { text })
-      expect(types(events)).toEqual(['agentText', 'result', 'approval'])
+  it('draws the result boards as the closing line and the card alone, with no bullets and no gate to answer', async () => {
+    for (const text of ['profile-result', 'ext-ok', 'ext-fail']) {
+      const events = await run(`t-result-${text}`, { text })
+      expect(types(events)).toEqual(['agentText', 'result', 'done'])
       expect(events[0]).not.toHaveProperty('bullets')
     }
   })
@@ -96,6 +166,21 @@ describe('chat mock', () => {
   it('serves the stopped draft and its expired gate for 도토리증권 without a first user bubble', async () => {
     const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { userMessageId: string | null; events: { type: string }[] }[]
     expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }, { type: 'choice', resolution: { status: 'EXPIRED' } }] })
+  })
+
+  it('closes a card restored from the stored turns without a run, and clears the list badge', async () => {
+    expect(((await call('GET', 'conversations/c-moa/turns')).data as unknown[]).length).toBe(1)
+    expect(await steps('c-moa', { text: '적용', resolve: { approvalId: 'moa-edit', optionId: 'apply' } })).toEqual([])
+    expect((await call('GET', 'conversations/c-moa/turns')).data).toEqual([])
+    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ status: null, lastLine: '' })
+  })
+
+  it('numbers a new run in a seeded conversation after its stored frames, also once its restored card is closed', async () => {
+    const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { events: { seq?: number }[] }[]
+    const stored = turns.flatMap((t) => t.events.map((e) => e.seq ?? 0))
+    expect(await steps('c-dotori', { resolve: { approvalId: 'ph3-review', optionId: 'review' } })).toEqual([])
+    const frames = await steps('c-dotori', { text: '이어서 봐 주세요' })
+    expect(Math.min(...frames.map((s) => s.frame.seq ?? 0))).toBeGreaterThan(Math.max(...stored))
   })
 
   it('restores a deleted link with its fit count and date, and restores a live link as is', async () => {
@@ -110,9 +195,9 @@ describe('chat mock', () => {
 
   it('holds the working line well past the 8s dwell for the Android tour token', async () => {
     const wait = async (text: string) => {
-      const steps = (await call('POST', 'chat/runs', { conversationId: `t-hold-${text}`, text })).data as Step[]
-      const run = steps.findIndex((s) => s.event.type === 'tool' && s.event.id.endsWith('-fit') && s.event.state === 'run')
-      return steps[run + 1]!.wait
+      const frames = await steps(`t-hold-${text}`, { text })
+      const at = frames.findIndex((s) => s.frame.type === 'tool' && s.frame.name.endsWith('-fit') && s.frame.state === 'run')
+      return frames[at + 1]!.wait
     }
     expect(await wait('tailor hold')).toBeGreaterThan(30_000)
     expect(await wait('tailor resume')).toBeLessThan(10_000)
@@ -130,11 +215,20 @@ describe('chat mock', () => {
     expect(types(await run('t-spent', { text: 'ph1-free' }))).toContain('fit')
   })
 
+  it('payments-closed answers paymentsEnabled false and leaves it out otherwise', async () => {
+    expect((await call('GET', 'chat/account')).data).not.toHaveProperty('paymentsEnabled')
+    setAccount({ closed: true })
+    expect((await call('GET', 'chat/account')).data).toMatchObject({ paymentsEnabled: false })
+    setAccount({ closed: false })
+    expect((await call('GET', 'chat/account')).data).not.toHaveProperty('paymentsEnabled')
+  })
+
   it('draws ChatStates.4 in one conversation: file card, apply record, then QUEUE_BUSY with a 12s wait', async () => {
     const file = await run('t-states', { text: 'states-file' })
-    expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [] })
+    expect(file.find((e) => e.type === 'result')).toMatchObject({ source: 'external', actions: [], savedLine: expect.any(String) })
     const applied = await run('t-states', { text: 'states-apply' })
-    expect(applied).toContainEqual(expect.objectContaining({ type: 'tool', state: 'ok', result: '지원했어요 · 마이 › 내 활동에 기록했어요' }))
+    // Tool lines are not drawn, so the record is a bot line of its own.
+    expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '모아페이에 지원했어요.\n[이동하기](/my)' }))
     expect(await run('t-states', { text: '도토리증권 공고도 맞춰 줘' })).toContainEqual(
       expect.objectContaining({ type: 'error', code: 'QUEUE_BUSY', text: '지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.' }),
     )
@@ -145,6 +239,20 @@ describe('chat mock', () => {
     expect(await order('ext-done')).toEqual(['tool', 'tool', 'todo'])
     expect(await order('profile-done')).toEqual(['tool', 'todo'])
     expect(types(await run('t-profile-done-2', { text: 'profile-done' }))).not.toContain('approval')
+  })
+
+  it('stacks two results of one document in one conversation, each below its own message', async () => {
+    const id = 't-twice'
+    let state = emptyChat
+    for (const n of [1, 2]) {
+      state = applyEvent(state, { type: 'user', id: `u${n}`, text: '프로필 고쳐 줘' })
+      for (const e of await run(id, { text: 'profile-done' })) state = applyEvent(state, e)
+    }
+    const at = (type: string) => state.items.flatMap((it, i) => (it.type === type ? [i] : []))
+    const [u1, u2] = at('user')
+    const [r1, r2] = at('result')
+    expect(at('result')).toHaveLength(2)
+    expect(u1 < r1 && r1 < u2 && u2 < r2).toBe(true)
   })
 
   it('plays a chat token for any text when a run: switch is set, until reset', async () => {
@@ -168,5 +276,17 @@ describe('chat mock', () => {
     expect((await call('GET', 'me/links')).data).toHaveLength(1)
     setAccount({ few: false })
     expect((await call('GET', 'chat/docs')).data).toHaveLength(4)
+  })
+})
+
+describe('clear chat', () => {
+  const stale = (events: ChatEvent[]) => events.some((e) => e.type === 'token' && e.text.includes('다시 불러 주세요'))
+
+  it('forgets the open card, so the next token runs its script', async () => {
+    await run('push', { text: 'ph0-start' })
+    expect(stale(await run('push', { text: 'profile-done' }))).toBe(true)
+    await run('push', { text: 'ph0-start' })
+    await mockFetch(new Request('http://x/api/v1/bots/push/transcript', { method: 'DELETE' }))
+    expect(stale(await run('push', { text: 'profile-done' }))).toBe(false)
   })
 })

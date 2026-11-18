@@ -3,8 +3,7 @@ import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
 import { Avatar, careerLine } from '@/features/hub'
-import { Icon, Text } from '../../../shared/components'
-import Highlight from './highlight'
+import { Highlight, Icon, Text } from '../../../shared/components'
 import { spacing } from '../../../theme'
 
 const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void }) => {
@@ -32,7 +31,7 @@ const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void
           </Text>
         ) : null}
       </View>
-      <Icon name="chev" size={18} color="t4" />
+      <Icon name="chev" size={18} color="t1" />
     </Pressable>
   )
 }

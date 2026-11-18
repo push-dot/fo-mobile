@@ -1,8 +1,9 @@
-import { type AccessMode, type DataEnvelope, type ListEnvelope } from '@push/api-client'
+import { type DataEnvelope, type ListEnvelope } from '@push/api-client'
 import { api, http, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
-import { MICRO_CREDITS_PER_CREDIT } from '../constants'
+import { DEFAULT_DOC } from '../constants'
+import { accountFromBilling } from '../utils/account'
 import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
@@ -25,8 +26,7 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
   recent: async () => (await api.me.postingViews({ limit: 50 })).data,
   recommended: async () => (await api.profiles.list({ explore: 'recommended', limit: 50 })).data,
   profile: () => api.me.profile(),
-  doc: async () => (await realDocs())[0]?.fileName,
-  connected: () => myApi.googleConnected(),
+  doc: async () => DEFAULT_DOC,
 }
 
 export const chatApi = {
@@ -34,6 +34,8 @@ export const chatApi = {
   conversation: (id: string) => data(c.get<DataEnvelope<ConversationRow>>(`conversations/${id}`)),
   /** Mock-only: the scripted agent run for one message or approval answer. */
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
+  /** The id of the default hub profile document the quick starts hand to the run, when the user has one. */
+  hubProfileId: async () => (await api.documents.list({ kind: 'HUB_PROFILE', limit: 1 })).data[0]?.id,
   // shortcut: push-be has no chat/docs; real mode reads 마이 › 서류 (myApi.sources) and uploads there.
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
   addDoc: async (file: PickedFile) => {
@@ -43,9 +45,7 @@ export const chatApi = {
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
-    const total = Math.round(b.monthlyMicroCredits / MICRO_CREDITS_PER_CREDIT)
-    const used = Math.round(b.spentMicroCredits / MICRO_CREDITS_PER_CREDIT)
-    return { email: me.email || null, plan: b.plan ?? 'FREE', credits: total > 0 ? { used, total } : null, paymentsEnabled: b.paymentsEnabled }
+    return accountFromBilling(b, me.email)
   },
   // shortcut: push-be has no chat/quick-starts; real mode assembles each sheet from existing lists (quickStartFrom).
   quickStart: async (key: string): Promise<QsData> => {
@@ -80,6 +80,8 @@ export const fetchArtifactBytes = (downloadUrl: string) => bytesOf(c.raw('GET', 
 
 export const fetchSourceBytes = (id: string) => bytesOf(api.sources.content(id))
 
+export const fetchProfilePdf = (photo = false) => bytesOf(api.me.profilePdf(photo))
+
 export const fetchDocumentPdf = async (id: string) => {
   if (!id) throw new Error('no document to export')
   const doc = await api.documents.get(id)
@@ -87,8 +89,6 @@ export const fetchDocumentPdf = async (id: string) => {
   if (!version) throw new Error(`document ${id} has no version`)
   return { title: doc.title, bytes: await bytesOf(api.documents.exportFile(id, version)) }
 }
-
-export const updateAiAccessMode = (mode: AccessMode) => api.me.updateSettings({ aiAccessMode: mode })
 
 export const streamConversation = api.conversations.stream
 

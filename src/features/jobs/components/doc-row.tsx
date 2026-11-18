@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native'
 import { Text } from '../../../shared/components'
+import { displayName } from '../../../shared/utility/display-name'
 import { spacing, useColors } from '../../../theme'
 import type { ApplyDoc } from '../types'
 
@@ -15,11 +16,13 @@ const DocRow = ({ doc, on, onPress }: { doc: ApplyDoc; on: boolean; onPress: () 
       <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: on ? 7 : 2, borderColor: on ? c.ac : c.t4 }} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text v="b1" weight="600" numberOfLines={1}>
-          {doc.name}
+          {displayName(doc.name)}
         </Text>
-        <Text v="c1" color="t3">
-          {doc.note}
-        </Text>
+        {doc.note ? (
+          <Text v="c1" color="t3">
+            {doc.note}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   )

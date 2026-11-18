@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
 import { POST_CATEGORIES, stageBadge } from '@push/api-client'
 import { careerLabel, monthDay } from '@push/shared'
-import { Badge, Chip, Icon, Text } from '@/shared/components'
+import { Badge, Chip, ChipRow, Icon, Text } from '@/shared/components'
 import { hitSlopTo, spacing, useColors } from '../../../theme'
 import {
   useAppliedApplications,
@@ -13,7 +13,7 @@ import {
   useMyPosts,
 } from '../api/hooks'
 import { FOLLOW_PREVIEW, POST_PREVIEW } from '../constants'
-import type { ActivitySub } from '../types'
+import type { ActivitySub, ScrollUnderBar } from '../types'
 import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
 import CalendarView from './calendar-view'
 import Empty, { TAB_EMPTY_LIFT } from './empty'
@@ -73,7 +73,7 @@ const Applications = () => {
   )
 }
 
-const Bookmarks = () => {
+export const Bookmarks = () => {
   const c = useColors()
   const { query, unbookmark } = useMyBookmarks()
   const { data, isLoading } = query
@@ -98,7 +98,7 @@ const Bookmarks = () => {
           key={p.id}
           accessibilityRole="button"
           accessibilityLabel={`${p.company} ${p.title}`}
-          onPress={() => router.push(`/postings/${p.id}`)}
+          onPress={() => router.push(`/postings/${p.id}?from=bookmark`)}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -259,19 +259,16 @@ const Posts = () => {
   )
 }
 
-const ActivityTab = ({ sub, onSub }: { sub: ActivitySub; onSub: (s: ActivitySub) => void }) => {
+const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub; onSub: (s: ActivitySub) => void } & ScrollUnderBar) => {
+  const c = useColors()
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: LIST_PAD }}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0 }}
-        contentContainerStyle={{ gap: spacing[2], paddingTop: spacing[5], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}
-      >
+    <ScrollView style={{ backgroundColor: c.bg }} contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ flexGrow: 1, paddingTop: top, paddingBottom: LIST_PAD }}>
+      {lead}
+      <ChipRow paddingTop={spacing[4]}>
         {SUBS.map((s) => (
           <Chip key={s.key} label={s.label} on={s.key === sub} onPress={() => onSub(s.key)} />
         ))}
-      </ScrollView>
+      </ChipRow>
       {sub === 'applications' ? <Applications /> : null}
       {sub === 'calendar' ? <CalendarView /> : null}
       {sub === 'bookmarks' ? <Bookmarks /> : null}
