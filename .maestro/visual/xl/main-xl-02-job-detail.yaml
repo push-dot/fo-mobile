@@ -4,7 +4,7 @@ tags:
   - visual
 ---
 # Run with the system text size raised (xl/ is a separate run).
-# JobDetailXL draws the fit card with three parts like ApplySheet and Applied (G74), so the page opens under `fit-three`.
+# The board draws the three-part fit card (G74).
 - runFlow:
     file: ../_login_mock.yaml
     env:

@@ -36,7 +36,7 @@ describe('SettingsRow', () => {
     expect(chevron({ label: '이력서', value: '3개', onPress: vi.fn() })).toMatchObject({ color: 't3' })
   })
 
-  it('draws the BotProfileXL row: 80 high (min-height 64 plus 8 padding each side), a 21 pt label and an 18 pt value in fixed pixels', () => {
+  it('draws the BotProfileXL row at XL_ROW_HEIGHT with a 21 pt label and an 18 pt value', () => {
     const tree = SettingsRow({ label: '공고', value: '11월 20일 마감', onPress: vi.fn(), xl: true })
     expect((findAll(tree, 'View')[0]?.props.style as { minHeight: number }).minHeight).toBe(80)
     expect(findAll(tree, 'Text')[0]?.props).toMatchObject({ allowFontScaling: false, style: { fontSize: 21, lineHeight: 28 } })

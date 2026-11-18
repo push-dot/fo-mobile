@@ -17,7 +17,7 @@ type RowProps = {
   mutedChevron?: boolean
   /** A value row that opens a picker (v415 Settings): the label is the value itself; only the up-down selector sits on the right. */
   picker?: boolean
-  /** BotProfileXL: the board's `.grp .it` is 80 high (min-height 64 plus 8 padding above and below) with 21 pt labels and 18 pt values, drawn in fixed pixels. */
+  /** BotProfileXL: the board's `.grp .it` is XL_ROW_HEIGHT high with 21 pt labels and 18 pt values, drawn in fixed pixels. */
   xl?: boolean
 }
 

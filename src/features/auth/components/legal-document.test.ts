@@ -34,7 +34,7 @@ describe('LegalDocument spacing follows the v489 boards', () => {
     expect(wrapper).toBeDefined()
   })
 
-  it('spaces list items by 10 and right-aligns the marker 13pt before the text, overhanging the page margin so the text column stays at 28', () => {
+  it('spaces items by 10 and right-aligns the marker 13pt before the text', () => {
     const nodes = render([{ kind: 'list', ordered: true, items: ['a', 'b'] }])
     expect(nodes.some((n) => flat(n.props.style).gap === 10)).toBe(true)
     const marker = nodes.find((n) => n.props.children === '1.')
