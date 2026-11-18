@@ -4,7 +4,6 @@ import { useColors, useShadow, type Colors } from '../../theme'
 import { toBoxShadow } from '../utility'
 import { DISABLED_OPACITY, PRESS_SCALE } from './constants'
 import Glass, { useGlassSurface, useSheetGlassFill } from './glass'
-import { useStrandedTap } from './stranded-tap'
 
 type Props = Omit<PressableProps, 'style' | 'children'> & {
   children: ReactNode
@@ -27,11 +26,10 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
   const sheetGlass = glass ? sheetFill : null
   const boxShadow = toBoxShadow(useShadow().glass)
   const dim = disabled ? { opacity: dimOpacity } : null
-  const tap = useStrandedTap(press.onPress, disabled, press.onPressIn)
   if (native) {
     return (
       <Glass interactive tint={tint} style={style}>
-        <Pressable {...press} {...tap} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
+        <Pressable {...press} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
           {children}
         </Pressable>
       </Glass>
@@ -40,7 +38,6 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
   return (
     <Pressable
       {...press}
-      {...tap}
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
