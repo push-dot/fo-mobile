@@ -42,6 +42,7 @@ const closing = (text: string, bullets?: string[]) => {
 }
 const done = s(200, { type: 'done', operation: null })
 const awaitingDone = s(200, { type: 'done', operation: null, awaiting: 'approval' })
+const awaitingChoiceDone = s(200, { type: 'done', operation: null, awaiting: 'choice' })
 // The document every scripted edit and draft changes (마이 › 서류 d1).
 const DOC = 'd1'
 
@@ -266,7 +267,7 @@ const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
 const ph1Plan = (plan: 'FREE' | 'ULTRA', gateWait?: number): Step[] => [
   s(200, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
   ...ph1Fit(plan, gateWait),
-  s(200, { type: 'done', operation: null, awaiting: 'choice' }),
+  awaitingChoiceDone,
 ]
 export const PH1 = ['이력서 읽기', 'GitHub 살펴보기', '공고 분석', '적합도 계산']
 const ph1: Step[] = [
@@ -290,6 +291,7 @@ const ph1: Step[] = [
   s(1500, tool('fit', '적합도 계산', '5개 항목 · 가중치 반영', 'ok', '6.9점')),
   s(200, todo('todo1', PH1, 4)),
   ...ph1Fit('PRO'),
+  awaitingChoiceDone,
 ]
 const feedbackOnly: Step[] = [
   s(300, tool('fbt', '피드백 정리', '공고 요건 ↔ 내 이력서', 'ok', '고칠 점 3개')),
