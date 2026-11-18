@@ -9,6 +9,8 @@ export type SegmentedControlProps<K extends string> = {
   onChange: (k: K) => void
   /** The 196 x 34 control Settings draws for the theme row (same on iOS and Android); the default is the 44pt full-width one. */
   compact?: boolean
+  /** The 40pt control the quick-start sheets draw (iOS only; Android keeps 44). */
+  slim?: boolean
 }
 
 const INSET = spacing[1]

@@ -15,6 +15,9 @@ import { CALENDAR_TASKS, DEFAULT_DOC, type QuickStart } from '../constants'
 import { initialPicks, startLink } from '../utils/quick-start-data'
 import { quickStartAllPath } from '../utils/sheet-routes'
 
+/** QsPostAll and QsReplyAll (`.compose`): the description sits 6 under the header (margin-top -10 under the 16 gap), the free-topic field is 52 high. */
+const ALL_DESCRIPTION_TOP = 6
+const ALL_FIELD_HEIGHT = 52
 
 export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
   return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null
@@ -84,7 +87,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   ) : (
     <>
       {all && qs.description ? (
-        <Text v="b2" color="t3">
+        <Text v="b2" color="t3" style={{ marginTop: ALL_DESCRIPTION_TOP }}>
           {qs.description}
         </Text>
       ) : null}
@@ -129,13 +132,13 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
       ) : null}
 
       {d.segments && (!qs.listLabel || listOpen) ? (
-        <SegmentedControl items={d.segments.map((label, i) => ({ key: String(i), label }))} value={String(seg)} onChange={(k) => setSeg(Number(k))} />
+        <SegmentedControl items={d.segments.map((label, i) => ({ key: String(i), label }))} value={String(seg)} onChange={(k) => setSeg(Number(k))} slim={!all} />
       ) : null}
 
       {qs.layout === 'calendar' ? <Calendar items={d.items} task={task} setTask={setTask} /> : null}
 
       {qs.layout === 'cards' ? (
-        <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: spacing[3] }}>
+        <View style={qs.grid ? { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] } : { gap: all ? spacing[4] : spacing[3] }}>
           {qs.grid ? (
             visible.map((it) => <OptionCard key={it.id} item={it} on={!typing && sel.includes(it.id)} grid onPress={() => (setCustom(''), toggle(it.id))} />)
           ) : (
@@ -148,7 +151,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
               onSeeAll={seeAll}
             />
           )}
-          {qs.custom ? <TextField placeholder={qs.custom} accessibilityLabel={qs.custom} value={custom} onChangeText={setCustom} /> : null}
+          {qs.custom ? <TextField placeholder={qs.custom} accessibilityLabel={qs.custom} value={custom} onChangeText={setCustom} minHeight={all ? ALL_FIELD_HEIGHT : qs.customHeight} /> : null}
         </View>
       ) : null}
 
@@ -175,7 +178,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   if (all)
     return (
       <PageModal title={qs.title} sheet white onClose={onClose} footer={action ? <Button label={action.label} disabled={action.disabled} onPress={action.onPress} /> : undefined}>
-        <View style={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>{content}</View>
+        <View style={{ gap: spacing[4], paddingHorizontal: spacing[5] }}>{content}</View>
       </PageModal>
     )
   return (

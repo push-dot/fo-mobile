@@ -118,6 +118,8 @@ export type QuickStart = {
   /** The list of postings is open from the start (QsGap, QsFit: 3 recent and 전체 보기); the others show the picked row and open the list on a tap. */
   openList?: boolean
   custom?: string
+  /** The free-input field's height when a board draws it other than the 56 default (QsExp: 54). */
+  customHeight?: number
   instant?: boolean
   start: (i: QsInput) => { title: string; message: string; intent: ChatIntent; context?: { documentId: string } } | null | undefined
 }
@@ -183,7 +185,7 @@ export const QUICK_STARTS: QuickStart[] = [
     start: (i) => (i.picked.length ? opened('허브 프로필 다듬기', `허브 프로필의 ${eulReul(i.picked.map((p) => p.title).join(', '))} 다듬어 주세요`, 'hub_profile', i.documentId) : null),
   },
   {
-    key: 'exp', label: '경험 만들기', icon: 'qs-experience', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기',
+    key: 'exp', label: '경험 만들기', icon: 'qs-experience', layout: 'cards', action: '프로젝트 기획 시작', custom: '직접 입력하기', customHeight: 54,
     title: '어떤 경험을 만들까요?', description: '갭 분석에서 부족했던 경험이에요.',
     start: (i) => {
       const topic = i.custom.trim() || one(i)?.title
