@@ -78,7 +78,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           </Pressable>
         ) : null}
         <View style={{ flex: 1, minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: showTools ? spacing[1] : spacing[3] }}>
-          {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. */}
+          {/* ChatBotHeaderLong: a long placeholder is one line cut with an ellipsis; a multiline field would wrap it. The View is the positioning parent of the absolute placeholder. */}
           <View>
             {p.value ? null : (
               <Text v="h3" weight="400" color="t4" numberOfLines={1} allowFontScaling={!xl} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>

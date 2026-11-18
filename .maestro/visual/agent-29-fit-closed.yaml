@@ -27,9 +27,7 @@ tags:
     file: _close_sheet.yaml
     env:
       TITLE: "이 공고에 맞춰 이력서를 고칠까요?"
-# Closing the sheet brings the keyboard back by itself, so the composer is not tapped (a tap on a focused field only opens the paste menu).
-# Closing the sheet leaves the field focused with the keyboard down, and a tap on it opens only the paste menu.
-# Typing one character brings the keyboard up; erasing it leaves the empty field with its caret, as the board draws it.
+# The tap only opens the paste menu, so type and erase one character to raise the keyboard with the empty field and its caret, as the board draws it.
 - tapOn: ".*에게 물어보기"
 - inputText: "a"
 - eraseText: 1
