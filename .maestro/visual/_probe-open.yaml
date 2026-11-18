@@ -1,0 +1,26 @@
+appId: app.push.mobile
+tags:
+  - subflow
+---
+- evalScript: ${output.n = (output.n || 0) + 1}
+- runFlow:
+    file: _login_mock.yaml
+    env:
+      MOCK: "push://sign-in?mock=blocked-by-them"
+      READY: "새로 올라온 공고"
+- tapOn: "마이"
+- extendedWaitUntil:
+    visible: "김서준"
+    timeout: 10000
+- tapOn: "받은 제안 .*개"
+- extendedWaitUntil:
+    visible: ".*오지현.*"
+    timeout: 10000
+- tapOn: ".*오지현.*"
+- extendedWaitUntil:
+    visible: "수락하고 답장하기"
+    timeout: 10000
+- tapOn: "수락하고 답장하기"
+- extendedWaitUntil:
+    visible: "어떻게 답장할까요?"
+    timeout: 10000

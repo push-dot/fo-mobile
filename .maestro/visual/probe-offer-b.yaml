@@ -1,0 +1,23 @@
+appId: app.push.mobile
+name: probe probe-offer-b.yaml
+tags:
+  - visual
+---
+- evalScript: ${output.n = 0}
+- repeat:
+    times: 8
+    commands:
+      - runFlow: _probe-open.yaml
+      - tapOn:
+          text: "답장.*"
+          retryTapIfNoChange: false
+      - waitForAnimationToEnd:
+          timeout: 1200
+      - tapOn:
+          text: "답장.*"
+          retryTapIfNoChange: false
+      - inputText: "제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요."
+      - copyTextFrom:
+          text: "DBG.*"
+      - evalScript: ${console.log('PROBEPRE ' + output.n + ' ' + maestro.copiedText)}
+      - runFlow: _probe-accept.yaml

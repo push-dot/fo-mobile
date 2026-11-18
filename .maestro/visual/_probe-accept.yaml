@@ -1,0 +1,18 @@
+appId: app.push.mobile
+tags:
+  - subflow
+---
+- tapOn: "수락하고 보내기"
+- extendedWaitUntil:
+    visible: ".*목요일 저녁 7시.*"
+    timeout: 6000
+    optional: true
+- runFlow:
+    when:
+      visible: "DBG.*"
+    commands:
+      - copyTextFrom:
+          text: "DBG.*"
+      - evalScript: ${console.log('PROBEFAIL ' + output.n + ' ' + maestro.copiedText)}
+      - takeScreenshot: probe-fail-${output.n}
+- evalScript: ${console.log('PROBEITER ' + output.n)}
