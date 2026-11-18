@@ -112,7 +112,7 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
 const IosSheet = (props: Props) => {
   const frame = useSafeAreaFrame()
   const [height, setHeight] = useState(0)
-  const keyboardUp = useKeyboardHeight() > 0
+  const keyboardUp = false && useKeyboardHeight() > 0
   const float = props.full ? null : floatingSheet(frame.width, Platform.Version, HOME_INSET, keyboardUp)
   return (
     <SafeAreaProvider initialMetrics={{ frame, insets: NO_INSETS }} style={{ flex: props.full ? 1 : 0 }}>
