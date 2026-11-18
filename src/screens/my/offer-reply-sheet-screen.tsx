@@ -45,6 +45,10 @@ const OfferReplySheetScreen = () => {
       <TextField
         accessibilityLabel="답장"
         multiline
+        onPressIn={() => dbg('tin')}
+        onPressOut={() => dbg('tout')}
+        onFocus={() => dbg('foc')}
+        onBlur={() => dbg('blur')}
         maxLength={500}
         value={reply}
         onChangeText={setReply}
@@ -52,7 +56,7 @@ const OfferReplySheetScreen = () => {
         style={{ minHeight: 72 }}
         placeholder={`${who.displayName} 님에게 답장을 써 주세요.`}
       />
-      <RNText accessibilityLabel={`DBG ${dbgLog.slice(-12).join(' ')}`}>{`DBG ${dbgLog.slice(-12).join(' ')}`}</RNText>
+      <RNText accessibilityLabel={`DBG ${dbgLog.slice(-16).join(' ')}`}>{`DBG ${dbgLog.slice(-16).join(' ')}`}</RNText>
     </Sheet>
   )
 }
