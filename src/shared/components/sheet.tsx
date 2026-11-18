@@ -4,6 +4,7 @@ import { Platform, View, type ViewProps } from 'react-native'
 import { initialWindowMetrics, SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { spacing, useColors } from '../../theme'
 import Button from './button'
+import { dbg } from './glass-pressable'
 import { GRABBER } from './constants'
 import { SheetSurface } from './glass'
 import { PM8_SLIM_ACTION } from './pm8'
@@ -62,6 +63,8 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
   }, [android, id, navigation])
   return (
     <View
+      onStartShouldSetResponderCapture={() => (dbg('capS'), false)}
+      onStartShouldSetResponder={() => (dbg('bubS'), false)}
       onLayout={(e) => {
         if (android && !closing.current) sizeSheet(id, e.nativeEvent.layout.height)
         onLayout?.(e)

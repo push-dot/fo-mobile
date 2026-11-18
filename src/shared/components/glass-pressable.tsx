@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useRef } from 'react'
-import { Pressable, View, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
+import { Pressable, TextInput, View, type ColorValue, type PressableProps, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, useShadow, type Colors } from '../../theme'
 import { toBoxShadow } from '../utility'
 import { DISABLED_OPACITY, PRESS_SCALE } from './constants'
@@ -47,11 +47,12 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
       ref={box}
       onTouchStart={(e) => {
         const t = e.nativeEvent
-        dbg(`ts2 p=${Math.round(t.pageX)},${Math.round(t.pageY)}`)
+        dbg(`ts2 p=${Math.round(t.pageX)},${Math.round(t.pageY)} f=${TextInput.State.currentlyFocusedInput() ? 1 : 0}`)
         box.current?.measureInWindow((x, y, w, h) => dbg(`box ${Math.round(x)},${Math.round(y)},${Math.round(w)}x${Math.round(h)}`))
       }}
-      onTouchEnd={() => dbg('te')}
+      onTouchEnd={() => { dbg('te'); box.current?.measureInWindow((x, y, w, h) => dbg(`boxE ${Math.round(x)},${Math.round(y)},${Math.round(w)}x${Math.round(h)}`)) }}
       onTouchCancel={() => dbg('tc')}
+      onResponderReject={() => dbg('rej')}
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
