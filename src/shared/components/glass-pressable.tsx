@@ -31,7 +31,7 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
   if (native) {
     return (
       <Glass interactive tint={tint} style={style}>
-        <Pressable {...press} {...tap} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
+        <Pressable {...press} {...tap} onPressIn={undefined} onPress={undefined} disabled={disabled} style={[CONTENT, { flexGrow: 1 }, contentStyle, dim]}>
           {children}
         </Pressable>
       </Glass>
@@ -41,6 +41,8 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
     <Pressable
       {...press}
       {...tap}
+      onPressIn={undefined}
+      onPress={undefined}
       disabled={disabled}
       android_ripple={{ color: c[pressedFill ?? 'fill2'], foreground: true }}
       style={({ pressed }) => [
