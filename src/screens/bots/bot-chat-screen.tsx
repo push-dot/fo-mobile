@@ -184,7 +184,13 @@ const Thread = ({ id }: { id: string }) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
   })
-  useGateModal(id, chat, (text, choice) => answer(id, text, choice), () => setTimeout(() => input.current?.focus(), 50))
+  // A closed sheet hides the keyboard but leaves the field focused as far as RN knows, so a bare focus() does nothing.
+  const raiseKeyboard = () =>
+    setTimeout(() => {
+      input.current?.blur()
+      input.current?.focus()
+    }, 50)
+  useGateModal(id, chat, (text, choice) => answer(id, text, choice), raiseKeyboard)
   const working = chat.working
   const renderItem = useCallback(
     ({ item, index }: { item: ThreadRow; index: number }) => (
