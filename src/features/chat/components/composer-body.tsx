@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type Ref } from 'react'
+import { useState, type Ref } from 'react'
 import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
 import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
@@ -54,11 +54,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const disc = { width: DISC, height: DISC, borderRadius: DISC / 2, alignItems: 'center', justifyContent: 'center' } as const
   const textType = type.h3
   const [layout, setLayout] = useState(COMPOSER_ROW)
-  const length = useRef(0)
-  length.current = p.value.length
-  useEffect(() => {
-    if (!p.value) setLayout((l) => settleComposerLayout(l, 1, 0))
-  }, [p.value])
+  if (!p.value && layout.box) setLayout(COMPOSER_ROW)
   const box = layout.box
   const plus = showTools ? (
     <Pressable key="plus" accessibilityRole="button" accessibilityLabel="첨부" onPress={p.onAttach} hitSlop={hitSlopTo(ROW_HEIGHT, ROW_HEIGHT)} style={round}>
@@ -79,7 +75,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
       <View
         onLayout={(e) => {
           const lines = Math.max(1, Math.round(e.nativeEvent.layout.height / (textType.lineHeight * fontScale)))
-          setLayout((l) => settleComposerLayout(l, lines, length.current))
+          setLayout((l) => settleComposerLayout(l, lines, p.value.length))
         }}
       >
         {p.value ? null : (

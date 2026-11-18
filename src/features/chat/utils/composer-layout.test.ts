@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COMPOSER_ROW, settleComposerLayout } from './composer-layout'
 
-const type = (steps: Array<[lines: number, length: number]>) => steps.reduce((layout, [lines, length]) => settleComposerLayout(layout, lines, length), COMPOSER_ROW)
+const type = (steps: [lines: number, length: number][]) => steps.reduce((layout, [lines, length]) => settleComposerLayout(layout, lines, length), COMPOSER_ROW)
 
 describe('composer layout', () => {
   it('stays one pill while the text fits on one line', () => {
