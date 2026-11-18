@@ -5,7 +5,7 @@ tags:
 ---
 - evalScript: ${output.n = 0}
 - repeat:
-    times: 14
+    times: 30
     commands:
       - runFlow: _probe-open.yaml
       - tapOn: "답장.*"
