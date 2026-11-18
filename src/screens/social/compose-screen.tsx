@@ -5,7 +5,7 @@ import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView,
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage } from '@/features/social'
-import { Button, GlassButton, Icon, Menu, Text } from '@/shared/components'
+import { Button, GlassButton, Icon, Menu, Text, inputResponder } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
@@ -75,6 +75,7 @@ const ComposeScreen = () => {
             </Text>
           </Pressable>
           <TextInput
+            {...inputResponder}
             ref={titleRef}
             testID="compose-title"
             value={title}
@@ -93,6 +94,7 @@ const ComposeScreen = () => {
             </Text>
           </Pressable>
           <TextInput
+            {...inputResponder}
             ref={bodyRef}
             testID="compose-body"
             value={body}

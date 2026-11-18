@@ -58,6 +58,7 @@ import {
   useKeyboardHeight,
   useToastLive,
   type MenuAction,
+  inputResponder,
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
@@ -105,6 +106,7 @@ const Input = ({
   const font = multiline ? type.b2 : type.b1
   return (
     <TextInput
+      {...inputResponder}
       accessibilityLabel={label}
       value={value}
       onChangeText={onChangeText}

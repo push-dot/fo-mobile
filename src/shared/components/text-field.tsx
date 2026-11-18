@@ -4,7 +4,7 @@ import type { IconName } from '@push/design-system'
 import { fontFor, iosSystemFill, radius, spacing, type, useColors, useThemeMode } from '../../theme'
 import GlassField from './glass-field'
 import Icon from './icon'
-import { inputMetrics, iosLineBox } from './text-field-metrics'
+import { inputMetrics, inputResponder, iosLineBox } from './text-field-metrics'
 import Text from './text'
 
 /** `compact`: the 48pt `.field` some boards draw instead of the 56pt default. `slim`: the iOS filter sheet's 40pt `.isearch` (17pt text, 12pt side padding). */
@@ -44,6 +44,7 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
           maxLength={max}
           placeholderTextColor={c.t4}
           style={[{ flex: 1, fontSize: slim ? type.h3.fontSize : type.b1.fontSize, letterSpacing: slim ? type.b1.letterSpacing * (type.h3.fontSize / type.b1.fontSize) : type.b1.letterSpacing, color: c.t1, ...inputMetrics(multiline, fontScale), textAlignVertical: multiline ? 'top' : 'center' }, fontFor('400'), multiline && iosLineBox(StyleSheet.flatten(style)?.lineHeight ?? type.b1.lineHeight, type.b1.fontSize, fontScale), style]}
+          {...inputResponder}
           {...rest}
         />
         {trailing}

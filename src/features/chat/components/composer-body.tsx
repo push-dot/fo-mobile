@@ -1,7 +1,7 @@
 import type { Ref } from 'react'
 import { ActivityIndicator, Pressable, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '../../../theme'
-import { GlassField, Icon, Text, hitSlopTo } from '@/shared/components'
+import { GlassField, Icon, Text, hitSlopTo, inputResponder } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { useXlBoardText } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
@@ -93,6 +93,7 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
               </Text>
             )}
             <TextInput
+              {...inputResponder}
               ref={inputRef}
               value={p.value}
               onChangeText={p.onChangeText}

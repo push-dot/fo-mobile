@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { inputMetrics, inputReset, iosLineBox } from '../text-field-metrics'
+import { inputMetrics, inputReset, inputResponder, iosLineBox } from '../text-field-metrics'
 
 vi.mock('react-native', () => ({ Platform: { OS: 'android' } }))
 
@@ -26,5 +26,11 @@ describe('text field input height', () => {
     expect(iosLineBox(24, 16, 1.5, 'ios')?.marginTop).toBeCloseTo(-0.624)
     expect(iosLineBox(20, 16, 1, 'ios')?.marginTop).toBe(-0)
     expect(iosLineBox(24, 16, 1, 'android')).toBeUndefined()
+  })
+})
+
+describe('text field responder', () => {
+  it('lets another touch take the responder from a focused input, so the first tap on a sheet button fires onPressIn', () => {
+    expect(inputResponder).toEqual({ rejectResponderTermination: false })
   })
 })

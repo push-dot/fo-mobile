@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
+import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText, inputResponder } from '@/shared/components'
 import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
@@ -520,6 +520,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
             {searchIcon}
             {/* Stays mounted while the link is checked: unmounting it drops the focus and the keyboard (BotNewLinkChecking draws both). */}
             <TextInput
+              {...inputResponder}
               autoFocus
               value={fieldValue(form)}
               onChangeText={linkWait ? undefined : onType}

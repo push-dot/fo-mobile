@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native'
 import { fontFor, hitSlopTo, radius, selectedRing, spacing, type, useColors } from '@/theme'
-import { Badge, Button, Chip, Icon, RecentList, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { Badge, Button, Chip, Icon, RecentList, SegmentedControl, Sheet, SHEET_ACTION_GAP, SheetScroll, Switch, Text, TextField, useSheetScrollMax, inputResponder } from '@/shared/components'
 import { inputMetrics } from '@/shared/components/text-field-metrics'
 import { readClipboard } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'
@@ -245,6 +245,7 @@ const LinkField = ({ value, onChangeText }: { value: string; onChangeText: (v: s
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], minHeight: 54, paddingHorizontal: spacing[4], borderRadius: radius.md, backgroundColor: c.fill }}>
       <Icon name="link" size={18} color="t1" />
       <TextInput
+        {...inputResponder}
         value={value}
         onChangeText={onChangeText}
         placeholder="https://"
