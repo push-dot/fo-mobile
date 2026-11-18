@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Keyboard, Text as RNText } from 'react-native'
-import { dbg, dbgLog } from '@/shared/components/glass-pressable'
+import { dbg, dbgLog, dbgSubs } from '@/shared/components/glass-pressable'
 import { counterpart, ListSkeleton, RETRY_LABEL, useOffer, useOfferDecision } from '@/features/my'
 import { Sheet, TextField } from '@/shared/components'
 
@@ -15,10 +15,11 @@ const OfferReplySheetScreen = () => {
   const o = offer.data
   const [, tick] = useState(0)
   useEffect(() => {
-    const t = setInterval(() => tick((n) => n + 1), 300)
+    const f = () => tick((n) => n + 1)
+    dbgSubs.add(f)
     const a = Keyboard.addListener('keyboardDidShow', () => dbg('kshow'))
     const b = Keyboard.addListener('keyboardDidHide', () => dbg('khide'))
-    return () => { clearInterval(t); a.remove(); b.remove() }
+    return () => { dbgSubs.delete(f); a.remove(); b.remove() }
   }, [])
   useEffect(() => { dbg(`mut:${accept.status}`) }, [accept.status])
   if (!o)

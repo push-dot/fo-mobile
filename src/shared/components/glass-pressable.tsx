@@ -17,7 +17,8 @@ type Props = Omit<PressableProps, 'style' | 'children'> & {
 }
 
 export const dbgLog: string[] = []
-export const dbg = (m: string) => { dbgLog.push(`${Date.now() % 100000}:${m}`) }
+export const dbgSubs = new Set<() => void>()
+export const dbg = (m: string) => { dbgLog.push(`${Date.now() % 100000}:${m}`); dbgSubs.forEach((f) => f()) }
 const CONTENT: ViewStyle = { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }
 
 // iOS glass answers presses natively (isInteractive); a JS scale around it would move the shape apart from its glass.
