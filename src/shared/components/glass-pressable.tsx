@@ -49,7 +49,7 @@ const GlassPressable = ({ children, style, contentStyle, glass = true, tint, fil
       ref={box}
       onTouchStart={(e) => {
         const t = e.nativeEvent
-        dbg(`ts2 p=${Math.round(t.pageX)},${Math.round(t.pageY)} f=${TextInput.State.currentlyFocusedInput() ? 1 : 0}`)
+        dbg(`ts2 n=${(e as unknown as { touchHistory?: { numberActiveTouches: number } }).touchHistory?.numberActiveTouches} t=${e.nativeEvent.touches?.length} p=${Math.round(t.pageX)},${Math.round(t.pageY)} f=${TextInput.State.currentlyFocusedInput() ? 1 : 0}`)
         box.current?.measureInWindow((x, y, w, h) => dbg(`box ${Math.round(x)},${Math.round(y)},${Math.round(w)}x${Math.round(h)}`))
       }}
       onTouchEnd={() => { dbg('te'); box.current?.measureInWindow((x, y, w, h) => dbg(`boxE ${Math.round(x)},${Math.round(y)},${Math.round(w)}x${Math.round(h)}`)) }}

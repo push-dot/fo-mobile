@@ -50,7 +50,7 @@ const OfferReplySheetScreen = () => {
         onTouchStart={() => dbg('Ts')}
         onTouchEnd={() => dbg('Te')}
         onTouchCancel={() => dbg('Tc')}
-        onPressIn={() => dbg('tin')}
+        onPressIn={(e) => dbg(`tin a=${(e as unknown as { touchHistory?: { numberActiveTouches: number } }).touchHistory?.numberActiveTouches} t=${e.nativeEvent.touches?.length}`)}
         onPressOut={() => dbg('tout')}
         onFocus={() => dbg('foc')}
         onBlur={() => dbg('blur')}
