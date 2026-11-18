@@ -19,7 +19,9 @@ const OfferReplySheetScreen = () => {
     dbgSubs.add(f)
     const a = Keyboard.addListener('keyboardDidShow', () => dbg('kshow'))
     const b = Keyboard.addListener('keyboardDidHide', () => dbg('khide'))
-    return () => { dbgSubs.delete(f); a.remove(); b.remove() }
+    const w1 = Keyboard.addListener('keyboardWillShow', () => dbg('wshow'))
+    const w2 = Keyboard.addListener('keyboardWillHide', () => dbg('whide'))
+    return () => { dbgSubs.delete(f); a.remove(); b.remove(); w1.remove(); w2.remove() }
   }, [])
   useEffect(() => { dbg(`mut:${accept.status}`) }, [accept.status])
   if (!o)
@@ -45,6 +47,9 @@ const OfferReplySheetScreen = () => {
       <TextField
         accessibilityLabel="답장"
         multiline
+        onTouchStart={() => dbg('Ts')}
+        onTouchEnd={() => dbg('Te')}
+        onTouchCancel={() => dbg('Tc')}
         onPressIn={() => dbg('tin')}
         onPressOut={() => dbg('tout')}
         onFocus={() => dbg('foc')}

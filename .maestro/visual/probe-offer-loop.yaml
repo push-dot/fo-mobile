@@ -5,7 +5,7 @@ tags:
 ---
 - evalScript: ${output.n = 0}
 - repeat:
-    times: 12
+    times: 16
     commands:
       - evalScript: ${output.n = output.n + 1}
       - runFlow:
@@ -36,8 +36,12 @@ tags:
           visible: ".*목요일 저녁 7시.*"
           timeout: 6000
           optional: true
-      - copyTextFrom:
-          text: "DBG.*"
-          optional: true
-      - evalScript: ${console.log('PROBE ' + output.n + ' copied=' + maestro.copiedText)}
-      - takeScreenshot: probe-${output.n}
+      - runFlow:
+          when:
+            visible: "DBG.*"
+          commands:
+            - copyTextFrom:
+                text: "DBG.*"
+            - evalScript: ${console.log('PROBEFAIL ' + output.n + ' ' + maestro.copiedText)}
+            - takeScreenshot: probe-fail-${output.n}
+      - evalScript: ${console.log('PROBEITER ' + output.n)}
