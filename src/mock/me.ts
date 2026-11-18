@@ -560,7 +560,7 @@ const person = (userId: string, displayName: string, headline: string): Profile 
 // Ids match hub.ts so a row opens that person's hub profile.
 const follows = [
   person('u2', '이하은', 'React로 사용자 경험을 다듬어요'),
-  person('u1', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
+  person('u-taeyoon', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
   person('u4', '최지우', '데이터 파이프라인 · Spark · Airflow'),
   person('u3', '박도윤', 'SwiftUI로 앱을 만드는 iOS 개발자'),
   person('u5', '정민재', '쿠버네티스 운영이 즐거운 DevOps'),
@@ -616,7 +616,7 @@ const commented = [
     displayName: '정민재',
   }),
   post('cp2', 'coffeechat', '판교 근처 백엔드 커피챗 하실 분', 12, 530, on(10, 11), {
-    id: 'u1',
+    id: 'u-taeyoon',
     displayName: '김태윤',
   }),
 ]

@@ -6,6 +6,7 @@ const MyHeader = () => {
   const { data: unread = 0 } = useUnreadOffers()
   return (
     <TopBar
+      transparent
       left={
         <Text v="h1" accessibilityRole="header">
           마이
