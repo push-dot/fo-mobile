@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Pressable, View } from 'react-native'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
@@ -21,9 +20,9 @@ const subline = (e: CalendarEvent) => {
 /** The board's MyCalendar: the day title (opens the month sheet), the add button and that day's list. */
 const CalendarView = () => {
   const c = useColors()
-  const today = useMemo(() => new Date(), [])
+  const today = new Date()
   const selected = useCalendarDay((s) => s.day)
-  const from = useMemo(() => new Date(selected.getFullYear(), selected.getMonth(), selected.getDate()), [selected])
+  const from = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate())
   const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1)
   const { data } = useCalendarEvents(from.toISOString(), to.toISOString())
   const dayEvents = [...(data?.data ?? [])].sort((a, b) => a.startsAt.localeCompare(b.startsAt))

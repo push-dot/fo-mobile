@@ -474,6 +474,19 @@ export const useOfferMessages = (offerId: string) => {
 
 type Upload = { name: string; size: number; progress: number }
 
+const settleUpload = async (file: PickedFile, isCancelled: () => boolean, onDone: (() => void) | undefined, finish: () => void) => {
+  try {
+    const s = await myApi.upload(file)
+    if (isCancelled()) await myApi.remove(s.id).catch(() => undefined)
+    else onDone?.()
+  } catch {
+    if (!isCancelled())
+      Alert.alert('파일을 올리지 못했어요', '네트워크를 확인하고 다시 올려 주세요.')
+  } finally {
+    finish()
+  }
+}
+
 export const useUpload = (onDone?: () => void) => {
   const qc = useQueryClient()
   const [upload, setUpload] = useState<Upload | null>(null)
@@ -489,18 +502,16 @@ export const useUpload = (onDone?: () => void) => {
       () => setUpload((u) => u && { ...u, progress: mockUploadHeldAt() ?? u.progress + (0.9 - u.progress) * 0.12 }),
       200,
     )
-    try {
-      const s = await myApi.upload(file)
-      if (cancelled.current) await myApi.remove(s.id).catch(() => undefined)
-      else onDone?.()
-    } catch {
-      if (!cancelled.current)
-        Alert.alert('파일을 올리지 못했어요', '네트워크를 확인하고 다시 올려 주세요.')
-    } finally {
-      clearInterval(timer.current ?? undefined)
-      setUpload(null)
-      void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
-    }
+    await settleUpload(
+      file,
+      () => cancelled.current,
+      onDone,
+      () => {
+        clearInterval(timer.current ?? undefined)
+        setUpload(null)
+        void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
+      },
+    )
   }
   const cancel = () => {
     cancelled.current = true

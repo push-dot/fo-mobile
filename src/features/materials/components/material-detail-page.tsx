@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useMemo } from 'react'
 import { Platform, View } from 'react-native'
 import { Button, PM8, PM8_MDET_HEAD, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
@@ -32,7 +31,7 @@ const open = (m: Material, inModal: boolean) => {
 
 export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
-  const now = useMemo(() => new Date(), [])
+  const now = new Date()
   const bound = useSheetScrollMax()
   const inModal = useInMaterialsModal()
   const secondaryFill = pm8SecondaryFill(Platform.OS === 'ios', useThemeMode() === 'dark')

@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import { brandColor, careerLabel } from '@push/shared'
@@ -48,4 +47,4 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
   )
 }
 
-export default memo(PostingRow)
+export default PostingRow

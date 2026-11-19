@@ -1,5 +1,5 @@
 import { type DataEnvelope, type ListEnvelope } from '@push/api-client'
-import { api, http, API_MOCK } from '@/shared/infrastructure'
+import { api, http, API_BASE_URL, API_MOCK } from '@/shared/infrastructure'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { DEFAULT_DOC } from '../constants'
@@ -76,7 +76,22 @@ export const fetchMentionBookmarks = () => api.me.bookmarks({ limit: 20 })
 
 const bytesOf = async (res: Promise<Response>) => new Uint8Array(await (await res).arrayBuffer())
 
-export const fetchArtifactBytes = (downloadUrl: string) => bytesOf(c.raw('GET', downloadUrl))
+// push-be sends a path relative to /api/v1, but an absolute or presigned (`?`) URL must not get the prefix. Only an
+// API-origin URL goes through the client (and carries the bearer); any other https URL is fetched bare.
+const artifactResponse = async (downloadUrl: string): Promise<Response> => {
+  const base = new URL(API_BASE_URL)
+  const basePath = base.pathname.replace(/\/+$/, '')
+  const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(downloadUrl) ? downloadUrl : downloadUrl.replace(/^\/+/, ''), `${base.origin}${basePath}/`)
+  if (url.origin === base.origin && url.pathname.startsWith(`${basePath}/`)) {
+    return c.raw('GET', url.pathname.slice(basePath.length), { query: Object.fromEntries(url.searchParams) })
+  }
+  if (url.protocol !== 'https:') throw new Error('unsupported download url')
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`download failed: ${res.status}`)
+  return res
+}
+
+export const fetchArtifactBytes = (downloadUrl: string) => bytesOf(artifactResponse(downloadUrl))
 
 export const fetchSourceBytes = (id: string) => bytesOf(api.sources.content(id))
 

@@ -4,6 +4,7 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.21",
+    "@legendapp/list": "^3.7.3",
     "@push/api-client": "workspace:*",
     "@push/design-system": "workspace:*",
     "@push/shared": "workspace:*",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
+    "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~58.0.4",
     "typescript": "~6.0.3",

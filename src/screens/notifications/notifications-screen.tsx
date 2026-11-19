@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
-import { useCallback, useMemo } from 'react'
-import { SectionList, View } from 'react-native'
+import { LegendList } from '@legendapp/list/react-native'
+import { View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
 import {
   groupLabel,
@@ -18,6 +18,8 @@ import { Button, ScreenBar, Skeleton, SkeletonRows, StatusNote, Text } from '@/s
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
+type Row = { type: 'header'; key: string; title: string; first: boolean } | { type: 'item'; key: string; n: AppNotification }
+
 const NotificationsScreen = () => {
   const c = useColors()
   const q = useNotifications()
@@ -26,26 +28,25 @@ const NotificationsScreen = () => {
   // NotificationsStates: the 알림 설정 button is drawn only on the board where the OS permission is off.
   const settingsVisible = useNotificationSettingsVisible()
   const items = q.data?.data ?? []
-  const sections = useMemo(() => {
-    const rows = q.data?.data ?? []
-    return ['오늘', '이번 주', '이전']
-      .map((title) => ({ title, data: rows.filter((n) => groupLabel(n.createdAt) === title) }))
-      .filter((s) => s.data.length)
-  }, [q.data])
+  const rows = ['오늘', '이번 주', '이전'].flatMap((title): Row[] => {
+    const data = items.filter((n) => groupLabel(n.createdAt) === title)
+    return data.length ? [{ type: 'header', key: `h:${title}`, title, first: false }, ...data.map((n): Row => ({ type: 'item', key: n.id, n }))] : []
+  }).map((r, i) => (r.type === 'header' ? { ...r, first: i === 0 } : r))
   const unread = items.some((n) => !n.readAt)
 
-  const open = useCallback(
-    (n: AppNotification) => {
-      if (!n.readAt) read.mutate([n.id])
-      const href = notificationHref(n)
-      if (href) router.push(href)
-    },
-    [read],
-  )
-  const renderItem = useCallback(
-    ({ item }: { item: AppNotification }) => <NotificationRow n={item} onPress={open} />,
-    [open],
-  )
+  const open = (n: AppNotification) => {
+    if (!n.readAt) read.mutate([n.id])
+    const href = notificationHref(n)
+    if (href) router.push(href)
+  }
+  const renderItem = ({ item }: { item: Row }) =>
+    item.type === 'header' ? (
+      <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: spacing[6], paddingTop: item.first ? spacing[2] : 22, paddingBottom: spacing[2] }}>
+        {item.title}
+      </Text>
+    ) : (
+      <NotificationRow n={item.n} onPress={open} />
+    )
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -58,19 +59,15 @@ const NotificationsScreen = () => {
         }}
       >
         {({ topInset, onScroll }) => (
-        <SectionList
-          sections={sections}
-          keyExtractor={(n) => n.id}
+        <LegendList
+          data={rows}
+          keyExtractor={(r) => r.key}
+          getItemType={(r) => r.type}
+          estimatedItemSize={72}
           contentInsetAdjustmentBehavior="never"
-          stickySectionHeadersEnabled={false}
           contentContainerStyle={{ flexGrow: 1, paddingTop: topInset }}
             onScroll={onScroll}
             scrollEventThrottle={64}
-          renderSectionHeader={({ section }) => (
-            <Text v="c1" weight="700" color="t3" style={{ paddingHorizontal: spacing[6], paddingTop: section.title === sections[0]?.title ? spacing[2] : 22, paddingBottom: spacing[2] }}>
-              {section.title}
-            </Text>
-          )}
           renderItem={renderItem}
           ListEmptyComponent={
             q.isPending ? (

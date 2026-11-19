@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
 import { Avatar, careerLine } from '@/features/hub'
@@ -36,4 +35,4 @@ const PersonRow = ({ p, q, onOpen }: { p: Profile; q: string; onOpen: () => void
   )
 }
 
-export default memo(PersonRow)
+export default PersonRow

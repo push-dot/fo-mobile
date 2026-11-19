@@ -1,10 +1,10 @@
 import { router } from 'expo-router'
-import { useRef, useState, type ComponentRef } from 'react'
+import { LegendList } from '@legendapp/list/react-native'
+import { useState } from 'react'
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native'
@@ -106,6 +106,15 @@ const SCROLL_PAD_BOTTOM = spacing[5]
 // ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
 const DAY_LABEL_LIFT = 2
 
+type Item =
+  | { kind: 'msg'; key: string; m: { id: string; senderId: string; body: string; createdAt: string; day: string | null }; first: boolean }
+  | { kind: 'posted'; key: string }
+  | { kind: 'empty'; key: string }
+  | { kind: 'pending'; key: string }
+  | { kind: 'failed'; key: string; f: FailedSend }
+
+const Gap = () => <View style={{ height: spacing[4] }} />
+
 const DayLabel = ({ day }: { day: string | null }) =>
   day ? (
     <Text v="c2" weight="600" color="t3" style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}>
@@ -119,7 +128,6 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const keyboardUp = useKeyboardHeight() > 0
   const [text, setText] = useState('')
   const [composerH, setComposerH] = useState(0)
-  const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
   const [failed, setFailed] = useState<FailedSend[]>([])
   const { data: o } = useOffer(id)
   const box = useViewerBox(o, hint)
@@ -166,6 +174,71 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const ios = Platform.OS === 'ios'
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
   const closed = composerClosed(failed, o.canSend)
+  const items: Item[] = [
+    ...thread.map((m, i): Item => ({ kind: 'msg', key: m.id, m, first: i === 0 })),
+    ...(thread.length === 0 && posted ? [{ kind: 'posted', key: 'posted' } as Item] : []),
+    ...(empty ? [{ kind: 'empty', key: 'empty' } as Item] : []),
+    ...(send.isPending ? [{ kind: 'pending', key: 'pending' } as Item] : []),
+    ...failed.map((f): Item => ({ kind: 'failed', key: f.key, f })),
+  ]
+  const renderItem = ({ item }: { item: Item }) => {
+    switch (item.kind) {
+      case 'msg':
+        return (
+          <View style={{ gap: spacing[4] }}>
+            <DayLabel day={item.m.day} />
+            {item.first ? posted : null}
+            <Bubble body={item.m.body} at={item.m.createdAt} mine={item.m.senderId === meId} />
+          </View>
+        )
+      case 'posted':
+        return (
+          <View style={{ gap: spacing[4] }}>
+            <DayLabel day={dayBreaks([{ createdAt: o.createdAt }])[0]!.day} />
+            {posted}
+          </View>
+        )
+      case 'empty':
+        return (
+          <View style={{ paddingVertical: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0) + 80 }}>
+            <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+              첫 메시지를 보내 대화를 시작해 보세요.
+            </Text>
+          </View>
+        )
+      case 'pending':
+        return <Bubble body={send.variables ?? ''} mine faded />
+      case 'failed': {
+        const f = item.f
+        return (
+          <View style={{ gap: spacing[1] }}>
+            <Bubble body={f.body} mine faded />
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: spacing[2] }}>
+              <Text v="c2" weight="700" color="red">
+                !
+              </Text>
+              <Text v="c2" color="red">
+                {failedLine(f).title}
+              </Text>
+              {failedLine(f).retry ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="다시 보내기"
+                  hitSlop={10}
+                  onPress={() => {
+                    setFailed((xs) => xs.filter((x) => x.key !== f.key))
+                    post(f.body)
+                  }}
+                >
+                  <Icon name="retry" size={16} color="t2" />
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+        )
+      }
+    }
+  }
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: c.bg }}>
@@ -200,79 +273,25 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           menu ? <GlassButton actions={[{ icon: 'more', label: '더 보기', menu }]} /> : undefined
         }
       />
-      <ScrollView
-        ref={scroll}
-        onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}
+      <LegendList
+        data={items}
+        keyExtractor={(it) => it.key}
+        getItemType={(it) => it.kind}
+        renderItem={renderItem}
+        ItemSeparatorComponent={Gap}
+        estimatedItemSize={64}
+        alignItemsAtEnd
+        initialScrollAtEnd
+        maintainScrollAtEnd
+        maintainVisibleContentPosition
         contentContainerStyle={{
           flexGrow: 1,
-          gap: spacing[4],
           paddingTop: spacing[1],
           paddingHorizontal: spacing[5],
           paddingBottom: SCROLL_PAD_BOTTOM,
         }}
         keyboardShouldPersistTaps="handled"
-      >
-        {thread.map((m, i) => (
-          <View key={m.id} style={{ gap: spacing[4] }}>
-            <DayLabel day={m.day} />
-            {i === 0 ? posted : null}
-            <Bubble body={m.body} at={m.createdAt} mine={m.senderId === meId} />
-          </View>
-        ))}
-        {thread.length === 0 && posted ? (
-          <View style={{ gap: spacing[4] }}>
-            <DayLabel day={dayBreaks([{ createdAt: o.createdAt }])[0]!.day} />
-            {posted}
-          </View>
-        ) : null}
-        {empty ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              paddingBottom: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0),
-            }}
-          >
-            <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
-              첫 메시지를 보내 대화를 시작해 보세요.
-            </Text>
-          </View>
-        ) : null}
-        {send.isPending ? <Bubble body={send.variables ?? ''} mine faded /> : null}
-        {failed.map((f) => (
-          <View key={f.key} style={{ gap: spacing[1] }}>
-            <Bubble body={f.body} mine faded />
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: spacing[2],
-              }}
-            >
-              <Text v="c2" weight="700" color="red">
-                !
-              </Text>
-              <Text v="c2" color="red">
-                {failedLine(f).title}
-              </Text>
-              {failedLine(f).retry ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="다시 보내기"
-                  hitSlop={10}
-                  onPress={() => {
-                    setFailed((xs) => xs.filter((x) => x.key !== f.key))
-                    post(f.body)
-                  }}
-                >
-                  <Icon name="retry" size={16} color="t2" />
-                </Pressable>
-              ) : null}
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+      />
       <View
         onLayout={(e) => setComposerH(e.nativeEvent.layout.height)}
         style={{

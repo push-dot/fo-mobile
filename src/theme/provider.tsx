@@ -8,9 +8,6 @@ export const DesignThemeProvider = ({ children }: { children: ReactNode }) => {
   const mode = useThemeMode()
   const colors = useColors()
   const base = mode === 'dark' ? DarkTheme : DefaultTheme
-  return (
-    <ThemeProvider value={{ ...base, colors: { ...base.colors, ...navigationColors(colors) } }}>
-      {children}
-    </ThemeProvider>
-  )
+  const value = { ...base, colors: { ...base.colors, ...navigationColors(colors) } }
+  return <ThemeProvider value={value}>{children}</ThemeProvider>
 }

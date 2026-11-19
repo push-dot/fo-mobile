@@ -1,5 +1,4 @@
 import { router, type Href } from 'expo-router'
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
 import { Badge, Icon, Text } from '../../../shared/components'
@@ -36,4 +35,4 @@ const ProfileRow = ({ p }: { p: Profile }) => {
   )
 }
 
-export default memo(ProfileRow)
+export default ProfileRow

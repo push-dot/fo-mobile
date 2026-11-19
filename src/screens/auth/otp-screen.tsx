@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Keyboard, Platform, Pressable, View } from 'react-native'
 import { router } from 'expo-router'
 import {
   AccountPill,
@@ -29,11 +29,12 @@ import {
   verifyPhoneCode,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
-import { Button, CtaBar, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const OtpScreen = () => {
   const c = useColors()
+  const keyboard = useKeyboardHeight()
   const digits = usePhoneAuth((state) => state.digits)
   const email = usePhoneAuth((state) => state.email)
   const provider = usePhoneAuth((state) => state.provider)
@@ -51,9 +52,11 @@ const OtpScreen = () => {
   const e164 = toE164(digits)
   const display = formatNational(digits)
 
+  // The code screen opens only after a code was really sent (the send sets the cooldown); a link or a back-forward into it goes back to the number.
+  const sent = cooldownEndsAt !== null
   useEffect(() => {
-    if (!e164) router.replace('/phone')
-  }, [e164])
+    if (!e164 || !sent) router.replace('/phone')
+  }, [e164, sent])
 
   const resend = () => {
     if (!e164) return
@@ -124,6 +127,8 @@ const OtpScreen = () => {
       </Pressable>
     )
 
+  if (!e164 || !sent) return null
+
   if (blocked) {
     return (
       <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -147,9 +152,10 @@ const OtpScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    // The code pad has no done key: a tap anywhere outside the cells closes it.
+    <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
+      <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
         {email ? (
           <View style={{ marginBottom: 18 }}>
             <AccountPill email={email} provider={provider} />
@@ -201,15 +207,15 @@ const OtpScreen = () => {
             </Text>
           </Pressable>
         </View>
-      </View>
-      <CtaBar>
+      </Pressable>
+      <CtaBar lift={keyboard}>
         {otpError === 'expired' ? (
           <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
         ) : (
           <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} style={{ flex: 1 }} />
         )}
       </CtaBar>
-    </View>
+    </Pressable>
   )
 }
 

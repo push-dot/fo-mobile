@@ -35,7 +35,7 @@ const stackLayoutSource = readFileSync(
   new URL('../../../app/(app)/(stack)/_layout.tsx', import.meta.url),
   'utf8',
 )
-const storesSource = readFileSync(new URL('../stores.ts', import.meta.url), 'utf8')
+const storesSource = ['run', 'consent', 'draft'].map((f) => readFileSync(new URL(`../stores/${f}.ts`, import.meta.url), 'utf8')).join('\n')
 const fetchersSource = readFileSync(new URL('../api/fetchers.ts', import.meta.url), 'utf8')
 const listenerSource = readFileSync(new URL('../components/consent-prompt-listener.tsx', import.meta.url), 'utf8')
 
