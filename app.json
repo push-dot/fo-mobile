@@ -53,7 +53,8 @@
     ],
     "scheme": "push",
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }
