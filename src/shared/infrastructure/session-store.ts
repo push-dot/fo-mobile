@@ -2,6 +2,7 @@ import type { Session } from '@push/api-client'
 import * as SecureStore from 'expo-secure-store'
 import { create } from 'zustand'
 import { queryClient } from '@/providers/query-client'
+import { runSessionCleared } from '@/shared/utility/session-reset'
 import { SESSION_STORAGE_KEY } from './constants'
 
 type SessionState = {
@@ -16,7 +17,16 @@ export const useSession = create<SessionState>((set) => ({
   ready: false,
   load: async () => {
     const raw = await SecureStore.getItemAsync(SESSION_STORAGE_KEY)
-    set({ session: raw ? (JSON.parse(raw) as Session) : null, ready: true })
+    let session: Session | null = null
+    if (raw) {
+      try {
+        session = JSON.parse(raw) as Session
+      } catch {
+        // A corrupted value must not keep the app on its splash: treat it as signed out.
+        await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY).catch(() => undefined)
+      }
+    }
+    set({ session, ready: true })
   },
   set: async (session) => {
     const hadSession = useSession.getState().session != null
@@ -25,6 +35,7 @@ export const useSession = create<SessionState>((set) => ({
     if (hadSession && session === null) {
       await queryClient.cancelQueries()
       queryClient.clear()
+      runSessionCleared()
     }
     set({ session })
   },

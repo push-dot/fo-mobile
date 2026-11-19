@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Appearance, View } from 'react-native'
-import { queryClient } from '@/providers'
+import { queryClient, useAppStateFocus } from '@/providers'
 import { RootErrorBoundary, ToastHost } from '@/shared/components'
 import SplashGate from '@/shared/infrastructure/splash-gate'
 import { noSelectionGrant } from '@/shared/utility'
@@ -17,10 +17,13 @@ void SplashScreen.preventAutoHideAsync()
 
 const RootLayout = () => {
   const themeChoice = useThemePreference((s) => s.choice)
-  const { ready, session, load } = useSession()
+  const ready = useSession((s) => s.ready)
+  const signedIn = useSession((s) => !!s.session)
+  const load = useSession((s) => s.load)
   const themeReady = useThemePreference((s) => s.ready)
   const loadTheme = useThemePreference((s) => s.load)
   const mode = useThemeMode()
+  useAppStateFocus()
 
   useEffect(() => {
     void load()
@@ -42,10 +45,10 @@ const RootLayout = () => {
           <SplashGate sessionReady={ready} themeReady={themeReady} />
           <View style={{ flex: 1 }} {...noSelectionGrant}>
             <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Protected guard={!!session} redirectTo="/sign-in">
+              <Stack.Protected guard={signedIn} redirectTo="/sign-in">
                 <Stack.Screen name="(app)" />
               </Stack.Protected>
-              <Stack.Protected guard={!session}>
+              <Stack.Protected guard={!signedIn}>
                 <Stack.Screen name="sign-in" />
                 <Stack.Screen name="phone" />
                 <Stack.Screen name="verify-phone" />

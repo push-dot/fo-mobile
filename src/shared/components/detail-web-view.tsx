@@ -3,11 +3,15 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { spacing, useColors, useThemeMode } from '../../theme'
-import { bootScript, detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom } from './detail-url'
+import { bootScript, originOf, detailUrl, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, mockFitSoonOn, mockFitThreeOn, mockWebPlanOf, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import LoadingIndicator from './loading-indicator'
 import Text from './text'
+
+// Mock-only scripts stay out of the release path: required only when the mock API is on.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mockScripts = (): { HOLD_FIT_SCRIPT: string; SOON_FIT_SCRIPT: string } => require('./detail-mock-scripts')
 
 const APP_PATH = /^\/(?!\/)/
 
@@ -42,22 +46,29 @@ type Props = {
 const insetScript = (top: number, bottom: number) =>
   `(function(){var s=document.getElementById('push-inset')||document.head.appendChild(Object.assign(document.createElement('style'),{id:'push-inset'}));s.textContent='html{padding-top:${top}px;padding-bottom:${bottom}px}';})();true;`
 
+const buildBoot = (mode: ReturnType<typeof useThemeMode>, applyZoom: string | undefined) =>
+  bootScript(
+    WEB_BASE_URL,
+    { apiBaseUrl: API_BASE_URL, mock: API_MOCK, plan: API_MOCK ? mockWebPlanOf() : undefined, fitParts: API_MOCK && mockFitThreeOn() ? 3 : undefined, theme: mode },
+    `${applyZoom ?? ''}${API_MOCK && mockFitHolding() ? mockScripts().HOLD_FIT_SCRIPT : ''}${API_MOCK && mockFitSoonOn() ? mockScripts().SOON_FIT_SCRIPT : ''}`,
+  )
+
+const injectedOf = (zoomScript: string | undefined, insetPart: string) => `${zoomScript ?? ''}${insetPart}` || undefined
+
 const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
   const c = useColors()
   const mode = useThemeMode()
   const ref = useRef<WebView<object>>(null)
   const token = useSession((s) => s.session?.accessToken ?? null)
+  const tokenRef = useRef(token)
+  useEffect(() => {
+    tokenRef.current = token
+  }, [token])
   const [failed, setFailed] = useState(false)
   const [loading, setLoading] = useState(() => !opened.has(path))
   const zoom = Math.round(useWindowDimensions().fontScale * 100)
   const applyZoom = Platform.OS === 'ios' ? textSizeScript(zoom) : undefined
-  const [boot] = useState(() =>
-    bootScript(
-      WEB_BASE_URL,
-      { token, apiBaseUrl: API_BASE_URL, mock: API_MOCK, plan: API_MOCK ? mockWebPlanOf() : undefined, fitParts: API_MOCK && mockFitThreeOn() ? 3 : undefined, theme: mode },
-      `${applyZoom ?? ''}${API_MOCK && mockFitHolding() ? HOLD_FIT_SCRIPT : ''}${API_MOCK && mockFitSoonOn() ? SOON_FIT_SCRIPT : ''}`,
-    ),
-  )
+  const [boot] = useState(() => buildBoot(mode, applyZoom))
 
   const done = () => {
     opened.add(path)
@@ -65,10 +76,12 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
   }
 
   useEffect(() => {
-    const t = setTimeout(done, LOADING_MAX_MS)
+    const t = setTimeout(() => {
+      opened.add(path)
+      setLoading(false)
+    }, LOADING_MAX_MS)
     return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [path])
 
   useEffect(() => {
     ref.current?.injectJavaScript(tokenEventScript(WEB_BASE_URL, token))
@@ -93,6 +106,8 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
     if (inset) ref.current?.injectJavaScript(insetScript(insetTop, insetBottom))
   }, [inset, insetTop, insetBottom])
 
+  const injected = injectedOf(applyZoom, inset ? insetScript(insetTop, insetBottom) : '')
+
   const onNavigate = ({ url }: { url: string }) => routeNavigation(url, WEB_BASE_URL, openBrowser)
 
   const onMessage = (e: WebViewMessageEvent) => {
@@ -106,6 +121,8 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
     if (m.type === 'title') return void ref.current?.injectJavaScript(FONTS_READY_SCRIPT)
     // The page is drawn and its web fonts are in: ending the loading earlier shows the fallback glyphs for a moment.
     if (m.type === 'fonts-ready') return done()
+    // The page asks for the token once it can listen; the app answers with a one-shot event, not a global.
+    if (m.type === 'ready') return void ref.current?.injectJavaScript(tokenEventScript(WEB_BASE_URL, tokenRef.current))
     if (m.type === 'open' && typeof m.path === 'string' && APP_PATH.test(m.path)) router.push(m.path as Href)
     else if (m.type === 'external' && typeof m.url === 'string' && /^https?:\/\//.test(m.url)) void openBrowser(m.url)
     else if (m.type === 'error') fail()
@@ -119,14 +136,14 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
         key={mode}
         source={{ uri: detailUrl(WEB_BASE_URL, path, mode, API_MOCK, from) }}
         injectedJavaScriptBeforeContentLoaded={boot}
-        injectedJavaScript={`${applyZoom ?? ''}${inset ? insetScript(insetTop, insetBottom) : ''}` || undefined}
+        injectedJavaScript={injected}
         onScroll={onScroll ? (e: { nativeEvent: { contentOffset: { y: number } } }) => onScroll(e.nativeEvent.contentOffset.y) : undefined}
         textZoom={zoom}
         onMessage={onMessage}
         onShouldStartLoadWithRequest={onNavigate}
         onError={fail}
         style={{ backgroundColor: c.bg }}
-        originWhitelist={['*']}
+        originWhitelist={[`${originOf(WEB_BASE_URL)}*`, 'about:blank']}
         setSupportMultipleWindows={false}
       />
       {loading && !failed ? <DetailLoading /> : null}
