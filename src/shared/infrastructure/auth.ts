@@ -67,8 +67,19 @@ export const signInWithApple = async (): Promise<SignInOutcome> => {
   }
 }
 
+// App Store guideline 5.1.1(v): an Apple account re-authorizes so the server can revoke the Sign in with Apple grant.
+const appleAuthorizationCode = async (): Promise<string | undefined> => {
+  if (Platform.OS !== 'ios') return undefined
+  const me = await api.auth.me()
+  if (me.provider !== 'apple') return undefined
+  const AppleAuthentication = await import('expo-apple-authentication')
+  const credential = await AppleAuthentication.signInAsync()
+  return credential.authorizationCode ?? undefined
+}
+
 export const deleteAccount = async () => {
-  await api.me.deleteAccount()
+  const appleCode = await appleAuthorizationCode()
+  await api.me.deleteAccount(appleCode ? { appleAuthorizationCode: appleCode } : undefined)
   await useSession.getState().set(null)
 }
 
