@@ -1,95 +1,27 @@
 import { create } from 'zustand'
 import { ApiError, QueueBusyError, type BotContract, type ChatIntent } from '@push/api-client'
-import type { Attachment, AttachmentKind, BotId } from '@/features/bots'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
 import { showToast } from '@/shared/components/toast-store'
+import { onSessionCleared } from '@/shared/utility/session-reset'
 import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } from '@/shared/infrastructure'
-import { chatApi } from './api/fetchers'
-import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
-import { applyEvent, emptyChat } from './utils/reducer'
-import { createTokenBatch } from './utils/token-batch'
-import { isConsentRequired } from './utils/consent'
-import { errorText, fromStream, type StreamEnd } from './utils/stream'
-import { openPieceId, restoreBotTurns } from './utils/turns'
-import { fromFirst, prependOlder } from './utils/find'
-import { withMaterial } from './utils/usage'
-import type { ChatEvent, ChatItem, ChatState } from './types'
+import { chatApi } from '../api/fetchers'
+import type { RunInput } from '../api/schemas'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from '../constants'
+import { applyEvent, emptyChat } from '../utils/reducer'
+import { createTokenBatch } from '../utils/token-batch'
+import { isConsentRequired } from '../utils/consent'
+import { errorText, fromStream, type StreamEnd } from '../utils/stream'
+import { openPieceId, restoreBotTurns } from '../utils/turns'
+import { fromFirst, prependOlder } from '../utils/find'
+import type { ChatEvent, ChatItem, ChatState } from '../types'
+import { askConsent, pendingConsent, resetConsent, takeConsent } from './consent'
+import { clearDraft, resetDrafts, useDraftStore } from './draft'
 
 // Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
 export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
-
-export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
-
-export const LOCAL_DRAFT = 'local'
-
-type Draft = { text: string; file?: PickedFile; chip?: string; chipKind?: AttachmentKind; chipId?: string }
-
-const EMPTY_DRAFT: Draft = { text: '' }
-
-export const useDraftStore = create<{ byBot: Record<string, Draft> }>(() => ({ byBot: {} }))
-
-const writeDraft = (id: string, next: Draft | undefined) => {
-  useDraftStore.setState((s) => {
-    if (!next) {
-      if (!s.byBot[id]) return s
-      const { [id]: _, ...rest } = s.byBot
-      return { byBot: rest }
-    }
-    return { byBot: { ...s.byBot, [id]: next } }
-  })
-}
-
-export const setDraftText = (id: string, text: string) => {
-  useDraftStore.setState((s) => {
-    const current = s.byBot[id] ?? EMPTY_DRAFT
-    if (!text && !current.file && !current.chip) {
-      if (!s.byBot[id]) return s
-      const { [id]: _, ...rest } = s.byBot
-      return { byBot: rest }
-    }
-    return { byBot: { ...s.byBot, [id]: { ...current, text } } }
-  })
-}
-
-export const appendDraftText = (id: string, text: string) => {
-  useDraftStore.setState((s) => ({ byBot: withMaterial(s.byBot, id, text, EMPTY_DRAFT) }))
-}
-
-export const attachDraftFile = (id: string, file: PickedFile) => {
-  useDraftStore.setState((s) => {
-    const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, file, chip: undefined, chipKind: undefined, chipId: undefined } } }
-  })
-}
-
-export const attachDraftChip = (id: string, chip: string, chipKind: AttachmentKind, chipId?: string) => {
-  useDraftStore.setState((s) => {
-    const current = s.byBot[id] ?? EMPTY_DRAFT
-    return { byBot: { ...s.byBot, [id]: { ...current, chip, chipKind, chipId, file: undefined } } }
-  })
-}
-
-export const detachDraft = (id: string) => {
-  useDraftStore.setState((s) => {
-    const current = s.byBot[id]
-    if (!current) return s
-    if (!current.text) {
-      const { [id]: _, ...rest } = s.byBot
-      return { byBot: rest }
-    }
-    return { byBot: { ...s.byBot, [id]: { text: current.text } } }
-  })
-}
-
-export const clearDraft = (id: string) => writeDraft(id, undefined)
-
-export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(botId, attachment.title, attachment.kind, attachment.id)
-
-type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
 type Outgoing = RunInput & { file?: PickedFile; reattach?: boolean }
 
@@ -107,47 +39,8 @@ const withUpload = async (input: Outgoing): Promise<RunInput | undefined> => {
   }
 }
 
-const pendingConsent = new Map<string, RunInput>()
-let pendingOpen: PendingOpen | null = null
-let pendingRetry: (() => void) | null = null
-let openChat: ((p: PendingOpen) => void) | null = null
-
-export const askConsent = (force = false) => {
-  const s = useConsentPrompt.getState()
-  if (!(force || !s.dismissed) || s.open) return
-  useConsentPrompt.setState({ open: true })
-}
-
-export const askConsentThen = (retry: () => void) => {
-  pendingRetry = retry
-  askConsent(true)
-}
-
-export const holdOpen = (p: PendingOpen) => {
-  pendingOpen = p
-}
-
-export const bindOpenChat = (fn: (p: PendingOpen) => void) => {
-  openChat = fn
-}
-
-export const laterConsent = () => {
-  pendingConsent.clear()
-  pendingOpen = null
-  pendingRetry = null
-  useConsentPrompt.setState({ open: false, dismissed: true })
-}
-
-export const consentTurnedOff = () => useConsentPrompt.setState({ dismissed: false, open: false })
-
 export const grantConsent = () => {
-  useConsentPrompt.setState({ open: false, dismissed: true })
-  const held = [...pendingConsent.values()]
-  pendingConsent.clear()
-  const open = pendingOpen
-  pendingOpen = null
-  const retry = pendingRetry
-  pendingRetry = null
+  const { held, open, retry, openChat } = takeConsent()
   retry?.()
   if (held.length) {
     for (const next of held) void startRun(next)
@@ -461,16 +354,24 @@ const MOCK_OLDER_CURSOR = '1000'
 // A tour that draws the thread from one of its lines (showFrom) has older turns above it, whatever page the transcript load reports.
 export const hasOlder = (id: string) => !!olderCursor.get(id) || mockFrom.has(id)
 
-export const loadOlder = async (id: string) => {
+const loadingOlder = new Map<string, Promise<void>>()
+
+export const loadOlder = (id: string) => {
   const cursor = olderCursor.get(id)
-  if (!cursor) return
-  const page = await botApi.bots.transcript(id, { cursor })
-  olderCursor.set(id, page.page.nextCursor)
-  const older = restoreBotTurns(page.data).items
-  useChatStore.setState((s) => {
-    const current = s.chats[id] ?? emptyChat
-    return { chats: { ...s.chats, [id]: { ...current, items: prependOlder(current.items, older) } } }
-  })
+  if (!cursor) return Promise.resolve()
+  const running = loadingOlder.get(id)
+  if (running) return running
+  const job = (async () => {
+    const page = await botApi.bots.transcript(id, { cursor })
+    olderCursor.set(id, page.page.nextCursor)
+    const older = restoreBotTurns(page.data).items
+    useChatStore.setState((s) => {
+      const current = s.chats[id] ?? emptyChat
+      return { chats: { ...s.chats, [id]: { ...current, items: prependOlder(current.items, older) } } }
+    })
+  })().finally(() => loadingOlder.delete(id))
+  loadingOlder.set(id, job)
+  return job
 }
 
 const busy = (id: string) => runs.has(id) || !!get(id).working || get(id).items.length > 0
@@ -537,3 +438,22 @@ export const deleteCompanyBot = async (id: string, kind: 'push' | 'company') => 
   void queryClient.invalidateQueries({ queryKey: ['bots'] })
   return true
 }
+
+/** Sign-out: no run, queue, draft, or conversation of the last account stays in memory for the next one. */
+export const resetChat = () => {
+  for (const id of new Set([...runs.keys(), ...Object.keys(useChatStore.getState().chats)])) tokenBatch.flushNow(id)
+  for (const ctrl of runs.values()) ctrl.abort()
+  runs.clear()
+  heldQueues.clear()
+  halting.clear()
+  olderCursor.clear()
+  loadingOlder.clear()
+  mockFrom.clear()
+  openGate = null
+  holdStop = false
+  useChatStore.setState({ chats: {} })
+  resetDrafts()
+  resetConsent()
+}
+
+onSessionCleared(resetChat)

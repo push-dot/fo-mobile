@@ -349,13 +349,16 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   // BotNewError: the platform's alert, not a box drawn in the screen. 다시 시도 creates again; the 만들기 button below does the same.
   const failed = phase.kind === 'error'
+  const retryRef = useRef(() => {})
+  useEffect(() => {
+    retryRef.current = () => void run(form)
+  })
   useEffect(() => {
     if (!failed) return
     Alert.alert(ERROR_TITLE, ERROR_BODY, [
       { text: CANCEL_LABEL, style: 'cancel' },
-      { text: RETRY_LABEL, onPress: () => void run(form) },
+      { text: RETRY_LABEL, onPress: () => retryRef.current() },
     ])
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- shown once per failure, not per render
   }, [failed])
 
   const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { detailFrom, detailUrl, HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT, textSizeScript } from './detail-url'
+import { HOLD_FIT_SCRIPT, SOON_FIT_SCRIPT } from './detail-mock-scripts'
+import { bootScript, detailFrom, detailUrl, textSizeScript } from './detail-url'
 
 describe('detail url', () => {
   it('url carries theme and mock', () => {
@@ -74,5 +75,13 @@ describe('soon fit script', () => {
     await Promise.resolve()
     expect(imports).toEqual(['http://localhost:5174/src/shared/api/mock.ts'])
     expect(() => mockFit.score).toThrow('mock fit soon')
+  })
+})
+
+describe('bootScript', () => {
+  it('never puts the token on the page global', () => {
+    const script = bootScript('https://web.test', { token: 'secret-token', theme: 'dark' })
+    expect(script).not.toContain('secret-token')
+    expect(script).toContain('"theme":"dark"')
   })
 })

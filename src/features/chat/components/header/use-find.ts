@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { BotContract } from '@push/api-client'
 import { showToast } from '@/shared/components/toast-store'
 import { botApi } from '@/shared/infrastructure'
@@ -7,6 +7,21 @@ import { hitOf, matchLabel, revealMatch, stepMatch, type FindStep } from '../../
 
 const DEBOUNCE_MS = 300
 const FAILED = '잠시 뒤에 다시 해 주세요.'
+
+const FAIL = Symbol('reveal-failed')
+
+const reveal = async (botId: string, match: BotContract.TranscriptMatch, list: BotContract.TranscriptMatch[], at: number) => {
+  try {
+    const id = await revealMatch(match, {
+      items: () => useChatStore.getState().chats[botId]?.items ?? [],
+      hasOlder: () => hasOlder(botId),
+      loadOlder: () => loadOlder(botId),
+    })
+    return id === undefined ? undefined : { id, hit: hitOf(list, at) }
+  } catch {
+    return FAIL
+  }
+}
 
 /** 채팅에서 찾기: the server searches the whole history, the app pages in older turns until the result's line exists. */
 export const useFind = (botId: string) => {
@@ -21,16 +36,10 @@ export const useFind = (botId: string) => {
     async (list: BotContract.TranscriptMatch[], at: number, ticket: number) => {
       const match = list[at]
       if (!match) return
-      try {
-        const id = await revealMatch(match, {
-          items: () => useChatStore.getState().chats[botId]?.items ?? [],
-          hasOlder: () => hasOlder(botId),
-          loadOlder: () => loadOlder(botId),
-        })
-        if (ticket === latest.current) setCurrent(id === undefined ? undefined : { id, hit: hitOf(list, at) })
-      } catch {
-        if (ticket === latest.current) showToast({ message: FAILED })
-      }
+      const found = await reveal(botId, match, list, at)
+      if (ticket !== latest.current) return
+      if (found === FAIL) showToast({ message: FAILED })
+      else setCurrent(found)
     },
     [botId],
   )
@@ -83,6 +92,6 @@ export const useFind = (botId: string) => {
     label: matchLabel(index, shown.length),
     step,
     currentId: current?.id,
-    highlight: useMemo(() => ({ query: open ? query : '', currentId: current?.id, currentHit: current?.hit }), [open, query, current]),
+    highlight: { query: open ? query : '', currentId: current?.id, currentHit: current?.hit },
   }
 }

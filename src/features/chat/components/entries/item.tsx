@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { useState } from 'react'
 import { Animated, Platform, Pressable, View } from 'react-native'
 import BotText, { BulletList, Bubble, DiffDetail, NumberMark, PlanBlock } from './bot'
 import Detail from './detail'
@@ -296,7 +296,7 @@ const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
 }
 
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
-const ItemComponent = ({
+export const Item = ({
   item,
   writing,
   onUsage,
@@ -358,8 +358,6 @@ const ItemComponent = ({
       )
   }
 }
-
-export const Item = memo(ItemComponent)
 
 // ChatErrUnavailable: an error is a bubble, not a status line (rule 29).
 const ErrorLine = ({ id, text }: { id: string; text: string }) => <Notice id={id} notice={{ kind: 'failed', text }} />

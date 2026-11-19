@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { View } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Keyboard, Pressable, View } from 'react-native'
 import { router } from 'expo-router'
 import {
   AccountPill,
@@ -15,19 +15,28 @@ import {
   toE164,
   usePhoneAuth,
 } from '@/features/auth'
-import { Button, CtaBar, Text, TopBar } from '@/shared/components'
+import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const PhoneScreen = () => {
   const c = useColors()
+  const keyboard = useKeyboardHeight()
   const email = usePhoneAuth((state) => state.email)
   const provider = usePhoneAuth((state) => state.provider)
+  const mode = usePhoneAuth((state) => state.mode)
+  const pendingToken = usePhoneAuth((state) => state.pendingToken)
   const digits = usePhoneAuth((state) => state.digits)
   const setDigits = usePhoneAuth((state) => state.setDigits)
   const setCooldown = usePhoneAuth((state) => state.setCooldown)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const e164 = toE164(digits)
+
+  // A social sign-in reaches this step with its pending token; without one there is nothing to finish, so start over.
+  const lost = mode === 'social' && !pendingToken
+  useEffect(() => {
+    if (lost) router.replace('/sign-in')
+  }, [lost])
 
   const send = () => {
     if (!e164) return
@@ -50,10 +59,13 @@ const PhoneScreen = () => {
       .finally(() => setBusy(false))
   }
 
+  if (lost) return null
+
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    // The phone pad has no done key: a tap anywhere outside the field closes it.
+    <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
-      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
+      <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
         {email ? (
           <View style={{ marginBottom: 18 }}>
             <AccountPill email={email} provider={provider} />
@@ -83,11 +95,11 @@ const PhoneScreen = () => {
             {error}
           </Text>
         ) : null}
-      </View>
-      <CtaBar>
+      </Pressable>
+      <CtaBar lift={keyboard}>
         <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} style={{ flex: 1 }} />
       </CtaBar>
-    </View>
+    </Pressable>
   )
 }
 

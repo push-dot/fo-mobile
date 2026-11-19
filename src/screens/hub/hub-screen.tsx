@@ -1,7 +1,7 @@
 import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
-import { useCallback, useMemo } from 'react'
-import { ActivityIndicator, FlatList, Platform, View } from 'react-native'
+import { LegendList } from '@legendapp/list/react-native'
+import { ActivityIndicator, Platform, View } from 'react-native'
 import {
   FilterButton,
   HUB_SKELETON,
@@ -29,13 +29,12 @@ const HubScreen = () => {
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   const viewerId = useViewerId()
   const list = useProfileList(category, sheet)
-  const items = useMemo(() => list.data?.pages.flatMap((p) => p.data) ?? [], [list.data])
+  const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
   // HubEmpty board: the title row sits 8pt under the chips; every other Hub board keeps 12pt.
   const emptyList = !list.isPending && !list.isError && items.length === 0
 
-  const header = useMemo(
-    () => (
+  const header = (
     <View>
       <ChipRow paddingTop={spacing[1]}>
         <Chip label="전체" on={category.length === 0} onPress={() => setCategory([])} />
@@ -49,11 +48,9 @@ const HubScreen = () => {
         <FilterButton onPress={() => router.push('/hub-filter')} />
       </View>
     </View>
-    ),
-    [category, setCategory, summary, sheet, emptyList],
   )
 
-  const renderItem = useCallback(({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />, [])
+  const renderItem = ({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -75,10 +72,12 @@ const HubScreen = () => {
         }
       />
       </FloatingHeader>
-      <FlatList
+      <LegendList
         data={items}
         keyExtractor={(p) => p.userId}
         renderItem={renderItem}
+        recycleItems
+        estimatedItemSize={88}
         ListHeaderComponent={header}
         ListEmptyComponent={
           list.isPending ? (

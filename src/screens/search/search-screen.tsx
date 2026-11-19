@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
-import { FlatList, Pressable, ScrollView, View } from 'react-native'
+import { useState } from 'react'
+import { LegendList } from '@legendapp/list/react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import type { Post, Posting, Profile } from '@push/api-client'
 import { formatCount } from '@/features/jobs'
 import {
@@ -39,28 +40,20 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
   const counts = useSearchCounts(q).data
   const active = results[tab]
   const loading = active.isPending || active.isPlaceholderData
-  const pageItems = useMemo(
-    () => active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? [],
-    // React Query may update `data` in place; matches posting-grid memo deps.
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- active tab slice from useInfiniteQuery
-    [active.data],
-  )
+  const pageItems = active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
   const items = loading ? [] : pageItems
   const totalOf = (k: SearchTab) => results[k].data?.pages[0]?.page.total
-  const remember = useCallback(() => {
+  const remember = () => {
     if (q) recent.add(q)
-  }, [q, recent])
-  const renderItem = useCallback(
-    ({ item }: { item: Posting | Profile | Post }) =>
-      'userId' in item ? (
-        <PersonRow p={item} q={q} onOpen={remember} />
-      ) : 'company' in item ? (
-        <PostingRow p={item} q={q} onOpen={remember} />
-      ) : (
-        <PostRow p={item} q={q} onOpen={remember} />
-      ),
-    [q, remember],
-  )
+  }
+  const renderItem = ({ item }: { item: Posting | Profile | Post }) =>
+    'userId' in item ? (
+      <PersonRow p={item} q={q} onOpen={remember} />
+    ) : 'company' in item ? (
+      <PostingRow p={item} q={q} onOpen={remember} />
+    ) : (
+      <PostRow p={item} q={q} onOpen={remember} />
+    )
   const submit = () => {
     search(text)
     if (text.trim()) recent.add(text.trim())
@@ -135,9 +128,12 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
           </View>
         </ScrollView>
       ) : (
-        <FlatList<Posting | Profile | Post>
+        <LegendList<Posting | Profile | Post>
           data={items}
           keyExtractor={(x) => ('userId' in x ? x.userId : x.id)}
+          getItemType={(x) => ('userId' in x ? 'person' : 'company' in x ? 'posting' : 'post')}
+          recycleItems
+          estimatedItemSize={96}
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"

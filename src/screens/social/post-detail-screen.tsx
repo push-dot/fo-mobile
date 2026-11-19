@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
+import { LegendList } from '@legendapp/list/react-native'
 import { useRef, useState, type ComponentRef } from 'react'
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
 import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
 import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
@@ -16,6 +17,16 @@ const PostDetailScreen = ({ id }: { id: string }) => {
   const toggleSave = useTogglePostSave(id)
   const comments = useComments(id, !!post.data)
   const rows = threadComments(comments.data?.pages.flatMap((p) => p.data) ?? [])
+  const renderComment = ({ item }: { item: (typeof rows)[number] }) => (
+      <CommentRow
+        comment={item}
+        reply={item.reply}
+        onReply={() => {
+          setReplyTo({ id: item.parentId ?? item.id, name: item.author.displayName })
+          inputRef.current?.focus()
+        }}
+      />
+  )
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -54,20 +65,13 @@ const PostDetailScreen = ({ id }: { id: string }) => {
       />
       {post.data ? (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-          <FlatList
+          <LegendList
             data={rows}
+            recycleItems
+            estimatedItemSize={88}
             keyExtractor={(r) => r.id}
             ListHeaderComponent={<PostHeader post={post.data} />}
-            renderItem={({ item }) => (
-              <CommentRow
-                comment={item}
-                reply={item.reply}
-                onReply={() => {
-                  setReplyTo({ id: item.parentId ?? item.id, name: item.author.displayName })
-                  inputRef.current?.focus()
-                }}
-              />
-            )}
+            renderItem={renderComment}
             contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[4] }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"

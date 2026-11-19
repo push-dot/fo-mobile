@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
-import { memo, useCallback, useMemo, type ReactElement } from 'react'
-import { ActivityIndicator, FlatList, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { type ReactElement } from 'react'
+import { LegendList } from '@legendapp/list/react-native'
+import { ActivityIndicator, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import type { Posting, PostingFilters } from '@push/api-client'
 import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
@@ -18,30 +19,35 @@ type Props = {
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
+// The grid pads its content by 20pt; the header, the empty state and the spinner run edge to edge.
+const bleed = { marginHorizontal: -spacing[5] }
+
 const Gap = () => <View style={{ height: 22 }} />
 
 const GridCard = ({ posting, width, onBookmark }: { posting: Posting; width: number; onBookmark: (p: Posting) => void }) => (
   <JobCard posting={posting} width={width} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
 )
-const MemoGridCard = memo(GridCard)
 
 const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props) => {
   const { width } = useWindowDimensions()
   const cardWidth = gridCardWidth(width)
   const q = usePostingPages(filters)
   const toggleBookmark = useToggleBookmark()
-  const items = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
-  const renderItem = useCallback(({ item }: { item: Posting }) => <MemoGridCard posting={item} width={cardWidth} onBookmark={toggleBookmark} />, [cardWidth, toggleBookmark])
+  const items = q.data?.pages.flatMap((p) => p.data) ?? []
+  const renderItem = ({ item }: { item: Posting }) => <GridCard posting={item} width={cardWidth} onBookmark={toggleBookmark} />
   return (
-    <FlatList
+    <LegendList
       data={items}
       keyExtractor={(p) => p.id}
       numColumns={2}
+      recycleItems
+      estimatedItemSize={cardWidth * 0.68 + 80}
       // The screen's ScreenBar floats over the list and passes its own height as topInset; an automatic inset would add the status bar on top of it (61pt after a sheet was dismissed).
       contentInsetAdjustmentBehavior="never"
       ListHeaderComponent={header}
-      columnWrapperStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}
-      contentContainerStyle={{ flexGrow: 1, paddingTop: topInset, paddingBottom: 32 }}
+      ListHeaderComponentStyle={bleed}
+      columnWrapperStyle={{ gap: spacing[3] }}
+      contentContainerStyle={{ flexGrow: 1, paddingTop: topInset, paddingBottom: 32, paddingHorizontal: spacing[5] }}
       onScroll={onScroll}
       scrollEventThrottle={64}
       ItemSeparatorComponent={Gap}
@@ -49,7 +55,8 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
       onEndReachedThreshold={0.5}
       ListEmptyComponent={
-        q.isPending ? (
+        <View style={{ ...bleed, flex: 1 }}>
+        {q.isPending ? (
           <PostingGridSkeleton cardWidth={gridFillWidth(width)} />
         ) : q.isError ? (
           <StatusNote lines={['공고를 불러오지 못했어요.', '잠시 후 다시 열어 주세요.']} style={emptyNoteStyle(160)} />
@@ -59,7 +66,8 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
             action={onReset ? { label: RESET_FILTERS_LABEL, onPress: onReset } : undefined}
             style={emptyNoteStyle(160)}
           />
-        )
+        )}
+        </View>
       }
       ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ marginTop: spacing[2] }} /> : undefined}
     />

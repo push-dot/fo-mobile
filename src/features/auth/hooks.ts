@@ -13,12 +13,14 @@ export const useCountdown = (endsAt: number | null) => {
   return remainingSeconds(endsAt, now)
 }
 
+const loadAppleAuth = () => import('expo-apple-authentication')
+
 export const useAppleSignIn = () => {
   const [available, setAvailable] = useState(false)
   useEffect(() => {
     if (Platform.OS !== 'ios') return
     let live = true
-    void import('expo-apple-authentication')
+    void loadAppleAuth()
       .then(async (mod) => {
         const ok = await mod.isAvailableAsync()
         if (live) setAvailable(ok)

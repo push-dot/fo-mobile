@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
-import { FlatList, Pressable, View } from 'react-native'
+import { LegendList } from '@legendapp/list/react-native'
+import { Pressable, View } from 'react-native'
 import type { Posting } from '@push/api-client'
 import type { SectionKind } from '@/features/jobs'
 import { Button, Icon, JobCard, Text } from '../../../shared/components'
@@ -7,6 +8,10 @@ import { radius, spacing, useColors } from '../../../theme'
 import { useHomePostings } from '../api/hooks'
 import { SECTION_ERROR_LINES, SECTION_RETRY_LABEL } from '../constants'
 import SectionSkeleton from './section-skeleton'
+
+const SectionCard = ({ posting, onBookmark }: { posting: Posting; onBookmark: (posting: Posting) => void }) => (
+  <JobCard posting={posting} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
+)
 
 const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; title: string; skeleton: boolean; onBookmark: (posting: Posting) => void }) => {
   const c = useColors()
@@ -45,15 +50,15 @@ const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; tit
           <Button label={SECTION_RETRY_LABEL} variant="secondary" size="pill" onPress={() => q.refetch()} />
         </View>
       ) : (
-        <FlatList
+        <LegendList
           horizontal
+          recycleItems
+          estimatedItemSize={200}
           data={items}
           keyExtractor={(p) => p.id}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 14, paddingHorizontal: spacing[5] }}
-          renderItem={({ item }) => (
-            <JobCard posting={item} onPress={() => router.push(`/postings/${item.id}`)} onBookmark={() => onBookmark(item)} />
-          )}
+          renderItem={({ item }) => <SectionCard posting={item} onBookmark={onBookmark} />}
         />
       )}
     </View>

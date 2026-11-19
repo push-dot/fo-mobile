@@ -41,15 +41,7 @@ const XL_BOARD_RULES = [
 export const textSizeScript = (percent: number) =>
   `(function(){var s=document.getElementById('push-text-size');if(!s){s=document.createElement('style');s.id='push-text-size';document.documentElement.appendChild(s)}s.textContent='html,body{-webkit-text-size-adjust:${percent}%!important}${isXlBoardText(percent / 100) ? XL_BOARD_RULES : ''}';document.documentElement.classList.toggle('push-xl',${isXlBoardText(percent / 100)})})();true;`
 
-/** Mock only (JobFit): fo-web answers the fit in a WebView after `setTimeout(resolve, 0)` set from fit-card.tsx, so a zero-delay timer set by that file waits 60 s (fo-web runs unminified from its dev server, so the file is in the stack). Timers set deeper, such as the mock data loader's, are left alone: holding those blanks the whole page. */
-export const HOLD_FIT_SCRIPT =
-  "(function(){var st=window.setTimeout;window.setTimeout=function(f,ms){var rest=Array.prototype.slice.call(arguments,2);var top=(new Error().stack||'').split('\\n').slice(0,3).join('\\n');return st.apply(window,[f,ms===0&&/fit-card/.test(top)?60000:ms].concat(rest))}})();"
-
-/** Mock only (JobDetailStates): the fit card reads `mockFit.score` once the document is known, so a getter that throws turns the fit request into an error and the card says 적합도는 곧 볼 수 있어요 with the document and three dashes. fo-web runs from its dev server, so the mock module has a stable URL and this import gets the page's own instance. */
-export const SOON_FIT_SCRIPT =
-  "import(location.origin+'/src/shared/api/mock.ts').then(function(m){Object.defineProperty(m.mockFit,'score',{get:function(){throw new Error('mock fit soon')},configurable:true})});"
-
-const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0].toLowerCase() ?? null
+export const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0].toLowerCase() ?? null
 
 /** Only fo-web itself may load in the WebView: the page gets the session token, and react-native-webview's originWhitelist matches by prefix. */
 export const loadsInWebView = (url: string, base: string) => url === 'about:blank' || originOf(url) === originOf(base)
@@ -67,8 +59,11 @@ export const routeNavigation = (url: string, base: string, open: (url: string) =
 
 const onWebOrigin = (base: string, script: string) => `if(location.origin===${JSON.stringify(originOf(base))}){${script}}true;`
 
-export const bootScript = (base: string, env: Record<string, unknown>, extra = '') =>
-  onWebOrigin(base, `window.__PUSH__=${JSON.stringify(env)};${extra}`)
+/** The page gets its settings here, never the token: that goes once through `tokenEventScript` after the page asks for it. */
+export const bootScript = (base: string, env: Record<string, unknown>, extra = '') => {
+  const { token: _token, ...safe } = env
+  return onWebOrigin(base, `window.__PUSH__=${JSON.stringify(safe)};${extra}`)
+}
 
 export const tokenEventScript = (base: string, token: string | null) =>
   onWebOrigin(base, `window.dispatchEvent(new CustomEvent('push:token',{detail:{token:${JSON.stringify(token)}}}));`)

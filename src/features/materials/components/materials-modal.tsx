@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, Platform, View, type ListRenderItem } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { LegendList } from '@legendapp/list/react-native'
+import { Platform, View } from 'react-native'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
 import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/features/my'
 import { useSearchQuery } from '@/features/search'
@@ -80,26 +81,24 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const bot = forBot as BotId | undefined
   const list = useMaterials({ tab, q, bot })
   const view = listView(list, tab, q)
-  const context = useMemo(() => sendContextOf(forBot), [forBot])
-  const now = useMemo(() => new Date(), [])
+  const context = sendContextOf(forBot)
+  const now = new Date()
   const refresh = useRefreshMaterials()
   const room = useSearchRoom()
 
   const { start } = useUpload(refresh)
   useImportRequest(() => void pickResume().then((file) => file && start(file)))
 
-  const onOpen = useCallback((m: Material) => router.push(materialDetailPath(m.kind, m.id, bot)), [bot])
-  const onSend = useCallback((m: Material) => sendMaterial(context, m), [context])
+  const onOpen = (m: Material) => router.push(materialDetailPath(m.kind, m.id, bot))
+  const onSend = (m: Material) => sendMaterial(context, m)
   const confirmDelete = useConfirmDeleteMaterial(room.toast)
   const confirmRef = useRef(confirmDelete)
   useEffect(() => {
     confirmRef.current = confirmDelete
   })
-  const onDelete = useCallback((m: Material) => confirmRef.current(m), [])
-  const renderItem = useCallback<ListRenderItem<ListRow>>(
-    ({ item }) => (item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} onDelete={onDelete} />),
-    [now, onOpen, onSend, onDelete],
-  )
+  const onDelete = (m: Material) => confirmRef.current(m)
+  const renderItem = ({ item }: { item: ListRow }) =>
+    item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} onDelete={onDelete} />
 
   const addMenu: MenuAction[] = [
     { key: 'link', label: ADD_LABEL.link, systemImage: 'link', icon: 'link', onPress: () => runAdd('link') },
@@ -119,14 +118,15 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
       }
       case 'list':
         return (
-          <FlatList
+          <LegendList
             data={view.rows}
             keyExtractor={(row) => row.key}
             renderItem={renderItem}
+            getItemType={(row) => row.type}
+            recycleItems
+            estimatedItemSize={72}
             onEndReached={list.loadMore}
             onEndReachedThreshold={0.5}
-            initialNumToRender={12}
-            windowSize={7}
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ paddingBottom: room.list }}

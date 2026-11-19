@@ -1,4 +1,4 @@
-import { createContext, Fragment, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ComponentProps, type ComponentRef, type RefObject } from 'react'
+import { createContext, Fragment, useContext, useEffect, useId, useRef, useState, type ComponentProps, type ComponentRef, type RefObject } from 'react'
 import { StyleSheet, Text as RNText, View } from 'react-native'
 import { Text } from '@/shared/components'
 import { WORD_JOINER } from '@/shared/utility/keep-words'
@@ -80,7 +80,7 @@ export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onText
   useEffect(() => {
     if (active) setLines(latest.current)
   }, [active])
-  const read = useCallback(() => {
+  const read = () => {
     if (!wrapper.current) return
     for (const [key, sides] of listed.current)
       for (const side of ['left', 'right'] as const)
@@ -89,41 +89,31 @@ export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onText
           (x, y) => setEdges((all) => (all[key]?.[side]?.x === x && all[key][side]?.y === y ? all : { ...all, [key]: { ...all[key], [side]: { x, y } } })),
           () => {},
         )
-  }, [])
-  const paint = useMemo<Paint>(
-    () => ({
-      enlist: (key, side, edge) => listed.current.set(key, { ...listed.current.get(key), [side]: edge }),
-      drop: (key) => {
-        listed.current.delete(key)
-        setEdges((all) => {
-          if (!(key in all)) return all
-          const next = { ...all }
-          delete next[key]
-          return next
-        })
-      },
-    }),
-    [],
-  )
-  const onLines = useCallback<NonNullable<ComponentProps<typeof Text>['onTextLayout']>>(
-    (e) => {
-      latest.current = e.nativeEvent.lines
-      if (active) {
-        setLines(e.nativeEvent.lines)
-        requestAnimationFrame(read)
-      }
-      onTextLayout?.(e)
+  }
+  const paint: Paint = {
+    enlist: (key, side, edge) => listed.current.set(key, { ...listed.current.get(key), [side]: edge }),
+    drop: (key) => {
+      listed.current.delete(key)
+      setEdges((all) => {
+        if (!(key in all)) return all
+        const next = { ...all }
+        delete next[key]
+        return next
+      })
     },
-    [active, onTextLayout, read],
-  )
-  const placed = useMemo(
-    () =>
-      active
-        ? Object.entries(edges).flatMap(([key, e]) => (e.left && e.right ? [{ key, rects: markRects(lines, e as MarkEdges, fontSize) }] : []))
-        : [],
-    [active, edges, lines, fontSize],
-  )
-  const drawn = useMemo(() => new Set(placed.filter((mark) => mark.rects.length).map((mark) => mark.key)), [placed])
+  }
+  const onLines: NonNullable<ComponentProps<typeof Text>['onTextLayout']> = (e) => {
+    latest.current = e.nativeEvent.lines
+    if (active) {
+      setLines(e.nativeEvent.lines)
+      requestAnimationFrame(read)
+    }
+    onTextLayout?.(e)
+  }
+  const placed = active
+    ? Object.entries(edges).flatMap(([key, e]) => (e.left && e.right ? [{ key, rects: markRects(lines, e as MarkEdges, fontSize) }] : []))
+    : []
+  const drawn = new Set(placed.filter((mark) => mark.rects.length).map((mark) => mark.key))
   return (
     <FindPaint.Provider value={paint}>
       <FindDrawn.Provider value={drawn}>

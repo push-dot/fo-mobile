@@ -1,4 +1,4 @@
-import { createApi, createBotApi, createClient } from '@push/api-client'
+import { ApiError, createApi, createBotApi, createClient, createRefresher } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
 import { API_BASE_URL } from './config'
@@ -20,26 +20,19 @@ const clientConfig = {
   uuid: () => Crypto.randomUUID(),
 }
 
-let refreshing: Promise<boolean> | null = null
-
 const refreshApi = createApi(createClient(clientConfig))
 
-export const refreshSession = () => {
-  const { session, set } = useSession.getState()
-  if (!session?.refreshToken) return Promise.resolve(false)
-  refreshing ??= (async () => {
-    try {
-      await set(await refreshApi.auth.refresh(session.refreshToken))
-      return true
-    } catch (error) {
-      if (isRefreshAuthFailure(error)) await set(null)
-      return false
-    } finally {
-      refreshing = null
-    }
-  })()
-  return refreshing
-}
+export const refreshSession = createRefresher({
+  refresh: (current) => {
+    // Not an auth failure: a missing token keeps whatever is stored.
+    if (!current?.refreshToken) throw new ApiError('no refresh token', 'NO_REFRESH_TOKEN', 0)
+    return refreshApi.auth.refresh(current.refreshToken)
+  },
+  load: () => useSession.getState().session,
+  save: (session) => useSession.getState().set(session),
+  clear: () => useSession.getState().set(null),
+  isAuthFailure: isRefreshAuthFailure,
+})
 
 export const http = createClient({ ...clientConfig, refresh: refreshSession })
 

@@ -18,8 +18,8 @@ const run = (script: string, origin: string): Page => {
 }
 
 describe('WebView token hand-off', () => {
-  it('gives the token to the fo-web page', () => {
-    expect(run(bootScript(WEB, { token: 'tok-1', theme: 'dark' }), WEB).window.__PUSH__?.token).toBe('tok-1')
+  it('keeps the token off the page global and sends it by event', () => {
+    expect(run(bootScript(WEB, { token: 'tok-1', theme: 'dark' }), WEB).window.__PUSH__?.token).toBeUndefined()
     expect(run(tokenEventScript(WEB, 'tok-2'), WEB).events).toHaveLength(1)
   })
 

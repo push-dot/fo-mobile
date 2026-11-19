@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { Post } from '@push/api-client'
 import { postInfo } from '@/features/social'
@@ -33,4 +32,4 @@ const PostRow = ({ p, q, onOpen }: { p: Post; q: string; onOpen: () => void }) =
   )
 }
 
-export default memo(PostRow)
+export default PostRow

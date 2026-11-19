@@ -69,4 +69,38 @@ describe('useSession.set', () => {
     expect(clearSpy).not.toHaveBeenCalled()
     expect(queryClient.getQueryData(['me', 'profile'])).toEqual({ displayName: 'stash' })
   })
+
+  it('tells the session listeners when the session is cleared', async () => {
+    const { onSessionCleared } = await import('@/shared/utility/session-reset')
+    const { useSession } = await import('./session-store')
+    const listener = vi.fn()
+    const off = onSessionCleared(listener)
+    useSession.setState({ session, ready: true })
+    await useSession.getState().set(null)
+    off()
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useSession.load', () => {
+  it('treats a corrupted stored session as signed out and drops it', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session: null, ready: false })
+    getItemAsync.mockResolvedValue('{not json')
+
+    await useSession.getState().load()
+
+    expect(useSession.getState()).toMatchObject({ session: null, ready: true })
+    expect(deleteItemAsync).toHaveBeenCalled()
+  })
+
+  it('restores a valid stored session', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session: null, ready: false })
+    getItemAsync.mockResolvedValue(JSON.stringify(session))
+
+    await useSession.getState().load()
+
+    expect(useSession.getState()).toMatchObject({ session, ready: true })
+  })
 })

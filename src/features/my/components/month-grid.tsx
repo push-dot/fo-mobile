@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { GlassButton, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
@@ -14,9 +14,9 @@ const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 /** The board's MyCalendarModal body: a month with prev/next, one t2 dot per day that has events. */
 const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date) => void }) => {
   const c = useColors()
-  const today = useMemo(() => new Date(), [])
+  const today = new Date()
   const [month, setMonth] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1))
-  const cells = useMemo(() => monthGrid(month.getFullYear(), month.getMonth()), [month])
+  const cells = monthGrid(month.getFullYear(), month.getMonth())
   const to = new Date(cells[cells.length - 1]!.getTime() + 86_400_000)
   const { data } = useCalendarEvents(cells[0]!.toISOString(), to.toISOString())
   const events = data?.data ?? []
