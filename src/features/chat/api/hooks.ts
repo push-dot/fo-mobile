@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { type ChatIntent, type ListEnvelope } from '@push/api-client'
 import { router } from 'expo-router'
@@ -194,21 +194,18 @@ export const useMentionGroups = (): MentionGroup[] => {
   const bookmarks = useQuery({ queryKey: ['me', 'bookmarks', 'mention'], queryFn: fetchMentionBookmarks })
   const docs = useChatDocs()
   const links = useMyLinks(true)
-  return useMemo(
-    () => [
-      {
-        title: '북마크 공고',
-        items: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, kind: 'job' as const, title: p.title, sub: `${p.company} · ${p.location}`, tag: p.company.slice(0, 1) })),
-      },
-      {
-        title: '마이 › 서류',
-        items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: displayName(d.fileName), sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
-      },
-      {
-        title: '내 링크',
-        items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
-      },
-    ],
-    [bookmarks.data, docs.data, links.data],
-  )
+  return [
+    {
+      title: '북마크 공고',
+      items: (bookmarks.data?.data ?? []).map((p) => ({ id: p.id, kind: 'job' as const, title: p.title, sub: `${p.company} · ${p.location}`, tag: p.company.slice(0, 1) })),
+    },
+    {
+      title: '마이 › 서류',
+      items: (docs.data ?? []).map((d) => ({ id: d.id, kind: 'doc' as const, title: displayName(d.fileName), sub: d.aiMade ? docAiSub(ago(d.createdAt)) : `${ago(d.createdAt)} · ${Math.round(d.size / 1000)}KB` })),
+    },
+    {
+      title: '내 링크',
+      items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
+    },
+  ]
 }

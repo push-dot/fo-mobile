@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
-import { useCallback, useState } from 'react'
-import { FlatList, Platform, View } from 'react-native'
+import { LegendList, useViewability } from '@legendapp/list/react-native'
+import { useState } from 'react'
+import { Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useKeyboardHeight, type MenuAction } from '@/shared/components'
@@ -22,7 +23,7 @@ import BotHomeRow from './bot-home-row'
 import BotHomeSearch from './bot-home-search'
 import { FIRST_SCREEN, LIST_BOTTOM } from './copy'
 import { barLift } from './bar-lift'
-import { homeChrome } from './metrics'
+import { homeChrome, type HomeChrome } from './metrics'
 
 const VIEWABILITY = { itemVisiblePercentThreshold: 60 }
 
@@ -40,6 +41,37 @@ const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
   read: 'check',
   mute: 'bell-off',
   delete: 'delete',
+}
+
+const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
+
+const menuActions = (bot: Bot, onMenu: (key: HomeMenuKey, bot: Bot) => void): MenuAction[] =>
+  companyMenu(bot.kind, bot.muted).map((item) => ({
+    key: item.key,
+    label: item.label,
+    destructive: item.destructive,
+    systemImage: item.key === 'mute' && bot.muted ? 'bell' : MENU_SYMBOL[item.key],
+    icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
+    onPress: () => onMenu(item.key, bot),
+  }))
+
+type HomeRowProps = {
+  bot: Bot
+  activity: LocalActivity | undefined
+  now: Date
+  chrome: HomeChrome
+  index: number
+  onMenu: (key: HomeMenuKey, bot: Bot) => void
+}
+
+/** One list row: `held` (mascot motion paused off screen) is derived from this row's own viewability, so scrolling never re-renders the others. */
+const HomeRow = ({ bot, activity, now, chrome, index, onMenu }: HomeRowProps) => {
+  const [seen, setSeen] = useState<boolean | null>(null)
+  useViewability((token) => setSeen(token.isViewable))
+  const row = botRow(bot, activity, now)
+  const actions = menuActions(bot, onMenu)
+  const onPress = () => openChat(bot)
+  return <BotHomeRow row={row} chrome={chrome} index={index} held={seen === null ? index >= FIRST_SCREEN : !seen} actions={actions} onPress={onPress} />
 }
 
 const BotHomeView = ({
@@ -76,9 +108,7 @@ const BotHomeView = ({
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [query, setQuery] = useState<string | null>(null)
-  const [scrolling, setScrolling] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [visible, setVisible] = useState<ReadonlySet<string> | null>(null)
   const searching = query !== null
   const found = useBotSearch(query ?? '')
   const now = new Date()
@@ -96,11 +126,6 @@ const BotHomeView = ({
     zIndex: 3,
   }
   const listPad = { paddingTop: top, paddingBottom: LIST_BOTTOM }
-  const onViewableItemsChanged = useCallback<NonNullable<FlatList<Bot>['props']['onViewableItemsChanged']>>(({ viewableItems }) => {
-    setVisible(new Set(viewableItems.flatMap((item) => (item.key ? [item.key] : []))))
-  }, [])
-
-  const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
   const openMaterials = () => router.push(materialsPath())
 
   const run = (key: HomeMenuKey, bot: Bot) => {
@@ -117,15 +142,7 @@ const BotHomeView = ({
       })
   }
 
-  const actionsFor = (bot: Bot): MenuAction[] =>
-    companyMenu(bot.kind, bot.muted).map((item) => ({
-      key: item.key,
-      label: item.label,
-      destructive: item.destructive,
-      systemImage: item.key === 'mute' && bot.muted ? 'bell' : MENU_SYMBOL[item.key],
-      icon: item.key === 'mute' && bot.muted ? 'bell' : MENU_ICON[item.key],
-      onPress: () => run(item.key, bot),
-    }))
+  const renderItem = ({ item, index }: { item: Bot; index: number }) => <HomeRow bot={item} activity={local[item.id]} now={now} chrome={chrome} index={index} onMenu={run} />
 
   const hero = push ? (
     <BotHomeHero
@@ -134,7 +151,7 @@ const BotHomeView = ({
       unread={botRow(push, local[push.id], now).unreadDot}
       motion={rowMotion(botRow(push, local[push.id], now).mascot, 0, false)}
       row={botRow(push, local[push.id], now)}
-      actions={actionsFor(push)}
+      actions={menuActions(push, run)}
       onPress={() => openChat(push)}
     />
   ) : null
@@ -169,38 +186,23 @@ const BotHomeView = ({
         ) : loading && !bots ? (
           <BotHomeLoading chrome={chrome} top={top} />
         ) : (
-          <FlatList
+          <LegendList
             data={home.companies}
             keyExtractor={(bot) => bot.id}
-            extraData={scrolling ? 'scroll' : visible ? [...visible].join('|') : 'open'}
+            renderItem={renderItem}
+            recycleItems
+            estimatedItemSize={84}
             contentContainerStyle={listPad}
             keyboardDismissMode="on-drag"
             viewabilityConfig={VIEWABILITY}
-            onViewableItemsChanged={onViewableItemsChanged}
             onScroll={(e) => setScrolled(e.nativeEvent.contentOffset.y > 0)}
             scrollEventThrottle={64}
-            onScrollBeginDrag={() => setScrolling(true)}
-            onScrollEndDrag={() => setScrolling(false)}
-            onMomentumScrollEnd={() => setScrolling(false)}
             ListHeaderComponent={
               <View>
                 {hero}
                 {error && !bots ? <BotHomeError onRetry={onRetry} /> : null}
               </View>
             }
-            renderItem={({ item, index }) => {
-              const held = scrolling || (visible ? !visible.has(item.id) : index >= FIRST_SCREEN)
-              return (
-                <BotHomeRow
-                  row={botRow(item, local[item.id], now)}
-                  chrome={chrome}
-                  index={index}
-                  held={held}
-                  actions={actionsFor(item)}
-                  onPress={() => openChat(item)}
-                />
-              )
-            }}
           />
         )}
         {ios && keyboard > 0 ? null : (

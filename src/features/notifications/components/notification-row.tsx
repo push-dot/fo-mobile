@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import type { AppNotification } from '@push/api-client'
 import { Text } from '../../../shared/components'
@@ -33,4 +32,4 @@ const NotificationRow = ({ n, onPress }: { n: AppNotification; onPress: (item: A
   )
 }
 
-export default memo(NotificationRow)
+export default NotificationRow

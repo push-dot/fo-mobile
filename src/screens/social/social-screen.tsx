@@ -1,18 +1,21 @@
 import { router } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
-import { ActivityIndicator, FlatList, View } from 'react-native'
+import { useState } from 'react'
+import { LegendList } from '@legendapp/list/react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
 import { Chip, ChipRow, FloatingHeader, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
+
+const Separator = () => <Band />
 
 const SocialScreen = () => {
   const c = useColors()
   const [category, setCategory] = useState<PostCategory | null>(null)
   const q = usePosts(category)
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
-  const posts = useMemo(() => q.data?.pages.flatMap((p) => p.data) ?? [], [q.data])
-  const renderItem = useCallback(({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />, [])
+  const posts = q.data?.pages.flatMap((p) => p.data) ?? []
+  const renderItem = ({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -40,11 +43,13 @@ const SocialScreen = () => {
         }
       />
       </FloatingHeader>
-      <FlatList
+      <LegendList
         data={posts}
         keyExtractor={(p) => p.id}
         renderItem={renderItem}
-        ItemSeparatorComponent={Band}
+        recycleItems
+        estimatedItemSize={220}
+        ItemSeparatorComponent={Separator}
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
         onEndReachedThreshold={0.5}

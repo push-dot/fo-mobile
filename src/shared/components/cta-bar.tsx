@@ -6,8 +6,11 @@ import { spacing, useColors } from '../../theme'
 
 const ios = Platform.OS === 'ios'
 
-/** `light`: only a faint fade behind the buttons, so a page scrolling under the bar stays visible (the web detail pages). */
-const CtaBar = ({ children, light = false }: { children: ReactNode; light?: boolean }) => {
+/**
+ * `light`: only a faint fade behind the buttons, so a page scrolling under the bar stays visible (the web detail pages).
+ * `lift`: the keyboard height, so the bar rides above an open keyboard instead of under it.
+ */
+const CtaBar = ({ children, light = false, lift = 0 }: { children: ReactNode; light?: boolean; lift?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   return (
@@ -16,13 +19,13 @@ const CtaBar = ({ children, light = false }: { children: ReactNode; light?: bool
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 0,
+        bottom: lift,
         zIndex: 4,
         flexDirection: 'row',
         gap: spacing[2],
         paddingTop: 14,
         paddingHorizontal: spacing[4],
-        paddingBottom: insets.bottom + (ios ? 6 : 10),
+        paddingBottom: (lift > 0 ? 0 : insets.bottom) + (ios ? 6 : 10),
         backgroundColor: ios ? undefined : c.bg,
         borderTopWidth: ios ? 0 : 1,
         borderTopColor: c.line,

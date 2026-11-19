@@ -119,6 +119,26 @@ const buy = async (sku: string, type: 'in-app' | 'subs') => {
   }
 }
 
+const restoreAll = async () => {
+  const fresh: Purchase[] = []
+  try {
+    await ready()
+    await restorePurchases()
+    const purchases = await getAvailablePurchases()
+    for (const purchase of purchases ?? []) {
+      if (claim(purchase)) fresh.push(purchase)
+    }
+    // shortcut: a mid-batch failure releases every token in the batch, upgrade when finishTransaction is idempotent
+    await settleRestored(fresh, deps)
+    refreshAccount()
+  } catch (error) {
+    fresh.forEach(release)
+    Alert.alert(verifyFailedMessage(error))
+  } finally {
+    setPending(false)
+  }
+}
+
 export const usePersonalPurchase = () => {
   const isPending = useSyncExternalStore(
     (listener) => {
@@ -143,25 +163,7 @@ export const usePersonalPurchase = () => {
     restore: () => {
       if (pending) return
       setPending(true)
-      void (async () => {
-        const fresh: Purchase[] = []
-        try {
-          await ready()
-          await restorePurchases()
-          const purchases = await getAvailablePurchases()
-          for (const purchase of purchases ?? []) {
-            if (claim(purchase)) fresh.push(purchase)
-          }
-          // shortcut: a mid-batch failure releases every token in the batch, upgrade when finishTransaction is idempotent
-          await settleRestored(fresh, deps)
-          refreshAccount()
-        } catch (error) {
-          fresh.forEach(release)
-          Alert.alert(verifyFailedMessage(error))
-        } finally {
-          setPending(false)
-        }
-      })()
+      void restoreAll()
     },
   }
 }

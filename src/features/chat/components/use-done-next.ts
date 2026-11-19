@@ -9,7 +9,7 @@ type Result = Extract<ChatItem, { type: 'result' }>
  * ChatDoneNext: when a run finishes with a result card, ask what to do next in a regular modal
  * instead of drawing buttons in the chat. A card already in the thread when it opens is never asked about.
  */
-export const useDoneNext = (chat: Pick<ChatState, 'items' | 'working' | 'approval'>, run: (action: ResultAction, card: Result) => void) => {
+export const useDoneNext = (chat: Pick<ChatState, 'items' | 'approval'> & { working: unknown }, run: (action: ResultAction, card: Result) => void) => {
   const asked = useRef(new Set(chat.items.flatMap((i) => (i.type === 'result' ? [i.id] : []))))
   const armed = useRef(false)
   const latest = useRef(run)

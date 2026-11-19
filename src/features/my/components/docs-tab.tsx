@@ -1,3 +1,4 @@
+import { LegendList } from '@legendapp/list/react-native'
 import { router, useIsFocused } from 'expo-router'
 import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
 import { isJobSettled } from '@push/api-client'
@@ -134,6 +135,7 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
   const { upload, start, cancel } = useUpload()
   const pickFile = () => void pickResume().then((file) => file && start(file))
   useImportRequest(pickFile)
+  const renderDoc = ({ item }: { item: MySource }) => <DocRow doc={item} live={focused} />
 
   if (isLoading) return <ActivityIndicator style={{ marginTop: 60 }} />
   const docs = (data?.data ?? []).filter((d) => !hidden.includes(d.id))
@@ -167,7 +169,18 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: top, paddingBottom: spacing[6] }}>
+      <LegendList
+        data={docs}
+        keyExtractor={(d) => d.id}
+        renderItem={renderDoc}
+        estimatedItemSize={64}
+        extraData={focused}
+        contentInsetAdjustmentBehavior="automatic"
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: top, paddingBottom: spacing[6] }}
+        ListHeaderComponent={
+          <>
         {lead}
         {preview.length > 0 ? (
           <>
@@ -229,17 +242,18 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
             </Pressable>
           </Row>
         ) : null}
-        {docs.map((d) => (
-          <DocRow key={d.id} doc={d} live={focused} />
-        ))}
-        <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
-          <Button
-            label="파일 등록"
-            // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
-            onPress={() => !upload && showImportMenu()}
-          />
-        </View>
-      </ScrollView>
+          </>
+        }
+        ListFooterComponent={
+          <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
+            <Button
+              label="파일 등록"
+              // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
+              onPress={() => !upload && showImportMenu()}
+            />
+          </View>
+        }
+      />
     </View>
   )
 }

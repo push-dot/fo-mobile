@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { Pressable, View } from 'react-native'
 import { spacing, type, useColors } from '@/theme'
 import { Icon, Text } from '@/shared/components'
@@ -7,8 +6,8 @@ import type { Material, MaterialSection } from '../types'
 import { materialRow } from '../utils/material-row'
 import { useListSize } from './list-size'
 
-/** Materials: one row, `.mrow`. The text opens the detail sheet, a long press (or the 삭제 accessibility action) asks to delete, 보내기 sends. Memoised: a list holds hundreds. */
-export const MaterialItem = memo(function MaterialItem({
+/** Materials: one row, `.mrow`. The text opens the detail sheet, a long press (or the 삭제 accessibility action) asks to delete, 보내기 sends. */
+export function MaterialItem({
   material,
   now,
   onOpen,
@@ -50,10 +49,10 @@ export const MaterialItem = memo(function MaterialItem({
       </Pressable>
     </View>
   )
-})
+}
 
 /** `.msec`: "서류 8". The picker sheet reuses it for its own groups, which carry no count. */
-export const GroupTitle = memo(function GroupTitle({ label, count }: { label: string; count?: number }) {
+export function GroupTitle({ label, count }: { label: string; count?: number }) {
   return (
     <View accessible accessibilityRole="header" accessibilityLabel={count === undefined ? label : `${label} ${count}`} style={{ flexDirection: 'row', gap: 6, paddingTop: 18, paddingBottom: 6, paddingHorizontal: spacing[5] }}>
       <Text v="c1" weight="700" color="t3">
@@ -66,14 +65,14 @@ export const GroupTitle = memo(function GroupTitle({ label, count }: { label: st
       )}
     </View>
   )
-})
+}
 
-export const SectionTitle = memo(function SectionTitle({ section, count }: { section: MaterialSection; count: number }) {
+export function SectionTitle({ section, count }: { section: MaterialSection; count: number }) {
   return <GroupTitle label={SECTION_LABEL[section]} count={count} />
-})
+}
 
 /** The picker sheet's row: `.mrow` with the 선택 pill where Materials has 보내기. */
-export const MaterialPickRow = memo(function MaterialPickRow({ title, sub, picked, onToggle }: { title: string; sub: string; picked: boolean; onToggle: () => void }) {
+export function MaterialPickRow({ title, sub, picked, onToggle }: { title: string; sub: string; picked: boolean; onToggle: () => void }) {
   const c = useColors()
   const size = useListSize()
   return (
@@ -93,10 +92,10 @@ export const MaterialPickRow = memo(function MaterialPickRow({ title, sub, picke
       </View>
     </Pressable>
   )
-})
+}
 
 /** A row that opens something else (the picker's 파일에서 고르기 and 링크 붙여넣기), in `.mrow`'s box. */
-export const MaterialNavRow = memo(function MaterialNavRow({ label, onPress }: { label: string; onPress: () => void }) {
+export function MaterialNavRow({ label, onPress }: { label: string; onPress: () => void }) {
   const size = useListSize()
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{ flexDirection: 'row', gap: spacing[3], minHeight: 56, ...size.row }}>
@@ -106,4 +105,4 @@ export const MaterialNavRow = memo(function MaterialNavRow({ label, onPress }: {
       <Icon name="chev" size={16} color="t3" />
     </Pressable>
   )
-})
+}

@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, KeyboardAvoidingView, Platform, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
+import { LegendList, type LegendListRef } from '@legendapp/list/react-native'
+import { useEffect, useRef, useState } from 'react'
+import { KeyboardAvoidingView, Platform, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePersonalPurchase } from '@/features/billing'
 import { accountPath, materialPickerPath, useBot, useBotProfile, type BotId } from '@/features/bots'
@@ -14,24 +15,17 @@ import {
   FindBar,
   FindHighlight,
   HeaderPill,
-  Item,
   NewMessagesPill,
   Onboarding,
   Queued,
   QuickStartRow,
-  RowMotion,
   SAVE_RETRY_TEXT,
-  StatusRow,
-  THREAD_BATCH,
-  THREAD_INITIAL_RENDER,
-  THREAD_WINDOW,
   answer,
   applyText,
   composerPlaceholder,
   turnFailed,
   followScroll,
   hasOlder,
-  isStopping,
   shownItems,
   headerLightOf,
   openBot,
@@ -47,8 +41,15 @@ import {
   useDoneNext,
   useDraftStore,
   useGateModal,
-  useChat,
+  useChatApproval,
+  useChatAwaiting,
+  useChatItems,
   useChatLimit,
+  useChatQueue,
+  useRunPhase,
+  ThreadCell,
+  loadOlder,
+  RowMotion,
   useFind,
   useReadWhileOpen,
   useUnseen,
@@ -60,9 +61,11 @@ import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
-// An inverted list sits at the bottom while its offset is near zero.
+// The list counts as at the bottom within this many points of its end.
 const AT_BOTTOM = 40
 const OPEN_REST_MS = 800
+
+const Gap = () => <View style={{ height: BUBBLE_GAP }} />
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
@@ -130,7 +133,13 @@ const Thread = ({ id }: { id: string }) => {
   const leading = useLeading()
   const bot = useBot(id as BotId)
   const profile = useBotProfile(id as BotId)
-  const chat = useChat(id)
+  // Separate selectors: a token batch re-renders only the streaming line (ThreadCell), not this screen.
+  const items = useChatItems(id)
+  const queue = useChatQueue(id)
+  const approval = useChatApproval(id)
+  const awaiting = useChatAwaiting(id)
+  const phase = useRunPhase(id)
+  const working = phase !== 'idle'
   const name = bot.data?.name
   const kind = bot.data?.kind
   const color = bot.data?.kind === 'company' ? bot.data.color : 'push'
@@ -142,16 +151,18 @@ const Thread = ({ id }: { id: string }) => {
   })
   const input = useRef<TextInputInstance>(null)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
-  const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && !!chat.working && !isStopping(chat.working))
-  const empty = chat.items.length === 0 && chat.queue.length === 0
+  const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && phase === 'working')
+  const empty = items.length === 0 && queue.length === 0
+  const greetingTitle = profile.data?.posting?.title
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
-  const greeting: ChatItem[] =
-    !empty && !hasOlder(id) && kind === 'company' && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, profile.data?.posting?.title) }] : []
-  const rows = threadRows(shownItems(id, chat.items), !!chat.working)
-  const data: ThreadRow[] = [...rows].reverse().concat(greeting)
+  const showGreeting = !empty && !hasOlder(id) && kind === 'company' && !!name
+  const greeting: ChatItem[] = showGreeting && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, greetingTitle) }] : []
+  const data: ThreadRow[] = [...greeting, ...threadRows(shownItems(id, items), working)]
+  // The newest drawn line: it is the one being written while the run works, and the one whose text may still grow.
+  const lastId = data.findLast((row) => row.type !== 'running')?.id
 
   const find = useFind(id)
-  const limit = useChatLimit(chat.items)
+  const limit = useChatLimit(items)
   const [headerH, setHeaderH] = useState(0)
   const [atBottom, setAtBottom] = useState(true)
   // Lines that are on screen when the room opens show at rest; only a line that arrives afterwards pops in (RowMotion).
@@ -160,22 +171,29 @@ const Thread = ({ id }: { id: string }) => {
     const timer = setTimeout(() => setLive(true), OPEN_REST_MS)
     return () => clearTimeout(timer)
   }, [])
-  const unseen = useUnseen(chat.items, atBottom)
+  const unseen = useUnseen(items, atBottom)
   useReadWhileOpen(bot.data, atBottom)
   const reduceMotion = useReduceMotion()
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed: turnFailed(chat.items), attention: !!chat.approval })
-  const list = useRef<FlatList<ThreadRow>>(null)
+  const failed = turnFailed(items)
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed, attention: !!approval })
+  const list = useRef<LegendListRef>(null)
   const dataRef = useRef(data)
   useEffect(() => {
     dataRef.current = data
   })
-  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => setAtBottom(e.nativeEvent.contentOffset.y < AT_BOTTOM), [])
-  const toBottom = () => list.current?.scrollToOffset({ offset: 0, animated: !reduceMotion })
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent
+    setAtBottom(contentOffset.y + layoutMeasurement.height >= contentSize.height - AT_BOTTOM)
+  }
+  const onStartReached = () => {
+    void loadOlder(id).catch(() => undefined)
+  }
+  const toBottom = () => void list.current?.scrollToEnd({ animated: !reduceMotion })
   const currentId = find.currentId
   useEffect(() => {
     if (!currentId) return
     const at = dataRef.current.findIndex((i) => i.id === currentId)
-    if (at >= 0) list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
+    if (at >= 0) void list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
   const convertRef = useRef(convert.mutate)
@@ -184,34 +202,49 @@ const Thread = ({ id }: { id: string }) => {
     convertRef.current = convert.mutate
     buyCredits.current = purchase.buyCredits
   }, [convert.mutate, purchase.buyCredits])
-  const onView = useCallback((card: Extract<ChatItem, { type: 'result' }>) => {
+  const onView = (card: Extract<ChatItem, { type: 'result' }>) => {
     router.push(`/docs/push/${card.documentId}`)
-  }, [])
-  const onUsage = useCallback((action: 'plan' | 'credits') => {
+  }
+  const onUsage = (action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
-  }, [])
-  const onRetry = useCallback(() => send(id, SAVE_RETRY_TEXT), [id])
+  }
+  const onRetry = () => send(id, SAVE_RETRY_TEXT)
   // ChatBotReadOff: 서류 첨부 opens the bot's material picker, 설정 열기 the settings.
-  const onReadOff = useCallback((action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings'), [id])
-  useDoneNext(chat, (action, card) => {
+  const onReadOff = (action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings')
+  useDoneNext({ items, working, approval }, (action, card) => {
     if (action.id === 'apply') send(id, applyText(card.company))
     else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
   })
-  useGateModal(id, chat, (text, choice) => answer(id, text, choice), () => setTimeout(() => input.current?.focus(), 50))
-  const working = chat.working
-  const renderItem = useCallback(
-    ({ item, index }: { item: ThreadRow; index: number }) => (
-      <RowMotion.Provider value={{ key: `${id}/${item.id}`, live }}>
-        {item.type === 'running' ? (
-          working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={() => stop(id)} color={color} /> : null
-        ) : (
-          <Item item={item} writing={!!working && index === 1} onView={onView} onUsage={onUsage} onRetry={onRetry} onReadOff={onReadOff} />
-        )}
-      </RowMotion.Provider>
-    ),
-    [onView, onUsage, onRetry, onReadOff, working, id, color, live],
-  )
+  useGateModal(id, { approval, items }, (text, choice) => answer(id, text, choice), () => setTimeout(() => input.current?.focus(), 50))
+  const renderItem = ({ item }: { item: ThreadRow }) => {
+    const last = item.id === lastId
+    return (
+      <ThreadCell
+        chatId={id}
+        row={item}
+        color={color}
+        live={live}
+        last={last}
+        writing={working && last}
+        onView={onView}
+        onUsage={onUsage}
+        onRetry={onRetry}
+        onReadOff={onReadOff}
+      />
+    )
+  }
+  const onboardingMotion = { key: `${id}/onboarding`, live }
+  const maintainScrollAtEnd = { animated: followScroll(true, working, reduceMotion) === 'animated' }
+  const contentContainerStyle = { paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: threadBottomGap(keyboard) }
+  const listHeader = <View style={{ height: headerH }} />
+  const listFooter = queue.length ? (
+    <View style={{ gap: BUBBLE_GAP, paddingTop: BUBBLE_GAP }}>
+      {queue.map((item, i) => (
+        <Queued key={`${i}-${item.text}`} text={item.text} />
+      ))}
+    </View>
+  ) : null
 
   return (
     <View style={{ flex: 1 }}>
@@ -224,47 +257,40 @@ const Thread = ({ id }: { id: string }) => {
       </View>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {empty && kind && name ? (
-        <RowMotion.Provider value={{ key: `${id}/onboarding`, live }}>
+        <RowMotion.Provider value={onboardingMotion}>
           <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
         </RowMotion.Provider>
       ) : (
       <View style={{ flex: 1 }}>
       <ChatBotColor.Provider value={color}>
       <FindHighlight.Provider value={find.highlight}>
-      <FlatList
+      <LegendList
         ref={list}
-        inverted
-        onScroll={onScroll}
-        scrollEventThrottle={100}
-        onScrollToIndexFailed={({ index, averageItemLength }) => {
-          list.current?.scrollToOffset({ offset: index * averageItemLength, animated: false })
-          setTimeout(() => list.current?.scrollToIndex({ index, viewPosition: 0.5, animated: true }), 100)
-        }}
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        initialNumToRender={THREAD_INITIAL_RENDER}
-        maxToRenderPerBatch={THREAD_BATCH}
-        windowSize={THREAD_WINDOW}
+        extraData={`${working}|${lastId}|${live}|${color}`}
+        getItemType={(item) => item.type}
+        estimatedItemSize={72}
+        // Off: Appear keeps its played/rest state in useState, so a recycled cell would show the previous row's state (a row that pops in would not).
+        recycleItems={false}
+        initialScrollAtEnd
+        maintainScrollAtEnd={maintainScrollAtEnd}
+        maintainVisibleContentPosition
+        onStartReached={onStartReached}
+        onStartReachedThreshold={1}
+        onScroll={onScroll}
+        scrollEventThrottle={100}
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
-        // The list is inverted: flex-end is its visual top, so a short thread stacks under the header as the boards draw it.
-        // paddingTop is the visual bottom of the inverted list: the boards put the last line 8 above the composer while the keyboard is up, 16 otherwise.
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', gap: BUBBLE_GAP, paddingHorizontal: spacing[5], paddingTop: threadBottomGap(keyboard), paddingBottom: spacing[4] }}
-        ListFooterComponent={<View style={{ height: Math.max(0, headerH - BUBBLE_GAP) }} />}
-        ListHeaderComponent={
-          chat.queue.length ? (
-            <View style={{ gap: BUBBLE_GAP }}>
-              {chat.queue.map((item, i) => (
-                <Queued key={`${i}-${item.text}`} text={item.text} />
-              ))}
-            </View>
-          ) : undefined
-        }
+        contentContainerStyle={contentContainerStyle}
+        ItemSeparatorComponent={Gap}
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={listFooter}
       />
       </FindHighlight.Provider>
       </ChatBotColor.Provider>
-      {unseen > 0 && followScroll(atBottom, !!chat.working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
+      {unseen > 0 && followScroll(atBottom, working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
       </View>
       )}
       {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
@@ -273,13 +299,13 @@ const Thread = ({ id }: { id: string }) => {
           botId={id}
           inputRef={input}
           placeholder={placeholder}
-          working={!!chat.working && !isStopping(chat.working)}
+          working={phase === 'working'}
           disabled={!!limit.banner}
           onStop={() => stop(id)}
           onSend={(text, attachment) => send(id, text, attachment)}
           above={
-            chat.awaiting ? (
-              <AwaitingRow text={AWAITING_TEXT[chat.awaiting]} color={color} />
+            awaiting ? (
+              <AwaitingRow text={AWAITING_TEXT[awaiting]} color={color} />
             ) : empty && kind ? (
               <QuickStartRow
                 kind={kind}

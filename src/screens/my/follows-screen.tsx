@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
+import { LegendList } from '@legendapp/list/react-native'
 import { useState } from 'react'
-import { ScrollView, TextInput, View } from 'react-native'
+import { TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
 import { GlassField, Icon, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
@@ -19,6 +20,22 @@ const FollowsScreen = () => {
   const query = following ? mine : fans
   // shortcut: filters the first page only; page the search when the list grows past 50.
   const people = followMatches(query.data?.data ?? [], following ? q : '')
+  const renderItem = ({ item: p }: { item: (typeof people)[number] }) =>
+      following ? (
+        <PersonRow p={p} known />
+      ) : (
+        <Row label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}`)}>
+          <Avatar name={p.displayName} url={p.avatarUrl} />
+          <View style={{ flex: 1 }}>
+            <Text v="b1" weight="700">
+              {p.displayName}
+            </Text>
+            <Text v="c1" color="t3" numberOfLines={1}>
+              {p.headline}
+            </Text>
+          </View>
+        </Row>
+      )
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={{ width: button }} />} />
@@ -49,39 +66,29 @@ const FollowsScreen = () => {
       {query.isLoading ? (
         <ListSkeleton />
       ) : (
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
-            {query.data?.page.total ?? people.length}명
-          </Text>
-          {people.length === 0 && following ? (
-            <Empty
-              text={emptyCta('follows').title}
-              action={q ? undefined : emptyCta('follows').action}
-              onAction={() => router.push(emptyCta('follows').href)}
-            />
-          ) : null}
-          {people.map((p) =>
+        <LegendList
+          data={people}
+          keyExtractor={(p) => p.userId}
+          renderItem={renderItem}
+          estimatedItemSize={72}
+          extraData={following}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          ListHeaderComponent={
+            <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+              {query.data?.page.total ?? people.length}명
+            </Text>
+          }
+          ListEmptyComponent={
             following ? (
-              <PersonRow key={p.userId} p={p} known />
-            ) : (
-              <Row
-                key={p.userId}
-                label={p.displayName}
-                onPress={() => router.push(`/profiles/${p.userId}`)}
-              >
-                <Avatar name={p.displayName} url={p.avatarUrl} />
-                <View style={{ flex: 1 }}>
-                  <Text v="b1" weight="700">
-                    {p.displayName}
-                  </Text>
-                  <Text v="c1" color="t3" numberOfLines={1}>
-                    {p.headline}
-                  </Text>
-                </View>
-              </Row>
-            ),
-          )}
-        </ScrollView>
+              <Empty
+                text={emptyCta('follows').title}
+                action={q ? undefined : emptyCta('follows').action}
+                onAction={() => router.push(emptyCta('follows').href)}
+              />
+            ) : null
+          }
+        />
       )}
     </View>
   )

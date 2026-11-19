@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
+import { LegendList } from '@legendapp/list/react-native'
 import { useState } from 'react'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { POST_CATEGORIES, type MyPostsSort } from '@push/api-client'
 import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
@@ -25,14 +26,19 @@ const MyPostsScreen = () => {
       {query.isLoading ? (
         <ListSkeleton />
       ) : (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
-            {query.data?.page.total ?? posts.length}개
-          </Text>
-          {posts.length === 0 && empty ? <Empty text={empty.title} action={empty.action} onAction={() => router.push(empty.href)} /> : null}
-          {posts.map((p) => (
+        <LegendList
+          data={posts}
+          keyExtractor={(p) => p.id}
+          estimatedItemSize={92}
+          contentContainerStyle={{ flexGrow: 1 }}
+          ListHeaderComponent={
+            <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+              {query.data?.page.total ?? posts.length}개
+            </Text>
+          }
+          ListEmptyComponent={empty ? <Empty text={empty.title} action={empty.action} onAction={() => router.push(empty.href)} /> : null}
+          renderItem={({ item: p }) => (
             <Pressable
-              key={p.id}
               accessibilityRole="button"
               onPress={() => router.push(`/posts/${p.id}`)}
               style={{ gap: spacing[1], paddingVertical: spacing[3], paddingHorizontal: spacing[5], borderBottomWidth: 1, borderBottomColor: c.line }}
@@ -55,8 +61,8 @@ const MyPostsScreen = () => {
                 </Text>
               </View>
             </Pressable>
-          ))}
-        </ScrollView>
+          )}
+        />
       )}
     </View>
   )
