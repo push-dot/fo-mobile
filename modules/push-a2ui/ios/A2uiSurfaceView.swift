@@ -11,7 +11,7 @@ final class A2uiSurfaceViewProps: UIBaseViewProps {
   /// Design tokens as JSON: `{colors, fonts, radius}` for the current scheme (see `PushTheme`).
   @Field var theme: String?
   /// False on every surface but the newest waiting one: its PushChoice does not respond.
-  @Field var interactive: Bool = true
+  @Field var interactive: Bool = false
   var onAction = EventDispatcher()
 }
 

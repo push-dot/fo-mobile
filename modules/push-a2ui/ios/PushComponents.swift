@@ -197,7 +197,7 @@ struct PushChoiceView: View {
       }
       .padding(.horizontal, 14).padding(.vertical, 8)
       .frame(minHeight: 52)
-      .background(on ? t.color("acSoft") : t.color("card"), in: RoundedRectangle(cornerRadius: 14))
+      .background(on ? t.color("acSoft") : t.color("card"), in: RoundedRectangle(cornerRadius: t.r("sm", 12)))
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
@@ -311,7 +311,7 @@ struct PushTodoView: View {
         Image(systemName: "checkmark").font(.system(size: 9, weight: .heavy)).foregroundStyle(t.color("bg"))
       case "running":
         Circle().fill(t.color("ac")).opacity(dim ? 0.35 : 1)
-        Circle().fill(Color.white).frame(width: 6, height: 6)
+        Circle().fill(t.color("onFill")).frame(width: 6, height: 6)
       default:
         Circle().fill(t.color("fill2"))
         Text(verbatim: "\(n)").font(t.font(11, .bold)).foregroundStyle(t.color("t2"))
@@ -484,7 +484,7 @@ struct PushDocumentView: View {
       }
       HStack(spacing: 12) {
         Image(systemName: "doc.text").font(.system(size: 18)).foregroundStyle(t.color("acText"))
-          .frame(width: 40, height: 40).background(t.color("acSoft"), in: RoundedRectangle(cornerRadius: 10))
+          .frame(width: 40, height: 40).background(t.color("acSoft"), in: RoundedRectangle(cornerRadius: t.r("sm", 12)))
         VStack(alignment: .leading, spacing: 0) {
           Text(verbatim: node.string(for: "name") ?? "").font(t.font(15, .semibold)).foregroundStyle(t.color("t1")).lineLimit(1).truncationMode(.tail)
           if let meta = node.string(for: "meta"), !meta.isEmpty { Caption(text: meta) }
@@ -532,6 +532,7 @@ struct PushJobCardView: View {
       ZStack(alignment: .bottomTrailing) {
         photo(company).frame(width: 169, height: 115).clipShape(RoundedRectangle(cornerRadius: t.r("md", 16)))
         let on = node.bool(for: "bookmarked") == true
+        // Fixed in both schemes: the bookmark chip sits on the posting image, white with a near-black icon.
         Image(systemName: on ? "bookmark.fill" : "bookmark").font(.system(size: 14, weight: .semibold))
           .foregroundStyle(on ? t.color("acText") : Color(red: 0.086, green: 0.098, blue: 0.114))
           .frame(width: 30, height: 30).background(Color.white.opacity(0.86), in: Circle()).padding(8)
@@ -551,7 +552,7 @@ struct PushJobCardView: View {
   @ViewBuilder private func photo(_ company: String) -> some View {
     let placeholder = ZStack {
       LinearGradient(colors: [t.color("ac"), t.color("ac").opacity(0.55)], startPoint: .topLeading, endPoint: .bottomTrailing)
-      Text(verbatim: String(company.prefix(1))).font(t.font(44, .heavy)).foregroundStyle(Color.white.opacity(0.92))
+      Text(verbatim: String(company.prefix(1))).font(t.font(44, .heavy)).foregroundStyle(t.color("onFill").opacity(0.92))
     }
     if let url = node.string(for: "imageUrl").flatMap(URL.init(string:)) {
       AsyncImage(url: url) { $0.resizable().scaledToFill() } placeholder: { placeholder }

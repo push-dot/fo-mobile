@@ -32,7 +32,8 @@ class PushTheme(
   private val fonts: Map<Int, FontFamily> = emptyMap(),
   private val radius: Map<String, Dp> = emptyMap(),
 ) {
-  fun color(name: String): Color = colors[name] ?: Color.Unspecified
+  /** JS sends every token this reads (a2ui-surface.tsx checks in development); a missing one falls back to the app's t1. */
+  fun color(name: String): Color = colors[name] ?: colors["t1"] ?: Color.Unspecified
   fun r(name: String, fallback: Dp): Dp = radius[name] ?: fallback
 
   /** Noto Sans KR: one file per weight, so the weight picks the family and the style stays at its normal weight. */
@@ -85,7 +86,7 @@ class PushTheme(
 val LocalPushTheme = compositionLocalOf { PushTheme() }
 
 /** False on every surface but the newest waiting one: its PushChoice does not respond. */
-val LocalPushInteractive = compositionLocalOf { true }
+val LocalPushInteractive = compositionLocalOf { false }
 
 /** A 24×24 line icon from the design system's SVG path (2px stroke, round caps), or filled. */
 @Composable

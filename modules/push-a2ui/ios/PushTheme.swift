@@ -21,7 +21,8 @@ struct PushTheme: Equatable {
     for (key, value) in root["radius"] as? [String: Double] ?? [:] { radius[key] = CGFloat(value) }
   }
 
-  func color(_ name: String) -> Color { colors[name] ?? .primary }
+  /// JS sends every token this reads (a2ui-surface.tsx checks in development); a missing one falls back to the app's t1.
+  func color(_ name: String) -> Color { colors[name] ?? colors["t1"] ?? .primary }
   func r(_ name: String, _ fallback: CGFloat) -> CGFloat { radius[name] ?? fallback }
 
   /// Noto Sans KR by weight; the system face when the app sent none.
@@ -68,7 +69,7 @@ struct PushDispatch {
 
 private struct PushThemeKey: EnvironmentKey { static let defaultValue = PushTheme() }
 private struct PushDispatchKey: EnvironmentKey { static let defaultValue = PushDispatch() }
-private struct PushInteractiveKey: EnvironmentKey { static let defaultValue = true }
+private struct PushInteractiveKey: EnvironmentKey { static let defaultValue = false }
 
 extension EnvironmentValues {
   var pushTheme: PushTheme {

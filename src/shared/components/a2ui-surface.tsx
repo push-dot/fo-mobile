@@ -1,31 +1,11 @@
 import type { A2uiAnswerContext, A2uiMessage } from '@push/api-client'
 import { Platform } from 'react-native'
 import { A2uiSurfaceView } from '../../../modules/push-a2ui'
-import { NATIVE_FONTS, radius, useColors, type Colors } from '@/theme'
+import { useColors } from '@/theme'
 import { routeA2uiAction, type A2uiLocal } from './a2ui-action'
+import { a2uiThemeJson } from './a2ui-theme'
 
 export type { A2uiLocal } from './a2ui-action'
-
-const THEME_COLORS = [
-  'bg', 'bg2', 'card', 'fill', 'fill2', 'line', 't1', 't2', 't3', 'ac', 'acSoft', 'acText',
-  'green', 'greenSoft', 'red', 'redSoft', 'orange', 'orangeSoft', 'onFill',
-] as const satisfies readonly (keyof Colors)[]
-
-/** The tokens a surface draws with. The server sends no theme: the app's colours for the current scheme, Noto Sans KR, its radii. */
-const themeJson = (c: Colors) =>
-  JSON.stringify({
-    colors: Object.fromEntries(THEME_COLORS.map((k) => [k, c[k]])),
-    fonts: NATIVE_FONTS,
-    radius: {
-      xs: radius.xs,
-      sm: radius.sm,
-      md: radius.md,
-      lg: radius.lg,
-      pill: radius.pill,
-      // The surface itself: iOS a grouped card (radius-lg), Android a Material card (12).
-      surface: Platform.OS === 'ios' ? radius.lg : radius.sm,
-    },
-  })
 
 type Props = {
   /** Every message of one surface so far, in order (append-only). */
@@ -42,7 +22,7 @@ type Props = {
  * checked, anything else dropped.
  */
 export const A2uiSurface = ({ messages, interactive, onAnswer, onLocal }: Props) => {
-  const theme = themeJson(useColors())
+  const theme = a2uiThemeJson(useColors(), Platform.OS === 'ios' ? 'ios' : 'android')
   const json = messages.map((m) => JSON.stringify(m))
   const onAction = (message: string) => {
     const routed = routeA2uiAction(message, interactive)

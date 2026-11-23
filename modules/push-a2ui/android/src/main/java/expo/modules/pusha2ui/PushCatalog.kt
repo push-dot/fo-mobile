@@ -1,6 +1,7 @@
 package expo.modules.pusha2ui
 
 import android.content.Context
+import android.provider.Settings
 import androidx.a2ui.compose.runtime.A2uiComponentProperties
 import androidx.a2ui.compose.runtime.A2uiComponentReference
 import androidx.a2ui.compose.runtime.A2uiComponentScope
@@ -44,8 +45,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.a2ui.catalog.A2uiAudioPlayerRenderer
 import androidx.compose.material3.a2ui.catalog.A2uiImageRenderer
 import androidx.compose.material3.a2ui.catalog.A2uiVideoRenderer
-import androidx.compose.material3.a2ui.catalog.materialA2uiBasicCatalogV1
 import androidx.compose.material3.a2ui.catalog.MaterialA2uiBasicCatalogV1Defaults
+import androidx.compose.material3.a2ui.catalog.materialA2uiBasicCatalogV1
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -59,6 +60,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -332,7 +334,11 @@ object PushTodo : A2uiComponent {
   @Composable
   override fun A2uiComponentScope.Content(properties: A2uiComponentProperties, modifier: Modifier) {
     val t = LocalPushTheme.current
-    val blink by rememberInfiniteTransition(label = "todo").animateFloat(1f, 0.35f, infiniteRepeatable(tween(500), RepeatMode.Reverse), label = "running")
+    val context = LocalContext.current
+    // Android's "Remove animations" sets the animator scale to 0; the running step then holds still, as on iOS.
+    val still = remember { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
+    val pulse by rememberInfiniteTransition(label = "todo").animateFloat(1f, 0.35f, infiniteRepeatable(tween(500), RepeatMode.Reverse), label = "running")
+    val blink = if (still) 1f else pulse
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
       Title("할 일")
       properties.bind(Items).maps().forEachIndexed { i, item ->
@@ -347,7 +353,7 @@ object PushTodo : A2uiComponent {
               }
               "running" -> {
                 Box(Modifier.matchParentSize().alpha(blink).background(t.color("ac"), shape))
-                Box(Modifier.size(6.dp).background(Color.White, CircleShape))
+                Box(Modifier.size(6.dp).background(t.color("onFill"), CircleShape))
               }
               else -> {
                 Box(Modifier.matchParentSize().background(t.color("fill2"), shape))
@@ -539,7 +545,7 @@ object PushDocument : A2uiComponent {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        Box(Modifier.size(40.dp).background(t.color("acSoft"), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(40.dp).background(t.color("acSoft"), RoundedCornerShape(t.r("sm", 12.dp))), contentAlignment = Alignment.Center) {
           PushIcon(PushIcons.DOC, t.color("acText"), 20.dp)
         }
         Column(Modifier.weight(1f)) {
@@ -592,7 +598,8 @@ object PushJobCard : A2uiComponent {
         Modifier.size(169.dp, 115.dp).clip(RoundedCornerShape(t.r("md", 16.dp))).background(Brush.linearGradient(listOf(t.color("ac"), t.color("ac").copy(alpha = 0.55f)))),
         contentAlignment = Alignment.Center,
       ) {
-        Text(company.take(1), style = t.text(44, 52, 800), color = Color.White.copy(alpha = 0.92f))
+        Text(company.take(1), style = t.text(44, 52, 800), color = t.color("onFill").copy(alpha = 0.92f))
+        // Fixed in both schemes: the bookmark chip sits on the posting image, white with a near-black icon.
         Box(Modifier.align(Alignment.BottomEnd).padding(8.dp).size(30.dp).background(Color.White.copy(alpha = 0.86f), CircleShape), contentAlignment = Alignment.Center) {
           PushIcon(PushIcons.BOOKMARK, if (on) t.color("acText") else Color(0xFF16191D), 16.dp, strokeWidth = 2.2f, filled = on)
         }

@@ -39,7 +39,7 @@ data class A2uiSurfaceViewProps(
   /** Design tokens as JSON: `{colors, fonts, radius}` for the current scheme (see `PushTheme`). */
   val theme: String? = null,
   /** False on every surface but the newest waiting one: its PushChoice does not respond. */
-  val interactive: Boolean = true,
+  val interactive: Boolean = false,
   val modifiers: ModifierList = emptyList()
 ) : ComposeProps
 
