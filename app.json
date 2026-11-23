@@ -10,6 +10,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "app.push.mobile",
       "usesAppleSignIn": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "icon": {
         "light": "./assets/icons/ios-light.png",
         "dark": "./assets/icons/ios-dark.png",
