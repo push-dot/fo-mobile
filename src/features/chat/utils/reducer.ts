@@ -1,10 +1,10 @@
 import type { ChatEvent, ChatItem, ChatState } from '../types'
 import { formatElapsed, type LiveLine, type Notice } from './status-line'
-import { answeredPatch, lastOpenGate, mergeSurface, reopenPatch, type SurfaceItem } from './surface'
+import { answeredPatch, mergeSurface, pausedOn, reopenPatch, runItems, type SurfaceItem } from './surface'
 
 export { formatElapsed }
 
-export const emptyChat: ChatState = { items: [], working: null, waiting: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null }
+export const emptyChat: ChatState = { items: [], working: null, waiting: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null, runAfter: null }
 
 const upsert = (items: ChatItem[], item: ChatItem) => {
   const i = items.findIndex((x) => x.id === item.id)
@@ -22,7 +22,7 @@ const patchSurface = (items: ChatItem[], surfaceId: string, patch: (item: Surfac
 export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
   switch (e.type) {
     case 'start':
-      return { ...s, runStartedAt: e.at, interrupted: false, waiting: null, awaiting: null, working: { verbs: ['생각하는 중…'], startedAt: e.at } }
+      return { ...s, runStartedAt: e.at, interrupted: false, waiting: null, awaiting: null, runAfter: s.items.at(-1)?.id ?? null, working: { verbs: ['생각하는 중…'], startedAt: e.at } }
     case 'status':
       return { ...s, working: { verbs: e.verbs, startedAt: s.working?.startedAt ?? s.runStartedAt ?? Date.now() } }
     case 'token': {
@@ -70,8 +70,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
         working: null,
         runStartedAt: null,
         awaiting,
-        // The run paused on the surface its waiting status named; a stream that sent no such status waits on its newest open gate.
-        waiting: awaiting ? (s.waiting ?? lastOpenGate(s.items)) : null,
+        waiting: awaiting ? pausedOn(runItems(s.items, s.runAfter), s.waiting) : null,
         items: [...s.items, { type: 'worked', id: `worked-${s.items.length}`, seconds }],
       }
     }

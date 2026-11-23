@@ -6,18 +6,18 @@ import Rich from './rich'
 import Notice from './notice'
 import UserBubble, { useBubbleMax } from './user'
 import { radius, spacing, useColors, type Colors } from '../../../../theme'
-import { A2uiSurface, Button, Icon, Text, type A2uiLocal } from '@/shared/components'
+import { Button, Icon, Text, type A2uiLocal } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
 import { useChatAccount, useOpenArtifact } from '../../api/hooks'
-import { useChatWaiting, usePop } from '../../hooks'
+import { usePop } from '../../hooks'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
 import { READ_OFF_CODE } from '../../constants'
-import { answerSurface } from '../../stores'
 import type { SurfaceItem } from '../../utils/surface'
 import ReadOff from './read-off'
 import { Appear } from '../motion'
+import { SurfaceRow } from './surface-row'
 import type { ChatItem, ToolState } from '../../types'
 
 
@@ -143,21 +143,6 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
         {item.preview ? <Button label="미리보기" variant="secondary" size="sm" onPress={share} /> : null}
         {done ? <ShareButton onPress={share} /> : null}
       </Surface>
-    </Appear>
-  )
-}
-
-/** A Bot card: its A2UI surface. Only the surface the run waits on takes an answer. */
-const SurfaceRow = ({ chatId, item, onLocal }: { chatId: string; item: SurfaceItem; onLocal?: (item: SurfaceItem, action: A2uiLocal) => void }) => {
-  const waiting = useChatWaiting(chatId)
-  return (
-    <Appear>
-      <A2uiSurface
-        messages={item.messages}
-        interactive={waiting === item.id}
-        onAnswer={(surfaceId, body) => answerSurface(chatId, surfaceId, body)}
-        onLocal={(_, action) => onLocal?.(item, action)}
-      />
     </Appear>
   )
 }

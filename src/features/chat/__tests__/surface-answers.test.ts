@@ -26,10 +26,10 @@ const model = (id: string, surfaceId: string) => {
 }
 
 /** A chat paused on one gate fixture, as the stream leaves it. */
-const waitingOn = (id: string, fixture: unknown) => {
+const waitingOn = (id: string, fixture: unknown, from = emptyChat) => {
   const f = fixture as A2uiFrame & StreamEvent
   const events = [...mapEvent(f), { type: 'wait' as const, surfaceId: f.surfaceId }, { type: 'done' as const, at: 0, awaiting: f.kind as 'approval' | 'choice' }]
-  useChatStore.setState({ chats: { [id]: events.reduce(applyEvent, emptyChat) } })
+  useChatStore.setState({ chats: { [id]: events.reduce(applyEvent, from) } })
   return f.surfaceId
 }
 
@@ -60,10 +60,18 @@ describe('answering a surface', () => {
     expect(model('c2', card)).toMatchObject({ picked: ['resume', 'cover_letter'] })
   })
 
-  it('ignores a surface the run does not wait on', () => {
-    waitingOn('c3', approvalTool)
-    answerSurface('c3', 'older-surface', { optionId: 'approve' })
+  it('ignores an answer to a surface the run does not wait on: no request, and the surface stays as it was', async () => {
+    const older = JSON.parse(JSON.stringify(approvalTool).replaceAll(`"${approvalTool.surfaceId}"`, '"older"')) as A2uiFrame & StreamEvent
+    useChatStore.setState({ chats: { c3: mapEvent(older).reduce(applyEvent, emptyChat) } })
+    const card = waitingOn('c3', choiceMultiple, chat('c3'))
+    const before = model('c3', 'older')
+    answerSurface('c3', 'older', { optionId: 'approve' })
+    await new Promise((resolve) => setTimeout(resolve, 20))
     expect(botApi.bots.answer).not.toHaveBeenCalled()
+    expect(botApi.bots.follow).not.toHaveBeenCalled()
+    expect(model('c3', 'older')).toEqual(before)
+    expect(model('c3', 'older')).toMatchObject({ open: true })
+    expect(chat('c3').waiting).toBe(card)
   })
 
   it('opens the surface again when the answer does not land', async () => {

@@ -9,7 +9,7 @@ import todo from '@push/api-client/a2ui-fixtures/todo.json'
 import approvalEditV1 from '@push/api-client/a2ui-fixtures/v1.0/approval-edit.json'
 import { describe, expect, it } from 'vitest'
 import { applyEvent, emptyChat } from '../utils/reducer'
-import { mapEvent } from '../utils/stream'
+import { fromStream, mapEvent } from '../utils/stream'
 import { dataModel, type SurfaceItem } from '../utils/surface'
 import { restoreBotTurns } from '../utils/turns'
 import type { ChatEvent, ChatState } from '../types'
@@ -45,6 +45,19 @@ describe('a2ui frames in the chat', () => {
     expect(s.awaiting).toBe('choice')
     s = applyEvent(s, { type: 'start', at: 1 })
     expect(s.waiting).toBeNull()
+  })
+
+  it('waits on the surface the latest waiting status named, not on a newer gate of the same run', () => {
+    const s = play(frame(approvalEdit), waitingStatus(approvalEdit.surfaceId), as(choiceSections, 'later'), done('approval'))
+    expect(s.waiting).toBe(approvalEdit.surfaceId)
+  })
+
+  it('never waits on a gate an earlier run left open', () => {
+    let s = play(as(choiceSingle, 'left-open'))
+    s = run([{ type: 'stop', resumable: false }, { type: 'user', id: 'u2', text: '다시 해 줘' }, { type: 'start', at: 2 }], s)
+    s = run(mapEvent(done('choice')), s)
+    expect(s.waiting).toBeNull()
+    expect(s.awaiting).toBe('choice')
   })
 
   it('falls back to the newest open gate when a paused run named none', () => {
@@ -96,5 +109,51 @@ describe('restoreBotTurns', () => {
   it('waits on nothing when the newest gate was answered or its turn failed', () => {
     expect(restoreBotTurns([turn('t1', [approvalEditAnswered])]).waiting).toBeNull()
     expect(restoreBotTurns([turn('t1', [approvalEdit], 'FAILED')]).waiting).toBeNull()
+  })
+
+  it('waits on nothing when the newest turn was cancelled with its gate still open', () => {
+    expect(restoreBotTurns([turn('t1', [approvalEdit], 'CANCELLED')]).waiting).toBeNull()
+  })
+
+  it('does not wait on an older turn\'s gate when the newest turn sent none', () => {
+    const older = turn('t1', [as(choiceSingle, 'stale-open')])
+    const newest = turn('t2', [{ type: 'token', text: '다른 걸 할게요' }])
+    const s = restoreBotTurns([newest, older])
+    expect(dataModel(surface(s, 'stale-open'))).toMatchObject({ open: true })
+    expect(s.waiting).toBeNull()
+  })
+
+  it('waits on the surface the newest turn\'s waiting status names, as the live stream does', () => {
+    const newest = turn('t1', [waitingStatus('first'), as(approvalEdit, 'first'), as(choiceSingle, 'second')])
+    expect(restoreBotTurns([newest]).waiting).toBe('first')
+  })
+})
+
+describe('stream frames around the cards', () => {
+  it('drops a frame type this build does not know and keeps the next frame', async () => {
+    expect(mapEvent({ type: 'nope' } as unknown as StreamEvent)).toEqual([])
+    async function* frames(): AsyncGenerator<StreamEvent> {
+      yield { type: 'nope' } as unknown as StreamEvent
+      yield { type: 'token', text: '계속', seq: 1 }
+      yield { type: 'done', operation: null, seq: 2 }
+    }
+    const out = []
+    for await (const event of fromStream(frames(), async function* () {})) out.push(event)
+    expect(out.map((event) => event.type)).toEqual(['token', 'done'])
+  })
+
+  it("keeps a tool line's target, result line, extra lines and warning", () => {
+    const s = play(
+      { type: 'tool', name: 'explore_github', state: 'run', summary: 'GitHub 살펴보기', target: 'seojun-kim' } as StreamEvent,
+      {
+        type: 'tool', name: 'explore_github', state: 'ok', summary: 'GitHub 살펴보기', target: 'seojun-kim',
+        resultLine: '저장소 12개 중 공고 관련 3개', extra: ['payment-retry-lab', 'settle-pipeline'], warning: '한 번 더 시도했어요',
+      } as StreamEvent,
+    )
+    expect(s.items).toHaveLength(1)
+    expect(s.items[0]).toMatchObject({
+      type: 'tool', action: 'GitHub 살펴보기', target: 'seojun-kim', state: 'ok',
+      result: '저장소 12개 중 공고 관련 3개', extra: ['payment-retry-lab', 'settle-pipeline'], warning: '한 번 더 시도했어요',
+    })
   })
 })

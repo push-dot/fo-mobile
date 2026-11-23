@@ -62,6 +62,8 @@ export type ChatState = {
   queue: { text: string; file?: PickedFile }[]
   interrupted: boolean
   runStartedAt: number | null
+  /** The last item before the newest run began (null: the run began the thread). Only that run's gates can wait. */
+  runAfter: string | null
 }
 
 /** One step of a scripted mock run: wait `wait` ms, then deliver `frame` as the server's stream would. */

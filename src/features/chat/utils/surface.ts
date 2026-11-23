@@ -46,8 +46,16 @@ export const components = (item: SurfaceItem): A2uiComponent[] => {
 
 export const componentOf = (item: SurfaceItem, type: string) => components(item).find((c) => c.component === type)
 
-/** The newest gate that still takes an answer, for a reopened chat or a `done.awaiting` without a waiting status. */
-export const lastOpenGate = (items: readonly ChatItem[]) => items.findLast(isOpen)?.id ?? null
+/** The items of the newest run: everything after `after`, the last item before it began (null: every item). */
+export const runItems = (items: readonly ChatItem[], after: string | null) => items.slice(after === null ? 0 : items.findIndex((x) => x.id === after) + 1)
+
+/**
+ * The surface a paused run waits on, for the live stream and a reopened chat alike (api-spec 3.3): the one its latest waiting
+ * status named while that still takes an answer, else the newest gate the run sent that does. `run` holds only that run's
+ * items, so a gate an earlier run left open never waits again.
+ */
+export const pausedOn = (run: readonly ChatItem[], named: string | null) =>
+  named !== null && run.some((x) => x.id === named && isOpen(x)) ? named : (run.findLast(isOpen)?.id ?? null)
 
 type Choice = { id?: string; label?: string; change?: boolean }
 type ChoiceProps = { questions?: { choices?: Choice[] }[] }
