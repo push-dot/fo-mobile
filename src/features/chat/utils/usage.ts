@@ -2,7 +2,6 @@ import type { IconName } from '@push/design-system'
 import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem } from '../types'
-import { foldBubbleCards } from './bubble-card'
 
 const BOT_SUFFIX = /(?:봇|Bot)$/
 
@@ -93,7 +92,7 @@ export type ThreadRow = ChatItem | RunningRow
  * Queue, XL, DocAgentNew, and ChatPh3 where it follows the draft that is being written).
  */
 export const threadRows = (items: readonly ChatItem[], working: boolean): ThreadRow[] => {
-  const drawn: ThreadRow[] = foldBubbleCards(items.filter(isDrawn))
+  const drawn: ThreadRow[] = items.filter(isDrawn)
   return working ? [...drawn, { type: 'running', id: 'running' }] : drawn
 }
 

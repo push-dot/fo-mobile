@@ -6,20 +6,14 @@ import { Text } from '@/shared/components'
 import { useXlBoardText, XL_CHAT_TRACKING } from '@/shared/components/xl-chrome'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, useColors } from '../../../../theme'
-import type { ChatItem, PlanItem } from '../../types'
+import type { ChatItem } from '../../types'
 import { splitBotText, type BotTextBlock } from '../../utils/bot-text'
 import { hitsBefore } from '../../utils/find'
-import { SAVE_RETRY_LABEL } from '../../utils/result-card'
-import { REVIEW_TITLE } from '../../utils/review-doc'
-import { showReviewPage } from '../../review-page'
-import BubbleLink from './bubble-link'
-import { blueprintList, isBlueprints, planGap, planKeywords, planTable } from '../../utils/plan-table'
 import { Appear } from '../motion'
 import { FindHighlight, FindText, Marked } from '../header/highlight'
 import Detail from './detail'
 import MdTable from './md-table'
 import ProfileUndo from './profile-undo'
-import ResultLine from './result-line'
 import Rich, { plainOf } from './rich'
 
 // ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
@@ -71,7 +65,7 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
 // `ol.mdol`: the text column starts at x59 (padding 22 + 2); the device's WebKit draws the number at the left of that 24 column (x35), not beside the text.
 const NUMBER_COL = 24
 
-export const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => (
+const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => (
   <View style={{ width: NUMBER_COL }}>
     <Text v="b1" color={color}>{`${n}.`}</Text>
   </View>
@@ -92,36 +86,11 @@ export const NumberedList = ({ items, markId, hitsBefore }: { items: string[]; m
   )
 }
 
-/** A plan or feedback inside the bot's bubble: the table, then its keywords as grey sub-text. */
-export const PlanBlock = ({ item }: { item: PlanItem }) => {
-  const tableWidth = useTableWidth()
-  if (isBlueprints(item)) {
-    const { lines, detail } = blueprintList(item)
-    return (
-      <>
-        <NumberedList items={lines} />
-        <Detail text={detail.text} more={detail.more} />
-      </>
-    )
-  }
-  const keywords = planKeywords(item)
-  return (
-    <>
-      <MdTable table={planTable(item)} width={tableWidth} />
-      {keywords ? <Detail text={keywords.text} more={keywords.more} /> : null}
-    </>
-  )
-}
-
-export const DiffDetail = ({ item }: { item: Extract<ChatItem, { type: 'diff' }> }) => (
-  <BubbleLink label={REVIEW_TITLE} accessibilityLabel={`${REVIEW_TITLE} 열기`} onPress={() => showReviewPage({ lines: item.lines })} />
-)
-
 /** The lines of a block that draw find marks, in render order. */
 const markedLines = (block: BotTextBlock): string[] =>
   block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' || block.kind === 'bullets' || block.kind === 'list' ? block.items : []
 
-const BotText = ({ item, onView, onRetry }: { item: Extract<ChatItem, { type: 'agentText' }>; onView?: (card: Extract<ChatItem, { type: 'result' }>) => void; onRetry?: () => void }) => {
+const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) => {
   const c = useColors()
   const tableWidth = useTableWidth()
   const xl = useXlBoardText()
@@ -133,7 +102,7 @@ const BotText = ({ item, onView, onRetry }: { item: Extract<ChatItem, { type: 'a
   const above = hitsBefore(lines.map(plainOf), query)
   const first = blocks.map((_, i) => blocks.slice(0, i).reduce((sum, b) => sum + markedLines(b).length, 0))
   return (
-    <Bubble gap={item.card ? planGap(item.card) : 6} wide={!!item.card}>
+    <Bubble>
       {blocks.map((block, i) =>
         block.kind === 'paragraph' ? (
           <Rich key={i} v="b1" text={block.text} markId={item.id} hitsBefore={above[first[i]!]} {...big} />
@@ -170,13 +139,9 @@ const BotText = ({ item, onView, onRetry }: { item: Extract<ChatItem, { type: 'a
         ),
       )}
       {item.undo ? <ProfileUndo changeId={item.undo} /> : null}
-      {item.retry && onRetry ? <BubbleLink label={SAVE_RETRY_LABEL} onPress={onRetry} /> : null}
       {item.detail ? <Detail text={item.detail} /> : null}
-      {item.card ? <PlanBlock item={item.card} /> : null}
-      {item.diff ? <DiffDetail item={item.diff} /> : null}
       {/* The closing line's summary is the dotted list of the v489 boards (ChatDone, ChatDoneNext, ChatDoneProfile, ChatDoneNoJob, ChatDoneSaveFail). */}
       {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
-      {item.result && onView ? <ResultLine card={item.result} onView={onView} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
           <Text v="c1" color="t2" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20 }}>

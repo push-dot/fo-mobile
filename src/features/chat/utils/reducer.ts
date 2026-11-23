@@ -1,28 +1,28 @@
 import type { ChatEvent, ChatItem, ChatState } from '../types'
 import { formatElapsed, type LiveLine, type Notice } from './status-line'
-import { attachPendingNote, clearPendingNote } from './stream-v3'
+import { answeredPatch, lastOpenGate, mergeSurface, reopenPatch, type SurfaceItem } from './surface'
 
 export { formatElapsed }
 
-export const emptyChat: ChatState = { items: [], working: null, approval: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null }
+export const emptyChat: ChatState = { items: [], working: null, waiting: null, awaiting: null, queue: [], interrupted: false, runStartedAt: null }
 
 const upsert = (items: ChatItem[], item: ChatItem) => {
   const i = items.findIndex((x) => x.id === item.id)
   if (i < 0) return [...items, item]
   const next = items.slice()
-  next[i] = item
+  const current = items[i]!
+  next[i] = current.type === 'surface' && item.type === 'surface' ? mergeSurface(current, item) : item
   return next
 }
 
-const boostRounds = (items: readonly ChatItem[]) =>
-  items
-    .slice(items.findLastIndex((x) => x.type === 'user') + 1)
-    .flatMap((x) => (x.type === 'tool' && x.state === 'ok' && x.target && x.result && /(^|-)boost\d*$/.test(x.name ?? '') ? [{ label: x.target, line: x.result }] : []))
+/** Adds messages to one surface (an answer's patches). */
+const patchSurface = (items: ChatItem[], surfaceId: string, patch: (item: SurfaceItem) => SurfaceItem['messages']) =>
+  items.map((x) => (x.type === 'surface' && x.id === surfaceId ? { ...x, messages: [...x.messages, ...patch(x)] } : x))
 
 export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
   switch (e.type) {
     case 'start':
-      return { ...s, runStartedAt: e.at, interrupted: false, approval: null, awaiting: null, working: { verbs: ['생각하는 중…'], startedAt: e.at } }
+      return { ...s, runStartedAt: e.at, interrupted: false, waiting: null, awaiting: null, working: { verbs: ['생각하는 중…'], startedAt: e.at } }
     case 'status':
       return { ...s, working: { verbs: e.verbs, startedAt: s.working?.startedAt ?? s.runStartedAt ?? Date.now() } }
     case 'token': {
@@ -38,12 +38,12 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       if (!e.sources.length || line?.type !== 'agentText') return s
       return { ...s, items: s.items.map((x, i) => (i === at ? { ...line, sources: e.sources } : x)) }
     }
-    case 'approval':
-      return { ...s, working: null, approval: e.approval, items: attachPendingNote(s.items, e.approval.pendingNote) }
+    case 'wait':
+      return { ...s, waiting: e.surfaceId }
     case 'answer':
-      return { ...s, approval: null, awaiting: null, items: [...clearPendingNote(s.items), { type: 'user', id: `ans-${s.items.length}`, text: e.text }] }
-    case 'dismiss':
-      return { ...s, approval: null, awaiting: null, items: clearPendingNote(s.items) }
+      return { ...s, waiting: null, awaiting: null, items: patchSurface(s.items, e.surfaceId, (x) => answeredPatch(x, e.picked)) }
+    case 'reopen':
+      return { ...s, waiting: e.surfaceId, items: patchSurface(s.items, e.surfaceId, reopenPatch) }
     case 'queue':
       return { ...s, queue: [...s.queue, { text: e.text, ...(e.file ? { file: e.file } : {}) }] }
     case 'dequeue':
@@ -55,7 +55,7 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
       return {
         ...s,
         working: null,
-        approval: null,
+        waiting: null,
         awaiting: null,
         interrupted: true,
         runStartedAt: null,
@@ -64,11 +64,14 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     }
     case 'done': {
       const seconds = s.runStartedAt === null ? 0 : Math.max(1, Math.round((e.at - s.runStartedAt) / 1000))
+      const awaiting = e.awaiting ?? null
       return {
         ...s,
         working: null,
         runStartedAt: null,
-        awaiting: e.awaiting ?? null,
+        awaiting,
+        // The run paused on the surface its waiting status named; a stream that sent no such status waits on its newest open gate.
+        waiting: awaiting ? (s.waiting ?? lastOpenGate(s.items)) : null,
         items: [...s.items, { type: 'worked', id: `worked-${s.items.length}`, seconds }],
       }
     }
@@ -79,10 +82,6 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     }
     case 'error':
       return { ...s, working: null, runStartedAt: null, items: upsert(s.items, e) }
-    case 'fit': {
-      const rounds = e.note ? boostRounds(s.items) : []
-      return { ...s, items: upsert(s.items, rounds.length ? { ...e, rounds } : e) }
-    }
     default:
       return { ...s, items: upsert(s.items, e) }
   }

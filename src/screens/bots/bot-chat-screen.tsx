@@ -19,9 +19,6 @@ import {
   Onboarding,
   Queued,
   QuickStartRow,
-  SAVE_RETRY_TEXT,
-  answer,
-  applyText,
   composerPlaceholder,
   turnFailed,
   followScroll,
@@ -38,10 +35,9 @@ import {
   instantRun,
   send,
   stop,
-  useDoneNext,
   useDraftStore,
-  useGateModal,
-  useChatApproval,
+  useSurfaceActions,
+  useChatWaiting,
   useChatAwaiting,
   useChatItems,
   useChatLimit,
@@ -55,7 +51,7 @@ import {
   useUnseen,
   type ChatItem,
 } from '@/features/chat'
-import { useConvertDocument, useReferenceConsent } from '@/features/my'
+import { useReferenceConsent } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
@@ -136,7 +132,7 @@ const Thread = ({ id }: { id: string }) => {
   // Separate selectors: a token batch re-renders only the streaming line (ThreadCell), not this screen.
   const items = useChatItems(id)
   const queue = useChatQueue(id)
-  const approval = useChatApproval(id)
+  const waiting = useChatWaiting(id)
   const awaiting = useChatAwaiting(id)
   const phase = useRunPhase(id)
   const working = phase !== 'idle'
@@ -146,9 +142,6 @@ const Thread = ({ id }: { id: string }) => {
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
   const purchase = usePersonalPurchase()
-  const convert = useConvertDocument((documentId) => {
-    router.push(`/docs/push/${documentId}`)
-  })
   const input = useRef<TextInputInstance>(null)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && phase === 'working')
@@ -157,6 +150,8 @@ const Thread = ({ id }: { id: string }) => {
   // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const showGreeting = !empty && !hasOlder(id) && kind === 'company' && !!name
   const greeting: ChatItem[] = showGreeting && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, greetingTitle) }] : []
+  // The surface the run waits on stays a row of its own, not the list footer, so answering it does not move and remount it:
+  // a remount drops the picks and step a person made on it.
   const data: ThreadRow[] = [...greeting, ...threadRows(shownItems(id, items), working)]
   // The newest drawn line: it is the one being written while the run works, and the one whose text may still grow.
   const lastId = data.findLast((row) => row.type !== 'running')?.id
@@ -175,7 +170,7 @@ const Thread = ({ id }: { id: string }) => {
   useReadWhileOpen(bot.data, atBottom)
   const reduceMotion = useReduceMotion()
   const failed = turnFailed(items)
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed, attention: !!approval })
+  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed, attention: !!waiting })
   const list = useRef<LegendListRef>(null)
   const dataRef = useRef(data)
   useEffect(() => {
@@ -196,42 +191,21 @@ const Thread = ({ id }: { id: string }) => {
     if (at >= 0) void list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
-  const convertRef = useRef(convert.mutate)
   const buyCredits = useRef(purchase.buyCredits)
   useEffect(() => {
-    convertRef.current = convert.mutate
     buyCredits.current = purchase.buyCredits
-  }, [convert.mutate, purchase.buyCredits])
-  const onView = (card: Extract<ChatItem, { type: 'result' }>) => {
-    router.push(`/docs/push/${card.documentId}`)
-  }
+  }, [purchase.buyCredits])
   const onUsage = (action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }
-  const onRetry = () => send(id, SAVE_RETRY_TEXT)
   // ChatBotReadOff: 서류 첨부 opens the bot's material picker, 설정 열기 the settings.
   const onReadOff = (action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings')
-  useDoneNext({ items, working, approval }, (action, card) => {
-    if (action.id === 'apply') send(id, applyText(card.company))
-    else if (action.id === 'convert' && !convert.isPending) convertRef.current(card.documentId)
-  })
-  useGateModal(id, { approval, items }, (text, choice) => answer(id, text, choice), () => setTimeout(() => input.current?.focus(), 50))
+  const onLocal = useSurfaceActions(id, () => setTimeout(() => input.current?.focus(), 50))
   const renderItem = ({ item }: { item: ThreadRow }) => {
     const last = item.id === lastId
     return (
-      <ThreadCell
-        chatId={id}
-        row={item}
-        color={color}
-        live={live}
-        last={last}
-        writing={working && last}
-        onView={onView}
-        onUsage={onUsage}
-        onRetry={onRetry}
-        onReadOff={onReadOff}
-      />
+      <ThreadCell chatId={id} row={item} color={color} live={live} last={last} onLocal={onLocal} onReadOff={onReadOff} />
     )
   }
   const onboardingMotion = { key: `${id}/onboarding`, live }

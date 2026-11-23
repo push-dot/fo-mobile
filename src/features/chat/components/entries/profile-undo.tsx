@@ -4,7 +4,7 @@ import { ApiError } from '@push/api-client'
 import { fetchProfileChange, undoProfileChange } from '@/features/my/api/fetchers'
 import { queryClient } from '@/providers/query-client'
 import { Text } from '@/shared/components'
-import { UNDO_LABEL } from '../../utils/gate-modals'
+import { UNDO_LABEL } from '../../constants'
 
 const UNDONE = '되돌렸어요'
 

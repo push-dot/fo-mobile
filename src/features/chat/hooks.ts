@@ -57,7 +57,7 @@ export const useChatItems = (id: string) => {
 export const useLiveItem = (id: string, itemId: string) => useChatStore((s) => s.chats[id]?.items.findLast((i) => i.id === itemId))
 
 export const useChatWorking = (id: string) => useChatStore((s) => s.chats[id]?.working ?? null)
-export const useChatApproval = (id: string) => useChatStore((s) => s.chats[id]?.approval ?? null)
+export const useChatWaiting = (id: string) => useChatStore((s) => s.chats[id]?.waiting ?? null)
 export const useChatAwaiting = (id: string) => useChatStore((s) => s.chats[id]?.awaiting ?? null)
 export const useChatQueue = (id: string) => useChatStore((s) => s.chats[id]?.queue ?? NO_QUEUE)
 

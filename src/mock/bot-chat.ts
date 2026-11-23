@@ -4,6 +4,7 @@
 import type { BotContract } from '@push/api-client'
 import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
 import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
+import { storedCardSurface } from './bot-scripts/surfaces'
 import { PROFILE_CHANGE_HEADLINE } from './bot-scripts/runs'
 import { hasReferenceConsent } from './chat'
 import { findMaterial } from './materials'
@@ -22,11 +23,7 @@ const error = (status: number, code: string, message: string, details?: Record<s
 const cardEvent = (c: MockCard, now: Date): Unstamped => {
   // The server closes a card unanswered once its time has gone by.
   const closed = c.status === 'PENDING' && c.expiresAt !== null && atOf(c.expiresAt, now) <= now
-  const resolution = { status: closed ? ('EXPIRED' as const) : c.status, optionId: null }
-  const times = { openedAt: atOf(c.at, now).toISOString(), expiresAt: c.expiresAt === null ? null : atOf(c.expiresAt, now).toISOString(), retryable: c.expiresAt !== null }
-  return c.for === 'answer'
-    ? { type: 'choice', id: c.id, title: c.title, options: c.options, ...(c.recommended ? { recommended: c.recommended } : {}), resolution, ...times }
-    : { type: 'approval', id: c.id, kind: 'TOOL_ACTION', title: c.title, options: c.options, ...(c.summary ? { summary: c.summary } : {}), resolution, ...times }
+  return storedCardSurface(c, c.status === 'PENDING' && !closed)
 }
 
 /** The stored turns of a thread, oldest first, with the seq every event carries on the wire. */

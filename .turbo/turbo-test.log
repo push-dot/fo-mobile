@@ -1,0 +1,313 @@
+$ vitest run --passWithNoTests
+
+ RUN  v3.2.7 /Volumes/Untitled/Documents/Github/push-fe-a2ui/apps/fo-mobile
+
+ ✓ src/mock/__tests__/detail-routes.test.ts (4 tests) 2832ms
+   ✓ serves the job and profile detail calls the native bars make  1063ms
+   ✓ follows the people the follow list shows, and keeps the board copy of the first offer row  1010ms
+   ✓ draws 파도AI unmarked in the lists but in the bookmark list  506ms
+ ✓ src/mock/__tests__/documents-write.test.ts (4 tests) 2846ms
+   ✓ renames a document and bumps its revision, 409 on a stale revision  822ms
+   ✓ rejects a bad body and an empty title  758ms
+   ✓ archives a document, keeps it in the list, and then takes no writes  1012ms
+ ✓ src/mock/__tests__/bot-status-boards.test.ts (13 tests) 3291ms
+   ✓ bot:<id>:empty > leaves a bot with no thread and nothing to ask  760ms
+   ✓ bot:<id>:resume > stores the newest page of a longer thread, with the resume offer suggested  758ms
+   ✓ bot:<id>:thread and :done > stores the finished chat with its sources and no card to answer  507ms
+   ✓ bot:<id>:thread and :done > is the newest page of a longer thread, so the room draws no greeting above it (ChatBotHeader boards)  503ms
+ ✓ src/mock/__tests__/profile-change.test.ts (3 tests) 1776ms
+   ✓ a Bot profile change in the mock > keeps the old headline under the change id, undoes it once, and answers 409 the second time  1018ms
+   ✓ a Bot profile change in the mock > is 404 for a change that is not there  504ms
+ ✓ src/features/chat/__tests__/script.test.ts (8 tests) 4564ms
+   ✓ scripted runs (mock) > tailor: works, asks, then finishes on approval  520ms
+   ✓ scripted runs (mock) > prevention asks for several categories  754ms
+   ✓ scripted runs (mock) > fit check, feedback only, then the feedback card  1516ms
+   ✓ scripted runs (mock) > an in-progress document asks to continue  504ms
+   ✓ scripted runs (mock) > talking after stop resumes with the added to-do  507ms
+ ✓ src/features/chat/__tests__/share-file.test.ts (9 tests) 2291ms
+   ✓ result file share > downloads the document export PDF with the session token  507ms
+   ✓ result file share > asks for the photo on the profile PDF only when the profile has one  507ms
+   ✓ result file share > says a document that is not finalized cannot be shared, from the server 422  507ms
+ ✓ src/mock/__tests__/calendar-deadlines.test.ts (2 tests) 1774ms
+   ✓ deadline events follow bookmark and apply > bookmark adds the posting deadline, un-bookmark removes it  1015ms
+   ✓ deadline events follow bookmark and apply > apply keeps the event after un-bookmark  759ms
+ ✓ src/mock/blocks.test.ts (2 tests) 1033ms
+   ✓ mock me/blocks like push-be > lists the newest block first with the total, and unblocking removes the row  780ms
+ ✓ src/mock/__tests__/board.test.ts (10 tests) 6124ms
+   ✓ mock data drawn on the design boards > reports the board totals for the filters the boards draw  774ms
+   ✓ mock data drawn on the design boards > shows the long titles only in the home 새로 올라온 공고 section  504ms
+   ✓ mock data drawn on the design boards > searches ‘백엔드’ with the board totals and row order  1013ms
+   ✓ mock data drawn on the design boards > counts every search tab without opening it, with the same totals the tabs report  1010ms
+   ✓ mock data drawn on the design boards > lets the phone code pick the outcome  1265ms
+   ✓ mock data drawn on the design boards > leaves no 오늘 notifications after 모두 읽음  504ms
+ ✓ src/features/bots/__tests__/feature-boundaries.test.ts (16 tests) 732ms
+ ✓ src/mock/__tests__/my-posts.test.ts (1 test) 806ms
+   ✓ resolves my post detail and comments next to the social posts  805ms
+ ✓ src/mock/__tests__/server.test.ts (2 tests) 1522ms
+   ✓ tour rules > fails, empties and then resets a route  1262ms
+ ✓ src/mock/__tests__/my-posts-sort-saved.test.ts (5 tests) 6619ms
+   ✓ sorts my posts, my commented posts and my saved posts by views or comments, newest first on ties  1827ms
+   ✓ rejects an unknown sort with 422 like push-be  757ms
+   ✓ saves and unsaves a post, newest save first, idempotent, 404 for a post that does not exist  1765ms
+   ✓ carries saved on the post detail, the feed and the saved list, following save and unsave  2018ms
+ ✓ src/mock/__tests__/postings.test.ts (3 tests) 779ms
+ ✓ src/features/chat/__tests__/one-chat.test.ts (15 tests) 832ms
+ ✓ src/mock/__tests__/find-in-chat.test.ts (2 tests) 520ms
+   ✓ ChatBotHeaderFind: the finished chat of ChatBotHeader > finds 프로필 three times, the newest first: the last answer, then the first answer twice  519ms
+ ✓ src/mock/__tests__/materials-bot-list.test.ts (2 tests) 516ms
+ ✓ src/mock/__tests__/postings-locations.test.ts (2 tests) 518ms
+ ✓ src/mock/__tests__/terms.test.ts (1 test) 756ms
+   ✓ terms mock > lets the default signed-in user skip the re-consent screen, and sends a new phone sign-in to the terms  756ms
+ ✓ src/mock/__tests__/trending.test.ts (1 test) 255ms
+ ✓ src/features/my/utils/link-restore.test.ts (2 tests) 257ms
+ ✓ src/features/chat/__tests__/attachment-upload.test.ts (7 tests) 368ms
+ ✓ src/mock/__tests__/social-empty.test.ts (1 test) 514ms
+   ✓ social feed mock > serves no posts once the empty-feed link has run  513ms
+ ✓ src/features/chat/__tests__/surface-answers.test.ts (5 tests) 211ms
+ ✓ src/shared/components/__tests__/glass-press.test.ts (3 tests) 184ms
+ ✓ src/features/my/import-menu.test.ts (1 test) 107ms
+ ✓ src/features/bots/__tests__/patch-bot.test.ts (3 tests) 55ms
+ ✓ src/features/chat/__tests__/attachment-upload-mock.test.ts (2 tests) 107ms
+ ✓ src/shared/__tests__/bot-copy.test.ts (11 tests) 38ms
+ ✓ src/features/chat/__tests__/reset.test.ts (1 test) 54ms
+ ✓ src/features/materials/__tests__/confirm-delete-material.test.ts (2 tests) 56ms
+ ✓ src/features/chat/__tests__/script-frames.test.ts (8 tests) 21ms
+ ✓ src/shared/infrastructure/session-store.test.ts (5 tests) 28ms
+ ✓ src/features/my/utils/offer-menu.test.ts (16 tests) 21ms
+ ✓ src/shared/components/web-view-guard.test.ts (29 tests) 16ms
+ ✓ src/features/my/stores.test.ts (13 tests) 20ms
+ ✓ src/features/my/utils/detail.test.ts (9 tests) 11ms
+ ✓ src/features/materials/__tests__/delete-material.test.ts (9 tests) 15ms
+ ✓ src/shared/components/mascot/motion.test.ts (27 tests) 9ms
+ ✓ src/shared/components/__tests__/empty-note-style.test.ts (3 tests) 14ms
+ ✓ src/shared/infrastructure/splash-hide.test.ts (7 tests) 3ms
+ ✓ src/features/chat/__tests__/surfaces.test.ts (8 tests) 7ms
+ ✓ src/screens/auth/terms-screen.test.ts (4 tests) 3ms
+ ✓ src/features/materials/__tests__/material-row.test.ts (29 tests) 6ms
+Sourcemap for "/Volumes/Untitled/Documents/Github/push-fe-a2ui/node_modules/.pnpm/expo-glass-effect@58.0.4_expo@58.0.16_react-native@0.88.0_@babel+core@7.29.7_@types+rea_e6551cf81cc4d9b12b9a2627aaaaf625/node_modules/expo-glass-effect/build/index.js" points to missing source files
+Sourcemap for "/Volumes/Untitled/Documents/Github/push-fe-a2ui/node_modules/.pnpm/expo-glass-effect@58.0.4_expo@58.0.16_react-native@0.88.0_@babel+core@7.29.7_@types+rea_e6551cf81cc4d9b12b9a2627aaaaf625/node_modules/expo-glass-effect/build/GlassView.js" points to missing source files
+ ✓ src/features/chat/__tests__/quick-start-data.test.ts (12 tests) 4ms
+Sourcemap for "/Volumes/Untitled/Documents/Github/push-fe-a2ui/node_modules/.pnpm/expo-glass-effect@58.0.4_expo@58.0.16_react-native@0.88.0_@babel+core@7.29.7_@types+rea_e6551cf81cc4d9b12b9a2627aaaaf625/node_modules/expo-glass-effect/build/GlassContainer.js" points to missing source files
+Sourcemap for "/Volumes/Untitled/Documents/Github/push-fe-a2ui/node_modules/.pnpm/expo-glass-effect@58.0.4_expo@58.0.16_react-native@0.88.0_@babel+core@7.29.7_@types+rea_e6551cf81cc4d9b12b9a2627aaaaf625/node_modules/expo-glass-effect/build/isLiquidGlassAvailable.js" points to missing source files
+Sourcemap for "/Volumes/Untitled/Documents/Github/push-fe-a2ui/node_modules/.pnpm/expo-glass-effect@58.0.4_expo@58.0.16_react-native@0.88.0_@babel+core@7.29.7_@types+rea_e6551cf81cc4d9b12b9a2627aaaaf625/node_modules/expo-glass-effect/build/isGlassEffectAPIAvailable.js" points to missing source files
+ ✓ src/features/bots/__tests__/schemas.test.ts (8 tests) 3ms
+ ✓ src/shared/components/__tests__/native-android.test.ts (17 tests) 9ms
+ ✓ src/theme/font-features.test.ts (5 tests) 3ms
+ ✓ src/mock/__tests__/bot-state.test.ts (18 tests) 4ms
+ ✓ src/shared/navigation/choice-modal.test.ts (2 tests) 11ms
+ ✓ src/screens/legal-text.test.ts (6 tests) 12ms
+ ✓ src/shared/navigation/consent-modal.test.ts (2 tests) 12ms
+ ✓ src/theme/tokens.test.ts (10 tests) 3ms
+ ✓ src/features/chat/__tests__/attachment-name.test.ts (2 tests) 2ms
+ ✓ src/features/bots/components/profile/profile-rows.test.ts (7 tests) 3ms
+ ✓ src/features/my/utils/my-rules.test.ts (22 tests) 4ms
+ ✓ src/shared/components/__tests__/native-ios.test.ts (14 tests) 6ms
+ ✓ src/shared/infrastructure/auth.test.ts (5 tests) 5ms
+ ✓ src/features/chat/__tests__/stop.test.ts (5 tests) 3ms
+ ✓ src/mock/__tests__/offers.test.ts (8 tests) 8971ms
+   ✓ opens the accepted o1 thread with the typed reply, then the board reply  580ms
+   ✓ shows o1 as a thread opener with the aliased Android reply once accepted, after the detail with its own date  784ms
+   ✓ archives and blocks like push-be: gone from the default list, archived=1 lists the archived, unarchive brings it back  3069ms
+   ✓ lists like push-be: box is required, totals count the whole box, and the seeded archived offer is the only one in the archive  2055ms
+   ✓ refuses messages and hub offers from people who blocked the viewer, like push-be (403 BLOCKED)  1283ms
+   ✓ makes the session user the recipient of every received offer and the sender of every sent one  852ms
+ ✓ src/features/bots/__tests__/live-state.test.ts (29 tests) 3ms
+ ✓ src/features/chat/components/header-inset.test.ts (4 tests) 2ms
+ ✓ src/shared/navigation/sheet-options.test.ts (7 tests) 4ms
+ ✓ src/shared/components/__tests__/menu-sections.test.ts (5 tests) 2ms
+ ✓ src/features/bots/utils/home-rows.test.ts (9 tests) 3ms
+ ✓ src/shared/components/__tests__/text-field-metrics.test.ts (4 tests) 3ms
+ ✓ src/features/billing/utils/settle.test.ts (13 tests) 5ms
+ ✓ src/features/home/snapshot/store.test.ts (3 tests) 4ms
+ ✓ src/features/chat/components/appear.test.ts (6 tests) 6ms
+ ✓ src/features/chat/__tests__/s-copy.test.ts (7 tests) 3ms
+ ✓ src/features/my/utils/undo.test.ts (6 tests) 4ms
+ ✓ src/shared/components/__tests__/toast-store.test.ts (10 tests) 3ms
+ ✓ src/features/chat/__tests__/transcript.test.ts (7 tests) 3ms
+ ✓ src/features/chat/__tests__/reducer.test.ts (8 tests) 3ms
+ ✓ src/features/chat/__tests__/draft.test.ts (6 tests) 5ms
+ ✓ src/shared/components/detail-web-view.test.ts (10 tests) 6ms
+ ✓ src/features/chat/__tests__/docs-origin.test.ts (2 tests) 3ms
+ ✓ src/shared/infrastructure/api-client.test.ts (6 tests) 3ms
+ ✓ src/features/auth/utils/auth-flow.test.ts (11 tests) 3ms
+ ✓ src/features/home/snapshot/hydrate.test.ts (3 tests) 5ms
+ ✓ src/features/chat/__tests__/composer-geometry.test.ts (5 tests) 3ms
+ ✓ src/features/materials/__tests__/material-view.test.ts (19 tests) 7ms
+ ✓ src/features/chat/__tests__/status-line.test.ts (9 tests) 3ms
+ ✓ src/features/my/utils/applied-only.test.ts (3 tests) 2ms
+ ✓ src/features/chat/__tests__/find.test.ts (22 tests) 3ms
+ ✓ src/features/chat/__tests__/header-state.test.ts (13 tests) 3ms
+ ✓ src/features/bots/utils/create-form.test.ts (15 tests) 4ms
+ ✓ src/features/chat/__tests__/quick-start-chips.test.ts (2 tests) 2ms
+ ✓ src/features/my/utils/lib.test.ts (14 tests) 3ms
+ ✓ src/theme/__tests__/mascot.test.ts (16 tests) 3ms
+ ✓ src/features/bots/components/profile/companies.test.ts (2 tests) 1ms
+ ✓ src/shared/components/__tests__/a2ui-catalog.test.ts (8 tests) 5ms
+ ✓ src/providers/query-client.test.ts (2 tests) 2ms
+ ✓ src/features/chat/__tests__/usage.test.ts (16 tests) 3ms
+ ✓ src/features/search/utils/search-tab.test.ts (6 tests) 2ms
+ ✓ src/features/hub/utils/filters.test.ts (12 tests) 2ms
+ ✓ src/features/chat/__tests__/queue-busy-message.test.ts (1 test) 2ms
+ ✓ src/features/search/hooks.test.ts (4 tests) 4ms
+ ✓ src/features/chat/__tests__/review-doc.test.ts (10 tests) 3ms
+ ✓ src/features/chat/components/quick-start-geometry.test.ts (3 tests) 3ms
+ ✓ src/features/chat/__tests__/artifact-download.test.ts (1 test) 2ms
+ ✓ src/shared/utility/box-shadow/box-shadow.test.ts (3 tests) 1ms
+ ✓ src/features/chat/__tests__/bot-text.test.ts (9 tests) 8ms
+ ✓ src/theme/hit-target.test.ts (3 tests) 1ms
+ ✓ src/features/jobs/utils/filters.test.ts (7 tests) 3ms
+ ✓ src/shared/utility/sheet-height/sheet-height.test.ts (4 tests) 1ms
+ ✓ src/features/chat/__tests__/mentions.test.ts (7 tests) 3ms
+ ✓ src/shared/components/__tests__/settings-row.test.ts (4 tests) 5ms
+ ✓ src/features/notifications/utils/href.test.ts (5 tests) 3ms
+ ✓ src/features/auth/components/legal-document.test.ts (3 tests) 2ms
+ ✓ src/shared/infrastructure/share-file.test.ts (2 tests) 2ms
+ ✓ src/shared/components/__tests__/text-line-height.test.ts (9 tests) 4ms
+ ✓ src/features/chat/__tests__/intent-payload.test.ts (7 tests) 3ms
+ ✓ src/features/materials/components/list-size.test.ts (1 test) 2ms
+ ✓ src/shared/utility/picker-date/picker-date.test.ts (13 tests) 3ms
+ ✓ src/features/my/utils/posting-title.test.ts (3 tests) 2ms
+ ✓ src/features/my/utils/posting-sent.test.ts (1 test) 2ms
+ ✓ src/shared/components/__tests__/reduce-error.test.ts (3 tests) 3ms
+ ✓ src/features/materials/__tests__/pm8-sheets.test.ts (1 test) 2ms
+ ✓ src/features/chat/__tests__/error-status.test.ts (3 tests) 2ms
+ ✓ src/features/chat/__tests__/v489-markup.test.ts (2 tests) 3ms
+ ✓ src/features/my/utils/posts-menu.test.ts (4 tests) 4ms
+ ✓ src/features/notifications/utils/device.test.ts (6 tests) 4ms
+ ✓ src/theme/design-system.test.ts (6 tests) 2ms
+ ✓ src/features/my/utils/skill-suggestions.test.ts (2 tests) 2ms
+ ✓ src/features/chat/__tests__/stream.test.ts (2 tests) 8ms
+ ✓ src/mock/__tests__/late-spec.test.ts (2 tests) 1ms
+ ✓ src/features/social/utils/post-save.test.ts (3 tests) 3ms
+ ✓ src/shared/components/__tests__/settings-group.test.ts (2 tests) 3ms
+ ✓ src/features/hub/utils/send-offer-error.test.ts (2 tests) 1ms
+ ✓ src/features/social/utils/lib.test.ts (7 tests) 4ms
+ ✓ src/features/my/utils/offer-send.test.ts (3 tests) 2ms
+ ✓ src/features/materials/__tests__/send-material.test.ts (4 tests) 3ms
+ ✓ src/features/auth/stores.test.ts (6 tests) 4ms
+ ✓ src/features/notifications/utils/format.test.ts (3 tests) 2ms
+ ✓ src/shared/navigation/use-focused-once.test.ts (11 tests) 2ms
+ ✓ src/features/chat/__tests__/account-menus.test.ts (5 tests) 4ms
+ ✓ src/features/my/utils/push-doc-menu.test.ts (3 tests) 3ms
+ ✓ src/shared/components/__tests__/a2ui-action.test.ts (5 tests) 2ms
+ ✓ src/shared/infrastructure/config.test.ts (3 tests) 2ms
+ ✓ src/features/bots/__tests__/paths.test.ts (12 tests) 3ms
+ ✓ src/features/my/utils/avatar-text.test.ts (1 test) 2ms
+ ✓ src/theme/selected-ring.test.ts (1 test) 1ms
+ ✓ src/shared/utility/__tests__/no-selection-grant.test.ts (2 tests) 2ms
+ ✓ src/features/chat/__tests__/thread-inset.test.ts (7 tests) 4ms
+ ✓ src/shared/components/__tests__/sheet-glass-fill.test.ts (2 tests) 1ms
+ ✓ src/features/chat/components/page-modal-surface.test.ts (3 tests) 2ms
+ ✓ src/shared/utility/composer-padding/composer-padding.test.ts (3 tests) 1ms
+ ✓ src/features/jobs/api/hooks.test.ts (1 test) 2ms
+ ✓ src/features/jobs/utils/apply-doc.test.ts (3 tests) 4ms
+ ✓ src/features/chat/__tests__/table-columns.test.ts (3 tests) 3ms
+ ✓ src/features/home/snapshot/persist.test.ts (1 test) 2ms
+ ✓ src/shared/utility/display-name/display-name.test.ts (11 tests) 2ms
+ ✓ src/features/chat/__tests__/stop-hold.test.ts (2 tests) 3ms
+ ✓ src/features/chat/__tests__/profile-undo.test.ts (3 tests) 2ms
+ ✓ src/shared/utility/keep-words/keep-words.test.ts (5 tests) 4ms
+ ✓ src/features/my/utils/push-doc-copy.test.ts (3 tests) 4ms
+ ✓ src/features/auth/cold-start-terms.test.ts (2 tests) 2ms
+ ✓ src/shared/components/xl-chrome.test.ts (6 tests) 2ms
+ ✓ src/features/chat/__tests__/token-batch.test.ts (4 tests) 2ms
+ ✓ src/shared/components/disabled-opacity.test.ts (2 tests) 2ms
+ ✓ src/features/my/utils/marketing.test.ts (3 tests) 3ms
+ ✓ src/features/chat/__tests__/badges.test.ts (1 test) 2ms
+ ✓ src/screens/choice/choice-sheet-layout.test.ts (5 tests) 2ms
+ ✓ src/shared/components/__tests__/confirm-store.test.ts (2 tests) 3ms
+ ✓ src/features/my/utils/doc-title.test.ts (6 tests) 2ms
+ ✓ src/shared/components/__tests__/sheet-scale.test.ts (5 tests) 3ms
+ ✓ src/features/bots/components/home/metrics.test.ts (1 test) 2ms
+ ✓ src/features/chat/__tests__/account-from-billing.test.ts (2 tests) 3ms
+ ✓ src/shared/utility/word-clamp/word-clamp.test.ts (6 tests) 2ms
+ ✓ src/features/chat/utils/composer-layout.test.ts (7 tests) 3ms
+ ✓ src/features/my/utils/blocked.test.ts (3 tests) 2ms
+ ✓ src/shared/infrastructure/open-url.test.ts (6 tests) 2ms
+ ✓ src/features/chat/__tests__/boost.test.ts (2 tests) 3ms
+ ✓ src/shared/utility/recent/recent.test.ts (4 tests) 1ms
+ ✓ src/features/chat/__tests__/conversation-menu.test.ts (2 tests) 2ms
+ ✓ src/features/chat/__tests__/xl-chat-text.test.ts (2 tests) 3ms
+ ✓ src/features/chat/__tests__/reading.test.ts (3 tests) 2ms
+ ✓ src/shared/infrastructure/refresh-auth-failure.test.ts (3 tests) 2ms
+ ✓ src/features/jobs/utils/grid.test.ts (3 tests) 2ms
+ ✓ src/features/my/utils/applied-fit.test.ts (3 tests) 2ms
+ ✓ src/features/chat/__tests__/links.test.ts (3 tests) 2ms
+ ✓ src/features/my/api/ingest-enabled.test.ts (2 tests) 1ms
+ ✓ src/features/bots/api/errors.test.ts (5 tests) 3ms
+ ✓ src/mock/__tests__/pick-fix-doc.test.ts (2 tests) 3ms
+ ✓ src/features/jobs/stores.test.ts (2 tests) 2ms
+ ✓ src/features/chat/__tests__/composer-weight.test.ts (2 tests) 1ms
+ ✓ src/features/chat/__tests__/rich-link.test.ts (1 test) 3ms
+ ✓ src/features/notifications/utils/permission.test.ts (4 tests) 2ms
+ ✓ src/features/chat/__tests__/conversation-list-rows.test.ts (1 test) 1ms
+ ✓ src/theme/user-bubble.test.ts (2 tests) 1ms
+ ✓ src/features/chat/__tests__/consent-prompt-listener.test.ts (3 tests) 3ms
+ ✓ src/features/chat/__tests__/follow-scroll.test.ts (4 tests) 1ms
+ ✓ src/features/chat/__tests__/sheet-routes.test.ts (3 tests) 2ms
+ ✓ src/shared/components/mascot/unread.test.ts (1 test) 1ms
+ ✓ src/features/chat/__tests__/consent.test.ts (1 test) 2ms
+ ✓ src/shared/navigation/sheet-header.test.ts (3 tests) 1ms
+ ✓ src/features/search/api/search-enabled.test.ts (2 tests) 1ms
+ ✓ src/features/chat/__tests__/retry.test.ts (1 test) 1ms
+ ✓ src/features/social/utils/post-info.test.ts (2 tests) 3ms
+ ✓ src/features/bots/utils/limit-row.test.ts (2 tests) 1ms
+ ✓ src/features/chat/__tests__/docs-key.test.ts (1 test) 2ms
+ ✓ src/features/bots/components/home/bar-lift.test.ts (3 tests) 1ms
+ ✓ src/features/home/snapshot/routes.test.ts (1 test) 2ms
+ ✓ src/features/materials/__tests__/in-materials-modal.test.ts (2 tests) 2ms
+ ✓ src/shared/components/__tests__/toast-live.test.ts (1 test) 1ms
+ ✓ src/mock/__tests__/chat.test.ts (33 tests) 20252ms
+   ✓ chat mock > seeds the five live conversations and three archived ones the design draws  523ms
+   ✓ chat mock > lists the bookmarks and recent postings in the 부족한 점 찾기 sheet like 적합도 보기  504ms
+   ✓ chat mock > serves one conversation by id, also when it is archived  505ms
+   ✓ chat mock > names the posting company on the 모아페이 conversations for the header pill  505ms
+   ✓ chat mock > draws the blueprints alone, with no failed check before them, for the ChatPh2XBlueprints shot  503ms
+   ✓ chat mock > fails the first 병목 강도 pick and passes the second  1011ms
+   ✓ chat mock > plays a run1 token for one natural line only, then the normal route  506ms
+   ✓ chat mock > jumps to the quality check without the boost card and applies the recommended fixes without asking; the design is the next turn  504ms
+   ✓ chat mock > selects 중간 제약으로 in the 병목 강도 gate  505ms
+   ✓ chat mock > jumps to one phase in a fresh conversation, under the typed user line alone  505ms
+   ✓ chat mock > holds the writing state with the draft card, while the run to the boost gate has no draft card  756ms
+   ✓ chat mock > draws the result boards as the result card alone, with no gate to answer, and the failed save with 다시 저장하기 only  1006ms
+   ✓ chat mock > closes a card restored from the stored turns without a run, and clears the list badge  1006ms
+   ✓ chat mock > numbers a new run in a seeded conversation after its stored frames, also once its restored card is closed  758ms
+   ✓ chat mock > restores a deleted link with its fit count and date, and restores a live link as is  1517ms
+   ✓ chat mock > holds the working line well past the 8s dwell for the Android tour token  506ms
+   ✓ chat mock > serves an ULTRA account, and one with every credit spent that answers runs with the usage card error  1266ms
+   ✓ chat mock > payments-closed answers paymentsEnabled false and leaves it out otherwise  758ms
+   ✓ chat mock > draws ChatStates.4 in one conversation: file card, apply record, then QUEUE_BUSY with a 12s wait  762ms
+   ✓ chat mock > draws the finished task lines above the to-do card on the done boards  763ms
+   ✓ chat mock > stacks two results of one document in one conversation, each below its own message  509ms
+   ✓ chat mock > plays a chat token for any text when a run: switch is set, until reset  509ms
+   ✓ chat mock > keeps one status verb while the interrupted run resumes  507ms
+   ✓ chat mock > serves two bookmarks-worth of documents and one link on the few-materials account  762ms
+   ✓ clear chat > forgets the open card, so the next token runs its script  1269ms
+ ✓ src/mock/__tests__/bot-contract.test.ts (51 tests) 27118ms
+   ✓ bots > opens the existing bot of a company instead of making a second one  505ms
+   ✓ bots > refuses a new company bot at the plan limit, and a body with a key it does not take  758ms
+   ✓ bots > asks for 참고 데이터 제공 before it creates a bot, sends, or answers a card  1259ms
+   ✓ bots > keeps the Push Bot, and checks the revision of an edit  758ms
+   ✓ bots > shows the Push Bot of AgentHomeNoBots unread with no line said, and AgentHomeError read (bot:push:read)  1767ms
+   ✓ bots > lists the three bots of BotNewLimitDelete at the FREE limit, each with the role it was made from  503ms
+   ✓ bots > resolves the posting link of BotNewLinkOk, and nothing else  505ms
+   ✓ bot chat > streams a send as stamped frames that end the turn, and stores the turn  505ms
+   ✓ bot chat > takes a posting that is not bookmarked, and refuses more than 10 attachments or a key it does not take  1013ms
+   ✓ bot chat > reattaches to a run under way and ends at once when nothing runs  509ms
+   ✓ bot chat > closes an expired card only with reject, and asks it again with the same lifetime  761ms
+   ✓ bot chat > closes an expired card with reject and resumes nothing  507ms
+   ✓ bot chat > resumes the run on a reject of an open tool card as push-be does, and keeps the waiting status of an answered card  508ms
+   ✓ bot chat > checks the bot, then consent, then the body, in the order push-be does  2289ms
+   ✓ server order > lists a new bot first among the company bots, as last activity orders them  763ms
+   ✓ server order > pages each default material section newest first  762ms
+   ✓ server order > pages each long material section newest first  760ms
+   ✓ materials > names the maker first and then the chats it was attached in  506ms
+   ✓ materials > lists a bot's own materials, as many as its profile counts (MaterialsFromProfile)  1017ms
+   ✓ materials > keeps a deleted material out of every list until a restore brings it back  2282ms
+   ✓ materials > forgets a deleted bot's chat, and reads what it made as made by no one known  1270ms
+
+ Test Files  208 passed (208)
+      Tests  1245 passed (1245)
+   Start at  00:18:15
+   Duration  27.79s (transform 2.29s, setup 0ms, collect 9.62s, tests 99.32s, environment 22ms, prepare 10.41s)
+

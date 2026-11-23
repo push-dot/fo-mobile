@@ -1,0 +1,1 @@
+$ node scripts/gen-typed-routes.cjs && tsc --noEmit
