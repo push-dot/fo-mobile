@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ApiError, QueueBusyError, type BotContract, type ChatIntent } from '@push/api-client'
+import { ApiError, QueueBusyError, type A2uiAnswerContext, type BotContract, type ChatIntent } from '@push/api-client'
 import { myApi } from '@/features/my/api/fetchers'
 import type { PickedFile } from '@/features/my/types'
 import { queryClient } from '@/providers/query-client'
@@ -64,7 +64,7 @@ const attachmentsOf = (input: RunInput): BotContract.AttachmentRef[] => [
 
 const setChatEvent = (id: string, e: ChatEvent) => {
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: applyEvent(s.chats[id] ?? emptyChat, e) } }))
-  if (e.type === 'approval') void hapticImpactLight()
+  if (e.type === 'wait') void hapticImpactLight()
   if (e.type === 'done') void hapticNotify('success')
   if (e.type === 'error') void hapticNotify('warning')
 }
@@ -160,7 +160,14 @@ const followed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefin
 const resolved = async function* (input: RunInput, signal: AbortSignal, end: StreamEnd | undefined, seen: { seq?: number }): AsyncGenerator<ChatEvent> {
   const { approvalId, optionId, optionIds } = input.resolve!
   const body = optionIds?.length ? { optionId, optionIds } : { optionId }
-  const { resumed } = await botApi.bots.answer(input.conversationId, approvalId, body)
+  let resumed: boolean
+  try {
+    resumed = (await botApi.bots.answer(input.conversationId, approvalId, body)).resumed
+  } catch (err) {
+    // The surface closed when the person answered; the answer never landed, so it waits again.
+    yield { type: 'reopen', surfaceId: approvalId }
+    throw err
+  }
   if (!resumed) return
   yield* followed(input, signal, end, seen)
 }
@@ -189,7 +196,7 @@ const launch = (id: string, next: Held) => {
 const flush = (id: string) => {
   const s = get(id)
   const q = heldQueues.get(id)
-  if (!q?.length || s.working || s.approval || runs.has(id)) return
+  if (!q?.length || s.working || s.waiting || runs.has(id)) return
   const next = q.shift()!
   if (!q.length) heldQueues.delete(id)
   dispatch(id, { type: 'dequeue' })
@@ -273,26 +280,23 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
     q.push({ text, file, attachment: nameOf(attachment), intent, context })
     heldQueues.set(id, q)
     dispatch(id, { type: 'queue', text, ...(file ? { file } : {}) })
-    if (!s.working && !s.approval && !runs.has(id)) flush(id)
+    if (!s.working && !s.waiting && !runs.has(id)) flush(id)
     return
   }
-  if (s.approval) {
-    // The server reads free text as the gate answer or as rejecting the pending approval.
-    dispatch(id, { type: 'answer', text })
-    return void startRun({ conversationId: id, text })
+  if (s.waiting) {
+    // The server reads free text as the gate's answer: the surface closes with nothing picked, and the text is a message as usual.
+    dispatch(id, { type: 'answer', surfaceId: s.waiting, picked: [] })
+    launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
+    return
   }
   launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
 }
 
-export const answer = (id: string, text: string, choice: number | number[]) => {
-  const approval = get(id).approval
-  if (!approval) return
-  const picks = Array.isArray(choice) ? choice : [choice]
-  const ids = picks.flatMap((n) => approval.optionIds[n] ?? [])
-  const optionId = ids[0]
-  if (!optionId) return
-  dispatch(id, { type: 'answer', text })
-  void startRun({ conversationId: id, text, resolve: { approvalId: approval.id, optionId, ...(ids.length > 1 ? { optionIds: ids } : {}) } })
+/** A PushChoice answer on the waiting surface: it closes in place at once, then the approvals POST resumes the run. Any other surface is ignored. */
+export const answerSurface = (id: string, surfaceId: string, body: A2uiAnswerContext) => {
+  if (get(id).waiting !== surfaceId) return
+  dispatch(id, { type: 'answer', surfaceId, picked: body.optionIds ?? [body.optionId] })
+  void startRun({ conversationId: id, resolve: { approvalId: surfaceId, optionId: body.optionId, ...(body.optionIds ? { optionIds: body.optionIds } : {}) } })
 }
 
 const halting = new Set<string>()
@@ -308,7 +312,7 @@ const reportCancel = (id: string) => {
   const ctrl = runs.get(id)
   if (API_MOCK) {
     // The mock has no server to say whether a document flow is active: a flow that drew its to-do list is.
-    const resumable = get(id).items.some((item) => item.type === 'todo')
+    const resumable = get(id).items.some((item) => item.type === 'surface' && item.kind === 'todo')
     if (holdStop) {
       holdStop = false
       dispatch(id, { type: 'status', verbs: [STOPPING_TEXT] })

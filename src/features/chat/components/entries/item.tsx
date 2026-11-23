@@ -1,27 +1,23 @@
 import { useState } from 'react'
-import { Animated, Platform, Pressable, View } from 'react-native'
-import BotText, { BulletList, Bubble, DiffDetail, NumberMark, PlanBlock } from './bot'
-import Detail from './detail'
+import { Animated, Pressable, View } from 'react-native'
+import BotText from './bot'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
 import UserBubble, { useBubbleMax } from './user'
-import { radius, spacing, type as typography, useColors, type Colors } from '../../../../theme'
-import { Button, Icon, Text } from '@/shared/components'
+import { radius, spacing, useColors, type Colors } from '../../../../theme'
+import { Button, Icon, Text, type A2uiLocal } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
-import { useChatAccount, useOpenArtifact, useShareFile } from '../../api/hooks'
+import { useChatAccount, useOpenArtifact } from '../../api/hooks'
 import { usePop } from '../../hooks'
-import { fitBubble, todoLines, type DetailText } from '../../utils/bubble-detail'
 import { isUsageExhausted, planRequired } from '../../utils/usage'
 import { displayName } from '@/shared/utility/display-name'
-import { profileSaveCopy, resultChrome, resultMeta, resultTitle } from '../../utils/result-card'
-import { fitChrome } from '../../utils/fit-card'
-import { BUBBLE_GAP } from '../../utils/thread-inset'
-import { FIT_LOCKED, READ_OFF_CODE } from '../../constants'
+import { READ_OFF_CODE } from '../../constants'
+import type { SurfaceItem } from '../../utils/surface'
 import ReadOff from './read-off'
 import { Appear } from '../motion'
-import Mark from '../mark'
+import { SurfaceRow } from './surface-row'
 import type { ChatItem, ToolState } from '../../types'
 
 
@@ -103,97 +99,6 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   )
 }
 
-// shortcut: Android does not draw the decoration on a label that turns done (probed: native-driver pop off strikes one of two rows, constant weight none), so it draws the board's rule itself: 1.5pt at 55% of each line box. Retry the native line on an RN upgrade.
-const StruckLabel = ({ on, ...props }: { on: boolean } & React.ComponentProps<typeof Text>) => {
-  const c = useColors()
-  const [lines, setLines] = useState<{ x: number; y: number; width: number; height: number }[]>([])
-  if (Platform.OS === 'ios') return <Text {...props} style={[props.style, on ? { textDecorationLine: 'line-through' } : null]} />
-  return (
-    <View>
-      <Text {...props} onTextLayout={(e) => setLines(e.nativeEvent.lines)} />
-      {on
-        ? lines.map((l, i) => (
-            <View key={i} pointerEvents="none" style={{ position: 'absolute', left: l.x, top: l.y + l.height * 0.55 - 0.75, width: l.width, height: 1.5, backgroundColor: c.t3 }} />
-          ))
-        : null}
-    </View>
-  )
-}
-
-const TODO_TITLE = '할 일'
-const WRITING = '쓰는 중'
-
-const TodoList = ({ item }: { item: Of<'todo'> }) => (
-  <Bubble>
-    <Text v="b1">{TODO_TITLE}</Text>
-    <View style={{ gap: 2, marginTop: 2 }}>
-      {todoLines(item).map((line, n) => {
-        const done = line.state === 'done'
-        return (
-          <View key={line.text} style={{ flexDirection: 'row' }}>
-            <NumberMark n={n + 1} color={done ? 't3' : 't1'} />
-            <View style={{ flexShrink: 1 }}>
-              <StruckLabel on={done} v="b1" color={done ? 't3' : 't1'}>
-                {line.text}
-              </StruckLabel>
-            </View>
-          </View>
-        )
-      })}
-    </View>
-  </Bubble>
-)
-
-const StaleGate = ({ item }: { item: Of<'stale'> }) => (
-  <Bubble>
-    <Rich v="b1" text={item.text} markId={item.id} />
-  </Bubble>
-)
-
-const Plan = ({ item }: { item: Of<'plan'> }) => (
-  <Bubble wide>
-    <PlanBlock item={item} />
-  </Bubble>
-)
-
-const BubbleDetailText = ({ id, view }: { id: string; view: DetailText }) => (
-  <Bubble>
-    <Rich v="b1" text={view.text} markId={id} />
-    {view.list ? <BulletList items={view.list} markId={id} /> : null}
-    {view.detail ? <Detail text={view.detail.text} more={view.detail.more} /> : null}
-  </Bubble>
-)
-
-/** The fit result as bubbles (ChatPh1Fit*): the sentence with its parts a tap away, then the summary. No projection line or pill (rule 39). */
-const FitCard = ({ item, onPlan: planEntry }: { item: Of<'fit'>; onPlan?: () => void }) => {
-  // No upgrade entry while payments are closed or the account has not loaded.
-  const open = paymentsOpen(useChatAccount(true).data)
-  const onPlan = open ? planEntry : undefined
-  const view = fitChrome(item)
-  const first = fitBubble(item)
-  return (
-    <View style={{ gap: BUBBLE_GAP }}>
-      {view.locked ? (
-        <Bubble>
-          <Rich v="b1" text={first.text} markId={item.id} />
-          <Pressable accessibilityRole={onPlan ? 'button' : 'text'} disabled={!onPlan} onPress={onPlan}>
-            <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: 20 }}>
-              {FIT_LOCKED}
-            </Text>
-          </Pressable>
-        </Bubble>
-      ) : (
-        <BubbleDetailText id={item.id} view={first} />
-      )}
-      {view.summary ? (
-        <Bubble>
-          <Rich v="b1" text={view.summary} markId={`${item.id}-summary`} />
-        </Bubble>
-      ) : null}
-    </View>
-  )
-}
-
 /** A file or result the bot made sits in a bubble of its own, the bot's bubble colour and corners (rule 30). */
 const Surface = ({ children }: { children: React.ReactNode }) => {
   const c = useColors()
@@ -242,80 +147,24 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
   )
 }
 
-const ResultCard = ({ item, onView }: { item: Of<'result'>; onView: () => void }) => {
-  const chrome = resultChrome(item)
-  const share = useShareFile()
-  const save = profileSaveCopy(item)
-  const title = displayName(save?.title ?? resultTitle(item))
-  const body = (
-    <Surface>
-      {chrome.initials && chrome.color ? <Mark text={chrome.initials} color={chrome.color} size={40} round /> : null}
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text v="b2" weight="700" numberOfLines={1}>
-          {title}
-        </Text>
-        <Text v="c1" color="t3">
-          {save?.body ?? resultMeta(item)}
-        </Text>
-      </View>
-      {save ? <Button label={save.buttons[0]} variant="secondary" size="sm" onPress={onView} /> : null}
-      {chrome.share ? <ShareButton onPress={() => share.mutate({ documentId: item.documentId, name: item.source === 'external' ? item.fileName : undefined })} /> : null}
-    </Surface>
-  )
-  // The chat holds no action buttons (ChatDoneNext); the profile card itself opens the profile.
-  return (
-    <Appear>
-      {item.source === 'profile' && !save ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`${title} 열기`} onPress={onView}>
-          {body}
-        </Pressable>
-      ) : (
-        body
-      )}
-    </Appear>
-  )
-}
-
-/** The draft as markdown inside the bot's bubble (rule 38, ChatPh3): its label (with "쓰는 중" while it is written), the title, the role line, the bullets. */
-const Paper = ({ item, writing }: { item: Of<'paper'>; writing?: boolean }) => {
-  const [first, ...rest] = item.lines
-  return (
-    <Bubble wide>
-      <Text v="c1" color="t3" style={{ fontSize: 14, lineHeight: typography.b1.lineHeight }}>
-        {writing ? `${item.label} · ${WRITING}` : item.label}
-      </Text>
-      <Text v="h3">{item.heading}</Text>
-      {first ? (
-        <Text v="b2" weight="600" style={{ marginTop: spacing[1] }}>
-          {first}
-        </Text>
-      ) : null}
-      {rest.length ? <BulletList items={rest.map((line) => line.replace(/^•\s+/, ''))} markId={item.id} /> : null}
-    </Bubble>
-  )
-}
-
 /** Renders one transcript item. Completion actions get callbacks from the screen. */
 export const Item = ({
+  chatId,
   item,
-  writing,
-  onUsage,
-  onView,
-  onRetry,
+  onLocal,
   onReadOff,
 }: {
+  chatId: string
   item: ChatItem
-  writing?: boolean
-  onUsage?: (action: 'plan' | 'credits') => void
-  onView?: (item: Of<'result'>) => void
-  onRetry?: () => void
+  /** A local action a surface dispatched (never sent to the server). */
+  onLocal?: (item: SurfaceItem, action: A2uiLocal) => void
   onReadOff?: (action: 'attach' | 'settings') => void
 }) => {
   switch (item.type) {
     case 'user':
       return <UserBubble item={item} />
     case 'agentText':
-      return <BotText item={item} onView={onView} onRetry={onRetry} />
+      return <BotText item={item} />
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
     case 'tool':
@@ -323,26 +172,10 @@ export const Item = ({
       return item.state === 'err' && item.error ? <ErrorLine id={item.id} text={item.error} /> : null
     case 'think':
       return null
-    case 'todo':
-      return <TodoList item={item} />
-    case 'stale':
-      return <StaleGate item={item} />
-    case 'plan':
-      return <Plan item={item} />
-    case 'diff':
-      return (
-        <Bubble>
-          <DiffDetail item={item} />
-        </Bubble>
-      )
-    case 'fit':
-      return <FitCard item={item} onPlan={onUsage ? () => onUsage('plan') : undefined} />
+    case 'surface':
+      return <SurfaceRow chatId={chatId} item={item} onLocal={onLocal} />
     case 'file':
       return <FileCard item={item} />
-    case 'paper':
-      return <Paper item={item} writing={writing} />
-    case 'result':
-      return <ResultCard item={item} onView={() => onView?.(item)} />
     case 'worked':
       return null
     case 'error':

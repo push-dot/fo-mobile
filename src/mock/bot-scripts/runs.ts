@@ -1,16 +1,15 @@
-// Scripted runs of the chat mock, written as the frames push-be streams (StreamEvent of @push/api-client).
+// Scripted runs of the chat mock, written as the frames push-be streams (StreamEvent of @push/api-client). Every Bot card is
+// an a2ui frame built from the golden fixtures (surfaces.ts).
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
-// Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
-import { GATED_STEP, HINTLESS_GATES } from '../../features/chat/constants'
+import { GATED_STEP } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
-import { DRAFT_V1_MD, PAGE_READ_OPTIONS } from './cards'
+import { DRAFT_V1_MD } from './cards'
 import { PROFILE_REVIEW_COUNTS, PROFILE_REVIEW_HUNKS } from './review-doc'
+import { choiceSurface, confirmSurface, editSurface, pageReadSurface, profileSurface, surface, todoSurface } from './surfaces'
 
 type Frame = Step['frame']
-type Card = Extract<StreamEvent, { type: 'choice' | 'approval' }>
-type Choice = Extract<Card, { type: 'choice' }>
 type Tool = Extract<StreamEvent, { type: 'tool' }>
 
 const s = (wait: number, frame: Frame): Step => ({ wait, frame })
@@ -19,27 +18,10 @@ const agent = (text: string): Frame => ({ type: 'token', text })
 const tool = (name: string, summary: string, target: string | undefined, state: Tool['state'], resultLine?: string, extra?: string[]): Tool => ({
   type: 'tool', name, summary, state, ...(target ? { target } : {}), ...(resultLine ? { resultLine } : {}), ...(extra ? { extra } : {}),
 })
-const todo = (id: string, labels: string[], done: number, added = -1): Frame => ({
-  type: 'todo',
-  id,
-  items: labels.map((text, i) => ({ id: String(i), text, state: i < done ? 'done' : i === done || i === added ? 'now' : 'todo', ...(i === added ? { added: true } : {}) })),
-})
-const ask = (card: Card) => s(500, card)
+const todo = (id: string, labels: string[], done: number, added = -1): Frame => todoSurface(id, labels, done, added)
+const ask = (card: Frame) => s(500, card)
 /** A numbered card. Its option ids are the positions the scripts branch on. */
-const numbered = (id: string, title: string, labels: string[], selected = 0): Choice => ({
-  type: 'choice',
-  id,
-  title,
-  options: labels.map((label, i) => ({ id: String(i), label })),
-  ...(selected ? { recommended: String(selected) } : {}),
-})
-/** A tool asking permission: the server's line under the options, when it has one, replaces the hint. */
-const confirm = (card: Choice, foot?: string): Card => ({ type: 'approval', id: card.id, kind: 'TOOL_ACTION', title: card.title!, options: card.options, ...(foot ? { foot } : {}) })
-/** The closing line above a result card. The app bolds the score change it reads from fitFrom and fitTo. */
-const closing = (text: string, bullets?: string[]) => {
-  const change = /\*\*(\d+\.\d) → (\d+\.\d)\*\*/.exec(text)
-  return { summary: text.replaceAll('**', ''), ...(change ? { fitFrom: Number(change[1]), fitTo: Number(change[2]) } : {}), ...(bullets ? { bullets } : {}) }
-}
+const numbered = (id: string, title: string, labels: string[], selected = 0) => choiceSurface(id, title, labels, selected ? { recommended: selected } : {})
 const done = s(200, { type: 'done', operation: null })
 const awaitingDone = s(200, { type: 'done', operation: null, awaiting: 'approval' })
 const awaitingChoiceDone = s(200, { type: 'done', operation: null, awaiting: 'choice' })
@@ -51,14 +33,8 @@ export const MOA = '모아페이 · 백엔드 엔지니어'
 export const PROFILE_TODO = ['프로필 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '프로필에 저장']
 export const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', 'Push 프로필 만들기']
 const FILE_TODO = TODO
-export const PROFILE_TASK = '프로필 수정 · Push 프로필 · 경력'
 const FILE_PAGE = 'A4 1쪽 · 186KB'
-// The server's save flag: a card with no savedLine means the save failed (never drawn).
-const FILE_SAVED = '저장됨'
 export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필 만들기']
-const BULLETS = ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요', '동아리 활동은 한 줄로 줄였어요']
-/** ChatPh6Result and ChatPh6ResultFile: the bullets are lines of the closing text (the bot's markdown list), not the structured summary of ChatDone. */
-const listed = (text: string) => `${text}\n${BULLETS.map((line) => `• ${line}`).join('\n')}`
 // Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
 // ChatPh3Review: the review line stays this long before the boost card, so the shot of the board catches it and the tour has left the chat before the next gate opens.
@@ -100,53 +76,26 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(500, agent('경력 섹션을 공고에 맞게 고쳤어요. 적합도는 6.9 → 8.1로 올라요.')),
   s(300, status('끄적이는 중…')),
   s(1200, tool('edit', '이력서 수정', '경력 · 모아페이', 'wait', `${PROFILE_REVIEW_COUNTS.added}줄 추가, ${PROFILE_REVIEW_COUNTS.removed}줄 삭제`)),
-  s(200, {
-    type: 'diff', documentId: DOC, revisionId: 'diff',
-    hunks: PROFILE_REVIEW_HUNKS,
-  }),
-  ask({
-    type: 'approval',
-    id: 'tailor-apply',
-    kind: 'DOCUMENT_EDIT',
-    title: '수정 적용',
-    summary: `${PROFILE_REVIEW_COUNTS.added + PROFILE_REVIEW_COUNTS.removed}줄을 고쳤어요. 적용하면 문서에 바로 반영돼요.`,
-    documentId: DOC,
-    options: [{ id: 'apply', label: '적용' }, { id: 'keep', label: '그대로 두기' }],
-  }),
+  ask(editSurface('tailor-apply', PROFILE_REVIEW_HUNKS.map(({ sign, text }) => ({ sign, text })), DOC, `${PROFILE_REVIEW_COUNTS.added}줄을 더하고 ${PROFILE_REVIEW_COUNTS.removed}줄을 뺐어요`)),
 ]
 
 // What the mapper makes of the server's result frame: the task line, the summary, then the card.
 // The done boards draw the finished task line above the to-do card, so it comes first when the card is new to the thread.
 const TASK_RESULT = '반영했어요 · 2줄 추가, 1줄 삭제'
-const profileDone = (wait: number, score: string, josa: string, bullets?: string[], asList = false): Step[] => [
-  s(wait + 200, {
-    type: 'result',
-    source: 'profile',
-    taskLine: '',
-    checklist: PROFILE_TODO,
-    name: '김서준',
-    headline: '백엔드 엔지니어',
-    title: '김서준 · 백엔드 엔지니어',
-    // Without a subtitle the closing line is the link "Push 프로필 보기 ›" (ChatPh6Result).
-    subtitle: asList ? '' : 'Push 프로필 · 방금 수정',
-    documentId: 'd1',
-    company: '모아페이',
-    actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }],
-    ...closing((asList ? listed : (t: string) => t)(`다 됐어요! 적합도를 **${score}**${josa} 올렸어요.`), bullets),
-  }),
-]
-const profileCard = (score: string, josa = '로'): Step[] => [
+// The saved profile (fixture result-profile) of the script's person, opening their Push 프로필 (d1).
+export const PROFILE_NAME = '김서준 · 백엔드 엔지니어'
+const profileDone = (wait: number, score: string): Step[] => [s(wait + 200, profileSurface(`result-profile-${score}`, PROFILE_NAME, 'd1'))]
+const profileCard = (score: string): Step[] => [
   s(400, tool('task', '프로필 수정', 'Push 프로필 · 경력', 'ok', TASK_RESULT)),
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),
-  ...profileDone(200, score, josa, BULLETS),
+  ...profileDone(200, score),
 ]
-const finish = (score: string, josa = '로'): Step[] => [...profileCard(score, josa), done]
+const finish = (score: string): Step[] => [...profileCard(score), done]
 
 // Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
 const EXT_FILE = '김서준_모아페이_백엔드.pdf'
-const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boolean; job?: boolean; bare?: boolean; josa?: string; asList?: boolean }): Step[] => {
+const ext = (o: { todo?: string[]; fileName?: string; saved?: boolean; bare?: boolean }): Step[] => {
   const labels = o.todo ?? FILE_TODO
-  const job = o.job ?? true
   const saved = o.saved ?? true
   return [
     // ChatPh6ResultFile and ChatPh6ResultFail draw only the closing line and the card, no task lines.
@@ -157,26 +106,8 @@ const ext = (o: { todo?: string[]; text?: string; fileName?: string; saved?: boo
           s(200, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
           s(200, todo('todo', labels, labels.length)),
         ]),
-    s(500, {
-      type: 'result',
-      source: 'external',
-      taskLine: '',
-      checklist: labels,
-      fileName: o.fileName ?? EXT_FILE,
-      // The bare boards name the pages only (ChatPh6ResultFile "· A4 1쪽"); the full run adds the size (ChatDone "· A4 1쪽 · 186KB").
-      pageLine: o.bare ? FILE_PAGE.split(' · ')[0]! : FILE_PAGE,
-      ...(saved ? { savedLine: FILE_SAVED } : {}),
-      cardMeta: FILE_PAGE,
-      documentId: 'src-upload',
-      ...(job ? { company: '모아페이' } : {}),
-      actions: o.bare
-        ? []
-        : [
-            ...(job ? [{ id: 'apply', label: '모아페이에 바로 지원하기' }] : []),
-            ...(saved ? [{ id: 'convert', label: '프로필로 전환', method: 'POST', path: '/api/v1/documents/src-upload/profile' }] : []),
-          ],
-      ...closing((o.asList ? listed : (t: string) => t)(o.text ?? `다 됐어요! 적합도를 **6.9 → 8.1**${o.josa ?? '로'} 올렸어요.`), o.bare ? undefined : BULLETS),
-    }),
+    // The made file (fixture result), or its failed save (fixture result-save-failed: 다시 저장하기 only).
+    s(500, surface(saved ? 'result' : 'result-save-failed', `result-${o.fileName ?? EXT_FILE}-${saved ? 'saved' : 'failed'}`)),
     done,
   ]
 }
@@ -220,29 +151,7 @@ const ph0Input: Step[] = [
   s(500, agent('Push에 있는 자료부터 찾아볼게요.')),
   s(300, tool('find', '자료 찾기', '마이 › 서류 · 북마크 공고', 'run', '서류와 북마크를 훑는 중')),
   s(1200, tool('find', '자료 찾기', '마이 › 서류 · 북마크 공고', 'ok', '이력서 3개 · 북마크 공고 2개 · GitHub 링크 1개')),
-  ask({
-    type: 'choice',
-    id: 'ph0-input',
-    title: '어떤 산출물을 만들까요?',
-    options: [{ id: 'cancel', label: '그만하기' }],
-    sections: [
-      { kind: 'chips', id: 's0', title: '만들 것', multiple: true, options: [{ id: 's0.0', label: '이력서' }, { id: 's0.1', label: '포트폴리오' }, { id: 's0.2', label: '자기소개서' }], selected: ['s0.0'] },
-      {
-        kind: 'toggle',
-        id: 'materials',
-        title: '가져올 자료를 골라 주세요',
-        options: [
-          { id: 'm_file', label: '허브 프로필', sub: '기본 서류' },
-          { id: 'm_posting', label: '백엔드 엔지니어 (Kotlin·Spring)', sub: '모아페이 공고' },
-          { id: 'm_github', label: 'github.com/seojun-kim', sub: '링크' },
-          { id: 'm_resume', label: '김서준_백엔드_이력서_2026', sub: '파일' },
-        ],
-        selected: ['m_file', 'm_posting'],
-      },
-      { kind: 'chips', id: 's2', title: '어떤 말투로 쓸까요?', options: [{ id: 's2.0', label: '원래 말투로' }, { id: 's2.1', label: '전문적으로' }, { id: 's2.2', label: '자신 있게' }, { id: 's2.3', label: '짧게' }, { id: 's2.4', label: '기술 중심으로' }, { id: 's2.5', label: '협업 중심으로' }], selected: ['s2.0'] },
-    ],
-    submit: { label: '이 말투로 쓰기' },
-  }),
+  ask(surface('choice-sections', 'ph0-input')),
 ]
 const ph0Start: Step[] = [
   s(400, tool('input', '입력 정리', undefined, 'ok', `이력서 **${RESUME}**\n공고 **${MOA}**\nGitHub **github.com/seojun-kim** · 말투 **그대로**`)),
@@ -250,18 +159,7 @@ const ph0Start: Step[] = [
 ]
 // The analysis card by plan: FREE locks the part rows, PRO teases ULTRA, ULTRA unfolds the projection.
 const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
-  s(300, {
-    type: 'fit',
-    score: 6.9,
-    band: '보통이고, 고칠 여지가 있어요.',
-    plan,
-    summary: '기술 스택은 잘 맞아요. 키워드와 정산 도메인이 약해요.',
-    parts: { techStack: 7.5, experienceLink: 7.0, careerLevel: 8.0, keyword: 4.5, domain: 5.0 },
-    keywords: [
-      { label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true },
-      { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false },
-    ],
-  }),
+  s(300, surface(plan === 'FREE' ? 'fit-locked' : 'fit', `fit-${plan}`)),
   { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['고치기', '피드백만 받기', '점수만 보기'])), wait: gateWait },
 ]
 const ph1Plan = (plan: 'FREE' | 'ULTRA', gateWait?: number): Step[] => [
@@ -296,18 +194,7 @@ const ph1: Step[] = [
 const feedbackOnly: Step[] = [
   s(300, tool('fbt', '피드백 정리', '공고 요건 ↔ 내 이력서', 'ok', '고칠 점 3개')),
   s(400, agent('이 공고 기준으로 고칠 점이에요.')),
-  s(300, {
-    type: 'plan',
-    id: 'feedback',
-    title: '',
-    meta: '',
-    rows: [
-      { tag: '키워드', label: 'Kafka, 정산 배치가 없어요', note: '경험 문장에 직접 넣기' },
-      { tag: '도메인', label: '정산 경험이 약해요', note: 'payment-retry-lab을 정산 맥락으로' },
-      { tag: '성과', label: '숫자가 부족해요', note: '승인 API 개선을 수치로' },
-    ],
-    keywords: [],
-  }),
+  s(300, surface('plan-feedback', 'plan:feedback')),
   ask(numbered('feedback', '피드백을 반영해서 수정할까요?', ['수정하기', '그대로 둘게요', '그만하기'])),
 ]
 export const startDocument: Step[] = [
@@ -320,19 +207,7 @@ const ph2: Step[] = [
   s(200, tool('strategy', '전략 세우기', '공고 요건 ↔ 내 경력', 'run', '섹션마다 할 일을 정하는 중')),
   s(1500, tool('strategy', '전략 세우기', '공고 요건 ↔ 내 경력', 'ok', '섹션 5개 · 추가할 키워드 4개')),
   s(300, agent('이렇게 고칠게요.')),
-  s(300, {
-    type: 'plan',
-    id: 'strategy',
-    title: '수정 전략',
-    meta: '섹션 5개',
-    rows: [
-      { tag: '강화', label: '경력 · 모아페이', note: '승인 API 성과를 숫자로' },
-      { tag: '수정', label: '기술 스택', note: 'Kafka 경험을 맨 앞으로' },
-      { tag: '추가', label: '프로젝트', note: 'payment-retry-lab' },
-      { tag: '축소', label: '사내 동아리', note: '공고와 연관이 낮아요' },
-    ],
-    keywords: ['결제 승인', '정산 배치', 'Kafka', '장애 대응'],
-  }),
+  s(300, surface('plan-strategy', 'plan:strategy')),
   ask(numbered('ph2', '이 전략대로 초안을 쓸까요?', ['초안 쓰기', '피드백만 보기', '그만하기'])),
 ]
 const PH3 = ['요약', '경력', '프로젝트', '기술 스택', '학력']
@@ -343,10 +218,7 @@ const ph3Open: Step[] = [
   s(100, status('경력 섹션을 쓰는 중')),
   s(100, tool('draft', '초안 쓰기', '이력서 v1 · 경력', 'run', '경력 섹션을 쓰는 중')),
 ]
-const paper = s(300, {
-  type: 'paper', id: 'paper', label: '이력서 초안 v1', heading: '김서준 · 백엔드 개발자',
-  lines: ['모아페이 · 백엔드 엔지니어 · 2022.03–현재', '• 결제 승인 API를 Kotlin·Spring으로 재설계, p95 응답 320ms → 140ms', '• Kafka 기반 결제 이벤트 파이프라인을 구축해 정산 지연을…'],
-})
+const paper = s(300, surface('paper', 'paper:draft'))
 const DRAFT_REVIEW_MD = [
   '첫 번째 초안(v1)을 만들었어요.',
   '• 승인 API 성과를 숫자로 강조했어요',
@@ -370,13 +242,7 @@ const ph3Boost: Step[] = [
   s(1300, tool('boost2', '점수 올리기 2회', '경력 · 모아페이', 'ok', '7.5 → 8.0 · 승인 API 성과를 숫자로 보여 줬어요')),
   s(200, tool('boost3', '점수 올리기 3회', '도메인', 'run', '도메인 맥락을 다시 쓰는 중')),
   s(1300, tool('boost3', '점수 올리기 3회', '도메인', 'ok', '8.0 → 8.3 · payment-retry-lab을 정산 맥락으로 고쳤어요')),
-  s(300, {
-    type: 'fit',
-    score: 8.3,
-    from: 6.9,
-    delta: '+1.4',
-    note: '적합도 6.9 → 8.3 (+1.4)',
-  }),
+  s(300, surface('fit-boost', 'fit-boost')),
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
 // ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between, and the review goes on by itself (a gate with one option is not asked).
@@ -386,17 +252,7 @@ const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD), ...ph3Boost]
 // ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.
 const QUALITY_HOLD = 10_000
 // The card's title is the modal's (ChatPh4Design); the sentence under the bot's line is its own bubble, which a tool frame keeps from merging into the one above.
-const DESIGN_ASK = ask({
-  type: 'choice',
-  id: 'ph4-design',
-  title: '어떤 디자인으로 만들까요?',
-  options: [{ id: 'cancel', label: '그만하기' }],
-  recommended: 't0',
-  sections: [
-    { kind: 'thumbnails', id: 's0', options: [{ id: 't0', label: '클래식' }, { id: 't1', label: '모던' }, { id: 't2', label: '컴팩트' }, { id: 't3', label: 'ATS' }], selected: ['t0'] },
-  ],
-  submit: { label: '클래식으로 만들기', optionLabels: { t0: '클래식으로 만들기', t1: '모던으로 만들기', t2: '컴팩트로 만들기', t3: 'ATS로 만들기' } },
-})
+const DESIGN_ASK = ask(surface('choice-templates', 'ph4-design'))
 const ph4Design: Step[] = [
   s(QUALITY_HOLD, agent('템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
   s(100, tool('design', '디자인 고르기', undefined, 'ok')),
@@ -445,27 +301,15 @@ const noPosting: Step[] = [
 ]
 const PREVENT = ['성능', '보안', '확장성', '안정성', '유지보수', '데이터 무결성', '그만하기']
 const ph2xPrevent: Step[] = [
-  ask({ ...numbered('ph2x-prevent', '어떤 문제를 예방할까요?', PREVENT), multiple: true }),
+  ask(choiceSurface('ph2x-prevent', '어떤 문제를 예방할까요?', PREVENT, { multiple: true })),
 ]
 const ph2xBlueprints: Step[] = [
   s(200, status('기획하는 중…')),
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'ok', '공고 연관성·임팩트·실현 가능성 모두 통과')),
   s(300, agent('프로젝트 기획서 4개를 만들었어요.')),
-  s(300, {
-    type: 'plan',
-    id: 'strategy',
-    title: '프로젝트 기획서',
-    meta: '4개',
-    rows: [
-      { tag: '통과', label: '결제 승인 재시도 큐', note: '안정성 · Kotlin, Kafka' },
-      { tag: '통과', label: '정산 배치 병렬화', note: '데이터 무결성 · Spring Batch' },
-      { tag: '조건부', label: '결제 이벤트 아웃박스', note: '무결성 · Kafka, JPA' },
-      { tag: '통과', label: '가맹점 API 레이트 리미터', note: '안정성 · Redis' },
-    ],
-    keywords: [],
-  }),
-  ask({ ...numbered('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['결제 승인 재시도 큐', '정산 배치 병렬화', '결제 이벤트 아웃박스', '가맹점 API 레이트 리미터', '그만하기']), submit: { label: '구현하기' } }),
+  s(300, surface('plan-strategy', 'plan:blueprints')),
+  ask(choiceSurface('ph2x-bp', '어떤 프로젝트를 구현할까요?', ['결제 승인 재시도 큐', '정산 배치 병렬화', '결제 이벤트 아웃박스', '가맹점 API 레이트 리미터', '그만하기'], { submit: '구현하기' })),
 ]
 
 const applyRun: Step[] = [
@@ -473,7 +317,7 @@ const applyRun: Step[] = [
   s(300, tool('save', '내 서류에 저장', undefined, 'run', '저장하는 중')),
   s(900, tool('save', '내 서류에 저장', undefined, 'ok')),
   s(300, tool('apply', '지원하기', MOA, 'wait', '확인을 기다리는 중')),
-  ask(confirm(numbered('apply', `${MOA} (Kotlin·Spring)에 지원할까요?`, ['지원하기', '닫기']))),
+  ask(confirmSurface('apply', `${MOA} (Kotlin·Spring)에 지원할까요?`, ['지원하기', '닫기'])),
 ]
 
 export const generic = (text: string): Step[] => [
@@ -497,7 +341,8 @@ export const profileChangeRun = (changeId: string): Step[] => [
 
 /** Approval id → choice → next steps. */
 export const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
-  'tailor-apply': (c, l) => (c === 0 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '그대로 뒀어요')), ...say('이 수정은 적용하지 않았어요.')]),
+  // The edit's buttons are 되돌리기 (skip) and 적용 (apply), in the fixture's order.
+  'tailor-apply': (c, l) => (c === 1 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '그대로 뒀어요')), ...say('이 수정은 적용하지 않았어요.')]),
   'fail-choice': (c) =>
     c === 0 ? say('공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.')
       : c === 1 ? tailorFit(TODO)
@@ -515,7 +360,7 @@ export const next: Record<string, (choice: number, labels: string[]) => Step[]> 
       : c === 1
         ? ph4Quality
         : say('알겠어요. 필요할 때 다시 불러 주세요.'),
-  'ph4-design': (c) => (c === -1 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1', '으로')]),
+  'ph4-design': (c) => (c === -1 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : [...ph5, ...finish('6.9 → 8.1')]),
   'ph2x-verify': (c) => (c === 0 ? ph2xBlueprints : c === 1 ? ph2xApproach : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-approach': (c) => (c === 0 ? ph2xLevel : c === 1 ? ph2xPrevent : say('알겠어요. 필요할 때 다시 불러 주세요.')),
   'ph2x-level': (c) => (c === 3 ? say('알겠어요. 필요할 때 다시 불러 주세요.') : ph2xBlueprints),
@@ -533,7 +378,7 @@ export const verifyFail: Step[] = [
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
   // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
   s(200, { type: 'notice', text: '방향 검증을 통과하지 못했어요.' } as unknown as Frame),
-  ask({ ...numbered('ph2x-verify', '어떻게 할까요?', ['다시 시도', '방향 바꾸기', '그만하기']), gate: HINTLESS_GATES[0] }),
+  ask(numbered('ph2x-verify', '어떻게 할까요?', ['다시 시도', '방향 바꾸기', '그만하기'])),
 ]
 const autoPick: Step[] = [
   s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개')),
@@ -543,23 +388,7 @@ const autoPick: Step[] = [
   s(DWELL + 12000, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
   done,
 ]
-const statesFile: Step[] = [
-  s(500, {
-    type: 'result',
-    source: 'external',
-    taskLine: '',
-    checklist: FILE_TODO,
-    fileName: EXT_FILE,
-    pageLine: FILE_PAGE,
-    savedLine: FILE_SAVED,
-    cardMeta: FILE_PAGE,
-    documentId: 'src-upload',
-    company: '모아페이',
-    actions: [],
-    ...closing('다 됐어요! 적합도를 6.9 → 8.1로 올렸어요.'),
-  }),
-  done,
-]
+const statesFile: Step[] = [s(500, surface('result', 'result-states')), done]
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
   s(900, tool('apply', '지원하기', MOA, 'ok')),
@@ -580,46 +409,23 @@ const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'd
 // ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
 // so no line depends on how long the screen takes to read.
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
-/** Choice cards whose room draws 답을 기다리고 있어요 (ChatBotStatusHelp); a plain choice has no line. The board reads 1분 12초, so the ask is that old. */
-export const WAITING_CHOICES = new Set(['st-help'])
-export const WAITING_SINCE_MS = 72_000
 const statusHelp: Step[] = [
-  ask({
-    type: 'choice',
-    id: 'st-help',
-    title: '지원 동기 첫 문장',
-    detail: '두 버전 모두 만들어 두었어요. 어느 쪽으로 쓸까요?',
-    options: [
-      { id: '0', label: '제품 관점' },
-      { id: '1', label: '데이터 관점' },
-      { id: '2', label: '직접 입력할게요' },
-    ],
-  }),
+  ask(numbered('st-help', '지원 동기 첫 문장', ['제품 관점', '데이터 관점', '직접 입력할게요'])),
   awaitingDone,
 ]
-const statusApprove: Step[] = [
-  ask({
-    type: 'approval',
-    id: 'st-approve',
-    kind: 'TOOL_ACTION',
-    title: '채용 페이지 열기',
-    summary: 'careers.moapay.co.kr를 열어도 될까요?',
-    options: PAGE_READ_OPTIONS,
-  }),
-  awaitingDone,
-]
+const statusApprove: Step[] = [ask(pageReadSurface('st-approve', '채용 페이지 열기', 'careers.moapay.co.kr를 열어도 될까요?')), awaitingDone]
 
 // Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
-export const TOKENS: Record<string, Step[]> = {
+const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('NOT_CONFIGURED'),
   'err-disconnect': fail('DISCONNECTED', { reason: '연결이 끊겼어요' }),
   'err-credit': fail('INSUFFICIENT_CREDITS'),
   'err-other': [s(300, agent('좋아요. 공고와 이력서를 비교해서 맞춤 초안을 만들어 볼게요.')), s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개')), ...fail('UNKNOWN')],
   'ext-done': ext({}),
-  'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'Push 프로필 만들기'], text: '다 됐어요! 이력서를 고쳤어요.', fileName: '김서준_백엔드_이력서_수정본.pdf', job: false }),
+  'ext-nojob': ext({ todo: ['이력서 읽기', '고칠 점 찾기', '경력 섹션 고치기', 'Push 프로필 만들기'], fileName: '김서준_백엔드_이력서_수정본.pdf' }),
   'ext-nosave': ext({ saved: false }),
-  'ext-ok': ext({ josa: '으로', bare: true, asList: true }),
-  'ext-fail': ext({ josa: '으로', saved: false, bare: true }),
+  'ext-ok': ext({ bare: true }),
+  'ext-fail': ext({ saved: false, bare: true }),
   // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
   'ph0-input': ph0Input,
@@ -627,21 +433,21 @@ export const TOKENS: Record<string, Step[]> = {
   'ph0-start': ph0Start,
   'feedback only': feedbackOnly,
   // ChatDoneProfile: the finished profile run without the 확인했어요 gate, so one elapsed line and no answer bubbles.
-  'profile-done': [...profileCard('6.9 → 8.1', '로'), done],
+  'profile-done': [...profileCard('6.9 → 8.1'), done],
   // Jumps for the boards that draw one phase under its own user line, without the earlier phases above it (Android types the alias).
   '네, 맞춰서 고쳐 주세요': ph2,
   ph2,
   '네, 써 주세요': ph3Writing,
   'ph3-write': ph3Writing,
-  '클래식으로 만들기': [...ph5, ...finish('6.9 → 8.1', '으로')],
-  ph5: [...ph5, ...finish('6.9 → 8.1', '으로')],
+  '클래식으로 만들기': [...ph5, ...finish('6.9 → 8.1')],
+  ph5: [...ph5, ...finish('6.9 → 8.1')],
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
   // ChatPh2XBlueprints: the blueprints alone under the user's line, without the failed check before them.
   'ph2x-blueprints': ph2xBlueprints,
   '기획서 보여 줘': ph2xBlueprints,
   // ChatPh6Result: the closing line with its list and the profile link, with no task lines above it.
-  'profile-result': [...profileDone(300, '6.9 → 8.1', '으로', undefined, true), done],
+  'profile-result': [...profileDone(300, '6.9 → 8.1'), done],
   'ph1-free': ph1Plan('FREE'),
   'ph1-ultra': ph1Plan('ULTRA'),
   // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.

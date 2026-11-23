@@ -121,7 +121,8 @@ export const listenMockLinks = () =>
       const reload = /^bot:(.+):reload$/.exec(s)
       if (reload) chat().forget(fixtureOf(reload[1]!)?.bot.id ?? reload[1]!)
       const from = /^bot:(.+):from:(user|notice|todo|agentText|fit)(?::(\d+|last))?$/.exec(s)
-      if (from) chat().showFrom(fixtureOf(from[1]!)?.bot.id ?? from[1]!, from[2] as 'user' | 'notice' | 'todo' | 'agentText' | 'fit', from[3] === 'last' ? 'last' : Number(from[3] ?? 1))
+      // A to-do list and a fit are Bot cards: the thread starts from its nth surface.
+      if (from) chat().showFrom(fixtureOf(from[1]!)?.bot.id ?? from[1]!, from[2] === 'todo' || from[2] === 'fit' ? 'surface' : (from[2] as 'user' | 'notice' | 'agentText'), from[3] === 'last' ? 'last' : Number(from[3] ?? 1))
       const late = lateSpec(s)
       if (late) setTimeout(() => lateAnswer(late.bot), late.delayMs)
       const seeded = /^bot:(.+):(thread|done|resume|sent)$/.exec(s)

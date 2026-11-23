@@ -12,23 +12,11 @@ export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
 
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
-export const CHOICE_QUESTION = '어떻게 할까요?'
-export const MULTI_PICK_SUBMIT = '이대로 진행'
-export const HINTLESS_GATES = ['validate_cap']
 
 /** The in-progress phrase while the cancel request is out (ChatBotStatusStopped, rule 29: a status is the step under way, the result is a bubble). */
 export const STOPPING_TEXT = '중지하는 중'
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
-export const FIT_ROWS = [
-  { key: 'techStack', label: '기술 스택' },
-  { key: 'experienceLink', label: '경험 연관성' },
-  { key: 'careerLevel', label: '경력 수준' },
-  { key: 'keyword', label: '키워드' },
-  { key: 'domain', label: '도메인' },
-] as const
-/** The FREE lock under the fit sentence (ChatPh1FitFree). */
-export const FIT_LOCKED = '항목별 점수는 PRO에서 볼 수 있어요 ›'
 
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 // push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
@@ -236,3 +224,11 @@ export const READ_OFF_CODE = 'FILES_READ_OFF'
 export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
 export const READ_OFF_ATTACH = '서류 첨부'
 export const READ_OFF_SETTINGS = '설정 열기'
+
+/** What a result's 지원하기 button sends: the Bot applies to the posting. */
+export const applyText = (company?: string) => (company ? `${company}에 바로 지원해 줘` : '바로 지원해 줘')
+/** What 다시 저장하기 sends: the bot saves the file it just made. */
+export const SAVE_RETRY_TEXT = '내 서류에 저장해 줘'
+
+/** The way out of an edit: the review page's button and the profile line's link. */
+export const UNDO_LABEL = '되돌리기'
