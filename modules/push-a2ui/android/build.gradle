@@ -1,0 +1,45 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:${kotlinVersion}")
+  }
+}
+
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+
+group = 'expo.modules.pusha2ui'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.pusha2ui"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+  buildFeatures {
+    compose true
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  implementation 'com.facebook.react:react-android'
+  // Pulls Compose 1.13.0-alpha03 into the app; needs compileSdk 37.1 and AGP 9.1+.
+  implementation 'androidx.compose.material3:material3-a2ui:1.0.0-alpha02'
+  implementation 'androidx.a2ui.compose:compose-ui:1.0.0-alpha02'
+  // material3-a2ui only has material3 on its runtime classpath; same version as @expo/ui.
+  implementation 'androidx.compose.material3:material3:1.5.0-beta01'
+  if (findProject(':expo-ui') != null) {
+    implementation project(':expo-ui')
+  } else {
+    implementation 'expo.modules.ui:expo.modules.ui:+'
+  }
+}
