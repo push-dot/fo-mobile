@@ -6,9 +6,9 @@ import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
 import { AWAITING_TEXT } from '../features/chat/constants'
 import { choiceIds, fixtureFrame, withSurfaceId } from './a2ui-fixtures'
-import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail } from './bot-scripts/runs'
+import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_NAME, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail } from './bot-scripts/runs'
 import { PROFILE_REVIEW_HUNKS } from './bot-scripts/review-doc'
-import { editSurface, surface, todoSurface } from './bot-scripts/surfaces'
+import { editSurface, profileSurface, surface, todoSurface } from './bot-scripts/surfaces'
 import { recordRun } from './bots'
 import { botProfileChange } from './me'
 import { mock, page } from './server'
@@ -285,7 +285,7 @@ const storedTurns: Record<string, ConversationTurn['events']> = {
     // Expired unanswered: the server replays it closed with nothing picked.
     stored(fixtureFrame('choice-single', 'ph3-review', { open: false, picked: [] }), 2),
   ],
-  'c-career': [stored(doneTodo('career', PROFILE_TODO), 1), stored(surface('result-profile', 'career-result'), 2)],
+  'c-career': [stored(doneTodo('career', PROFILE_TODO), 1), stored(profileSurface('career-result', PROFILE_NAME, 'd1'), 2)],
 }
 
 /**

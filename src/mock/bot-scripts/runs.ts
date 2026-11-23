@@ -1,14 +1,13 @@
 // Scripted runs of the chat mock, written as the frames push-be streams (StreamEvent of @push/api-client). Every Bot card is
 // an a2ui frame built from the golden fixtures (surfaces.ts).
 // The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
-// Converted from the reducer-event scripts by scripts/mock-wire-frames.cjs. Edit the frames here from now on.
 import type { StreamEvent } from '@push/api-client'
 import { GATED_STEP } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import type { Step } from '../../features/chat/types'
 import { DRAFT_V1_MD } from './cards'
 import { PROFILE_REVIEW_COUNTS, PROFILE_REVIEW_HUNKS } from './review-doc'
-import { choiceSurface, confirmSurface, editSurface, pageReadSurface, surface, todoSurface } from './surfaces'
+import { choiceSurface, confirmSurface, editSurface, pageReadSurface, profileSurface, surface, todoSurface } from './surfaces'
 
 type Frame = Step['frame']
 type Tool = Extract<StreamEvent, { type: 'tool' }>
@@ -83,8 +82,9 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
 // What the mapper makes of the server's result frame: the task line, the summary, then the card.
 // The done boards draw the finished task line above the to-do card, so it comes first when the card is new to the thread.
 const TASK_RESULT = '반영했어요 · 2줄 추가, 1줄 삭제'
-// The saved profile (fixture result-profile). The script's score and wording live in the fixture's own summary.
-const profileDone = (wait: number, score: string): Step[] => [s(wait + 200, surface('result-profile', `result-profile-${score}`))]
+// The saved profile (fixture result-profile) of the script's person, opening their Push 프로필 (d1).
+export const PROFILE_NAME = '김서준 · 백엔드 엔지니어'
+const profileDone = (wait: number, score: string): Step[] => [s(wait + 200, profileSurface(`result-profile-${score}`, PROFILE_NAME, 'd1'))]
 const profileCard = (score: string): Step[] => [
   s(400, tool('task', '프로필 수정', 'Push 프로필 · 경력', 'ok', TASK_RESULT)),
   s(200, todo('todo', PROFILE_TODO, PROFILE_TODO.length)),

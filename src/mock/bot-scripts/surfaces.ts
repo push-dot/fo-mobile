@@ -20,6 +20,9 @@ const withoutChild = (frame: A2uiFrame, child: string) =>
 /** A fixture as it is, under the script's surface id. */
 export const surface = (name: FixtureName, id: string) => fixtureFrame(name, id)
 
+/** The saved Push 프로필 (fixture result-profile) under the script's person, opening the mock's profile document. */
+export const profileSurface = (id: string, name: string, documentId: string) => setProps(fixtureFrame('result-profile', id), 'document', { name, documentId })
+
 /** The to-do list (fixture todo) with the script's steps: done before `done`, running at `done` (and at `added`), then waiting. */
 export const todoSurface = (id: string, labels: string[], done: number, added = -1) =>
   fixtureFrame('todo', `todo:${id}`, {

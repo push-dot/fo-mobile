@@ -42,7 +42,11 @@ describe('scripted runs (mock)', () => {
   it('tailor: works, asks, then finishes on approval', async () => {
     let s = play(emptyChat, await run({ conversationId: 't1', text: '모아페이 공고에 맞춰 이력서 고쳐 주세요' }))
     expect(s.waiting).toBe('tailor-apply')
-    expect(componentOf(waitingCard(s)!, 'PushDiff')).toBeTruthy()
+    expect(componentOf(waitingCard(s)!, 'PushDiff')).toMatchObject({
+      title: '6줄을 더하고 4줄을 뺐어요',
+      documentId: 'd1',
+      lines: expect.arrayContaining([{ sign: '+', text: '결제 승인 API 재설계, p95 320ms → 140ms' }, { sign: '-', text: '결제 승인 API와 정산 배치를 맡고 있어요.' }]),
+    })
     s = await reply(s, 't1', 'tailor-apply', 'apply')
     expect(dataModel(surfaces(s).find((i) => i.id === 'tailor-apply')!)).toMatchObject({ open: false, picked: ['apply'] })
     expect(todoLabels(s)).toEqual([
@@ -52,7 +56,14 @@ describe('scripted runs (mock)', () => {
       '경력 섹션 고치기',
       '프로필에 저장',
     ])
-    expect(surfaces(s).find((i) => i.kind === 'result')).toBeTruthy()
+    expect(componentOf(surfaces(s).find((i) => i.kind === 'result')!, 'PushDocument')).toMatchObject({
+      status: 'done',
+      title: 'Push 프로필에 저장했어요',
+      name: '김서준 · 백엔드 엔지니어',
+      meta: 'Push 프로필 · 방금 수정',
+      documentId: 'd1',
+      actions: [{ id: 'view', label: '프로필 보기' }],
+    })
     expect(s.waiting).toBeNull()
     expect(s.items.some((i) => i.type === 'worked')).toBe(true)
     expect(JSON.stringify(s.items)).not.toContain('PDF로')
@@ -88,7 +99,10 @@ describe('scripted runs (mock)', () => {
     expect(s.items.filter((i) => i.type === 'agentText').at(-1)).toMatchObject({
       text: '이 공고 기준으로 고칠 점이에요.',
     })
-    expect(surfaces(s).find((i) => i.kind === 'plan')).toBeTruthy()
+    expect(componentOf(surfaces(s).find((i) => i.kind === 'plan')!, 'PushPlan')).toMatchObject({
+      title: '고칠 점',
+      rows: [expect.objectContaining({ tag: '성과', label: '성과가 숫자로 없어요' }), expect.objectContaining({ tag: '도메인', label: '도메인 경험이 약해요' })],
+    })
     expect(question(s)).toBe('피드백을 반영해서 수정할까요?')
     expect(choiceLabels(s)).toEqual(['수정하기', '그대로 둘게요', '그만하기'])
     s = await reply(s, 'fit1', 'feedback', '1')
