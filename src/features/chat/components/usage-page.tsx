@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
-import { Alert, View } from 'react-native'
+import { Alert, Animated, View } from 'react-native'
 import { radius, spacing, useColors } from '../../../theme'
-import { Button, GlassButton, SettingsGroup, Text } from '@/shared/components'
+import { Button, GlassButton, SettingsGroup, Text, useGrow } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { useChatAccount } from '../api/hooks'
 import { USAGE_BY_BOT_TITLE, USAGE_TITLE } from '../constants'
@@ -28,6 +28,8 @@ export const UsagePage = () => {
   const percent = usagePercent(account?.credits)
   const refill = monthDay(account?.creditsRefillAt)
   const bots = account?.usageByBot ?? []
+  // ChatAccountUsage grows the fill from the left, .15s after the page opens.
+  const grow = useGrow(150)
   const buy = () => {
     if (purchase.pending) return
     if (open) purchase.buyCredits()
@@ -43,7 +45,7 @@ export const UsagePage = () => {
               <Text v="c1" color="t3">{`${account?.plan ?? ''} · 이번 달`}</Text>
             </View>
             <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: percent }} style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}>
-              <View style={{ width: `${percent}%`, height: 6, borderRadius: 3, backgroundColor: c.ac }} />
+              <Animated.View style={{ width: grow.interpolate({ inputRange: [0, 1], outputRange: ['0%', `${percent}%`] }), height: 6, borderRadius: 3, backgroundColor: c.ac }} />
             </View>
           </View>
           {bots.length ? (

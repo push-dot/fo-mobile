@@ -149,7 +149,7 @@ const BotHomeView = ({
       chrome={chrome}
       state={botRow(push, local[push.id], now).mascot}
       unread={botRow(push, local[push.id], now).unreadDot}
-      motion={rowMotion(botRow(push, local[push.id], now).mascot, 0, false)}
+      motion={rowMotion(0, false)}
       row={botRow(push, local[push.id], now)}
       actions={menuActions(push, run)}
       onPress={() => openChat(push)}

@@ -82,10 +82,10 @@ describe('dropDeleted', () => {
 })
 
 describe('rowMotion', () => {
-  it('holds a frame while off-screen and staggers bots that are moving', () => {
-    expect(rowMotion('think', 2, true)).toEqual({ mode: 'frame3' })
-    expect(rowMotion('idle', 0, false)).toEqual({ mode: 'still' })
-    expect(rowMotion('work', 3, false)).toEqual({ mode: 'animate', delayMs: 480 })
+  it('holds a frame while off-screen and staggers every bot, idle included', () => {
+    expect(rowMotion(2, true)).toEqual({ mode: 'frame3' })
+    expect(rowMotion(0, false)).toEqual({ mode: 'animate', delayMs: 0 })
+    expect(rowMotion(3, false)).toEqual({ mode: 'animate', delayMs: 480 })
   })
 })
 

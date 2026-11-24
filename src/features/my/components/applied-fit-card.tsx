@@ -1,17 +1,12 @@
-import { useEffect, useState } from 'react'
-import { Animated, Easing, Pressable, View } from 'react-native'
-import { Icon, Text, useReduceMotion } from '@/shared/components'
+import { Animated, Pressable, View } from 'react-native'
+import { Icon, Text, useGrow } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 import { APPLIED_FIT_LABEL, type AppliedFit } from '../utils'
 import FitRing from './fit-ring'
 
 const Bar = ({ pct, low, delay }: { pct: number; low: boolean; delay: number }) => {
   const c = useColors()
-  const reduce = useReduceMotion()
-  const grow = useState(() => new Animated.Value(reduce ? 1 : 0))[0]
-  useEffect(() => {
-    Animated.timing(grow, { toValue: 1, duration: reduce ? 0 : 900, delay, easing: Easing.bezier(0.2, 0.8, 0.2, 1), useNativeDriver: false }).start()
-  }, [grow, reduce, delay])
+  const grow = useGrow(delay)
   return (
     <View style={{ flex: 1, height: 8, borderRadius: 4, backgroundColor: c.fill2, overflow: 'hidden' }}>
       <Animated.View

@@ -4,7 +4,9 @@ import { useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   KeyboardAvoidingView,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -25,6 +27,9 @@ import {
   careerDeleteBody,
   careerDeleteCopy,
   careerPeriod,
+  dropIndex,
+  indexAfterMove,
+  moveItem,
   FieldLabel,
   AVATAR_IMAGE_OPTIONS,
   skillOrderHint,
@@ -61,7 +66,8 @@ import {
 } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
-import { fontFor, hitSlopTo, radius, spacing, type, useColors } from '@/theme'
+import { toBoxShadow } from '@/shared/utility'
+import { fontFor, hitSlopTo, radius, spacing, type, useColors, useShadow } from '@/theme'
 
 /** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
 const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
@@ -425,16 +431,38 @@ const EditCareer = ({ p }: { p: Profile }) => {
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
-  // shortcut: no drag library installed, so the grip moves an item up one place; swap for drag-to-reorder if one is added.
-  const moveUp = (i: number) => {
-    if (i === 0) return
-    setItems((xs) => {
-      const next = [...xs]
-      ;[next[i - 1], next[i]] = [next[i]!, next[i - 1]!]
-      return next
-    })
-    setOpen((o) => (o === i ? i - 1 : o === i - 1 ? i : o))
+  // EditCareer: the grip drags its card (끌어서 순서 바꾸기); the card follows the finger and lands where it is dropped.
+  const shadow = useShadow()
+  const [heights, setHeights] = useState<Record<string, number>>({})
+  const dragY = useState(() => new Animated.Value(0))[0]
+  const [dragging, setDragging] = useState<number | null>(null)
+  const move = (from: number, to: number) => {
+    if (from === to || to < 0 || to >= items.length) return
+    setItems((xs) => moveItem(xs, from, to))
+    setOpen((o) => indexAfterMove(o, from, to))
   }
+  const endDrag = () => {
+    dragY.setValue(0)
+    setDragging(null)
+  }
+  const grip = (i: number) =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: () => {
+        dragY.setValue(0)
+        setDragging(i)
+      },
+      onPanResponderMove: (_, g) => dragY.setValue(g.dy),
+      onPanResponderRelease: (_, g) => {
+        // A card hidden behind the undo toast takes no room, so a drag passes it at once.
+        const room = items.map((x) => (x.key === gone ? -FORM.gap : (heights[x.key] ?? 0)))
+        move(i, dropIndex(room, i, g.dy, FORM.gap))
+        endDrag()
+      },
+      onPanResponderTerminate: endDrag,
+    }).panHandlers
 
   return (
     <>
@@ -446,6 +474,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
       <ScrollView
         contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
+        scrollEnabled={dragging === null}
       >
         {items.map((it, i) => {
           if (it.key === gone) return null
@@ -455,17 +484,32 @@ const EditCareer = ({ p }: { p: Profile }) => {
           const end = it.current ? null : parseYm(it.end)
           const period = it.saved?.period ?? (start && (it.current || end) ? careerPeriod({ startedOn: start, endedOn: end }) : null)
           return (
-            <View key={it.key} style={{ padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] }}>
+            <Animated.View
+              key={it.key}
+              onLayout={(e) => {
+                const h = e.nativeEvent.layout.height
+                setHeights((hs) => (hs[it.key] === h ? hs : { ...hs, [it.key]: h }))
+              }}
+              style={[
+                { padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] },
+                dragging === i ? { zIndex: 1, transform: [{ translateY: dragY }, { scale: 1.02 }], ...(Platform.OS === 'ios' ? shadow.pop : { boxShadow: toBoxShadow(shadow.pop) }) } : null,
+              ]}
+            >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="위로 옮기기"
-                  disabled={i === 0}
-                  onPress={() => moveUp(i)}
+                <View
+                  {...grip(i)}
+                  accessible
+                  accessibilityRole="adjustable"
+                  accessibilityLabel="끌어서 순서 바꾸기"
+                  accessibilityActions={[
+                    { name: 'decrement', label: '위로 옮기기' },
+                    { name: 'increment', label: '아래로 옮기기' },
+                  ]}
+                  onAccessibilityAction={(e) => move(i, e.nativeEvent.actionName === 'decrement' ? i - 1 : i + 1)}
                   hitSlop={spacing[3]}
                 >
                   <Icon name="drag-handle" size={18} color="t3" />
-                </Pressable>
+                </View>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityState={{ expanded }}
@@ -582,7 +626,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   </Pressable>
                 </View>
               ) : null}
-            </View>
+            </Animated.View>
           )
         })}
         <Button

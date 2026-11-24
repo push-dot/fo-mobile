@@ -18,7 +18,7 @@ const BotHomePreview = ({ row }: { row: BotRow }) => {
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Mascot size={64} state={row.mascot} color={row.color} unread={row.unreadDot} />
+        <Mascot size={64} state={row.mascot} color={row.color} unread={row.unreadDot} motion={{ mode: 'animate' }} />
         <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text v="h3" numberOfLines={2}>
             {row.name}

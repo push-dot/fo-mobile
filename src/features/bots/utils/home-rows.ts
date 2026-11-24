@@ -48,11 +48,8 @@ export const dropDeleted = <T extends { id: string }>(rows: readonly T[], id: st
   return rows.filter((row) => row.id !== id)
 }
 
-export const rowMotion = (mascot: MascotState, index: number, held: boolean): HomeMotion => {
-  if (held) return { mode: 'frame3' }
-  if (mascot === 'idle') return { mode: 'still' }
-  return { mode: 'animate', delayMs: index * STAGGER_MS }
-}
+// Every state moves, 대기 too (it blinks and breathes, as AgentHome draws it).
+export const rowMotion = (index: number, held: boolean): HomeMotion => (held ? { mode: 'frame3' } : { mode: 'animate', delayMs: index * STAGGER_MS })
 
 export const searchSections = (botCount: number, messageCount: number) =>
   [botCount > 0 ? `Bot ${botCount}` : '', messageCount > 0 ? `대화 ${messageCount}` : ''].filter((title) => title !== '')

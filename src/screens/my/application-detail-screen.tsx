@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { ScrollView, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
 import { botChatPath, openPostingBot } from '@/features/bots'
@@ -22,8 +22,8 @@ import {
   useMyApplications,
   usePostingDetail,
 } from '@/features/my'
-import { CtaBar, Badge, Button, GlassButton, Text, TopBar } from '@/shared/components'
-import { shareMessage } from '@/shared/infrastructure'
+import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { openBrowser, shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
 
 
@@ -95,6 +95,15 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               <PostingSection title="자격 요건" items={p.requirements} />
               <PostingSection title="우대 사항" items={p.preferred ?? []} />
               <PostingSection title="근무 조건" items={workConditionLines(p.workConditions)} />
+              {p.sourceUrl ? (
+                <Pressable accessibilityRole="link" onPress={() => p.sourceUrl && void openBrowser(p.sourceUrl)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                  <Icon name="ext" size={14} color="t3" />
+                  <Text v="c1" weight="600" color="t3">
+                    원문 보기 · {item.company} 채용 사이트
+                  </Text>
+                  <Icon name="chev" size={14} color="t3" />
+                </Pressable>
+              ) : null}
             </>
           ) : null}
         </ScrollView>
