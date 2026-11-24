@@ -31,10 +31,3 @@ describe('profile undo from the thread data', () => {
     expect(s.items.filter((x) => x.type === 'agentText').map((x) => (x.type === 'agentText' ? x.text : ''))).toEqual(['프로필을 고쳤어요.', '바꿨어요.'])
   })
 })
-
-describe('result gate without a question', () => {
-  it('draws nothing when the server sends the profile result gate with auto set', () => {
-    const present = { type: 'choice' as const, id: 'present', gate: 'present', auto: true, recommended: 'done', options: [{ id: 'done', label: '확인했어요' }] }
-    expect(mapEvent(present)).toEqual([])
-  })
-})

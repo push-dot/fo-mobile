@@ -126,9 +126,9 @@ describe('isDrawn', () => {
 
 describe('threadRows', () => {
   const user: ChatItem = { type: 'user', id: 'u', text: '네, 써 주세요' }
-  const todo: ChatItem = { type: 'todo', id: 'todo', items: [{ label: '요약', state: 'now' }] }
+  const todo: ChatItem = { type: 'surface', id: 'todo', kind: 'todo', messages: [] }
   const tool: ChatItem = { type: 'tool', id: 'tool', action: '이력서 쓰기', state: 'run' }
-  const paper: ChatItem = { type: 'paper', id: 'p', label: '이력서 초안 v1', heading: '김서준', lines: [] }
+  const paper: ChatItem = { type: 'surface', id: 'p', kind: 'paper', messages: [] }
   const ids = (rows: { id: string }[]) => rows.map((r) => r.id)
 
   it('puts the running line under the draft being written (ChatPh3)', () => {
@@ -147,12 +147,5 @@ describe('threadRows', () => {
 
   it('draws a finished draft as it is, with no line', () => {
     expect(ids(threadRows([user, todo, paper], false))).toEqual(['u', 'todo', 'p'])
-  })
-
-  it('lets a diff that follows a bot line ride on that line\'s bubble (ChatApprove)', () => {
-    const say: ChatItem = { type: 'agentText', id: 'a', text: '경력 섹션을 공고에 맞게 고쳤어요.' }
-    const diff: ChatItem = { type: 'diff', id: 'd', lines: [{ n: 13, sign: '+', text: '재설계' }] }
-    expect(ids(threadRows([user, diff], false))).toEqual(['u', 'd'])
-    expect(ids(threadRows([user, say, diff], false))).toEqual(['u', 'a'])
   })
 })

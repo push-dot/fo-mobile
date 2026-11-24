@@ -7,7 +7,7 @@ const files = [
   'features/chat/components/entries/item.tsx',
   'features/chat/components/composer-area.tsx',
   'features/chat/components/quick-start-sheet.tsx',
-  'features/chat/components/use-gate-modal.ts',
+  'features/chat/components/use-material-change.ts',
   'features/my/components/docs-tab.tsx',
   'features/my/components/index.ts',
   'features/jobs/components/doc-row.tsx',

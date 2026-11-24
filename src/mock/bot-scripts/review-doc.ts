@@ -1,4 +1,4 @@
-import type { StreamHunk } from '@push/api-client'
+type StreamHunk = { line: number; sign: '' | '+' | '-'; text: string }
 
 const keep = (text: string): Omit<StreamHunk, 'line'> => ({ sign: '', text })
 const drop = (text: string): Omit<StreamHunk, 'line'> => ({ sign: '-', text })

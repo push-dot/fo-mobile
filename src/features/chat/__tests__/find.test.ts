@@ -90,7 +90,7 @@ describe('fromFirst', () => {
   })
 
   it('keeps the whole thread when no line has the type', () => {
-    expect(fromFirst([user('m1'), user('m2')], 'todo').map((i) => i.id)).toEqual(['m1', 'm2'])
+    expect(fromFirst([user('m1'), user('m2')], 'surface').map((i) => i.id)).toEqual(['m1', 'm2'])
   })
 })
 

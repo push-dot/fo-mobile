@@ -36,8 +36,9 @@ describe('company-bot status board tokens', () => {
   })
 
   it('stops at a card that waits for an answer', () => {
-    expect(frames('st-help').map((f) => f.type)).toEqual(['choice', 'done'])
-    expect(frames('st-approve')[0]).toMatchObject({ type: 'approval', kind: 'TOOL_ACTION', title: '채용 페이지 열기', summary: 'careers.moapay.co.kr를 열어도 될까요?' })
+    expect(frames('st-help').map((f) => f.type)).toEqual(['a2ui', 'done'])
+    expect(frames('st-approve')[0]).toMatchObject({ type: 'a2ui', kind: 'approval', surfaceId: 'st-approve' })
+    expect(JSON.stringify(frames('st-approve')[0])).toContain('careers.moapay.co.kr를 열어도 될까요?')
   })
 
   it('answers the Android alias in its capitalized form', () => {
@@ -60,8 +61,9 @@ describe('bot:<id>:resume', () => {
     const page = await api.bots.transcript('b-moa')
     expect(page.page.nextCursor).not.toBeNull()
     expect((await api.bots.transcript('b-moa', { cursor: page.page.nextCursor! })).data).toEqual([])
-    const offer = page.data[0]!.events.find((e) => e.type === 'choice')
-    expect(offer).toMatchObject({ options: [{ label: '이어서 작성하기' }, { label: '새로 시작하기' }], recommended: '0' })
+    const offer = page.data[0]!.events.find((e) => e.type === 'a2ui' && e.kind === 'choice')
+    expect(JSON.stringify(offer)).toContain('"label":"이어서 작성하기","recommended":true')
+    expect(JSON.stringify(offer)).toContain('"open":true')
     emptyBot('b-moa')
     expect((await api.bots.transcript('b-moa')).page.nextCursor).toBeNull()
   })

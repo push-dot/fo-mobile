@@ -1,60 +1,8 @@
-import type { BotContract, ConversationTurn, Message, StreamEvent } from '@push/api-client'
+import type { BotContract, StreamEvent } from '@push/api-client'
 import type { ChatEvent, ChatState } from '../types'
 import { applyEvent, emptyChat } from './reducer'
 import { mapEvent } from './stream'
-import { approvalFromSections, sectionLabel, sectionSel } from './stream-v3'
-
-type Card = Extract<StreamEvent, { type: 'approval' | 'choice' }>
-
-const labelsOf = (card: Card | undefined, ids: string[]) => {
-  if (card?.type === 'choice' && card.sections?.length && ids.includes('submit')) {
-    const approval = approvalFromSections(card)
-    return sectionLabel(approval, sectionSel(approval, ids))
-  }
-  return ids.flatMap((id) => card?.options.find((o) => o.id === id)?.label ?? []).join(', ')
-}
-
-const answerIds = (a: NonNullable<ConversationTurn['answer']>) => (a.optionIds?.length ? a.optionIds : a.optionId ? [a.optionId] : [])
-
-/** Rebuilds a reopened conversation from GET .../turns (newest first) and its messages. */
-export const restoreTurns = (turns: ConversationTurn[], messages: Message[]): ChatState => {
-  const text = new Map(messages.map((m) => [m.id, m.text]))
-  const cards = new Map<string, Card>()
-  let s = emptyChat
-  const put = (e: ChatEvent) => {
-    s = applyEvent(s, e)
-  }
-  for (const t of [...turns].reverse()) {
-    // Only the newest turn can still be waiting on a card.
-    s = { ...s, approval: null, awaiting: null }
-    const said = (t.userMessageId && text.get(t.userMessageId)) || (t.answer ? labelsOf(cards.get(t.answer.approvalId), answerIds(t.answer)) : '')
-    if (said) put({ type: 'user', id: t.userMessageId ?? `ans-${t.jobId}`, text: said })
-    let spoke = false
-    for (const ev of t.events) {
-      if (ev.type === 'approval' || ev.type === 'choice') {
-        cards.set(ev.id, ev)
-        const answered = ev.resolution && ev.resolution.status !== 'PENDING'
-        if (answered && !(ev.type === 'choice' && ev.auto)) {
-          const question = ev.resolution?.status === 'EXPIRED' ? mapEvent(ev).find((e) => e.type === 'approval') : undefined
-          if (question?.type === 'approval') put({ type: 'stale', id: `stale-${ev.id}`, text: question.approval.question })
-          continue
-        }
-      }
-      if (ev.type === 'token') {
-        spoke = true
-        put({ type: 'agentText', id: `${t.jobId}-${ev.seq ?? s.items.length}`, text: ev.text })
-        continue
-      }
-      for (const e of mapEvent(ev)) {
-        put(e)
-        if (e.type === 'approval') s = { ...s, awaiting: ev.type === 'choice' ? 'choice' : 'approval' }
-      }
-    }
-    const reply = !spoke && t.assistantMessageId ? text.get(t.assistantMessageId) : undefined
-    if (reply) put({ type: 'agentText', id: t.assistantMessageId!, text: reply })
-  }
-  return { ...s, working: null, runStartedAt: null }
-}
+import { pausedOn, runItems } from './surface'
 
 export const openPieceId = (turns: BotContract.Turn[], live?: { turnId: string; lastSeq: number } | null) => {
   if (!live) return undefined
@@ -76,17 +24,22 @@ export const openPieceId = (turns: BotContract.Turn[], live?: { turnId: string; 
   return open ? piece : undefined
 }
 
-/** A card the server closed unanswered: it draws as the bot's earlier question, not as an open card. */
-const lapsed = (ev: Card) => ev.resolution?.status === 'EXPIRED'
-
+/**
+ * Rebuilds a reopened chat from GET /bots/:id/transcript (newest turn first). A card replays as its surface with the answer
+ * already in the data model (`/open` false, `/picked`), so an answered surface opens answered. Only the newest turn can still
+ * wait, on the surface `pausedOn` picks from its own items and its waiting status.
+ */
 export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: string; lastSeq: number } | null): ChatState => {
   let s = emptyChat
   const put = (e: ChatEvent) => {
     s = applyEvent(s, e)
   }
   const ordered = [...turns].reverse()
-  for (const [i, t] of ordered.entries()) {
-    s = { ...s, approval: null, awaiting: null }
+  let runAfter: string | null = null
+  let named: string | null = null
+  for (const t of ordered) {
+    runAfter = s.items.at(-1)?.id ?? null
+    named = null
     if (t.user?.text) put({ type: 'user', id: t.user.messageId, text: t.user.text })
     let piece: string | null = null
     const events = t.id === live?.turnId ? t.events.filter((ev) => ev.seq <= live.lastSeq) : t.events
@@ -98,21 +51,16 @@ export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: stri
         } else put({ type: 'token', text: ev.text })
         continue
       }
-      if (ev.type === 'status') continue
-      piece = null
-      const card = ev.type === 'approval' || ev.type === 'choice' ? (ev as Card) : undefined
-      // An earlier turn's card that ran out is the bot's question as a bubble, not an open panel (ChatResume); only the newest turn can still be waiting.
-      if (card && i < ordered.length - 1 && lapsed(card)) {
-        const question = mapEvent(card).find((e) => e.type === 'approval')
-        if (question?.type === 'approval') put({ type: 'stale', id: `stale-${card.id}`, text: question.approval.question })
+      if (ev.type === 'status') {
+        for (const e of mapEvent(ev as StreamEvent, t.id)) if (e.type === 'wait') named = e.surfaceId
         continue
       }
-      for (const e of mapEvent(ev as StreamEvent, t.id)) {
-        // A reopened chat has no run on screen, so a card that was asked in an earlier visit draws no live waiting line (ChatResume); a reattached run does.
-        put(e.type === 'approval' && ev.type === 'choice' && t.id !== live?.turnId ? { ...e, approval: { ...e.approval, openedAt: undefined } } : e)
-      }
+      piece = null
+      for (const e of mapEvent(ev as StreamEvent, t.id)) put(e)
     }
     if (t.assistant?.sources.length) put({ type: 'sources', sources: t.assistant.sources })
   }
-  return { ...s, working: null, runStartedAt: null }
+  const newest = turns[0]
+  const waiting = newest && newest.status !== 'FAILED' && newest.status !== 'CANCELLED' ? pausedOn(runItems(s.items, runAfter), named) : null
+  return { ...s, working: null, runStartedAt: null, waiting, awaiting: null, runAfter }
 }

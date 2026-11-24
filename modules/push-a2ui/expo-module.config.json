@@ -1,0 +1,10 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["PushA2uiModule"],
+    "podspecPath": "PushA2ui.podspec"
+  },
+  "android": {
+    "modules": ["expo.modules.pusha2ui.PushA2uiModule"]
+  }
+}

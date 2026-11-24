@@ -1,6 +1,7 @@
 import { ApiError, createApi, createBotApi, createClient, createRefresher } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
+import { A2UI_VERSION } from './a2ui-version'
 import { API_BASE_URL } from './config'
 import { isRefreshAuthFailure } from './refresh-auth-failure'
 import { useSession } from './session-store'
@@ -18,6 +19,7 @@ const clientConfig = {
   getToken: () => useSession.getState().session?.accessToken,
   fetch: clientFetch,
   uuid: () => Crypto.randomUUID(),
+  a2uiVersion: A2UI_VERSION,
 }
 
 const refreshApi = createApi(createClient(clientConfig))

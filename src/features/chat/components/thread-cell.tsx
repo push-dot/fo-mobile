@@ -7,7 +7,7 @@ import { RowMotion } from './motion'
 import { StatusRow } from './status-line'
 
 type ItemProps = Parameters<typeof Item>[0]
-type Callbacks = Pick<ItemProps, 'onView' | 'onUsage' | 'onRetry' | 'onReadOff'>
+type Callbacks = Pick<ItemProps, 'onLocal' | 'onReadOff'>
 
 const noStop = () => undefined
 
@@ -18,9 +18,9 @@ const RunningLine = ({ chatId, color }: { chatId: string; color: MascotColor }) 
 }
 
 /** The last bot line grows token by token: it alone follows the store. */
-const StreamingItem = ({ chatId, row, ...rest }: { chatId: string; row: ChatItem; writing: boolean } & Callbacks) => {
+const StreamingItem = ({ chatId, row, ...rest }: { chatId: string; row: ChatItem } & Callbacks) => {
   const live = useLiveItem(chatId, row.id) ?? row
-  return <Item item={live} {...rest} />
+  return <Item chatId={chatId} item={live} {...rest} />
 }
 
 type Props = Callbacks & {
@@ -29,22 +29,20 @@ type Props = Callbacks & {
   color: MascotColor
   /** Lines that arrive after the room opened pop in (RowMotion). */
   live: boolean
-  /** The line right above the running line: the one being written. */
-  writing: boolean
   /** The newest line of the thread; a bot line there may still be streaming. */
   last: boolean
 }
 
-export const ThreadCell = ({ chatId, row, color, live, writing, last, ...callbacks }: Props) => {
+export const ThreadCell = ({ chatId, row, color, live, last, ...callbacks }: Props) => {
   const motion = { key: `${chatId}/${row.id}`, live }
   return (
     <RowMotion.Provider value={motion}>
       {row.type === 'running' ? (
         <RunningLine chatId={chatId} color={color} />
       ) : last && row.type === 'agentText' ? (
-        <StreamingItem chatId={chatId} row={row} writing={writing} {...callbacks} />
+        <StreamingItem chatId={chatId} row={row} {...callbacks} />
       ) : (
-        <Item item={row} writing={writing} {...callbacks} />
+        <Item chatId={chatId} item={row} {...callbacks} />
       )}
     </RowMotion.Provider>
   )

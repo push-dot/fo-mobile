@@ -1,4 +1,4 @@
-import type { ChatItem, DiffLine } from '../types'
+import type { DiffLine } from '../types'
 
 export type ReviewKind = 'title' | 'headline' | 'section' | 'role' | 'text'
 export type ReviewPart = { text: string; strong?: boolean }
@@ -92,12 +92,3 @@ const removedBefore = (rows: ReviewRow[], i: number) => {
   return removed.join(' ')
 }
 
-/** The changed lines of the edit the bot proposed since the person last spoke. */
-export const latestDiffLines = (items: readonly ChatItem[]): DiffLine[] => {
-  for (const item of [...items].reverse()) {
-    if (item.type === 'user') return []
-    const diff = item.type === 'diff' ? item : item.type === 'agentText' ? item.diff : undefined
-    if (diff) return diff.lines
-  }
-  return []
-}
