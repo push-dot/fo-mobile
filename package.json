@@ -56,6 +56,8 @@
     "start:test": "EXPO_PUBLIC_API_BASE_URL=https://push-be-staging.youngjoon568.workers.dev/api/v1 expo start",
     "ios": "expo run:ios",
     "android": "expo run:android",
+    "eas:build": "EAS_NO_VCS=1 EAS_PROJECT_ROOT=\"$(cd ../.. && pwd)\" eas build",
+    "eas-build-pre-install": "if [ \"$EAS_BUILD_PLATFORM\" = ios ]; then defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES; fi",
     "typecheck": "node scripts/gen-typed-routes.cjs && tsc --noEmit",
     "lint": "expo lint",
     "test": "vitest run --passWithNoTests"

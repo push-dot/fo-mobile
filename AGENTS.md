@@ -44,4 +44,8 @@ Docs: https://docs.expo.dev/eas/index.md
 
 Pick dependency versions in this directory with `npx expo install`. The lockfile and `patches/expo-router@58.0.24.patch` live in `push-fe`, so run `pnpm install` at the `push-fe` root and commit `pnpm-lock.yaml` there.
 
+Start EAS builds with `pnpm eas:build --platform <ios|android> --profile <preview|production>`, never bare `eas build`. This repo is a submodule, so a bare `eas build` uploads only this folder and the build server cannot find the `@push/*` workspace packages or `pnpm-lock.yaml`; the script uploads the `push-fe` root instead.
+
+The `eas-build-pre-install` script skips Xcode's package plug-in validation on the iOS build server only, because nobody can press "Trust & Enable" there for the A2UI Swift package. On your own Mac, open `ios/Push.xcworkspace` once and trust the plug-in.
+
 App CI runs from the push-fe root with `pnpm install --frozen-lockfile`. A dependency change needs `pnpm-lock.yaml` on a push-fe branch, referenced from the app PR body as a single line `push-fe-ref: <branch-or-sha>`.
