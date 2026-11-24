@@ -1,6 +1,6 @@
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
 import { CAREER_STATUSES } from '@push/api-client'
-import { Chip, FilterSheetNav, Text } from '../../../shared/components'
+import { Chip, FilterSheetNav, SheetScroll, Text } from '../../../shared/components'
 import { hitSlopTo, type } from '../../../theme'
 import { EMPTY_SHEET, TENURE_CHIPS, tenureChipOn, toggle, toggleTenureChip, type Explore, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
@@ -9,13 +9,15 @@ type Props = {
   draft: SheetFilters
   sent: number | undefined
   onChange: (sheet: SheetFilters) => void
+  /** Caps the groups at the sheet max (useSheetScrollMax): the head stays put and the groups scroll past it. */
+  scroll: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
 const exploreChip = (draft: SheetFilters, key: Explore, label: string, onChange: (sheet: SheetFilters) => void) => (
   <Chip sheet key={key} label={label} check on={draft.explore === key} onPress={() => onChange({ ...draft, explore: draft.explore === key ? null : key })} />
 )
 
-const HubFilterSheet = ({ draft, sent, onChange }: Props) => {
+const HubFilterSheet = ({ draft, sent, onChange, scroll }: Props) => {
   const ios = Platform.OS === 'ios'
   const reset = () => onChange(EMPTY_SHEET)
   return (
@@ -35,21 +37,23 @@ const HubFilterSheet = ({ draft, sent, onChange }: Props) => {
           </Pressable>
         </View>
       )}
-      <HubFilterGroup title="재직 기간">
-        {TENURE_CHIPS.map((t) => (
-          <Chip sheet key={t.label} label={t.label} check on={tenureChipOn(draft.tenure, t)} onPress={() => onChange({ ...draft, tenure: toggleTenureChip(draft.tenure, t) })} />
-        ))}
-      </HubFilterGroup>
-      <HubFilterGroup title="커리어 상태">
-        {CAREER_STATUSES.map((s) => (
-          <Chip sheet key={s.key} label={s.label} check on={draft.status.includes(s.key)} onPress={() => onChange({ ...draft, status: toggle(draft.status, s.key) })} />
-        ))}
-      </HubFilterGroup>
-      <HubFilterGroup title="탐색">
-        {exploreChip(draft, 'recommended', '추천', onChange)}
-        {exploreChip(draft, 'received', '제안', onChange)}
-        {exploreChip(draft, 'offers', `보낸 제안${sent === undefined ? '' : ` ${sent}`}`, onChange)}
-      </HubFilterGroup>
+      <SheetScroll style={{ maxHeight: scroll.maxHeight }} onLayout={scroll.onLayout} contentContainerStyle={{ gap: ios ? 0 : 14 }}>
+        <HubFilterGroup title="재직 기간">
+          {TENURE_CHIPS.map((t) => (
+            <Chip sheet key={t.label} label={t.label} check on={tenureChipOn(draft.tenure, t)} onPress={() => onChange({ ...draft, tenure: toggleTenureChip(draft.tenure, t) })} />
+          ))}
+        </HubFilterGroup>
+        <HubFilterGroup title="커리어 상태">
+          {CAREER_STATUSES.map((s) => (
+            <Chip sheet key={s.key} label={s.label} check on={draft.status.includes(s.key)} onPress={() => onChange({ ...draft, status: toggle(draft.status, s.key) })} />
+          ))}
+        </HubFilterGroup>
+        <HubFilterGroup title="탐색">
+          {exploreChip(draft, 'recommended', '추천', onChange)}
+          {exploreChip(draft, 'received', '제안', onChange)}
+          {exploreChip(draft, 'offers', `보낸 제안${sent === undefined ? '' : ` ${sent}`}`, onChange)}
+        </HubFilterGroup>
+      </SheetScroll>
     </View>
   )
 }

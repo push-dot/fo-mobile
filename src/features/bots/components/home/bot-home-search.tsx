@@ -103,7 +103,7 @@ const BotHomeSearch = ({
       <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
         <View style={hit}>
           <View style={{ marginTop: chrome.mascotTop }}>
-            <Mascot size={chrome.rowMascot} state={done ? 'done' : 'idle'} color={message.bot.color ?? 'push'} motion={{ mode: done ? 'frame3' : 'still' }} />
+            <Mascot size={chrome.rowMascot} state={done ? 'done' : 'idle'} color={message.bot.color ?? 'push'} motion={{ mode: done ? 'animate' : 'still' }} />
           </View>
           <View style={body}>
             <View style={topRow}>
