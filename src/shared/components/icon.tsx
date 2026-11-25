@@ -13,7 +13,7 @@ const APP_ICONS = {
     '<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"></path></svg>',
 } as const
 
-export type AppIconName = keyof typeof APP_ICONS
+type AppIconName = keyof typeof APP_ICONS
 
 type Props = { name: IconName | AppIconName; size?: number; color?: keyof Colors | (string & {}); filled?: boolean }
 
@@ -24,5 +24,7 @@ const Icon = ({ name, size = 24, color = 't1', filled }: Props) => {
   const xml = filled ? line.replace('fill="none"', 'fill="currentColor"') : line
   return <SvgXml xml={xml} width={size} height={size} color={resolved} />
 }
+
+export type { AppIconName }
 
 export default Icon

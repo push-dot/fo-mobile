@@ -1,9 +1,8 @@
 import type { AccessMode, ChatIntent } from '@push/api-client'
 import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
-import { ERROR_TEXT } from './error-text'
+import { planRequired } from './utils/usage'
 
-export { ERROR_TEXT } from './error-text'
 
 export const BUBBLE = [0.2, 0.9, 0.25, 1.15] as const
 
@@ -208,3 +207,16 @@ export const applyText = (company?: string) => (company ? `${company}에 바로 
 export const SAVE_RETRY_TEXT = '내 서류에 저장해 줘'
 
 export const UNDO_LABEL = '되돌리기'
+
+const USAGE_BODY = '이번 달 사용량을 모두 썼어요.'
+
+export const ERROR_TEXT: Record<string, string> = {
+  FEATURE_DISABLED: USAGE_BODY,
+  INSUFFICIENT_CREDITS: USAGE_BODY,
+  PLAN_REQUIRED: planRequired('FREE'),
+  [READ_OFF_CODE]: READ_OFF_TEXT,
+  QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
+  APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
+  APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
+  NOT_CONFIGURED: '지금은 Bot을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
+}

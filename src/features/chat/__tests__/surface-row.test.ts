@@ -3,11 +3,11 @@ import { findAll } from '@/shared/components/__tests__/native-stubs'
 
 const waiting = vi.hoisted(() => ({ id: 'newest' as string | null }))
 vi.mock('@/shared/components', () => ({ A2uiSurface: 'A2uiSurface' }))
-vi.mock('../components/motion', () => ({ Appear: 'Appear' }))
+vi.mock('../components/motion', () => ({ default: 'Appear' }))
 vi.mock('../hooks', () => ({ useChatWaiting: () => waiting.id }))
 vi.mock('../stores', () => ({ answerSurface: vi.fn() }))
 
-const { SurfaceRow } = await import('../components/entries/surface-row')
+const { default: SurfaceRow } = await import('../components/entries/surface-row')
 
 const row = (id: string) => {
   const tree = SurfaceRow({ chatId: 'c1', item: { type: 'surface', id, kind: 'approval', messages: [] } })

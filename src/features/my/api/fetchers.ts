@@ -1,36 +1,16 @@
 import { atDocumentRevision, jobQuery, type DataEnvelope, type ListEnvelope, type MyPostsSort, type Posting } from '@push/api-client'
 import { api, deleteAccount, http, API_MOCK, signOut } from '../../../shared/infrastructure'
-import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, PickedFile, ResumeDraft } from '../types'
+import { sourcesApi } from '../../../shared/infrastructure/sources'
+import type { ApplicationDetail, CalendarEvent, DocVersion, HubDocument, MySource, ResumeDraft } from '../types'
 import { copyBody, copyVersionBody, profileConvertBody, setBaseProfilePath, toResumeDraft } from '../utils'
 
 const c = http
 
-const uploaded = new Map<string, string | undefined>()
-
 export const myApi = {
   renameSource: (id: string, fileName: string) => c.patch<DataEnvelope<MySource>>(`sources/${id}`, { body: { fileName } }),
-  sources: async (): Promise<ListEnvelope<MySource>> => {
-    const r = await api.sources.list({ kind: 'UPLOAD', limit: 100 })
-    return {
-      ...r,
-      data: r.data.map((s) => {
-        const raw = s as MySource
-        return { ...raw, jobId: uploaded.get(s.id) ?? raw.jobId }
-      }),
-    }
-  },
-  upload: async (file: PickedFile) => {
-    const form = new FormData()
-    form.append('kind', 'RESUME')
-    form.append('file', { uri: file.uri, name: file.name, type: file.mimeType ?? 'application/pdf', size: file.size ?? 0 } as unknown as Blob)
-    const s = await api.sources.upload(form)
-    uploaded.set(s.id, s.jobId)
-    return s
-  },
-  remove: async (id: string) => {
-    await api.sources.remove(id)
-    uploaded.delete(id)
-  },
+  sources: sourcesApi.list,
+  upload: sourcesApi.upload,
+  remove: sourcesApi.remove,
   archive: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.archive(id, revision)),
   restore: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.restore(id, revision)),
   resumeDraft: async (sourceId: string): Promise<ResumeDraft> =>

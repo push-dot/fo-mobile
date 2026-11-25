@@ -10,8 +10,10 @@ const run = (script: string, origin: string): Page => {
   const win = Object.assign(page.window, {
     dispatchEvent: (e: unknown) => void page.events.push(e),
   })
-  const CustomEvent = function (this: unknown, type: string, init: unknown) {
-    return { type, init }
+  const CustomEvent = class {
+    constructor(type: string, init: unknown) {
+      return { type, init }
+    }
   }
   new Function('window', 'location', 'CustomEvent', script)(win, page.location, CustomEvent)
   return page

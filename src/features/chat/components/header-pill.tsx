@@ -7,7 +7,7 @@ import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/c
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { largeType } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
-import { HeaderLamp } from './header/header-lamp'
+import HeaderLamp from './header/header-lamp'
 import type { HeaderLight } from './header/state'
 import { clearPushChat, deleteCompanyBot } from '../stores'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'

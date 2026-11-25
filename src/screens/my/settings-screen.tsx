@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 'react-native'
-import { ApiError, type Settings } from '@push/api-client'
+import type { Settings } from '@push/api-client'
 import {
   Avatar,
   deleteAccountSession,
@@ -31,6 +31,7 @@ import {
   useReferenceConsent,
   useSettings,
   WITHDRAW_BODY,
+  needsReauth,
 } from '@/features/my'
 import {
   Icon,
@@ -91,7 +92,7 @@ const SettingsScreen = () => {
           style: 'destructive',
           onPress: () =>
             void deleteAccountSession().catch((error: unknown) =>
-              error instanceof ApiError && error.code === 'REAUTH_REQUIRED'
+              needsReauth(error)
                 ? Alert.alert('다시 로그인해 주세요', '탈퇴는 로그인한 지 10분 안에만 할 수 있어요. 다시 로그인한 뒤 탈퇴해 주세요.', [
                     { text: '다시 로그인', onPress: () => void signOutSession() },
                   ])

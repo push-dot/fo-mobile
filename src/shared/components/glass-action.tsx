@@ -9,7 +9,7 @@ import type { MenuProps } from './menu-action'
 import Text from './text'
 import { useXlChrome } from './xl-chrome'
 
-export type GlassAction = {
+type GlassAction = {
   icon: IconName | AppIconName
   label: string
   onPress?: () => void
@@ -77,5 +77,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   badgeText: { color: theme.colors.bg },
 }))
+
+export type { GlassAction }
 
 export default GlassActionButton

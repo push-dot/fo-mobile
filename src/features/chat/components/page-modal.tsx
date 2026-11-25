@@ -91,14 +91,6 @@ const PageModal = ({
   )
 }
 
-const EMPTY_INSET = 40
-export const EMPTY_RESERVE = 140
-
-export const PageEmpty = ({ children, reserve = EMPTY_RESERVE }: { children: ReactNode; reserve?: number }) => {
-  const insets = useSafeAreaInsets()
-  return <View style={styles.empty(reserve, insets.bottom)}>{children}</View>
-}
-
 const styles = StyleSheet.create((theme) => ({
   root: (fill: string, top: number | undefined, page: boolean, insetTop: number) => ({
     flex: 1,
@@ -134,14 +126,6 @@ const styles = StyleSheet.create((theme) => ({
   cover: (fill: string) => ({ position: 'absolute', inset: 0, backgroundColor: fill }),
   fade: (height: number) => ({ position: 'absolute', left: 0, right: 0, top: -height, height }),
   inset: { position: 'absolute', inset: 0 },
-  empty: (reserve: number, bottom: number) => ({
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing[2],
-    paddingHorizontal: EMPTY_INSET,
-    paddingBottom: Math.max(reserve - theme.spacing[6] - bottom, 0),
-  }),
 }))
 
 export default PageModal

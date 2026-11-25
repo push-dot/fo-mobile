@@ -20,7 +20,7 @@ const monthDay = (iso?: string) => {
 
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 
-export const UsagePage = () => {
+const UsagePage = () => {
   const account = useChatAccount(true).data
   const purchase = usePersonalPurchase()
   const open = paymentsOpen(account)
@@ -85,3 +85,5 @@ const styles = StyleSheet.create((theme) => ({
   note: { paddingTop: theme.spacing[2] },
   action: { paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[4] },
 }))
+
+export default UsagePage

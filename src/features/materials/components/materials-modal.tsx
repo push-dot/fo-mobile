@@ -14,9 +14,10 @@ import type { Material, MaterialTab } from '../types'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
 import { useConfirmDeleteMaterial } from './confirm-delete-material'
 import { sendMaterial } from './send-material'
-import { MaterialItem, SectionTitle } from './material-item'
-import { MaterialsTabs } from './materials-tabs'
-import { MaterialsSearch, useSearchRoom } from './materials-search'
+import MaterialItem from './material-item'
+import SectionTitle from './section-title'
+import MaterialsTabs from './materials-tabs'
+import MaterialsSearch, { useSearchRoom } from './materials-search'
 
 const ios = Platform.OS === 'ios'
 
@@ -67,7 +68,7 @@ const Loading = () => (
   </View>
 )
 
-export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
+const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const [tab, setTab] = useState<MaterialTab>('all')
   const { text, q, setText } = useSearchQuery()
   const bot = forBot as BotId | undefined
@@ -162,3 +163,5 @@ const styles = StyleSheet.create((theme) => ({
   tabs: { paddingTop: 6, paddingHorizontal: theme.spacing[4], paddingBottom: theme.spacing[1] },
   flex: { flex: 1 },
 }))
+
+export default MaterialsModal

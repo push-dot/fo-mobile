@@ -1,13 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { Mascot, Text } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { largeType } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
-import { lineFromWorking, statusLineView, type LiveLine, type StatusLineView } from '../utils/status-line'
-
-export const ChatBotColor = createContext<MascotColor>('push')
+import { statusLineView, type LiveLine, type StatusLineView } from '../utils/status-line'
+import { ChatBotColor } from './chat-bot-color'
 
 const TONE_COLOR = { neutral: 't2', help: 'orange', quiet: 't3' } as const
 
@@ -57,13 +56,3 @@ const styles = StyleSheet.create((theme) => ({
 }))
 
 export default StatusLine
-
-type StatusRowProps = { verbs: string[]; startedAt: number; onStop: () => void; color?: MascotColor }
-
-export const StatusRow = ({ verbs, startedAt, color }: StatusRowProps) => <StatusLine line={lineFromWorking(verbs, new Date(startedAt))} color={color} />
-
-export const AwaitingRow = ({ text, color }: { text: string; color?: MascotColor }) => {
-  const [since] = useState(() => new Date())
-  const line: LiveLine = { kind: 'waiting', since, for: text.startsWith('확인') ? 'confirm' : 'answer', cardId: 'awaiting', text }
-  return <StatusLine line={line} color={color} />
-}

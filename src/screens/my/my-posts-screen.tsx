@@ -2,9 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
-import { POST_CATEGORIES, type MyPostsSort } from '@push/api-client'
+import type { MyPostsSort } from '@push/api-client'
 import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
-import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
+import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView, POST_CATEGORIES } from '@/features/my'
 import { StyleSheet } from 'react-native-unistyles'
 
 const MyPostsScreen = () => {

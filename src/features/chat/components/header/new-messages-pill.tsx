@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { GlassPressable, Icon, Text } from '@/shared/components'
 import { useColors } from '../../../../theme'
 
-export const NewMessagesPill = ({ count, onPress }: { count: number; onPress: () => void }) => {
+const NewMessagesPill = ({ count, onPress }: { count: number; onPress: () => void }) => {
   const c = useColors()
   return (
     <View pointerEvents="box-none" style={styles.wrap}>
@@ -29,3 +29,5 @@ const styles = StyleSheet.create((theme) => ({
   content: { gap: 6 },
   label: { fontSize: 14 },
 }))
+
+export default NewMessagesPill

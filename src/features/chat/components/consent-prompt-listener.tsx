@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Alert } from 'react-native'
-import { grantReferenceAccess } from '@/features/my/api/fetchers'
+import { grantReferenceAccess } from '@/features/my'
 import { showConsentModal } from '@/shared/navigation'
 import { CONSENT_AGREE, CONSENT_BODY, CONSENT_TITLE } from '../constants'
 import { grantConsent, laterConsent, useConsentPrompt } from '../stores'

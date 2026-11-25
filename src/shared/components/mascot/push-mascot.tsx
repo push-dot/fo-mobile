@@ -28,7 +28,7 @@ import {
 } from './motion'
 import { BADGE, BODY, DOTS, EYE, EYE_REACH, EYES_AT, FOLD_IN, FOLD_OUT, LOOK_UP, MOUTH, SMILE_WIDTH, SMILES, SPARKS, UNREAD } from './shapes'
 
-export type MascotProps = {
+type MascotProps = {
   size?: number
   state?: MascotState
   color?: MascotColor
@@ -263,5 +263,7 @@ const styles = StyleSheet.create(() => ({
   box: (size: number) => ({ width: size, height: size }),
   passThrough: { pointerEvents: 'none' },
 }))
+
+export type { MascotProps }
 
 export default Mascot

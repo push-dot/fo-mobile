@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
-import type { Application, ApplicationStage, Profile, SourceItem, UserRef } from '@push/api-client'
+import type { Application, ApplicationStage, Profile, UserRef } from '@push/api-client'
 
 export type CalendarEventType = 'INTERVIEW' | 'DEADLINE' | 'FOLLOW_UP' | 'COFFEE_CHAT' | 'CUSTOM'
 
@@ -42,7 +42,7 @@ export type ResumeDraft = {
   >
 }
 
-export type MySource = SourceItem & { jobId?: string; status?: string }
+export type { MySource, PickedFile } from '../../shared/infrastructure/sources'
 
 export type HubDocument = {
   id: string
@@ -69,8 +69,6 @@ export type HubProfile = {
   careers: { company: string; role: string; startedOn: string | null; endedOn: string | null; description: string }[]
   skills: string[]
 }
-
-export type PickedFile = { uri: string; name: string; mimeType?: string | null; size?: number | null }
 
 export type ProfileSection = 'basic' | 'intro' | 'career' | 'skills'
 

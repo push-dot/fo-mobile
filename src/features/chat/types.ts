@@ -1,5 +1,5 @@
 import type { A2uiKind, A2uiMessage, BotContract, StreamEvent } from '@push/api-client'
-import type { PickedFile } from '@/features/my'
+import type { PickedFile } from '@/shared/infrastructure/sources'
 import type { Notice } from './utils/status-line'
 
 
@@ -46,3 +46,10 @@ export type ChatState = {
 }
 
 export type Step = { wait: number; frame: StreamEvent }
+
+export type ReviewPageRequest = {
+  lines: DiffLine[]
+  apply?: () => void
+  undo?: () => void
+  onDismiss?: () => void
+}

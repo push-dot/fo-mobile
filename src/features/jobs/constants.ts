@@ -1,6 +1,8 @@
 import type { PostingSort, SectionKind } from './types'
 import type { FilterKey } from './utils'
 
+export { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
+
 export const POSTING_PAGE_LIMIT = 20
 export const CARD_RADIUS = 20
 export const GRID_SKELETON_CARDS = 4

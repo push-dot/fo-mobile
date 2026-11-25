@@ -2,9 +2,9 @@ import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import Text from './text'
 
-export type BadgeTone = 'ac' | 'grey' | 'red' | 'green' | 'orange'
+type BadgeTone = 'ac' | 'grey' | 'red' | 'green' | 'orange'
 
-export type BadgeGlyph = { char: string; gap: number }
+type BadgeGlyph = { char: string; gap: number }
 
 const Badge = ({ label, minWidth, glyph }: { label: string; tone?: BadgeTone; minWidth?: number; glyph?: BadgeGlyph }) => {
   const passed = label === '합격' || label === '수락함'
@@ -32,5 +32,7 @@ const styles = StyleSheet.create((theme) => ({
   inkPassed: { color: theme.colors.bg },
   glyph: (marginRight: number) => ({ marginRight }),
 }))
+
+export type { BadgeTone, BadgeGlyph }
 
 export default Badge

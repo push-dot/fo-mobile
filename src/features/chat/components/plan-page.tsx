@@ -6,7 +6,7 @@ import { Badge, Button, GlassButton, Icon, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { useChatAccount } from '../api/hooks'
 import { PLAN_HEADER } from '../constants'
-import { Appear } from './motion'
+import Appear from './motion'
 import PageModal from './page-modal'
 
 const PLANS = [
@@ -56,7 +56,7 @@ const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => 
   </Pressable>
 )
 
-export const PlanPage = () => {
+const PlanPage = () => {
   const account = useChatAccount(true).data
   const purchase = usePersonalPurchase()
   const open = paymentsOpen(account)
@@ -114,3 +114,5 @@ const styles = StyleSheet.create((theme) => ({
   header: { paddingTop: 10, paddingHorizontal: theme.spacing[6], paddingBottom: theme.spacing[4] },
   plans: { paddingHorizontal: theme.spacing[5], gap: theme.spacing[2] },
 }))
+
+export default PlanPage

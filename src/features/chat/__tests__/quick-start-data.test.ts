@@ -6,7 +6,7 @@ import { QUICK_STARTS } from '../constants'
 import { docMeta, initialPicks, postingMeta, quickStartFrom, startLink } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
-  const utils = await import('../../my/utils')
+  const utils = await import('../../my/utils/index')
   return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo }
 })
 

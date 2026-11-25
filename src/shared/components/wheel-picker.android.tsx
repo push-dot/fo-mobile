@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { type } from '../../theme'
 import Text from './text'
 
-export type WheelPickerProps = {
+type WheelPickerProps = {
   items: readonly { key: string; label: string }[]
   value: string
   onChange: (key: string) => void
@@ -89,5 +89,7 @@ const styles = StyleSheet.create((theme) => ({
 }))
 
 const WheelPicker = (props: WheelPickerProps) => (props.columns ? <SnapWheel {...props} /> : <RadioList {...props} />)
+
+export type { WheelPickerProps }
 
 export default WheelPicker

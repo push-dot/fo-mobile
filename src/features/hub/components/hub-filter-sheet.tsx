@@ -1,8 +1,8 @@
 import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
-import { CAREER_STATUSES } from '@push/api-client'
 import { Chip, FilterSheetNav, SheetScroll, Text } from '../../../shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { hitSlopTo, type } from '../../../theme'
+import { CAREER_STATUSES } from '../constants'
 import { EMPTY_SHEET, TENURE_CHIPS, tenureChipOn, toggle, toggleTenureChip, type Explore, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
 

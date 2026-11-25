@@ -2,7 +2,7 @@ import { Platform, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import type { HeaderLight } from './state'
 
-export const HeaderLamp = ({ light }: { light: HeaderLight }) => {
+const HeaderLamp = ({ light }: { light: HeaderLight }) => {
   if (light === 'none') return null
   return (
     <View pointerEvents="none" style={styles.ring}>
@@ -24,3 +24,5 @@ const styles = StyleSheet.create((theme) => ({
     }
   },
 }))
+
+export default HeaderLamp

@@ -1,10 +1,11 @@
 import { useCallback, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { type ChatIntent, type ListEnvelope } from '@push/api-client'
+import { ApiError, type ChatIntent, type ListEnvelope } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { botChatPath, type BotId } from '@/features/bots'
-import { useMyLinks, type PickedFile } from '@/features/my'
+import { fetchProfileChange, undoProfileChange, useMyLinks, type PickedFile } from '@/features/my'
+import { queryClient } from '@/providers/query-client'
 import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
@@ -206,4 +207,25 @@ export const useMentionGroups = (): MentionGroup[] => {
       items: (links.data?.data ?? []).map((l) => ({ id: l.id, kind: 'link' as const, title: l.title, sub: linkMentionSub(LINK_KIND_LABEL[l.kind], l.url) })),
     },
   ]
+}
+
+export const useProfileUndo = (changeId: string) => {
+  const key = ['me', 'profile-change', changeId]
+  const change = useQuery({ queryKey: key, queryFn: () => fetchProfileChange(changeId), retry: false })
+  const undo = useMutation({
+    mutationFn: () => undoProfileChange(changeId),
+    onSuccess: (profile) => {
+      queryClient.setQueryData(['me', 'profile'], profile)
+      void queryClient.invalidateQueries({ queryKey: key })
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 409) {
+        void queryClient.invalidateQueries({ queryKey: key })
+        return void queryClient.invalidateQueries({ queryKey: ['me', 'profile'] })
+      }
+      Alert.alert('되돌리지 못했어요', '잠시 뒤에 다시 해 주세요.')
+    },
+  })
+  const gone = change.error instanceof ApiError && change.error.status === 404 && !undo.isSuccess
+  return { gone, done: Boolean(change.data?.undone) || undo.isSuccess, pending: undo.isPending, undo: () => undo.mutate() }
 }

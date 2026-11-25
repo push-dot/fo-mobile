@@ -9,7 +9,7 @@ const ios = Platform.OS === 'ios'
 
 type Props = { query: string; label: string; onQuery: (q: string) => void; onStep: (step: FindStep) => void; onClose: () => void }
 
-export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
+const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
   const c = useColors()
   useHardwareBack(onClose)
   const field = (
@@ -57,3 +57,5 @@ const styles = StyleSheet.create((theme) => ({
   input: { flex: 1, minWidth: 0, height: 44, padding: 0, ...fontFor('400'), fontSize: theme.type.b1.fontSize, letterSpacing: theme.type.b1.letterSpacing, color: theme.colors.t1 },
   glass: { height: 44, borderRadius: theme.radius.pill },
 }))
+
+export default FindBar

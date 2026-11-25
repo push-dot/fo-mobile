@@ -1,9 +1,9 @@
-import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, Platform, View } from 'react-native'
 import {
   FilterButton,
+  HUB_CATEGORIES,
   HUB_SKELETON,
   ProfileRow,
   appliedCount,

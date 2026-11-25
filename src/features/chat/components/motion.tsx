@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useContext, useEffect, useState, type ReactNode } from 'react'
 import { Animated, Easing, type StyleProp, type ViewStyle } from 'react-native'
 import { BUBBLE } from '../constants'
 import { appearFrom, appearMoves, appearMs, playAppear, type AppearKind } from './appear'
 import { useReduceMotion } from '@/shared/components'
+import { RowMotion } from './row-motion'
 
-export const RowMotion = createContext<{ key: string; live: boolean } | null>(null)
 const played = new Set<string>()
 
 type AppearProps = {
@@ -15,7 +15,7 @@ type AppearProps = {
   duration?: number
 }
 
-export const Appear = ({ children, style, kind = 'up', delay = 0, duration }: AppearProps) => {
+const Appear = ({ children, style, kind = 'up', delay = 0, duration }: AppearProps) => {
   const reduce = useReduceMotion()
   const row = useContext(RowMotion)
   const rowKey = row?.key
@@ -56,3 +56,5 @@ export const Appear = ({ children, style, kind = 'up', delay = 0, duration }: Ap
     </Animated.View>
   )
 }
+
+export default Appear

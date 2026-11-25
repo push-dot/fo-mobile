@@ -15,7 +15,7 @@ import Note from './note'
 import PageModal from './page-modal'
 
 
-export const AccountModal = () => {
+const AccountModal = () => {
   const account = useChatAccount(true)
   return (
     <PageModal title="계정" tight>
@@ -106,3 +106,5 @@ const styles = StyleSheet.create((theme) => ({
   group: { paddingHorizontal: theme.spacing[5] },
   note: { paddingTop: theme.spacing[2] },
 }))
+
+export default AccountModal

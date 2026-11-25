@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { useColors } from '../../theme'
 import TopBar from './top-bar'
 
-export type ScreenBarScroll = {
+type ScreenBarScroll = {
   topInset: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
@@ -39,5 +39,7 @@ const styles = StyleSheet.create((theme) => ({
   bar: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 },
   fade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: -theme.spacing[3] },
 }))
+
+export type { ScreenBarScroll }
 
 export default ScreenBar

@@ -63,7 +63,7 @@ import {
   updateReferenceConsent,
   updateSettings,
 } from './fetchers'
-import { ingestEnabled } from './ingest-enabled'
+import { ingestEnabled } from '../utils/ingest-enabled'
 
 export const useUnreadOffers = () =>
   useQuery({

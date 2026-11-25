@@ -54,7 +54,7 @@ const DrawnTabs = ({ value, onChange }: Props) => {
   return <View style={styles.track(height)}>{row}</View>
 }
 
-export const MaterialsTabs = (props: Props) => (Platform.OS === 'ios' ? <NativeTabs {...props} /> : <DrawnTabs {...props} />)
+const MaterialsTabs = (props: Props) => (Platform.OS === 'ios' ? <NativeTabs {...props} /> : <DrawnTabs {...props} />)
 
 const styles = StyleSheet.create((theme) => ({
   native: { height: HEIGHT },
@@ -64,3 +64,5 @@ const styles = StyleSheet.create((theme) => ({
   tabOnDark: { backgroundColor: theme.colors.fill2, boxShadow: cssShadow.segment },
   track: (height: number) => ({ height, borderRadius: height / 2, backgroundColor: theme.colors.fill }),
 }))
+
+export default MaterialsTabs

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { LOADING_LABEL } from './constants'
 import Skeleton from './skeleton'
 
-export type SkeletonRowsShape = {
+type SkeletonRowsShape = {
   count: number
   lead?: { size: number; radius: number }
   lines: readonly { width: DimensionValue; height: number }[]
@@ -28,5 +28,7 @@ const styles = StyleSheet.create((theme) => ({
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing[3], paddingHorizontal: theme.spacing[5], paddingVertical: theme.spacing[3] },
   lines: { flex: 1, gap: theme.spacing[2] },
 }))
+
+export type { SkeletonRowsShape }
 
 export default SkeletonRows

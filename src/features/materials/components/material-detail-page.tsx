@@ -26,7 +26,7 @@ const open = (m: Material, inModal: boolean) => {
   else router.push(`/docs/${m.id}`)
 }
 
-export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
+const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const now = new Date()
   const bound = useSheetScrollMax()
@@ -86,3 +86,5 @@ const styles = StyleSheet.create((theme) => ({
   buttons: { flexDirection: 'row', gap: theme.spacing[2], marginTop: PM8.buttonsTop },
   fill: (backgroundColor: string) => ({ backgroundColor }),
 }))
+
+export default MaterialDetailPage

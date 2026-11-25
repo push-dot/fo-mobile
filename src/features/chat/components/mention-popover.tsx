@@ -9,7 +9,7 @@ import { toBoxShadow } from '@/shared/utility'
 import { useMentionGroups } from '../api/hooks'
 import { filterMentions, mentionMaxHeight, type MentionItem } from '../utils/mentions'
 import { mentionListMarginBottom } from '../utils/composer-geometry'
-import { Appear } from './motion'
+import Appear from './motion'
 import Mark from './mark'
 
 const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionItem) => void }) => {

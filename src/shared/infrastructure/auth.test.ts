@@ -21,8 +21,8 @@ vi.mock('./api-client', () => ({ api: { me: { consents }, auth: { start: async (
 vi.mock('./pkce', () => ({ createPkce: async () => ({ verifier: 'verifier', challenge: 'challenge' }) }))
 const appleFails = vi.hoisted(() => vi.fn(() => false))
 vi.mock('./platform', () => ({ mockAppleFailing: appleFails, openAuthSession: async () => ({ type: 'success', url: 'https://push.app/callback?code=abc' }) }))
-vi.mock('../../features/auth/utils/auth-flow', () => ({ isAppleCancel: () => false }))
-vi.mock('../../features/auth/stores', () => ({ usePhoneAuth: { getState: () => ({ hold }) } }))
+vi.mock('./apple-cancel', () => ({ isAppleCancel: () => false }))
+vi.mock('./phone-auth-store', () => ({ usePhoneAuth: { getState: () => ({ hold }) } }))
 
 const { signIn, signInWithApple } = await import('./auth')
 

@@ -19,7 +19,7 @@ export const useSearchRoom = () => {
   return { list: FADE + field.height + GAP_BELOW + bottom, toast: field.height + GAP_BELOW + spacing[2] }
 }
 
-export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: (q: string) => void }) => {
+const MaterialsSearch = ({ value, onChange }: { value: string; onChange: (q: string) => void }) => {
   const c = useColors()
   const { field: size } = useListSize()
   const keyboard = useKeyboardHeight()
@@ -90,3 +90,5 @@ const styles = StyleSheet.create((theme) => ({
   fade: { position: 'absolute', inset: 0 },
   glass: (borderRadius: number) => ({ borderRadius }),
 }))
+
+export default MaterialsSearch

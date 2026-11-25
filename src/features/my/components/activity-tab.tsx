@@ -1,21 +1,20 @@
 import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
-import { POST_CATEGORIES, stageBadge } from '@push/api-client'
-import { careerLabel, monthDay } from '@push/shared'
+import { monthDay } from '@push/shared'
 import { Badge, Chip, ChipRow, Icon, Text } from '@/shared/components'
-import { hitSlopTo, spacing, useColors } from '../../../theme'
+import { spacing } from '../../../theme'
 import {
   useAppliedApplications,
-  useMyBookmarks,
   useMyCommentedPosts,
   useMyFollowers,
   useMyFollows,
   useMyPosts,
 } from '../api/hooks'
-import { FOLLOW_PREVIEW, POST_PREVIEW } from '../constants'
+import { ACTIVITY_LIST_PAD, FOLLOW_PREVIEW, POST_CATEGORIES, POST_PREVIEW } from '../constants'
 import type { ActivitySub, ScrollUnderBar } from '../types'
-import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageTone } from '../utils'
+import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageBadge, stageTone } from '../utils'
+import ActivityBookmarks from './activity-bookmarks'
 import CalendarView from './calendar-view'
 import Empty, { TAB_EMPTY_LIFT } from './empty'
 import ListSkeleton from './list-skeleton'
@@ -25,8 +24,7 @@ import PersonRow from './person-row'
 import Row from './row'
 import SectionHead from './section-head'
 
-const LIST_PAD = 40
-const EMPTY_LIFT = TAB_EMPTY_LIFT - LIST_PAD
+const EMPTY_LIFT = TAB_EMPTY_LIFT - ACTIVITY_LIST_PAD
 
 const SUBS: { key: ActivitySub; label: string }[] = [
   { key: 'applications', label: '지원활동' },
@@ -69,62 +67,6 @@ const Applications = () => {
           </View>
           <Badge label={stageBadge(a.stage)} tone={stageTone(a.stage)} />
         </Row>
-      ))}
-    </>
-  )
-}
-
-export const Bookmarks = () => {
-  const c = useColors()
-  const { query, unbookmark } = useMyBookmarks()
-  const { data, isLoading } = query
-  if (isLoading) return <ListSkeleton />
-  const list = (data?.data ?? []).filter(
-    (p) => !(unbookmark.isPending && unbookmark.variables?.id === p.id),
-  )
-  return (
-    <>
-      {list.length === 0 ? (
-        <Empty
-          text={emptyCta('bookmarks').title}
-          lift={EMPTY_LIFT}
-          action={emptyCta('bookmarks').action}
-          onAction={() => router.push(emptyCta('bookmarks').href)}
-        />
-      ) : (
-        <ListTitle title="북마크한 공고" count={data?.page.total ?? list.length} />
-      )}
-      {list.map((p) => (
-        <Pressable
-          key={p.id}
-          accessibilityRole="button"
-          accessibilityLabel={`${p.company} ${p.title}`}
-          onPress={() => router.push(`/postings/${p.id}?from=bookmark`)}
-          style={styles.bookmark}
-        >
-          <Logo name={p.company} size={56} />
-          <View style={styles.bookmarkBody}>
-            <Text v="c1" weight="600" color="t3">
-              {p.company}
-            </Text>
-            <Text v="b1" weight="700" numberOfLines={1}>
-              {p.title}
-            </Text>
-            <Text v="c1" color="t3">
-              {p.location} · {careerLabel(p)}
-            </Text>
-          </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="북마크 해제"
-            accessibilityState={{ selected: true }}
-            onPress={() => unbookmark.mutate(p)}
-            hitSlop={hitSlopTo(20)}
-            style={styles.unbookmark}
-          >
-            <Icon name="bookmark" size={20} color={c.acText} filled />
-          </Pressable>
-        </Pressable>
       ))}
     </>
   )
@@ -245,7 +187,7 @@ const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub
       </ChipRow>
       {sub === 'applications' ? <Applications /> : null}
       {sub === 'calendar' ? <CalendarView /> : null}
-      {sub === 'bookmarks' ? <Bookmarks /> : null}
+      {sub === 'bookmarks' ? <ActivityBookmarks /> : null}
       {sub === 'follows' ? <Follows /> : null}
       {sub === 'posts' ? <Posts /> : null}
     </ScrollView>
@@ -254,15 +196,6 @@ const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub
 
 const styles = StyleSheet.create((theme) => ({
   body: { flex: 1, minWidth: 0 },
-  bookmark: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[5],
-  },
-  bookmarkBody: { flex: 1, minWidth: 0, gap: 1 },
-  unbookmark: { width: 20, height: 20 },
   seeAll: { paddingVertical: theme.spacing[4], paddingHorizontal: theme.spacing[5] },
   seeAllDivided: { marginTop: theme.spacing[1], borderTopWidth: 1, borderTopColor: theme.colors.line },
   post: {
@@ -277,7 +210,7 @@ const styles = StyleSheet.create((theme) => ({
   stats: { flexDirection: 'row', gap: theme.spacing[3] },
   stat: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
   scroll: { backgroundColor: theme.colors.bg },
-  content: (top: number) => ({ flexGrow: 1, paddingTop: top, paddingBottom: LIST_PAD }),
+  content: (top: number) => ({ flexGrow: 1, paddingTop: top, paddingBottom: ACTIVITY_LIST_PAD }),
 }))
 
 export default ActivityTab

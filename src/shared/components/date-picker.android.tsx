@@ -8,7 +8,7 @@ import Icon from './icon'
 import NativeHost from './native-host'
 import Text from './text'
 
-export type DatePickerProps = {
+type DatePickerProps = {
   value: Date | null
   onChange: (date: Date) => void
   label: string
@@ -79,5 +79,7 @@ const styles = StyleSheet.create((theme) => ({
   }),
   value: { flex: 1 },
 }))
+
+export type { DatePickerProps }
 
 export default DatePicker

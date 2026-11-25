@@ -1,6 +1,6 @@
 import { Slot } from 'expo-router'
-import { useColdStartTermsCheck } from '@/features/auth/use-cold-start-terms-check'
-import { useHomeSnapshotSync } from '@/features/home/use-home-snapshot-sync'
+import { useColdStartTermsCheck } from '@/features/auth'
+import { useHomeSnapshotSync } from '@/features/home'
 
 const AppLayout = () => {
   const ready = useHomeSnapshotSync()

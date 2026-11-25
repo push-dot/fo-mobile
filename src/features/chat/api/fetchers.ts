@@ -1,7 +1,6 @@
 import { type DataEnvelope, type ListEnvelope } from '@push/api-client'
 import { api, http, API_BASE_URL, API_MOCK } from '@/shared/infrastructure'
-import { myApi } from '@/features/my/api/fetchers'
-import type { PickedFile } from '@/features/my/types'
+import { sourcesApi, type PickedFile } from '@/shared/infrastructure/sources'
 import { DEFAULT_DOC } from '../constants'
 import { accountFromBilling } from '../utils/account'
 import { chatDocFromSource } from '../utils/docs'
@@ -13,7 +12,7 @@ const c = http
 
 const data = async <T>(p: Promise<DataEnvelope<T>>) => (await p).data
 
-const realDocs = async (): Promise<ChatDoc[]> => (await myApi.sources()).data.map(chatDocFromSource)
+const realDocs = async (): Promise<ChatDoc[]> => (await sourcesApi.list()).data.map(chatDocFromSource)
 
 const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
   bookmarks: async () => (await api.me.bookmarks({ limit: 50 })).data,
@@ -34,7 +33,7 @@ export const chatApi = {
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
   addDoc: async (file: PickedFile) => {
     if (API_MOCK) return data(c.post<DataEnvelope<ChatDoc>>('chat/docs', { body: { fileName: file.name, size: file.size ?? 0 } }))
-    await myApi.upload(file)
+    await sourcesApi.upload(file)
   },
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { countUnread } from '@/features/home/snapshot/dto'
+import { countUnread } from '@/features/home'
 import { usePushDevice } from '../hooks'
 import { fetchNotifications, readNotifications } from './fetchers'
 

@@ -3,8 +3,8 @@ import { useChatWorking, useLiveItem } from '../hooks'
 import type { ChatItem } from '../types'
 import type { ThreadRow } from '../utils/usage'
 import { Item } from './entries'
-import { RowMotion } from './motion'
-import { StatusRow } from './status-line'
+import { RowMotion } from './row-motion'
+import StatusRow from './status-row'
 
 type ItemProps = Parameters<typeof Item>[0]
 type Callbacks = Pick<ItemProps, 'onLocal' | 'onReadOff'>
@@ -29,7 +29,7 @@ type Props = Callbacks & {
   last: boolean
 }
 
-export const ThreadCell = ({ chatId, row, color, live, last, ...callbacks }: Props) => {
+const ThreadCell = ({ chatId, row, color, live, last, ...callbacks }: Props) => {
   const motion = { key: `${chatId}/${row.id}`, live }
   return (
     <RowMotion.Provider value={motion}>
@@ -43,3 +43,5 @@ export const ThreadCell = ({ chatId, row, color, live, last, ...callbacks }: Pro
     </RowMotion.Provider>
   )
 }
+
+export default ThreadCell

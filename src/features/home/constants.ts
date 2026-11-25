@@ -14,3 +14,9 @@ export const SHORTCUTS: { label: string; icon: Icon3DName; glow: string; opacity
   { label: '북마크', icon: 'bookmark', glow: glow.orange, opacity: 0.28, href: '/bookmarks' },
   { label: '내 활동', icon: 'chart', glow: glow.green, opacity: 0.26, href: '/my-activity' },
 ]
+
+export const HOME_SNAPSHOT_VERSION = 2
+export const HOME_SNAPSHOT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
+export const homeSnapshotFileUri = (documentDirectory: string, userId: string) =>
+  `${documentDirectory}home-snapshots/${encodeURIComponent(userId)}.json`

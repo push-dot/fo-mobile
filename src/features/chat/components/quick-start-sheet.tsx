@@ -17,7 +17,7 @@ import { initialPicks, startLink } from '../utils/quick-start-data'
 import { quickStartAllPath } from '../utils/sheet-routes'
 
 
-export const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
+const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose: () => void; all?: boolean }) => {
   return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null
 }
 
@@ -497,3 +497,5 @@ const styles = StyleSheet.create((theme) => ({
   stripe: (color: 'red' | 'orange' | 'green') => ({ width: 3, alignSelf: 'stretch', marginVertical: theme.spacing[2], borderRadius: 2, backgroundColor: theme.colors[color] }),
   task: { height: 48, paddingHorizontal: theme.spacing[5] - selectedRing(theme.colors).borderWidth, justifyContent: 'center', borderRadius: theme.radius.pill },
 }))
+
+export default QuickStartSheet

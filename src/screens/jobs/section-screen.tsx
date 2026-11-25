@@ -1,7 +1,6 @@
-import { withDeadlineWindow } from '@push/api-client'
 import { router } from 'expo-router'
 import { View } from 'react-native'
-import { PostingGrid, SECTIONS, type SectionKind } from '@/features/jobs'
+import { PostingGrid, SECTIONS, withDeadlineWindow, type SectionKind } from '@/features/jobs'
 import { ScreenBar, Text } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 

@@ -4,7 +4,7 @@ import { cssShadow, spacing } from '../../theme'
 import { COMPACT_HEIGHT, COMPACT_WIDTH } from './segmented-control.compact'
 import Text from './text'
 
-export type SegmentedControlProps<K extends string> = {
+type SegmentedControlProps<K extends string> = {
   items: { key: K; label: string }[]
   value: K | null
   onChange: (k: K) => void
@@ -53,5 +53,7 @@ const styles = StyleSheet.create((theme) => ({
   segment: (size: number) => ({ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: size / 2 }),
   segmentOn: { backgroundColor: theme.mode === 'dark' ? theme.colors.fill2 : theme.colors.bg, boxShadow: cssShadow.segment },
 }))
+
+export type { SegmentedControlProps }
 
 export default SegmentedControl

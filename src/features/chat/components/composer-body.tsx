@@ -18,7 +18,7 @@ const PILL_PAD = 4
 const PILL_HEIGHT = ROW_HEIGHT + PILL_PAD * 2
 const DISC = 36
 
-export type ComposerProps = {
+type ComposerProps = {
   value: string
   onChangeText: (t: string) => void
   onSend: () => void
@@ -37,7 +37,7 @@ export type ComposerProps = {
   disabled?: boolean
 }
 
-export const Composer = ({ inputRef, ...p }: ComposerProps) => {
+const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const xl = useXlBoardText()
   const { fontScale: system } = useWindowDimensions()
   const fontScale = composerFontScale(xl, system)
@@ -198,3 +198,7 @@ const styles = StyleSheet.create((theme) => ({
   bar: { flexDirection: 'row', alignItems: 'center' },
   spacer: { flex: 1 },
 }))
+
+export type { ComposerProps }
+
+export default Composer

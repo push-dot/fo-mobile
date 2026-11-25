@@ -3,7 +3,9 @@ import { Fragment, useContext, type ComponentProps } from 'react'
 import { Text } from '@/shared/components'
 import { keepPartsWhole } from '@/shared/utility/keep-words'
 import { hitCount } from '../../utils/find'
-import { FindHighlight, FindText, Marked } from '../header/highlight'
+import { FindHighlight } from '../header/find-highlight'
+import FindText from '../header/find-text'
+import Marked from '../header/marked'
 
 const PART = /(\*\*.+?\*\*|\[[^\]]+\]\(\/[^)\s]*\))/g
 const LINK = /^\[([^\]]+)\]\((\/[^)\s]*)\)$/

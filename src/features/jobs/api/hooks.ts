@@ -2,7 +2,7 @@ import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClie
 import type { PostingDetail, PostingFilters } from '@push/api-client'
 import { applyDoc, toQuery, type Filters } from '../utils'
 import type { ApplyBody } from '../types'
-import { invalidateAfterPostingBookmarkToggle } from './bookmark-invalidation'
+import { invalidateAfterPostingBookmarkToggle } from '../utils/bookmark-invalidation'
 import { applyToPosting, fetchApplyDocs, fetchMyProfile, fetchPosting, fetchPostingCount, fetchPostingLocations, fetchPostingPages, togglePostingBookmark } from './fetchers'
 
 export const usePostingPages = (f: PostingFilters) =>

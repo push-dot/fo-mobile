@@ -4,6 +4,8 @@ import {
 } from '@push/api-client'
 import { FILTER_TITLES } from '../constants'
 
+export { withDeadlineWindow } from '@push/api-client'
+
 export type Filters = {
   category: JobCategory[]
   skills: string[]

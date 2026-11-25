@@ -1,6 +1,5 @@
 import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
-import { EMPLOYMENT_TYPES, workConditionLines } from '@push/api-client'
 import { careerLabel } from '@push/shared'
 import { botChatPath, openPostingBot } from '@/features/bots'
 import { postingShareMessage, useToggleBookmark } from '@/features/jobs'
@@ -21,6 +20,8 @@ import {
   useDocuments,
   useMyApplications,
   usePostingDetail,
+  EMPLOYMENT_TYPES,
+  workConditionLines,
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { openBrowser, shareMessage } from '@/shared/infrastructure'

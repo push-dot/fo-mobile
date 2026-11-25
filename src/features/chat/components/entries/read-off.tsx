@@ -2,7 +2,7 @@ import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { Button } from '@/shared/components'
 import { READ_OFF_ATTACH, READ_OFF_SETTINGS } from '../../constants'
-import { Bubble } from './bot'
+import Bubble from './bubble'
 import Rich from './rich'
 
 const ReadOff = ({ text, onAction }: { text: string; onAction: (action: 'attach' | 'settings') => void }) => {

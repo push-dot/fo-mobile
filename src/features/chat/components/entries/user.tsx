@@ -5,8 +5,9 @@ import { useXlBoardText, XL_CHAT_TRACKING } from '@/shared/components/xl-chrome'
 import { spacing } from '../../../../theme'
 import type { ChatItem } from '../../types'
 import UserBubbleView from '../bubbles'
-import { FindText, Marked } from '../header/highlight'
-import { Appear } from '../motion'
+import FindText from '../header/find-text'
+import Marked from '../header/marked'
+import Appear from '../motion'
 
 export const useBubbleMax = (chrome: number) => (useWindowDimensions().width - spacing[5] * 2) * 0.82 + chrome
 

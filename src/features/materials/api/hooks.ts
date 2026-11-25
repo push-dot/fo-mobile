@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { MaterialKind, MaterialsFilter, MaterialsPage } from '../types'
-import { deleteOptions, LISTS, MATERIALS, type Pages } from './cache'
+import { deleteOptions, LISTS, MATERIALS, type Pages } from '../utils/material-cache'
 import { deleteMaterial, fetchMaterial, fetchMaterials, restoreMaterial } from './fetchers'
 
 const joined = (data: Pages): MaterialsPage => {

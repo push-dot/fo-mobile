@@ -14,7 +14,7 @@ const KIND_CHIP = { padding: spacing[3], height: 36 }
 const KIND_GAP = 6
 const KINDS = Object.keys(LINK_KIND_LABEL) as LinkKind[]
 
-export const MaterialLinkAddPage = () => {
+const MaterialLinkAddPage = () => {
   const refresh = useRefreshMaterials()
   const [url, setUrl] = useState('')
   const [picked, setPicked] = useState<LinkKind | null>(null)
@@ -52,3 +52,5 @@ const styles = StyleSheet.create((theme) => ({
   content: { gap: theme.spacing[3] },
   kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: KIND_GAP },
 }))
+
+export default MaterialLinkAddPage

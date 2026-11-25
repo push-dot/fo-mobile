@@ -14,14 +14,7 @@ import {
   View,
 } from 'react-native'
 import { initialWindowMetrics, SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-  CAREER_STATUSES,
-  JOB_CATEGORIES,
-  type Career,
-  type CareerStatus,
-  type JobCategory,
-  type Profile,
-} from '@push/api-client'
+import type { Career, CareerStatus, JobCategory, Profile } from '@push/api-client'
 import {
   Avatar,
   careerDeleteBody,
@@ -44,6 +37,8 @@ import {
   useMyProfile,
   useSaveProfile,
   type ProfileSection,
+  CAREER_STATUSES,
+  JOB_CATEGORIES,
 } from '@/features/my'
 import {
   askConfirm,

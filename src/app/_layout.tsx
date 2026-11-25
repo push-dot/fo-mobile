@@ -12,7 +12,7 @@ import SplashGate from '@/shared/infrastructure/splash-gate'
 import { noSelectionGrant } from '@/shared/utility'
 import { useSession } from '@/shared/infrastructure'
 import { useThemeMode, useThemePreference } from '@/theme'
-import { DesignThemeProvider } from '@/theme/provider'
+import DesignThemeProvider from '@/theme/provider'
 
 void SplashScreen.preventAutoHideAsync()
 

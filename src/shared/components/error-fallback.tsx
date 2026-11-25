@@ -32,7 +32,7 @@ type State = { ui: ErrorBoundaryUiState }
 
 type Props = { children: ReactNode }
 
-export class RootErrorBoundary extends Component<Props, State> {
+class RootErrorBoundary extends Component<Props, State> {
   state: State = { ui: 'ok' }
 
   static getDerivedStateFromError(): State {
@@ -54,3 +54,5 @@ export class RootErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
+
+export default RootErrorBoundary

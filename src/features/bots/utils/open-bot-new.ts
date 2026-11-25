@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
-import { fetchConsents, grantReferenceAccess } from '@/features/my/api/fetchers'
+import { fetchConsents, grantReferenceAccess } from '@/features/my'
 import { queryClient } from '@/providers/query-client'
 import { showConsentModal } from '@/shared/navigation'
 import { CONSENT_COPY } from '../components/new/copy'

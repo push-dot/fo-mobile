@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { botChatPath, botHomePath, type Bot } from '@/features/bots'
 import { CREATE_PICK_HINT } from '../constants'
-import { BotPickSheet } from './send-bot-page'
+import BotPickSheet from './bot-pick-sheet'
 
-export const MaterialCreateBotPage = () => (
+const MaterialCreateBotPage = () => (
   <BotPickSheet
     title={CREATE_PICK_HINT}
     onPick={(bot: Bot) => {
@@ -12,3 +12,5 @@ export const MaterialCreateBotPage = () => (
     }}
   />
 )
+
+export default MaterialCreateBotPage

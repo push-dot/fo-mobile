@@ -16,4 +16,5 @@ module.exports = defineConfig([
     open: ['constants', 'types', 'utils/'],
   }),
   { files: ['src/app/**'], rules: { 'coding-hooks/filename-case': 'off' } },
+  { files: ['scripts/**'], languageOptions: { globals: { __dirname: 'readonly', __filename: 'readonly' } } },
 ])

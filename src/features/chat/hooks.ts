@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Animated } from 'react-native'
+import { useMarkBotRead, type Bot, type BotId, type LocalActivity } from '@/features/bots'
 import { useReduceMotion } from '@/shared/components'
-import { useChatStore } from './stores'
+import { setReading, useChatStore, useReadingStore } from './stores'
 import type { ChatItem, ChatState } from './types'
 import { isStopping } from './utils/status-line'
 
@@ -61,3 +62,27 @@ export const useRunPhase = (id: string): RunPhase =>
     const working = s.chats[id]?.working ?? null
     return !working ? 'idle' : isStopping(working) ? 'stopping' : 'working'
   })
+
+export const useLocalActivity = (): Readonly<Record<BotId, LocalActivity>> => useReadingStore((s) => s.byBot)
+
+export const useReadWhileOpen = (bot: Bot | undefined, atBottom: boolean) => {
+  const markRead = useMarkBotRead()
+  const mark = useRef(markRead)
+  const told = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    mark.current = markRead
+  })
+  const id = bot?.id
+  useEffect(() => {
+    if (!id || !atBottom) return
+    setReading(id, true)
+    return () => setReading(id, false)
+  }, [id, atBottom])
+  const unread = bot?.unread
+  const at = bot?.lastActivityAt.toISOString() ?? ''
+  useEffect(() => {
+    if (!bot || !unread || !atBottom || told.current === `${bot.id}@${at}`) return
+    told.current = `${bot.id}@${at}`
+    void mark.current(bot).catch(() => undefined)
+  }, [bot, unread, at, atBottom])
+}

@@ -2,7 +2,7 @@ import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
 import { forgetRequiredTerms } from './chat'
 import { postings } from './postings'
-import { usePhoneAuth } from '../features/auth/stores'
+import { usePhoneAuth } from '../shared/infrastructure/phone-auth-store'
 import { softPad } from '../features/auth/utils/soft-pad'
 import { MOCK_USER_ID, mock, page } from './server'
 
