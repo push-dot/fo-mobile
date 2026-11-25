@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import { ApiError } from '@push/api-client'
 import type { Bot, BotAddress, BotColor, BotId, BotLimit, BotProfile, CompanyBot } from '../types'
@@ -11,8 +11,10 @@ const BOTS = ['bots'] as const
 const LIST = [...BOTS, 'list'] as const
 const detailKey = (address: BotAddress) => [...BOTS, 'detail', address] as const
 
+export const botListQuery = queryOptions({ queryKey: LIST, queryFn: fetchBots })
+
 export const useBots = ({ live = false }: { live?: boolean } = {}) => {
-  const q = useQuery({ queryKey: LIST, queryFn: fetchBots, refetchInterval: (query) => pollIntervalOf(query.state.data?.bots, live) })
+  const q = useQuery({ ...botListQuery, refetchInterval: (query) => pollIntervalOf(query.state.data?.bots, live) })
   const { refetch } = q
   const wasLive = useRef(live)
   useEffect(() => {
@@ -31,7 +33,7 @@ export const useBotProfile = (address: BotAddress) => {
 }
 
 export const useBot = (address: BotAddress) => {
-  const list = useQuery({ queryKey: LIST, queryFn: fetchBots })
+  const list = useQuery(botListQuery)
   const cached = listed(list.data, address)
   const one = useQuery({ queryKey: detailKey(address), queryFn: () => fetchBotProfile(address), enabled: !cached })
   const data = cached ?? one.data?.bot

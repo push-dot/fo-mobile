@@ -15,14 +15,15 @@ type Props = {
   posting: Posting
   width?: number
   onPress?: () => void
+  onPressIn?: () => void
   onBookmark?: () => void
 }
 
-const JobCard = ({ posting: p, width = 200, onPress, onBookmark }: Props) => {
+const JobCard = ({ posting: p, width = 200, onPress, onPressIn, onBookmark }: Props) => {
   const c = useColors()
   const brand = brandColor(p.company)
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} style={styles.card(width)}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} onPressIn={onPressIn} style={styles.card(width)}>
       <View style={styles.media(Math.round((width * 136) / 200))}>
         {p.imageUrl ? (
           <Image source={{ uri: assetUrl(p.imageUrl) }} recyclingKey={p.id} style={styles.cover} contentFit="cover" cachePolicy="memory-disk" />

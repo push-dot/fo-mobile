@@ -4,7 +4,7 @@ import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { StyleSheet } from 'react-native-unistyles'
 import { useThemeMode } from '../../theme'
-import { bootScript, originOf, detailUrl, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom } from './detail-url'
+import { bootScript, detailEventScript, originOf, detailUrl, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom, type DetailSeed } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, mockFitSoonOn, mockFitThreeOn, mockWebPlanOf, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
 import LoadingIndicator from './loading-indicator'
@@ -30,6 +30,7 @@ const DetailLoading = () => (
 type Props = {
   path: string
   from?: DetailFrom
+  seed?: DetailSeed
   onBridge?: (message: Record<string, unknown>) => void
   inset?: { top: number; bottom: number }
   onScroll?: (offsetY: number) => void
@@ -47,7 +48,7 @@ const buildBoot = (mode: ReturnType<typeof useThemeMode>, applyZoom: string | un
 
 const injectedOf = (zoomScript: string | undefined, insetPart: string) => `${zoomScript ?? ''}${insetPart}` || undefined
 
-const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
+const DetailWebView = ({ path, from, seed, onBridge, inset, onScroll }: Props) => {
   const mode = useThemeMode()
   const ref = useRef<WebView<object>>(null)
   const token = useSession((s) => s.session?.accessToken ?? null)
@@ -55,6 +56,14 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
   useEffect(() => {
     tokenRef.current = token
   }, [token])
+  const seedRef = useRef(seed)
+  const seedAt = seed?.updatedAt
+  useEffect(() => {
+    seedRef.current = seed
+  })
+  useEffect(() => {
+    if (seedAt !== undefined) ref.current?.injectJavaScript(detailEventScript(WEB_BASE_URL, path, seedRef.current))
+  }, [seedAt, path])
   const [failed, setFailed] = useState(false)
   const [loading, setLoading] = useState(() => !opened.has(path))
   const zoom = Math.round(useWindowDimensions().fontScale * 100)
@@ -110,7 +119,7 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
     }
     if (m.type === 'title') return void ref.current?.injectJavaScript(FONTS_READY_SCRIPT)
     if (m.type === 'fonts-ready') return done()
-    if (m.type === 'ready') return void ref.current?.injectJavaScript(tokenEventScript(WEB_BASE_URL, tokenRef.current))
+    if (m.type === 'ready') return void ref.current?.injectJavaScript(`${detailEventScript(WEB_BASE_URL, path, seedRef.current)}${tokenEventScript(WEB_BASE_URL, tokenRef.current)}`)
     if (m.type === 'open' && typeof m.path === 'string' && APP_PATH.test(m.path)) router.push(m.path as Href)
     else if (m.type === 'external' && typeof m.url === 'string' && /^https?:\/\//.test(m.url)) void openBrowser(m.url)
     else if (m.type === 'error') fail()

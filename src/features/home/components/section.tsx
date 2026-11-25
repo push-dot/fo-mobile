@@ -3,14 +3,14 @@ import { LegendList } from '@legendapp/list/react-native'
 import { Pressable, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import type { Posting } from '@push/api-client'
-import type { SectionKind } from '@/features/jobs'
+import { prefetchPosting, type SectionKind } from '@/features/jobs'
 import { Button, Icon, JobCard, Text } from '../../../shared/components'
 import { useHomePostings } from '../api/hooks'
 import { SECTION_ERROR_LINES, SECTION_RETRY_LABEL } from '../constants'
 import SectionSkeleton from './section-skeleton'
 
 const SectionCard = ({ posting, onBookmark }: { posting: Posting; onBookmark: (posting: Posting) => void }) => (
-  <JobCard posting={posting} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
+  <JobCard posting={posting} onPress={() => router.push(`/postings/${posting.id}`)} onPressIn={() => prefetchPosting(posting.id)} onBookmark={() => onBookmark(posting)} />
 )
 
 const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; title: string; skeleton: boolean; onBookmark: (posting: Posting) => void }) => {

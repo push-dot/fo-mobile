@@ -4,7 +4,7 @@ import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import type { Posting, PostingFilters } from '@push/api-client'
 import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
-import { usePostingPages, useToggleBookmark } from '../api/hooks'
+import { prefetchPosting, usePostingPages, useToggleBookmark } from '../api/hooks'
 import { JOBS_EMPTY_LINES, RESET_FILTERS_LABEL } from '../constants'
 import { StyleSheet } from 'react-native-unistyles'
 import { gridCardWidth, gridFillWidth } from '../utils/grid'
@@ -21,7 +21,7 @@ type Props = {
 const Gap = () => <View style={styles.gap} />
 
 const GridCard = ({ posting, width, onBookmark }: { posting: Posting; width: number; onBookmark: (p: Posting) => void }) => (
-  <JobCard posting={posting} width={width} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
+  <JobCard posting={posting} width={width} onPress={() => router.push(`/postings/${posting.id}`)} onPressIn={() => prefetchPosting(posting.id)} onBookmark={() => onBookmark(posting)} />
 )
 
 const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props) => {

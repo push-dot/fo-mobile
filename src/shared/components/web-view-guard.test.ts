@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bootScript, loadsInWebView, routeNavigation, tokenEventScript, webViewNavigation } from './detail-url'
+import { bootScript, detailEventScript, loadsInWebView, routeNavigation, tokenEventScript, webViewNavigation } from './detail-url'
 
 const WEB = 'https://push-fo-web.example.dev'
 
@@ -100,5 +100,15 @@ describe('WebView navigation, written differently', () => {
     expect(routeNavigation('https://other.example/a', WEB, open)).toBe(false)
     expect(routeNavigation(`${WEB}/postings/p1`, WEB, open)).toBe(true)
     expect(opened).toEqual(['https://other.example/a'])
+  })
+})
+
+describe('WebView detail hand-off', () => {
+  it('sends the fetched detail only to the web origin', () => {
+    const seed = { data: { id: 'p1', title: '</script>' }, updatedAt: 7 }
+    const page = run(detailEventScript(WEB, '/postings/p1', seed), WEB)
+    expect(page.events).toEqual([{ type: 'push:detail', init: { detail: { path: '/postings/p1', data: seed.data, updatedAt: 7 } } }])
+    expect(run(detailEventScript(WEB, '/postings/p1', seed), 'https://attacker.test').events).toHaveLength(0)
+    expect(detailEventScript(WEB, '/postings/p1', undefined)).toBe('')
   })
 })

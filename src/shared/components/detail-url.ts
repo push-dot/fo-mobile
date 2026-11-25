@@ -57,5 +57,10 @@ export const bootScript = (base: string, env: Record<string, unknown>, extra = '
   return onWebOrigin(base, `window.__PUSH__=${JSON.stringify(safe)};${extra}`)
 }
 
+export type DetailSeed = { data: unknown; updatedAt: number }
+
+export const detailEventScript = (base: string, path: string, seed: DetailSeed | undefined) =>
+  seed ? onWebOrigin(base, `window.dispatchEvent(new CustomEvent('push:detail',{detail:${JSON.stringify({ path, ...seed })}}));`) : ''
+
 export const tokenEventScript = (base: string, token: string | null) =>
   onWebOrigin(base, `window.dispatchEvent(new CustomEvent('push:token',{detail:{token:${JSON.stringify(token)}}}));`)

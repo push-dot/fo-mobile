@@ -3,12 +3,13 @@ import { Pressable, View } from 'react-native'
 import type { Profile } from '@push/api-client'
 import { Badge, Icon, Text } from '../../../shared/components'
 import { StyleSheet } from 'react-native-unistyles'
+import { prefetchProfile } from '../api/hooks'
 import { STATUS_TONE } from '../constants'
 import { careerLine, statusLabel } from '../utils'
 import Avatar from './avatar'
 
 const ProfileRow = ({ p }: { p: Profile }) => (
-  <Pressable accessibilityRole="button" onPress={() => router.push(`/profiles/${p.userId}` as Href)} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
+  <Pressable accessibilityRole="button" onPress={() => router.push(`/profiles/${p.userId}` as Href)} onPressIn={() => prefetchProfile(p.userId)} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
     <Avatar name={p.displayName} url={p.avatarUrl} size={52} />
     <View style={styles.body}>
       <View style={styles.nameRow}>
