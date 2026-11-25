@@ -12,7 +12,7 @@ vi.mock('react-native', () => ({ ScrollView: 'ScrollView', View: 'View' }))
 vi.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }))
 vi.mock('expo-router', () => ({ router: { back: vi.fn() }, useLocalSearchParams: () => ({ term: h.term }) }))
 vi.mock('@/theme', () => ({ HIT_TARGET: 44, spacing: Array(12).fill(0), useColors: () => ({}) }))
-vi.mock('@/shared/components', () => ({ Button: 'Button', CtaBar: 'CtaBar', SegmentedControl: 'SegmentedControl', TopBar: 'TopBar' }))
+vi.mock('@/shared/components', () => ({ Button: 'Button', CtaBar: 'CtaBar', SegmentedControl: 'SegmentedControl', TopBar: 'TopBar', NativeTopBar: 'NativeTopBar' }))
 vi.mock('@/features/auth', async () => ({
   ...(await import('@/features/auth/constants')),
   LegalDocument: 'LegalDocument',

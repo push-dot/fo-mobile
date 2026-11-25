@@ -3,7 +3,7 @@ import { LegendList } from '@legendapp/list/react-native'
 import { useState, type ComponentProps } from 'react'
 import { View } from 'react-native'
 import { Empty, OFFER_ARCHIVED_ROW, OFFER_EMPTY_ACTION, OfferRow, Row, useArchivedOffers, useOffers } from '@/features/my'
-import { Icon, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
+import { Icon, SegmentedControl, SkeletonRows, Text, NativeTopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { radius } from '@/theme'
@@ -47,7 +47,7 @@ const OffersScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <TopBar title={box === 'received' ? '받은 제안' : '제안함'} onBack={() => router.back()} />
+      <NativeTopBar title={box === 'received' ? '받은 제안' : '제안함'} onBack={() => router.back()} />
       <View style={styles.segment}>
         <SegmentedControl
           items={[

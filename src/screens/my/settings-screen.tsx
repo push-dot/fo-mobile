@@ -39,7 +39,7 @@ import {
   SettingsRow,
   Switch,
   Text,
-  TopBar,
+  NativeTopBar,
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
 import { StyleSheet } from 'react-native-unistyles'
@@ -51,7 +51,7 @@ const IOS_PICKER = Platform.OS === 'ios'
 
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => (
   <View style={styles.screen}>
-    <TopBar title={title} onBack={() => router.back()} />
+    <NativeTopBar title={title} onBack={() => router.back()} />
     <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
   </View>
 )

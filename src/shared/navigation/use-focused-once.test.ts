@@ -13,6 +13,7 @@ vi.mock('react', async (orig) => ({
 vi.mock('expo-router', () => ({ useIsFocused: () => h.focused, Stack: Object.assign(() => null, { Screen: () => null }) }))
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' } }))
 vi.mock('@/theme', () => ({ useColors: () => ({}), radius: {} }))
+vi.mock('@/shared/components', () => ({ nativeHeaderOptions: () => ({}) }))
 vi.mock('@/screens/home/home-screen', () => ({ default: 'HomeScreen' }))
 vi.mock('@/screens/hub/hub-screen', () => ({ default: 'HubScreen' }))
 vi.mock('@/screens/social/social-screen', () => ({ default: 'SocialScreen' }))

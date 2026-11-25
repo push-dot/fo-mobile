@@ -34,7 +34,7 @@ import {
   JOB_CATEGORIES,
 } from '@/features/my'
 import { showChoiceModal } from '@/shared/navigation'
-import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
+import { CtaBar, askConfirm, Badge, Button, Icon, showToast, TOAST_ABOVE, Text, NativeTopBar } from '@/shared/components'
 import { spacing } from '@/theme'
 
 const HUB_BADGE = '지원용 프로필'
@@ -134,17 +134,13 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
 
   return (
     <View style={styles.screen}>
-      <TopBar
+      <NativeTopBar
         title={application ? undefined : '지원용 프로필'}
         onBack={() => router.back()}
-        right={
-          <GlassButton
-            actions={[
-              { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
-              ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
-            ]}
-          />
-        }
+        actions={[
+          { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
+          ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
+        ]}
       />
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />

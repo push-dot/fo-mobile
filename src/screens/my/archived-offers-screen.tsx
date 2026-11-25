@@ -3,7 +3,7 @@ import { LegendList } from '@legendapp/list/react-native'
 import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { OFFER_ARCHIVED_NOTE, OFFER_MENU_COPY, OfferRow, RETRY_LABEL, useArchivedOffers } from '@/features/my'
-import { emptyNoteStyle, SkeletonRows, StatusNote, Text, TopBar } from '@/shared/components'
+import { emptyNoteStyle, SkeletonRows, StatusNote, Text, NativeTopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
 import { radius } from '@/theme'
 
@@ -20,7 +20,7 @@ const ArchivedOffersScreen = () => {
   const q = useArchivedOffers('received')
   return (
     <View style={styles.screen}>
-      <TopBar title="보관한 제안" onBack={() => router.back()} />
+      <NativeTopBar title="보관한 제안" onBack={() => router.back()} />
       <LegendList
         data={q.data?.data ?? []}
         keyExtractor={(o) => o.id}

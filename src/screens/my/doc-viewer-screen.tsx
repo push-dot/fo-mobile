@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { ScrollView, useWindowDimensions, View } from 'react-native'
+import { Platform, ScrollView, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import { botPickPath } from '@/features/bots'
@@ -12,7 +12,7 @@ import {
   useUndoRemove,
   type ResumeDraft,
 } from '@/features/my'
-import { CtaBar, Button, FloatingHeader, GlassButton, Skeleton, Text, TopBar, useFloatingHeader } from '@/shared/components'
+import { CtaBar, Button, FloatingHeader, Skeleton, Text, NativeTopBar, useFloatingHeader } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { counterPill, onAccent, palette, paperPage, spacing } from '@/theme'
 
@@ -110,7 +110,9 @@ const Paper = ({ d }: { d: ResumeDraft }) => {
 
 const DocViewerScreen = ({ id }: { id: string }) => {
   const insets = useSafeAreaInsets()
-  const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
+  const floating = useFloatingHeader()
+  const { scrolled, onHeight, onScroll } = floating
+  const inset = Platform.OS === 'ios' ? 0 : floating.inset
   const doc = useSource(id)
   const share = useShareFile()
   const draft = useResumeDraft(id)
@@ -122,18 +124,14 @@ const DocViewerScreen = ({ id }: { id: string }) => {
   return (
     <View style={styles.screen}>
       <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
-      <TopBar
+      <NativeTopBar
         transparent
         title={s ? displayName(s.fileName) : '서류 보기'}
         onBack={() => router.back()}
-        right={
-          <GlassButton
-            actions={[
-              { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
-              { icon: 'more', label: '더 보기', onPress: openMenu },
-            ]}
-          />
-        }
+        actions={[
+          { icon: 'share', label: '공유', onPress: () => (s ? share.mutate({ sourceId: id, name: s.fileName, mimeType: s.mimeType }) : doc.isError && share.mutate({ documentId: id })) },
+          { icon: 'more', label: '더 보기', onPress: openMenu },
+        ]}
       />
       </FloatingHeader>
       <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={styles.content(inset)}>

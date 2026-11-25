@@ -29,7 +29,7 @@ import {
   verifyPhoneCode,
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
-import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { Button, CtaBar, Text, NativeTopBar, useKeyboardHeight } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 
 const OtpScreen = () => {
@@ -130,7 +130,7 @@ const OtpScreen = () => {
   if (blocked) {
     return (
       <View style={styles.screen}>
-        <TopBar onBack={() => router.back()} />
+        <NativeTopBar onBack={() => router.back()} />
         <View style={styles.body}>
           <Text accessibilityRole="header" v="h1" style={styles.title}>
             {TOO_MANY_TITLE}
@@ -151,7 +151,7 @@ const OtpScreen = () => {
 
   return (
     <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.screen}>
-      <TopBar onBack={() => router.back()} />
+      <NativeTopBar onBack={() => router.back()} />
       <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.body}>
         {email ? (
           <View style={styles.pill}>
