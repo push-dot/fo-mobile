@@ -433,6 +433,7 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
 export const resetBots = () => {
   setBots('home')
   plan = 'PRO'
+  schedules = seedSchedules()
 }
 
 export const fixturesNow = () => fixtures
@@ -649,5 +650,99 @@ mock('DELETE', 'bots/:id/transcript', ({ params }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
   emptyBot(params.id!)
+  return undefined
+})
+
+type MockSchedule = Omit<BotContract.BotSchedule, 'nextRunAt'>
+
+const SCHEDULE_LIMIT = 5
+const KST = 9 * 3_600_000
+const CADENCES: readonly BotContract.BotScheduleCadence[] = ['DAILY', 'WEEKDAYS', 'WEEKLY']
+
+const seedSchedules = (): MockSchedule[] => [
+  { id: 'sch-1', botId: 'b-push', prompt: '새 공고 3개 찾아 줘', cadence: 'DAILY', hour: 9, weekday: null, enabled: true, lastRunAt: '2026-11-25T00:00:00Z', lastError: null },
+  { id: 'sch-2', botId: 'b-push', prompt: '지원 현황 정리해 줘', cadence: 'WEEKLY', hour: 18, weekday: 5, enabled: true, lastRunAt: '2026-11-21T09:00:00Z', lastError: 'BOT_BUSY' },
+]
+
+let schedules = seedSchedules()
+
+export const nextRunOf = (s: Pick<MockSchedule, 'cadence' | 'hour' | 'weekday'>, now: Date) => {
+  const local = new Date(now.getTime() + KST)
+  for (let day = 0; day <= 7; day++) {
+    const at = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + day, s.hour) - KST
+    const weekday = new Date(at + KST).getUTCDay()
+    const fits = s.cadence === 'DAILY' || (s.cadence === 'WEEKDAYS' ? weekday >= 1 && weekday <= 5 : weekday === s.weekday)
+    if (at > now.getTime() && fits) return new Date(at).toISOString()
+  }
+  throw new Error('no next run')
+}
+
+const scheduleDto = (s: MockSchedule): BotContract.BotSchedule => ({ ...s, nextRunAt: nextRunOf(s, new Date()) })
+
+const scheduleFieldError = (b: Record<string, unknown>, cadence: unknown, weekday: unknown) => {
+  if (b.prompt !== undefined && (typeof b.prompt !== 'string' || b.prompt.trim().length < 1 || b.prompt.trim().length > 500)) return invalid('prompt', 'must be 1-500 characters')
+  if (!CADENCES.some((c) => c === cadence)) return invalid('cadence', `must be one of ${CADENCES.join(', ')}`)
+  if (b.hour !== undefined && !(Number.isInteger(b.hour) && (b.hour as number) >= 0 && (b.hour as number) <= 23)) return invalid('hour', 'must be 0-23')
+  if (cadence === 'WEEKLY' && !(Number.isInteger(weekday) && (weekday as number) >= 0 && (weekday as number) <= 6)) return invalid('weekday', 'must be 0-6 for WEEKLY')
+  if (b.enabled !== undefined && typeof b.enabled !== 'boolean') return invalid('enabled', 'must be a boolean')
+  return null
+}
+
+const scheduleOf = (params: Record<string, string | undefined>) => {
+  const f = fixtureOf(params.id!)
+  return f && schedules.find((s) => s.botId === f.bot.id && s.id === params.scheduleId)
+}
+
+mock('GET', 'bots/:id/schedules', ({ params }) => {
+  const f = fixtureOf(params.id!)
+  return f ? { data: schedules.filter((s) => s.botId === f.bot.id).map(scheduleDto) } : notFound()
+})
+
+mock('POST', 'bots/:id/schedules', ({ params, body }) => {
+  const f = fixtureOf(params.id!)
+  if (!f) return notFound()
+  if (!hasReferenceConsent()) return consentRequired()
+  const b = (body ?? {}) as Record<string, unknown>
+  if (b.prompt === undefined || b.hour === undefined) return invalid(b.prompt === undefined ? 'prompt' : 'hour', 'is required')
+  const bad = scheduleFieldError(b, b.cadence, b.weekday)
+  if (bad) return bad
+  if (schedules.length >= SCHEDULE_LIMIT) return error(403, 'SCHEDULE_LIMIT', 'schedule limit reached', { limit: SCHEDULE_LIMIT })
+  const made: MockSchedule = {
+    id: nextId('sch'),
+    botId: f.bot.id,
+    prompt: (b.prompt as string).trim(),
+    cadence: b.cadence as BotContract.BotScheduleCadence,
+    hour: b.hour as number,
+    weekday: b.cadence === 'WEEKLY' ? (b.weekday as number) : null,
+    enabled: true,
+    lastRunAt: null,
+    lastError: null,
+  }
+  schedules.push(made)
+  return { status: 201, body: { data: scheduleDto(made) } }
+})
+
+mock('PATCH', 'bots/:id/schedules/:scheduleId', ({ params, body }) => {
+  const s = scheduleOf(params)
+  if (!s) return notFound()
+  const b = (body ?? {}) as Record<string, unknown>
+  const cadence = b.cadence ?? s.cadence
+  const weekday = b.weekday ?? s.weekday
+  const bad = scheduleFieldError(b, cadence, weekday)
+  if (bad) return bad
+  Object.assign(s, {
+    ...(typeof b.prompt === 'string' ? { prompt: b.prompt.trim() } : {}),
+    ...(typeof b.hour === 'number' ? { hour: b.hour } : {}),
+    ...(typeof b.enabled === 'boolean' ? { enabled: b.enabled } : {}),
+    cadence,
+    weekday: cadence === 'WEEKLY' ? weekday : null,
+  })
+  return { data: scheduleDto(s) }
+})
+
+mock('DELETE', 'bots/:id/schedules/:scheduleId', ({ params }) => {
+  const s = scheduleOf(params)
+  if (!s) return notFound()
+  schedules = schedules.filter((x) => x !== s)
   return undefined
 })

@@ -66,3 +66,12 @@ describe('bot profile allowed sites', () => {
     expect(allowedLine(new Date(2026, 10, 6), 'other')).toBe('11월 6일 허용')
   })
 })
+
+describe('bot profile schedules', () => {
+  it('draws the row first among the preferences on both kinds, with its count', () => {
+    expect(ids('push', { scheduleCount: 2 })).toEqual(['posting', 'fit', 'materials', 'schedules', 'notify'])
+    expect(ids('company', { scheduleCount: 0 })).toEqual(['posting', 'fit', 'materials', 'schedules', 'color', 'notify', 'delete'])
+    expect(profileGroups({ kind: 'push', posting: null, fitScore: null, materialCount: null, scheduleCount: 3 })[0]?.[0]).toEqual({ id: 'schedules', label: '예약한 일', value: '3개' })
+    expect(ids('push')).not.toContain('schedules')
+  })
+})

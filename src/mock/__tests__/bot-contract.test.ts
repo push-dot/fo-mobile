@@ -39,6 +39,10 @@ const BOT_CALLS: Record<keyof BotApi['bots'], () => Promise<unknown>> = {
   cancel: () => api.bots.cancel('b-dotori'),
   answer: () => api.bots.answer('b-moa', 'card-moa-edit', { optionId: 'approve' }),
   retryCard: () => api.bots.retryCard('b-moa', 'card-moa-edit'),
+  schedules: () => api.bots.schedules('push'),
+  createSchedule: () => api.bots.createSchedule('b-moa', { prompt: '새 공고 3개 찾아 줘', cadence: 'DAILY', hour: 9 }),
+  updateSchedule: () => api.bots.updateSchedule('push', 'sch-1', { enabled: false }),
+  removeSchedule: () => api.bots.removeSchedule('push', 'sch-2'),
 }
 
 const MATERIAL_CALLS: Record<keyof BotApi['materials'], () => Promise<unknown>> = {
@@ -298,5 +302,38 @@ describe('materials', () => {
     await api.bots.remove('b-moa')
     expect(await api.materials.get('file', 'f1')).toMatchObject({ createdBy: null, usedBy: [] })
     await expect(api.materials.list({ bot: 'b-moa' })).rejects.toMatchObject({ status: 404 })
+  })
+})
+
+describe('schedules', () => {
+  const create = (body: Partial<BotContract.CreateBotScheduleBody> = {}) =>
+    api.bots.createSchedule('push', { prompt: '지원 현황 정리해 줘', cadence: 'WEEKLY', hour: 18, weekday: 1, ...body })
+
+  it('lists the seeded Push Bot schedules with a next run in the future', async () => {
+    const list = await api.bots.schedules('push')
+    expect(list.map((s) => [s.cadence, s.hour, s.weekday, s.lastError])).toEqual([['DAILY', 9, null, null], ['WEEKLY', 18, 5, 'BOT_BUSY']])
+    for (const s of list) expect(Date.parse(s.nextRunAt)).toBeGreaterThan(Date.now())
+  })
+
+  it('creates, pauses, and deletes a schedule', async () => {
+    const made = await create()
+    expect(made).toMatchObject({ prompt: '지원 현황 정리해 줘', weekday: 1, enabled: true, lastError: null })
+    expect((await api.bots.updateSchedule('push', made.id, { enabled: false })).enabled).toBe(false)
+    await api.bots.removeSchedule('push', made.id)
+    expect((await api.bots.schedules('push')).map((s) => s.id)).not.toContain(made.id)
+  })
+
+  it('refuses the sixth schedule across bots, a blank prompt, and a weekly run with no weekday', async () => {
+    await create()
+    await create()
+    await create()
+    await expect(create()).rejects.toMatchObject({ status: 403, code: 'SCHEDULE_LIMIT', details: { limit: 5 } })
+    await expect(api.bots.createSchedule('b-moa', { prompt: ' ', cadence: 'DAILY', hour: 9 })).rejects.toMatchObject({ status: 400 })
+    await expect(api.bots.createSchedule('b-moa', { prompt: 'a', cadence: 'WEEKLY', hour: 9 })).rejects.toMatchObject({ status: 400 })
+  })
+
+  it('needs reference consent to create', async () => {
+    await withdrawConsent()
+    await expect(create()).rejects.toMatchObject({ status: 403, code: 'CONSENT_REQUIRED' })
   })
 })

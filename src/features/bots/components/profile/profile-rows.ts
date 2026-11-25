@@ -1,3 +1,5 @@
+import { SCHEDULES_ROW, schedulesValue } from '../../utils/schedules'
+
 export const PROFILE_LOADING_LABEL = 'Bot 프로필을 불러오는 중이에요'
 export const PROFILE_ERROR_TITLE = 'Bot 정보를 불러오지 못했어요'
 export const PROFILE_ERROR_BODY = '인터넷 연결을 확인하고 다시 시도해 주세요.'
@@ -49,7 +51,7 @@ export const revokeA11y = (host: string) => `${host} ${REVOKE_LABEL}`
 export const colorA11y = (index: number) => `색 ${index + 1}`
 
 export type ProfileRow =
-  | { id: 'posting' | 'fit' | 'materials' | 'allowed' | 'companies'; label: string; value: string }
+  | { id: 'posting' | 'fit' | 'materials' | 'allowed' | 'companies' | 'schedules'; label: string; value: string }
   | { id: 'color' | 'notify' | 'delete'; label: string }
 
 export const profileGroups = (input: {
@@ -59,6 +61,7 @@ export const profileGroups = (input: {
   materialCount: number | null
   companyCount?: number | null
   allowedCount?: number | null
+  scheduleCount?: number | null
 }): ProfileRow[][] => {
   const facts: ProfileRow[] = []
   if (input.posting) facts.push({ id: 'posting', label: POSTING_LABEL, value: deadlineValue(input.posting.deadline) })
@@ -68,6 +71,7 @@ export const profileGroups = (input: {
   if (input.allowedCount) docs.push({ id: 'allowed', label: ALLOWED_ROW, value: allowedValue(input.allowedCount) })
   if (input.kind === 'push' && input.companyCount) docs.push({ id: 'companies', label: COMPANIES_ROW, value: companiesValue(input.companyCount) })
   const prefs: ProfileRow[] = []
+  if (input.scheduleCount !== undefined) prefs.push({ id: 'schedules', label: SCHEDULES_ROW, value: schedulesValue(input.scheduleCount) })
   if (input.kind === 'company') prefs.push({ id: 'color', label: COLOR_ROW })
   prefs.push({ id: 'notify', label: NOTIFY_LABEL })
   const groups = [facts, docs, prefs].filter((group) => group.length > 0)
