@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
@@ -65,18 +65,17 @@ import {
 } from './fetchers'
 import { ingestEnabled } from '../utils/ingest-enabled'
 
-export const useUnreadOffers = () =>
-  useQuery({
-    queryKey: ['me', 'offers', 'received', 'unread'],
-    queryFn: fetchUnreadOffers,
-    select: (r) => r.data.filter((o) => !o.readAt).length,
-  })
+export const unreadOffersQuery = queryOptions({ queryKey: ['me', 'offers', 'received', 'unread'], queryFn: fetchUnreadOffers })
+export const myProfileQuery = queryOptions({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
+export const consentsQuery = queryOptions({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
 
-export const useMyProfile = () => useQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
+export const useUnreadOffers = () => useQuery({ ...unreadOffersQuery, select: (r) => r.data.filter((o) => !o.readAt).length })
+
+export const useMyProfile = () => useQuery(myProfileQuery)
 
 export const useReferenceConsent = () => {
   const qc = useQueryClient()
-  const q = useQuery({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
+  const q = useQuery(consentsQuery)
   const m = useMutation({
     mutationFn: updateReferenceConsent,
     onSuccess: (data) => qc.setQueryData(['me', 'consents'], data),
@@ -95,7 +94,7 @@ export const useReferenceConsent = () => {
 
 export const useMarketingConsent = () => {
   const qc = useQueryClient()
-  const q = useQuery({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
+  const q = useQuery(consentsQuery)
   const m = useMutation({
     mutationFn: updateMarketingConsent,
     onSuccess: (data) => {

@@ -1,15 +1,18 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { JobCategory, ProfileFilters } from '@push/api-client'
+import { queryClient } from '@/providers/query-client'
 import { sendOfferError, type SheetFilters } from '../utils'
 import { fetchOfferPostings, fetchProfile, fetchProfileCount, fetchProfileList, followProfile, sendProfileOffer, unfollowProfile } from './fetchers'
 
-export const useProfileList = (category: JobCategory[], sheet: SheetFilters) =>
-  useInfiniteQuery({
+export const profileListQuery = (category: JobCategory[], sheet: SheetFilters) =>
+  infiniteQueryOptions({
     queryKey: ['profiles', 'list', category, sheet],
     queryFn: ({ pageParam }) => fetchProfileList(category, sheet, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
   })
+
+export const useProfileList = (category: JobCategory[], sheet: SheetFilters) => useInfiniteQuery(profileListQuery(category, sheet))
 
 export const useProfileCount = (key: unknown[], query: ProfileFilters, enabled: boolean) =>
   useQuery({ queryKey: ['profiles', 'count', ...key], queryFn: () => fetchProfileCount(query), enabled }).data?.page.total
@@ -35,7 +38,11 @@ export const useSendOffer = (userId: string, message: string, postingId: string 
   })
 }
 
-export const useProfile = (id: string) => useQuery({ queryKey: ['profiles', 'detail', id], queryFn: () => fetchProfile(id) })
+export const profileDetailQuery = (id: string) => queryOptions({ queryKey: ['profiles', 'detail', id], queryFn: () => fetchProfile(id) })
+
+export const prefetchProfile = (id: string) => void queryClient.prefetchQuery(profileDetailQuery(id))
+
+export const useProfile = (id: string) => useQuery(profileDetailQuery(id))
 
 export const useFollow = (id: string) => {
   const qc = useQueryClient()

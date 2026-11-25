@@ -11,7 +11,7 @@ import { StyleSheet } from 'react-native-unistyles'
 const CTA_HEIGHT = 14 + 56 + 6
 
 const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
-  const { data: p } = usePosting(id)
+  const { data: p, dataUpdatedAt } = usePosting(id)
   const toggleBookmark = useToggleBookmark()
   const floating = useFloatingHeader()
   const { onHeight } = floating
@@ -21,7 +21,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
 
   return (
     <View style={styles.screen}>
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
       <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
       <NativeTopBar
         transparent

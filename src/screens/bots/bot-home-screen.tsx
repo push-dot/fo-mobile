@@ -14,8 +14,7 @@ const BotHomeScreen = () => {
   const setMuted = useSetBotMuted()
   const local = useLocalActivity()
   const consent = useReferenceConsent()
-  if (!consent.data) return null
-  if (consent.data.referenceData === false) return <Redirect href={`${botChatPath('push')}?instant=1`} />
+  if (consent.data?.referenceData === false) return <Redirect href={`${botChatPath('push')}?instant=1`} />
   return (
     <BotHomeView
       bots={list.data}

@@ -17,7 +17,7 @@ const OwnProfile = () => {
 
 const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
   const me = useViewerId()
-  const { data: p } = useProfile(id)
+  const { data: p, dataUpdatedAt } = useProfile(id)
   const follow = useFollow(id)
   const following = follow.isPending ? follow.variables : !!p?.following
   const self = me === id
@@ -49,7 +49,7 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
 
   return (
     <View style={styles.screen}>
-      {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
+      {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
       <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
         <NativeTopBar
           transparent

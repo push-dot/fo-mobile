@@ -1,6 +1,6 @@
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useRef, useState } from 'react'
-import { useHomeSnapshotSync } from '@/features/home'
+import { useHomeSnapshotReady } from '@/features/home'
 import { useSession } from './session-store'
 import { SPLASH_ABSOLUTE_TIMEOUT_MS, SPLASH_SNAPSHOT_TIMEOUT_MS, shouldHideSplash } from './splash-hide'
 
@@ -12,7 +12,7 @@ type Props = {
 const SplashGate = ({ sessionReady, themeReady }: Props) => {
   const session = useSession((s) => s.session)
   const sessionId = session?.user.id ?? null
-  const snapshotReady = useHomeSnapshotSync()
+  const snapshotReady = useHomeSnapshotReady()
   const [timeoutForUser, setTimeoutForUser] = useState<string | null>(null)
   const [absoluteTimedOut, setAbsoluteTimedOut] = useState(false)
   const timedOut = sessionId !== null && timeoutForUser === sessionId

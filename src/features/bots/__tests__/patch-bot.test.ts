@@ -4,7 +4,7 @@ import { ApiError } from '@push/api-client'
 import type { Bot, BotId, BotProfile, CompanyBot } from '../types'
 
 const updateBot = vi.fn()
-vi.mock('../api/fetchers', () => ({ updateBot: (...args: unknown[]) => updateBot(...args) }))
+vi.mock('../api/fetchers', () => ({ fetchBots: vi.fn(), updateBot: (...args: unknown[]) => updateBot(...args) }))
 const { patchBotMutation } = await import('../api/hooks')
 
 const moapay: CompanyBot = {

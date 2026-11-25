@@ -104,3 +104,21 @@ describe('useSession.load', () => {
     expect(useSession.getState()).toMatchObject({ session, ready: true })
   })
 })
+
+describe('expiresSoon', () => {
+  it('flags a session within a minute of expiry', async () => {
+    const { expiresSoon } = await import('./session-store')
+    const now = 1_000_000
+    expect(expiresSoon({ ...session, expiresAt: now + 30_000 }, now)).toBe(true)
+    expect(expiresSoon({ ...session, expiresAt: now + 120_000 }, now)).toBe(false)
+    expect(expiresSoon(session, now)).toBe(false)
+  })
+
+  it('stamps the expiry when a session is saved', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session: null, ready: true })
+    const before = Date.now()
+    await useSession.getState().set(session)
+    expect(useSession.getState().session?.expiresAt).toBeGreaterThanOrEqual(before + 3_600_000)
+  })
+})

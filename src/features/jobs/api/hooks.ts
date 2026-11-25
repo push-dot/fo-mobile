@@ -1,5 +1,6 @@
-import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, queryOptions, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PostingDetail, PostingFilters } from '@push/api-client'
+import { queryClient } from '@/providers/query-client'
 import { applyDoc, toQuery, type Filters } from '../utils'
 import type { ApplyBody } from '../types'
 import { invalidateAfterPostingBookmarkToggle } from '../utils/bookmark-invalidation'
@@ -59,5 +60,8 @@ export const useApplyDocs = (enabled: boolean) =>
     enabled,
   })
 
-export const usePosting = (id: string) =>
-  useQuery({ queryKey: ['postings', 'detail', id], queryFn: () => fetchPosting(id), enabled: id.length > 0 })
+export const postingDetailQuery = (id: string) => queryOptions({ queryKey: ['postings', 'detail', id], queryFn: () => fetchPosting(id) })
+
+export const prefetchPosting = (id: string) => void queryClient.prefetchQuery(postingDetailQuery(id))
+
+export const usePosting = (id: string) => useQuery({ ...postingDetailQuery(id), enabled: id.length > 0 })

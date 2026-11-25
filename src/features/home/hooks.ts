@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { create } from 'zustand'
 import type { SectionKind } from '@/features/jobs'
 import { useSession } from '@/shared/infrastructure'
 import { createSnapshotPersistGate, persistHomeSnapshotIfCurrent } from './utils/snapshot-persist'
@@ -27,13 +28,21 @@ const schedulePersist = (
   )
 }
 
+const useHydratedUser = create<{ userId: string | null }>(() => ({ userId: null }))
+const setHydratedUser = (userId: string) => useHydratedUser.setState({ userId })
+
+export const useHomeSnapshotReady = () => {
+  const userId = useSession((s) => s.session?.user.id ?? null)
+  const hydratedUser = useHydratedUser((s) => s.userId)
+  return !userId || hydratedUser === userId
+}
+
 export const useHomeSnapshotSync = () => {
   const qc = useQueryClient()
   const userId = useSession((s) => s.session?.user.id ?? null)
-  const [hydratedUser, setHydratedUser] = useState<string | null>(null)
+  const ready = useHomeSnapshotReady()
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
   const gate = useRef(createSnapshotPersistGate(() => useSession.getState().session?.user.id))
-  const ready = !userId || hydratedUser === userId
 
   useEffect(() => {
     return useSession.subscribe((next, prev) => {
