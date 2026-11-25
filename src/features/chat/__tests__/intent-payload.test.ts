@@ -46,6 +46,11 @@ describe('quick start intent payloads', () => {
       message: '모아페이 백엔드 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요',
       context: { documentId: DOC },
     })
+    expect(start('gap', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
+      intent: 'gaps',
+      message: '모아페이 백엔드 공고 요건에 비해 내 프로필에서 부족한 점을 알려 주세요',
+      context: { documentId: DOC },
+    })
     expect(start('boost', { picked: [job], doc: '이력서.pdf', documentId: DOC })).toMatchObject({
       intent: 'boost',
       context: { documentId: DOC },
@@ -92,7 +97,7 @@ describe('quick start intent payloads', () => {
     const fit = QUICK_STARTS.find((q) => q.key === 'fit')!
     expect(gap).toMatchObject({ openList: true, label: '부족한 점 찾기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', action: '부족한 점 찾기', listLabel: '공고', readsHub: true })
     expect(fit!.openList).toBe(true)
-    expect(fit).toMatchObject({ label: '적합도 보기', title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.', listLabel: '공고', readsHub: true })
+    expect(fit).toMatchObject({ label: '적합도 보기', title: '어떤 공고와 비교할까요?', description: '적합도를 보고, 이어서 점수를 올려요.', listLabel: '공고', readsHub: true })
     expect(fit.docLabel).toBeUndefined()
     expect(gap.docLabel).toBeUndefined()
   })

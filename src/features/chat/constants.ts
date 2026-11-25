@@ -126,11 +126,11 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'gap', label: '부족한 점 찾기', icon: 'qs-gap', layout: 'pick', action: '부족한 점 찾기', listLabel: '공고', openList: true, readsHub: true,
     title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
-    start: (i) => one(i) && opened(`${one(i)!.over} 부족한 점`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
+    start: (i) => one(i) && opened(`${one(i)!.over} 부족한 점`, `${one(i)!.over} ${one(i)!.title} 공고 요건에 비해 내 프로필에서 부족한 점을 알려 주세요`, 'gaps', i.documentId),
   },
   {
     key: 'fit', label: '적합도 보기', icon: 'qs-fit', layout: 'pick', action: '적합도 보기', listLabel: '공고', openList: true, readsHub: true,
-    title: '어떤 공고와 비교할까요?', description: '공고 요건과 내 서류를 비교해요.',
+    title: '어떤 공고와 비교할까요?', description: '적합도를 보고, 이어서 점수를 올려요.',
     start: (i) => one(i) && opened(`${one(i)!.over} 적합도`, `${one(i)!.over} ${one(i)!.title} 공고와 내 프로필을 비교해서 적합도와 부족한 점을 알려 주세요`, 'fit', i.documentId),
   },
   {
@@ -189,7 +189,7 @@ export const QUICK_STARTS: QuickStart[] = [
   },
 ]
 
-export const CALENDAR_TASKS = ['이번 주 정리하기', '면접·커피챗 잡기', '준비 알림 만들기'] as const
+export const CALENDAR_TASKS = ['이번 주 정리하기', '마감일 넣기', '면접·커피챗 잡기', '준비 알림 만들기'] as const
 
 export const KEYWORD_GLYPH = {
   ok: { char: '✓', gap: 3 },
