@@ -1,14 +1,11 @@
 import { router } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { useRef, useState, type ComponentRef } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, TextInput, View } from 'react-native'
 import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
-import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
+import { TOAST_ABOVE, Text, NativeTopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
 import { StyleSheet } from 'react-native-unistyles'
-import { radius } from '@/theme'
-
-const moreButton = { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
 
 const PostDetailScreen = ({ id }: { id: string }) => {
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null)
@@ -30,12 +27,13 @@ const PostDetailScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={styles.screen}>
-      <TopBar
+      <NativeTopBar
         onBack={() => router.back()}
-        right={
-          <Menu
-            accessibilityLabel="더 보기"
-            actions={[
+        actions={[
+          {
+            icon: 'more',
+            label: '더 보기',
+            menu: [
               { key: 'save', actions: [saveMenuAction(!!post.data?.saved, () => toggleSave.mutate(!post.data?.saved))] },
               {
                 key: 'send',
@@ -49,19 +47,9 @@ const PostDetailScreen = ({ id }: { id: string }) => {
                   },
                 ],
               },
-            ]}
-          >
-            {Platform.OS === 'ios' ? (
-              <Glass interactive style={moreButton}>
-                <Icon name="more" size={22} color="t1" />
-              </Glass>
-            ) : (
-              <View style={moreButton}>
-                <Icon name="more" size={22} color="t1" />
-              </View>
-            )}
-          </Menu>
-        }
+            ],
+          },
+        ]}
       />
       {post.data ? (
         <KeyboardAvoidingView style={styles.body} behavior="padding">

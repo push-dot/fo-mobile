@@ -23,7 +23,7 @@ import {
   EMPLOYMENT_TYPES,
   workConditionLines,
 } from '@/features/my'
-import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { CtaBar, Badge, Button, Icon, Text, NativeTopBar } from '@/shared/components'
 import { openBrowser, shareMessage } from '@/shared/infrastructure'
 import { StyleSheet } from 'react-native-unistyles'
 
@@ -41,17 +41,15 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
 
   return (
     <View style={styles.screen}>
-      <TopBar
+      <NativeTopBar
         onBack={() => router.back()}
-        right={
-          p ? (
-            <GlassButton
-              actions={[
+        actions={
+          p
+            ? [
                 { icon: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크', active: p.bookmarked, onPress: () => toggleBookmark(p) },
                 { icon: 'share', label: '공유', onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }) },
-              ]}
-            />
-          ) : null
+              ]
+            : undefined
         }
       />
       {isLoading || detailLoading ? (

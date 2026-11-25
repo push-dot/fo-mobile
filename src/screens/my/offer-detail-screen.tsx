@@ -16,7 +16,7 @@ import {
   useViewerBox,
 } from '@/features/my'
 import { openPostingBot } from '@/features/bots'
-import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
+import { CtaBar, Badge, Button, Chip, Icon, Skeleton, Text, NativeTopBar } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 
 type Box = 'received' | 'sent'
@@ -30,7 +30,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
   if (isLoading || !o) {
     return (
       <View style={styles.root}>
-        <TopBar onBack={() => router.back()} />
+        <NativeTopBar onBack={() => router.back()} />
         {isLoading ? (
           <View style={styles.loading}>
             <Skeleton width="60%" height={24} />
@@ -50,19 +50,9 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
 
   return (
     <View style={styles.root}>
-      <TopBar
+      <NativeTopBar
         onBack={() => router.back()}
-        right={
-          <GlassButton
-            actions={[
-              {
-                icon: 'more',
-                label: '더 보기',
-                menu: menu ?? [],
-              },
-            ]}
-          />
-        }
+        actions={menu ? [{ icon: 'more', label: '더 보기', menu }] : undefined}
       />
       <ScrollView
         contentContainerStyle={styles.content}

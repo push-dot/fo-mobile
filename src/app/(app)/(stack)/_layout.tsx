@@ -2,6 +2,7 @@ import { Stack } from 'expo-router'
 import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { ConsentPromptListener } from '@/features/chat'
+import { nativeHeaderOptions } from '@/shared/components'
 import { fullPageOptions, modalOptions, sheetOptions, tintedSheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
@@ -15,33 +16,35 @@ const instantNone = ({ route }: { route: { params?: unknown } }) => ({ animation
 
 const SignedInStack = () => {
   const c = useColors()
+  const bar = nativeHeaderOptions(c)
+  const clearBar = nativeHeaderOptions(c, true)
   return (
     <View style={styles.root}>
       <ConsentPromptListener />
       <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
-      <Stack.Screen name="postings/[id]" />
-      <Stack.Screen name="profiles/[id]" />
-      <Stack.Screen name="posts/[id]" />
+      <Stack.Screen name="postings/[id]" options={clearBar} />
+      <Stack.Screen name="profiles/[id]" options={clearBar} />
+      <Stack.Screen name="posts/[id]" options={bar} />
       <Stack.Screen name="compose" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="notifications" />
-      <Stack.Screen name="search" />
-      <Stack.Screen name="offers/index" />
-      <Stack.Screen name="offers/archived" />
-      <Stack.Screen name="offers/[id]" />
-      <Stack.Screen name="offers/[id]/messages" />
-      <Stack.Screen name="settings/index" />
-      <Stack.Screen name="settings/blocked" />
-      <Stack.Screen name="settings/career" />
-      <Stack.Screen name="settings/legal" />
-      <Stack.Screen name="docs/[id]" />
-      <Stack.Screen name="docs/push/index" />
-      <Stack.Screen name="docs/push/[id]" />
+      <Stack.Screen name="notifications" options={clearBar} />
+      <Stack.Screen name="search" options={{ animation: 'fade' }} />
+      <Stack.Screen name="offers/index" options={bar} />
+      <Stack.Screen name="offers/archived" options={bar} />
+      <Stack.Screen name="offers/[id]" options={bar} />
+      <Stack.Screen name="offers/[id]/messages" options={bar} />
+      <Stack.Screen name="settings/index" options={bar} />
+      <Stack.Screen name="settings/blocked" options={bar} />
+      <Stack.Screen name="settings/career" options={bar} />
+      <Stack.Screen name="settings/legal" options={bar} />
+      <Stack.Screen name="docs/[id]" options={clearBar} />
+      <Stack.Screen name="docs/push/index" options={bar} />
+      <Stack.Screen name="docs/push/[id]" options={bar} />
       <Stack.Screen name="docs/push/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="edit-profile/[section]" options={modalOptions(c)} />
-      <Stack.Screen name="activity/follows" />
-      <Stack.Screen name="activity/posts" />
-      <Stack.Screen name="activity/applications/[id]" />
+      <Stack.Screen name="activity/follows" options={bar} />
+      <Stack.Screen name="activity/posts" options={bar} />
+      <Stack.Screen name="activity/applications/[id]" options={bar} />
       <Stack.Screen name="choice" options={sheetOptions(c)} />
       <Stack.Screen name="consent" options={sheetOptions(c)} />
       <Stack.Screen name="reconsent-terms" options={{ gestureEnabled: false }} />

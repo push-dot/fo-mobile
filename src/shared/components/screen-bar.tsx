@@ -1,8 +1,10 @@
-import { useState, type ComponentProps, type ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { Platform, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
+import { useHeaderHeight } from 'expo-router/react-navigation'
 import { StyleSheet } from 'react-native-unistyles'
-import { useColors } from '../../theme'
+import { spacing } from '../../theme'
+import GlassButton, { type GlassAction } from './glass-button'
+import NativeTopBar from './native-top-bar'
 import TopBar from './top-bar'
 
 type ScreenBarScroll = {
@@ -10,35 +12,26 @@ type ScreenBarScroll = {
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-const ScreenBar = ({ bar, children }: { bar: ComponentProps<typeof TopBar>; children: (scroll: ScreenBarScroll) => ReactNode }) => {
-  const c = useColors()
-  const [height, setHeight] = useState(0)
-  const [scrolled, setScrolled] = useState(false)
+const ScreenBar = ({ bar: { actions, ...bar }, children }: { bar: ComponentProps<typeof TopBar> & { actions?: GlassAction[] }; children: (scroll: ScreenBarScroll) => ReactNode }) => {
+  const header = useHeaderHeight()
   if (Platform.OS !== 'ios')
     return (
       <>
-        <TopBar {...bar} />
+        <TopBar {...bar} right={bar.right ?? (actions?.length ? <GlassButton actions={actions} /> : undefined)} />
         {children({ topInset: 0 })}
       </>
     )
   return (
     <View style={styles.screen}>
-      {children({ topInset: height, onScroll: (e) => setScrolled(e.nativeEvent.contentOffset.y > 0) })}
-      <View style={styles.bar} onLayout={(e) => setHeight(e.nativeEvent.layout.height)}>
-        {scrolled ? (
-          <LinearGradient pointerEvents="none" colors={[`${c.bg}F2`, `${c.bg}00`]} style={styles.fade} />
-        ) : null}
-        <TopBar {...bar} transparent />
-      </View>
+      <NativeTopBar transparent title={bar.title} onBack={bar.onBack ?? (() => undefined)} right={bar.right} actions={actions} />
+      {header > 0 ? children({ topInset: header + spacing[2] }) : null}
     </View>
   )
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create({
   screen: { flex: 1 },
-  bar: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 },
-  fade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: -theme.spacing[3] },
-}))
+})
 
 export type { ScreenBarScroll }
 

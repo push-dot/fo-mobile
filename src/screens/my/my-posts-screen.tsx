@@ -3,7 +3,7 @@ import { LegendList } from '@legendapp/list/react-native'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import type { MyPostsSort } from '@push/api-client'
-import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
+import { Icon, Text, NativeTopBar } from '@/shared/components'
 import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView, POST_CATEGORIES } from '@/features/my'
 import { StyleSheet } from 'react-native-unistyles'
 
@@ -16,10 +16,10 @@ const MyPostsScreen = () => {
   const empty = view === 'mine' ? emptyCta('posts') : view === 'saved' ? emptyCta('saved') : null
   return (
     <View style={styles.screen}>
-      <TopBar
+      <NativeTopBar
         title={postsTitle(view)}
         onBack={() => router.back()}
-        right={<GlassButton actions={[{ icon: 'more', label: '더 보기', menu: postsMenu({ view, sort }, { view: setView, sort: setSort }) }]} />}
+        actions={[{ icon: 'more', label: '더 보기', menu: postsMenu({ view, sort }, { view: setView, sort: setSort }) }]}
       />
       {query.isLoading ? (
         <ListSkeleton />
