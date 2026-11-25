@@ -5,17 +5,19 @@ import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import { useColors } from '../../theme'
+import { useXlChrome } from './xl-chrome'
 
 export const useFloatingHeader = () => {
   const [scrolled, setScrolled] = useState(false)
   const [height, setHeight] = useState(0)
   const { top } = useSafeAreaInsets()
+  const { row } = useXlChrome()
   return {
     scrolled,
     onHeight: setHeight,
     onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) =>
       setScrolled(e.nativeEvent.contentOffset.y > 0),
-    inset: Math.max(height - top, 0),
+    inset: height ? Math.max(height - top, 0) : row,
   }
 }
 

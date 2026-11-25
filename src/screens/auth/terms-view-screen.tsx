@@ -2,7 +2,7 @@ import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams } from 'expo-router'
 import { LegalDocument, TERMS_AGREE, TERM_DOCUMENTS, TERM_ROWS, isTermKey, useTermsConsent } from '@/features/auth'
-import { Button, CtaBar, TopBar } from '@/shared/components'
+import { Button, CtaBar, NativeTopBar } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '@/theme'
 
@@ -16,7 +16,7 @@ const TermsViewScreen = () => {
   if (!isTermKey(term))
     return (
       <View style={styles.screen}>
-        <TopBar onBack={() => router.back()} />
+        <NativeTopBar onBack={() => router.back()} />
       </View>
     )
 
@@ -24,7 +24,7 @@ const TermsViewScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <TopBar onBack={() => router.back()} />
+      <NativeTopBar onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content(hasCta, insets.bottom)}>
         <LegalDocument document={TERM_DOCUMENTS[term]} />
       </ScrollView>

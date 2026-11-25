@@ -15,7 +15,7 @@ import {
   toE164,
   usePhoneAuth,
 } from '@/features/auth'
-import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { Button, CtaBar, Text, NativeTopBar, useKeyboardHeight } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 
 const PhoneScreen = () => {
@@ -61,7 +61,7 @@ const PhoneScreen = () => {
 
   return (
     <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.screen}>
-      <TopBar onBack={() => router.back()} />
+      <NativeTopBar onBack={() => router.back()} />
       <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.body}>
         {email ? (
           <View style={styles.pill}>

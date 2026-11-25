@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile } from '@/features/chat'
 import { ProfileTab, useMyProfile } from '@/features/my'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
-import { DetailWebView, FloatingHeader, Glass, Text, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
+import { DetailWebView, FloatingHeader, Glass, Text, NativeTopBar, useFloatingHeader, useNativeTopBarInset, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { StyleSheet } from 'react-native-unistyles'
 
@@ -21,7 +21,9 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const follow = useFollow(id)
   const following = follow.isPending ? follow.variables : !!p?.following
   const self = me === id
-  const { onHeight, inset } = useFloatingHeader()
+  const floating = useFloatingHeader()
+  const { onHeight } = floating
+  const inset = useNativeTopBarInset(floating.inset)
   const [offset, setOffset] = useState(0)
   const { top } = useSafeAreaInsets()
 
@@ -49,7 +51,7 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
     <View style={styles.screen}>
       {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
       <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
-        <TopBar
+        <NativeTopBar
           transparent
           onBack={() => router.back()}
           right={Platform.OS === 'ios' ? <Glass interactive style={styles.glass}>{actions}</Glass> : actions}

@@ -27,7 +27,7 @@ import {
   type FailedSend,
 } from '@/features/my'
 import { Composer } from '@/features/chat'
-import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
+import { Icon, Skeleton, Text, NativeTopBar, useKeyboardHeight } from '@/shared/components'
 import { composerPadding } from '@/shared/utility'
 import { onAccent, spacing } from '@/theme'
 
@@ -124,7 +124,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   if (!o) {
     return (
       <View style={styles.screen}>
-        <TopBar onBack={() => router.back()} />
+        <NativeTopBar onBack={() => router.back()} />
         <View style={styles.loading}>
           <Skeleton width="100%" height={64} />
           <Skeleton width="60%" height={44} />
@@ -228,9 +228,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.screen}>
-      <TopBar
+      <NativeTopBar
         onBack={() => router.back()}
-        left={
+        titleView={
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`${who.displayName} 허브 프로필 보기`}
@@ -250,9 +250,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             </View>
           </Pressable>
         }
-        right={
-          menu ? <GlassButton actions={[{ icon: 'more', label: '더 보기', menu }]} /> : undefined
-        }
+        actions={menu ? [{ icon: 'more', label: '더 보기', menu }] : undefined}
       />
       <LegendList
         data={items}

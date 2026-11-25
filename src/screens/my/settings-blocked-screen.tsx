@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { Avatar, BLOCKED_COPY, blockedLine, OFFER_MENU_COPY, RETRY_LABEL, useBlocked, useUnblock } from '@/features/my'
-import { Button, emptyNoteStyle, SettingsGroup, StatusNote, Text, TopBar } from '@/shared/components'
+import { Button, emptyNoteStyle, SettingsGroup, NativeTopBar, StatusNote, Text } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { HIT_TARGET } from '@/theme'
 
@@ -13,7 +13,7 @@ const SettingsBlockedScreen = () => {
   const rows = data?.data
   return (
     <View style={styles.screen}>
-      <TopBar title={BLOCKED_COPY.title} onBack={() => router.back()} />
+      <NativeTopBar title={BLOCKED_COPY.title} onBack={() => router.back()} />
       {isPending ? (
         <ActivityIndicator style={styles.spinner} />
       ) : !rows ? (

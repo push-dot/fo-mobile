@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import { ScrollView, View } from 'react-native'
 import { hideCompanyLabel, useMyFollowers, useMyProfile, useSettings, VISIBILITY } from '@/features/my'
-import { SettingsGroup, SettingsRow, Switch, TopBar } from '@/shared/components'
+import { SettingsGroup, SettingsRow, Switch, NativeTopBar } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 
 const SettingsCareerScreen = () => {
@@ -13,7 +13,7 @@ const SettingsCareerScreen = () => {
   const company = me?.careers.find((x) => !x.endedOn)?.company ?? ''
   return (
     <View style={styles.root}>
-      <TopBar title="커리어 상태" onBack={() => router.back()} />
+      <NativeTopBar title="커리어 상태" onBack={() => router.back()} />
       {s ? (
         <ScrollView contentContainerStyle={styles.content}>
           <SettingsGroup note={current?.sub(count)}>

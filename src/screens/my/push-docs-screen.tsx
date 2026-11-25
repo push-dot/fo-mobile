@@ -4,7 +4,7 @@ import { Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import { FitRing, ListSkeleton, pushCardLines, PUSH_DOCS_TITLE, useDocuments, useMyApplications } from '@/features/my'
-import { Text, TopBar } from '@/shared/components'
+import { Text, NativeTopBar } from '@/shared/components'
 import { lineRing } from '@/theme'
 import type { HubDocument } from '@/features/my'
 
@@ -48,7 +48,7 @@ const PushDocsScreen = () => {
   const docs = data?.data ?? []
   return (
     <View style={styles.screen}>
-      <TopBar title={PUSH_DOCS_TITLE} onBack={() => router.back()} />
+      <NativeTopBar title={PUSH_DOCS_TITLE} onBack={() => router.back()} />
       {isLoading ? (
         <ListSkeleton />
       ) : (

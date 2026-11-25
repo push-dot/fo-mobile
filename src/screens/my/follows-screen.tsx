@@ -3,7 +3,7 @@ import { LegendList } from '@legendapp/list/react-native'
 import { useState } from 'react'
 import { TextInput, View } from 'react-native'
 import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, useMyFollowers, useMyFollows } from '@/features/my'
-import { GlassField, Icon, Text, TopBar } from '@/shared/components'
+import { GlassField, Icon, Text, NativeTopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { StyleSheet } from 'react-native-unistyles'
@@ -37,7 +37,7 @@ const FollowsScreen = () => {
       )
   return (
     <View style={styles.screen}>
-      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={styles.spacer(button)} />} />
+      <NativeTopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={styles.spacer(button)} />} />
       {following ? (
         <GlassField
           style={styles.search}
