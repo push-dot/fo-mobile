@@ -57,7 +57,7 @@ describe('chat attachment upload', () => {
     expect(upload).toHaveBeenCalledWith(file)
     expect(botApi.bots.send).toHaveBeenCalledWith(
       'c-up',
-      { text: '이 파일 봐 줘', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
+      { text: '이 파일 봐 줘', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
     expect(botApi.bots.send.mock.calls[0]?.[1]).not.toHaveProperty('attachment')
@@ -71,7 +71,6 @@ describe('chat attachment upload', () => {
       'c-doc',
       {
         text: '공고에 맞춰 줘',
-        accessMode: 'AUTO',
         intent: 'match_posting',
         attachments: [
           { kind: 'document', id: 'doc-1' },
@@ -111,7 +110,7 @@ describe('chat attachment upload', () => {
     expect(upload).toHaveBeenCalledWith(queued)
     expect(botApi.bots.send).toHaveBeenLastCalledWith(
       'c-q',
-      { text: '이어서', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
+      { text: '이어서', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
   })
@@ -146,7 +145,7 @@ describe('chat attachment upload', () => {
     expect(upload).not.toHaveBeenCalled()
     expect(botApi.bots.send).toHaveBeenCalledWith(
       'c-src',
-      { text: '이 서류를 고쳐 줘', accessMode: 'AUTO', attachments: [{ kind: 'file', id: sourceId }] },
+      { text: '이 서류를 고쳐 줘', attachments: [{ kind: 'file', id: sourceId }] },
       expect.anything(),
     )
   })
@@ -155,6 +154,6 @@ describe('chat attachment upload', () => {
     send('c-name', '안녕', 'note.pdf')
     await vi.waitFor(() => expect(chat('c-name').working).toBeNull())
     expect(upload).not.toHaveBeenCalled()
-    expect(botApi.bots.send).toHaveBeenCalledWith('c-name', { text: '안녕', accessMode: 'AUTO' }, expect.anything())
+    expect(botApi.bots.send).toHaveBeenCalledWith('c-name', { text: '안녕' }, expect.anything())
   })
 })

@@ -8,7 +8,7 @@ import { API_MOCK, botApi, hapticImpactLight, hapticNotify, mockUploadFailing } 
 import { sourcesApi, type PickedFile } from '@/shared/infrastructure/sources'
 import { chatApi } from './api/fetchers'
 import type { RunInput } from './api/schemas'
-import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DEFAULT_ACCESS_MODE, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
+import { CHAT_STOP_FAILED, CHAT_STOP_FORBIDDEN, DISCONNECT_REASON, GATED_STEP, STOPPING_TEXT, UPLOAD_ERROR_CODE, UPLOAD_ERROR_TEXT } from './constants'
 import type { ChatEvent, ChatItem, ChatState, ReviewPageRequest } from './types'
 import { isConsentRequired } from '@/shared/utility/consent-error'
 import { fromFirst, prependOlder } from './utils/find'
@@ -254,7 +254,6 @@ const streamed = (input: RunInput, signal: AbortSignal, end: StreamEnd | undefin
   const attachments = attachmentsOf(input)
   const body: BotContract.SendBody = {
     text: input.text ?? '',
-    accessMode: DEFAULT_ACCESS_MODE,
     ...(intent ? { intent } : {}),
     ...(attachments.length ? { attachments } : {}),
   }

@@ -8,6 +8,7 @@ import { type Account } from '../api/schemas'
 import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
 import { useChatAccount, useMe } from '../api/hooks'
 import { ACCOUNT_REFERENCE_NOTE, DEFAULT_DOC, ACCOUNT_REFERENCE_TITLE } from '../constants'
+import { accessLabel, accessMenu } from '../utils/access-mode'
 import { currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
 import GroupTitle from './group-title'
 import Mark from './mark'
@@ -89,6 +90,11 @@ const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: 
           <Menu stretch accessibilityLabel="말투" actions={toneMenu(tone?.key, (defaultTone) => save.mutate({ defaultTone }))}>
             <View>
               <AccountRow label={toneLabel(tone)} />
+            </View>
+          </Menu>
+          <Menu stretch accessibilityLabel="실행 방식" actions={accessMenu(settings.data?.aiAccessMode, (aiAccessMode) => save.mutate({ aiAccessMode }))}>
+            <View>
+              <AccountRow label="실행 방식" value={accessLabel(settings.data?.aiAccessMode)} />
             </View>
           </Menu>
         </SettingsGroup>
