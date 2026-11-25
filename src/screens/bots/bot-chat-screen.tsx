@@ -137,6 +137,7 @@ const Thread = ({ id }: { id: string }) => {
   const purchase = usePersonalPurchase()
   const input = useRef<TextInputInstance>(null)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
+  const typing = useDraftStore((s) => !!s.byBot[id]?.text)
   const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && phase === 'working')
   const empty = items.length === 0 && queue.length === 0
   const greetingTitle = profile.data?.posting?.title
@@ -265,7 +266,7 @@ const Thread = ({ id }: { id: string }) => {
           above={
             awaiting ? (
               <AwaitingRow text={AWAITING_TEXT[awaiting]} color={color} />
-            ) : empty && kind ? (
+            ) : empty && kind && !typing ? (
               <QuickStartRow
                 kind={kind}
                 onChip={(key) => {

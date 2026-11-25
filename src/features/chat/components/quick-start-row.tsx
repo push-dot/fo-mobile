@@ -1,8 +1,8 @@
-import { Pressable, ScrollView } from 'react-native'
+import { ScrollView } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
-import { Icon3D, Text } from '@/shared/components'
+import { GlassPressable, Icon3D, Text } from '@/shared/components'
 import { quickStartsFor } from '../utils/quick-start-chips'
-import { quickStartMarginBottom } from '../utils/composer-geometry'
+import { quickStartMarginBottom, quickStartShadowRoom } from '../utils/composer-geometry'
 
 const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (key: string) => void }) => {
   return (
@@ -15,17 +15,19 @@ const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (ke
       contentContainerStyle={styles.content}
     >
       {quickStartsFor(kind).map((item) => (
-        <Pressable
+        <GlassPressable
           key={item.label}
           accessibilityRole="button"
           onPress={() => onChip(item.key)}
+          fill="bg2"
           style={styles.chip}
+          contentStyle={styles.chipContent}
         >
           <Icon3D name={item.icon} size={30} />
           <Text v="b2" weight="600" numberOfLines={1}>
             {item.label}
           </Text>
-        </Pressable>
+        </GlassPressable>
       ))}
     </ScrollView>
   )
@@ -33,8 +35,9 @@ const QuickStartRow = ({ kind, onChip }: { kind: 'push' | 'company'; onChip: (ke
 
 const styles = StyleSheet.create((theme) => ({
   row: { flexGrow: 0, marginHorizontal: -theme.spacing[3], marginBottom: quickStartMarginBottom },
-  content: { gap: theme.spacing[2], paddingHorizontal: theme.spacing[4], paddingTop: theme.spacing[2] },
-  chip: { height: 52, paddingLeft: theme.spacing[3], paddingRight: theme.spacing[5], gap: theme.spacing[2], borderRadius: theme.radius.pill, backgroundColor: theme.colors.bg2, flexDirection: 'row', alignItems: 'center' },
+  content: { gap: theme.spacing[2], paddingHorizontal: theme.spacing[4], paddingVertical: quickStartShadowRoom },
+  chip: { height: 52, borderRadius: theme.radius.pill },
+  chipContent: { paddingLeft: theme.spacing[3], paddingRight: theme.spacing[5], gap: theme.spacing[2] },
 }))
 
 export default QuickStartRow

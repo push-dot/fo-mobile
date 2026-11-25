@@ -59,7 +59,7 @@ describe('bot and material routes', () => {
     [materialsPath(id), 'materials/index', '{modalOptions(c)}'],
     [materialDetailPath('posting', 'p1'), 'materials/[kind]/[id]', '{sheetOptions(c)}'],
     [materialLinkAddPath(), 'materials/link-add', '{sheetOptions(c)}'],
-    [materialPickerPath(id), 'material-picker', '{modalOptions(c)}'],
+    [materialPickerPath(id), 'material-picker', '{sheetOptions(c)}'],
     [accountPath(), 'account', '{modalOptions(c)}'],
     [accountPath('plan'), 'plan', '{fullPageOptions()}'],
   ])('%s opens %s', (_href, route, options) => {
