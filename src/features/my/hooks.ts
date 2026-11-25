@@ -1,7 +1,7 @@
 import { router, useIsFocused } from 'expo-router'
 import { useEffect, useEffectEvent } from 'react'
 import { TOAST_ABOVE, askConfirm, showToast, type ConfirmRequest } from '@/shared/components'
-import { materialCreateBotPath } from '@/features/bots'
+import { materialCreateBotPath } from '@/shared/navigation'
 import { showChoiceModal } from '@/shared/navigation'
 import { pickDocument } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'

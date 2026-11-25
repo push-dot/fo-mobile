@@ -5,7 +5,7 @@ import { splitBotText } from '../../features/chat/utils/bot-text'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
 import { pick } from '../bot-scripts/runs'
 import { emptyBot, resetBots, seedThread } from '../bots'
-import { grantReference } from '../chat'
+import { grantReference } from '../chat-state'
 import { mockFetch } from '../index'
 
 const api = createBotApi(createClient({ baseUrl: 'http://x/api/v1', getToken: () => 't', fetch: mockFetch, uuid: () => 'k' }))

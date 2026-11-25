@@ -8,6 +8,7 @@ import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHA
 import { PROFILE_REVIEW_HUNKS } from './bot-scripts/review-doc'
 import { editSurface, profileSurface, surface, todoSurface } from './bot-scripts/surfaces'
 import { recordRun } from './bots'
+import { consent, docs, scenario, waiting } from './chat-state'
 import { botProfileChange } from './me'
 import { mock, page } from './server'
 import { LEGAL_VERSION } from '@push/shared'
@@ -15,7 +16,6 @@ import { LEGAL_VERSION } from '@push/shared'
 type Terms = { version: string; age14At: string | null; serviceTermsAt: string | null; privacyAt: string | null; marketing: boolean; marketingAt: string | null }
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
-
 
 const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null, at?: string): ConversationRow => ({
   id,
@@ -40,11 +40,6 @@ const conversations: ConversationRow[] = [
   conv('a-baemin', '배민 공고 갭 분석', 0, '경력 섹션을 고쳤어요', null, '2026-08-30T03:00:00.000Z'),
 ]
 const archived = new Set(['a-toss', 'a-line', 'a-baemin'])
-let referenceData = false
-export const grantReference = () => {
-  referenceData = true
-}
-export const hasReferenceConsent = () => referenceData
 const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)
@@ -53,7 +48,7 @@ mock('GET', 'conversations', ({ query }) =>
   page(query.get('archived') === 'true' ? byRecent(conversations.filter((c) => archived.has(c.id))) : live(), query),
 )
 mock('POST', 'conversations', ({ body }) => {
-  if (!referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
+  if (!consent.referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
   const b = body as { title: string }
   const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^(ext-nojob|fail|no-posting|이 서류를 고쳐 줘)$/i.test(b.title.trim()) ? null : '모아페이' }
   conversations.push(c)
@@ -86,15 +81,15 @@ mock('DELETE', 'conversations/:id', ({ params }) => {
 const accepted = () => new Date().toISOString()
 const terms: Terms = { version: LEGAL_VERSION, age14At: accepted(), serviceTermsAt: accepted(), privacyAt: accepted(), marketing: false, marketingAt: null }
 export const forgetRequiredTerms = () => Object.assign(terms, { age14At: null, serviceTermsAt: null, privacyAt: null })
-mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null, terms } }))
+mock('GET', 'me/consents', () => ({ data: { referenceData: consent.referenceData, updatedAt: null, terms } }))
 mock('PUT', 'me/consents', ({ body }) => {
-  referenceData = (body as { referenceData?: boolean }).referenceData === true
-  return { data: { referenceData, updatedAt: new Date().toISOString(), terms } }
+  consent.referenceData = (body as { referenceData?: boolean }).referenceData === true
+  return { data: { referenceData: consent.referenceData, updatedAt: new Date().toISOString(), terms } }
 })
 mock('PUT', 'me/consents/terms', ({ body }) => {
   const marketing = (body as { marketing?: boolean }).marketing
   if (typeof marketing === 'boolean') Object.assign(terms, { marketing, marketingAt: new Date().toISOString() })
-  return { data: { referenceData, updatedAt: null, terms } }
+  return { data: { referenceData: consent.referenceData, updatedAt: null, terms } }
 })
 mock('GET', 'conversations/:id/messages', ({ params, query }) => {
   const c = find(params.id!)
@@ -108,20 +103,12 @@ mock('GET', 'conversations/:id/messages', ({ params, query }) => {
   return page(msgs.reverse(), query)
 })
 
-
 type Frame = Step['frame']
 type Card = A2uiFrame
 
 const BUSY = new Set(['queue-busy', '도토리증권 공고도 맞춰 줘'])
 
-const scenario = new Map<string, { prefix: string; labels: string[]; verified?: boolean }>()
-const waiting = new Map<string, Card>()
 let runs = 0
-
-export const forgetRun = (id: string) => {
-  waiting.delete(id)
-  scenario.delete(id)
-}
 
 const isCard = (f: Frame) => f.type === 'a2ui' && (f.kind === 'approval' || f.kind === 'choice')
 
@@ -235,7 +222,6 @@ mock('POST', 'chat/runs', ({ body }) => {
   return { data: out }
 })
 
-
 const stored = (frame: A2uiFrame, seq: number) => ({ ...frame, seq }) as ConversationTurn['events'][number]
 const doneTodo = (id: string, labels: string[]) => todoSurface(id, labels, labels.length)
 const storedTurns: Record<string, ConversationTurn['events']> = {
@@ -265,7 +251,6 @@ mock('GET', 'conversations/:id/turns', ({ params, query }) => {
     : []
   return page(turns, query)
 })
-
 
 const links: UserLink[] = [
   { id: 'l1', kind: 'job', url: 'https://careers.moapay.kr/jobs/1182', title: '모아페이 · 결제 플랫폼 시니어 엔지니어', status: 'READ', fitCount: 2, aiRead: true, createdAt: ago(60) },
@@ -307,17 +292,6 @@ mock('POST', 'me/links/:id/restore', ({ params }) => {
   return { data: link }
 })
 
-
-const docs: ChatDoc[] = [
-  { id: 'd1', fileName: RESUME, size: 2_400_000, createdAt: '2026-10-12T09:00:00+09:00' },
-  { id: 'd2', fileName: '경력기술서_모아페이.docx', size: 640_000, createdAt: '2026-09-28T09:00:00+09:00' },
-  { id: 'd3', fileName: '포트폴리오_결제시스템.pdf', size: 8_100_000, createdAt: '2026-08-03T09:00:00+09:00' },
-  { id: 'd4', fileName: '모아페이_맞춤_이력서_v2.pdf', size: 186_000, createdAt: ago(10), aiMade: true },
-]
-export const removeChatDoc = (id: string) => {
-  const i = docs.findIndex((d) => d.id === id)
-  if (i >= 0) docs.splice(i, 1)
-}
 mock('GET', 'chat/docs', () => ({ data: account.few ? docs.filter((d) => d.id === 'd2' || d.id === 'd4') : docs }))
 mock('POST', 'chat/docs', ({ body }) => {
   const b = body as { fileName: string; size: number }
@@ -347,7 +321,6 @@ mock('GET', 'chat/account', () => {
   const now = new Date()
   return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(), usageByBot: account.spent ? USAGE_SPENT : USAGE_BY_BOT } }
 })
-
 
 const job = (id: string, over: string, title: string, sub: string, text: string, color: string, extra: Partial<QsData['items'][number]> = {}) => ({
   id, over, title, sub, logo: { text, color }, ...extra,

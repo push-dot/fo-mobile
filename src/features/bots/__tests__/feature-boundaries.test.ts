@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 let eslint: ESLint
 
 beforeAll(async () => {
-  eslint = new ESLint({ cwd: join(__dirname, '../../../..') })
+  eslint = new ESLint({ cwd: join(__dirname, '../../../..'), overrideConfig: { rules: { 'import/no-cycle': 'off' } } })
   await eslint.lintText('export {}\n', { filePath: 'src/screens/bots/x.tsx' })
 }, 60_000)
 

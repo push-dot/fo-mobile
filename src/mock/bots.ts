@@ -1,7 +1,7 @@
 import type { BotContract } from '@push/api-client'
 import { BOT_COLORS } from '../features/bots/constants'
 import { DRAFT_V1_MD } from './bot-scripts/cards'
-import { forgetRun, hasReferenceConsent } from './chat'
+import { forgetRun, hasReferenceConsent } from './chat-state'
 import { postings } from './postings'
 import { mock } from './server'
 

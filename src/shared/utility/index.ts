@@ -1,6 +1,7 @@
 export * from './asset-url'
 export * from './box-shadow'
 export * from './composer-padding'
+export * from './consent-error'
 export * from './given-name'
 export * from './keep-words'
 export * from './no-selection-grant'

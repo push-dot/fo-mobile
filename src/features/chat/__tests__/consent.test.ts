@@ -1,6 +1,6 @@
 import { ApiError } from '@push/api-client'
 import { describe, expect, it } from 'vitest'
-import { isConsentRequired } from '../utils/consent'
+import { isConsentRequired } from '@/shared/utility/consent-error'
 
 describe('reference-data consent gate', () => {
   it('opens only on 403 CONSENT_REQUIRED', () => {

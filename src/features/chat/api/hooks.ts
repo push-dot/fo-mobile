@@ -15,7 +15,7 @@ import { LINK_KIND_LABEL } from '../utils/links'
 import { cacheName } from '../utils/cache-name'
 import { exclusive, pdfName, shareErrorText } from '../utils/share'
 import type { MentionGroup } from '../utils/mentions'
-import { isConsentRequired } from '../utils/consent'
+import { isConsentRequired } from '@/shared/utility/consent-error'
 import { retryUnlessMissing } from '../utils/retry'
 import { askConsent, bindOpenChat, forget, holdOpen, openBot, send } from '../stores'
 import {

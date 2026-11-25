@@ -7,7 +7,7 @@ import { fontFor, onAccent, useColors, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
-import { askConsentThen, isConsentRequired } from '@/features/chat'
+import { isConsentRequired } from '@/shared/utility/consent-error'
 import { botErrorKind } from '../../utils/bot-errors'
 import { checkLink, findBotForPosting } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
@@ -70,6 +70,7 @@ type Props = {
   onClose: () => void
   onOpenBot: (id: BotId) => void
   onUpgrade: () => void
+  onConsentRequired: (retry: () => void) => void
 }
 
 const SWATCH = 46
@@ -198,7 +199,7 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
   )
 }
 
-const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
+const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequired }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboard = useKeyboardHeight()
@@ -324,7 +325,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     } catch (error) {
       if (isConsentRequired(error)) {
         setForm(base)
-        askConsentThen(() => void run(base))
+        onConsentRequired(() => void run(base))
         return
       }
       if (botErrorKind(error) === 'limit') {
