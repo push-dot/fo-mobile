@@ -42,7 +42,7 @@ export const scheduleTiming = ({ cadence, hour, weekday }: { cadence: ScheduleCa
 
 export const scheduleErrorLine = (code: string | null) => {
   if (code === null) return null
-  return code === 'BOT_BUSY' ? '봇이 다른 일을 하고 있어서 이번에는 건너뛰었어요' : '지난번에 실행하지 못했어요'
+  return code === 'BOT_BUSY' ? 'Bot이 다른 일을 하고 있어서 이번에는 건너뛰었어요' : '지난번에 실행하지 못했어요'
 }
 
 export const scheduleSaveError = (e: unknown) => {

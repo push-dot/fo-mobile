@@ -24,7 +24,7 @@ describe('schedule timing line', () => {
 describe('schedule errors', () => {
   it('explains a skipped run when the bot was busy, and stays generic otherwise', () => {
     expect(scheduleErrorLine(null)).toBeNull()
-    expect(scheduleErrorLine('BOT_BUSY')).toBe('봇이 다른 일을 하고 있어서 이번에는 건너뛰었어요')
+    expect(scheduleErrorLine('BOT_BUSY')).toBe('Bot이 다른 일을 하고 있어서 이번에는 건너뛰었어요')
     expect(scheduleErrorLine('INSUFFICIENT_CREDITS')).toBe('지난번에 실행하지 못했어요')
   })
 
