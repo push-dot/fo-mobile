@@ -49,7 +49,8 @@
     "eslint": "^9.0.0",
     "eslint-config-expo": "~58.0.4",
     "typescript": "~6.0.3",
-    "vitest": "^3.2.7"
+    "vitest": "^3.2.7",
+    "@push/eslint-config": "workspace:*"
   },
   "scripts": {
     "start": "expo start",
