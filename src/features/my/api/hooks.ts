@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
-import { type LinkKind, type MyPostsSort, type Offer, type Profile, type Settings } from '@push/api-client'
+import { type LinkKind, type MyPostsSort, type Offer, type Profile, type Settings, type UserMemory } from '@push/api-client'
 import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
@@ -48,6 +48,10 @@ import {
   fetchDocumentVersions,
   fetchEvents,
   fetchSettings,
+  fetchMemories,
+  updateMemory,
+  removeMemory,
+  clearMemories,
   fetchSource,
   fetchUnreadOffers,
   followProfile,
@@ -226,6 +230,35 @@ export const useUpdateSettings = () => {
     onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
+
+const MEMORIES_KEY = ['me', 'memories']
+
+export const useMemories = (enabled = true) => useQuery({ queryKey: MEMORIES_KEY, queryFn: fetchMemories, enabled })
+
+const useMemoriesMutation = <V,>(mutationFn: (v: V) => Promise<unknown>, next: (rows: UserMemory[], v: V) => UserMemory[], failed: string) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn,
+    onMutate: async (v: V) => {
+      await qc.cancelQueries({ queryKey: MEMORIES_KEY })
+      const prev = qc.getQueryData<UserMemory[]>(MEMORIES_KEY)
+      if (prev) qc.setQueryData(MEMORIES_KEY, next(prev, v))
+      return prev
+    },
+    onError: (_e, _v, prev) => {
+      if (prev) qc.setQueryData(MEMORIES_KEY, prev)
+      Alert.alert(failed, '잠시 뒤에 다시 해 주세요.')
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: MEMORIES_KEY }),
+  })
+}
+
+export const useUpdateMemory = () =>
+  useMemoriesMutation(updateMemory, (rows, { id, text }) => rows.map((m) => (m.id === id ? { ...m, text } : m)), '기억을 고치지 못했어요')
+
+export const useRemoveMemory = () => useMemoriesMutation(removeMemory, (rows, id) => rows.filter((m) => m.id !== id), '기억을 지우지 못했어요')
+
+export const useClearMemories = () => useMemoriesMutation<void>(clearMemories, () => [], '기억을 지우지 못했어요')
 
 export const useBookmarkList = (enabled: boolean) =>
   useQuery({ queryKey: ['me', 'bookmarks', 'chat'], queryFn: fetchBookmarkList, enabled })

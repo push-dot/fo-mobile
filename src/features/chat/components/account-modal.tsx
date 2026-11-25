@@ -5,11 +5,12 @@ import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '../../../theme'
 import { Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
-import { TONES, useMySettings, useUpdateSettings } from '@/features/my'
+import { TONES, useMemories, useMySettings, useUpdateSettings } from '@/features/my'
 import { useChatAccount, useMe } from '../api/hooks'
 import { ACCOUNT_REFERENCE_NOTE, DEFAULT_DOC, ACCOUNT_REFERENCE_TITLE } from '../constants'
 import { accessLabel, accessMenu } from '../utils/access-mode'
 import { currentRole, toneLabel, toneMenu, usagePercent } from '../utils/account-menus'
+import { MEMORIES_COPY, memoryCount } from '../utils/memories'
 import GroupTitle from './group-title'
 import Mark from './mark'
 import Note from './note'
@@ -20,7 +21,7 @@ const AccountModal = () => {
   const account = useChatAccount(true)
   return (
     <PageModal title="계정" tight>
-      <AccountPage account={account.data} onPlan={() => router.push('/plan')} onUsage={() => router.push('/usage')} />
+      <AccountPage account={account.data} onPlan={() => router.push('/plan')} onUsage={() => router.push('/usage')} onMemories={() => router.push('/memories')} />
     </PageModal>
   )
 }
@@ -53,10 +54,11 @@ const AccountRow = ({ label, value, bold, plain, onPress }: { label: string; val
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
 
-const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: () => void; onUsage: () => void }) => {
+const AccountPage = ({ account, onPlan, onUsage, onMemories }: { account?: Account; onPlan: () => void; onUsage: () => void; onMemories: () => void }) => {
   const me = useMe()
   const settings = useMySettings(true)
   const save = useUpdateSettings()
+  const memories = useMemories(true)
   const toMy = () => router.navigate('/my')
   const tone = TONES.find((t) => t.key === settings.data?.defaultTone)
   const usage = usagePercent(account?.credits)
@@ -97,6 +99,7 @@ const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: 
               <AccountRow label="실행 방식" value={accessLabel(settings.data?.aiAccessMode)} />
             </View>
           </Menu>
+          <AccountRow label={MEMORIES_COPY.title} value={memoryCount(memories.data)} onPress={onMemories} />
         </SettingsGroup>
       </View>
     </>

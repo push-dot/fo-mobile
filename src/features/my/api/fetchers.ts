@@ -59,6 +59,14 @@ export const updateMarketingConsent = (marketing: boolean) => api.me.updateMarke
 
 export const updateSettings = api.me.updateSettings
 
+export const fetchMemories = () => api.me.memories()
+
+export const updateMemory = ({ id, text }: { id: string; text: string }) => api.me.updateMemory(id, text)
+
+export const removeMemory = (id: string) => api.me.removeMemory(id)
+
+export const clearMemories = () => api.me.clearMemories()
+
 export const grantReferenceAccess = async () => {
   const consents = await updateReferenceConsent(true)
   await updateSettings({ allowAiReadMyFiles: true })

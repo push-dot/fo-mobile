@@ -8,6 +8,7 @@ import type {
   ProfileChange,
   Settings,
   Source,
+  UserMemory,
   UserRef,
 } from '@push/api-client'
 import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
@@ -919,6 +920,30 @@ mock('GET', 'me/settings', () => ({ data: settings }))
 mock('PATCH', 'me/settings', ({ body }) => {
   settings = { ...settings, ...(body as Partial<Settings>) }
   return { data: settings }
+})
+
+let memories: UserMemory[] = [
+  { id: 'mem-remote', text: '주 2일 이상 재택근무를 원해요.', createdAt: on(11, 24, 9), updatedAt: on(11, 24, 9) },
+  { id: 'mem-stack', text: 'TypeScript와 React Native를 주로 써요.', createdAt: on(11, 18, 14), updatedAt: on(11, 21, 10) },
+  { id: 'mem-size', text: '50명 이하 스타트업을 선호해요.', createdAt: on(11, 12, 20), updatedAt: on(11, 12, 20) },
+]
+const MEMORY_MAX = 300
+mock('GET', 'me/memories', () => ({ data: [...memories].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) }))
+mock('PATCH', 'me/memories/:id', ({ params, body }) => {
+  const raw = (body as { text?: unknown } | null)?.text
+  const text = typeof raw === 'string' ? raw.trim() : ''
+  if (!text || text.length > MEMORY_MAX) return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'mock: bad memory text', details: { field: 'text' } } } }
+  const row = memories.find((m) => m.id === params.id)
+  if (!row) return { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock: memory' } } }
+  const next = { ...row, text, updatedAt: new Date().toISOString() }
+  memories = memories.map((m) => (m.id === next.id ? next : m))
+  return { data: next }
+})
+mock('DELETE', 'me/memories/:id', ({ params }) => {
+  memories = memories.filter((m) => m.id !== params.id)
+})
+mock('DELETE', 'me/memories', () => {
+  memories = []
 })
 
 const devices = new Map<string, 'ios' | 'android'>()
