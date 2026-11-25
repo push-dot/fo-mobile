@@ -48,7 +48,7 @@ const SignedInStack = () => {
       <Stack.Screen name="terms-view" options={fullPageOptions()} />
       <Stack.Screen name="quick-start/[key]" options={sheetOptions(c)} />
       <Stack.Screen name="quick-start/[key]/all" options={modalOptions(c)} />
-      <Stack.Screen name="material-picker" options={modalOptions(c)} />
+      <Stack.Screen name="material-picker" options={sheetOptions(c)} />
       <Stack.Screen name="review" options={modalOptions(c)} />
       <Stack.Screen name="bots/[botId]/index" options={instantNone} />
       <Stack.Screen name="bots/[botId]/profile" />
