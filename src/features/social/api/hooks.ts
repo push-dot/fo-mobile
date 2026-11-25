@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { infiniteQueryOptions, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { showToast, TOAST_ABOVE } from '@/shared/components'
@@ -8,13 +8,15 @@ import type { SocialImage } from '../types'
 import { invalidateAfterPostSaveToggle } from '../utils/post-save'
 import { createComment, createPost, fetchComments, fetchPost, fetchPosts, savePost, unsavePost, uploadPostImage } from './fetchers'
 
-export const usePosts = (category: PostCategory | null) =>
-  useInfiniteQuery({
+export const postsQuery = (category: PostCategory | null) =>
+  infiniteQueryOptions({
     queryKey: ['posts', category],
     queryFn: ({ pageParam }) => fetchPosts(category, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
   })
+
+export const usePosts = (category: PostCategory | null) => useInfiniteQuery(postsQuery(category))
 
 export const usePost = (id: string) => useQuery({ queryKey: ['post', id], queryFn: () => fetchPost(id) })
 

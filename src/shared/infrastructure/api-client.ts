@@ -4,7 +4,7 @@ import * as Crypto from 'expo-crypto'
 import { A2UI_VERSION } from './a2ui-version'
 import { API_BASE_URL } from './config'
 import { isRefreshAuthFailure } from './refresh-auth-failure'
-import { useSession } from './session-store'
+import { expiresSoon, useSession } from './session-store'
 
 const MOCK = process.env.EXPO_PUBLIC_API_MOCK === '1'
 /* eslint-disable @typescript-eslint/no-require-imports */
@@ -34,7 +34,14 @@ export const refreshSession = createRefresher({
   isAuthFailure: isRefreshAuthFailure,
 })
 
-export const http = createClient({ ...clientConfig, refresh: refreshSession })
+export const http = createClient({
+  ...clientConfig,
+  getToken: async () => {
+    if (expiresSoon(useSession.getState().session)) await refreshSession()
+    return useSession.getState().session?.accessToken
+  },
+  refresh: refreshSession,
+})
 
 export const api = createApi(http)
 

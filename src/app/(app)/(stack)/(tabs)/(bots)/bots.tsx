@@ -7,10 +7,9 @@ const Bots = () => {
   const seen = useFocusedOnce()
   const [Screen, setScreen] = useState<React.ComponentType | null>(null)
   useEffect(() => {
-    if (!seen || Screen) return
     void loadScreen().then((m) => setScreen(() => m.default))
-  }, [seen, Screen])
-  return Screen ? <Screen /> : null
+  }, [])
+  return seen && Screen ? <Screen /> : null
 }
 
 export default Bots
