@@ -1,5 +1,5 @@
 export { default as HeaderPill } from '../header-pill'
-export { CreditBanner } from './credit-banner'
+export { default as CreditBanner } from './credit-banner'
 export { FindBar } from './find-bar'
 export { FindHighlight, FindText, Marked } from './highlight'
 export { NewMessagesPill } from './new-messages-pill'

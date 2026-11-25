@@ -1,7 +1,7 @@
 {
   "name": "@push/fo-mobile",
   "version": "1.0.0",
-  "main": "expo-router/entry",
+  "main": "index.ts",
   "dependencies": {
     "@expo/ui": "~58.0.21",
     "@legendapp/list": "^3.7.3",
@@ -37,20 +37,22 @@
     "expo-web-browser": "~58.0.6",
     "react": "19.3.0",
     "react-native": "0.88.0",
+    "react-native-nitro-modules": "0.37.1",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
     "react-native-svg": "15.16.0",
+    "react-native-unistyles": "3.8.1",
     "react-native-webview": "14.0.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@push/eslint-config": "workspace:*",
     "@types/react": "~19.3.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~58.0.4",
     "typescript": "~6.0.3",
-    "vitest": "^3.2.7",
-    "@push/eslint-config": "workspace:*"
+    "vitest": "^3.2.7"
   },
   "scripts": {
     "start": "expo start",
