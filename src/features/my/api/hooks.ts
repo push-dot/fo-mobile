@@ -63,7 +63,7 @@ import {
   updateReferenceConsent,
   updateSettings,
 } from './fetchers'
-import { ingestEnabled } from './ingest-enabled'
+import { ingestEnabled } from '../utils/ingest-enabled'
 
 export const useUnreadOffers = () =>
   useQuery({
@@ -149,7 +149,6 @@ export const useSetBaseProfile = (onDone: () => void) => {
   })
 }
 
-// The refetch is returned, so a caller's onSuccess runs once the new revision is loaded.
 const useDocumentWrite = <V,>(write: (v: V) => Promise<unknown>) => {
   const qc = useQueryClient()
   return useMutation({
@@ -203,7 +202,6 @@ export const useSettings = () => {
 
 export const useBlocked = () => useQuery({ queryKey: ['me', 'blocks'], queryFn: fetchBlocked, refetchOnMount: 'always' })
 
-// push-be lists offers without the people you block, so unblocking brings their offers back into the lists.
 export const useUnblock = () => {
   const qc = useQueryClient()
   return useMutation({
@@ -263,7 +261,6 @@ export const useAddLink = (onAdded: () => void) => {
   })
 }
 
-// shortcut: lists load the first 50 items; switch to useInfiniteQuery if people keep more than that.
 export const useMyApplications = () =>
   useQuery({
     queryKey: ['applications', 'my-list'],
@@ -329,7 +326,6 @@ const POSTS_LISTS = {
   saved: { key: 'saved-posts', fetch: fetchSavedPosts },
 } as const
 
-/** The list behind the 내가 쓴 글 screen's current 보기 and 정렬; the other views are not fetched. */
 export const usePostsList = (view: PostsView, sort: MyPostsSort) =>
   useQuery({ queryKey: ['me', POSTS_LISTS[view].key, sort], queryFn: () => POSTS_LISTS[view].fetch(sort) })
 

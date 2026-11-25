@@ -11,15 +11,12 @@ const call = async (method: string, path: string, body?: unknown) => {
   return (await res.json()) as { data: unknown }
 }
 const steps = async (conversationId: string, extra: object) => (await call('POST', 'chat/runs', { conversationId, ...extra })).data as Step[]
-/** A run as the screen gets it: its frames through the live stream's mapper. */
 const run = async (conversationId: string, extra: object) => (await steps(conversationId, extra)).flatMap((s) => mapEvent(s.frame))
 const answer = (conversationId: string, approvalId: string, optionId: string) => run(conversationId, { resolve: { approvalId, optionId } })
 const types = (events: ChatEvent[]) => events.map((e) => e.type)
 type Surface = Extract<ChatEvent, { type: 'surface' }>
 const surfaces = (events: ChatEvent[]) => events.filter((e): e is Surface => e.type === 'surface')
-/** The kinds of the Bot cards a run sent, in order. */
 const kinds = (events: ChatEvent[]) => surfaces(events).map((e) => e.kind)
-/** The run sent the card with this id (a gate keeps the script's id). */
 const asks = (events: ChatEvent[], id: string) => surfaces(events).some((e) => e.id === id)
 const component = (e: Surface | undefined, type: string) => {
   const update = e?.messages.find((m) => 'updateComponents' in m)
@@ -36,7 +33,6 @@ describe('chat mock', () => {
 
   it('draws the 가져올 자료 board: four rows with the first two on, and 원래 말투로 first and on', async () => {
     const events = await run('t-ph0', { text: 'ph0-input' })
-    // The sections card is the golden fixture choice-sections: three questions stepping 1/3, defaults in /selected.
     const card = surfaces(events).find((e) => e.id === 'ph0-input')
     expect(component(card, 'PushChoice')).toMatchObject({ answer: 'submit', questions: [{ id: 'targets' }, { id: 'materials' }, { id: 'tone' }] })
   })
@@ -131,7 +127,6 @@ describe('chat mock', () => {
     const design = await run('t-design', { text: '2개 반영하고 디자인으로' })
     const sentences = design.filter((e) => e.type === 'token').map((e) => e.text)
     expect(sentences).toEqual(['템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.', '검증을 마쳤어요. 디자인을 골라 주세요.'])
-    // The template pick is the golden fixture choice-templates.
     expect(component(surfaces(design).find((e) => e.id === 'ph4-design'), 'PushChoice')).toMatchObject({ answer: 'submit', submit: { labels: { MODERN: '모던으로 만들기' } } })
   })
 
@@ -139,7 +134,6 @@ describe('chat mock', () => {
     const events = await run('t-level', { text: 'ph2x' })
     const gate = surfaces(await answer('t-level', 'ph2x-approach', '0')).find((e) => e.id === 'ph2x-level')
     expect(events).not.toHaveLength(0)
-    // 중간 제약 is the suggested one.
     expect(component(gate, 'PushChoice')).toMatchObject({ questions: [{ choices: [{ label: '가벼운 제약' }, { label: '중간 제약', recommended: true }, {}, {}] }] })
   })
 
@@ -237,7 +231,6 @@ describe('chat mock', () => {
     const file = await run('t-states', { text: 'states-file' })
     expect(kinds(file)).toEqual(['result'])
     const applied = await run('t-states', { text: 'states-apply' })
-    // Tool lines are not drawn, so the record is a bot line of its own.
     expect(applied).toContainEqual(expect.objectContaining({ type: 'token', text: '모아페이에 지원했어요.\n[이동하기](/my)' }))
     expect(await run('t-states', { text: '도토리증권 공고도 맞춰 줘' })).toContainEqual(
       expect.objectContaining({ type: 'error', code: 'QUEUE_BUSY', text: '지금 요청이 많아요. 12초 뒤에 다시 보내 주세요.' }),

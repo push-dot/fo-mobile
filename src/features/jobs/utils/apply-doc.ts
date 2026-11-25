@@ -9,7 +9,6 @@ export const monthDay = (iso: string) => {
 export const applyDoc = (s: SourceItem): ApplyDoc => {
   const ai = s.origin === 'AI'
   const date = s.createdAt
-  // The sheet shows the date only; how a document was made is not told here.
   return { id: s.id, name: s.fileName, ai, note: date ? monthDay(date) : '', kind: s.kind ?? null, date }
 }
 

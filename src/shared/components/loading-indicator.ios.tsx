@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Animated, Easing } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import Svg, { Circle } from 'react-native-svg'
 import { useColors } from '../../theme'
 
@@ -8,10 +9,6 @@ const STROKE = 4
 const R = (SIZE - STROKE) / 2
 const CIRC = 2 * Math.PI * R
 
-/**
- * A ring with a turning arc (the round loading spinner). It always turns: it is the only sign the page is coming, so Reduce Motion
- * does not stop it, and it turns on the native driver so a busy JS thread does not freeze it.
- */
 const LoadingIndicator = () => {
   const c = useColors()
   const [turn] = useState(() => new Animated.Value(0))
@@ -20,9 +17,9 @@ const LoadingIndicator = () => {
     loop.start()
     return () => loop.stop()
   }, [turn])
-  const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] })
+  const spin = { transform: [{ rotate: turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
   return (
-    <Animated.View style={{ width: SIZE, height: SIZE, transform: [{ rotate }] }}>
+    <Animated.View style={[styles.box, spin]}>
       <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
         <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} stroke={c.fill2} strokeWidth={STROKE} fill="none" />
         <Circle
@@ -40,5 +37,9 @@ const LoadingIndicator = () => {
     </Animated.View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  box: { width: SIZE, height: SIZE },
+}))
 
 export default LoadingIndicator

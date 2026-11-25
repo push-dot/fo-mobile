@@ -3,7 +3,6 @@ import { MASCOT_COLORS, mascotAccent, mascotPalette } from '../mascot'
 import { onAccent } from '../on-accent'
 import { palette } from '../tokens'
 
-// Body, dark fold, light fold, as drawn in the 2026-11-12 boards.
 const BOARD = {
   teal: ['#2BB5A0', '#1B7063', '#95DAD0'],
   sky: ['#5BC0EB', '#387792', '#ADE0F5'],

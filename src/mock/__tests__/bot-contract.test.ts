@@ -21,7 +21,6 @@ beforeEach(() => {
 
 const withdrawConsent = () => mockFetch('http://x/api/v1/me/consents', { method: 'PUT', body: JSON.stringify({ referenceData: false }) })
 
-// A Record over the api-client's functions: a function added there without a call here fails `tsc`.
 const BOT_CALLS: Record<keyof BotApi['bots'], () => Promise<unknown>> = {
   list: async () => [await api.bots.list(), await api.bots.list({ postingId: 'p13' })],
   search: () => api.bots.search('모아'),
@@ -103,7 +102,6 @@ describe('bots', () => {
   it('finds bots by name or posting and messages by text, the Push Bot first and the rest newest first', async () => {
     const { data } = await api.bots.search('모아')
     expect(data.bots.map((b) => [b.displayName, b.line])).toEqual([['모아페이', '모아페이 · 백엔드 엔지니어']])
-    // AgentHomeSearch draws the Push Bot hit (어제) above 도토리증권 (1시간 전), and cuts 도토리증권's right before the hit.
     expect(data.messages.map((m) => [m.bot.displayName, m.role])).toEqual([['Push Bot', 'ASSISTANT'], ['도토리증권', 'ASSISTANT']])
     expect(data.messages.map((m) => m.snippet)).toEqual(['모아페이 공고 마감이 이번 주 금요일이에요', '…모아페이 경력과 겹치는 부분을 정리했어요'])
   })

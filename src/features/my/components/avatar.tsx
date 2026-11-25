@@ -1,7 +1,7 @@
 import { Image } from 'expo-image'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Text } from '@/shared/components'
-import { useColors } from '../../../theme'
 import { assetUrl } from '@/shared/utility'
 import { avatarTextSize, givenName } from '../utils'
 
@@ -13,38 +13,28 @@ const Avatar = ({
   name: string
   url?: string | null
   size?: number
-}) => {
-  const c = useColors()
-  return url ? (
-    <Image
-      source={{ uri: assetUrl(url) }}
-      style={{ width: size, height: size, borderRadius: size / 2 }}
-      cachePolicy="memory-disk"
-      accessibilityIgnoresInvertColors
-    />
+}) =>
+  url ? (
+    <Image source={{ uri: assetUrl(url) }} style={styles.image(size)} cachePolicy="memory-disk" accessibilityIgnoresInvertColors />
   ) : (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: c.t1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Text
-        weight="700"
-        style={{
-          color: c.bg,
-          fontSize: avatarTextSize(size),
-          lineHeight: Math.round(size * 0.4),
-        }}
-      >
+    <View style={styles.fallback(size)}>
+      <Text weight="700" style={styles.initial(size)}>
         {givenName(name)}
       </Text>
     </View>
   )
-}
+
+const styles = StyleSheet.create((theme) => ({
+  image: (size: number) => ({ width: size, height: size, borderRadius: size / 2 }),
+  fallback: (size: number) => ({
+    width: size,
+    height: size,
+    borderRadius: size / 2,
+    backgroundColor: theme.colors.t1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }),
+  initial: (size: number) => ({ color: theme.colors.bg, fontSize: avatarTextSize(size), lineHeight: Math.round(size * 0.4) }),
+}))
 
 export default Avatar

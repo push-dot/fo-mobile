@@ -1,1 +1,1 @@
-export { timeAgo } from '@/features/my/utils/time-ago'
+export { timeAgo } from '../../../shared/utility/time-ago'

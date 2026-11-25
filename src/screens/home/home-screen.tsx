@@ -1,29 +1,25 @@
 import { router } from 'expo-router'
 import { ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
-import { useToggleBookmark } from '@/features/jobs/api/hooks'
-import { SECTIONS } from '@/features/jobs/constants'
-import type { SectionKind } from '@/features/jobs/types'
+import { SECTIONS, useToggleBookmark, type SectionKind } from '@/features/jobs'
 import { useUnreadCount } from '@/features/notifications'
 import { FloatingHeader, GlassButton, TopBar, Wordmark, useFloatingHeader } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
 
 const HomeScreen = () => {
-  const c = useColors()
   const unread = useUnreadCount()
   const toggleBookmark = useToggleBookmark()
   const kinds: SectionKind[] = useHomeSections()
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      {/* The scroll view must be the screen's first child: the native tab bar only minimizes on scroll for the first scroll view in the first-child chain. */}
+    <View style={styles.screen}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         scrollEventThrottle={64}
         onScroll={onScroll}
-        contentContainerStyle={{ paddingTop: inset, paddingBottom: 21 }}
+        contentContainerStyle={styles.content(inset)}
       >
-        <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2] }}>
+        <View style={styles.shortcuts}>
           {SHORTCUTS.map((s) => (
             <Shortcut key={s.label} {...s} />
           ))}
@@ -49,5 +45,11 @@ const HomeScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: (inset: number) => ({ paddingTop: inset, paddingBottom: 21 }),
+  shortcuts: { flexDirection: 'row', gap: theme.spacing[2], paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[2] },
+}))
 
 export default HomeScreen

@@ -12,11 +12,6 @@ import { docMeta, postingMeta } from '../utils/quick-start-data'
 const RECENT = 3
 const SEE_ALL = '전체 보기'
 
-/**
- * The 변경 link of a material row in a PushChoice: which material to use instead, picked in the regular modal.
- * The pick goes into the composer; the surface stays open, so the person sends it or answers the card.
- * `enabled`: a waiting surface has a material row, so its lists load before the link is tapped.
- */
 export const useMaterialChange = (botId: string, onSay: () => void, enabled: boolean) => {
   const docs = useChatDocs(enabled)
   const bookmarks = useBookmarkList(enabled)

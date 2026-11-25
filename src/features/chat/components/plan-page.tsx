@@ -1,11 +1,12 @@
 import { router } from 'expo-router'
 import { Alert, Pressable, View } from 'react-native'
-import { radius, selectedRing, spacing, useColors } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { selectedRing } from '../../../theme'
 import { Badge, Button, GlassButton, Icon, Text } from '@/shared/components'
 import { PAYMENTS_CLOSED_MESSAGE, paymentsOpen, usePersonalPurchase } from '@/features/billing'
 import { useChatAccount } from '../api/hooks'
 import { PLAN_HEADER } from '../constants'
-import { Appear } from './motion'
+import Appear from './motion'
 import PageModal from './page-modal'
 
 const PLANS = [
@@ -17,26 +18,24 @@ const PLANS = [
 const back = [{ icon: 'back', label: '뒤로', onPress: () => router.back() }] as const
 
 const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[number]; current: boolean; disabled: boolean; onPress: () => void }) => {
-  const c = useColors()
-  const ring = selectedRing(c)
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: current, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[{ borderRadius: radius.card, padding: spacing[4] - ring.borderWidth, gap: spacing[2], backgroundColor: c.bg2, borderWidth: ring.borderWidth, borderColor: 'transparent' }, current && ring]}
+      style={[styles.card, current && styles.cardOn]}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+      <View style={styles.row}>
         <Text v="h3">{plan.key}</Text>
         {current ? <Badge label="지금 쓰는 중" /> : plan.key === 'ULTRA' ? <Badge label="추천" /> : null}
-        <Text v="b2" weight="700" style={{ flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
+        <Text v="b2" weight="700" style={styles.price}>
           {plan.price}
         </Text>
       </View>
-      <View style={{ gap: spacing[1] }}>
+      <View style={styles.features}>
         {plan.features.map((f) => (
-          <View key={f} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+          <View key={f} style={styles.row}>
             <Icon name="check" size={14} color="t1" />
             <Text v="c1" color="t2">
               {f}
@@ -48,28 +47,19 @@ const PlanCard = ({ plan, current, disabled, onPress }: { plan: (typeof PLANS)[n
   )
 }
 
-const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={{ minHeight: 56, marginTop: spacing[3], marginHorizontal: spacing[5], paddingHorizontal: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
-    >
-      <Text v="b2" weight="700" style={{ flex: 1 }}>
-        {label}
-      </Text>
-      <Icon name="chev" size={18} color="t3" />
-    </Pressable>
-  )
-}
+const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => (
+  <Pressable accessibilityRole="button" onPress={onPress} style={styles.link}>
+    <Text v="b2" weight="700" style={styles.flex}>
+      {label}
+    </Text>
+    <Icon name="chev" size={18} color="t3" />
+  </Pressable>
+)
 
-/** 플랜 (PlanUpgrade, PlanUltra): its own page with a back button and the pay button at the bottom. */
-export const PlanPage = () => {
+const PlanPage = () => {
   const account = useChatAccount(true).data
   const purchase = usePersonalPurchase()
   const open = paymentsOpen(account)
-  // The store flow stays as is. Only when the server really has payments off, a tap tells why instead of opening the store.
   const pay = (buy: () => void) => () => {
     if (purchase.pending) return
     if (open) buy()
@@ -92,11 +82,10 @@ export const PlanPage = () => {
     >
       {account ? (
         <Appear kind="fade">
-          {/* PlanUltra: the h2 block starts 8 under the 6pt gap below the header and the scroll's 4: 10 in all. */}
-          <Text v="h2" style={{ paddingTop: 10, paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
+          <Text v="h2" style={styles.header}>
             {PLAN_HEADER}
           </Text>
-          <View style={{ paddingHorizontal: spacing[5], gap: spacing[2] }}>
+          <View style={styles.plans}>
             {PLANS.map((p) => (
               <PlanCard
                 key={p.key}
@@ -113,3 +102,17 @@ export const PlanPage = () => {
     </PageModal>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  card: { borderRadius: theme.radius.card, padding: theme.spacing[4] - selectedRing(theme.colors).borderWidth, gap: theme.spacing[2], backgroundColor: theme.colors.bg2, borderWidth: selectedRing(theme.colors).borderWidth, borderColor: 'transparent' },
+  cardOn: selectedRing(theme.colors),
+  row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  price: { flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] },
+  features: { gap: theme.spacing[1] },
+  link: { minHeight: 56, marginTop: theme.spacing[3], marginHorizontal: theme.spacing[5], paddingHorizontal: theme.spacing[4], borderRadius: theme.radius.card, backgroundColor: theme.colors.bg2, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  flex: { flex: 1 },
+  header: { paddingTop: 10, paddingHorizontal: theme.spacing[6], paddingBottom: theme.spacing[4] },
+  plans: { paddingHorizontal: theme.spacing[5], gap: theme.spacing[2] },
+}))
+
+export default PlanPage

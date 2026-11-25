@@ -1,26 +1,19 @@
 import { useState, type ComponentProps } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { type } from '../../theme'
 import { clampLines, dotted, longestFit } from '../utility'
 import Text from './text'
 
-// A space of the boards' Noto Sans KR (the shrink-wrapped box keeps the trailing space of its widest line).
 const SPACE_EM = 0.27
 
 type Props = Omit<ComponentProps<typeof Text>, 'children' | 'numberOfLines' | 'onTextLayout'> & {
   children: string
   lines: number
-  /**
-   * `hang`: the dots sit after the last word, outside the centred line (the board's centred clamp).
-   * `inline`: one line, the dots follow the kept text, space included (`text-overflow`).
-   * `line`: the dots end the last kept line inside the box, which a `-webkit-box` shrinks to its widest line plus a space, so characters of a last line that leaves no room for them are cut.
-   */
   ellipsis: 'hang' | 'inline' | 'line'
-  /** Sets the width the text wraps at; the hidden measuring copy fills it. */
   wrapperStyle?: StyleProp<ViewStyle>
 }
 
-/** Text cut like the boards' `-webkit-line-clamp` / `text-overflow: ellipsis`: at a word, where native tail truncation cuts the last line by character. */
 const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, ...rest }: Props) => {
   const [laid, setLaid] = useState<{ text: string; lines: string[]; widest: number } | null>(null)
   const [fitted, setFitted] = useState<{ text: string; line: string } | null>(null)
@@ -35,13 +28,13 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
         accessible={false}
         importantForAccessibility="no-hide-descendants"
         pointerEvents="none"
-        style={[style, { position: 'absolute', left: 0, right: 0, opacity: 0 }]}
+        style={[style, styles.measure]}
         onTextLayout={(e) => setLaid({ text, lines: e.nativeEvent.lines.map((line) => line.text), widest: Math.max(...e.nativeEvent.lines.map((line) => line.width)) })}
       >
         {text}
       </Text>
       {candidates && laid ? (
-        <View pointerEvents="none" style={{ position: 'absolute', left: 0, width: 2000, opacity: 0 }}>
+        <View pointerEvents="none" style={styles.probe}>
           <Text
             {...rest}
             accessible={false}
@@ -76,12 +69,12 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
                 {line.trimEnd()}
               </Text>
             ))}
-            <View style={{ flexDirection: 'row' }}>
+            <View style={styles.row}>
               <Text {...rest} style={style}>
                 {last.trimEnd()}
               </Text>
-              <View style={{ width: 0 }}>
-                <Text {...rest} numberOfLines={1} style={[style, { width: 48, textAlign: 'left' }]}>
+              <View style={styles.zero}>
+                <Text {...rest} numberOfLines={1} style={[style, styles.ellipsis]}>
                   …
                 </Text>
               </View>
@@ -96,5 +89,13 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
     </View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  measure: { position: 'absolute', left: 0, right: 0, opacity: 0 },
+  probe: { position: 'absolute', left: 0, width: 2000, opacity: 0 },
+  row: { flexDirection: 'row' },
+  zero: { width: 0 },
+  ellipsis: { width: 48, textAlign: 'left' },
+}))
 
 export default WordClampText

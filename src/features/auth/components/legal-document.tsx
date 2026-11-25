@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
-import { StyleSheet, View, useWindowDimensions } from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { LEGAL_OPERATOR, legalEffectiveLabel, type LegalBlock, type LegalDocument as Document } from '@push/shared'
 import { Text } from '@/shared/components'
-import { radius, spacing, type, useColors } from '@/theme'
+import { type } from '@/theme'
 
 const TITLE_GAP = 6
 const TITLE_SIZE = { fontSize: 24, lineHeight: 32 }
@@ -15,22 +16,20 @@ const LIST_GAP = 10
 const CARD_LINE = { lineHeight: 21 }
 
 const Body = ({ children, flex }: { children: ReactNode; flex?: boolean }) => (
-  <Text v="b2" color="t2" style={[BODY_LINE, flex ? { flex: 1 } : null]}>
+  <Text v="b2" color="t2" style={[BODY_LINE, flex ? styles.flex : null]}>
     {children}
   </Text>
 )
 
 const Block = ({ block }: { block: LegalBlock }) => {
-  const c = useColors()
-  // "12." must stay on one line at large text sizes, so the marker grows with the font.
   const markerWidth = Math.ceil(MARKER_WIDTH * useWindowDimensions().fontScale)
   if (block.kind === 'paragraph') return <Body>{block.text}</Body>
   if (block.kind === 'list')
     return (
-      <View style={{ gap: LIST_GAP }}>
+      <View style={styles.list}>
         {block.items.map((item, index) => (
-          <View key={index} style={{ flexDirection: 'row' }}>
-            <Text v="b2" color="t2" style={[BODY_LINE, { width: markerWidth + MARKER_OVERHANG, marginLeft: -MARKER_OVERHANG, paddingRight: MARKER_GAP, textAlign: 'right' }]}>
+          <View key={index} style={styles.item}>
+            <Text v="b2" color="t2" style={[BODY_LINE, styles.marker(markerWidth)]}>
               {block.ordered ? `${index + 1}.` : '•'}
             </Text>
             <Body flex>{item}</Body>
@@ -40,12 +39,12 @@ const Block = ({ block }: { block: LegalBlock }) => {
     )
   const labels = block.columns.slice(1)
   return (
-    <View style={{ borderRadius: radius.md, backgroundColor: c.bg2, paddingHorizontal: spacing[4], paddingVertical: spacing[1] }}>
+    <View style={styles.card}>
       {block.rows.map((row, index) => (
         <View
           key={index}
           accessible
-          style={{ paddingVertical: ROW_PADDING, gap: spacing[1], borderTopWidth: index ? StyleSheet.hairlineWidth : 0, borderTopColor: c.line }}
+          style={[styles.row, index ? styles.rowDivider : null]}
         >
           <Text v="b2" weight="600">
             {row[0]}
@@ -63,7 +62,7 @@ const Block = ({ block }: { block: LegalBlock }) => {
 
 const LegalDocument = ({ document }: { document: Document }) => (
   <>
-    <View style={{ gap: TITLE_GAP }}>
+    <View style={styles.heading}>
       <Text accessibilityRole="header" v="h1" style={TITLE_SIZE}>
         {document.title}
       </Text>
@@ -77,7 +76,7 @@ const LegalDocument = ({ document }: { document: Document }) => (
       <Block key={index} block={block} />
     ))}
     {document.articles.map((article) => (
-      <View key={article.heading} style={{ gap: spacing[2] }}>
+      <View key={article.heading} style={styles.article}>
         <Text v="h3" accessibilityRole="header">
           {article.heading}
         </Text>
@@ -88,5 +87,17 @@ const LegalDocument = ({ document }: { document: Document }) => (
     ))}
   </>
 )
+
+const styles = StyleSheet.create((theme) => ({
+  flex: { flex: 1 },
+  list: { gap: LIST_GAP },
+  item: { flexDirection: 'row' },
+  marker: (markerWidth: number) => ({ width: markerWidth + MARKER_OVERHANG, marginLeft: -MARKER_OVERHANG, paddingRight: MARKER_GAP, textAlign: 'right' }),
+  card: { borderRadius: theme.radius.md, backgroundColor: theme.colors.bg2, paddingHorizontal: theme.spacing[4], paddingVertical: theme.spacing[1] },
+  row: { paddingVertical: ROW_PADDING, gap: theme.spacing[1], borderTopWidth: 0, borderTopColor: theme.colors.line },
+  rowDivider: { borderTopWidth: StyleSheet.hairlineWidth },
+  heading: { gap: TITLE_GAP },
+  article: { gap: theme.spacing[2] },
+}))
 
 export default LegalDocument

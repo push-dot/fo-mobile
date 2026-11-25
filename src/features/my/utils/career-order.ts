@@ -1,4 +1,3 @@
-/** `xs` with the item at `from` moved to `to`. */
 export const moveItem = <T>(xs: readonly T[], from: number, to: number): T[] => {
   const next = [...xs]
   const [item] = next.splice(from, 1)
@@ -6,10 +5,6 @@ export const moveItem = <T>(xs: readonly T[], from: number, to: number): T[] => 
   return next
 }
 
-/**
- * Where a card dragged `dy` from slot `from` lands (EditCareer, 끌어서 순서 바꾸기): it passes a neighbour once it has
- * travelled half of that neighbour's height plus the list gap.
- */
 export const dropIndex = (heights: readonly number[], from: number, dy: number, gap: number) => {
   const dir = dy > 0 ? 1 : -1
   let to = from
@@ -23,7 +18,6 @@ export const dropIndex = (heights: readonly number[], from: number, dy: number, 
   return to
 }
 
-/** The open card's index after the card at `from` moved to `to`. */
 export const indexAfterMove = (index: number | null, from: number, to: number) => {
   if (index === null) return null
   if (index === from) return to

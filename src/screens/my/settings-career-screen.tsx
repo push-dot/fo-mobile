@@ -2,11 +2,9 @@ import { router } from 'expo-router'
 import { ScrollView, View } from 'react-native'
 import { hideCompanyLabel, useMyFollowers, useMyProfile, useSettings, VISIBILITY } from '@/features/my'
 import { SettingsGroup, SettingsRow, Switch, TopBar } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
-/** SettingsVisibility: 커리어 상태 is its own page; the row shows only the current value and opens the wheel modal, with the hide-my-company switch under it. */
 const SettingsCareerScreen = () => {
-  const c = useColors()
   const { s, set } = useSettings()
   const { data: me } = useMyProfile()
   const followers = useMyFollowers()
@@ -14,10 +12,10 @@ const SettingsCareerScreen = () => {
   const current = VISIBILITY.find((v) => v.key === s?.careerStatusVisibility)
   const company = me?.careers.find((x) => !x.endedOn)?.company ?? ''
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.root}>
       <TopBar title="커리어 상태" onBack={() => router.back()} />
       {s ? (
-        <ScrollView contentContainerStyle={{ paddingTop: 0, paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}>
+        <ScrollView contentContainerStyle={styles.content}>
           <SettingsGroup note={current?.sub(count)}>
             <SettingsRow label={current?.label ?? ''} picker onPress={() => router.push({ pathname: '/settings/pick', params: { kind: 'career' } })} />
           </SettingsGroup>
@@ -33,5 +31,10 @@ const SettingsCareerScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingTop: 0, paddingHorizontal: theme.spacing[5], paddingBottom: 48, gap: 22 },
+}))
 
 export default SettingsCareerScreen

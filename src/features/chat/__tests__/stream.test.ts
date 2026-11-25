@@ -34,7 +34,6 @@ describe('fromStream', () => {
     expect(resume).not.toHaveBeenCalled()
     expect(await collect(fromStream(frames({ type: 'token', text: 'a', seq: 1 }), resume))).toEqual([{ type: 'token', text: 'a' }])
     expect(resume).toHaveBeenCalledTimes(1)
-    // No seq: resuming would replay from the start, so it stops instead.
     expect(await collect(fromStream(frames({ type: 'token', text: 'b' }), resume))).toEqual([{ type: 'token', text: 'b' }])
     expect(resume).toHaveBeenCalledTimes(1)
   })

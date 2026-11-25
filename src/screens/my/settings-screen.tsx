@@ -1,7 +1,7 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, View } from 'react-native'
-import { ApiError, type Settings } from '@push/api-client'
+import type { Settings } from '@push/api-client'
 import {
   Avatar,
   deleteAccountSession,
@@ -31,6 +31,7 @@ import {
   useReferenceConsent,
   useSettings,
   WITHDRAW_BODY,
+  needsReauth,
 } from '@/features/my'
 import {
   Icon,
@@ -41,26 +42,19 @@ import {
   TopBar,
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { THEME_CHOICES, useThemePreference } from '@/theme'
 import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
-// Settings: the 연락처 and 말투 rows open a picker sheet; iOS draws the up-down selector, Android a plain t3 chevron (`.and-only` / `.ios-only`). 언어 and 테마 keep the selector on both.
 const IOS_PICKER = Platform.OS === 'ios'
 
-const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
-  const c = useColors()
-  return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={title} onBack={() => router.back()} />
-      <ScrollView
-        contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}
-      >
-        {children}
-      </ScrollView>
-    </View>
-  )
-}
+const Screen = ({ title, children }: { title: string; children: ReactNode }) => (
+  <View style={styles.screen}>
+    <TopBar title={title} onBack={() => router.back()} />
+    <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
+  </View>
+)
 
 const SettingsScreen = () => {
   const { s, set } = useSettings()
@@ -75,7 +69,7 @@ const SettingsScreen = () => {
   if (!s) {
     return (
       <Screen title="설정">
-        <ActivityIndicator style={{ marginTop: 40 }} />
+        <ActivityIndicator style={styles.spinner} />
       </Screen>
     )
   }
@@ -98,7 +92,7 @@ const SettingsScreen = () => {
           style: 'destructive',
           onPress: () =>
             void deleteAccountSession().catch((error: unknown) =>
-              error instanceof ApiError && error.code === 'REAUTH_REQUIRED'
+              needsReauth(error)
                 ? Alert.alert('다시 로그인해 주세요', '탈퇴는 로그인한 지 10분 안에만 할 수 있어요. 다시 로그인한 뒤 탈퇴해 주세요.', [
                     { text: '다시 로그인', onPress: () => void signOutSession() },
                   ])
@@ -115,10 +109,10 @@ const SettingsScreen = () => {
           accessibilityRole="button"
           accessibilityLabel={`${me?.displayName ?? ''}, ${login}`}
           onPress={() => router.push('/edit-profile/basic')}
-          style={{ minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
+          style={styles.profile}
         >
           <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl} />
-          <View style={{ flex: 1 }}>
+          <View style={styles.profileText}>
             <Text v="b1" weight="700">
               {me?.displayName}
             </Text>
@@ -198,7 +192,6 @@ const SettingsScreen = () => {
       <SettingsGroup title="기타">
         <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
         <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
-        {/* SettingsStates draws 구매 복원 on both platforms. */}
         <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} />
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />
@@ -207,5 +200,13 @@ const SettingsScreen = () => {
     </Screen>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 48, gap: 22 },
+  spinner: { marginTop: 40 },
+  profile: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  profileText: { flex: 1 },
+}))
 
 export default SettingsScreen

@@ -4,7 +4,6 @@ import { Platform } from 'react-native'
 
 export const readNotificationPermission = () => Notifications.getPermissionsAsync()
 
-// Android 13+ shows no permission prompt, and a token call fails, until a notification channel exists; creating it again is a no-op.
 const ensureAndroidChannel = async () => {
   if (Platform.OS !== 'android') return
   await Notifications.setNotificationChannelAsync('default', { name: '알림', importance: AndroidImportance.DEFAULT })

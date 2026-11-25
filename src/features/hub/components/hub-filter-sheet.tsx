@@ -1,7 +1,8 @@
 import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
-import { CAREER_STATUSES } from '@push/api-client'
 import { Chip, FilterSheetNav, SheetScroll, Text } from '../../../shared/components'
+import { StyleSheet } from 'react-native-unistyles'
 import { hitSlopTo, type } from '../../../theme'
+import { CAREER_STATUSES } from '../constants'
 import { EMPTY_SHEET, TENURE_CHIPS, tenureChipOn, toggle, toggleTenureChip, type Explore, type SheetFilters } from '../utils'
 import HubFilterGroup from './hub-filter-group'
 
@@ -9,7 +10,6 @@ type Props = {
   draft: SheetFilters
   sent: number | undefined
   onChange: (sheet: SheetFilters) => void
-  /** Caps the groups at the sheet max (useSheetScrollMax): the head stays put and the groups scroll past it. */
   scroll: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
@@ -21,12 +21,11 @@ const HubFilterSheet = ({ draft, sent, onChange, scroll }: Props) => {
   const ios = Platform.OS === 'ios'
   const reset = () => onChange(EMPTY_SHEET)
   return (
-    // iOS: the 52pt .inav then the groups, no gap (.ihead carries its own 14 above and 6 below).
-    <View style={{ gap: ios ? 0 : 14 }}>
+    <View style={ios ? styles.tight : styles.gap}>
       {ios ? (
         <FilterSheetNav title="필터" onReset={reset} />
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={styles.header}>
           <Text v="h2" accessibilityRole="header">
             필터
           </Text>
@@ -37,7 +36,7 @@ const HubFilterSheet = ({ draft, sent, onChange, scroll }: Props) => {
           </Pressable>
         </View>
       )}
-      <SheetScroll style={{ maxHeight: scroll.maxHeight }} onLayout={scroll.onLayout} contentContainerStyle={{ gap: ios ? 0 : 14 }}>
+      <SheetScroll style={styles.scroll(scroll.maxHeight)} onLayout={scroll.onLayout} contentContainerStyle={ios ? styles.tight : styles.gap}>
         <HubFilterGroup title="재직 기간">
           {TENURE_CHIPS.map((t) => (
             <Chip sheet key={t.label} label={t.label} check on={tenureChipOn(draft.tenure, t)} onPress={() => onChange({ ...draft, tenure: toggleTenureChip(draft.tenure, t) })} />
@@ -57,5 +56,12 @@ const HubFilterSheet = ({ draft, sent, onChange, scroll }: Props) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  gap: { gap: 14 },
+  tight: { gap: 0 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+})
 
 export default HubFilterSheet

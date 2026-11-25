@@ -4,7 +4,6 @@ import { radius, type Colors } from '../../theme'
 
 export type SheetDetents = NativeStackNavigationOptions['sheetAllowedDetents']
 
-// iOS 26 floats partial-detent sheets inset with concentric corners; keep the system corner.
 export const sheetOptions = (c: Colors, detents: SheetDetents = 'fitToContents'): NativeStackNavigationOptions => {
   const android = Platform.OS === 'android'
   return {
@@ -22,11 +21,8 @@ export const tintedSheetOptions = (c: Colors, detents?: SheetDetents): NativeSta
   return Platform.OS === 'android' ? o : { ...o, contentStyle: { backgroundColor: c.sheet } }
 }
 
-/** A sheet drawn to the top of the screen: iOS attaches it 10pt under the status bar, opaque; Android right under it. */
 export const fullSheetOptions = (c: Colors): NativeStackNavigationOptions => ({ ...sheetOptions(c, [1]), contentStyle: { backgroundColor: c.bg } })
 
-/** A full-screen modal: iOS keeps the system `modal`; Android's `modal` is a plain full-screen slide, so it takes the boards' full sheet (radius 28, the screen behind shows above it). */
 export const modalOptions = (c: Colors): NativeStackNavigationOptions => (Platform.OS === 'android' ? fullSheetOptions(c) : { presentation: 'modal' })
 
-/** A full page opened from inside a page-sheet modal (the plan, owner rule 8): a plain push stays inside that sheet on iOS (10pt gap, header 20pt low), so iOS presents it full screen. */
 export const fullPageOptions = (): NativeStackNavigationOptions => (Platform.OS === 'ios' ? { presentation: 'fullScreenModal' } : {})

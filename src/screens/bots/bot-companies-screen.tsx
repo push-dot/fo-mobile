@@ -2,16 +2,15 @@ import { router } from 'expo-router'
 import { Platform, ScrollView, View } from 'react-native'
 import { SettingsGroup, SettingsRow, Text, TopBar } from '@/shared/components'
 import { companiesTitle, companyNames, useBots } from '@/features/bots'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const BotCompaniesScreen = () => {
-  const c = useColors()
   const names = companyNames(useBots().data)
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar circleBack chat={Platform.OS === 'ios'} onBack={() => router.back()} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[6] }}>
-        <Text v="h2" weight="700" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 30, paddingTop: spacing[2], paddingBottom: spacing[3] }}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text v="h2" weight="700" accessibilityRole="header" style={styles.title}>
           {companiesTitle(names.length)}
         </Text>
         <SettingsGroup>
@@ -23,5 +22,11 @@ const BotCompaniesScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingHorizontal: theme.spacing[5], paddingBottom: theme.spacing[6] },
+  title: { fontSize: 22, lineHeight: 30, paddingTop: theme.spacing[2], paddingBottom: theme.spacing[3] },
+}))
 
 export default BotCompaniesScreen

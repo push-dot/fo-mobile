@@ -1,10 +1,11 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { Posting } from '@push/api-client'
 import { brandColor, careerLabel } from '@push/shared'
 import { useToggleBookmark } from '@/features/jobs'
 import { Highlight, Icon, Text } from '../../../shared/components'
-import { onAccent, radius, spacing } from '../../../theme'
+import { onAccent } from '../../../theme'
 
 const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => void }) => {
   const toggleBookmark = useToggleBookmark()
@@ -16,14 +17,14 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
         onOpen()
         router.push(`/postings/${p.id}`)
       }}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4], paddingHorizontal: spacing[5], paddingVertical: spacing[3] }}
+      style={styles.row}
     >
-      <View style={{ width: 56, height: 56, borderRadius: radius.md, backgroundColor: brandColor(p.company), alignItems: 'center', justifyContent: 'center' }}>
-        <Text v="h3" weight="800" style={{ color: onAccent, fontSize: 21, lineHeight: 26 }}>
+      <View style={styles.logo(brandColor(p.company))}>
+        <Text v="h3" weight="800" style={styles.initial}>
           {[...p.company][0]}
         </Text>
       </View>
-      <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+      <View style={styles.body}>
         <Text v="c1" weight="600" color="t3" numberOfLines={1}>
           {p.company}
         </Text>
@@ -46,5 +47,12 @@ const PostingRow = ({ p, q, onOpen }: { p: Posting; q: string; onOpen: () => voi
     </Pressable>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[4], paddingHorizontal: theme.spacing[5], paddingVertical: theme.spacing[3] },
+  logo: (brand: string) => ({ width: 56, height: 56, borderRadius: theme.radius.md, backgroundColor: brand, alignItems: 'center', justifyContent: 'center' }),
+  initial: { color: onAccent, fontSize: 21, lineHeight: 26 },
+  body: { flex: 1, minWidth: 0, gap: 1 },
+}))
 
 export default PostingRow

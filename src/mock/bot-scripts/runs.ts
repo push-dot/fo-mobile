@@ -1,6 +1,3 @@
-// Scripted runs of the chat mock, written as the frames push-be streams (StreamEvent of @push/api-client). Every Bot card is
-// an a2ui frame built from the golden fixtures (surfaces.ts).
-// The app plays them through the same mapper as a live stream, so a run draws what the server's frames would draw.
 import type { StreamEvent } from '@push/api-client'
 import { GATED_STEP } from '../../features/chat/constants'
 import { STATUS_STEPS } from '../../features/chat/utils/status-line'
@@ -20,12 +17,10 @@ const tool = (name: string, summary: string, target: string | undefined, state: 
 })
 const todo = (id: string, labels: string[], done: number, added = -1): Frame => todoSurface(id, labels, done, added)
 const ask = (card: Frame) => s(500, card)
-/** A numbered card. Its option ids are the positions the scripts branch on. */
 const numbered = (id: string, title: string, labels: string[], selected = 0) => choiceSurface(id, title, labels, selected ? { recommended: selected } : {})
 const done = s(200, { type: 'done', operation: null })
 const awaitingDone = s(200, { type: 'done', operation: null, awaiting: 'approval' })
 const awaitingChoiceDone = s(200, { type: 'done', operation: null, awaiting: 'choice' })
-// The document every scripted edit and draft changes (마이 › 서류 d1).
 const DOC = 'd1'
 
 export const RESUME = '김서준_백엔드_이력서_2026.pdf'
@@ -35,15 +30,11 @@ export const TODO = ['이력서 읽기', '공고 요건 정리', '적합도 계�
 const FILE_TODO = TODO
 const FILE_PAGE = 'A4 1쪽 · 186KB'
 export const TODO_PLUS = ['이력서 읽기', '공고 요건 정리', '적합도 계산', '경력 섹션 고치기', '자기소개서 초안 쓰기', 'Push 프로필 만들기']
-// Hold a running line this long so a screenshot can catch it.
 const DWELL = 8000
-// ChatPh3Review: the review line stays this long before the boost card, so the shot of the board catches it and the tour has left the chat before the next gate opens.
 const REVIEW_HOLD = 60_000
 const JD_RUN_HOLD = 20_000
-// ChatPh4Quality: the card opens after the tour has typed the line and lowered the keyboard (a card that opens over the raised keyboard comes up blank).
 const QUALITY_LATER = 15_000
 const after = (steps: Step[], ms: number): Step[] => steps.map((st, i) => (i === 0 ? { ...st, wait: ms } : st))
-// Android taps wait up to 10s for a running line's spinner to settle, so a tour that acts while one runs needs far more than DWELL.
 const HOLD = 150_000
 export const JD_LINES = ['필수 · Kotlin 또는 Java 4년 이상', '필수 · Spring Boot 운영', '필수 · RDBMS 설계와 튜닝', '필수 · 대용량 트래픽 처리', '필수 · 결제·정산 도메인 이해', '우대 · Kafka · 장애 대응 · MSA']
 
@@ -58,7 +49,6 @@ const tailorRead: Step[] = [
   s(1500, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
 ]
 
-// 마이 › 서류 › Bot으로 고치기 has no posting yet: the run starts by reading the file, before any plan or todo (DocAgentNew).
 const fixDocRun: Step[] = [
   s(200, status('서류를 읽는 중')),
   s(300, tool('resume', '이력서 읽기', RESUME, 'run', '서류를 읽는 중')),
@@ -68,7 +58,6 @@ const fixDocRun: Step[] = [
 
 const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   s(200, todo('todo', labels, 2, added)),
-  // The status line draws the status frame, not the tool's result line (ChatStates.3 reads "기술 스택을 비교하는 중 14초").
   s(100, status(added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(200, tool('fit', '적합도 계산', added < 0 ? '5개 항목' : '이어서', 'run', added < 0 ? '기술 스택을 비교하는 중' : '경력 수준을 비교하는 중')),
   s(hold + 1300, tool('fit', '적합도 계산', '5개 항목', 'ok', '6.9점 · 키워드와 도메인이 약해요')),
@@ -79,10 +68,7 @@ const tailorFit = (labels: string[], added = -1, hold = DWELL): Step[] => [
   ask(editSurface('tailor-apply', PROFILE_REVIEW_HUNKS.map(({ sign, text }) => ({ sign, text })), DOC, `${PROFILE_REVIEW_COUNTS.added}줄을 더하고 ${PROFILE_REVIEW_COUNTS.removed}줄을 뺐어요`)),
 ]
 
-// What the mapper makes of the server's result frame: the task line, the summary, then the card.
-// The done boards draw the finished task line above the to-do card, so it comes first when the card is new to the thread.
 const TASK_RESULT = '반영했어요 · 2줄 추가, 1줄 삭제'
-// The saved profile (fixture result-profile) of the script's person, opening their Push 프로필 (d1).
 export const PROFILE_NAME = '김서준 · 백엔드 엔지니어'
 const profileDone = (wait: number, score: string): Step[] => [s(wait + 200, profileSurface(`result-profile-${score}`, PROFILE_NAME, 'd1'))]
 const profileCard = (score: string): Step[] => [
@@ -92,13 +78,11 @@ const profileCard = (score: string): Step[] => [
 ]
 const finish = (score: string): Step[] => [...profileCard(score), done]
 
-// Upload scenarios (ChatDone, ChatDoneNoJob, ChatDoneSaveFail, ChatPh6ResultFile, ChatPh6ResultFail).
 const EXT_FILE = '김서준_모아페이_백엔드.pdf'
 const ext = (o: { todo?: string[]; fileName?: string; saved?: boolean; bare?: boolean }): Step[] => {
   const labels = o.todo ?? FILE_TODO
   const saved = o.saved ?? true
   return [
-    // ChatPh6ResultFile and ChatPh6ResultFail draw only the closing line and the card, no task lines.
     ...(o.bare
       ? []
       : [
@@ -106,7 +90,6 @@ const ext = (o: { todo?: string[]; fileName?: string; saved?: boolean; bare?: bo
           s(200, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
           s(200, todo('todo', labels, labels.length)),
         ]),
-    // The made file (fixture result), or its failed save (fixture result-save-failed: 다시 저장하기 only).
     s(500, surface(saved ? 'result' : 'result-save-failed', `result-${o.fileName ?? EXT_FILE}-${saved ? 'saved' : 'failed'}`)),
     done,
   ]
@@ -141,7 +124,6 @@ const failRun: Step[] = [
 
 const say = (text: string): Step[] => [s(600, agent(text)), done]
 
-// Phase boards ChatPh0 … ChatPh6Apply as one guided flow.
 const ph0: Step[] = [
   s(300, status('생각하는 중…')),
   s(600, agent('좋아요! 시작하기 전에 하나만 여쭤볼게요.')),
@@ -157,7 +139,6 @@ const ph0Start: Step[] = [
   s(400, tool('input', '입력 정리', undefined, 'ok', `이력서 **${RESUME}**\n공고 **${MOA}**\nGitHub **github.com/seojun-kim** · 말투 **그대로**`)),
   ask(numbered('ph0-start', '이대로 분석을 시작할까요?', ['시작하기', '자료 바꾸기', '그만할게요'])),
 ]
-// The analysis card by plan: FREE locks the part rows, PRO teases ULTRA, ULTRA unfolds the projection.
 const ph1Fit = (plan: 'FREE' | 'PRO' | 'ULTRA', gateWait = 500): Step[] => [
   s(300, surface(plan === 'FREE' ? 'fit-locked' : 'fit', `fit-${plan}`)),
   { ...ask(numbered('ph1-fit', '이 공고에 맞춰 이력서를 고칠까요?', ['고치기', '피드백만 받기', '점수만 보기'])), wait: gateWait },
@@ -178,10 +159,8 @@ const ph1: Step[] = [
   s(1500, tool('gh', 'GitHub 살펴보기', 'seojun-kim', 'ok', '저장소 12개 중 공고 관련 3개', ['payment-retry-lab', 'settle-pipeline', 'kotlin-ledger'])),
   s(300, agent('이력서에 없는 저장소 **payment-retry-lab**을 찾았어요. 경험으로 넣을지 분석이 끝나면 여쭤볼게요.')),
   s(200, todo('todo1', PH1, 2)),
-  // ChatPh1 draws this as the working line (status frame), as the tailor run does for 기술 스택을 비교하는 중.
   s(200, status('필수·우대 스택을 뽑는 중')),
   s(100, tool('jd', '공고 읽기', MOA, 'run', '필수·우대 스택을 뽑는 중')),
-  // The running line is what ChatPh1 draws; a tour needs a few seconds after its own steps to find it below the fold.
   s(JD_RUN_HOLD, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개', JD_LINES)),
   s(200, todo('todo1', PH1, 3)),
   s(200, status('맞춰보는 중…')),
@@ -214,7 +193,6 @@ const PH3 = ['요약', '경력', '프로젝트', '기술 스택', '학력']
 const ph3Open: Step[] = [
   s(200, status('끄적이는 중…')),
   s(200, todo('todo3', PH3, 1)),
-  // ChatPh3 draws this as the working line (status frame), as ph1 does for 필수·우대 스택을 뽑는 중.
   s(100, status('경력 섹션을 쓰는 중')),
   s(100, tool('draft', '초안 쓰기', '이력서 v1 · 경력', 'run', '경력 섹션을 쓰는 중')),
 ]
@@ -245,13 +223,9 @@ const ph3Boost: Step[] = [
   s(300, surface('fit-boost', 'fit-boost')),
   ask(numbered('ph3-boost', '점수를 한 번 더 올릴까요?', ['한 번 더 올리기', '여기서 멈추기', '그만하기'])),
 ]
-// ChatPh3Review goes from the 초안 쓰기 line straight to what changed, with no draft card between, and the review goes on by itself (a gate with one option is not asked).
 const ph3: Step[] = [...ph3Open, ...ph3Rest(DWELL), s(REVIEW_HOLD, status('초안을 검토하는 중')), ...ph3Boost]
-// ChatPh3 draws the writing state (to-do 1/5, the streaming draft card), so the run holds on it long enough to shoot.
 const ph3Writing: Step[] = [...ph3Open, paper, ...ph3Rest(HOLD), ...ph3Boost]
-// ChatPh4Quality: the recommended fixes are applied without asking, so the run says what it changed and goes on to the design.
 const QUALITY_HOLD = 10_000
-// The card's title is the modal's (ChatPh4Design); the sentence under the bot's line is its own bubble, which a tool frame keeps from merging into the one above.
 const DESIGN_ASK = ask(surface('choice-templates', 'ph4-design'))
 const ph4Design: Step[] = [
   s(QUALITY_HOLD, agent('템플릿을 골라 주세요. 처음이라면 클래식을 추천해요.')),
@@ -281,7 +255,6 @@ const ph5: Step[] = [
   s(300, tool('design', '디자인 적용', '모던', 'ok', 'A4 1쪽 · 여백과 줄 간격 맞춤')),
   s(300, tool('photo', '프로필 사진', '마이 › 프로필', 'ok', '헤더 왼쪽 원형 80px')),
   s(300, tool('save', 'Push 프로필', '마이 › 프로필', 'run', 'Push 프로필에 저장하는 중…')),
-  // Tool lines are not drawn, so ChatPh5's status line needs its own frame (tailorDone does the same).
   s(200, status('Push 프로필에 저장하는 중…')),
   s(HOLD, tool('save', 'Push 프로필', '마이 › 프로필', 'ok', '저장했어요')),
 ]
@@ -328,20 +301,16 @@ export const generic = (text: string): Step[] => [
   ...say('정리했어요. 더 필요한 게 있으면 말해 주세요.'),
 ]
 
-/** The ask that makes the Bot change the headline at once (update_my_profile, rule 39) and leave 되돌리기. */
 export const PROFILE_CHANGE_ASK = 'change headline'
 export const PROFILE_CHANGE_HEADLINE = '결제·정산 시스템을 만드는 시니어 백엔드 개발자'
 export const PROFILE_CHANGE_REPLY = '한 줄 소개를 바꿨어요.'
-/** The tool line's result carries the change id, as push-be's does. */
 export const profileChangeRun = (changeId: string): Step[] => [
   s(200, status('프로필을 고치는 중')),
   s(400, { ...tool('update_my_profile', '프로필 수정', undefined, 'ok'), result: { headline: PROFILE_CHANGE_HEADLINE, changeId } }),
   ...say(PROFILE_CHANGE_REPLY),
 ]
 
-/** Approval id → choice → next steps. */
 export const next: Record<string, (choice: number, labels: string[]) => Step[]> = {
-  // The edit's buttons are 되돌리기 (skip) and 적용 (apply), in the fixture's order.
   'tailor-apply': (c, l) => (c === 1 ? tailorDone(l) : [s(200, tool('edit', '이력서 수정', '경력 · 모아페이', 'ok', '그대로 뒀어요')), ...say('이 수정은 적용하지 않았어요.')]),
   'fail-choice': (c) =>
     c === 0 ? say('공고 본문을 붙여넣어 주세요. 받는 대로 이어서 할게요.')
@@ -376,13 +345,11 @@ export const verifyFail: Step[] = [
   s(200, status('검증하는 중…')),
   s(300, tool('check', '방향 검증', '5개 기준', 'run', '공고 연관성을 보는 중')),
   s(1200, tool('check', '방향 검증', '5개 기준', 'err')),
-  // ChatVerifyFail: the failed check is a notice frame under the user's line (notices.ts draws it as the red status line).
   s(200, { type: 'notice', text: '방향 검증을 통과하지 못했어요.' } as unknown as Frame),
   ask(numbered('ph2x-verify', '어떻게 할까요?', ['다시 시도', '방향 바꾸기', '그만하기'])),
 ]
 const autoPick: Step[] = [
   s(300, tool('jd', '공고 읽기', MOA, 'ok', '필수 5개 · 우대 3개')),
-  // ChatStates.1: the Bot says what it chose in one sentence and goes on writing; the run is held long enough for a tour to take the panel while the status line shows.
   s(400, agent('모던 템플릿으로 만들고, 경력 섹션부터 고칠게요.')),
   s(300, status('경력 섹션을 쓰는 중')),
   s(DWELL + 12000, tool('pdf', 'PDF 만들기', '모던 템플릿', 'ok', FILE_PAGE)),
@@ -392,11 +359,9 @@ const statesFile: Step[] = [s(500, surface('result', 'result-states')), done]
 const appliedRecord: Step[] = [
   s(300, tool('apply', '지원하기', MOA, 'run', EXT_FILE)),
   s(900, tool('apply', '지원하기', MOA, 'ok')),
-  // The record is a bubble of its own (tool lines are not drawn) with an in-bubble link, between the file card and the busy error (ChatStates.4).
   s(300, agent('모아페이에 지원했어요.\n[이동하기](/my)')),
   done,
 ]
-// ChatStates.2 draws the answer as a plain finished reply (3 lines, no 확인을 기다리고 있어요 line, no sheet): the run ends with `done`, not `awaiting`.
 const awaitReply: Step[] = [
   s(300, tool('resume', '이력서 읽기', RESUME, 'ok', '2쪽 · 경력 2건')),
   s(400, agent('경력 섹션을 이렇게 바꿀게요. 승인 API 성과를 숫자로 보여 주고, Kafka 경험을 맨 앞으로 옮겨요.')),
@@ -404,10 +369,7 @@ const awaitReply: Step[] = [
 ]
 export const fail = (code: string, details?: Record<string, unknown>): Step[] => [s(300, { type: 'error', error: { code, message: code, ...(details ? { details } : {}) } })]
 
-// The company-bot status boards (ChatBotStatus*): one status line held, one card, or one finished answer.
 const held = (text: string): Step[] => [s(200, status(text)), s(HOLD, { type: 'done', operation: null })]
-// ChatBotStatusSteps: the 13 status lines one after the other. A tour shoots a line, then sends the mock link `step-next` for the next one,
-// so no line depends on how long the screen takes to read.
 const statusSteps: Step[] = [...STATUS_STEPS.map((text, i) => s(i ? GATED_STEP : 200, status(text))), s(GATED_STEP, { type: 'done', operation: null })]
 const statusHelp: Step[] = [
   ask(numbered('st-help', '지원 동기 첫 문장', ['제품 관점', '데이터 관점', '직접 입력할게요'])),
@@ -415,7 +377,6 @@ const statusHelp: Step[] = [
 ]
 const statusApprove: Step[] = [ask(pageReadSurface('st-approve', '채용 페이지 열기', 'careers.moapay.co.kr를 열어도 될까요?')), awaitingDone]
 
-// Words only the tours type: they pick a scenario that the design draws but a plain message would not reach.
 const TOKENS: Record<string, Step[]> = {
   'err-unavailable': fail('NOT_CONFIGURED'),
   'err-disconnect': fail('DISCONNECTED', { reason: '연결이 끊겼어요' }),
@@ -426,15 +387,12 @@ const TOKENS: Record<string, Step[]> = {
   'ext-nosave': ext({ saved: false }),
   'ext-ok': ext({ bare: true }),
   'ext-fail': ext({ saved: false, bare: true }),
-  // Each phase board draws one thread under its own user line, so jump to it in a fresh conversation (Android types the alias).
   '1번, 지금 이력서로 할게요': ph0Input,
   'ph0-input': ph0Input,
   '이력서 · 자료 2개 · 말투 그대로': ph0Start,
   'ph0-start': ph0Start,
   'feedback only': feedbackOnly,
-  // ChatDoneProfile: the finished profile run without the 확인했어요 gate, so one elapsed line and no answer bubbles.
   'profile-done': [...profileCard('6.9 → 8.1'), done],
-  // Jumps for the boards that draw one phase under its own user line, without the earlier phases above it (Android types the alias).
   '네, 맞춰서 고쳐 주세요': ph2,
   ph2,
   '네, 써 주세요': ph3Writing,
@@ -443,22 +401,15 @@ const TOKENS: Record<string, Step[]> = {
   ph5: [...ph5, ...finish('6.9 → 8.1')],
   '중간 제약으로': verifyFail,
   'verify-fail': verifyFail,
-  // ChatPh2XBlueprints: the blueprints alone under the user's line, without the failed check before them.
   'ph2x-blueprints': ph2xBlueprints,
   '기획서 보여 줘': ph2xBlueprints,
-  // ChatPh6Result: the closing line with its list and the profile link, with no task lines above it.
   'profile-result': [...profileDone(300, '6.9 → 8.1'), done],
   'ph1-free': ph1Plan('FREE'),
   'ph1-ultra': ph1Plan('ULTRA'),
-  // The open gate hides the chat from accessibility, so hold it back until a tour has tapped the card open.
   'ph1-ultra-open': ph1Plan('ULTRA', DWELL + 4000),
   'auto-pick': autoPick,
-  // The long-held working line: a second message or 중지 must land while it still runs (ChatWorking, ChatInterrupt on Android).
-  // ChatHeaderNoCompany: no posting yet, so the conversation has no company and the header pill shows the logo only.
   'no-posting': noPosting,
-  // ChatResume: the work that was running when the chat was left, asked about on the next message.
   'resume-doc': startDocument,
-  // The company-bot boards (ChatBotStatus*): hold one status line (중지 on it is ChatBotStatusStopped), or stop at a card.
   'st-think': held('생각 중'),
   'st-work': held('공고 요건을 읽는 중'),
   'st-steps': statusSteps,
@@ -467,23 +418,16 @@ const TOKENS: Record<string, Step[]> = {
   'st-help': statusHelp,
   'st-approve': statusApprove,
   'tailor hold': [...tailorRead, ...tailorFit(TODO, -1, HOLD)],
-  // ChatStates.4 in one conversation: the file card, then the apply record, then (busy below) the 혼잡 error.
   'states-file': statesFile,
   'states-apply': appliedRecord,
-  // Jump straight to a phase: the design draws each phase under its own user line.
   analyze: ph1,
   boost: ph3Boost,
-  // ChatPh3BoostStop, second state: the score stopped moving before the fifth round.
   'boost-stuck': [...ph3Boost.slice(0, -1), s(400, agent('더 올리기 어려워서 여기서 멈출게요.')), done],
-  // ChatPh3BoostStop, first state: the board has the user line, the score card and the stop line, with no 한 번 더 올리기 answer between, so the run ends here by itself.
   'boost-max': [...ph3Boost.slice(0, -1), s(400, agent('최대 5번까지 올렸어요.')), done],
-  // ChatPh4Quality draws the quality check right under this line, without the boost card.
-  // ChatPh4Quality ends at the sentence, with no status line; the design is the next run (ChatPh4Design's user line).
   quality: after([...ph4Check, done], QUALITY_LATER),
   '품질 검사로 넘어가기': after([...ph4Check, done], QUALITY_LATER),
   design: ph4Design,
   '2개 반영하고 디자인으로': ph4Design,
-  // An earlier turn of the same document flow: its to-do card stays above the later boards (ChatPh5).
   'flow-history': [s(200, todo('todo', TODO, TODO.length)), done],
   'ph2x': ph2xApproach,
   '네, 시작해 주세요': ph1,
@@ -500,12 +444,9 @@ const deadlineRun: Step[] = [
 ]
 
 export const pick = (text: string, interrupted: boolean, attachment?: string, intent?: string, run?: string): { steps: Step[]; labels?: string[] } | null => {
-  // The Android keyboard capitalizes the first letter of a tour's typed English alias.
   const t = text.trim().toLowerCase()
-  // `run:<token>` (links.ts) plays that scenario for any text, so a tour can type the design's own user line (ChatErrUnavailable, ChatErrOther).
   const token = TOKENS[run ?? t]
   if (token) return { steps: token }
-  // 서류 보기 › 봇으로 고치기 sends the file name as its attachment; that is the read-then-fix run below, not an external file.
   if (attachment && t !== '이 서류를 고쳐 줘') return { steps: fileRun() }
   if (intent === 'fit') return { steps: ph1 }
   if (intent === 'deadline_postings') return { steps: deadlineRun }

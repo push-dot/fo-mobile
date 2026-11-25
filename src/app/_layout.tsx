@@ -5,13 +5,14 @@ import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Appearance, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { queryClient, useAppStateFocus } from '@/providers'
 import { RootErrorBoundary, ToastHost } from '@/shared/components'
 import SplashGate from '@/shared/infrastructure/splash-gate'
 import { noSelectionGrant } from '@/shared/utility'
 import { useSession } from '@/shared/infrastructure'
 import { useThemeMode, useThemePreference } from '@/theme'
-import { DesignThemeProvider } from '@/theme/provider'
+import DesignThemeProvider from '@/theme/provider'
 
 void SplashScreen.preventAutoHideAsync()
 
@@ -30,7 +31,6 @@ const RootLayout = () => {
     void loadTheme()
   }, [load, loadTheme])
 
-  // Native sheets, menus and alerts follow the in-app theme, not only the system one.
   useEffect(
     () => Appearance.setColorScheme(themeChoice === 'system' ? 'unspecified' : themeChoice),
     [themeChoice],
@@ -43,7 +43,7 @@ const RootLayout = () => {
       <QueryClientProvider client={queryClient}>
         <RootErrorBoundary>
           <SplashGate sessionReady={ready} themeReady={themeReady} />
-          <View style={{ flex: 1 }} {...noSelectionGrant}>
+          <View style={styles.root} {...noSelectionGrant}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Protected guard={signedIn} redirectTo="/sign-in">
                 <Stack.Screen name="(app)" />
@@ -64,5 +64,9 @@ const RootLayout = () => {
     </DesignThemeProvider>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  root: { flex: 1 },
+}))
 
 export default RootLayout

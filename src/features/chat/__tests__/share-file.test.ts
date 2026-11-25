@@ -9,7 +9,8 @@ vi.mock('@/shared/infrastructure', async () => {
   const http = createClient({ baseUrl: 'http://x/api/v1', getToken: () => 'token', fetch: fetch as typeof globalThis.fetch, uuid: () => 'k' })
   return { api: createApi(http), http, API_MOCK: true }
 })
-vi.mock('@/features/my', () => ({ myApi: {} }))
+vi.mock('@/features/my', () => ({}))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: {} }))
 
 const { fetchDocumentPdf, fetchProfilePdf, fetchSourceBytes } = await import('../api/fetchers')
 const { exclusive, pdfName, shareErrorText } = await import('../utils/share')

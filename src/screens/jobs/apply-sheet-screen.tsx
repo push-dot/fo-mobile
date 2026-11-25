@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
+import { StyleSheet } from 'react-native-unistyles'
 import { Sheet, SheetScroll, TOAST_ABOVE, showToast, useSheetScrollMax } from '@/shared/components'
 
 const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
@@ -44,7 +45,7 @@ const ApplySheetScreen = () => {
         pending: apply.isPending,
       }}
     >
-      <SheetScroll keyboardShouldPersistTaps="handled" style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+      <SheetScroll keyboardShouldPersistTaps="handled" style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout}>
         <ApplySheet
           main={main}
           extras={extras}
@@ -57,5 +58,9 @@ const ApplySheetScreen = () => {
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create({
+  scroll: (maxHeight: number) => ({ maxHeight }),
+})
 
 export default ApplySheetScreen

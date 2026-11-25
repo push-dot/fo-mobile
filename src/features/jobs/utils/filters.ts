@@ -4,6 +4,8 @@ import {
 } from '@push/api-client'
 import { FILTER_TITLES } from '../constants'
 
+export { withDeadlineWindow } from '@push/api-client'
+
 export type Filters = {
   category: JobCategory[]
   skills: string[]
@@ -59,7 +61,6 @@ const withRegion = (list: string[], value: string) => {
   return [...list.filter((x) => (whole ? sidoOf(x) !== sido : x !== sido)), value]
 }
 
-/** Picking a district past MAX_REGIONS does nothing; removing one always works. */
 export const toggleRegion = (list: string[], value: string): string[] => {
   if (list.includes(value)) return list.filter((x) => x !== value)
   const next = withRegion(list, value)

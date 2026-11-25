@@ -1,15 +1,11 @@
-import { ApiError } from '@push/api-client'
 import { Alert } from 'react-native'
 import { showToast } from '@/shared/components'
 import { useDeleteMaterial, useRestoreMaterial } from '../api/hooks'
 import { CANCEL_LABEL, CITED, DELETE_CONFIRM, RESTORE_FAILED, UNDO_LABEL } from '../constants'
 import type { Material } from '../types'
+import { isCitedError } from '../utils/delete-error'
 import { deleteCopy } from '../utils/material-view'
 
-/** DELETE answers 409 for a file a career row still cites. */
-const cited = (error: unknown) => error instanceof ApiError && error.status === 409
-
-/** A long press on a row asks it in a native alert; the detail sheet has no delete. */
 export const useConfirmDeleteMaterial = (toastBottom: number) => {
   const remove = useDeleteMaterial()
   const restore = useRestoreMaterial()
@@ -26,7 +22,7 @@ export const useConfirmDeleteMaterial = (toastBottom: number) => {
               onPress: () => void restore(m.kind, m.id).catch(() => showToast({ message: RESTORE_FAILED, alert: true, bottom: toastBottom })),
             },
           }),
-        (error: unknown) => showToast({ message: cited(error) ? CITED : copy.failed, alert: true, bottom: toastBottom }),
+        (error: unknown) => showToast({ message: isCitedError(error) ? CITED : copy.failed, alert: true, bottom: toastBottom }),
       )
     Alert.alert(copy.title, copy.body, [
       { text: CANCEL_LABEL, style: 'cancel' },

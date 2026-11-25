@@ -1,9 +1,9 @@
 import { Box, Switch as ComposeSwitch } from '@expo/ui/jetpack-compose'
 import { semantics } from '@expo/ui/jetpack-compose/modifiers'
-import { onAccent, spacing, useColors } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { onAccent, useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/** Android: Material 3 switch. iOS keeps RN Switch, which is UISwitch. */
 const Switch = ({
   value,
   onValueChange,
@@ -14,9 +14,8 @@ const Switch = ({
   label: string
 }) => {
   const c = useColors()
-  // M3 pads the 32dp switch to a 48dp touch target; the negative margin keeps the target but lays out 32dp
   return (
-    <NativeHost matchContents style={{ marginVertical: -spacing[2] }}>
+    <NativeHost matchContents style={styles.host}>
       <ComposeSwitch
         value={value}
         onCheckedChange={onValueChange}
@@ -29,7 +28,6 @@ const Switch = ({
         }}
         modifiers={[semantics({ contentDescription: label })]}
       >
-        {/* M3 draws the off thumb at 16dp unless the thumb has content; the boards' `.and .sw:after` is 24 in both states. */}
         <ComposeSwitch.ThumbContent>
           <Box />
         </ComposeSwitch.ThumbContent>
@@ -37,5 +35,9 @@ const Switch = ({
     </NativeHost>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  host: { marginVertical: -theme.spacing[2] },
+}))
 
 export default Switch

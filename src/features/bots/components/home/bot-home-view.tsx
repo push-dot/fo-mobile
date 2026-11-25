@@ -64,7 +64,6 @@ type HomeRowProps = {
   onMenu: (key: HomeMenuKey, bot: Bot) => void
 }
 
-/** One list row: `held` (mascot motion paused off screen) is derived from this row's own viewability, so scrolling never re-renders the others. */
 const HomeRow = ({ bot, activity, now, chrome, index, onMenu }: HomeRowProps) => {
   const [seen, setSeen] = useState<boolean | null>(null)
   useViewability((token) => setSeen(token.isViewable))

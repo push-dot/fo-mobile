@@ -1,5 +1,3 @@
-// In-memory mock of the push-be API for UI work while v2 endpoints don't exist (api-spec §4 is a draft).
-// shortcut: fixtures only, no persistence across reloads; remove once push-be v2 ships (EXPO_PUBLIC_API_MOCK=0).
 
 type Req = { method: string; path: string; query: URLSearchParams; body: unknown; params: Record<string, string> }
 type Handler = (req: Req) => unknown | Promise<unknown>
@@ -9,7 +7,6 @@ const routes: Route[] = []
 
 export const MOCK_USER_ID = 'dev'
 
-/** Registers `GET postings/:id` style routes. Return `{ status, body }` to control the response. */
 export const mock = (method: string, pattern: string, handler: Handler) => {
   const keys: string[] = []
   const re = new RegExp(
@@ -28,10 +25,6 @@ trailer<</Root 1 0 R>>
 export const pdfResponse = () =>
   new Response(Uint8Array.from(PDF, (ch) => ch.charCodeAt(0)), { headers: { 'Content-Type': 'application/pdf' } })
 
-/**
- * sort of me/posts, me/saved-posts and me/commented-posts like push-be: views and comments rank first and newest-first breaks ties (the lists are
- * kept newest first, and sort is stable); an unknown sort is a 422.
- */
 export const sortPosts = <T extends { viewCount: number; commentCount: number }>(items: T[], query: URLSearchParams) => {
   const sort = query.get('sort') ?? 'latest'
   if (!['latest', 'views', 'comments'].includes(sort)) {
@@ -41,7 +34,6 @@ export const sortPosts = <T extends { viewCount: number; commentCount: number }>
   return { rows: by ? [...items].sort((a, b) => b[by] - a[by]) : items }
 }
 
-/** Cursor page like push-be. Only GET postings reports `total`, so other lists leave it out too. */
 export const page = <T>(items: T[], query: URLSearchParams, withTotal = false) => {
   const limit = Number(query.get('limit') ?? 20)
   const start = Number(query.get('cursor') ?? 0)
@@ -50,10 +42,6 @@ export const page = <T>(items: T[], query: URLSearchParams, withTotal = false) =
   return { data: slice, page: { nextCursor: next, hasMore: next !== null, ...(withTotal ? { total: items.length } : {}) } }
 }
 
-/**
- * Tour switches (links.ts). A rule matches `method` + a regex on the path (or path + query string, to tell `GET postings` sorts apart) and makes the route misbehave: `hang` never answers in time
- * (loading skeletons), `fail` answers 500 (error states), `empty` serves the handler's list with no rows (empty states).
- */
 export type Rule = { kind: 'hang' | 'fail' | 'empty'; method: string; re: RegExp }
 let rules: Rule[] = []
 export const setRules = (next: Rule[]) => {
@@ -67,12 +55,10 @@ const json = (status: number, body: unknown) =>
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export const mockFetch: typeof fetch = async (input, init) => {
-  // ky passes a Request; plain callers pass (url, init).
   const req = input instanceof Request ? input : new Request(input, init)
   const url = new URL(req.url)
   const path = url.pathname.replace(/^.*\/api\/v1\//, '')
   const method = req.method.toUpperCase()
-  // RN's fetch polyfill keeps the original FormData on the Request; uploads need its parts, not text.
   const form = (req as unknown as { _bodyFormData?: FormData })._bodyFormData
   const text = form || method === 'GET' || method === 'HEAD' ? '' : await req.clone().text().catch(() => '')
   const parse = (t: string) => {

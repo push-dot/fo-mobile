@@ -6,20 +6,17 @@ import { noticeOf } from './notices'
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
 
-/** A code with no sentence of its own, sent with a reason, is drawn as the bubble 작업 중 문제가 생겼어요. {reason}. 다시 해 볼까요? */
 export const errorReason = (code: string | undefined, reason: unknown) =>
   code !== 'QUEUE_BUSY' && !(code && ERROR_TEXT[code]) && typeof reason === 'string' && reason ? reason : undefined
 
 export const errorText = (code?: string, retryAfterSec?: number, reason?: unknown) =>
   code === 'QUEUE_BUSY' ? queueBusyMessage(retryAfterSec, reason) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-/** One server frame → transcript events. Every Bot card is an `a2ui` frame: a surface row upserted by its surfaceId. */
 export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
   switch (ev.type) {
     case 'token':
       return [{ type: 'token', text: ev.text }]
     case 'status': {
-      // The waiting status names the surface the run pauses on (bot contract: phase waiting, cardId).
       const card = (ev as { phase?: string; cardId?: string }).phase === 'waiting' ? (ev as { cardId?: string }).cardId : undefined
       return [{ type: 'status', verbs: [ev.text] }, ...(card ? [{ type: 'wait' as const, surfaceId: card }] : [])]
     }
@@ -27,7 +24,6 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
       return [{ type: 'surface', id: ev.surfaceId, kind: ev.kind, messages: ev.messages }]
     case 'tool': {
       const error = ev.state === 'err' && typeof ev.result?.error === 'string' ? ev.result.error : undefined
-      // update_my_profile applies at once (rule 39); the server kept the old values under changeId, so a reopened chat draws 되돌리기 too.
       const changeId = ev.name === 'update_my_profile' && ev.state === 'ok' && typeof ev.result?.changeId === 'string' ? ev.result.changeId : undefined
       const line: ChatEvent[] = changeId ? [{ type: 'agentText', id: `undo-${changeId}`, text: PROFILE_SAVED, undo: changeId }] : []
       return [
@@ -60,12 +56,10 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
     case 'cancelled':
       return [{ type: 'stop', resumable: (ev as { resumable?: boolean }).resumable === true, ...(turn ? { turn } : {}) }]
     case 'done': {
-      // The legacy StreamEvent type predates the bot stream's `sources`.
       const sources = (ev as { sources?: BotContract.Attachment[] }).sources
       return [...(sources?.length ? [{ type: 'sources' as const, sources }] : []), { type: 'done', at: 0, awaiting: ev.awaiting }]
     }
     default: {
-      // push-be #224: a type this build does not know must not stop the stream.
       const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; seq?: number }) : null
       return notice ? [notice] : []
     }
@@ -113,7 +107,6 @@ export const fromStream = async function* (
       mark('reattach-empty')
       return
     }
-    // Without seq a resume would replay from the start and duplicate text.
     if (seq === undefined) {
       mark('no-seq')
       return

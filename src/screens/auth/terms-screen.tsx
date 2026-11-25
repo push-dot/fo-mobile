@@ -20,10 +20,9 @@ import {
 import { useSession } from '@/shared/infrastructure'
 import { Button, CtaBar, Text, TopBar, showToast } from '@/shared/components'
 import { marketingResult } from '@/features/my'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const TermsScreen = () => {
-  const c = useColors()
   const held = usePhoneAuth((state) => state.held)
   const clear = usePhoneAuth((state) => state.clear)
   const checked = useTermsConsent((state) => state.checked)
@@ -79,19 +78,19 @@ const TermsScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar onBack={leave} />
-      <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
-        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
+      <View style={styles.body}>
+        <Text accessibilityRole="header" v="h1" style={styles.title}>
           {TERMS_TITLE}
         </Text>
-        <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
+        <Text v="b2" color="t2" style={styles.subtitle}>
           {TERMS_BODY}
         </Text>
-        <View style={{ marginTop: spacing[6] }}>
+        <View style={styles.all}>
           <TermsAllRow checked={all} onPress={toggleAll} />
         </View>
-        <View style={{ paddingTop: spacing[2], paddingHorizontal: spacing[4] }}>
+        <View style={styles.rows}>
           {TERM_ROWS.map((row) => (
             <TermRow
               key={row.id}
@@ -107,9 +106,9 @@ const TermsScreen = () => {
         <Pressable
           accessibilityRole="link"
           onPress={() => openTerm('privacyPolicy')}
-          style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}
+          style={styles.policy}
         >
-          <Text v="c2" color="t2" style={{ textDecorationLine: 'underline' }}>
+          <Text v="c2" color="t2" style={styles.underline}>
             {TERMS_PRIVACY_POLICY}
           </Text>
         </Pressable>
@@ -120,10 +119,22 @@ const TermsScreen = () => {
         ) : null}
       </View>
       <CtaBar>
-        <Button label={TERMS_START} disabled={!requiredOk || busy} onPress={submit} style={{ flex: 1 }} />
+        <Button label={TERMS_START} disabled={!requiredOk || busy} onPress={submit} style={styles.flex} />
       </CtaBar>
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  body: { paddingHorizontal: theme.spacing[6], paddingTop: theme.spacing[3] },
+  title: { fontSize: 24, lineHeight: 32 },
+  subtitle: { marginTop: theme.spacing[2] },
+  all: { marginTop: theme.spacing[6] },
+  rows: { paddingTop: theme.spacing[2], paddingHorizontal: theme.spacing[4] },
+  policy: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
+  underline: { textDecorationLine: 'underline' },
+  flex: { flex: 1 },
+}))
 
 export default TermsScreen

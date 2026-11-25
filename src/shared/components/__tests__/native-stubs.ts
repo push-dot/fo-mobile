@@ -81,3 +81,6 @@ export const find = (tree: ReactNode, type: unknown) => {
   if (!first) throw new Error(`no ${String(type)} in tree`)
   return first
 }
+
+export const flat = (style: unknown): Record<string, unknown> =>
+  Array.isArray(style) ? Object.assign({}, ...style.map(flat)) : ((style as Record<string, unknown> | null | undefined) ?? {})

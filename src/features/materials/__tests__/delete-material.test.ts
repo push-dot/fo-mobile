@@ -1,7 +1,7 @@
 import { MutationObserver, QueryClient } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import type { Material, MaterialKind, MaterialsPage } from '../types'
-import { deleteOptions, LISTS, type Pages } from '../api/cache'
+import { deleteOptions, LISTS, type Pages } from '../utils/material-cache'
 
 const day = new Date(2026, 10, 2)
 const one: Record<MaterialKind, Material> = {

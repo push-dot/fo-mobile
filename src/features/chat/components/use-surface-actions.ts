@@ -4,7 +4,7 @@ import { useConvertDocument } from '@/features/my'
 import type { A2uiLocal } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { useShareFile } from '../api/hooks'
-import { showReviewPage } from '../review-page'
+import { showReviewPage } from '../utils/review-page'
 import { send, useChatStore } from '../stores'
 import { emptyChat } from '../utils/reducer'
 import { runSurfaceAction } from '../utils/surface-action'
@@ -13,10 +13,6 @@ import { useMaterialChange } from './use-material-change'
 
 const openDocument = (documentId: string) => router.push(`/docs/push/${documentId}`)
 
-/**
- * The local actions a surface dispatches, run by the app's own code. None reaches the server, and `result_action` runs only
- * its allowlisted ids (checked by the wrapper); a method or path a surface names is never called.
- */
 export const useSurfaceActions = (botId: string, onSay: () => void) => {
   const share = useShareFile()
   const convert = useConvertDocument(openDocument)

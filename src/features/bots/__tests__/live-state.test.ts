@@ -32,7 +32,6 @@ const bot = (over: Partial<CompanyBot> = {}): CompanyBot => ({
 })
 
 describe('mascotStateOf', () => {
-  // AgentHomeMascot: 확인 필요 → 완료 안 읽음 → 작업 중 → 생각 중 → 대기, one state per bot.
   const expected: [BotActivity['phase'], boolean, MascotState][] = [
     ['waiting', true, 'help'],
     ['waiting', false, 'help'],
@@ -84,7 +83,6 @@ describe('pollIntervalOf', () => {
 })
 
 describe('botRow', () => {
-  // The AgentHome board, row for row.
   it.each([
     [bot({ activity: ACTIVITY.waiting }), '이 변경을 이력서에 반영할까요?', 'help', '10분 전'],
     [bot({ name: '도토리증권', activity: ACTIVITY.working, lastActivityAt: minAgo(60) }), '경력 섹션 고치는 중', 'work', '1시간 전'],

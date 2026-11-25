@@ -3,7 +3,7 @@ import { emptyChat } from '../utils/reducer'
 
 const botApi = vi.hoisted(() => ({ bots: { cancel: vi.fn(), send: vi.fn(), follow: vi.fn(), get: vi.fn(), transcript: vi.fn(), answer: vi.fn() } }))
 vi.mock('@/shared/infrastructure', () => ({ api: {}, botApi, http: {}, API_MOCK: false, hapticImpactLight: vi.fn(), hapticNotify: vi.fn() }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({ chatApi: {} }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 

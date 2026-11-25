@@ -1,10 +1,10 @@
 import { useState, type ComponentRef, type RefObject } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import { Composer } from '@/features/chat'
 import { Icon, Text, useKeyboardHeight } from '../../../shared/components'
 import { composerPadding } from '../../../shared/utility'
-import { spacing, useColors } from '../../../theme'
 import { useCreateComment } from '../api/hooks'
 import { MAX_COMMENT } from '../constants'
 
@@ -19,11 +19,9 @@ const CommentComposer = ({
   onClearReply: () => void
   inputRef: RefObject<ComponentRef<typeof TextInput> | null>
 }) => {
-  const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboardUp = useKeyboardHeight() > 0
   const [text, setText] = useState('')
-  const ios = Platform.OS === 'ios'
   const send = useCreateComment(postId, () => {
     setText('')
     onClearReply()
@@ -45,16 +43,10 @@ const CommentComposer = ({
   )
 
   return (
-    <View
-      style={{
-        ...composerPadding(ios, insets.bottom, keyboardUp),
-        backgroundColor: ios ? 'transparent' : c.bg,
-        gap: spacing[2],
-      }}
-    >
+    <View style={styles.composer(insets.bottom, keyboardUp)}>
       {replyTo ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing[2] }}>
-          <Text v="c1" color="t3" style={{ flex: 1 }}>
+        <View style={styles.reply}>
+          <Text v="c1" color="t3" style={styles.replyText}>
             {replyTo.name}님에게 답글 남기는 중
           </Text>
           <Pressable accessibilityRole="button" accessibilityLabel="답글 취소" onPress={onClearReply} hitSlop={14}>
@@ -66,5 +58,15 @@ const CommentComposer = ({
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  composer: (bottom: number, keyboardUp: boolean) => ({
+    ...composerPadding(Platform.OS === 'ios', bottom, keyboardUp),
+    backgroundColor: Platform.OS === 'ios' ? 'transparent' : theme.colors.bg,
+    gap: theme.spacing[2],
+  }),
+  reply: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: theme.spacing[2] },
+  replyText: { flex: 1 },
+}))
 
 export default CommentComposer

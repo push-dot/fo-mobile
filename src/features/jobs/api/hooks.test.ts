@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
-import { invalidateAfterPostingBookmarkToggle } from './bookmark-invalidation'
+import { invalidateAfterPostingBookmarkToggle } from '../utils/bookmark-invalidation'
 
 const KEYS = [
   ['postings', 'list', {}],

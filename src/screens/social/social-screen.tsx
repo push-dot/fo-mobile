@@ -2,15 +2,15 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, View } from 'react-native'
-import { POST_CATEGORIES, type PostCategory } from '@push/api-client'
-import { Band, PostCard, PostListSkeleton, usePosts } from '@/features/social'
+import type { PostCategory } from '@push/api-client'
+import { Band, PostCard, PostListSkeleton, usePosts, POST_CATEGORIES } from '@/features/social'
 import { Chip, ChipRow, FloatingHeader, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { spacing } from '@/theme'
 
 const Separator = () => <Band />
 
 const SocialScreen = () => {
-  const c = useColors()
   const [category, setCategory] = useState<PostCategory | null>(null)
   const q = usePosts(category)
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
@@ -18,7 +18,7 @@ const SocialScreen = () => {
   const renderItem = ({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
       <TopBar
         transparent
@@ -55,14 +55,12 @@ const SocialScreen = () => {
         onEndReachedThreshold={0.5}
         refreshing={q.isRefetching && !q.isFetchingNextPage}
         onRefresh={() => q.refetch()}
-        contentContainerStyle={{ flexGrow: 1, paddingTop: inset }}
+        contentContainerStyle={styles.list(inset)}
         onScroll={onScroll}
         scrollEventThrottle={64}
-        // SocialStates: the empty feed draws no scroll bar
         showsVerticalScrollIndicator={posts.length > 0}
-        // The chips scroll away with the feed; only the title bar stays up.
         ListHeaderComponent={
-        <View style={{ marginBottom: spacing[1] }}>
+        <View style={styles.chips}>
           <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>
             {POST_CATEGORIES.map((cat) => (
               <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
@@ -85,10 +83,17 @@ const SocialScreen = () => {
             />
           )
         }
-        ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ padding: spacing[5] }} /> : undefined}
+        ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : undefined}
       />
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  list: (inset: number) => ({ flexGrow: 1, paddingTop: inset }),
+  chips: { marginBottom: theme.spacing[1] },
+  footer: { padding: theme.spacing[5] },
+}))
 
 export default SocialScreen

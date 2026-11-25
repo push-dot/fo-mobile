@@ -1,8 +1,9 @@
 import { Box, DropdownMenu, DropdownMenuItem, HorizontalDivider, RNHostView, Text as ComposeText } from '@expo/ui/jetpack-compose'
 import { Fragment } from 'react'
 import { fillMaxSize, selectable } from '@expo/ui/jetpack-compose/modifiers'
-import { StyleSheet, View } from 'react-native'
-import { radius, spacing, useColors } from '../../theme'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { radius, useColors } from '../../theme'
 import Icon from './icon'
 import { menuSections, type MenuAction, type MenuSection } from './menu-action'
 import NativeHost from './native-host'
@@ -13,7 +14,6 @@ const CHECK_SIZE = 18
 
 type Props = { actions: MenuAction[] | MenuSection[]; open: boolean; onClose: () => void; children: React.ReactElement }
 
-/** Android: Material 3 dropdown anchored over its trigger; the overlay passes touches to the trigger. */
 const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
   const c = useColors()
   const sections = menuSections(actions)
@@ -36,7 +36,7 @@ const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
                       weight="700"
                       color="t3"
                       accessibilityRole="header"
-                      style={{ paddingHorizontal: spacing[3], paddingTop: spacing[2], paddingBottom: spacing[1] }}
+                      style={styles.title}
                     >
                       {s.title}
                     </Text>
@@ -62,7 +62,7 @@ const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
                               ) : a.selected ? (
                                 <Icon name="check" size={CHECK_SIZE} color="t1" />
                               ) : (
-                                <View style={{ width: CHECK_SIZE, height: CHECK_SIZE }} />
+                                <View style={styles.checkSpace} />
                               )}
                             </RNHostView>
                           </DropdownMenuItem.LeadingIcon>
@@ -89,5 +89,10 @@ const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  title: { paddingHorizontal: theme.spacing[3], paddingTop: theme.spacing[2], paddingBottom: theme.spacing[1] },
+  checkSpace: { width: CHECK_SIZE, height: CHECK_SIZE },
+}))
 
 export default MenuAnchor

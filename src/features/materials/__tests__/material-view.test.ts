@@ -3,7 +3,6 @@ import type { BotId, BotRef } from '@/features/bots'
 import type { Material, MaterialsPage } from '../types'
 import { deleteCopy, detailFacts, detailTitle, listView, searchEmptyTitle, sendContextOf } from '../utils/material-view'
 
-// The boards are drawn on 2026-11-09.
 const now = new Date(2026, 10, 9, 15, 0)
 const at = (m: number, d: number, h = 15, min = 0) => new Date(2026, m - 1, d, h, min)
 const moapay: BotRef = { id: 'b1' as BotId, kind: 'company', name: '모아페이', color: 'teal' }

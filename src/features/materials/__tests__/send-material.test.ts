@@ -6,7 +6,6 @@ const toast = vi.hoisted(() => vi.fn())
 vi.mock('expo-router', () => ({ router: nav }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: toast }))
 vi.mock('@/features/chat', () => ({ attach: (id: string, a: { title: string }) => void (drafts.byBot[id] = a.title) }))
-// The bots barrel pulls in React Native; the route builders are the part under test.
 vi.mock('@/features/bots', () => import('../../bots/utils/paths'))
 
 import type { Bot, BotId } from '@/features/bots'

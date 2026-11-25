@@ -2,10 +2,6 @@ import { useWindowDimensions } from 'react-native'
 import { radius, spacing } from '@/theme'
 import { isXlBoardText } from '@/shared/components/xl-chrome'
 
-/**
- * The boxes of `.mrow`, `.usep` and `.spill` as Materials draws them, and under `.xl` (MaterialsXL). The text in
- * them grows with the system size by itself.
- */
 const SIZES = {
   normal: {
     row: { alignItems: 'center', paddingVertical: 10, paddingLeft: spacing[5], paddingRight: spacing[4] },
@@ -23,7 +19,6 @@ const SIZES = {
   },
 } as const
 
-/** From the harness XL size (iOS extra-extra-large) up the list draws MaterialsXL. */
 export const listSizeFor = (fontScale: number) => SIZES[isXlBoardText(fontScale) ? 'large' : 'normal']
 
 export const useListSize = () => listSizeFor(useWindowDimensions().fontScale)

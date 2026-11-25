@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Alert, Platform, Pressable, useWindowDimensions, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 import {
   APPLE,
@@ -25,7 +24,9 @@ import {
 } from '@/features/auth'
 import { DEV_AUTH_TOKEN, signIn, signInWithApple, signInWithDevToken, type SignInOutcome } from '@/shared/infrastructure'
 import { Mascot, Text } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
+import { useColors } from '@/theme'
 
 const devToken = __DEV__ ? DEV_AUTH_TOKEN : undefined
 
@@ -35,7 +36,6 @@ const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   router.push('/phone')
 }
 
-// A failed login is the platform's own alert (iOS alert, Android dialog), not a box drawn on the screen.
 const fail = (provider: LoginProvider) => {
   const { title, body } = loginFailureCopy(provider)
   Alert.alert(title, body, [{ text: '확인' }])
@@ -70,18 +70,17 @@ const SignInScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View style={{ marginTop: insets.top + (compact ? LOGO_TOP_COMPACT : LOGO_TOP), alignItems: 'center', gap: spacing[5], paddingHorizontal: 28 }}>
-        <View accessible accessibilityRole="image" accessibilityLabel={LOGO_LABEL} style={{ marginBottom: 10 }}>
+    <View style={styles.screen}>
+      <View style={styles.hero(insets.top, compact)}>
+        <View accessible accessibilityRole="image" accessibilityLabel={LOGO_LABEL} style={styles.logo}>
           <Mascot size={compact ? LOGO_SIZE_COMPACT : LOGO_SIZE} />
         </View>
-        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33, textAlign: 'center' }}>
+        <Text accessibilityRole="header" v="h1" style={styles.title}>
           {'AI와 함께 하는 커리어,\nPush에서 시작하기'}
         </Text>
       </View>
 
-      <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 24, gap: spacing[3] }}>
-        {/* SignIn board: iOS Google is a borderless grey pill, Android keeps the outlined card. */}
+      <View style={styles.actions(insets.bottom)}>
         <ProviderButton label={GOOGLE_START} logo={GOOGLE} bg={Platform.OS === 'ios' ? c.fill : c.card} fg={c.t1} border={Platform.OS === 'ios' ? undefined : c.line} disabled={busy} onPress={() => run('google')} />
         {apple ? (
           <ProviderButton label={APPLE_START} logo={APPLE} bg={c.t1} fg={c.bg} disabled={busy} onPress={() => run('apple')} />
@@ -91,7 +90,7 @@ const SignInScreen = () => {
           accessibilityRole="button"
           disabled={busy}
           onPress={startPhone}
-          style={{ alignSelf: 'center', minHeight: 44, paddingHorizontal: spacing[4], justifyContent: 'center' }}
+          style={styles.phone}
         >
           <Text weight="600" color="t2">
             {PHONE_START}
@@ -100,11 +99,10 @@ const SignInScreen = () => {
         {devToken ? (
           <Pressable
             accessibilityRole="button"
-            style={{ position: 'absolute', top: '100%', left: 0, right: 0, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+            style={styles.dev}
             onPress={() => signInWithDevToken(devToken)}
           >
-            {/* Dev builds only (__DEV__). The board has no such link, so it is transparent: still in the accessibility tree, never drawn. */}
-            <Text v="c1" weight="700" style={{ color: 'transparent' }}>
+            <Text v="c1" weight="700" style={styles.devLabel}>
               개발 토큰으로 들어가기
             </Text>
           </Pressable>
@@ -113,5 +111,21 @@ const SignInScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  hero: (top: number, compact: boolean) => ({
+    marginTop: top + (compact ? LOGO_TOP_COMPACT : LOGO_TOP),
+    alignItems: 'center',
+    gap: theme.spacing[5],
+    paddingHorizontal: 28,
+  }),
+  logo: { marginBottom: 10 },
+  title: { fontSize: 24, lineHeight: 33, textAlign: 'center' },
+  actions: (bottom: number) => ({ position: 'absolute', left: 20, right: 20, bottom: bottom + 24, gap: theme.spacing[3] }),
+  phone: { alignSelf: 'center', minHeight: 44, paddingHorizontal: theme.spacing[4], justifyContent: 'center' },
+  dev: { position: 'absolute', top: '100%', left: 0, right: 0, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  devLabel: { color: 'transparent' },
+}))
 
 export default SignInScreen

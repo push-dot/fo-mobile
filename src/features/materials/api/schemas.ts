@@ -2,16 +2,12 @@ import type { BotContract } from '@push/api-client'
 import { dateOf, dayOf, toBotRef } from '@/features/bots'
 import type { MadeBy, Material, MaterialDetail, MaterialsPage } from '../types'
 
-// The only place that reads material wire field names. Dates and bot references are read by the bots feature's
-// wire readers, so a bad value is handled the same way in both: the row is dropped.
 
-/** LinkedIn is not a stored link kind. The server sends the link's host, and the label comes from it. An empty host has none. */
 const LINKEDIN_HOST = /(^|\.)linkedin\.com$/
 
 const madeByOf = (origin: 'UPLOAD' | 'AI', createdBy: BotContract.BotRef | null): MadeBy =>
   origin === 'UPLOAD' ? { by: 'user' } : { by: 'bot', bot: createdBy && toBotRef(createdBy) }
 
-/** Null for a material whose dates do not parse. */
 export const toMaterial = (m: BotContract.Material): Material | null => {
   switch (m.kind) {
     case 'file': {

@@ -1,11 +1,9 @@
 import type { AccessMode, ChatIntent } from '@push/api-client'
 import type { Icon3DName } from '@/shared/components'
 import type { QsItem } from './api/schemas'
-import { ERROR_TEXT } from './error-text'
+import { planRequired } from './utils/usage'
 
-export { ERROR_TEXT } from './error-text'
 
-// Motion values from feature-spec 15.4. Reduce Motion → fades only, no loops.
 export const BUBBLE = [0.2, 0.9, 0.25, 1.15] as const
 
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
@@ -13,27 +11,21 @@ export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
 export const MICRO_CREDITS_PER_CREDIT = 6000
 
 
-/** The in-progress phrase while the cancel request is out (ChatBotStatusStopped, rule 29: a status is the step under way, the result is a bubble). */
 export const STOPPING_TEXT = '중지하는 중'
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
 
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
-// push-be writes nothing while a Stripe webhook holds the billing row, so the same request can go again. Same line as fo-web streamErrorText.
 export const billingLockedText = (sec: number) => `결제 정보를 정리하고 있어요. ${sec}초 뒤에 다시 보내 주세요.`
-/** QUEUE_BUSY copy. reason BILLING_LOCKED uses the web billing line when a retry delay is known. */
 export const queueBusyMessage = (retryAfterSec?: number, reason?: unknown) => {
   if (retryAfterSec && reason === 'BILLING_LOCKED') return billingLockedText(retryAfterSec)
   if (retryAfterSec) return queueBusyText(retryAfterSec)
   return ERROR_TEXT.QUEUE_BUSY
 }
-/** The tail of the status line when the stream drops and cannot be picked up again. */
 export const DISCONNECT_REASON = '연결이 끊겼어요'
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
-/** A scripted mock step with this wait does not run on a timer: it waits for the mock link `step-next` (ChatBotStatusSteps). */
 export const GATED_STEP = -1
 
-/** The error line of a failed attachment upload carries this code: no run started, so the header lamp stays off (ChatErrUpload). */
 export const UPLOAD_ERROR_CODE = 'UPLOAD_FAILED'
 export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크를 확인하고 다시 올려 주세요.'
 export const CHAT_STOP_FORBIDDEN = '다른 담당자가 시작한 작업이라 멈출 수 없어요'
@@ -63,10 +55,8 @@ export const LINK_UNDO = '되돌리기'
 export const PROFILE_SAVED = '프로필을 고쳤어요.'
 export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
-/** The default document of every quick start and of the account sheet is the default hub profile (RULINGS 31), never an uploaded file. */
 export const DEFAULT_DOC = '허브 프로필'
 const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`
-// Chat docs are the same rows as my sources, so the key sits under ['me', 'sources'] and refreshes when my uploads or removes one.
 export const CHAT_DOCS_KEY = ['me', 'sources', 'chat-docs'] as const
 
 export const CHAT_ATTACHMENT_TYPES = [
@@ -80,19 +70,15 @@ export const CHAT_DOC_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ]
 export const CHAT_ATTACHMENT_OPTIONS = { type: CHAT_ATTACHMENT_TYPES, copyToCacheDirectory: true }
-// Android's document picker has no MIME for .md and greys it out, so it also lists any text and untyped file; `isChatAttachment` then filters by extension.
 export const CHAT_ATTACHMENT_OPTIONS_ANDROID = { type: [...CHAT_ATTACHMENT_TYPES, 'text/*', 'application/octet-stream'], copyToCacheDirectory: true }
 export const isChatAttachment = (name: string) => /\.(pdf|docx|txt|md)$/i.test(name)
 export const CHAT_DOC_OPTIONS = { type: CHAT_DOC_TYPES, copyToCacheDirectory: true }
 
 export type QsLayout = 'link' | 'match' | 'pick' | 'status' | 'calendar' | 'cards' | 'reply'
 
-/** What the sheet collected; `start` turns it into the conversation title and first message. */
 export type QsInput = { picked: QsItem[]; url: string; chips: string[]; option: boolean; doc?: string; documentId?: string; task: string; custom: string }
 
-/** QsPostAll, QsReplyAll (`.compose`). The CTA sits 8 above the home inset. */
 export const COMPOSE = { top: 16, header: 44, side: 20, bottom: 8 }
-/** The description's margin-top -10 under the board's 16 gap. */
 export const ALL_DESCRIPTION_TOP = 6
 export const ALL_FIELD_HEIGHT = 52
 
@@ -101,20 +87,16 @@ export type QuickStart = {
   label: string
   icon: Icon3DName
   title: string
-  /** Under the title; empty draws nothing (QsMatch). */
   description: string
   layout: QsLayout
-  /** Button label; omitted when tapping a row starts the conversation (제안 답장). */
   action?: string | ((n: number) => string)
   multi?: boolean
   grid?: boolean
   docLabel?: string
   readsHub?: boolean
   listLabel?: string
-  /** The list of postings is open from the start (QsGap, QsFit: 3 recent and 전체 보기); the others show the picked row and open the list on a tap. */
   openList?: boolean
   custom?: string
-  /** The free-input field's height when a board draws it other than the 56 default (QsExp: 54). */
   customHeight?: number
   instant?: boolean
   start: (i: QsInput) => { title: string; message: string; intent: ChatIntent; context?: { documentId: string } } | null | undefined
@@ -130,7 +112,6 @@ const opened = (title: string, message: string, intent: ChatIntent, documentId?:
 const one = (i: QsInput) => i.picked[0]
 const host = (url: string) => url.replace(/^https?:\/\//, '').split(/[/?#]/)[0] ?? url
 
-// Order of the previous design's quick-start row (Push 앱 › 이전 버전): the job tasks first, the calendar after the application status, social tasks last.
 export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'link', label: '공고 링크로 맞추기', icon: 'qs-job-link', layout: 'link', action: '맞추기 시작', readsHub: true,
@@ -210,25 +191,32 @@ export const QUICK_STARTS: QuickStart[] = [
 
 export const CALENDAR_TASKS = ['이번 주 정리하기', '면접·커피챗 잡기', '준비 알림 만들기'] as const
 
-/** Board `.kw-ok:before` / `.kw-miss:before`: the glyph's right margin differs (3px / 4px). */
 export const KEYWORD_GLYPH = {
   ok: { char: '✓', gap: 3 },
   // eslint-disable-next-line no-restricted-syntax -- board value; importing the theme here breaks the node tests
   miss: { char: '!', gap: 4 },
 } as const
 
-/** The page-style modal a form card (ChatPh0Input) opens in: its title is the sheet's, not the bot's question. */
 
-// ChatBotReadOff: 내 자료 읽기 is off, so a company bot cannot read 마이 › 서류 or the bookmarks. The refused send is a bot line with two ways out.
 export const READ_OFF_CODE = 'FILES_READ_OFF'
 export const READ_OFF_TEXT = '내 자료 읽기가 꺼져 있어서 마이 › 서류와 북마크 공고를 읽을 수 없어요. 서류를 직접 첨부하거나, 설정에서 내 자료 읽기를 켜 주세요.'
 export const READ_OFF_ATTACH = '서류 첨부'
 export const READ_OFF_SETTINGS = '설정 열기'
 
-/** What a result's 지원하기 button sends: the Bot applies to the posting. */
 export const applyText = (company?: string) => (company ? `${company}에 바로 지원해 줘` : '바로 지원해 줘')
-/** What 다시 저장하기 sends: the bot saves the file it just made. */
 export const SAVE_RETRY_TEXT = '내 서류에 저장해 줘'
 
-/** The way out of an edit: the review page's button and the profile line's link. */
 export const UNDO_LABEL = '되돌리기'
+
+const USAGE_BODY = '이번 달 사용량을 모두 썼어요.'
+
+export const ERROR_TEXT: Record<string, string> = {
+  FEATURE_DISABLED: USAGE_BODY,
+  INSUFFICIENT_CREDITS: USAGE_BODY,
+  PLAN_REQUIRED: planRequired('FREE'),
+  [READ_OFF_CODE]: READ_OFF_TEXT,
+  QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
+  APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
+  APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
+  NOT_CONFIGURED: '지금은 Bot을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
+}

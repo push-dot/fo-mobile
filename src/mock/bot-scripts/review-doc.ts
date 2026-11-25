@@ -4,10 +4,6 @@ const keep = (text: string): Omit<StreamHunk, 'line'> => ({ sign: '', text })
 const drop = (text: string): Omit<StreamHunk, 'line'> => ({ sign: '-', text })
 const add = (text: string): Omit<StreamHunk, 'line'> => ({ sign: '+', text })
 
-/**
- * The Push 프로필 of ChatApprove as the hunks the app reads: every line of the document, the changed ones marked.
- * The live edit_document tool sends the same shape: every line of the document version, the changed ones marked (push-be personal/tools.py `_page_hunks`).
- */
 export const PROFILE_REVIEW_HUNKS: StreamHunk[] = [
   keep('# 김서준'),
   keep('결제 시스템을 만드는 백엔드 개발자 · 4년차'),

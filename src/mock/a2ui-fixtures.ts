@@ -1,5 +1,3 @@
-// The golden A2UI wire frames from @push/api-client (copies of push-be packages/contracts/a2ui/fixtures), for mock mode.
-// Mock mode replays the set of the protocol this platform speaks (A2UI_VERSION).
 import type { A2uiFrame } from '@push/api-client'
 import approvalEditV091 from '@push/api-client/a2ui-fixtures/approval-edit.json'
 import approvalEditAnsweredV091 from '@push/api-client/a2ui-fixtures/approval-edit-answered.json'
@@ -103,10 +101,6 @@ const V1: Record<keyof typeof V091, unknown> = {
 
 export type FixtureName = keyof typeof V091
 
-/**
- * A golden frame as a fresh copy for one surface: its surfaceId replaced everywhere, without the fixture's seq, at and turn.
- * `model` replaces top-level keys of its data model (a to-do list's items as a run goes on).
- */
 export const fixtureFrame = (name: FixtureName, surfaceId: string, model?: Record<string, unknown>): A2uiFrame => {
   const raw = (A2UI_VERSION === '1.0' ? V1 : V091)[name] as A2uiFrame
   const { seq: _seq, at: _at, turn: _turn, ...frame } = JSON.parse(JSON.stringify(raw).replaceAll(`"${raw.surfaceId}"`, JSON.stringify(surfaceId))) as A2uiFrame & { seq?: number; at?: string; turn?: string }
@@ -117,13 +111,11 @@ export const fixtureFrame = (name: FixtureName, surfaceId: string, model?: Recor
   }
 }
 
-/** The ids a surface's PushChoice answers with, in order: what a mock run branches on. */
 export const choiceIds = (frame: A2uiFrame): string[] => {
   const update = frame.messages.find((m) => 'updateComponents' in m)
   const choice = update && 'updateComponents' in update ? update.updateComponents.components.find((c) => c.component === 'PushChoice') : undefined
   return ((choice?.questions as { choices?: { id: string }[] }[] | undefined) ?? []).flatMap((q) => (q.choices ?? []).map((c) => c.id))
 }
 
-/** The same frame under another surface id, everywhere it is named. */
 export const withSurfaceId = (frame: A2uiFrame, surfaceId: string): A2uiFrame =>
   JSON.parse(JSON.stringify(frame).replaceAll(`"${frame.surfaceId}"`, JSON.stringify(surfaceId))) as A2uiFrame

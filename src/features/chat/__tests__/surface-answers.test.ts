@@ -7,7 +7,7 @@ const botApi = vi.hoisted(() => ({
   bots: { cancel: vi.fn(), send: vi.fn(), follow: vi.fn(), get: vi.fn(), transcript: vi.fn(), answer: vi.fn() },
 }))
 vi.mock('@/shared/infrastructure', () => ({ api: {}, botApi, http: {}, API_MOCK: false, hapticImpactLight: vi.fn(), hapticNotify: vi.fn() }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({ chatApi: {} }))
 
 const { answerSurface, send, useChatStore } = await import('../stores')
@@ -25,7 +25,6 @@ const model = (id: string, surfaceId: string) => {
   return row?.type === 'surface' ? dataModel(row) : undefined
 }
 
-/** A chat paused on one gate fixture, as the stream leaves it. */
 const waitingOn = (id: string, fixture: unknown, from = emptyChat) => {
   const f = fixture as A2uiFrame & StreamEvent
   const events = [...mapEvent(f), { type: 'wait' as const, surfaceId: f.surfaceId }, { type: 'done' as const, at: 0, awaiting: f.kind as 'approval' | 'choice' }]

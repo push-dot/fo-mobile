@@ -1,28 +1,26 @@
 import { DatePickerDialog, TimePickerDialog } from '@expo/ui/jetpack-compose'
 import { useState } from 'react'
 import { Pressable } from 'react-native'
-import { radius, spacing, useColors } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useColors } from '../../theme'
 import { formatDay, formatMonth, formatTime, fromPickerUtc, startOfMonth, toPickerUtc, withTime } from '../utility'
 import Icon from './icon'
 import NativeHost from './native-host'
 import Text from './text'
 
-export type DatePickerProps = {
+type DatePickerProps = {
   value: Date | null
   onChange: (date: Date) => void
-  /** Accessibility label; also the placeholder on Android while value is null. */
   label: string
   mode?: 'date' | 'time' | 'month'
   min?: Date
   max?: Date
-  /** Field background: 'fill' on sheets, 'bg' inside bg2 cards, 'bg2' inside bg cards. */
   surface?: 'fill' | 'bg' | 'bg2'
   minHeight?: number
 }
 
 const FORMAT = { date: formatDay, time: formatTime, month: formatMonth }
 
-/** Android: a field that opens the Material 3 date or time dialog. Month mode keeps year and month of the picked day. */
 const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface = 'fill', minHeight = 48 }: DatePickerProps) => {
   const c = useColors()
   const [open, setOpen] = useState(false)
@@ -33,9 +31,9 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={() => setOpen(true)}
-        style={{ minHeight, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+        style={styles.field(minHeight, surface)}
       >
-        <Text v="b1" color={value ? 't1' : 't4'} style={{ flex: 1 }}>
+        <Text v="b1" color={value ? 't1' : 't4'} style={styles.value}>
           {value ? FORMAT[mode](value) : label}
         </Text>
         {mode === 'month' ? null : <Icon name={mode === 'time' ? 'clock' : 'calendar'} size={18} color="t3" />}
@@ -68,5 +66,20 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
     </>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  field: (minHeight: number, surface: 'fill' | 'bg' | 'bg2') => ({
+    minHeight,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors[surface],
+    paddingHorizontal: theme.spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[2],
+  }),
+  value: { flex: 1 },
+}))
+
+export type { DatePickerProps }
 
 export default DatePicker

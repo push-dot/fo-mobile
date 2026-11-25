@@ -15,7 +15,6 @@ import { restoreBotTurns } from '../utils/turns'
 import type { ChatEvent, ChatState } from '../types'
 
 const frame = (json: unknown) => json as A2uiFrame & StreamEvent
-/** The fixtures share one surface id: a copy under another, everywhere it is named. */
 const as = (json: { surfaceId: string }, id: string) => JSON.parse(JSON.stringify(json).replaceAll(`"${json.surfaceId}"`, JSON.stringify(id))) as A2uiFrame & StreamEvent
 const run = (events: ChatEvent[], from: ChatState = emptyChat) => events.reduce(applyEvent, from)
 const play = (...frames: StreamEvent[]) => run(frames.flatMap((f) => mapEvent(f)))

@@ -2,11 +2,11 @@ import { needsTerms, type AuthResult } from '@push/api-client'
 import * as Crypto from 'expo-crypto'
 import { router } from 'expo-router'
 import { Platform } from 'react-native'
-import { usePhoneAuth } from '../../features/auth/stores'
-import { isAppleCancel } from '../../features/auth/utils/auth-flow'
 import { api } from './api-client'
+import { isAppleCancel } from './apple-cancel'
 import { AUTH_REDIRECT_URI } from './constants'
 import { createPkce } from './pkce'
+import { usePhoneAuth } from './phone-auth-store'
 import { mockAppleFailing, openAuthSession } from './platform'
 import { useSession } from './session-store'
 
@@ -19,7 +19,6 @@ export type SignInOutcome =
 
 const applyAuthResult = async (result: AuthResult): Promise<SignInOutcome> => {
   if (!('accessToken' in result)) return { kind: 'phone', pendingToken: result.pendingToken }
-  // Same gate as the phone code screen: a stale or missing terms version stays signed out until consent.
   const consent = await api.me.consents(result.accessToken)
   if (needsTerms(consent)) {
     usePhoneAuth.getState().hold(result)
@@ -67,7 +66,6 @@ export const signInWithApple = async (): Promise<SignInOutcome> => {
   }
 }
 
-// App Store guideline 5.1.1(v): an Apple account re-authorizes so the server can revoke the Sign in with Apple grant.
 const appleAuthorizationCode = async (): Promise<string | undefined> => {
   if (Platform.OS !== 'ios') return undefined
   const me = await api.auth.me()

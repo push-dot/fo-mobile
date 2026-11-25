@@ -1,9 +1,9 @@
 import { View, type DimensionValue } from 'react-native'
-import { spacing } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import { LOADING_LABEL } from './constants'
 import Skeleton from './skeleton'
 
-export type SkeletonRowsShape = {
+type SkeletonRowsShape = {
   count: number
   lead?: { size: number; radius: number }
   lines: readonly { width: DimensionValue; height: number }[]
@@ -12,9 +12,9 @@ export type SkeletonRowsShape = {
 const SkeletonRows = ({ count, lead, lines }: SkeletonRowsShape) => (
   <View accessible accessibilityRole="progressbar" accessibilityLabel={LOADING_LABEL}>
     {Array.from({ length: count }, (_, row) => (
-      <View key={row} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingHorizontal: spacing[5], paddingVertical: spacing[3] }}>
+      <View key={row} style={styles.row}>
         {lead ? <Skeleton width={lead.size} height={lead.size} radius={lead.radius} /> : null}
-        <View style={{ flex: 1, gap: spacing[2] }}>
+        <View style={styles.lines}>
           {lines.map((line, index) => (
             <Skeleton key={index} width={line.width} height={line.height} />
           ))}
@@ -23,5 +23,12 @@ const SkeletonRows = ({ count, lead, lines }: SkeletonRowsShape) => (
     ))}
   </View>
 )
+
+const styles = StyleSheet.create((theme) => ({
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing[3], paddingHorizontal: theme.spacing[5], paddingVertical: theme.spacing[3] },
+  lines: { flex: 1, gap: theme.spacing[2] },
+}))
+
+export type { SkeletonRowsShape }
 
 export default SkeletonRows

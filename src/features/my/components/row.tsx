@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
 import { Pressable } from 'react-native'
-import { radius, spacing, useColors } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const Row = ({
   children,
@@ -12,27 +12,30 @@ const Row = ({
   onPress?: () => void
   label?: string
   top?: boolean
-}) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={label}
-      disabled={!onPress}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: top ? 'flex-start' : 'center',
-        gap: 14,
-        paddingVertical: 14,
-        paddingHorizontal: spacing[5],
-        backgroundColor: pressed ? c.fill : 'transparent',
-        borderRadius: radius.xs,
-      })}
-    >
-      {children}
-    </Pressable>
-  )
-}
+}) => (
+  <Pressable
+    accessibilityRole={onPress ? 'button' : undefined}
+    accessibilityLabel={label}
+    disabled={!onPress}
+    onPress={onPress}
+    style={({ pressed }) => [styles.row, top && styles.top, pressed && styles.pressed]}
+  >
+    {children}
+  </Pressable>
+)
+
+const styles = StyleSheet.create((theme) => ({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 14,
+    paddingHorizontal: theme.spacing[5],
+    backgroundColor: 'transparent',
+    borderRadius: theme.radius.xs,
+  },
+  top: { alignItems: 'flex-start' },
+  pressed: { backgroundColor: theme.colors.fill },
+}))
 
 export default Row

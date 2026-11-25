@@ -1,6 +1,5 @@
 import { clipTitle } from './doc-title'
 
-/** push-be takes 1-300 characters for a document title. */
 const TITLE_MAX = 300
 const COPY_SUFFIX = ' 사본'
 
@@ -11,7 +10,6 @@ type CopyBlock = { id: string; text: string; evidenceRefs?: unknown }
 
 export const copyTitle = (title: string) => `${clipTitle(title, TITLE_MAX - Array.from(COPY_SUFFIX).length)}${COPY_SUFFIX}`
 
-/** POST documents body of a copy: same posting, kind, template and language, under the copy's title. */
 export const copyBody = (doc: CopySource) => ({
   applicationId: doc.applicationId,
   title: copyTitle(doc.title),
@@ -20,7 +18,6 @@ export const copyBody = (doc: CopySource) => ({
   language: doc.language || 'ko',
 })
 
-/** POST documents/:id/versions body: the source's latest content, blocks cut to the fields push-be accepts. */
 export const copyVersionBody = (revision: number, version: { content?: unknown; blocks?: CopyBlock[] }) => ({
   expectedRevision: revision,
   content: version.content,

@@ -39,9 +39,10 @@ describe('mock fit hold script (JobFit)', () => {
   const delays: number[] = []
   let stack = ''
   const win = { setTimeout: (_f: unknown, ms: number) => void delays.push(ms) }
-  // The script reads the caller from the stack of an Error it creates, so the test supplies the stack.
-  const FakeError = function () {
-    return { stack }
+  const FakeError = class {
+    constructor() {
+      return { stack }
+    }
   } as unknown as ErrorConstructor
   new Function('window', 'Error', HOLD_FIT_SCRIPT)(win, FakeError)
 

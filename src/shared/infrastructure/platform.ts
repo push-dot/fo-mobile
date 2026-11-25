@@ -16,7 +16,6 @@ export const openAuthSession = (url: string, redirectUri: string) =>
 
 let stubbedDocument: DocumentPicker.DocumentPickerAsset[] | null = null
 
-/** Mock tours (`mock=upload-fail`): the next pickDocument returns these assets instead of opening the system file picker, which a tour cannot drive. */
 export const stubPickDocument = (assets: DocumentPicker.DocumentPickerAsset[]) => {
   stubbedDocument = assets
 }
@@ -27,49 +26,42 @@ export const pickDocument = (options: DocumentPicker.DocumentPickerOptions): Pro
   return assets ? Promise.resolve({ canceled: false, assets }) : DocumentPicker.getDocumentAsync(options)
 }
 
-/** Mock tours (`mock=upload-fail`): the mock API skips the upload, so this makes it fail the way a dropped connection does (ChatErrUpload). */
 let mockUploadFails = false
 export const failMockUploads = (on: boolean) => {
   mockUploadFails = on
 }
 export const mockUploadFailing = () => mockUploadFails
 
-/** Mock tours (`mock=pick-career`): the upload row keeps this fraction (Uploading draws 1.1 of 1.8MB) instead of the progress that grows with the clock. */
 let mockUploadAt: number | undefined
 export const holdMockUpload = (fraction: number | undefined) => {
   mockUploadAt = fraction
 }
 export const mockUploadHeldAt = () => mockUploadAt
 
-/** Mock tours (`mock=fit-comparing`): fo-web's WebView mock answers the fit at once, so JobFit's 비교하는 중 card is never on screen. The WebView is told to wait. */
 let mockFitHeld = false
 export const holdMockFit = (on: boolean) => {
   mockFitHeld = on
 }
 export const mockFitHolding = () => mockFitHeld
 
-/** Mock tours (`mock=fit-soon`): the WebView mock always answers a finished fit, so JobDetailStates' 적합도는 곧 볼 수 있어요 card never shows. The fit request is made to fail. */
 let mockFitSoon = false
 export const setMockFitSoon = (on: boolean) => {
   mockFitSoon = on
 }
 export const mockFitSoonOn = () => mockFitSoon
 
-/** Mock tours (`mock=plan-free`, `plan-ultra`): the WebView mock cannot read the account, so the job page's fit card is told the plan (PRO when none is set): FREE draws the locked card, ULTRA the `이렇게 고치면 N점대` row. */
 let mockWebPlan: 'FREE' | 'ULTRA' | undefined
 export const setMockWebPlan = (plan: 'FREE' | 'ULTRA' | undefined) => {
   mockWebPlan = plan
 }
 export const mockWebPlanOf = () => mockWebPlan
 
-/** Mock tours (`mock=fit-three`): the Applied and ApplySheet boards draw the fit card with three parts (기술 스택, 경험 연관성, 키워드); JobDetail draws all five. */
 let mockFitThree = false
 export const setMockFitThree = (on: boolean) => {
   mockFitThree = on
 }
 export const mockFitThreeOn = () => mockFitThree
 
-/** Mock tours (`mock=apple-fail`): the Apple sign-in sheet cannot be driven or made to fail in a tour, so the attempt reports a failure instead of opening it (SignInErrors.4). */
 let mockAppleFails = false
 export const failMockApple = (on: boolean) => {
   mockAppleFails = on
@@ -78,7 +70,6 @@ export const mockAppleFailing = () => mockAppleFails
 
 let stubbedPick: ImagePicker.ImagePickerAsset[] | null = null
 
-/** Mock tours (`mock=two-photos`): the next pickImage returns these assets instead of opening the system picker, whose labels the app does not set. */
 export const stubPickImage = (assets: ImagePicker.ImagePickerAsset[]) => {
   stubbedPick = assets
 }

@@ -5,8 +5,6 @@ import { sheetScrollMax } from '../utility'
 import { floatingSheet } from './sheet-scale'
 import { useKeyboardHeight } from './use-keyboard-height'
 
-/** Bounds a SheetScroll by the room left on screen: pass `onSheetLayout` to the Sheet and `onScrollLayout` to the SheetScroll. */
-/** The one max height of a non-page modal: past it the body scrolls and the header and footer stay put. */
 export const SHEET_MAX = 0.6
 
 export const useSheetScrollMax = (cap = SHEET_MAX) => {

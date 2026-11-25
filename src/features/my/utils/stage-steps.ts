@@ -1,7 +1,6 @@
 import type { ApplicationStage } from '@push/api-client'
 import { stageFlow } from './my-rules'
 
-// The server stages that start each step. 지원 is dated by appliedAt, and 결과 by the first outcome reached.
 const STEP_STAGES: readonly (readonly ApplicationStage[])[] = [[], ['SCREENING'], ['INTERVIEW'], ['OFFER', 'ACCEPTED', 'REJECTED', 'WITHDRAWN']]
 
 const dot = (iso: string | null | undefined) => {

@@ -1,7 +1,6 @@
 import { CAREER_STATUSES, JOB_CATEGORIES, type CareerStatus, type JobCategory, type Profile, type ProfileFilters, type Tenure } from '@push/api-client'
 
 export type Explore = NonNullable<ProfileFilters['explore']>
-/** `explore: null` is no 탐색 filter at all: every public profile, not only the recommended ones. */
 export type SheetFilters = { tenure: Tenure[]; status: CareerStatus[]; explore: Explore | null }
 
 export const EMPTY_SHEET: SheetFilters = { tenure: [], status: [], explore: 'recommended' }
@@ -9,7 +8,6 @@ export const EMPTY_SHEET: SheetFilters = { tenure: [], status: [], explore: 'rec
 export const tenureOf = (years: number): Tenure =>
   years <= 0 ? '0' : years <= 2 ? '1-2' : years <= 5 ? '3-5' : years <= 9 ? '6-9' : '10+'
 
-/** The 허브 필터 board draws four 재직 기간 chips; 0–2년 stands for push-be's 0 and 1-2 together. */
 export const TENURE_CHIPS: { label: string; keys: Tenure[] }[] = [
   { label: '0–2년', keys: ['0', '1-2'] },
   { label: '3–5년', keys: ['3-5'] },

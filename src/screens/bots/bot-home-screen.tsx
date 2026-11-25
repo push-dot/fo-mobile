@@ -14,7 +14,6 @@ const BotHomeScreen = () => {
   const setMuted = useSetBotMuted()
   const local = useLocalActivity()
   const consent = useReferenceConsent()
-  // Consent is taken in Push Bot's onboarding and no Bot works without it: until then the Bot home is never drawn, it redirects at once.
   if (!consent.data) return null
   if (consent.data.referenceData === false) return <Redirect href={`${botChatPath('push')}?instant=1`} />
   return (

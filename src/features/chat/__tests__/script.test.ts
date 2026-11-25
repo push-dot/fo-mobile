@@ -10,11 +10,9 @@ const run = async (body: object): Promise<Step[]> => {
   const res = await mockFetch('http://x/api/v1/chat/runs', { method: 'POST', body: JSON.stringify(body) })
   return ((await res.json()) as { data: Step[] }).data
 }
-/** What the screen draws from a run: its frames through the live stream's mapper, into the reducer. */
 const play = (s: ChatState, steps: Step[]) =>
   steps.flatMap((st) => mapEvent(st.frame)).reduce((acc, e) => applyEvent(acc, e), applyEvent(s, { type: 'start', at: 0 }))
 const answer = (conversationId: string, approvalId: string, optionId: string) => run({ conversationId, text: optionId, resolve: { approvalId, optionId } })
-/** Answering a card closes it in place, then the run it starts plays below it. */
 const reply = async (s: ChatState, conversationId: string, approvalId: string, optionId: string) =>
   play(applyEvent(s, { type: 'answer', surfaceId: approvalId, picked: [optionId] }), await answer(conversationId, approvalId, optionId))
 const surfaces = (s: ChatState) => s.items.filter((i): i is SurfaceItem => i.type === 'surface')

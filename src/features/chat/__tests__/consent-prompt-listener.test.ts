@@ -14,7 +14,7 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {},
   createConversation: vi.fn(),
@@ -35,7 +35,7 @@ const stackLayoutSource = readFileSync(
   new URL('../../../app/(app)/(stack)/_layout.tsx', import.meta.url),
   'utf8',
 )
-const storesSource = ['run', 'consent', 'draft'].map((f) => readFileSync(new URL(`../stores/${f}.ts`, import.meta.url), 'utf8')).join('\n')
+const storesSource = readFileSync(new URL('../stores.ts', import.meta.url), 'utf8')
 const fetchersSource = readFileSync(new URL('../api/fetchers.ts', import.meta.url), 'utf8')
 const listenerSource = readFileSync(new URL('../components/consent-prompt-listener.tsx', import.meta.url), 'utf8')
 
@@ -63,7 +63,7 @@ describe('ConsentPromptListener', () => {
     expect(stackLayoutSource).not.toMatch(/from ['"]@\/features\/chat\//)
     expect(storesSource).not.toMatch(/from ['"]@\/features\/my['"]/)
     expect(fetchersSource).not.toMatch(/from ['"]@\/features\/my['"]/)
-    expect(storesSource).toContain("@/features/my/api/fetchers")
-    expect(fetchersSource).toContain("@/features/my/types")
+    expect(storesSource).toContain("@/shared/infrastructure/sources")
+    expect(fetchersSource).toContain("@/shared/infrastructure/sources")
   })
 })

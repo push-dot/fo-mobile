@@ -1,10 +1,11 @@
 import { router } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { OFFER_ARCHIVED_NOTE, OFFER_MENU_COPY, OfferRow, RETRY_LABEL, useArchivedOffers } from '@/features/my'
 import { emptyNoteStyle, SkeletonRows, StatusNote, Text, TopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { radius } from '@/theme'
 
 const OFFER_SKELETON: SkeletonRowsShape = {
   count: 3,
@@ -16,10 +17,9 @@ const OFFER_SKELETON: SkeletonRowsShape = {
 }
 
 const ArchivedOffersScreen = () => {
-  const c = useColors()
   const q = useArchivedOffers('received')
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar title="보관한 제안" onBack={() => router.back()} />
       <LegendList
         data={q.data?.data ?? []}
@@ -30,11 +30,7 @@ const ArchivedOffersScreen = () => {
           <Text
             v="b2"
             color="t3"
-            style={{
-              paddingTop: spacing[1],
-              paddingBottom: spacing[3],
-              paddingHorizontal: spacing[6],
-            }}
+            style={styles.note}
           >
             {OFFER_ARCHIVED_NOTE}
           </Text>
@@ -50,5 +46,10 @@ const ArchivedOffersScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  note: { paddingTop: theme.spacing[1], paddingBottom: theme.spacing[3], paddingHorizontal: theme.spacing[6] },
+}))
 
 export default ArchivedOffersScreen

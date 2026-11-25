@@ -1,5 +1,3 @@
-// Mock routes for the me area (마이). Sample data from the 마이 / 제안함 / 설정 boards.
-// me/bookmarks and me/notifications are registered by other areas.
 import type {
   Application,
   Offer,
@@ -24,7 +22,6 @@ const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 const H = 3_600_000
 const D = 24 * H
 const on = (m: number, d: number, h = 12, min = 0) => new Date(2026, m - 1, d, h, min).toISOString()
-// Boards draw counts larger than the first page (18명, 8개); only `total` is reported, like push-be.
 const withTotal = <T>(items: T[], query: URLSearchParams, total: number) => {
   const r = page(items, query)
   return { ...r, page: { ...r.page, total } }
@@ -65,10 +62,8 @@ let profile: Profile = {
   updatedAt: ago(D),
 }
 
-// Followed people, shared with hub.ts. 이하은 starts unfollowed (프로필 상세 board shows 팔로우); me/follows marks everyone it lists.
 export const following = new Set<string>()
 export const myProfile = () => profile
-/** EditIntro draws two paragraphs while MyProfile draws the first only, so the edit tour switches the longer intro on (`mock=long-intro`) after MyProfile's shot. */
 const INTRO_MORE = '요즘은 Kafka 기반 이벤트 처리와 부하 테스트에 관심이 많아요.'
 export const longIntro = () => {
   if (!profile.intro.includes(INTRO_MORE)) profile = { ...profile, intro: `${profile.intro}\n\n${INTRO_MORE}` }
@@ -85,11 +80,9 @@ mock('PATCH', 'me/profile', ({ body }) => {
   return { data: profile }
 })
 
-// A Bot profile change as push-be keeps it: the replaced values under the change id, undone once (409 the second time).
 type Change = { before: Partial<Profile>; undone: boolean; createdAt: string }
 const changes = new Map<string, Change>()
 
-/** What update_my_profile does in a mock run: sets the headline and keeps the old one under a new change id. */
 export const botProfileChange = (headline: string): string => {
   const id = `chg-${changes.size + 1}`
   changes.set(id, { before: { headline: profile.headline }, undone: false, createdAt: new Date().toISOString() })
@@ -112,7 +105,6 @@ mock('POST', 'me/profile/changes/:id/undo', ({ params }) => {
   return { data: profile }
 })
 
-// 서류 (sources)
 const src = (id: string, fileName: string, size: number, createdAt: string): Source => ({
   id,
   fileName,
@@ -130,13 +122,11 @@ let sources: (Source & { jobId?: string })[] = [
   { ...src('s3', '포트폴리오_결제시스템.pdf', 8_100_000, on(8, 3)), status: 'FAILED' },
 ]
 
-// The 지원 서류 sheet lists with no kind filter and reads origin/kind: the AI résumé first (dated like the ApplySheet board), the 포트폴리오 as an extra, the 읽는 중 docx left out (마이 › 서류 asks for UPLOAD).
 const applySources = () => [
   { ...src('s-ai', '모아페이_백엔드_이력서_v2.pdf', 186_000, on(11, 13)), origin: 'AI' },
   ...sources.filter((s) => s.id !== 's2').map((s) => ({ ...s, origin: 'UPLOAD', ...(s.id === 's3' ? { kind: 'PORTFOLIO' } : {}) })),
 ]
 mock('GET', 'sources', ({ query }) => page(query.get('kind') ? sources : applySources(), query))
-// s2 stays 읽는 중: its ingest job never settles.
 mock('GET', 'ai/jobs/:id', ({ params }) =>
   params.id === 'j-read'
     ? {
@@ -175,7 +165,6 @@ mock('DELETE', 'sources/:id', ({ params }) => {
   removeChatDoc(params.id!)
 })
 mock('POST', 'sources', async ({ body }) => {
-  // RN FormData keeps the appended file object (uri, name, type, size) in getParts().
   const parts =
     (
       body as {
@@ -228,7 +217,6 @@ const draft: ResumeDraft = {
 }
 mock('GET', 'sources/:id/profile-draft', () => ({ data: draft }))
 
-// 지원활동
 const app = (
   id: string,
   jobId: string,
@@ -252,7 +240,6 @@ const applications: Application[] = [
   app('a3', 'p8', '별빛게임즈', 'DevOps 엔지니어', 'APPLIED', on(10, 16)),
   app('a4', 'p7', '라온헬스', '백엔드 개발자 (Java)', 'ACCEPTED', on(9, 22)),
   app('a5', 'p6', '새벽마켓', '결제 플랫폼 엔지니어', 'REJECTED', on(9, 8)),
-  // Applications behind the Push 서류 cards, not applied yet; push-be's GET /applications still lists them.
   ...(
     [
       ['a6', '다온뱅크', '서버 개발자', 76],
@@ -271,7 +258,6 @@ mock('GET', 'applications', ({ query }) => {
   const applied = query.get('applied') === 'true'
   return page(applied ? appliedOnly(applications) : applications, query, applied)
 })
-// MyAppliedJob draws the stage dates and the stored fit; its parts are the chat's p1 fit card's.
 const appliedDetail: Record<string, Omit<ApplicationDetail, keyof Application>> = {
   a1: {
     stageEnteredAt: { APPLIED: on(10, 14), SCREENING: on(10, 17), INTERVIEW: on(10, 21) },
@@ -311,15 +297,11 @@ let documents: HubDocument[] = [
   pushDoc('d5', 'a10', '서버 엔지니어 이력서', on(9, 11)),
 ]
 
-// The document the agent saved for the chat upload result card (its documentId), and a tailored draft never finalized; both outside 마이's list.
 const agentDoc: HubDocument = { ...pushDoc('src-upload', '', '김서준_모아페이_백엔드', on(10, 20)), applicationId: null }
 const draftDoc: HubDocument = { ...pushDoc('d-draft', '', '모아페이 맞춤 이력서', on(10, 21)), applicationId: null, kind: 'TAILORED' }
-// 내 서류's AI-made row (chat.ts d4) is a Push document too: deleting it archives it.
 const chatAiDoc: HubDocument = { ...pushDoc('d4', '', '모아페이_맞춤_이력서_v2', on(10, 22)), applicationId: null, kind: 'TAILORED' }
-// The résumé behind the applied job a1 (its fit's documentId), outside 마이's list.
 const appliedDoc: HubDocument = pushDoc('d-a1', 'a1', '김서준_백엔드_이력서_2026', on(10, 14))
 const findDoc = (id?: string) => [...documents, agentDoc, draftDoc, chatAiDoc, appliedDoc].find((d) => d.id === id)
-// push-be exports a HUB_PROFILE's latest version before finalize; no mock document is finalized.
 const exportable = (d: HubDocument | undefined, versionId?: string) => d?.kind === 'HUB_PROFILE' && d.latestVersionId === versionId
 
 mock('GET', 'documents', ({ query }) => page(documents, query))
@@ -334,7 +316,6 @@ mock('GET', 'documents/:id/versions/:versionId/export', ({ params }) =>
     ? pdfResponse()
     : { status: 422, body: { error: { code: 'DOCUMENT_NOT_FINALIZED', message: 'only the finalized version can be exported' } } },
 )
-// documents PATCH / archive like push-be: strict body, 404, archived documents take no writes, 409 REVISION_CONFLICT on a stale expectedRevision.
 const docFail = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({
   status,
   body: { error: { code, message, ...(details ? { details } : {}) } },
@@ -363,7 +344,6 @@ mock('PATCH', 'documents/:id', ({ params, body }) => {
   Object.assign(doc!, { revision: doc!.revision + 1, updatedAt: new Date().toISOString() })
   return { data: doc }
 })
-// POST documents (a copy's new draft) and its first version, like push-be: the posting must exist, title 1-300.
 mock('POST', 'documents', ({ body }) => {
   const b = (body ?? {}) as Record<string, unknown>
   if (typeof b.applicationId !== 'string' || typeof b.title !== 'string' || !b.title) return docInvalid('title')
@@ -409,7 +389,6 @@ const hubContent = {
     docText('paragraph', 'Kotlin, Spring Boot, Kafka, MySQL, Redis'),
   ],
 }
-// 지원 서류용 프로필(허브형) made from an uploaded file: the draft the profile tab already shows.
 const profileContent = {
   type: 'doc',
   content: [
@@ -470,7 +449,6 @@ mock('POST', 'documents/:id/profile', ({ params, body }) => {
   return { data: { documentId: doc.id, applicationId: doc.applicationId } }
 })
 
-// 캘린더 (local route until push-be /calendar is wired)
 const ev = (
   id: string,
   type: CalendarEvent['type'],
@@ -508,19 +486,14 @@ const events: CalendarEvent[] = [
   }),
   ev('e11', 'CUSTOM', '부하 테스트 스터디', on(10, 29, 20)),
   ev('e12', 'FOLLOW_UP', '모아페이 면접 후기 보내기', on(10, 30, 10)),
-  // The calendar draws a day's dots in response order and the board lists 커피챗 before 후속 연락 there, so e15 precedes e14 (the day list sorts by time itself).
   ev('e15', 'COFFEE_CHAT', '오지현 님과 커피챗', on(10, 21, 18, 30), {
     notes: '받은 제안을 수락해서 잡힌 일정이에요',
   }),
   ev('e14', 'FOLLOW_UP', '모아페이 면접 감사 메일 보내기', on(10, 21, 17)),
-  // MyCalendar lists a fourth row on the 21st, the 마감 of 파도AI; the board's date and D-2 follow its own "today" (G43).
   ev('e16', 'DEADLINE', '파도AI 데이터 분석가', on(10, 21, 23, 59), {
     notes: '서류 확정이 필요해요',
   }),
 ]
-// The board lists the 면접 once on the calendar and once on the application, so this one is only
-// served to the application's next-event query. shortcut: told apart by `from`, which is the
-// current time there and a local midnight on the calendar grid; drop when /calendar is real.
 const nextInterview = ev('e13', 'INTERVIEW', '결제 플랫폼팀 1차 면접', on(10, 21, 15), {
   endsAt: on(10, 21, 16),
   location: 'Google Meet',
@@ -545,7 +518,6 @@ mock('POST', 'calendar/events', ({ body }) => {
   return { data: e }
 })
 
-// 팔로우
 const person = (userId: string, displayName: string, headline: string): Profile => ({
   ...profile,
   userId,
@@ -557,7 +529,6 @@ const person = (userId: string, displayName: string, headline: string): Profile 
   resumeSourceId: null,
   following: true,
 })
-// Ids match hub.ts so a row opens that person's hub profile.
 const follows = [
   person('u2', '이하은', 'React로 사용자 경험을 다듬어요'),
   person('u-taeyoon', '김태윤', '결제 시스템을 만드는 백엔드 개발자'),
@@ -580,7 +551,6 @@ mock('GET', 'me/follows', ({ query }) => {
 })
 mock('GET', 'me/followers', ({ query }) => withTotal(followers, query, 12))
 
-// 게시글
 const post = (
   id: string,
   category: Post['category'],
@@ -625,8 +595,6 @@ const sortedList = (items: Post[], query: URLSearchParams, total?: number) => {
   return fail ?? (total === undefined ? page(rows, query, true) : withTotal(rows, query, total))
 }
 mock('GET', 'me/posts', ({ query }) => sortedList(myPosts, query))
-// social.ts owns `posts/:id` and 404s my ids, so index.ts loads this file first and these patterns
-// (regex, not :params) catch the mp* ids only. shortcut: only mp1 has a body and comments.
 mock('GET', 'posts/mp[0-9]+', ({ path }) => {
   const p = myPosts.find((x) => x.id === path.split('/').pop())
   return p
@@ -645,12 +613,8 @@ mock('GET', 'posts/mp[0-9]+/comments', ({ path, query }) =>
   ),
 )
 mock('GET', 'me/commented-posts', ({ query }) => sortedList(commented, query, 9))
-// The profile screen as a PDF; the sample file is the same stub the document export serves.
 mock('GET', 'me/profile/pdf', () => pdfResponse())
 
-// 제안함
-// push-be embeds only a posting stub in offers.
-// p25 lives in postings.ts so the card can read its location, career and deadline.
 const offerPosting: OfferPosting = { id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', imageUrl: null }
 const user = (id: string, displayName: string, companyName: string, headline: string) => ({
   id,
@@ -775,17 +739,14 @@ const update = (id: string, patch: Partial<Offer>) => {
   const o = findOffer(id)
   if (!o) return notFound
   Object.assign(o, patch)
-  // The answer reads like GET: an accepted o1 is the thread's one-paragraph opener, not the detail's two paragraphs the app may have cached.
   return { data: o1View(o) }
 }
 
-// The 받은 제안 board's first row previews the opening line and 2시간 전; the detail keeps the full message and its date.
 const o1Row = (o: Offer): Offer =>
   o.id === 'o1'
     ? { ...o, message: '결제 플랫폼팀 시니어 포지션으로 가볍게 커피챗 어떠세요? 승인 API 개선하신 경험이 딱 저희 팀 고민이에요.', createdAt: ago(2 * H + 10 * 60_000) }
     : o
 const archivedAt = new Map<string, string>([['o8', on(9, 20, 9)]])
-// People who blocked the viewer (tours switch it on with `mock=blocked-by-them`); push-be answers their messages and offers 403 BLOCKED.
 const blockedMe = new Set<string>()
 export const setBlockedByThem = (enabled: boolean) => {
   blockedMe.clear()
@@ -835,7 +796,6 @@ mock('POST', 'me/blocks', ({ body }) => {
     return { status: 400, body: { error: { code: 'VALIDATION_ERROR', message: 'cannot block yourself', details: { field: 'userId' } } } }
   const displayName = partyName(userId)
   if (!displayName) return notFound
-  // Like ON CONFLICT DO NOTHING: blocking twice keeps the first date.
   if (!blockedUsers.has(userId)) blockedUsers.set(userId, { displayName, createdAt: new Date().toISOString() })
 })
 mock('DELETE', 'me/blocks/:userId', ({ params }) => {
@@ -850,8 +810,6 @@ mock('GET', 'me/blocks', ({ query }) => {
     .map(([id, b]) => ({ user: { id, displayName: b.displayName }, createdAt: b.createdAt }))
   return page(rows, new URLSearchParams({ limit: String(Math.min(Number(limit ?? 50), 100)), cursor: query.get('cursor') ?? '' }), true)
 })
-// The boards draw o1 twice: the detail (two paragraphs; its date line slices the UTC day but shows the local clock, so shift the instant until
-// both read 10월 20일 오전 1:42) and, once accepted, the thread's opening bubble (one paragraph, local day).
 const o1Opening =
   '서준 님, 안녕하세요! 허브에서 프로필 보고 연락드려요. 결제 승인 API를 다시 설계하신 경험이 저희 팀 고민과 딱 맞아서요. 30분 정도 커피챗 어떠세요?'
 const o1DetailAt = () => {
@@ -863,7 +821,6 @@ const o1View = (o: Offer): Offer =>
 mock('GET', 'me/offers/:id', ({ params }) => {
   const o = findOffer(params.id!)
   if (!o) return notFound
-  // Opening a received offer marks it read (보낸 사람에게 '읽음').
   if (o.recipient.id === ME.id && !o.readAt)
     Object.assign(o, {
       readAt: new Date().toISOString(),
@@ -871,10 +828,7 @@ mock('GET', 'me/offers/:id', ({ params }) => {
     })
   return { data: { ...o1View(o), archivedAt: archivedAt.get(o.id) ?? null } }
 })
-// Android types ASCII only, so the tour's "Thank you" stands for the board's Korean reply (case-insensitive, like chat.ts aliases).
 const REPLY_ALIAS: Record<string, string> = { 'thank you': '제안 감사해요, 지현 님! 다음 주 화요일이나 목요일 저녁이면 좋아요.' }
-// Accepting o1 lands in the thread the 제안함 board draws, opened by the typed reply (no reply leaves the 메시지 · 빈 상태 thread);
-// the 3s wait keeps the 보내는 중 button on screen.
 const o1Thread = (typed: string): OfferMessage[] => [
   {
     id: 'm-o1-1',
@@ -909,7 +863,6 @@ mock('POST', 'me/offers/:id/decline', ({ params }) => update(params.id!, { statu
 mock('GET', 'me/offers/:id/messages', ({ params, query }) =>
   page(messages[params.id!] ?? [], query),
 )
-// The 보내지 못했어요 board needs a send that fails; the tour types one of these.
 const FAILING_BODIES = ['좋아요. 그때 뵐게요!', 'fail']
 mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
   const o = findOffer(params.id!)
@@ -929,7 +882,6 @@ mock('POST', 'me/offers/:id/messages', ({ params, body }) => {
   return { status: 201, body: { data: m } }
 })
 
-// 설정
 let settings: Settings = {
   notifyDeadline: true,
   notifyOffer: true,

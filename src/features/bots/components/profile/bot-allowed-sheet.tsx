@@ -1,17 +1,15 @@
 import { useEffect } from 'react'
 import { View } from 'react-native'
 import { Button, Sheet, SheetScroll, Text, useSheetScrollMax } from '@/shared/components'
-import { spacing, useColors } from '../../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { spacing } from '../../../../theme'
 import { useBotProfile, useRevokeAllowedSite } from '../../api/hooks'
 import type { BotAddress } from '../../types'
 import { ALLOWED_BODY, REVOKE_LABEL, allowedLine, allowedTitle } from './profile-rows'
 
 const ROW_MIN = 64
 
-// BotProfileAllowed, BotProfileAllowedRevoke, BotProfileChiefAllowed: `.sheet2` with the title and the one-line promise,
-// then one `min-height: 64` row per site. 허용 해제 acts at once; the list shrinks (Revoke shows the 1 left of 2).
 const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: () => void }) => {
-  const c = useColors()
   const profile = useBotProfile(address)
   const revoke = useRevokeAllowedSite()
   const bound = useSheetScrollMax()
@@ -23,26 +21,19 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
   }, [loaded, sites.length, onClose])
   return (
     <Sheet gap={spacing[2]} onLayout={bound.onSheetLayout}>
-      <Text v="h3" accessibilityRole="header" style={{ paddingTop: spacing[1] }}>
+      <Text v="h3" accessibilityRole="header" style={styles.title}>
         {allowedTitle(sites.length)}
       </Text>
       <Text v="b2" color="t2">
         {ALLOWED_BODY}
       </Text>
-      <SheetScroll style={{ marginTop: spacing[2], maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+      <SheetScroll style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout}>
         {sites.map((site) => (
           <View
             key={site.id}
-            style={{
-              minHeight: ROW_MIN,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing[3],
-              borderTopWidth: 1,
-              borderTopColor: c.line,
-            }}
+            style={styles.row}
           >
-            <View style={{ flex: 1, gap: 2 }}>
+            <View style={styles.site}>
               <Text v="b1" weight="600" numberOfLines={1}>
                 {site.host}
               </Text>
@@ -64,5 +55,12 @@ const BotAllowedSheet = ({ address, onClose }: { address: BotAddress; onClose: (
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  title: { paddingTop: theme.spacing[1] },
+  scroll: (maxHeight: number | undefined) => ({ marginTop: theme.spacing[2], maxHeight }),
+  row: { minHeight: ROW_MIN, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], borderTopWidth: 1, borderTopColor: theme.colors.line },
+  site: { flex: 1, gap: 2 },
+}))
 
 export default BotAllowedSheet

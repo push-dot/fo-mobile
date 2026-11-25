@@ -1,5 +1,3 @@
-// Rule 5: a word the boards keep whole (WebKit keep-all) is not broken at its middle dot, its brackets, its hyphens, or where Latin or digits
-// meet Hangul ("payment-retry-lab을"). TextKit breaks at those spots, so a line could start with "을" or "·정산". A word joiner (U+2060) forbids the break there only.
 export const WORD_JOINER = '\u2060'
 const WJ = WORD_JOINER
 const HANGUL = '가-힣'
@@ -13,7 +11,6 @@ export const keepWordsWhole = (s: string) =>
     .replace(new RegExp(`([${LATIN}])-(?=[${LATIN}])`, 'g'), `$1${WJ}-${WJ}`)
     .replace(new RegExp(`([${LATIN}])(?=[${HANGUL}])|([${HANGUL}])(?=[${LATIN}])`, 'g'), (_, latin, hangul) => `${latin ?? hangul}${WJ}`)
 
-/** keepWordsWhole over text that a caller lays out as several nested Text nodes: a joiner at a seam goes to the start of the next part. */
 export const keepPartsWhole = (parts: readonly string[]) => {
   const whole = keepWordsWhole(parts.join(''))
   let at = 0

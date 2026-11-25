@@ -21,8 +21,6 @@ type Push = typeof import('expo-router').router.push
 
 const id = 'b1' as BotId
 
-// Never called. `typecheck` compiles it against the generated typed routes, so a builder whose route file is gone,
-// or one that widens to `string`, fails there.
 export const everyBuilderCompiles = (push: Push) => {
   push(botHomePath)
   push(botChatPath(id))
@@ -52,9 +50,7 @@ const STACK = join(__dirname, '../../../app/(app)/(stack)')
 const layout = readFileSync(join(STACK, '_layout.tsx'), 'utf8')
 
 describe('bot and material routes', () => {
-  // Route file, and how the stack presents it (routes.ts in the design).
   it.each([
-    // A redirect opens the chat with no slide, so the route reads `instantNone` from its params.
     [botChatPath(id), 'bots/[botId]/index', '{instantNone}'],
     [botProfilePath(id), 'bots/[botId]/profile', null],
     [botColorPath(id), 'bots/[botId]/color', '{sheetOptions(c)}'],

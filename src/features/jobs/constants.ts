@@ -1,6 +1,8 @@
 import type { PostingSort, SectionKind } from './types'
 import type { FilterKey } from './utils'
 
+export { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
+
 export const POSTING_PAGE_LIMIT = 20
 export const CARD_RADIUS = 20
 export const GRID_SKELETON_CARDS = 4
@@ -10,7 +12,6 @@ export const RESET_FILTERS_LABEL = '필터 초기화'
 export const FILTER_KEYS: FilterKey[] = ['category', 'skills', 'careerYears', 'location', 'employmentType']
 
 export const LONG_FILTER_KINDS: FilterKey[] = ['skills', 'location']
-/** Sheets that are a header over one chip group (FilterRole, FilterType, ...): the board draws them with the native sheet's tight header. */
 export const CHIP_FILTER_KINDS: FilterKey[] = ['category', 'careerYears', 'employmentType']
 
 export const POSTING_SORTS: { key: PostingSort; label: string }[] = [
@@ -29,7 +30,6 @@ export const FILTER_TITLES: Record<FilterKey, string> = {
 
 export const POPULAR_SKILL_COUNT = 5
 
-// shortcut: fixed catalog for 기술 검색; switch to a skills endpoint once push-be has one.
 export const SKILL_CATALOG = [
   'Java', 'Kotlin', 'Spring Boot', 'JPA', 'MySQL', 'PostgreSQL', 'Redis', 'Kafka', 'AWS', 'Kubernetes', 'Docker',
   'Go', 'gRPC', 'Node.js', 'TypeScript', 'JavaScript', 'React', 'Vue', 'Next.js', 'Swift', 'SwiftUI', 'Android',

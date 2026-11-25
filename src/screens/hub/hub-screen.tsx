@@ -1,9 +1,9 @@
-import { HUB_CATEGORIES } from '@push/api-client'
 import { router, type Href } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, Platform, View } from 'react-native'
 import {
   FilterButton,
+  HUB_CATEGORIES,
   HUB_SKELETON,
   ProfileRow,
   appliedCount,
@@ -14,13 +14,12 @@ import {
   useViewerId,
 } from '@/features/hub'
 import { Badge, Button, Chip, ChipRow, FloatingHeader, GlassButton, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { spacing } from '@/theme'
 
-// Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
 const HEADER_GAP = Platform.OS === 'ios' ? 14 : 6
 
 const HubScreen = () => {
-  const c = useColors()
   const category = useHubFilterStore((s) => s.category)
   const sheet = useHubFilterStore((s) => s.sheet)
   const setCategory = useHubFilterStore((s) => s.setCategory)
@@ -31,7 +30,6 @@ const HubScreen = () => {
   const list = useProfileList(category, sheet)
   const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
-  // HubEmpty board: the title row sits 8pt under the chips; every other Hub board keeps 12pt.
   const emptyList = !list.isPending && !list.isError && items.length === 0
 
   const header = (
@@ -42,9 +40,9 @@ const HubScreen = () => {
           <Chip key={k.key} label={k.label} on={category.includes(k.key)} onPress={() => setCategory(toggle(category, k.key))} />
         ))}
       </ChipRow>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: emptyList ? spacing[2] : spacing[3], paddingBottom: spacing[1], gap: spacing[2] }}>
+      <View style={[styles.toolbar, emptyList && styles.toolbarEmpty]}>
         {summary ? <Badge label={summary} /> : null}
-        <View style={{ flex: 1 }} />
+        <View style={styles.flex} />
         <FilterButton onPress={() => router.push('/hub-filter')} />
       </View>
     </View>
@@ -53,7 +51,7 @@ const HubScreen = () => {
   const renderItem = ({ item }: { item: (typeof items)[number] }) => <ProfileRow p={item} />
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
       <TopBar
         transparent
@@ -63,7 +61,7 @@ const HubScreen = () => {
           </Text>
         }
         right={
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP }}>
+          <View style={styles.right}>
             {viewerId ? (
               <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
             ) : null}
@@ -83,7 +81,7 @@ const HubScreen = () => {
           list.isPending ? (
             <SkeletonRows {...HUB_SKELETON} />
           ) : list.isError ? (
-            <Text v="b2" color="t3" style={{ textAlign: 'center', marginTop: 32 }}>
+            <Text v="b2" color="t3" style={styles.error}>
               프로필을 불러오지 못했어요.
             </Text>
           ) : (
@@ -96,8 +94,8 @@ const HubScreen = () => {
         }
         onEndReached={() => list.hasNextPage && !list.isFetchingNextPage && list.fetchNextPage()}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={list.isFetchingNextPage ? <ActivityIndicator style={{ marginVertical: spacing[4] }} /> : undefined}
-        contentContainerStyle={{ flexGrow: 1, paddingTop: inset }}
+        ListFooterComponent={list.isFetchingNextPage ? <ActivityIndicator style={styles.more} /> : undefined}
+        contentContainerStyle={styles.content(inset)}
         contentInsetAdjustmentBehavior="automatic"
         onScroll={onScroll}
         scrollEventThrottle={64}
@@ -105,5 +103,24 @@ const HubScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing[5],
+    paddingTop: theme.spacing[3],
+    paddingBottom: theme.spacing[1],
+    gap: theme.spacing[2],
+  },
+  toolbarEmpty: { paddingTop: theme.spacing[2] },
+  flex: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  right: { flexDirection: 'row', alignItems: 'center', gap: HEADER_GAP },
+  error: { textAlign: 'center', marginTop: 32 },
+  more: { marginVertical: theme.spacing[4] },
+  content: (paddingTop: number) => ({ flexGrow: 1, paddingTop }),
+}))
 
 export default HubScreen

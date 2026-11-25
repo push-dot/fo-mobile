@@ -1,6 +1,5 @@
 import { isXlBoardText } from './xl-scale'
 
-/** Which list opened the page: the same fo-web route draws a different board for each. */
 export type DetailFrom = 'following' | 'bookmark'
 
 const FROMS: readonly string[] = ['following', 'bookmark']
@@ -10,7 +9,6 @@ export const detailFrom = (value: string | string[] | undefined): DetailFrom | u
   return v && FROMS.includes(v) ? (v as DetailFrom) : undefined
 }
 
-/** WebView query: theme always, mock only when the mock API is on, from only when a list opened the page. */
 export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', mock: boolean, from?: DetailFrom) => {
   const query = new URLSearchParams()
   query.set('theme', theme)
@@ -19,7 +17,6 @@ export const detailUrl = (base: string, path: string, theme: 'light' | 'dark', m
   return `${base}${path}?${query.toString()}`
 }
 
-/** The `.xl` text rules of the job detail boards (JobDetailXL): drawn in fixed pixels, so each rule also drops the system inflation for its own element. */
 const XL_BOARD_RULES = [
   '.h1{font-size:34px;line-height:44px}',
   '.h2{font-size:26px;line-height:34px}',
@@ -37,20 +34,16 @@ const XL_BOARD_RULES = [
   .map((rule) => `html.push-xl ${rule.slice(0, -1)};-webkit-text-size-adjust:100%!important}`)
   .join('')
 
-/** fo-web sets text-size-adjust on body, so an inline value on html never reached the text. From the harness XL size the page also takes the board's `.xl` sizes. */
 export const textSizeScript = (percent: number) =>
   `(function(){var s=document.getElementById('push-text-size');if(!s){s=document.createElement('style');s.id='push-text-size';document.documentElement.appendChild(s)}s.textContent='html,body{-webkit-text-size-adjust:${percent}%!important}${isXlBoardText(percent / 100) ? XL_BOARD_RULES : ''}';document.documentElement.classList.toggle('push-xl',${isXlBoardText(percent / 100)})})();true;`
 
 export const originOf = (url: string) => /^[a-z][a-z0-9+.-]*:\/\/[^/?#]*/i.exec(url)?.[0].toLowerCase() ?? null
 
-/** Only fo-web itself may load in the WebView: the page gets the session token, and react-native-webview's originWhitelist matches by prefix. */
 export const loadsInWebView = (url: string, base: string) => url === 'about:blank' || originOf(url) === originOf(base)
 
-/** Where a navigation goes: fo-web loads in place, other http(s) pages open in the system browser, everything else (intent:, push:, tel:, javascript:) is dropped. */
 export const webViewNavigation = (url: string, base: string): 'load' | 'browser' | 'ignore' =>
   loadsInWebView(url, base) ? 'load' : /^https?:\/\//i.test(url) ? 'browser' : 'ignore'
 
-/** Whether the WebView loads the navigation; an http(s) page elsewhere goes to `open`, and a browser that fails to open shows nothing. */
 export const routeNavigation = (url: string, base: string, open: (url: string) => Promise<void>) => {
   const target = webViewNavigation(url, base)
   if (target === 'browser') open(url).catch(() => undefined)
@@ -59,7 +52,6 @@ export const routeNavigation = (url: string, base: string, open: (url: string) =
 
 const onWebOrigin = (base: string, script: string) => `if(location.origin===${JSON.stringify(originOf(base))}){${script}}true;`
 
-/** The page gets its settings here, never the token: that goes once through `tokenEventScript` after the page asks for it. */
 export const bootScript = (base: string, env: Record<string, unknown>, extra = '') => {
   const { token: _token, ...safe } = env
   return onWebOrigin(base, `window.__PUSH__=${JSON.stringify(safe)};${extra}`)
