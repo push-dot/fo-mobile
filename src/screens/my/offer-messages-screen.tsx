@@ -5,10 +5,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  StyleSheet,
   View,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import {
   Avatar,
   clock,
@@ -29,7 +29,7 @@ import {
 import { Composer } from '@/features/chat'
 import { GlassButton, Icon, Skeleton, Text, TopBar, useKeyboardHeight } from '@/shared/components'
 import { composerPadding } from '@/shared/utility'
-import { onAccent, radius, spacing, useColors } from '@/theme'
+import { onAccent, spacing } from '@/theme'
 
 type Box = 'received' | 'sent'
 
@@ -48,25 +48,15 @@ const Bubble = ({
   onPress?: () => void
   posting?: { title: string; company: string; onPress: () => void }
 }) => {
-  const c = useColors()
   return (
-    <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: spacing[1] }}>
+    <View style={[styles.bubbleWrap, mine && styles.bubbleWrapMine]}>
       <Pressable
         accessibilityRole={onPress ? 'button' : undefined}
         disabled={!onPress}
         onPress={onPress}
-        style={{
-          maxWidth: '82%',
-          borderRadius: radius.md,
-          borderBottomLeftRadius: mine ? radius.md : radius.xs,
-          borderBottomRightRadius: mine ? radius.xs : radius.md,
-          paddingVertical: spacing[3],
-          paddingHorizontal: spacing[4],
-          backgroundColor: mine ? c.ac : c.bg2,
-          opacity: faded ? 0.55 : 1,
-        }}
+        style={[styles.bubble, mine && styles.bubbleMine, faded && styles.faded]}
       >
-        <Text v="b2" style={{ color: mine ? onAccent : c.t1 }}>
+        <Text v="b2" style={[styles.bubbleText, mine && styles.bubbleTextMine]}>
           {body}
         </Text>
         {posting ? (
@@ -74,9 +64,9 @@ const Bubble = ({
             accessibilityRole="button"
             accessibilityLabel={`함께 보낸 공고 ${posting.company} ${posting.title}`}
             onPress={posting.onPress}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, paddingVertical: spacing[3], paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: c.bg }}
+            style={styles.posting}
           >
-            <View style={{ flexShrink: 1, minWidth: 0 }}>
+            <View style={styles.postingText}>
               <Text v="b2" weight="700" numberOfLines={1}>
                 {posting.title}
               </Text>
@@ -85,7 +75,7 @@ const Bubble = ({
               </Text>
             </View>
             <Icon name="chev" size={16} color="t3" />
-            <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius.md, borderWidth: 1, borderColor: c.line }]} />
+            <View pointerEvents="none" style={styles.postingRing} />
           </Pressable>
         ) : null}
       </Pressable>
@@ -111,17 +101,16 @@ type Item =
   | { kind: 'pending'; key: string }
   | { kind: 'failed'; key: string; f: FailedSend }
 
-const Gap = () => <View style={{ height: spacing[4] }} />
+const Gap = () => <View style={styles.gap} />
 
 const DayLabel = ({ day }: { day: string | null }) =>
   day ? (
-    <Text v="c2" weight="600" color="t3" style={{ textAlign: 'center', paddingTop: DAY_LABEL_LIFT }}>
+    <Text v="c2" weight="600" color="t3" style={styles.dayLabel}>
       {day}
     </Text>
   ) : null
 
 const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
-  const c = useColors()
   const insets = useSafeAreaInsets()
   const keyboardUp = useKeyboardHeight() > 0
   const [text, setText] = useState('')
@@ -134,9 +123,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
 
   if (!o) {
     return (
-      <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={styles.screen}>
         <TopBar onBack={() => router.back()} />
-        <View style={{ gap: spacing[4], padding: spacing[5] }}>
+        <View style={styles.loading}>
           <Skeleton width="100%" height={64} />
           <Skeleton width="60%" height={44} />
         </View>
@@ -169,7 +158,6 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     send.mutate(body, {
       onError: (e) => setFailed((f) => [...f, failedSend(body, e)]),
     })
-  const ios = Platform.OS === 'ios'
   const empty = data?.data.length === 0 && !send.isPending && failed.length === 0
   const closed = composerClosed(failed, o.canSend)
   const items: Item[] = [
@@ -183,7 +171,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     switch (item.kind) {
       case 'msg':
         return (
-          <View style={{ gap: spacing[4] }}>
+          <View style={styles.stack}>
             <DayLabel day={item.m.day} />
             {item.first ? posted : null}
             <Bubble body={item.m.body} at={item.m.createdAt} mine={item.m.senderId === meId} />
@@ -191,15 +179,15 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         )
       case 'posted':
         return (
-          <View style={{ gap: spacing[4] }}>
+          <View style={styles.stack}>
             <DayLabel day={dayBreaks([{ createdAt: o.createdAt }])[0]!.day} />
             {posted}
           </View>
         )
       case 'empty':
         return (
-          <View style={{ paddingVertical: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0) + 80 }}>
-            <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+          <View style={styles.empty(composerH)}>
+            <Text v="b2" color="t3" style={styles.center}>
               첫 메시지를 보내 대화를 시작해 보세요.
             </Text>
           </View>
@@ -209,9 +197,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
       case 'failed': {
         const f = item.f
         return (
-          <View style={{ gap: spacing[1] }}>
+          <View style={styles.failed}>
             <Bubble body={f.body} mine faded />
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: spacing[2] }}>
+            <View style={styles.failedRow}>
               <Text v="c2" weight="700" color="red">
                 !
               </Text>
@@ -239,7 +227,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: c.bg }}>
+    <KeyboardAvoidingView behavior="padding" style={styles.screen}>
       <TopBar
         onBack={() => router.back()}
         left={
@@ -247,15 +235,10 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             accessibilityRole="button"
             accessibilityLabel={`${who.displayName} 허브 프로필 보기`}
             onPress={() => router.push(`/profiles/${who.id}`)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing[3],
-              paddingLeft: spacing[1],
-            }}
+            style={styles.who}
           >
             <Avatar name={who.displayName} url={who.avatarUrl} size={36} />
-            <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={styles.whoText}>
               <Text v="b2" weight="700" numberOfLines={1} accessibilityRole="header">
                 {who.displayName}
               </Text>
@@ -282,34 +265,19 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         initialScrollAtEnd
         maintainScrollAtEnd
         maintainVisibleContentPosition
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingTop: spacing[1],
-          paddingHorizontal: spacing[5],
-          paddingBottom: SCROLL_PAD_BOTTOM,
-        }}
+        contentContainerStyle={styles.list}
         keyboardShouldPersistTaps="handled"
       />
       <View
         onLayout={(e) => setComposerH(e.nativeEvent.layout.height)}
-        style={{
-          ...composerPadding(ios, insets.bottom, keyboardUp),
-          backgroundColor: ios ? undefined : c.bg,
-        }}
+        style={styles.composer(insets.bottom, keyboardUp)}
       >
         {closed ? (
           <View
             accessibilityRole="alert"
-            style={{
-              minHeight: COMPOSER_HEIGHT,
-              borderRadius: COMPOSER_RADIUS,
-              paddingHorizontal: spacing[4],
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: c.fill,
-            }}
+            style={styles.closed}
           >
-            <Text v="c1" color="t2" style={{ textAlign: 'center' }}>
+            <Text v="c1" color="t2" style={styles.center}>
               {OFFER_BLOCKED_COMPOSER}
             </Text>
           </View>
@@ -329,5 +297,60 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     </KeyboardAvoidingView>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  loading: { gap: theme.spacing[4], padding: theme.spacing[5] },
+  bubbleWrap: { alignItems: 'flex-start', gap: theme.spacing[1] },
+  bubbleWrapMine: { alignItems: 'flex-end' },
+  bubble: {
+    maxWidth: '82%',
+    borderRadius: theme.radius.md,
+    borderBottomLeftRadius: theme.radius.xs,
+    borderBottomRightRadius: theme.radius.md,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[4],
+    backgroundColor: theme.colors.bg2,
+    opacity: 1,
+  },
+  bubbleMine: { borderBottomLeftRadius: theme.radius.md, borderBottomRightRadius: theme.radius.xs, backgroundColor: theme.colors.ac },
+  faded: { opacity: 0.55 },
+  bubbleText: { color: theme.colors.t1 },
+  bubbleTextMine: { color: onAccent },
+  posting: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 10,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.bg,
+  },
+  postingText: { flexShrink: 1, minWidth: 0 },
+  postingRing: { ...StyleSheet.absoluteFillObject, borderRadius: theme.radius.md, borderWidth: 1, borderColor: theme.colors.line },
+  gap: { height: theme.spacing[4] },
+  dayLabel: { textAlign: 'center', paddingTop: DAY_LABEL_LIFT },
+  stack: { gap: theme.spacing[4] },
+  empty: (composerH: number) => ({ paddingVertical: Math.max(EMPTY_LIFT - composerH - SCROLL_PAD_BOTTOM, 0) + 80 }),
+  center: { textAlign: 'center' },
+  failed: { gap: theme.spacing[1] },
+  failedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: theme.spacing[2] },
+  who: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingLeft: theme.spacing[1] },
+  whoText: { flex: 1, minWidth: 0 },
+  list: { flexGrow: 1, paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: SCROLL_PAD_BOTTOM },
+  composer: (bottom: number, keyboardUp: boolean) => ({
+    ...composerPadding(Platform.OS === 'ios', bottom, keyboardUp),
+    backgroundColor: Platform.OS === 'ios' ? undefined : theme.colors.bg,
+  }),
+  closed: {
+    minHeight: COMPOSER_HEIGHT,
+    borderRadius: COMPOSER_RADIUS,
+    paddingHorizontal: theme.spacing[4],
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.fill,
+  },
+}))
 
 export default OfferMessagesScreen

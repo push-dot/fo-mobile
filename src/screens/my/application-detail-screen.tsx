@@ -24,11 +24,9 @@ import {
 } from '@/features/my'
 import { CtaBar, Badge, Button, GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { openBrowser, shareMessage } from '@/shared/infrastructure'
-import { spacing, useColors } from '@/theme'
-
+import { StyleSheet } from 'react-native-unistyles'
 
 const ApplicationDetailScreen = ({ id }: { id: string }) => {
-  const c = useColors()
   const { data, isLoading } = useMyApplications()
   const item = data?.data.find((a) => a.id === id)
   const detailQuery = useApplication(id)
@@ -41,7 +39,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const fit = appliedFit(item?.fitScore, detail?.fit)
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar
         onBack={() => router.back()}
         right={
@@ -62,9 +60,9 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       ) : !item ? (
         <Empty text={emptyCta('applications').title} />
       ) : (
-        <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120, gap: spacing[6] }}>
-          <View style={{ gap: spacing[3] }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.header}>
+            <View style={styles.companyRow}>
               <Logo name={item.company} size={44} />
               <Text v="b2" weight="700">
                 {item.company}
@@ -74,7 +72,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               {postingTitleLines(item.title).join('\n')}
             </Text>
             {p ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+              <View style={styles.badges}>
                 <Badge label={p.location} />
                 {career ? <Badge label={career === '신입' ? career : `경력 ${career}`} /> : null}
                 <Badge label={EMPLOYMENT_TYPES.find((t) => t.key === p.employmentType)?.label ?? ''} />
@@ -95,7 +93,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               <PostingSection title="우대 사항" items={p.preferred ?? []} />
               <PostingSection title="근무 조건" items={workConditionLines(p.workConditions)} />
               {p.sourceUrl ? (
-                <Pressable accessibilityRole="link" onPress={() => p.sourceUrl && void openBrowser(p.sourceUrl)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+                <Pressable accessibilityRole="link" onPress={() => p.sourceUrl && void openBrowser(p.sourceUrl)} style={styles.sourceLink}>
                   <Icon name="ext" size={14} color="t3" />
                   <Text v="c1" weight="600" color="t3">
                     원문 보기 · {item.company} 채용 사이트
@@ -110,11 +108,21 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       {item ? (
         <CtaBar>
         <Button label="지원한 서류" variant="secondary" disabled={!docId} onPress={() => docId && router.push(`/docs/push/${docId}`)} />
-        <Button label={INTERVIEW_PREP} onPress={() => router.push(botChatPath('push'))} style={{ flex: 1 }} />
+        <Button label={INTERVIEW_PREP} onPress={() => router.push(botChatPath('push'))} style={styles.primaryCta} />
         </CtaBar>
       ) : null}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 120, gap: theme.spacing[6] },
+  header: { gap: theme.spacing[3] },
+  companyRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },
+  sourceLink: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  primaryCta: { flex: 1 },
+}))
 
 export default ApplicationDetailScreen

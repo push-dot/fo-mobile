@@ -2,7 +2,8 @@ import { router } from 'expo-router'
 import { Platform, View } from 'react-native'
 import { Button, PM8, PM8_MDET_HEAD, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing, useThemeMode } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useThemeMode } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
 import { LOAD_ERROR, OPEN_LABEL, SEND_LABEL } from '../constants'
 import type { Material, MaterialKind } from '../types'
@@ -37,14 +38,14 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
     return (
       <Sheet>
         {detail.isError ? (
-          <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[4] }}>
+          <View accessibilityRole="alert" style={styles.error}>
             <Text v="b2" color="t3">
               {LOAD_ERROR.title}
             </Text>
             <Button label={LOAD_ERROR.retry} variant="secondary" size="sm" onPress={detail.refetch} />
           </View>
         ) : (
-          <View style={{ alignItems: 'center', paddingVertical: spacing[4] }}>
+          <View style={styles.loading}>
             <Spinner />
           </View>
         )}
@@ -60,18 +61,28 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
 
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout}>
-      <View style={{ minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' }}>
-        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+      <View style={styles.head}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={styles.title}>
           {detailTitle(m)}
         </Text>
       </View>
-      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+      <SheetScroll style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout}>
         <MaterialFacts facts={detailFacts(m, detail.data?.usedBy ?? [], now)} />
       </SheetScroll>
-      <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: PM8.buttonsTop }}>
+      <View style={styles.buttons}>
         <Button label={SEND_LABEL} onPress={send} style={SLIM} />
-        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={[SLIM, secondaryFill ? { backgroundColor: secondaryFill } : null]} />
+        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={[SLIM, secondaryFill ? styles.fill(secondaryFill) : null]} />
       </View>
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  error: { alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[4] },
+  loading: { alignItems: 'center', paddingVertical: theme.spacing[4] },
+  head: { minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' },
+  title: { textAlign: 'center' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+  buttons: { flexDirection: 'row', gap: theme.spacing[2], marginTop: PM8.buttonsTop },
+  fill: (backgroundColor: string) => ({ backgroundColor }),
+}))

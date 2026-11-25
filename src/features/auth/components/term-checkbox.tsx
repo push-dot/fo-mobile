@@ -1,16 +1,18 @@
 import { View } from 'react-native'
 import { Icon } from '../../../shared/components'
-import { onAccent, useColors } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { onAccent } from '../../../theme'
 
-const TermCheckbox = ({ checked, size }: { checked: boolean; size: number }) => {
-  const c = useColors()
-  return (
-    <View
-      style={{ width: size, height: size, borderRadius: 8, borderWidth: checked ? 0 : 2, borderColor: c.t3, backgroundColor: checked ? c.ac : 'transparent', alignItems: 'center', justifyContent: 'center' }}
-    >
-      {checked ? <Icon name="check" size={14} color={onAccent} /> : null}
-    </View>
-  )
-}
+const TermCheckbox = ({ checked, size }: { checked: boolean; size: number }) => (
+  <View style={[styles.box(size), checked ? styles.boxChecked : styles.boxEmpty]}>
+    {checked ? <Icon name="check" size={14} color={onAccent} /> : null}
+  </View>
+)
+
+const styles = StyleSheet.create((theme) => ({
+  box: (size: number) => ({ width: size, height: size, borderRadius: 8, borderColor: theme.colors.t3, alignItems: 'center', justifyContent: 'center' }),
+  boxChecked: { borderWidth: 0, backgroundColor: theme.colors.ac },
+  boxEmpty: { borderWidth: 2, backgroundColor: 'transparent' },
+}))
 
 export default TermCheckbox

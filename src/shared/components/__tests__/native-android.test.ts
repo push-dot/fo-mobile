@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { palette } from '@/theme/tokens'
 import { toPickerUtc } from '@/shared/utility/picker-date'
-import { find, findAll, stubs } from './native-stubs'
+import { find, findAll, flat, stubs } from './native-stubs'
 
 const state = vi.hoisted(() => ({ value: undefined as unknown, set: (() => {}) as (v: unknown) => void }))
 vi.mock('react', async (orig) => ({ ...(await orig<typeof import('react')>()), useState: (init: unknown) => [state.value ?? init, state.set], useEffect: () => {}, useId: () => 'id', useRef: (v: unknown) => ({ current: v }) }))
@@ -59,8 +59,8 @@ describe('SegmentedControl (Android)', () => {
     expect(tree.props).toMatchObject({ accessibilityRole: 'tablist', style: { height: 44, backgroundColor: c.fill, borderRadius: 22 } })
     const tabs = findAll(tree, 'Pressable')
     expect(tabs.map((t) => (t.props.accessibilityState as { selected: boolean }).selected)).toEqual([false, true])
-    expect((tabs[1]!.props.style as { backgroundColor?: string }).backgroundColor).toBe(c.bg)
-    expect((tabs[0]!.props.style as { backgroundColor?: string }).backgroundColor).toBeUndefined()
+    expect((flat(tabs[1]!.props.style) as { backgroundColor?: string }).backgroundColor).toBe(c.bg)
+    expect((flat(tabs[0]!.props.style) as { backgroundColor?: string }).backgroundColor).toBeUndefined()
     ;(tabs[0]!.props.onPress as () => void)()
     expect(onChange).toHaveBeenCalledWith('a')
   })

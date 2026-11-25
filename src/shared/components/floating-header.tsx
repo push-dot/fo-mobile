@@ -3,7 +3,8 @@ import { useState, type ReactNode } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { spacing, useColors } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useColors } from '../../theme'
 
 export const useFloatingHeader = () => {
   const [scrolled, setScrolled] = useState(false)
@@ -30,7 +31,7 @@ const FloatingHeader = ({
   const c = useColors()
   return (
     <View
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 }}
+      style={styles.header}
       onLayout={(e) => onHeight(e.nativeEvent.layout.height)}
     >
       {scrolled ? (
@@ -38,12 +39,17 @@ const FloatingHeader = ({
           pointerEvents="none"
           colors={[`${c.bg}F2`, `${c.bg}F2`, `${c.bg}00`]}
           locations={[0, 0.7, 1]}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: -spacing[3] }}
+          style={styles.fade}
         />
       ) : null}
       {children}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  header: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 },
+  fade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: -theme.spacing[3] },
+}))
 
 export default FloatingHeader

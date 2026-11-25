@@ -1,6 +1,7 @@
 import { brandColor } from '@push/shared'
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '../../../theme'
 import { Icon, Menu, SettingsGroup, Text } from '@/shared/components'
 import { type Account } from '../api/schemas'
@@ -25,11 +26,11 @@ export const AccountModal = () => {
 
 const AccountRow = ({ label, value, bold, plain, onPress }: { label: string; value?: string; bold?: boolean; plain?: boolean; onPress?: () => void }) => {
   const body = (
-    <View style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-      <Text v="b1" weight={bold ? '700' : undefined} style={{ flex: 1 }}>
+    <View style={styles.row}>
+      <Text v="b1" weight={bold ? '700' : undefined} style={styles.label}>
         {label}
       </Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+      <View style={styles.value}>
         {value ? (
           <Text v="b2" color="t2">
             {value}
@@ -61,9 +62,9 @@ const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: 
 
   return (
     <>
-      <View style={{ alignItems: 'center', gap: spacing[2], paddingTop: spacing[2], paddingHorizontal: spacing[5], paddingBottom: spacing[1] }}>
+      <View style={styles.profile}>
         <Mark text={me.given} color={brandColor(me.name)} size={76} round />
-        <Text v="h2" style={{ marginTop: 6 }}>
+        <Text v="h2" style={styles.name}>
           {me.name}
         </Text>
       </View>
@@ -74,16 +75,16 @@ const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: 
         </SettingsGroup>
       </View>
       <GroupTitle style={TITLE}>{ACCOUNT_REFERENCE_TITLE}</GroupTitle>
-      <View style={{ paddingHorizontal: spacing[5] }}>
+      <View style={styles.group}>
         <SettingsGroup>
           <AccountRow label={currentRole(me.profile) || '희망 직무'} onPress={toMy} />
           <AccountRow label={me.profile?.tenureYears != null ? `${me.profile.tenureYears}년차` : '연차'} onPress={toMy} />
           <AccountRow label={DEFAULT_DOC} onPress={toMy} />
         </SettingsGroup>
       </View>
-      <Note style={{ paddingTop: spacing[2] }}>{ACCOUNT_REFERENCE_NOTE}</Note>
+      <Note style={styles.note}>{ACCOUNT_REFERENCE_NOTE}</Note>
       <GroupTitle style={TITLE}>대화</GroupTitle>
-      <View style={{ paddingHorizontal: spacing[5] }}>
+      <View style={styles.group}>
         <SettingsGroup>
           <Menu stretch accessibilityLabel="말투" actions={toneMenu(tone?.key, (defaultTone) => save.mutate({ defaultTone }))}>
             <View>
@@ -95,3 +96,13 @@ const AccountPage = ({ account, onPlan, onUsage }: { account?: Account; onPlan: 
     </>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  label: { flex: 1 },
+  value: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
+  profile: { alignItems: 'center', gap: theme.spacing[2], paddingTop: theme.spacing[2], paddingHorizontal: theme.spacing[5], paddingBottom: theme.spacing[1] },
+  name: { marginTop: 6 },
+  group: { paddingHorizontal: theme.spacing[5] },
+  note: { paddingTop: theme.spacing[2] },
+}))

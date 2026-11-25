@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native'
-import { cssShadow, spacing, useColors, useThemeMode } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { cssShadow, spacing } from '../../theme'
 import { COMPACT_HEIGHT, COMPACT_WIDTH } from './segmented-control.compact'
 import Text from './text'
 
@@ -19,14 +20,12 @@ const VARIANT = {
 } as const
 
 const SegmentedControl = <K extends string,>({ items, value, onChange, compact }: SegmentedControlProps<K>) => {
-  const c = useColors()
-  const dark = useThemeMode() === 'dark'
   const variant = VARIANT[compact ? 'compact' : 'regular']
   const segment = variant.height - 2 * INSET
   return (
     <View
       accessibilityRole={variant.group}
-      style={{ height: variant.height, width: variant.width, borderRadius: variant.height / 2, backgroundColor: c.fill, flexDirection: 'row', padding: INSET }}
+      style={styles.track(variant.height, variant.width)}
     >
       {items.map((it) => {
         const on = it.key === value
@@ -37,14 +36,7 @@ const SegmentedControl = <K extends string,>({ items, value, onChange, compact }
             accessibilityState={variant.state(on)}
             hitSlop={{ top: INSET, bottom: INSET }}
             onPress={() => onChange(it.key)}
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: segment / 2,
-              backgroundColor: on ? (dark ? c.fill2 : c.bg) : undefined,
-              boxShadow: on ? cssShadow.segment : undefined,
-            }}
+            style={[styles.segment(segment), on && styles.segmentOn]}
           >
             <Text v="segLabel" color={on ? 't1' : 't3'} numberOfLines={1}>
               {it.label}
@@ -55,5 +47,11 @@ const SegmentedControl = <K extends string,>({ items, value, onChange, compact }
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  track: (height: number, width: number | undefined) => ({ height, width, borderRadius: height / 2, backgroundColor: theme.colors.fill, flexDirection: 'row', padding: INSET }),
+  segment: (size: number) => ({ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: size / 2 }),
+  segmentOn: { backgroundColor: theme.mode === 'dark' ? theme.colors.fill2 : theme.colors.bg, boxShadow: cssShadow.segment },
+}))
 
 export default SegmentedControl

@@ -1,8 +1,8 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { Offer } from '@push/api-client'
 import { Badge, Text, WordClampText } from '@/shared/components'
-import { radius, spacing, useColors } from '../../../theme'
 import { counterpart, OFFER_ARCHIVED_BADGE, offerBadge, personLine, timeAgo } from '../utils'
 import Avatar from './avatar'
 import Logo from './logo'
@@ -11,7 +11,6 @@ import Row from './row'
 type Box = 'received' | 'sent'
 
 const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean }) => {
-  const c = useColors()
   const who = counterpart(o, box)
   const unread = !archived && box === 'received' && !o.readAt
   const badge = archived
@@ -30,13 +29,13 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
       ) : (
         <Avatar name={who.displayName} url={who.avatarUrl} />
       )}
-      <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-          <Text v="b1" weight="700" numberOfLines={1} style={{ flexShrink: 1 }}>
+      <View style={styles.body}>
+        <View style={styles.head}>
+          <Text v="b1" weight="700" numberOfLines={1} style={styles.name}>
             {who.displayName}
           </Text>
           <Badge label={badge.label} tone={badge.tone} />
-          <Text v="c2" color="t3" style={{ marginLeft: 'auto' }}>
+          <Text v="c2" color="t3" style={styles.time}>
             {timeAgo(o.createdAt)}
           </Text>
         </View>
@@ -50,10 +49,18 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
         </WordClampText>
       </View>
       {unread ? (
-        <View style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: c.ac }} />
+        <View style={styles.dot} />
       ) : null}
     </Row>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  body: { flex: 1, minWidth: 0, gap: theme.spacing[1] },
+  head: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  name: { flexShrink: 1 },
+  time: { marginLeft: 'auto' },
+  dot: { width: 8, height: 8, borderRadius: theme.radius.pill, backgroundColor: theme.colors.ac },
+}))
 
 export default OfferRow

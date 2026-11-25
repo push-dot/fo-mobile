@@ -1,6 +1,7 @@
 import { Box, Switch as ComposeSwitch } from '@expo/ui/jetpack-compose'
 import { semantics } from '@expo/ui/jetpack-compose/modifiers'
-import { onAccent, spacing, useColors } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { onAccent, useColors } from '../../theme'
 import NativeHost from './native-host'
 
 const Switch = ({
@@ -14,7 +15,7 @@ const Switch = ({
 }) => {
   const c = useColors()
   return (
-    <NativeHost matchContents style={{ marginVertical: -spacing[2] }}>
+    <NativeHost matchContents style={styles.host}>
       <ComposeSwitch
         value={value}
         onCheckedChange={onValueChange}
@@ -34,5 +35,9 @@ const Switch = ({
     </NativeHost>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  host: { marginVertical: -theme.spacing[2] },
+}))
 
 export default Switch

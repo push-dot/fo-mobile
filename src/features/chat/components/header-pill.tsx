@@ -1,10 +1,11 @@
 import { Redirect, router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { botHomePath, botProfilePath, type BotId } from '@/features/bots'
 import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
-import { largeType, spacing, useColors } from '../../../theme'
+import { largeType } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { HeaderLamp } from './header/header-lamp'
 import type { HeaderLight } from './header/state'
@@ -52,7 +53,6 @@ const HeaderPill = ({
       })
     }
   }
-  const c = useColors()
   const ios = Platform.OS === 'ios'
   const { xl, button } = useXlChrome()
   const spoken = name ? botSpokenName(name) : ''
@@ -63,13 +63,13 @@ const HeaderPill = ({
         accessibilityRole="button"
         accessibilityLabel={`${spoken} 프로필 보기`}
         onPress={() => openProfile(botId)}
-        style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2, flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingLeft: 6, paddingRight: 14, backgroundColor: ios ? 'transparent' : c.fill }}
+        style={[styles.pill(xl ? 220 : 210, button), styles.name, !ios && styles.nameFill]}
       >
-        <View style={{ width: 32, height: 32 }}>
+        <View style={styles.mascot}>
           <Mascot size={32} state="idle" motion={{ mode: 'still' }} color={color} />
           <HeaderLamp light={light} />
         </View>
-        <Text v="b1" weight="700" numberOfLines={1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, xl ? { fontSize: largeType.b2.fontSize, lineHeight: largeType.b2.lineHeight } : null]}>
+        <Text v="b1" weight="700" numberOfLines={1} allowFontScaling={!xl} style={[styles.label, xl && styles.labelXl]}>
           {name}
         </Text>
       </Pressable>
@@ -82,7 +82,7 @@ const HeaderPill = ({
       backIcon={leading === 'botHome' ? 'menu' : undefined}
       backLabel={leading === 'botHome' ? 'Bot 홈' : undefined}
       reserveBack={leading === 'none'}
-      left={nameButton && ios ? <Glass style={{ alignSelf: 'center', maxWidth: xl ? 220 : 210, height: button, borderRadius: button / 2 }}>{nameButton}</Glass> : nameButton}
+      left={nameButton && ios ? <Glass style={styles.pill(xl ? 220 : 210, button)}>{nameButton}</Glass> : nameButton}
       right={
         kind && botId && name ? (
           <GlassButton
@@ -100,5 +100,14 @@ const HeaderPill = ({
     />
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  pill: (maxWidth: number, height: number) => ({ alignSelf: 'center', maxWidth, height, borderRadius: height / 2 }),
+  name: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], paddingLeft: 6, paddingRight: 14, backgroundColor: 'transparent' },
+  nameFill: { backgroundColor: theme.colors.fill },
+  mascot: { width: 32, height: 32 },
+  label: { flexShrink: 1 },
+  labelXl: { fontSize: largeType.b2.fontSize, lineHeight: largeType.b2.lineHeight },
+}))
 
 export default HeaderPill

@@ -1,5 +1,6 @@
 import { LegendList } from '@legendapp/list/react-native'
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Highlight, Mascot, Text } from '@/shared/components'
 import { spacing, type } from '../../../../theme'
 import type { Bot, BotSearch, LocalActivity } from '../../types'
@@ -99,7 +100,7 @@ const BotHomeSearch = ({
     return (
       <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => onOpenMessage(message.bot.id, message.messageId)}>
         <View style={hit}>
-          <View style={{ marginTop: chrome.mascotTop }}>
+          <View style={styles.mascot(chrome.mascotTop)}>
             <Mascot size={chrome.rowMascot} state={done ? 'done' : 'idle'} color={message.bot.color ?? 'push'} motion={{ mode: done ? 'animate' : 'still' }} />
           </View>
           <View style={body}>
@@ -139,5 +140,9 @@ const BotHomeSearch = ({
     />
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  mascot: (marginTop: number) => ({ marginTop }),
+}))
 
 export default BotHomeSearch

@@ -2,34 +2,34 @@ import { router } from 'expo-router'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { Avatar, BLOCKED_COPY, blockedLine, OFFER_MENU_COPY, RETRY_LABEL, useBlocked, useUnblock } from '@/features/my'
 import { Button, emptyNoteStyle, SettingsGroup, StatusNote, Text, TopBar } from '@/shared/components'
-import { HIT_TARGET, spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { HIT_TARGET } from '@/theme'
 
 const UNBLOCK_HEIGHT = 36
 
 const SettingsBlockedScreen = () => {
-  const c = useColors()
   const { data, isPending, refetch } = useBlocked()
   const unblock = useUnblock()
   const rows = data?.data
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar title={BLOCKED_COPY.title} onBack={() => router.back()} />
       {isPending ? (
-        <ActivityIndicator style={{ marginTop: spacing[6] }} />
+        <ActivityIndicator style={styles.spinner} />
       ) : !rows ? (
         <StatusNote lines={[OFFER_MENU_COPY.failed]} action={{ label: RETRY_LABEL, onPress: () => void refetch() }} style={emptyNoteStyle(140, false)} />
       ) : rows.length === 0 ? (
         <StatusNote lines={[BLOCKED_COPY.empty]} style={emptyNoteStyle(140, false)} />
       ) : (
-        <ScrollView contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: HIT_TARGET }}>
-          <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[1], paddingBottom: spacing[4] }}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text v="b2" color="t3" style={styles.intro}>
             {BLOCKED_COPY.intro}
           </Text>
           <SettingsGroup note={BLOCKED_COPY.note}>
             {rows.map((b) => (
-              <View key={b.user.id} style={{ minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+              <View key={b.user.id} style={styles.row}>
                 <Avatar name={b.user.displayName} size={44} />
-                <View style={{ flex: 1, minWidth: 0 }}>
+                <View style={styles.rowText}>
                   <Text v="b1" numberOfLines={1}>
                     {b.user.displayName}
                   </Text>
@@ -42,7 +42,7 @@ const SettingsBlockedScreen = () => {
                   size="sm"
                   weight="600"
                   disabled={unblock.isPending && unblock.variables === b.user.id}
-                  style={{ height: UNBLOCK_HEIGHT, minHeight: UNBLOCK_HEIGHT, borderRadius: UNBLOCK_HEIGHT / 2, alignSelf: 'center', flexShrink: 0 }}
+                  style={styles.unblock}
                   onPress={() => unblock.mutate(b.user.id)}
                 />
               </View>
@@ -53,5 +53,15 @@ const SettingsBlockedScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  spinner: { marginTop: theme.spacing[6] },
+  content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: HIT_TARGET },
+  intro: { paddingHorizontal: theme.spacing[1], paddingBottom: theme.spacing[4] },
+  row: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  rowText: { flex: 1, minWidth: 0 },
+  unblock: { height: UNBLOCK_HEIGHT, minHeight: UNBLOCK_HEIGHT, borderRadius: UNBLOCK_HEIGHT / 2, alignSelf: 'center', flexShrink: 0 },
+}))
 
 export default SettingsBlockedScreen

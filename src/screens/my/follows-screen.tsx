@@ -6,8 +6,8 @@ import { Avatar, Empty, emptyCta, followMatches, ListSkeleton, PersonRow, Row, u
 import { GlassField, Icon, Text, TopBar } from '@/shared/components'
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { useXlChrome } from '@/shared/components/xl-chrome'
-import { fontFor, radius, spacing, type, useColors } from '@/theme'
-
+import { StyleSheet } from 'react-native-unistyles'
+import { fontFor, useColors } from '@/theme'
 
 const FollowsScreen = () => {
   const c = useColors()
@@ -25,7 +25,7 @@ const FollowsScreen = () => {
       ) : (
         <Row label={p.displayName} onPress={() => router.push(`/profiles/${p.userId}`)}>
           <Avatar name={p.displayName} url={p.avatarUrl} />
-          <View style={{ flex: 1 }}>
+          <View style={styles.personText}>
             <Text v="b1" weight="700">
               {p.displayName}
             </Text>
@@ -36,20 +36,11 @@ const FollowsScreen = () => {
         </Row>
       )
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={{ width: button }} />} />
+    <View style={styles.screen}>
+      <TopBar title={following ? '팔로잉' : '팔로워'} onBack={() => router.back()} right={<View style={styles.spacer(button)} />} />
       {following ? (
         <GlassField
-          style={{
-            marginHorizontal: spacing[5],
-            marginVertical: spacing[2],
-            height: 44,
-            borderRadius: radius.pill,
-            paddingHorizontal: spacing[4],
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: spacing[2],
-          }}
+          style={styles.search}
         >
           <Icon name="search" size={18} color="t3" />
           <TextInput
@@ -58,7 +49,7 @@ const FollowsScreen = () => {
             onChangeText={setQ}
             placeholder="이름이나 직무로 찾기"
             placeholderTextColor={c.t4}
-            style={[{ flex: 1, fontSize: type.b2.fontSize, color: c.t1, ...inputReset }, fontFor('400')]}
+            style={styles.input}
           />
         </GlassField>
       ) : null}
@@ -72,9 +63,9 @@ const FollowsScreen = () => {
           estimatedItemSize={72}
           extraData={following}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.list}
           ListHeaderComponent={
-            <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+            <Text v="c1" weight="600" color="t2" style={styles.count}>
               {query.data?.page.total ?? people.length}명
             </Text>
           }
@@ -92,5 +83,24 @@ const FollowsScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  personText: { flex: 1 },
+  spacer: (width: number) => ({ width }),
+  search: {
+    marginHorizontal: theme.spacing[5],
+    marginVertical: theme.spacing[2],
+    height: 44,
+    borderRadius: theme.radius.pill,
+    paddingHorizontal: theme.spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[2],
+  },
+  input: { flex: 1, fontSize: theme.type.b2.fontSize, color: theme.colors.t1, ...inputReset, ...fontFor('400') },
+  list: { flexGrow: 1 },
+  count: { paddingTop: theme.spacing[2], paddingBottom: theme.spacing[1], paddingHorizontal: theme.spacing[5] },
+}))
 
 export default FollowsScreen

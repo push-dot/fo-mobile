@@ -3,22 +3,28 @@ import { ScrollView, View } from 'react-native'
 import { router } from 'expo-router'
 import { APP_LEGAL_DOCUMENTS, LEGAL_TABS, LEGAL_TITLE, LegalDocument, type LegalTab } from '@/features/auth'
 import { SegmentedControl, TopBar } from '@/shared/components'
-import { HIT_TARGET, spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { HIT_TARGET } from '@/theme'
 
 const LegalScreen = () => {
-  const c = useColors()
   const [tab, setTab] = useState<LegalTab>('termsOfService')
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.root}>
       <TopBar title={LEGAL_TITLE} onBack={() => router.back()} />
-      <View style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5] }}>
+      <View style={styles.tabs}>
         <SegmentedControl items={LEGAL_TABS} value={tab} onChange={setTab} />
       </View>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[6], paddingTop: spacing[4], paddingBottom: HIT_TARGET, gap: spacing[6] }}>
+      <ScrollView contentContainerStyle={styles.content}>
         <LegalDocument document={APP_LEGAL_DOCUMENTS[tab]} />
       </ScrollView>
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.bg },
+  tabs: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5] },
+  content: { paddingHorizontal: theme.spacing[6], paddingTop: theme.spacing[4], paddingBottom: HIT_TARGET, gap: theme.spacing[6] },
+}))
 
 export default LegalScreen

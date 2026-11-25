@@ -3,22 +3,19 @@ import { useEffect, useRef, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { Button, Icon, Sheet, SheetScroll, Switch, Text, TextField, useSheetScrollMax } from '@/shared/components'
 import { CHOICE_HANDOFF_MS, useChoiceModal } from '@/shared/navigation'
-import { iosSeparator, onAccent, spacing, useColors, useThemeMode } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { iosSeparator, onAccent, useThemeMode } from '@/theme'
 import { PM8, pm8Row, pm8SecondaryFill } from './choice-sheet-layout'
 
 const MARK = 24
 
-const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => {
-  const c = useColors()
-  return (
-    <View style={{ width: MARK, height: MARK, borderRadius: MARK / 2, borderWidth: checked ? 0 : 2, borderColor: c.t3, backgroundColor: checked ? c.ac : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-      {checked ? multi ? <Icon name="check" size={MARK - 10} color={onAccent} /> : <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: onAccent }} /> : null}
-    </View>
-  )
-}
+const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => (
+  <View style={[styles.mark, checked ? styles.markOn : styles.markOff]}>
+    {checked ? multi ? <Icon name="check" size={MARK - 10} color={onAccent} /> : <View style={styles.dot} /> : null}
+  </View>
+)
 
 const ChoiceSheetScreen = () => {
-  const c = useColors()
   const dark = useThemeMode() === 'dark'
   const request = useChoiceModal((s) => s.request)
   const bound = useSheetScrollMax()
@@ -50,35 +47,34 @@ const ChoiceSheetScreen = () => {
   const closeLabel = request.confirm?.closeLabel
   const toggleOption = (i: number) => setSelected((cur) => (form?.multi ? (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]) : [i]))
   const secondaryFill = pm8SecondaryFill(Platform.OS === 'ios', dark)
-  const secondaryStyle = secondaryFill ? { backgroundColor: secondaryFill } : null
-  const row = (last: boolean, mark = false) => ({ ...pm8Row(mark), flexDirection: 'row' as const, alignItems: 'center' as const, paddingHorizontal: spacing[1], borderBottomWidth: last ? 0 : 1, borderBottomColor: Platform.OS === 'ios' ? iosSeparator[dark ? 'dark' : 'light'] : c.line })
+  const secondaryStyle = secondaryFill ? styles.fill(secondaryFill) : null
   return (
     <Sheet onLayout={bound.onSheetLayout} gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} secondaryFill={secondaryFill} slimAction action={confirm && !closeLabel ? { label: confirm.label, onPress: () => run(confirm.onPress), disabled: 'disabled' in confirm && confirm.disabled } : undefined}
       secondary={request.confirm?.secondary ? { label: request.confirm.secondary.label, onPress: () => run(request.confirm!.secondary!.onPress) } : undefined}
     >
-      <View style={{ minHeight: 52, justifyContent: 'center' }}>
-        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+      <View style={styles.head}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={styles.title}>
           {request.title}
         </Text>
       </View>
-      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: PM8.gap }} keyboardShouldPersistTaps="handled">
+      <SheetScroll style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {request.message ? (
-        <Text v={request.items ? 'b2' : 'b1'} color="t2" style={{ paddingHorizontal: spacing[1], marginBottom: request.items || form ? 2 : 0 }}>
+        <Text v={request.items ? 'b2' : 'b1'} color="t2" style={[styles.message, (request.items || form) && styles.messageGap]}>
           {request.message}
         </Text>
       ) : null}
       {request.items && request.buttons ? (
-        <View style={{ gap: spacing[2], marginTop: PM8.buttonsTop }}>
+        <View style={styles.buttons}>
           {request.items.map((item, i) => (
-            <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={[{ minHeight: 52, borderRadius: 26 }, i === 0 ? null : secondaryStyle]} />
+            <Button key={item.label} label={item.label} variant={i === 0 ? 'primary' : 'secondary'} weight="700" onPress={() => run(item.onPress)} style={[styles.pill, i === 0 ? null : secondaryStyle]} />
           ))}
         </View>
       ) : null}
       {request.items && !request.buttons ? (
-        <View style={{ gap: 6 }}>
+        <View style={styles.list}>
           {request.items.map((item, i) => (
-            <Pressable key={item.label} accessibilityRole="button" accessibilityLabel={item.label} onPress={() => run(item.onPress)} style={row(i === request.items!.length - 1)}>
-              <View style={{ flex: 1 }}>
+            <Pressable key={item.label} accessibilityRole="button" accessibilityLabel={item.label} onPress={() => run(item.onPress)} style={styles.row(i === request.items!.length - 1)}>
+              <View style={styles.flex}>
                 <Text v="h3" weight="400" color={item.destructive ? 'red' : 't1'}>
                   {item.label}
                 </Text>
@@ -101,17 +97,17 @@ const ChoiceSheetScreen = () => {
         <TextField value={text} onChangeText={setText} placeholder={input.placeholder} autoCapitalize="none" autoCorrect={false} keyboardType={input.keyboardType} autoFocus accessibilityLabel={input.placeholder} />
       ) : null}
       {form ? (
-        <View style={{ gap: 6 }}>
+        <View style={styles.list}>
           {form.options.map((option, i) => (
             <Pressable
               key={option.label}
               accessibilityRole={form.multi ? 'checkbox' : 'radio'}
               accessibilityState={form.multi ? { checked: selected.includes(i) } : { selected: selected.includes(i) }}
               onPress={() => toggleOption(i)}
-              style={row(i === form.options.length - 1 && !form.toggle, true)}
+              style={styles.row(i === form.options.length - 1 && !form.toggle, true)}
             >
               <Mark checked={selected.includes(i)} multi={!!form.multi} />
-              <View style={{ flex: 1 }}>
+              <View style={styles.flex}>
                 <Text v="h3" weight="400">
                   {option.label}
                 </Text>
@@ -124,8 +120,8 @@ const ChoiceSheetScreen = () => {
             </Pressable>
           ))}
           {form.toggle ? (
-            <View style={row(true)}>
-              <Text v="h3" weight="400" style={{ flex: 1 }}>
+            <View style={styles.row(true)}>
+              <Text v="h3" weight="400" style={styles.flex}>
                 {form.toggle.label}
               </Text>
               <Switch value={on} onValueChange={setOn} label={form.toggle.label} />
@@ -135,13 +131,41 @@ const ChoiceSheetScreen = () => {
       ) : null}
       </SheetScroll>
       {confirm && closeLabel ? (
-        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: 10 }}>
-          <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={[{ flex: 1, minHeight: 52, borderRadius: 26 }, secondaryStyle]} />
-          <Button label={confirm.label} onPress={() => run(confirm.onPress)} style={{ flex: 1, minHeight: 52, borderRadius: 26 }} />
+        <View style={styles.pair}>
+          <Button label={closeLabel} variant="secondary" onPress={() => router.back()} style={[styles.pairButton, secondaryStyle]} />
+          <Button label={confirm.label} onPress={() => run(confirm.onPress)} style={styles.pairButton} />
         </View>
       ) : null}
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  mark: { width: MARK, height: MARK, borderRadius: MARK / 2, borderColor: theme.colors.t3, alignItems: 'center', justifyContent: 'center' },
+  markOn: { borderWidth: 0, backgroundColor: theme.colors.ac },
+  markOff: { borderWidth: 2, backgroundColor: 'transparent' },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: onAccent },
+  fill: (backgroundColor: string) => ({ backgroundColor }),
+  row: (last: boolean, mark = false) => ({
+    ...pm8Row(mark),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing[1],
+    borderBottomWidth: last ? 0 : 1,
+    borderBottomColor: Platform.OS === 'ios' ? iosSeparator[theme.mode] : theme.colors.line,
+  }),
+  head: { minHeight: 52, justifyContent: 'center' },
+  title: { textAlign: 'center' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+  content: { gap: PM8.gap },
+  message: { paddingHorizontal: theme.spacing[1], marginBottom: 0 },
+  messageGap: { marginBottom: 2 },
+  buttons: { gap: theme.spacing[2], marginTop: PM8.buttonsTop },
+  pill: { minHeight: 52, borderRadius: 26 },
+  list: { gap: 6 },
+  flex: { flex: 1 },
+  pair: { flexDirection: 'row', gap: theme.spacing[2], marginTop: 10 },
+  pairButton: { flex: 1, minHeight: 52, borderRadius: 26 },
+}))
 
 export default ChoiceSheetScreen

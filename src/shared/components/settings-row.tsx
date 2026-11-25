@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
-import { largeType, spacing, type } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { largeType, type } from '../../theme'
 import Icon from './icon'
 import Text from './text'
 
@@ -26,15 +27,9 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
   const valueSize = xl ? XL_ROW_VALUE : undefined
   const body = (
     <View
-      style={{
-        minHeight: xl ? XL_ROW_HEIGHT : 56,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing[3],
-        paddingVertical: spacing[2],
-      }}
+      style={[styles.row, xl && styles.rowXl]}
     >
-      <View style={{ flex: 1 }}>
+      <View style={styles.labels}>
         <Text v="b1" color={danger ? 'red' : 't1'} allowFontScaling={xl ? false : undefined} style={labelSize}>
           {label}
         </Text>
@@ -48,7 +43,7 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
         (picker ? (
           <Icon name="updown" size={14} color="t3" />
         ) : onPress || chevron ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+          <View style={styles.trail}>
             {value ? (
               <Text v="b2" color="t3" allowFontScaling={xl ? false : undefined} style={valueSize}>
                 {value}
@@ -71,5 +66,12 @@ const SettingsRow = ({ label, sub, value, onPress, right, danger, chevron, muted
     body
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[2] },
+  rowXl: { minHeight: XL_ROW_HEIGHT },
+  labels: { flex: 1 },
+  trail: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+}))
 
 export default SettingsRow

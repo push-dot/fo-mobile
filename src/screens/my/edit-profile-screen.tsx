@@ -67,7 +67,8 @@ import {
 import { inputReset } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { toBoxShadow } from '@/shared/utility'
-import { fontFor, hitSlopTo, radius, spacing, type, useColors, useShadow } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { fontFor, hitSlopTo, radius, spacing, useColors } from '@/theme'
 
 const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
@@ -109,7 +110,6 @@ const Input = ({
   keyboardType?: 'numbers-and-punctuation'
 }) => {
   const c = useColors()
-  const font = multiline ? type.b2 : type.b1
   return (
     <TextInput
       accessibilityLabel={label}
@@ -119,23 +119,7 @@ const Input = ({
       placeholderTextColor={c.t4}
       multiline={multiline}
       keyboardType={keyboardType}
-      style={[
-        {
-          ...inputReset,
-          minHeight: multiline ? 72 : 48,
-          borderRadius: radius.md,
-          backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
-          ...(invalid && Platform.OS !== 'ios' ? { borderWidth: 1.5, borderColor: c.red } : null),
-          paddingHorizontal: spacing[4],
-          paddingTop: multiline ? spacing[3] : 0,
-          fontSize: font.fontSize,
-          lineHeight: font.lineHeight,
-          letterSpacing: font.letterSpacing,
-          color: c.t1,
-          textAlignVertical: multiline ? 'top' : 'center',
-        },
-        fontFor('400'),
-      ]}
+      style={styles.input(!!multiline, !!invalid)}
     />
   )
 }
@@ -149,22 +133,11 @@ const SelectField = ({
   value: string
   actions: MenuAction[]
 }) => {
-  const c = useColors()
   return (
-    <View style={{ flex: 1, gap: spacing[2] }}>
+    <View style={styles.selectField}>
       <FieldLabel>{label}</FieldLabel>
       <Menu actions={actions} accessibilityLabel={`${label} ${value}`} stretch>
-        <View
-          style={{
-            minHeight: 56,
-            borderRadius: radius.md,
-            backgroundColor: c.fill,
-            paddingHorizontal: spacing[4],
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <View style={styles.selectBox}>
           <Text v="b1">{value}</Text>
           <Icon name="down" size={16} color="t1" />
         </View>
@@ -226,28 +199,14 @@ const EditBasic = ({ p }: { p: Profile }) => {
         contentContainerStyle={FORM}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
+        <View style={styles.photoRow}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="프로필 사진 바꾸기"
             onPress={() => void pickPhoto()}
           >
             <Avatar name={name || p.displayName} url={photo?.uri ?? p.avatarUrl} size={64} />
-            <View
-              style={{
-                position: 'absolute',
-                right: -4,
-                bottom: -4,
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: c.t1,
-                borderWidth: 2,
-                borderColor: c.bg,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
+            <View style={styles.photoBadge}>
               {uploading ? (
                 <ActivityIndicator size="small" color={c.bg} />
               ) : (
@@ -259,11 +218,11 @@ const EditBasic = ({ p }: { p: Profile }) => {
             {'사진은 허브 프로필과\n이력서 템플릿에 함께 쓰여요.'}
           </Text>
         </View>
-        <View style={{ gap: spacing[2] }}>
+        <View style={styles.field}>
           <FieldLabel>이름</FieldLabel>
           <TextField accessibilityLabel="이름" value={name} onChangeText={setName} maxLength={20} />
         </View>
-        <View style={{ gap: spacing[2] }}>
+        <View style={styles.field}>
           <FieldLabel>헤드라인</FieldLabel>
           <View>
             <TextField
@@ -271,16 +230,16 @@ const EditBasic = ({ p }: { p: Profile }) => {
               value={headline}
               onChangeText={setHeadline}
               maxLength={40}
-              style={{ paddingRight: 44 }}
+              style={styles.headlineInput}
             />
-            <View pointerEvents="none" style={{ position: 'absolute', right: spacing[4], top: 0, bottom: 0, justifyContent: 'center' }}>
+            <View pointerEvents="none" style={styles.counter}>
               <Text v="c2" color="t3">
                 {headline.length}/40
               </Text>
             </View>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', gap: spacing[3] }}>
+        <View style={styles.selectRow}>
           <SelectField
             label="직군"
             value={JOB_CATEGORIES.find((j) => j.key === job)?.label ?? ''}
@@ -302,22 +261,12 @@ const EditBasic = ({ p }: { p: Profile }) => {
             }))}
           />
         </View>
-        <View style={{ gap: spacing[2] }}>
+        <View style={styles.field}>
           <FieldLabel>커리어 상태</FieldLabel>
           <SegmentedControl items={CAREER_STATUSES} value={status} onChange={setStatus} />
         </View>
-        <View
-          style={{
-            minHeight: 56,
-            borderRadius: radius.md,
-            backgroundColor: c.fill,
-            paddingHorizontal: spacing[4],
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: spacing[3],
-          }}
-        >
-          <View style={{ flex: 1 }}>
+        <View style={styles.offerRow}>
+          <View style={styles.flex}>
             <Text v="b1">제안 받기</Text>
             <Text v="c1" color="t3">
               허브에서 다른 사람이 제안을 보낼 수 있어요
@@ -350,7 +299,7 @@ const EditIntro = ({ p }: { p: Profile }) => {
           max={500}
           value={intro}
           onChangeText={setIntro}
-          style={{ minHeight: 200, lineHeight: 25 }}
+          style={styles.introInput}
           placeholder="어떤 일을 해 왔고, 요즘 무엇에 관심 있는지 적어 보세요."
         />
         <Button
@@ -404,7 +353,6 @@ const toCareer = (d: CareerDraft): Career | null => {
 }
 
 const EditCareer = ({ p }: { p: Profile }) => {
-  const c = useColors()
   const save = useSaveProfile()
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
@@ -423,9 +371,9 @@ const EditCareer = ({ p }: { p: Profile }) => {
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
-  const shadow = useShadow()
   const [heights, setHeights] = useState<Record<string, number>>({})
   const dragY = useState(() => new Animated.Value(0))[0]
+  const dragStyle = { transform: [{ translateY: dragY }, { scale: 1.02 }] }
   const [dragging, setDragging] = useState<number | null>(null)
   const move = (from: number, to: number) => {
     if (from === to || to < 0 || to >= items.length) return
@@ -480,12 +428,9 @@ const EditCareer = ({ p }: { p: Profile }) => {
                 const h = e.nativeEvent.layout.height
                 setHeights((hs) => (hs[it.key] === h ? hs : { ...hs, [it.key]: h }))
               }}
-              style={[
-                { padding: spacing[4], borderRadius: radius.card, backgroundColor: c.bg2, gap: spacing[2] },
-                dragging === i ? { zIndex: 1, transform: [{ translateY: dragY }, { scale: 1.02 }], ...(Platform.OS === 'ios' ? shadow.pop : { boxShadow: toBoxShadow(shadow.pop) }) } : null,
-              ]}
+              style={[styles.card, dragging === i && styles.cardDragging, dragging === i && dragStyle]}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+              <View style={styles.cardHead}>
                 <View
                   {...grip(i)}
                   accessible
@@ -504,28 +449,22 @@ const EditCareer = ({ p }: { p: Profile }) => {
                   accessibilityRole="button"
                   accessibilityState={{ expanded }}
                   onPress={() => setOpen(expanded ? null : i)}
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: spacing[2],
-                    minHeight: 24,
-                  }}
+                  style={styles.cardToggle}
                   hitSlop={hitSlopTo(24)}
                 >
-                  <Text v="b1" weight="700" numberOfLines={1} style={{ flex: 1 }}>
+                  <Text v="b1" weight="700" numberOfLines={1} style={styles.flex}>
                     {it.saved?.head ?? `${it.company || '새 경력'}${it.role ? ` · ${it.role}` : ''}`}
                   </Text>
                   <Icon name={expanded ? 'up' : 'down'} size={18} color="t3" />
                 </Pressable>
               </View>
               {period ? (
-                <Text v="c1" color="t3" style={{ paddingLeft: spacing[6] }}>
+                <Text v="c1" color="t3" style={styles.period}>
                   {period}
                 </Text>
               ) : null}
               {expanded ? (
-                <View style={{ gap: spacing[2], paddingTop: spacing[2] }}>
+                <View style={styles.cardBody}>
                   <Input
                     label="회사"
                     invalid={tried && !it.company.trim()}
@@ -538,8 +477,8 @@ const EditCareer = ({ p }: { p: Profile }) => {
                     value={it.role}
                     onChangeText={(t) => set(i, { role: t })}
                   />
-                  <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-                    <View style={{ flex: 1 }}>
+                  <View style={styles.dateRow}>
+                    <View style={styles.flex}>
                       <DatePicker
                         label="시작"
                         mode="month"
@@ -549,17 +488,8 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
-                    <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : c.bg }}>
-                      <View
-                        style={{
-                          minHeight: 48,
-                          paddingLeft: spacing[4],
-                          paddingRight: spacing[2],
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                      >
+                    <View style={styles.currentBox}>
+                      <View style={styles.currentRow}>
                         <Text v="b1">재직 중</Text>
                         <Switch
                           label="재직 중"
@@ -602,12 +532,7 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         onConfirm: () => removeAt(it),
                       })
                     }
-                    style={{
-                      height: 40,
-                      paddingHorizontal: spacing[3],
-                      justifyContent: 'center',
-                      alignSelf: 'center',
-                    }}
+                    style={styles.deleteButton}
                   >
                     <Text v="b2" weight="600" color="red">
                       이 경력 삭제하기
@@ -636,7 +561,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
 }
 
 const EditSkills = ({ p }: { p: Profile }) => {
-  const c = useColors()
   const save = useSaveProfile()
   const [skills, setSkills] = useState(p.skills)
   const [q, setQ] = useState('')
@@ -679,15 +603,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
           autoCorrect={false}
         />
         {hits.length ? (
-          <View
-            style={{
-              marginTop: -6,
-              borderRadius: radius.card,
-              backgroundColor: c.bg2,
-              paddingVertical: spacing[1],
-              paddingHorizontal: spacing[2],
-            }}
-          >
+          <View style={styles.hits}>
             {hits.map(({ item }, n) => {
               return (
                 <Pressable
@@ -695,14 +611,7 @@ const EditSkills = ({ p }: { p: Profile }) => {
                   accessibilityRole="button"
                   accessibilityLabel={`${item} 추가`}
                   onPress={() => add(item)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                    height: 44,
-                    paddingHorizontal: 14,
-                    borderRadius: radius.sm,
-                  }}
+                  style={styles.hit}
                 >
                   <Icon name="plus" size={16} />
                   <Text v="b1" weight={n === 0 ? '700' : undefined}>
@@ -713,10 +622,10 @@ const EditSkills = ({ p }: { p: Profile }) => {
             })}
           </View>
         ) : null}
-        <Text v="b2" weight="700" style={{ marginTop: 6 }}>
+        <Text v="b2" weight="700" style={styles.skillsTitle}>
           내 기술 {skills.length}개
         </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+        <View style={styles.chips}>
           {skills.map((s, i) => (
             <Chip
               key={s}
@@ -737,7 +646,6 @@ const EditSkills = ({ p }: { p: Profile }) => {
 }
 
 const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
-  const c = useColors()
   const raw = useSafeAreaInsets()
   const insets = { ...raw, bottom: Platform.OS === 'ios' ? (initialWindowMetrics?.insets.bottom ?? 0) : raw.bottom }
   const keyboardUp = useKeyboardHeight() > 0
@@ -746,16 +654,8 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
     { basic: EditBasic, intro: EditIntro, career: EditCareer, skills: EditSkills }[section] ??
     EditBasic
   return (
-    <View style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={{
-          flex: 1,
-          backgroundColor: c.bg,
-          paddingTop: Platform.OS === 'android' ? insets.top : 0,
-          paddingBottom: Platform.OS === 'android' && keyboardUp ? 0 : insets.bottom,
-        }}
-      >
+    <View style={styles.flex}>
+      <KeyboardAvoidingView behavior="padding" style={styles.screen(insets.top, insets.bottom, keyboardUp)}>
         {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
       </KeyboardAvoidingView>
       {Platform.OS === 'ios' ? (
@@ -766,5 +666,98 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  flex: { flex: 1 },
+  input: (multiline: boolean, invalid: boolean) => ({
+    ...inputReset,
+    minHeight: multiline ? 72 : 48,
+    borderRadius: theme.radius.md,
+    backgroundColor: Platform.OS === 'ios' ? undefined : theme.colors.bg,
+    ...(invalid && Platform.OS !== 'ios' ? { borderWidth: 1.5, borderColor: theme.colors.red } : null),
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: multiline ? theme.spacing[3] : 0,
+    fontSize: (multiline ? theme.type.b2 : theme.type.b1).fontSize,
+    lineHeight: (multiline ? theme.type.b2 : theme.type.b1).lineHeight,
+    letterSpacing: (multiline ? theme.type.b2 : theme.type.b1).letterSpacing,
+    color: theme.colors.t1,
+    textAlignVertical: multiline ? 'top' : 'center',
+    ...fontFor('400'),
+  }),
+  selectField: { flex: 1, gap: theme.spacing[2] },
+  selectBox: {
+    minHeight: 56,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.fill,
+    paddingHorizontal: theme.spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  photoRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[4] },
+  photoBadge: {
+    position: 'absolute',
+    right: -4,
+    bottom: -4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.colors.t1,
+    borderWidth: 2,
+    borderColor: theme.colors.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  field: { gap: theme.spacing[2] },
+  headlineInput: { paddingRight: 44 },
+  counter: { position: 'absolute', right: theme.spacing[4], top: 0, bottom: 0, justifyContent: 'center' },
+  selectRow: { flexDirection: 'row', gap: theme.spacing[3] },
+  offerRow: {
+    minHeight: 56,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.fill,
+    paddingHorizontal: theme.spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[3],
+  },
+  introInput: { minHeight: 200, lineHeight: 25 },
+  card: { padding: theme.spacing[4], borderRadius: theme.radius.card, backgroundColor: theme.colors.bg2, gap: theme.spacing[2] },
+  cardDragging: {
+    zIndex: 1,
+    ...(Platform.OS === 'ios' ? theme.shadow.pop : { boxShadow: toBoxShadow(theme.shadow.pop) }),
+  },
+  cardHead: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  cardToggle: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], minHeight: 24 },
+  period: { paddingLeft: theme.spacing[6] },
+  cardBody: { gap: theme.spacing[2], paddingTop: theme.spacing[2] },
+  dateRow: { flexDirection: 'row', gap: theme.spacing[2], alignItems: 'center' },
+  currentBox: { flex: 1, borderRadius: theme.radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : theme.colors.bg },
+  currentRow: {
+    minHeight: 48,
+    paddingLeft: theme.spacing[4],
+    paddingRight: theme.spacing[2],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  deleteButton: { height: 40, paddingHorizontal: theme.spacing[3], justifyContent: 'center', alignSelf: 'center' },
+  hits: {
+    marginTop: -6,
+    borderRadius: theme.radius.card,
+    backgroundColor: theme.colors.bg2,
+    paddingVertical: theme.spacing[1],
+    paddingHorizontal: theme.spacing[2],
+  },
+  hit: { flexDirection: 'row', alignItems: 'center', gap: 10, height: 44, paddingHorizontal: 14, borderRadius: theme.radius.sm },
+  skillsTitle: { marginTop: 6 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },
+  screen: (top: number, bottom: number, keyboardUp: boolean) => ({
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+    paddingTop: Platform.OS === 'android' ? top : 0,
+    paddingBottom: Platform.OS === 'android' && keyboardUp ? 0 : bottom,
+  }),
+}))
 
 export default EditProfileScreen

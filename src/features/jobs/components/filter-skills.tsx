@@ -1,7 +1,7 @@
 import { searchHangul } from '@push/shared'
 import { useState } from 'react'
 import { Platform, View } from 'react-native'
-import { spacing } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import { Chip, Text, TextField } from '../../../shared/components'
 import { useProfile } from '../api/hooks'
 import { POPULAR_SKILL_COUNT, SKILL_CATALOG } from '../constants'
@@ -16,7 +16,7 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
   const found = q.trim() ? searchHangul(SKILL_CATALOG, q, (s) => [s]).map((r) => r.item) : []
   return (
     <>
-      <View style={{ marginBottom: ios ? spacing[2] : 0 }}>
+      <View style={ios ? styles.searchIos : undefined}>
         <TextField compact slim={ios} icon="search" placeholder="기술 검색" value={q} onChangeText={setQ} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
       </View>
       {q.trim() ? (
@@ -54,5 +54,9 @@ const FilterSkills = ({ selected, trending, onToggle }: { selected: string[]; tr
     </>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  searchIos: { marginBottom: theme.spacing[2] },
+}))
 
 export default FilterSkills

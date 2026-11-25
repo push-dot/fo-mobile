@@ -1,7 +1,8 @@
 import { DatePickerDialog, TimePickerDialog } from '@expo/ui/jetpack-compose'
 import { useState } from 'react'
 import { Pressable } from 'react-native'
-import { radius, spacing, useColors } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useColors } from '../../theme'
 import { formatDay, formatMonth, formatTime, fromPickerUtc, startOfMonth, toPickerUtc, withTime } from '../utility'
 import Icon from './icon'
 import NativeHost from './native-host'
@@ -30,9 +31,9 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
         accessibilityRole="button"
         accessibilityLabel={label}
         onPress={() => setOpen(true)}
-        style={{ minHeight, borderRadius: radius.md, backgroundColor: c[surface], paddingHorizontal: spacing[4], flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+        style={styles.field(minHeight, surface)}
       >
-        <Text v="b1" color={value ? 't1' : 't4'} style={{ flex: 1 }}>
+        <Text v="b1" color={value ? 't1' : 't4'} style={styles.value}>
           {value ? FORMAT[mode](value) : label}
         </Text>
         {mode === 'month' ? null : <Icon name={mode === 'time' ? 'clock' : 'calendar'} size={18} color="t3" />}
@@ -65,5 +66,18 @@ const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface =
     </>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  field: (minHeight: number, surface: 'fill' | 'bg' | 'bg2') => ({
+    minHeight,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors[surface],
+    paddingHorizontal: theme.spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[2],
+  }),
+  value: { flex: 1 },
+}))
 
 export default DatePicker

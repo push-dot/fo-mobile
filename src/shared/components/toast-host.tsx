@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { AccessibilityInfo, Animated, Platform, PlatformColor, View, type ViewStyle } from 'react-native'
+import { AccessibilityInfo, Animated, Platform, PlatformColor, View, type ColorValue, type ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { cssShadow, iosMaterial, palette, radius, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
+import { cssShadow, iosMaterial, palette, spacing, toast as toastColor, useColors, useThemeMode } from '../../theme'
 import { TOAST_BOTTOM_GAP, TOAST_SHEET_GAP } from './constants'
 import GlassPressable from './glass-pressable'
 import Text from './text'
@@ -14,15 +15,11 @@ const SHAPE = Platform.OS === 'ios'
   ? { inset: spacing[2], radius: 26, shadow: cssShadow.banner, minHeight: 64, top: 2 }
   : { inset: spacing[2], radius: 4, shadow: cssShadow.toast, minHeight: 52, top: 0 }
 
-const Surface = ({ shape, shadow, children }: { shape: ViewStyle; shadow: string; children: ReactNode }) => {
-  const c = useColors()
-  const dark = useThemeMode() === 'dark'
-  return (
-    <View pointerEvents="box-none" style={[shape, { backgroundColor: Platform.OS === 'ios' ? iosMaterial[dark ? 'dark' : 'light'] : c.t1, boxShadow: shadow }]}>
-      {children}
-    </View>
-  )
-}
+const Surface = ({ shape, shadow, children }: { shape: ViewStyle; shadow: string; children: ReactNode }) => (
+  <View pointerEvents="box-none" style={[shape, styles.surface(shadow)]}>
+    {children}
+  </View>
+)
 
 const ToastHost = () => {
   const ios = Platform.OS === 'ios'
@@ -53,22 +50,20 @@ const ToastHost = () => {
   if (!toast) return null
   const translateY = shown.interpolate({ inputRange: [0, 1], outputRange: [still ? 0 : ios ? -24 : 24, 0] })
   const shape = SHAPE
+  const motion = { opacity: Platform.OS === 'ios' ? 1 : shown, transform: [{ translateY }] }
   return (
     <Animated.View
       accessibilityLiveRegion="polite"
       pointerEvents={toast.action ? 'box-none' : 'none'}
-      style={{
-        position: 'absolute',
-        left: shape.inset,
-        right: shape.inset,
-        ...(ios ? { top: insets.top + shape.top } : { bottom: sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP) }),
-        opacity: Platform.OS === 'ios' ? 1 : shown,
-        transform: [{ translateY }],
-      }}
+      style={[
+        styles.toast,
+        ios ? styles.top(insets.top + shape.top) : styles.bottom(sheet ? sheet + TOAST_SHEET_GAP : insets.bottom + (toast.bottom ?? TOAST_BOTTOM_GAP)),
+        motion,
+      ]}
     >
       <Surface shape={{ borderRadius: shape.radius }} shadow={shape.shadow}>
-        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: shape.minHeight, paddingLeft: ios ? spacing[5] : spacing[4], paddingRight: toast.action && !ios ? spacing[2] : spacing[4], paddingVertical: ios ? TOAST_IOS_PAD : 0 }}>
-          <Text v="b2" weight="600" pointerEvents="none" style={{ flex: 1, color: ink.text, ...(ios ? { lineHeight: 20 } : null) }}>
+        <View pointerEvents="box-none" style={[styles.row, ios && styles.rowIos, !!toast.action && !ios && styles.rowAction]}>
+          <Text v="b2" weight="600" pointerEvents="none" style={[styles.message(ink.text), ios && styles.iosLine]}>
             {toast.message}
           </Text>
           {toast.action ? (
@@ -76,14 +71,14 @@ const ToastHost = () => {
               accessibilityRole="button"
               glass={false}
               fill={null}
-              style={{ height: ACTION_HEIGHT, borderRadius: radius.sm, ...(ios ? { marginHorizontal: -spacing[3] } : null) }}
+              style={[styles.action, ios && styles.actionIos]}
               contentStyle={{ paddingHorizontal: spacing[3] }}
               onPress={() => {
                 toast.action?.onPress()
                 hideToast(toast.id)
               }}
             >
-              <Text v="b2" weight={ios ? '600' : '700'} style={{ color: ink.action, ...(ios ? { lineHeight: 20 } : null) }}>
+              <Text v="b2" weight={ios ? '600' : '700'} style={[styles.ink(ink.action), ios && styles.iosLine]}>
                 {toast.action.label}
               </Text>
             </GlassPressable>
@@ -93,5 +88,20 @@ const ToastHost = () => {
     </Animated.View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  surface: (shadow: string) => ({ backgroundColor: Platform.OS === 'ios' ? iosMaterial[theme.mode] : theme.colors.t1, boxShadow: shadow }),
+  toast: { position: 'absolute', left: SHAPE.inset, right: SHAPE.inset },
+  top: (top: number) => ({ top }),
+  bottom: (bottom: number) => ({ bottom }),
+  row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], minHeight: SHAPE.minHeight, paddingLeft: theme.spacing[4], paddingRight: theme.spacing[4], paddingVertical: 0 },
+  rowIos: { paddingLeft: theme.spacing[5], paddingVertical: TOAST_IOS_PAD },
+  rowAction: { paddingRight: theme.spacing[2] },
+  message: (color: ColorValue) => ({ flex: 1, color }),
+  ink: (color: ColorValue) => ({ color }),
+  iosLine: { lineHeight: 20 },
+  action: { height: ACTION_HEIGHT, borderRadius: theme.radius.sm },
+  actionIos: { marginHorizontal: -theme.spacing[3] },
+}))
 
 export default ToastHost

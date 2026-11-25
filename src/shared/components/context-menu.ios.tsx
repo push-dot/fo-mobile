@@ -1,5 +1,6 @@
 import { ContextMenu as SwiftContextMenu, RNHostView } from '@expo/ui/swift-ui'
 import { Pressable, useWindowDimensions } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { ContextMenuProps } from './menu-action'
 import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
@@ -15,7 +16,7 @@ const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }
         </SwiftContextMenu.Items>
         <SwiftContextMenu.Trigger>
           <RNHostView matchContents={{ vertical: true }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={{ maxWidth: width }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={styles.trigger(width)}>
               {children}
             </Pressable>
           </RNHostView>
@@ -29,5 +30,9 @@ const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }
     </NativeHost>
   )
 }
+
+const styles = StyleSheet.create({
+  trigger: (width: number) => ({ maxWidth: width }),
+})
 
 export default ContextMenu

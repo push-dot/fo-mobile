@@ -1,4 +1,5 @@
 import { Switch as RNSwitch } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { onAccent, useColors } from '../../theme'
 
 const Switch = ({
@@ -13,7 +14,7 @@ const Switch = ({
   const c = useColors()
   return (
     <RNSwitch
-      style={{ alignSelf: 'center' }}
+      style={styles.switch}
       accessibilityLabel={label}
       value={value}
       onValueChange={onValueChange}
@@ -23,5 +24,9 @@ const Switch = ({
     />
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  switch: { alignSelf: 'center' },
+}))
 
 export default Switch

@@ -1,6 +1,7 @@
 import { NativeTabs } from 'expo-router/native-tabs'
 import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import { platformTheme, tabColor, useColors, useThemeMode } from '@/theme'
 
 const ICONS = {
@@ -53,11 +54,16 @@ const TabsLayout = () => {
   )
   if (!android) return tabs
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.root}>
       {tabs}
-      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: BAR_HEIGHT + insets.bottom, height: 1, backgroundColor: c.line }} />
+      <View pointerEvents="none" style={styles.divider(insets.bottom)} />
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1 },
+  divider: (insetBottom: number) => ({ position: 'absolute', left: 0, right: 0, bottom: BAR_HEIGHT + insetBottom, height: 1, backgroundColor: theme.colors.line }),
+}))
 
 export default TabsLayout

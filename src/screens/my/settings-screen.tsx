@@ -41,25 +41,19 @@ import {
   TopBar,
 } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { THEME_CHOICES, useThemePreference } from '@/theme'
 import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
 const IOS_PICKER = Platform.OS === 'ios'
 
-const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
-  const c = useColors()
-  return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <TopBar title={title} onBack={() => router.back()} />
-      <ScrollView
-        contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 48, gap: 22 }}
-      >
-        {children}
-      </ScrollView>
-    </View>
-  )
-}
+const Screen = ({ title, children }: { title: string; children: ReactNode }) => (
+  <View style={styles.screen}>
+    <TopBar title={title} onBack={() => router.back()} />
+    <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
+  </View>
+)
 
 const SettingsScreen = () => {
   const { s, set } = useSettings()
@@ -74,7 +68,7 @@ const SettingsScreen = () => {
   if (!s) {
     return (
       <Screen title="설정">
-        <ActivityIndicator style={{ marginTop: 40 }} />
+        <ActivityIndicator style={styles.spinner} />
       </Screen>
     )
   }
@@ -114,10 +108,10 @@ const SettingsScreen = () => {
           accessibilityRole="button"
           accessibilityLabel={`${me?.displayName ?? ''}, ${login}`}
           onPress={() => router.push('/edit-profile/basic')}
-          style={{ minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}
+          style={styles.profile}
         >
           <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl} />
-          <View style={{ flex: 1 }}>
+          <View style={styles.profileText}>
             <Text v="b1" weight="700">
               {me?.displayName}
             </Text>
@@ -205,5 +199,13 @@ const SettingsScreen = () => {
     </Screen>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 48, gap: 22 },
+  spinner: { marginTop: 40 },
+  profile: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  profileText: { flex: 1 },
+}))
 
 export default SettingsScreen

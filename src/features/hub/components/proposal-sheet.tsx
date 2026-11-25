@@ -1,6 +1,7 @@
 import { brandColor } from '@push/shared'
 import { Platform, ScrollView, View, type LayoutChangeEvent } from 'react-native'
 import { Chip, SheetScroll, Text, TextField } from '../../../shared/components'
+import { StyleSheet } from 'react-native-unistyles'
 import { onAccent, spacing } from '../../../theme'
 import { PROPOSAL_MAX } from '../constants'
 import Avatar from './avatar'
@@ -25,14 +26,14 @@ const bleed = Platform.OS === 'android' ? spacing[5] : spacing[4]
 
 const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, maxHeight, onScrollLayout, onMessage, onPosting, onError }: Props) => {
   return (
-    <View style={{ gap: 14 }}>
+    <View style={styles.sheet}>
       <Text v="h2" accessibilityRole="header">
         제안하기
       </Text>
-      <SheetScroll style={{ maxHeight }} onLayout={onScrollLayout} contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+      <SheetScroll style={styles.scroll(maxHeight)} onLayout={onScrollLayout} contentContainerStyle={styles.sheet} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
+      <View style={styles.to}>
         <Avatar name={name} size={44} />
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
           <Text v="b1" weight="700">
             {name} 님에게
           </Text>
@@ -54,11 +55,11 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, ma
         placeholder="어떤 이야기를 나누고 싶은지 적어 주세요"
       />
       {postings.length ? (
-        <View style={{ gap: spacing[3] }}>
+        <View style={styles.postings}>
           <Text v="b2" weight="700">
             함께 보낼 우리 회사 공고 (선택)
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginRight: -bleed }} contentContainerStyle={{ gap: spacing[2], paddingRight: bleed }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.postingsScroll} contentContainerStyle={styles.postingsList}>
             {postings.map((p) => (
               <Chip
                 key={p.id}
@@ -66,8 +67,8 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, ma
                 leadInset={8}
                 label={`${p.company} · ${p.title}`}
                 lead={
-                  <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: brandColor(p.company), alignItems: 'center', justifyContent: 'center' }}>
-                    <Text v="tab" weight="800" style={{ color: onAccent }}>
+                  <View style={styles.logo(brandColor(p.company))}>
+                    <Text v="tab" weight="800" style={styles.logoText}>
                       {[...p.company][0]}
                     </Text>
                   </View>
@@ -91,5 +92,17 @@ const ProposalSheet = ({ name, subtitle, message, postingId, postings, error, ma
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  sheet: { gap: 14 },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+  to: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  flex: { flex: 1 },
+  postings: { gap: theme.spacing[3] },
+  postingsScroll: { marginRight: -bleed },
+  postingsList: { gap: theme.spacing[2], paddingRight: bleed },
+  logo: (backgroundColor: string) => ({ width: 24, height: 24, borderRadius: 8, backgroundColor, alignItems: 'center', justifyContent: 'center' }),
+  logoText: { color: onAccent },
+}))
 
 export default ProposalSheet

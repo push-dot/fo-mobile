@@ -2,7 +2,8 @@ import { router, type Href } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Platform, useWindowDimensions, View } from 'react-native'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
-import { spacing, useColors, useThemeMode } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useThemeMode } from '../../theme'
 import { bootScript, originOf, detailUrl, textSizeScript, routeNavigation, tokenEventScript, type DetailFrom } from './detail-url'
 import { API_BASE_URL, API_MOCK, WEB_BASE_URL, mockFitHolding, mockFitSoonOn, mockFitThreeOn, mockWebPlanOf, openBrowser, useSession } from '../infrastructure'
 import Button from './button'
@@ -20,14 +21,11 @@ const opened = new Set<string>()
 
 const FONTS_READY_SCRIPT = `(function(){var done=false;function post(){if(done)return;done=true;window.ReactNativeWebView.postMessage(JSON.stringify({type:'fonts-ready'}))}setTimeout(post,2500);function frames(n,f){if(n===0)return f();requestAnimationFrame(function(){frames(n-1,f)})}function settle(){frames(3,function(){if(document.fonts.status==='loading'){document.fonts.ready.then(settle)}else{post()}})}settle()})();true;`
 
-const DetailLoading = () => {
-  const c = useColors()
-  return (
-    <View accessible accessibilityLabel="불러오는 중" style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: c.bg }}>
-      <LoadingIndicator />
-    </View>
-  )
-}
+const DetailLoading = () => (
+  <View accessible accessibilityLabel="불러오는 중" style={styles.cover}>
+    <LoadingIndicator />
+  </View>
+)
 
 type Props = {
   path: string
@@ -50,7 +48,6 @@ const buildBoot = (mode: ReturnType<typeof useThemeMode>, applyZoom: string | un
 const injectedOf = (zoomScript: string | undefined, insetPart: string) => `${zoomScript ?? ''}${insetPart}` || undefined
 
 const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
-  const c = useColors()
   const mode = useThemeMode()
   const ref = useRef<WebView<object>>(null)
   const token = useSession((s) => s.session?.accessToken ?? null)
@@ -121,7 +118,7 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <WebView<object>
         ref={ref}
         key={mode}
@@ -133,13 +130,13 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
         onMessage={onMessage}
         onShouldStartLoadWithRequest={onNavigate}
         onError={fail}
-        style={{ backgroundColor: c.bg }}
+        style={styles.web}
         originWhitelist={[`${originOf(WEB_BASE_URL)}*`, 'about:blank']}
         setSupportMultipleWindows={false}
       />
       {loading && !failed ? <DetailLoading /> : null}
       {failed ? (
-        <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', gap: spacing[4], backgroundColor: c.bg }}>
+        <View style={[styles.cover, styles.failed]}>
           <Text v="b2" color="t3">
             불러오지 못했어요
           </Text>
@@ -158,5 +155,12 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  cover: { position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.bg },
+  failed: { gap: theme.spacing[4] },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  web: { backgroundColor: theme.colors.bg },
+}))
 
 export default DetailWebView

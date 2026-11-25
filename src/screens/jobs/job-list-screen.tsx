@@ -3,11 +3,11 @@ import { useEffect } from 'react'
 import { View } from 'react-native'
 import { FILTER_KEYS, POSTING_SORTS, PostingGrid, chipText, formatCount, isEmpty, toQuery, useJobListStore, usePostingPages, EMPTY } from '@/features/jobs'
 import { Chip, ChipRow, GlassButton, Icon, Menu, ScreenBar, Skeleton, Text } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { spacing } from '@/theme'
 
 
 const JobListScreen = () => {
-  const c = useColors()
   const filters = useJobListStore((s) => s.filters)
   const sort = useJobListStore((s) => s.sort)
   const setFilters = useJobListStore((s) => s.setFilters)
@@ -20,7 +20,7 @@ const JobListScreen = () => {
   const sortLabel = POSTING_SORTS.find((s) => s.key === sort)?.label ?? '최신순'
 
   const header = (
-    <View style={{ backgroundColor: c.bg }}>
+    <View style={styles.header}>
       <ChipRow paddingTop={spacing[1]}>
         <Chip label="전체" on={isEmpty(filters)} onPress={() => setFilters(EMPTY)} />
         {FILTER_KEYS.map((k) => (
@@ -28,11 +28,11 @@ const JobListScreen = () => {
         ))}
       </ChipRow>
       {pages.isPending ? (
-        <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[5], paddingBottom: spacing[3] }}>
+        <View style={styles.loading}>
           <Skeleton width={80} height={12} />
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: 7, marginBottom: -1 }}>
+        <View style={styles.meta}>
           <Text v="c1" weight="600" color="t3">
             {total === undefined ? ' ' : `공고 ${formatCount(total)}개`}
           </Text>
@@ -40,7 +40,7 @@ const JobListScreen = () => {
             accessibilityLabel={`정렬, ${sortLabel}`}
             actions={POSTING_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], minHeight: 44 }}>
+            <View style={styles.sort}>
               <Text v="c1" weight="600" color="t2">
                 {sortLabel}
               </Text>
@@ -53,7 +53,7 @@ const JobListScreen = () => {
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <ScreenBar
         bar={{
           title: '채용공고',
@@ -66,5 +66,13 @@ const JobListScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  header: { backgroundColor: theme.colors.bg },
+  loading: { paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[5], paddingBottom: theme.spacing[3] },
+  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: theme.spacing[5], paddingTop: 7, marginBottom: -1 },
+  sort: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1], minHeight: 44 },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+}))
 
 export default JobListScreen

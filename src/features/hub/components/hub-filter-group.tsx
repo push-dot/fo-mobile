@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import { Platform, View } from 'react-native'
 import { SheetHead, Text } from '../../../shared/components'
-import { spacing } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const HubFilterGroup = ({ title, children }: { title: string; children: ReactNode }) => {
   const ios = Platform.OS === 'ios'
   return (
-    <View style={{ gap: ios ? 0 : spacing[2] }}>
+    <View style={ios ? styles.groupIos : styles.group}>
       {ios ? (
         <SheetHead>{title}</SheetHead>
       ) : (
@@ -14,9 +14,15 @@ const HubFilterGroup = ({ title, children }: { title: string; children: ReactNod
           {title}
         </Text>
       )}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing[2] }}>{children}</View>
+      <View style={styles.chips}>{children}</View>
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  group: { gap: theme.spacing[2] },
+  groupIos: { gap: 0 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: theme.spacing[2] },
+}))
 
 export default HubFilterGroup

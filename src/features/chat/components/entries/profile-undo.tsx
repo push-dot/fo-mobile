@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Alert, Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { ApiError } from '@push/api-client'
 import { fetchProfileChange, undoProfileChange } from '@/features/my/api/fetchers'
 import { queryClient } from '@/providers/query-client'
@@ -31,12 +32,16 @@ const ProfileUndo = ({ changeId }: { changeId: string }) => {
       {UNDONE}
     </Text>
   ) : (
-    <Pressable accessibilityRole="button" accessibilityLabel={UNDO_LABEL} disabled={undo.isPending} onPress={() => undo.mutate()} hitSlop={10} style={{ alignSelf: 'flex-start' }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={UNDO_LABEL} disabled={undo.isPending} onPress={() => undo.mutate()} hitSlop={10} style={styles.undo}>
       <Text v="b2" weight="600" color="acText">
         {UNDO_LABEL}
       </Text>
     </Pressable>
   )
 }
+
+const styles = StyleSheet.create({
+  undo: { alignSelf: 'flex-start' },
+})
 
 export default ProfileUndo

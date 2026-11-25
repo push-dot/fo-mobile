@@ -1,9 +1,10 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Button, Icon, Mascot, SettingsGroup, SettingsRow, Skeleton, Switch, Text, TopBar, XL_ROW_HEIGHT, XL_ROW_LABEL } from '@/shared/components'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
-import { radius, spacing, type, useColors, useThemeMode } from '../../../../theme'
+import { type } from '../../../../theme'
 import { mascotPalette } from '../../../../theme/mascot'
 import { useBot, useBotProfile, useBots, useDeleteBot, useSetBotMuted } from '../../api/hooks'
 import { botAllowedPath, botColorPath, botCompaniesPath, materialsPath } from '../../utils/paths'
@@ -28,47 +29,27 @@ const LOADING_GROUPS: readonly (readonly number[])[] = [[60, 80], [60], [40, 60]
 const SKELETON_MASCOT_RADIUS = 36
 
 const Loading = () => {
-  const c = useColors()
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }} accessibilityLabel={PROFILE_LOADING_LABEL}>
+    <View style={styles.screen} accessibilityLabel={PROFILE_LOADING_LABEL}>
       <TopBar circleBack chat={IOS} onBack={() => router.back()} />
-      <View
-        style={{
-          alignItems: 'center',
-          gap: spacing[1],
-          paddingTop: spacing[1],
-          paddingHorizontal: 28,
-          paddingBottom: spacing[5],
-        }}
-      >
-        <View style={{ marginBottom: 10 }}>
+      <View style={styles.head}>
+        <View style={styles.skeletonMascot}>
           <Skeleton width={HEADER_MASCOT} height={HEADER_MASCOT} radius={SKELETON_MASCOT_RADIUS} />
         </View>
         <Skeleton width={120} height={22} />
-        <View style={{ marginTop: 6 }}>
+        <View style={styles.skeletonSub}>
           <Skeleton width={180} height={14} />
         </View>
       </View>
       {LOADING_GROUPS.map((widths, group) => (
         <View
           key={group}
-          style={{
-            marginHorizontal: spacing[5],
-            marginTop: group > 0 ? spacing[3] : 0,
-            borderRadius: radius.card,
-            backgroundColor: c.bg2,
-            paddingHorizontal: spacing[4],
-          }}
+          style={[styles.skeletonGroup, group > 0 && styles.groupGap]}
         >
           {widths.map((width, row) => (
             <View
               key={row}
-              style={{
-                minHeight: 56,
-                justifyContent: 'center',
-                borderTopWidth: row > 0 ? 1 : 0,
-                borderTopColor: c.line,
-              }}
+              style={[styles.skeletonRow, row > 0 && styles.skeletonRowDivided]}
             >
               <Skeleton width={width} height={14} />
             </View>
@@ -83,33 +64,20 @@ const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typ
   const xl = useXlBoardText()
   const size = xl ? { mascot: 80, name: 28, nameLine: 36, sub: 17, subLine: 24 } : { mascot: HEADER_MASCOT, name: 22, nameLine: 30, sub: 13, subLine: 18 }
   return (
-    <View
-      style={{
-        alignItems: 'center',
-        gap: spacing[1],
-        paddingTop: spacing[1],
-        paddingHorizontal: 28,
-        paddingBottom: spacing[5],
-      }}
-    >
-      <View style={{ marginBottom: 6 }}>
+    <View style={styles.head}>
+      <View style={styles.headMascot}>
         <Mascot size={size.mascot} color={color} motion={{ mode: 'still' }} />
       </View>
       <Text
         weight="800"
         numberOfLines={2}
         allowFontScaling={xl ? false : undefined}
-        style={{
-          textAlign: 'center',
-          maxWidth: 330,
-          fontSize: size.name,
-          lineHeight: size.nameLine,
-        }}
+        style={styles.name(size.name, size.nameLine)}
       >
         {name}
       </Text>
       {sub ? (
-        <Text color="t3" numberOfLines={1} allowFontScaling={xl ? false : undefined} style={{ textAlign: 'center', fontSize: size.sub, lineHeight: size.subLine }}>
+        <Text color="t3" numberOfLines={1} allowFontScaling={xl ? false : undefined} style={styles.sub(size.sub, size.subLine)}>
           {sub}
         </Text>
       ) : null}
@@ -118,35 +86,27 @@ const ProfileHead = ({ name, color, sub }: { name: string; color: Parameters<typ
 }
 
 const Failed = ({ bot, onRetry }: { bot: Bot | undefined; onRetry: () => void }) => {
-  const c = useColors()
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       {bot ? <ProfileHead name={bot.name} color={bot.kind === 'push' ? 'push' : bot.color} /> : null}
       <View
         accessibilityRole="alert"
-        style={{
-          alignItems: 'center',
-          gap: spacing[2],
-          paddingHorizontal: 36,
-          paddingTop: spacing[6],
-        }}
+        style={styles.failed}
       >
-        <Text v="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>
+        <Text v="h3" accessibilityRole="header" style={styles.center}>
           {PROFILE_ERROR_TITLE}
         </Text>
-        <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+        <Text v="b2" color="t3" style={styles.center}>
           {PROFILE_ERROR_BODY}
         </Text>
-        <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={{ marginTop: spacing[3] }} />
+        <Button label={RETRY_LABEL} variant="secondary" size="sm" onPress={onRetry} style={styles.retry} />
       </View>
     </View>
   )
 }
 
 const BotProfileView = ({ address }: { address: BotAddress }) => {
-  const c = useColors()
-  const mode = useThemeMode()
   const profile = useBotProfile(address)
   const listed = useBot(address)
   const setMuted = useSetBotMuted()
@@ -194,26 +154,14 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
       return (
         <Pressable key={row.id} accessibilityRole="button" accessibilityLabel={COLOR_A11Y} onPress={() => open(row)}>
           <View
-            style={{
-              minHeight: xl ? XL_ROW_HEIGHT : 56,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing[3],
-              paddingVertical: spacing[2],
-            }}
+            style={[styles.colorRow, xl && styles.colorRowXl]}
           >
-            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[{ flex: 1 }, xl ? XL_ROW_LABEL : { lineHeight: type.b2.lineHeight }]}>
+            <Text v="b1" allowFontScaling={xl ? false : undefined} style={[styles.colorLabel, xl ? styles.colorLabelXl : styles.colorLabelLine]}>
               {row.label}
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <View style={styles.colorTrail}>
               <View
-                style={{
-                  width: COLOR_DOT,
-                  height: COLOR_DOT,
-                  borderRadius: COLOR_DOT / 2,
-                  marginRight: spacing[1],
-                  backgroundColor: mascotPalette(bot.color, mode).body,
-                }}
+                style={styles.colorDot(bot.color)}
               />
               <Icon name="chev" size={16} color="t3" />
             </View>
@@ -232,12 +180,12 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   }
   return (
     <XlBoardChrome>
-      <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={styles.screen}>
         <TopBar circleBack chat={IOS} onBack={() => router.back()} />
-        <ScrollView contentContainerStyle={{ paddingBottom: spacing[6] }}>
+        <ScrollView contentContainerStyle={styles.content}>
           <ProfileHead name={bot.name} color={color} sub={posting?.title} />
           {groups.map((group, index) => (
-            <View key={group.map((row) => row.id).join('-')} style={{ marginHorizontal: spacing[5], marginTop: index > 0 ? spacing[3] : 0 }}>
+            <View key={group.map((row) => row.id).join('-')} style={[styles.group, index > 0 && styles.groupGap]}>
               <SettingsGroup>{group.map(rowOf)}</SettingsGroup>
             </View>
           ))}
@@ -246,5 +194,31 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
     </XlBoardChrome>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  head: { alignItems: 'center', gap: theme.spacing[1], paddingTop: theme.spacing[1], paddingHorizontal: 28, paddingBottom: theme.spacing[5] },
+  skeletonMascot: { marginBottom: 10 },
+  skeletonSub: { marginTop: 6 },
+  skeletonGroup: { marginHorizontal: theme.spacing[5], marginTop: 0, borderRadius: theme.radius.card, backgroundColor: theme.colors.bg2, paddingHorizontal: theme.spacing[4] },
+  skeletonRow: { minHeight: 56, justifyContent: 'center', borderTopWidth: 0, borderTopColor: theme.colors.line },
+  skeletonRowDivided: { borderTopWidth: 1 },
+  headMascot: { marginBottom: 6 },
+  name: (fontSize: number, lineHeight: number) => ({ textAlign: 'center', maxWidth: 330, fontSize, lineHeight }),
+  sub: (fontSize: number, lineHeight: number) => ({ textAlign: 'center', fontSize, lineHeight }),
+  failed: { alignItems: 'center', gap: theme.spacing[2], paddingHorizontal: 36, paddingTop: theme.spacing[6] },
+  center: { textAlign: 'center' },
+  retry: { marginTop: theme.spacing[3] },
+  colorRow: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[2] },
+  colorRowXl: { minHeight: XL_ROW_HEIGHT },
+  colorLabel: { flex: 1 },
+  colorLabelXl: { ...XL_ROW_LABEL },
+  colorLabelLine: { lineHeight: type.b2.lineHeight },
+  colorTrail: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  colorDot: (color: Parameters<typeof mascotPalette>[0]) => ({ width: COLOR_DOT, height: COLOR_DOT, borderRadius: COLOR_DOT / 2, marginRight: theme.spacing[1], backgroundColor: mascotPalette(color, theme.mode).body }),
+  content: { paddingBottom: theme.spacing[6] },
+  group: { marginHorizontal: theme.spacing[5], marginTop: 0 },
+  groupGap: { marginTop: theme.spacing[3] },
+}))
 
 export default BotProfileView

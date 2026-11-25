@@ -1,4 +1,5 @@
 import type { StyleProp, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { IconName } from '@push/design-system'
 import { onAccent, platformTheme, spacing, type, useColors, type Colors, type TypeName } from '../../theme'
 import { PENDING_OPACITY } from './constants'
@@ -56,11 +57,15 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSi
       contentStyle={{ paddingHorizontal: paddingX ?? s.paddingHorizontal, paddingVertical: spacing[2], gap: 6 }}
     >
       {icon ? <Icon name={icon} size={iconSize ?? s.icon} color={fg} /> : null}
-      <Text v={s.text} weight={weight ?? '700'} style={{ color: fg, fontSize: s.fontSize }}>
+      <Text v={s.text} weight={weight ?? '700'} style={styles.label(fg, s.fontSize)}>
         {label}
       </Text>
     </GlassPressable>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  label: (color: string, fontSize: number) => ({ color, fontSize }),
+}))
 
 export default Button

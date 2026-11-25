@@ -1,11 +1,12 @@
 import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { CAREER_STATUSES, JOB_CATEGORIES } from '@push/api-client'
 import { profileShareMessage } from '@/features/hub'
 import { Badge, Button, Icon, SkeletonRows, Text } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { radius, spacing, useColors } from '../../../theme'
+import { radius, spacing } from '../../../theme'
 import { useMyProfile } from '../api/hooks'
 import { PROFILE_ACTIONS_TOP, PROFILE_NAME_TOP } from '../constants'
 import type { ProfileSection } from '../types'
@@ -38,8 +39,8 @@ const Section = ({
   children: ReactNode
 }) => {
   return (
-    <View style={{ paddingHorizontal: spacing[5], gap }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+    <View style={styles.section(gap)}>
+      <View style={styles.sectionHead}>
         <Text v="h3" accessibilityRole="header">
           {title}
         </Text>
@@ -47,7 +48,7 @@ const Section = ({
           accessibilityRole="button"
           accessibilityLabel={`${title} 편집`}
           onPress={onEdit}
-          style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
+          style={styles.edit}
         >
           <Icon name="edit" size={18} color="t3" />
         </Pressable>
@@ -58,29 +59,28 @@ const Section = ({
 }
 
 const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; onExport?: () => void; exporting?: boolean }) => {
-  const c = useColors()
   const { data: p, isLoading } = useMyProfile()
   if (isLoading || !p) return <SkeletonRows {...LOADING_ROWS} />
   const job = JOB_CATEGORIES.find((j) => j.key === p.jobCategory)?.label ?? ''
   const status = CAREER_STATUSES.find((s) => s.key === p.careerStatus)?.label ?? ''
 
   return (
-    <View style={{ gap: spacing[6], paddingTop: share ? spacing[6] : DETAIL_TOP, paddingBottom: spacing[6] }}>
-      <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5] }}>
+    <View style={[styles.tab, !share && styles.tabDetail]}>
+      <View style={styles.hero}>
         <Avatar name={p.displayName} url={p.avatarUrl} size={84} />
-        <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
+        <Text v="h1" style={styles.name}>
           {p.displayName}
         </Text>
         {p.headline ? (
-          <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
+          <Text v="b2" color="t2" style={styles.headline}>
             {p.headline}
           </Text>
         ) : null}
-        <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] }}>
+        <View style={styles.badges}>
           {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
           {status ? <Badge label={status} tone="grey" /> : null}
         </View>
-        <View style={{ flexDirection: 'row', gap: spacing[4], marginTop: spacing[2] }}>
+        <View style={styles.counts}>
           {(
             [
               [profileCountLabels(p).following, '/activity/follows', 'following'],
@@ -102,7 +102,7 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
             </Pressable>
           ))}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
+        <View style={styles.actions}>
           <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
           {onExport ? <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={exporting} onPress={onExport} /> : null}
           {share ? (
@@ -126,21 +126,14 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
           p.careers.map((cr, i) => {
             const last = i === p.careers.length - 1
             return (
-              <View key={`${cr.company}-${i}`} style={{ flexDirection: 'row', gap: spacing[4] }}>
-                <View style={{ alignItems: 'center', paddingTop: spacing[2] }}>
-                  <View
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: radius.xs,
-                      backgroundColor: cr.endedOn ? c.t4 : c.ac,
-                    }}
-                  />
+              <View key={`${cr.company}-${i}`} style={styles.career}>
+                <View style={styles.rail}>
+                  <View style={[styles.marker, !!cr.endedOn && styles.markerEnded]} />
                   {!last ? (
-                    <View style={{ flex: 1, width: 2, backgroundColor: c.line, marginTop: spacing[1] }} />
+                    <View style={styles.railLine} />
                   ) : null}
                 </View>
-                <View style={{ flex: 1, paddingBottom: last ? 0 : spacing[3] }}>
+                <View style={[styles.careerBody, last && styles.careerBodyLast]}>
                   <Text v="b1" weight="700">
                     {cr.company} · {cr.role}
                   </Text>
@@ -148,7 +141,7 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
                     {careerPeriod(cr)}
                   </Text>
                   {cr.description ? (
-                    <Text v="b2" color="t2" style={{ marginTop: spacing[1] }}>
+                    <Text v="b2" color="t2" style={styles.description}>
                       {cr.description}
                     </Text>
                   ) : null}
@@ -165,7 +158,7 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
             아직 등록한 기술이 없어요.
           </Text>
         ) : (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+          <View style={styles.skills}>
             {p.skills.map((s) => (
               <Badge key={s} label={s} tone="grey" />
             ))}
@@ -175,5 +168,28 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  section: (gap: number) => ({ paddingHorizontal: theme.spacing[5], gap }),
+  sectionHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  edit: { width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' },
+  tab: { gap: theme.spacing[6], paddingTop: theme.spacing[6], paddingBottom: theme.spacing[6] },
+  tabDetail: { paddingTop: DETAIL_TOP },
+  hero: { alignItems: 'center', gap: theme.spacing[2], paddingHorizontal: theme.spacing[5] },
+  name: { marginTop: PROFILE_NAME_TOP },
+  headline: { textAlign: 'center' },
+  badges: { flexDirection: 'row', gap: theme.spacing[2], marginTop: theme.spacing[1] },
+  counts: { flexDirection: 'row', gap: theme.spacing[4], marginTop: theme.spacing[2] },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], marginTop: PROFILE_ACTIONS_TOP },
+  career: { flexDirection: 'row', gap: theme.spacing[4] },
+  rail: { alignItems: 'center', paddingTop: theme.spacing[2] },
+  marker: { width: 10, height: 10, borderRadius: theme.radius.xs, backgroundColor: theme.colors.ac },
+  markerEnded: { backgroundColor: theme.colors.t4 },
+  railLine: { flex: 1, width: 2, backgroundColor: theme.colors.line, marginTop: theme.spacing[1] },
+  careerBody: { flex: 1, paddingBottom: theme.spacing[3] },
+  careerBodyLast: { paddingBottom: 0 },
+  description: { marginTop: theme.spacing[1] },
+  skills: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },
+}))
 
 export default ProfileTab

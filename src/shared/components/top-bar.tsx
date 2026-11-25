@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { Platform, StyleSheet, View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import { sheetHeaderTop } from '../navigation/sheet-header'
-import { spacing, useColors } from '../../theme'
+import { spacing } from '../../theme'
 import Blur from './blur'
 import GlassButton from './glass-button'
 import Text from './text'
@@ -34,7 +35,6 @@ const RIGHT_MARGIN = 8
 const TITLE_MARGIN = spacing[2]
 
 const TopBar = ({ title, left, onBack, backIcon, backLabel, reserveBack, right, safeTop = true, sheet = false, translucent = false, transparent = false, chat = false, circleBack = false, pillRight = false }: Props) => {
-  const c = useColors()
   const insets = useSafeAreaInsets()
   const { xl, row: baseRow, button } = useXlChrome()
   const row = chat && !xl ? CHAT_ROW : baseRow
@@ -45,34 +45,28 @@ const TopBar = ({ title, left, onBack, backIcon, backLabel, reserveBack, right, 
   const room = Math.max(sides.start, sides.end) + TITLE_MARGIN
   return (
     <View
-      style={{
-        paddingTop: safeTop ? sheetHeaderTop(Platform.OS, sheet, insets.top, row) : 0,
-        backgroundColor: veil || transparent || flat ? undefined : c.bg,
-        borderBottomWidth: solidChat ? 1 : 0,
-        borderBottomColor: c.line,
-        zIndex: 3,
-      }}
+      style={[styles.bar(safeTop ? sheetHeaderTop(Platform.OS, sheet, insets.top, row) : 0), !(veil || transparent || flat) && styles.solid, solidChat && styles.divided]}
     >
       {veil ? (
         <>
           <Blur intensity={30} style={StyleSheet.absoluteFill} />
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: c.bg, opacity: 0.6 }]} />
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.veil]} />
         </>
       ) : null}
-      <View style={{ minHeight: row, flexDirection: 'row', alignItems: 'center', paddingLeft: chat ? spacing[4] : onBack ? EDGE : spacing[5], paddingRight: chat ? spacing[4] : EDGE, gap: chat ? 10 : 2 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }} onLayout={(e) => setSides((cur) => ({ ...cur, start: e.nativeEvent.layout.x + e.nativeEvent.layout.width }))}>
-          {onBack ? <GlassButton circle={chat || circleBack} actions={[{ icon: backIcon ?? 'back', label: backLabel ?? '뒤로', onPress: onBack }]} /> : reserveBack ? <View style={{ width: button, height: button }} /> : null}
+      <View style={[styles.row(row, onBack ? EDGE : spacing[5]), chat && styles.rowChat]}>
+        <View style={styles.start} onLayout={(e) => setSides((cur) => ({ ...cur, start: e.nativeEvent.layout.x + e.nativeEvent.layout.width }))}>
+          {onBack ? <GlassButton circle={chat || circleBack} actions={[{ icon: backIcon ?? 'back', label: backLabel ?? '뒤로', onPress: onBack }]} /> : reserveBack ? <View style={styles.square(button)} /> : null}
         </View>
-        {left ? <View style={{ flex: 1 }}>{left}</View> : <View style={{ flex: 1 }} />}
+        {left ? <View style={styles.fill}>{left}</View> : <View style={styles.fill} />}
         <View
           onLayout={(e) => setSides((cur) => ({ ...cur, end: e.nativeEvent.layout.width + (chat ? spacing[4] : EDGE) }))}
-          style={{ minWidth: onBack || reserveBack ? button : 0, marginLeft: flat && title && right && !pillRight ? RIGHT_MARGIN : 0, flexDirection: 'row', justifyContent: 'flex-end', gap: ios ? (chat ? CHAT_RIGHT_GAP : RIGHT_GAP) : 2 }}
+          style={[styles.end(onBack || reserveBack ? button : 0, ios ? (chat ? CHAT_RIGHT_GAP : RIGHT_GAP) : 2), !!(flat && title && right && !pillRight) && styles.endMargin]}
         >
           {right}
         </View>
         {title ? (
-          <View pointerEvents="none" style={{ position: 'absolute', left: room, right: room, top: 0, bottom: 0, justifyContent: 'center' }}>
-            <Text v="h3" numberOfLines={1} accessibilityRole="header" style={{ textAlign: 'center' }}>
+          <View pointerEvents="none" style={styles.title(room)}>
+            <Text v="h3" numberOfLines={1} accessibilityRole="header" style={styles.titleText}>
               {title}
             </Text>
           </View>
@@ -81,5 +75,21 @@ const TopBar = ({ title, left, onBack, backIcon, backLabel, reserveBack, right, 
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  bar: (paddingTop: number) => ({ paddingTop, borderBottomWidth: 0, borderBottomColor: theme.colors.line, zIndex: 3 }),
+  solid: { backgroundColor: theme.colors.bg },
+  divided: { borderBottomWidth: 1 },
+  veil: { backgroundColor: theme.colors.bg, opacity: 0.6 },
+  row: (minHeight: number, paddingLeft: number) => ({ minHeight, flexDirection: 'row', alignItems: 'center', paddingLeft, paddingRight: EDGE, gap: 2 }),
+  rowChat: { paddingLeft: theme.spacing[4], paddingRight: theme.spacing[4], gap: 10 },
+  start: { flexDirection: 'row', alignItems: 'center' },
+  square: (size: number) => ({ width: size, height: size }),
+  fill: { flex: 1 },
+  end: (minWidth: number, gap: number) => ({ minWidth, marginLeft: 0, flexDirection: 'row', justifyContent: 'flex-end', gap }),
+  endMargin: { marginLeft: RIGHT_MARGIN },
+  title: (room: number) => ({ position: 'absolute', left: room, right: room, top: 0, bottom: 0, justifyContent: 'center' }),
+  titleText: { textAlign: 'center' },
+}))
 
 export default TopBar

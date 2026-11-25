@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { ConsentPromptListener } from '@/features/chat'
 import { fullPageOptions, modalOptions, sheetOptions, tintedSheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
@@ -15,7 +16,7 @@ const instantNone = ({ route }: { route: { params?: unknown } }) => ({ animation
 const SignedInStack = () => {
   const c = useColors()
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.root}>
       <ConsentPromptListener />
       <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
@@ -77,5 +78,9 @@ const SignedInStack = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  root: { flex: 1 },
+}))
 
 export default SignedInStack

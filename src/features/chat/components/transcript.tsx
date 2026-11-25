@@ -1,4 +1,5 @@
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Text } from '@/shared/components'
 import type { TranscriptEntry } from '../utils/reducer'
 import BotText from './entries/bot'
@@ -7,7 +8,7 @@ import UserBubble from './entries/user'
 import StatusLine from './status-line'
 
 const Transcript = ({ entries }: { entries: readonly TranscriptEntry[] }) => (
-  <View style={{ gap: 18 }}>
+  <View style={styles.list}>
     {entries.map((entry) => {
       if (entry.type === 'status') return <StatusLine key={entry.id} line={entry.line} />
       if (entry.type === 'notice') return <Notice key={entry.id} id={entry.id} notice={entry.notice} />
@@ -21,5 +22,9 @@ const Transcript = ({ entries }: { entries: readonly TranscriptEntry[] }) => (
     })}
   </View>
 )
+
+const styles = StyleSheet.create({
+  list: { gap: 18 },
+})
 
 export default Transcript

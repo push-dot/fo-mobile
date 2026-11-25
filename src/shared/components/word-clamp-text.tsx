@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { View, type StyleProp, type ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { type } from '../../theme'
 import { clampLines, dotted, longestFit } from '../utility'
 import Text from './text'
@@ -27,13 +28,13 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
         accessible={false}
         importantForAccessibility="no-hide-descendants"
         pointerEvents="none"
-        style={[style, { position: 'absolute', left: 0, right: 0, opacity: 0 }]}
+        style={[style, styles.measure]}
         onTextLayout={(e) => setLaid({ text, lines: e.nativeEvent.lines.map((line) => line.text), widest: Math.max(...e.nativeEvent.lines.map((line) => line.width)) })}
       >
         {text}
       </Text>
       {candidates && laid ? (
-        <View pointerEvents="none" style={{ position: 'absolute', left: 0, width: 2000, opacity: 0 }}>
+        <View pointerEvents="none" style={styles.probe}>
           <Text
             {...rest}
             accessible={false}
@@ -68,12 +69,12 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
                 {line.trimEnd()}
               </Text>
             ))}
-            <View style={{ flexDirection: 'row' }}>
+            <View style={styles.row}>
               <Text {...rest} style={style}>
                 {last.trimEnd()}
               </Text>
-              <View style={{ width: 0 }}>
-                <Text {...rest} numberOfLines={1} style={[style, { width: 48, textAlign: 'left' }]}>
+              <View style={styles.zero}>
+                <Text {...rest} numberOfLines={1} style={[style, styles.ellipsis]}>
                   …
                 </Text>
               </View>
@@ -88,5 +89,13 @@ const WordClampText = ({ children: text, lines, ellipsis, wrapperStyle, style, .
     </View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  measure: { position: 'absolute', left: 0, right: 0, opacity: 0 },
+  probe: { position: 'absolute', left: 0, width: 2000, opacity: 0 },
+  row: { flexDirection: 'row' },
+  zero: { width: 0 },
+  ellipsis: { width: 48, textAlign: 'left' },
+}))
 
 export default WordClampText

@@ -17,14 +17,11 @@ import {
 } from '@/features/my'
 import { openPostingBot } from '@/features/bots'
 import { CtaBar, Badge, Button, Chip, GlassButton, Icon, Skeleton, Text, TopBar } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Box = 'received' | 'sent'
 
-const DECLINE_INSET = Platform.OS === 'ios' ? spacing[1] : 0
-
 const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: Box }) => {
-  const c = useColors()
   const { data: o, isLoading } = useOffer(id)
   const box = useViewerBox(o, hint)
   const { decline } = useOfferDecision(id, '', () => undefined)
@@ -32,10 +29,10 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
 
   if (isLoading || !o) {
     return (
-      <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={styles.root}>
         <TopBar onBack={() => router.back()} />
         {isLoading ? (
-          <View style={{ gap: spacing[4], padding: spacing[5] }}>
+          <View style={styles.loading}>
             <Skeleton width="60%" height={24} />
             <Skeleton width="100%" height={96} />
           </View>
@@ -52,7 +49,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
   const p = o.posting
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.root}>
       <TopBar
         onBack={() => router.back()}
         right={
@@ -68,18 +65,18 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
         }
       />
       <ScrollView
-        contentContainerStyle={{ gap: spacing[5], paddingTop: spacing[1], paddingHorizontal: spacing[5], paddingBottom: 120 }}
+        contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
+        <View style={styles.head}>
           {who.kind === 'COMPANY' ? (
             <Logo name={who.companyName ?? who.displayName} size={56} mono />
           ) : (
             <Avatar name={who.displayName} url={who.avatarUrl} size={56} />
           )}
-          <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
-              <Text v="h3" accessibilityRole="header" numberOfLines={1} style={{ flexShrink: 1 }}>
+          <View style={styles.headText}>
+            <View style={styles.nameRow}>
+              <Text v="h3" accessibilityRole="header" numberOfLines={1} style={styles.name}>
                 {who.displayName}
               </Text>
               <Badge label={badge.label} tone={badge.tone} />
@@ -91,22 +88,15 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             ) : null}
           </View>
         </View>
-        <View style={{ alignSelf: 'flex-start' }}>
+        <View style={styles.profileChip}>
           <Chip label="허브 프로필 보기" icon="user" chevron onPress={() => router.push(`/profiles/${who.id}`)} />
         </View>
-        <View
-          style={{
-            borderRadius: radius.card,
-            backgroundColor: c.bg2,
-            paddingVertical: spacing[4],
-            paddingHorizontal: spacing[5],
-          }}
-        >
-          <Text v="b1" style={{ lineHeight: 25 }}>
+        <View style={styles.message}>
+          <Text v="b1" style={styles.messageText}>
             {o.message}
           </Text>
         </View>
-        <Text v="c1" color="t3" style={{ marginTop: -spacing[2] }}>
+        <Text v="c1" color="t3" style={styles.meta}>
           {monthDay(o.createdAt)} {clock(o.createdAt)} · {box === 'received' ? '받음' : '보냄'}
         </Text>
 
@@ -116,17 +106,9 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
           <Pressable
             accessibilityRole="button"
             onPress={() => openPostingBot(p.id)}
-            style={{
-              paddingVertical: spacing[4],
-              paddingHorizontal: spacing[5],
-              borderRadius: radius.card,
-              backgroundColor: c.bg2,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: spacing[3],
-            }}
+            style={styles.bot}
           >
-            <Text v="b2" weight="700" style={{ flex: 1 }}>
+            <Text v="b2" weight="700" style={styles.flex}>
               Bot한테 이 공고 보내기
             </Text>
             <Icon name="chev" size={18} color="t3" />
@@ -140,7 +122,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             label="거절"
             variant="secondary"
             disabled={decline.isPending}
-            style={{ paddingHorizontal: DECLINE_INSET }}
+            style={styles.decline}
             onPress={() =>
               Alert.alert('이 제안을 거절할까요?', `${o.sender.displayName} 님에게 이번 제안은 정중히 거절한다고 전해요.`, [
                 { text: '취소', style: 'cancel' },
@@ -148,11 +130,36 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
               ])
             }
           />
-          <Button label="수락하고 답장하기" onPress={() => router.push(`/offers/${o.id}/reply`)} style={{ flex: 1 }} />
+          <Button label="수락하고 답장하기" onPress={() => router.push(`/offers/${o.id}/reply`)} style={styles.flex} />
         </CtaBar>
       ) : null}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.bg },
+  loading: { gap: theme.spacing[4], padding: theme.spacing[5] },
+  content: { gap: theme.spacing[5], paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 120 },
+  head: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[4] },
+  headText: { flex: 1, minWidth: 0, gap: theme.spacing[1] },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  name: { flexShrink: 1 },
+  profileChip: { alignSelf: 'flex-start' },
+  message: { borderRadius: theme.radius.card, backgroundColor: theme.colors.bg2, paddingVertical: theme.spacing[4], paddingHorizontal: theme.spacing[5] },
+  messageText: { lineHeight: 25 },
+  meta: { marginTop: -theme.spacing[2] },
+  bot: {
+    paddingVertical: theme.spacing[4],
+    paddingHorizontal: theme.spacing[5],
+    borderRadius: theme.radius.card,
+    backgroundColor: theme.colors.bg2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[3],
+  },
+  flex: { flex: 1 },
+  decline: { paddingHorizontal: Platform.OS === 'ios' ? theme.spacing[1] : 0 },
+}))
 
 export default OfferDetailScreen

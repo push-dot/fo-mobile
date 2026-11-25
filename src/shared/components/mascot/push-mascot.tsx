@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Animated, Easing, PixelRatio, View, type ViewStyle } from 'react-native'
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg'
+import { StyleSheet } from 'react-native-unistyles'
 import { useColors, useThemeMode } from '../../../theme'
 import { MASCOT_FACE, mascotAccent, mascotPalette, type MascotColor } from '../../../theme/mascot'
 import { useReduceMotion } from '../use-reduce-motion'
@@ -199,9 +200,9 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
       accessibilityLabel={accessibilityLabel}
       accessibilityElementsHidden={!labelled}
       importantForAccessibility={labelled ? 'yes' : 'no-hide-descendants'}
-      style={{ width: size, height: size, pointerEvents: 'none' }}
+      style={[styles.box(size), styles.passThrough]}
     >
-      <Animated.View key={moves ? 'moves' : 'still'} style={[{ width: size, height: size }, layers.body]}>
+      <Animated.View key={moves ? 'moves' : 'still'} style={[styles.box(size), layers.body]}>
         <Svg {...FILL} viewBox="0 0 100 100">
           <Path d={BODY} fill={pal.body} />
           <Path d={FOLD_OUT} fill={pal.foldDark} />
@@ -257,5 +258,10 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
     </View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  box: (size: number) => ({ width: size, height: size }),
+  passThrough: { pointerEvents: 'none' },
+}))
 
 export default Mascot

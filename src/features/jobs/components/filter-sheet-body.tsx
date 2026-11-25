@@ -1,6 +1,7 @@
 import { Platform, Pressable, View, type LayoutChangeEvent } from 'react-native'
 import { CAREER_YEARS, EMPLOYMENT_TYPES, JOB_CATEGORIES } from '@push/api-client'
 import { FilterSheetNav, SheetScroll, Text } from '../../../shared/components'
+import { StyleSheet } from 'react-native-unistyles'
 import { hitSlopTo, type } from '../../../theme'
 import { FILTER_TITLES } from '../constants'
 import { EMPTY, toggle, toggleRegion, type FilterKey, type Filters } from '../utils'
@@ -37,16 +38,16 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
   const isheet = ios && kind !== 'location'
   const reset = () => set(EMPTY[kind])
   return (
-    <View style={{ gap: compact || isheet ? 0 : 14, flexGrow: 1 }}>
+    <View style={[styles.body, (compact || isheet) && styles.tight]}>
       {isheet ? (
         <FilterSheetNav title={FILTER_TITLES[kind]} onReset={reset} />
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: compact ? 52 : undefined }}>
-          <View style={{ width: REGION_SLOT }} />
-          <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
+        <View style={[styles.header, compact && styles.headerCompact]}>
+          <View style={styles.slot} />
+          <Text v="h3" accessibilityRole="header" style={styles.title}>
             {FILTER_TITLES[kind]}
           </Text>
-          <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }} style={{ width: REGION_SLOT, alignItems: 'flex-end' }}>
+          <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }} style={styles.reset}>
             <Text v="c1" weight={ios ? '400' : '700'} color={ios ? 'ac' : 'acText'}>
               초기화
             </Text>
@@ -54,7 +55,7 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
         </View>
       )}
       {scroll && kind !== 'location' ? (
-        <SheetScroll keyboardShouldPersistTaps="handled" style={{ maxHeight: scroll.maxHeight }} onLayout={scroll.onLayout} contentContainerStyle={{ gap: isheet ? 0 : 14 }}>
+        <SheetScroll keyboardShouldPersistTaps="handled" style={styles.scroll(scroll.maxHeight)} onLayout={scroll.onLayout} contentContainerStyle={isheet ? styles.tight : styles.options}>
           {options}
         </SheetScroll>
       ) : (
@@ -63,5 +64,17 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  body: { gap: 14, flexGrow: 1 },
+  tight: { gap: 0 },
+  options: { gap: 14 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerCompact: { minHeight: 52 },
+  slot: { width: REGION_SLOT },
+  title: { flex: 1, textAlign: 'center' },
+  reset: { width: REGION_SLOT, alignItems: 'flex-end' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+})
 
 export default FilterSheetBody

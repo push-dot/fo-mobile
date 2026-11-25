@@ -3,6 +3,7 @@ import { LegendList, type LegendListRef } from '@legendapp/list/react-native'
 import { useEffect, useRef, useState } from 'react'
 import { KeyboardAvoidingView, Platform, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import { usePersonalPurchase } from '@/features/billing'
 import { accountPath, materialPickerPath, useBot, useBotProfile, type BotId } from '@/features/bots'
 import {
@@ -54,24 +55,22 @@ import {
 import { useReferenceConsent } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
-import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
 const AT_BOTTOM = 40
 const OPEN_REST_MS = 800
 
-const Gap = () => <View style={{ height: BUBBLE_GAP }} />
+const Gap = () => <View style={styles.gap} />
 
 const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
 
 const BotChatScreen = () => {
   const raw = useLocalSearchParams<{ botId: string }>().botId
   const address = addressOf(raw)
-  const c = useColors()
   const [tryN, setTryN] = useState(0)
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <Opened key={`${address}:${tryN}`} address={address} onRetry={() => setTryN((n) => n + 1)} />
     </View>
   )
@@ -106,11 +105,11 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
 
   if (id) return <Thread id={id} />
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.flex}>
       <HeaderPill leading={leading} />
       {failed ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], padding: spacing[5] }}>
-          <Text v="c1" color="t2" style={{ flex: 1 }}>
+        <View style={styles.failed}>
+          <Text v="c1" color="t2" style={styles.flex}>
             대화를 불러오지 못했어요
           </Text>
           <Button label="다시 불러오기" size="sm" variant="secondary" onPress={onRetry} />
@@ -198,10 +197,9 @@ const Thread = ({ id }: { id: string }) => {
   }
   const onboardingMotion = { key: `${id}/onboarding`, live }
   const maintainScrollAtEnd = { animated: followScroll(true, working, reduceMotion) === 'animated' }
-  const contentContainerStyle = { paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: threadBottomGap(keyboard) }
-  const listHeader = <View style={{ height: headerH }} />
+  const listHeader = <View style={styles.height(headerH)} />
   const listFooter = queue.length ? (
-    <View style={{ gap: BUBBLE_GAP, paddingTop: BUBBLE_GAP }}>
+    <View style={styles.queue}>
       {queue.map((item, i) => (
         <Queued key={`${i}-${item.text}`} text={item.text} />
       ))}
@@ -209,21 +207,21 @@ const Thread = ({ id }: { id: string }) => {
   ) : null
 
   return (
-    <View style={{ flex: 1 }}>
-      <View onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 }}>
+    <View style={styles.flex}>
+      <View onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)} style={styles.header}>
         {find.open ? (
           <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
         ) : (
           <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} leading={leading} onFind={find.show} />
         )}
       </View>
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior="padding" style={styles.flex}>
       {empty && kind && name ? (
         <RowMotion.Provider value={onboardingMotion}>
           <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
         </RowMotion.Provider>
       ) : (
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <ChatBotColor.Provider value={color}>
       <FindHighlight.Provider value={find.highlight}>
       <LegendList
@@ -244,7 +242,7 @@ const Thread = ({ id }: { id: string }) => {
         scrollEventThrottle={100}
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={contentContainerStyle}
+        contentContainerStyle={styles.thread(threadBottomGap(keyboard))}
         ItemSeparatorComponent={Gap}
         ListHeaderComponent={listHeader}
         ListFooterComponent={listFooter}
@@ -255,7 +253,7 @@ const Thread = ({ id }: { id: string }) => {
       </View>
       )}
       {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
-      <View style={{ paddingHorizontal: spacing[3], paddingBottom: keyboard ? spacing[2] : insets.bottom + COMPOSER_BOTTOM }}>
+      <View style={styles.composer(keyboard ? null : insets.bottom + COMPOSER_BOTTOM)}>
         <ComposerArea
           botId={id}
           inputRef={input}
@@ -285,6 +283,18 @@ const Thread = ({ id }: { id: string }) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  flex: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  gap: { height: BUBBLE_GAP },
+  failed: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], padding: theme.spacing[5] },
+  height: (height: number) => ({ height }),
+  queue: { gap: BUBBLE_GAP, paddingTop: BUBBLE_GAP },
+  header: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 },
+  thread: (paddingBottom: number) => ({ paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[4], paddingBottom }),
+  composer: (paddingBottom: number | null) => ({ paddingHorizontal: theme.spacing[3], paddingBottom: paddingBottom ?? theme.spacing[2] }),
+}))
 
 const BotChatScreenWithXlChrome = () => (
   <XlBoardChrome>

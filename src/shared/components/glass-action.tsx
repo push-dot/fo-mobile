@@ -1,6 +1,7 @@
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { IconName } from '@push/design-system'
-import { radius, useColors, type Colors } from '../../theme'
+import { useColors, type Colors } from '../../theme'
 import { PRESS_SCALE } from './constants'
 import Icon, { type AppIconName } from './icon'
 import Menu from './menu'
@@ -21,27 +22,14 @@ export type GlassAction = {
 const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction; width: number; iconSize?: number; filled?: boolean }) => {
   const c = useColors()
   const { button } = useXlChrome()
-  const box = { height: button, minWidth: width, alignItems: 'center', justifyContent: 'center' } as const
   const face = (
     <>
       <Icon name={a.icon} size={iconSize} color={a.active ? c.acText : c[a.color ?? 't1']} filled={a.active} />
       {a.badge ? (
         <View
-          style={{
-            position: 'absolute',
-            top: 4,
-            right: 2,
-            minWidth: 18,
-            height: 18,
-            paddingHorizontal: 5,
-            borderRadius: radius.pill,
-            backgroundColor: c.t1,
-            boxShadow: `0 0 0 2px ${c.bg}`,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          style={styles.badge}
         >
-          <Text v="tab" weight="800" style={{ color: c.bg }}>
+          <Text v="tab" weight="800" style={styles.badgeText}>
             {a.badge > 99 ? '99+' : a.badge}
           </Text>
         </View>
@@ -51,7 +39,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
   if (a.menu) {
     return (
       <Menu actions={a.menu} accessibilityLabel={a.label}>
-        <View style={[box, filled ? { backgroundColor: c.fill, borderRadius: radius.pill } : null]}>{face}</View>
+        <View style={[styles.box(button, width), filled && styles.filled]}>{face}</View>
       </Menu>
     )
   }
@@ -63,14 +51,31 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
       onPress={a.onPress}
       hitSlop={4}
       android_ripple={filled ? { color: c.fill2, foreground: true } : undefined}
-      style={({ pressed }) => [
-        box,
-        filled ? { backgroundColor: c.fill, borderRadius: radius.pill, overflow: 'hidden', transform: [{ scale: pressed ? PRESS_SCALE : 1 }] } : null,
-      ]}
+      style={({ pressed }) => [styles.box(button, width), filled && styles.filled, filled && styles.pressable(pressed)]}
     >
       {face}
     </Pressable>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  box: (height: number, minWidth: number) => ({ height, minWidth, alignItems: 'center', justifyContent: 'center' }),
+  filled: { backgroundColor: theme.colors.fill, borderRadius: theme.radius.pill },
+  pressable: (pressed: boolean) => ({ overflow: 'hidden', transform: [{ scale: pressed ? PRESS_SCALE : 1 }] }),
+  badge: {
+    position: 'absolute',
+    top: 4,
+    right: 2,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 5,
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.t1,
+    boxShadow: `0 0 0 2px ${theme.colors.bg}`,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: { color: theme.colors.bg },
+}))
 
 export default GlassActionButton

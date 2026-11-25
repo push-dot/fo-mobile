@@ -1,8 +1,9 @@
 import { createContext, Fragment, useContext, useEffect, useId, useRef, useState, type ComponentProps, type ComponentRef, type RefObject } from 'react'
-import { StyleSheet, Text as RNText, View } from 'react-native'
+import { Text as RNText, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Text } from '@/shared/components'
 import { WORD_JOINER } from '@/shared/utility/keep-words'
-import { onAccent, type as typography, useColors } from '../../../../theme'
+import { onAccent, type as typography } from '../../../../theme'
 import { MARK_RADIUS, markRects, splitMarks, type MarkEdges, type Point, type TextLine } from '../../utils/find'
 
 export const FindHighlight = createContext<{ query: string; currentId?: string; currentHit?: number }>({ query: '' })
@@ -14,7 +15,7 @@ const FindPaint = createContext<Paint | null>(null)
 const FindDrawn = createContext<ReadonlySet<string>>(new Set())
 
 const MARK_PAD = { left: 2, right: 1.5 }
-const Pad = ({ pt }: { pt: number }) => <RNText style={{ fontSize: pt / 0.224, letterSpacing: 0 }}>{'\xa0'}</RNText>
+const Pad = ({ pt }: { pt: number }) => <RNText style={styles.pad(pt)}>{'\xa0'}</RNText>
 
 const ZERO = { width: 0, height: 0 }
 
@@ -31,7 +32,6 @@ const Edge = ({ markKey, side }: { markKey: string; side: 'left' | 'right' }) =>
 export const Marked = ({ text, itemId, current: lineCurrent }: { text: string; itemId: string; current?: boolean }) => {
   const { query, currentId } = useContext(FindHighlight)
   const drawn = useContext(FindDrawn)
-  const c = useColors()
   const id = useId()
   if (!query.trim()) return <>{text}</>
   const current = lineCurrent ?? itemId === currentId
@@ -43,7 +43,7 @@ export const Marked = ({ text, itemId, current: lineCurrent }: { text: string; i
         return (
           <Fragment key={i}>
             <Edge markKey={key} side="left" />
-            <RNText style={{ color: current ? onAccent : undefined, backgroundColor: drawn.has(key) ? undefined : current ? c.ac : c.acSoft }}>
+            <RNText style={[current && styles.markOn, !drawn.has(key) && (current ? styles.fillOn : styles.fill)]}>
               <Pad pt={MARK_PAD.left} />
               {mark.text}
               <Pad pt={MARK_PAD.right} />
@@ -59,7 +59,6 @@ export const Marked = ({ text, itemId, current: lineCurrent }: { text: string; i
 
 export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onTextLayout, children, ...rest }: ComponentProps<typeof Text> & { itemId: string; current?: boolean }) => {
   const { query, currentId } = useContext(FindHighlight)
-  const c = useColors()
   const fontSize = StyleSheet.flatten(style)?.fontSize ?? typography[v].fontSize
   const latest = useRef<TextLine[]>([])
   const [lines, setLines] = useState<TextLine[]>([])
@@ -110,7 +109,7 @@ export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onText
         <View ref={wrapper} collapsable={false}>
           {placed.flatMap((mark) =>
             mark.rects.map((box, i) => (
-              <View key={`${mark.key}:${i}`} pointerEvents="none" style={{ position: 'absolute', ...box, borderRadius: MARK_RADIUS, backgroundColor: (lineCurrent ?? itemId === currentId) ? c.ac : c.acSoft }} />
+              <View key={`${mark.key}:${i}`} pointerEvents="none" style={[styles.box(box), (lineCurrent ?? itemId === currentId) ? styles.fillOn : styles.fill]} />
             )),
           )}
           <Text v={v} style={style} onTextLayout={onLines} {...rest}>
@@ -121,3 +120,11 @@ export const FindText = ({ itemId, current: lineCurrent, v = 'b2', style, onText
     </FindPaint.Provider>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  pad: (pt: number) => ({ fontSize: pt / 0.224, letterSpacing: 0 }),
+  markOn: { color: onAccent },
+  fill: { backgroundColor: theme.colors.acSoft },
+  fillOn: { backgroundColor: theme.colors.ac },
+  box: (box: ReturnType<typeof markRects>[number]) => ({ position: 'absolute', ...box, borderRadius: MARK_RADIUS }),
+}))

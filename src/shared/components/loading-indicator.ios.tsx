@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Animated, Easing } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import Svg, { Circle } from 'react-native-svg'
 import { useColors } from '../../theme'
 
@@ -16,9 +17,9 @@ const LoadingIndicator = () => {
     loop.start()
     return () => loop.stop()
   }, [turn])
-  const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] })
+  const spin = { transform: [{ rotate: turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }
   return (
-    <Animated.View style={{ width: SIZE, height: SIZE, transform: [{ rotate }] }}>
+    <Animated.View style={[styles.box, spin]}>
       <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
         <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} stroke={c.fill2} strokeWidth={STROKE} fill="none" />
         <Circle
@@ -36,5 +37,9 @@ const LoadingIndicator = () => {
     </Animated.View>
   )
 }
+
+const styles = StyleSheet.create(() => ({
+  box: { width: SIZE, height: SIZE },
+}))
 
 export default LoadingIndicator

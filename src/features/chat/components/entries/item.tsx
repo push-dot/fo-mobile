@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Animated, Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import BotText from './bot'
 import { Dot } from './glyph'
 import Rich from './rich'
 import Notice from './notice'
 import UserBubble, { useBubbleMax } from './user'
-import { radius, spacing, useColors, type Colors } from '../../../../theme'
+import { useColors, type Colors } from '../../../../theme'
 import { Button, Icon, Text, type A2uiLocal } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
 import { paymentsOpen } from '@/features/billing'
@@ -25,10 +26,7 @@ type Of<K extends ChatItem['type']> = Extract<ChatItem, { type: K }>
 
 const dotColor = (c: Colors, s: ToolState) => ({ run: c.t3, ok: c.green, err: c.red, wait: c.orange })[s]
 
-const Elbow = () => {
-  const c = useColors()
-  return <View style={{ width: 10, height: 10, marginTop: 2, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: c.deco, borderBottomLeftRadius: 3 }} />
-}
+const Elbow = () => <View style={styles.elbow} />
 
 export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   const c = useColors()
@@ -36,13 +34,14 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   const pop = usePop(item.state === 'ok')
   const extra = item.extra ?? []
   const result = [item.warning, item.result].filter(Boolean).join(' · ')
+  const popStyle = { transform: [{ scale: pop }] }
   return (
-    <Appear style={{ gap: spacing[1] }}>
-      <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
-        <Animated.View style={{ transform: [{ scale: pop }] }}>
+    <Appear style={styles.tool}>
+      <View style={styles.toolRow}>
+        <Animated.View style={popStyle}>
           <Dot color={item.warning && item.state === 'ok' ? c.orange : dotColor(c, item.state)} top={7} />
         </Animated.View>
-        <Text v="b2" style={{ flex: 1 }}>
+        <Text v="b2" style={styles.flex}>
           <Text v="b2" weight="700">
             {item.action}
           </Text>
@@ -55,24 +54,24 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
         </Text>
       </View>
       {item.error ? (
-        <Appear kind="fade" style={{ flexDirection: 'row', gap: spacing[2], paddingLeft: spacing[1] }}>
+        <Appear kind="fade" style={styles.detail}>
           <Elbow />
-          <Text v="c1" weight="600" color="red" style={{ flex: 1, fontSize: 14, lineHeight: 20 }}>
+          <Text v="c1" weight="600" color="red" style={[styles.flex, styles.small]}>
             {item.error}
           </Text>
         </Appear>
       ) : result ? (
-        <Appear kind="fade" key={item.state} style={{ flexDirection: 'row', gap: spacing[2], paddingLeft: spacing[1] }}>
+        <Appear kind="fade" key={item.state} style={styles.detail}>
           <Elbow />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
-              <Rich v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }} text={result} />
+          <View style={styles.result}>
+            <Text v="c1" color="t2" style={styles.small}>
+              <Rich v="c1" color="t2" style={styles.small} text={result} />
               {extra.length && !open ? (
                 <Text
                   v="c1"
                   color="t3"
                   weight="600"
-                  style={{ fontSize: 14 }}
+                  style={styles.more}
                   accessibilityRole="button"
                   accessibilityLabel={`${extra.length}줄 더 보기`}
                   onPress={() => setOpen(true)}
@@ -85,7 +84,7 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
             {open ? (
               <Appear kind="fade">
                 <Pressable accessibilityRole="button" accessibilityLabel="접기" onPress={() => setOpen(false)}>
-                  <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20 }}>
+                  <Text v="c1" color="t2" style={styles.small}>
                     {extra.join('\n')}
                   </Text>
                 </Pressable>
@@ -98,38 +97,28 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   )
 }
 
-const Surface = ({ children }: { children: React.ReactNode }) => {
-  const c = useColors()
-  return (
-    <View
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], padding: 14, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}
-    >
-      {children}
-    </View>
-  )
-}
+const Surface = ({ children }: { children: React.ReactNode }) => <View style={styles.surface}>{children}</View>
 
 const ShareButton = ({ onPress }: { onPress: () => void }) => (
-  <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+  <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={styles.share}>
     <Icon name="share" size={20} color="t2" />
   </Pressable>
 )
 
 const FileCard = ({ item }: { item: Of<'file'> }) => {
-  const c = useColors()
   const open = useOpenArtifact()
   const share = () => (item.url ? open.mutate({ url: item.url, name: item.name }) : void shareMessage({ message: item.name, title: item.name }))
   const done = item.progress === undefined || item.progress >= 1
   return (
     <Appear>
       <Surface>
-        <View style={{ flex: 1, minWidth: 0, gap: spacing[1] }}>
+        <View style={styles.file}>
           <Text v="b2" weight="700" numberOfLines={1}>
             {displayName(item.name)}
           </Text>
           {!done ? (
-            <View style={{ height: 6, borderRadius: 3, backgroundColor: c.fill2, overflow: 'hidden' }}>
-              <View style={{ width: `${(item.progress ?? 0) * 100}%`, height: '100%', backgroundColor: c.ac }} />
+            <View style={styles.track}>
+              <View style={styles.bar(item.progress ?? 0)} />
             </View>
           ) : item.meta ? (
             <Text v="c1" color="t3">
@@ -193,19 +182,36 @@ const PlanRequired = ({ id }: { id: string }) => {
 }
 
 export const Queued = ({ text }: { text: string }) => {
-  const c = useColors()
   const maxWidth = useBubbleMax(27)
   return (
     <Appear
       kind="bubble"
-      style={{ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderRadius: 14, backgroundColor: c.fill }}
+      style={styles.queued(maxWidth)}
     >
       <Icon name="clock" size={16} color="t2" />
-      <Text v="c1" color="t2" style={{ fontSize: 14, lineHeight: 20, flexShrink: 1 }}>
+      <Text v="c1" color="t2" style={[styles.small, styles.shrink]}>
         {text}
       </Text>
     </Appear>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  elbow: { width: 10, height: 10, marginTop: 2, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: theme.colors.deco, borderBottomLeftRadius: 3 },
+  tool: { gap: theme.spacing[1] },
+  toolRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
+  flex: { flex: 1 },
+  small: { fontSize: 14, lineHeight: 20 },
+  more: { fontSize: 14 },
+  shrink: { flexShrink: 1 },
+  detail: { flexDirection: 'row', gap: theme.spacing[2], paddingLeft: theme.spacing[1] },
+  result: { flex: 1, gap: 2 },
+  surface: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], padding: 14, borderRadius: theme.radius.lg, borderBottomLeftRadius: theme.radius.xs, backgroundColor: theme.colors.fill },
+  share: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  file: { flex: 1, minWidth: 0, gap: theme.spacing[1] },
+  track: { height: 6, borderRadius: 3, backgroundColor: theme.colors.fill2, overflow: 'hidden' },
+  bar: (progress: number) => ({ width: `${progress * 100}%` as const, height: '100%', backgroundColor: theme.colors.ac }),
+  queued: (maxWidth: number) => ({ alignSelf: 'flex-end', maxWidth, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: theme.spacing[2], paddingHorizontal: theme.spacing[3], borderRadius: 14, backgroundColor: theme.colors.fill }),
+}))
 
 export { default as Rich } from './rich'

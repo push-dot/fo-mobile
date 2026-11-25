@@ -2,6 +2,7 @@ import { router } from 'expo-router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { isJobSettled, JOB_CATEGORIES } from '@push/api-client'
 import { botPickPath } from '@/features/bots'
 import { useShareFile } from '@/features/chat'
@@ -33,7 +34,7 @@ import {
 } from '@/features/my'
 import { showChoiceModal } from '@/shared/navigation'
 import { CtaBar, askConfirm, Badge, Button, GlassButton, Icon, showToast, TOAST_ABOVE, Text, TopBar } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { spacing } from '@/theme'
 
 const HUB_BADGE = '지원용 프로필'
 
@@ -50,8 +51,8 @@ const Section = ({
   gap?: number
   children: ReactNode
 }) => (
-  <View style={{ paddingHorizontal: spacing[5], gap }}>
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+  <View style={styles.section(gap)}>
+    <View style={styles.sectionHead}>
       <Text v="h3" accessibilityRole="header">
         {title}
       </Text>
@@ -60,7 +61,7 @@ const Section = ({
           accessibilityRole="button"
           accessibilityLabel={`${title} 편집`}
           onPress={onEdit}
-          style={{ width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' }}
+          style={styles.editButton}
         >
           <Icon name="edit" size={18} color="t3" />
         </Pressable>
@@ -71,7 +72,6 @@ const Section = ({
 )
 
 const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
-  const c = useColors()
   const doc = useDocument(id)
   const versions = useDocumentVersions(id)
   const ingest = useIngestJob(jobId).data
@@ -132,7 +132,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
   const jobLine = [job, tenureLabel(me?.tenureYears ?? null)].filter(Boolean).join(' · ')
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar
         title={application ? undefined : '지원용 프로필'}
         onBack={() => router.back()}
@@ -148,23 +148,23 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
       {doc.isLoading || !item || !lines ? (
         <ListSkeleton />
       ) : (
-        <ScrollView contentContainerStyle={{ paddingBottom: application ? 120 : spacing[6], gap: spacing[6] }}>
-          <View style={{ alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: application ? 0 : spacing[1] }}>
+        <ScrollView contentContainerStyle={[styles.content, !!application && styles.contentWithCta]}>
+          <View style={[styles.hero, !!application && styles.heroWithApplication]}>
             <Avatar name={me?.displayName ?? ''} url={me?.avatarUrl ?? null} size={84} />
-            <Text v="h1" style={{ marginTop: PROFILE_NAME_TOP }}>
+            <Text v="h1" style={styles.name}>
               {me?.displayName}
             </Text>
             {profile.headline || me?.headline ? (
-              <Text v="b2" color="t2" style={{ textAlign: 'center' }}>
+              <Text v="b2" color="t2" style={styles.headline}>
                 {profile.headline || me?.headline}
               </Text>
             ) : null}
-            <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] }}>
+            <View style={styles.badges}>
               {jobLine ? <Badge label={jobLine} tone="grey" /> : null}
               {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
             </View>
             {application ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: PROFILE_ACTIONS_TOP }}>
+              <View style={styles.actions}>
                 <Button label="기본 정보 편집" variant="secondary" size="sm" paddingX={spacing[4]} onPress={() => edit('basic')} />
                 <Button label="내보내기" variant="secondary" size="sm" paddingX={spacing[4]} pending={share.isPending} onPress={() => share.mutate({ documentId: id })} />
               </View>
@@ -178,13 +178,13 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
                 onPress={() =>
                   showChoiceModal({ title: SET_BASE_COPY.action, message: SET_BASE_COPY.body, confirm: { label: SET_BASE_COPY.confirm, closeLabel: SET_BASE_COPY.close, onPress: () => setBase.mutate(id) } })
                 }
-                style={{ marginTop: PROFILE_ACTIONS_TOP }}
+                style={styles.setBase}
               />
             )}
           </View>
 
           {making ? (
-            <View style={{ alignItems: 'center', gap: spacing[2], paddingTop: spacing[5] }}>
+            <View style={styles.making}>
               <ActivityIndicator />
               <Text v="b2" color="t3">
                 만드는 중
@@ -205,12 +205,12 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
               {profile.careers.map((cr, i) => {
                 const last = i === profile.careers.length - 1
                 return (
-                  <View key={`${cr.company}-${i}`} style={{ flexDirection: 'row', gap: spacing[4] }}>
-                    <View style={{ alignItems: 'center', paddingTop: spacing[2] }}>
-                      <View style={{ width: 10, height: 10, borderRadius: radius.pill, backgroundColor: cr.endedOn ? c.t4 : c.ac }} />
-                      {!last ? <View style={{ flex: 1, width: 2, backgroundColor: c.line, marginTop: spacing[1] }} /> : null}
+                  <View key={`${cr.company}-${i}`} style={styles.career}>
+                    <View style={styles.rail}>
+                      <View style={[styles.dot, !!cr.endedOn && styles.dotEnded]} />
+                      {!last ? <View style={styles.railLine} /> : null}
                     </View>
-                    <View style={{ flex: 1, paddingBottom: last ? 0 : spacing[3] }}>
+                    <View style={[styles.careerBody, last && styles.careerBodyLast]}>
                       <Text v="b1" weight="700">
                         {cr.company} · {cr.role}
                       </Text>
@@ -220,7 +220,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
                         </Text>
                       ) : null}
                       {cr.description ? (
-                        <Text v="b2" color="t2" style={{ marginTop: spacing[1] }}>
+                        <Text v="b2" color="t2" style={styles.careerDescription}>
                           {cr.description}
                         </Text>
                       ) : null}
@@ -233,7 +233,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
 
           {profile.skills.length ? (
             <Section title="기술 스택" onEdit={editable('skills')} gap={spacing[3]}>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+              <View style={styles.skills}>
                 {profile.skills.map((s) => (
                   <Badge key={s} label={s} tone="grey" />
                 ))}
@@ -253,12 +253,39 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
             label={applied ? '지원 완료' : '이 서류로 지원'}
             pending={applied}
             onPress={() => router.push({ pathname: '/apply', params: { postingId: application.jobId } })}
-            style={{ flex: 1 }}
+            style={styles.flex}
           />
         </CtaBar>
       ) : null}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  section: (gap: number) => ({ paddingHorizontal: theme.spacing[5], gap }),
+  sectionHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  editButton: { width: 44, height: 44, margin: -6, alignItems: 'center', justifyContent: 'center' },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  content: { paddingBottom: theme.spacing[6], gap: theme.spacing[6] },
+  contentWithCta: { paddingBottom: 120 },
+  hero: { alignItems: 'center', gap: theme.spacing[2], paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[1] },
+  heroWithApplication: { paddingTop: 0 },
+  name: { marginTop: PROFILE_NAME_TOP },
+  headline: { textAlign: 'center' },
+  badges: { flexDirection: 'row', gap: theme.spacing[2], marginTop: theme.spacing[1] },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], marginTop: PROFILE_ACTIONS_TOP },
+  setBase: { marginTop: PROFILE_ACTIONS_TOP },
+  making: { alignItems: 'center', gap: theme.spacing[2], paddingTop: theme.spacing[5] },
+  career: { flexDirection: 'row', gap: theme.spacing[4] },
+  rail: { alignItems: 'center', paddingTop: theme.spacing[2] },
+  dot: { width: 10, height: 10, borderRadius: theme.radius.pill, backgroundColor: theme.colors.ac },
+  dotEnded: { backgroundColor: theme.colors.t4 },
+  railLine: { flex: 1, width: 2, backgroundColor: theme.colors.line, marginTop: theme.spacing[1] },
+  careerBody: { flex: 1, paddingBottom: theme.spacing[3] },
+  careerBodyLast: { paddingBottom: 0 },
+  careerDescription: { marginTop: theme.spacing[1] },
+  skills: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },
+  flex: { flex: 1 },
+}))
 
 export default PushDocScreen

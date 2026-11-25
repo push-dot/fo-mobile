@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native-unistyles'
 import { Badge, Button, Highlight, GlassButton, GlassPressable, Icon, Mascot, Spinner, Text, useKeyboardHeight, WordClampText } from '@/shared/components'
-import { fontFor, onAccent, platformTheme, radius, spacing, useColors, useThemeMode, type } from '@/theme'
+import { fontFor, onAccent, useColors, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
@@ -116,7 +117,6 @@ const fieldValue = (form: CreateForm) => {
 }
 
 const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: () => void; busy?: boolean; enabled: boolean; xl: boolean }) => {
-  const c = useColors()
   return (
     <GlassPressable
       accessibilityRole="button"
@@ -125,11 +125,11 @@ const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: ()
       fill={enabled ? 'ac' : 'fill2'}
       pressedFill="acPress"
       onPress={!enabled || busy ? undefined : onPress}
-      contentStyle={busy ? { gap: spacing[2] } : undefined}
-      style={{ minHeight: xl ? CTA_XL : CTA, borderRadius: platformTheme.buttonRadius, opacity: busy ? CREATING_DIM : 1 }}
+      contentStyle={busy ? styles.ctaBusyContent : undefined}
+      style={[styles.cta, xl && styles.ctaXl, busy && styles.ctaBusy]}
     >
       {busy ? <Spinner size={18} color="onFill" /> : null}
-      <Text weight="700" numberOfLines={1} allowFontScaling={!xl} style={{ flexShrink: 1, color: enabled ? onAccent : c.t3, fontSize: xl ? CTA_FONT_XL : type.button.fontSize, lineHeight: xl ? 30 : type.button.lineHeight }}>
+      <Text weight="700" numberOfLines={1} allowFontScaling={!xl} style={[styles.ctaLabel, !enabled && styles.ctaLabelOff, xl && styles.ctaLabelXl]}>
         {label}
       </Text>
     </GlassPressable>
@@ -139,19 +139,17 @@ const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: ()
 const RING = DOT + 10
 
 const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (next: BotColor) => void }) => {
-  const c = useColors()
-  const ring = { width: RING, height: RING, borderRadius: RING / 2, borderWidth: on ? 2 : 0, borderColor: c.t1, alignItems: 'center' as const, justifyContent: 'center' as const }
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={name} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={{ width: SWATCH, height: SWATCH, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={ring}>
-        <View style={{ width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: MASCOT_PALETTES[name].body }} />
+    <Pressable accessibilityRole="button" accessibilityLabel={name} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={styles.swatch}>
+      <View style={[styles.ring, on && styles.ringOn]}>
+        <View style={styles.dot(name)} />
       </View>
     </Pressable>
   )
 }
 
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
+  <View style={styles.swatches}>
     {BOT_COLORS.map((name) => (
       <Swatch key={name} name={name} on={name === color} onPick={onPick} />
     ))}
@@ -164,34 +162,33 @@ const LIMIT_MASCOT = 64
 const LIMIT_OVERLAP = -14
 
 const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
-  const c = useColors()
   const copy = limit ? limitCopy(limit) : null
   if (!copy) return null
   return (
     <View>
-      <View style={{ alignItems: 'center', gap: 10, paddingTop: 28, paddingHorizontal: 36 }}>
-        <View style={{ flexDirection: 'row', marginBottom: 6 }}>
+      <View style={styles.limitHead}>
+        <View style={styles.limitMascots}>
           {LIMIT_MASCOTS.map((color, i) => (
-            <View key={color} style={{ marginLeft: i > 0 ? LIMIT_OVERLAP : 0 }}>
+            <View key={color} style={i > 0 && styles.overlap}>
               <Mascot size={LIMIT_MASCOT} color={color} motion={{ mode: 'still' }} />
             </View>
           ))}
         </View>
-        <Text v="h2" accessibilityRole="header" style={{ textAlign: 'center' }}>
+        <Text v="h2" accessibilityRole="header" style={styles.center}>
           {copy.title}
         </Text>
-        <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+        <Text v="b2" color="t3" style={styles.center}>
           {copy.body}
         </Text>
       </View>
-      <View style={{ marginTop: spacing[5], backgroundColor: c.bg2, borderRadius: radius.lg, paddingHorizontal: spacing[4] }}>
+      <View style={styles.plans}>
         {copy.rows.map((row, i) => (
-          <View key={row.plan} style={{ minHeight: PLAN_ROW, flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: c.line }}>
+          <View key={row.plan} style={[styles.planRow, i > 0 && styles.planRowDivided]}>
             <Text v="b1" weight="700">
               {row.plan}
             </Text>
             {row.current ? <Badge label={CURRENT_PLAN} tone="grey" /> : null}
-            <Text v="b1" weight="700" color="t2" style={{ marginLeft: 'auto' }}>
+            <Text v="b1" weight="700" color="t2" style={styles.planValue}>
               {row.value}
             </Text>
           </View>
@@ -204,7 +201,6 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
 const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const c = useColors()
   const insets = useSafeAreaInsets()
-  const mode = useThemeMode()
   const keyboard = useKeyboardHeight()
   const window = useWindowDimensions()
   const xl = isXlBoardText(window.fontScale)
@@ -386,39 +382,33 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const fieldFont = xl ? 19 : type.b1.fontSize
   const fieldLine = xl ? 29 : type.b1.lineHeight
   const ios = Platform.OS === 'ios'
-  const fieldBox = { height: control, borderRadius: control / 2, ...(ios ? { boxShadow: FIELD_SHADOW[mode] } : null) }
-  const fieldRow = { flex: 1, flexDirection: 'row' as const, alignItems: 'center' as const, gap: spacing[2], paddingHorizontal: spacing[4] }
   const shell = (children: ReactNode, style?: object) => (
-    <View style={[fieldBox, { backgroundColor: ios ? sheetGlassFill(true, mode === 'dark', c) : c.fill }, style]}>
-      <View style={fieldRow}>{children}</View>
+    <View style={[styles.field(control), style]}>
+      <View style={styles.fieldRow}>{children}</View>
     </View>
   )
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
-  const rowTitle = { justifyContent: 'center' as const, gap: 2, paddingVertical: 14, paddingHorizontal: spacing[4] }
-  const rowTitleText = { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight }
-  const card = { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }
-  const note = { textAlign: 'center' as const, paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight }
   const showRows = phase.kind === 'searching' && !!query && !asLink(query) && rows.length > 0
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
   const noResults = phase.kind === 'searching' && !!query && !asLink(query) && !loading && rows.length === 0
 
   const header = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: (ios ? 0 : insets.top) + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+    <View style={styles.header(ios ? 0 : insets.top)}>
       {organizing ? (
         <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => setOrganizing(false) }]} />
       ) : (
         <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose }]} />
       )}
-      <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[{ flex: 1, textAlign: 'center' }, xl ? { fontSize: 22, lineHeight: 30 } : null]}>
+      <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[styles.title, xl && styles.titleXl]}>
         {organizing ? DELETE_TITLE : SHEET_TITLE}
       </Text>
-      <View style={{ width: FIELD, height: control }} />
+      <View style={styles.spacer(control)} />
     </View>
   )
 
   const preview = (
-    <View style={{ marginTop: 'auto', alignItems: 'center', gap: spacing[2], paddingTop: 2, paddingHorizontal: spacing[6] }}>
+    <View style={styles.preview}>
       <Mascot size={PREVIEW} color={form.color} state={phase.kind === 'creating' ? 'work' : 'idle'} motion={{ mode: phase.kind === 'creating' ? 'animate' : 'still' }} />
       <WordClampText
         lines={2}
@@ -426,13 +416,13 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         weight={name ? '800' : '700'}
         color={name ? 't1' : 't3'}
         allowFontScaling={!xl}
-        wrapperStyle={{ width: '100%', maxWidth: 320, alignItems: 'center' }}
-        style={{ fontSize: 24, lineHeight: 32, textAlign: 'center' }}
+        wrapperStyle={styles.previewNameWrap}
+        style={styles.previewName}
       >
         {name ?? NAME_PLACEHOLDER}
       </WordClampText>
       {posting ? (
-        <Text color="t3" allowFontScaling={!xl} style={{ fontSize: PREVIEW_SUB, lineHeight: PREVIEW_SUB_LINE, textAlign: 'center' }}>
+        <Text color="t3" allowFontScaling={!xl} style={styles.previewSub}>
           {posting.title}
         </Text>
       ) : null}
@@ -442,73 +432,73 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const fieldShell =
     !posting
       ? shell(
-          <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={SEARCH_PLACEHOLDER} onPress={() => setForm(focusSearch)} style={styles.fieldPress}>
             {searchIcon}
-            <Text color="t3" allowFontScaling={!xl} style={{ flex: 1, fontSize: fieldFont, lineHeight: fieldLine }}>
+            <Text color="t3" allowFontScaling={!xl} style={[styles.flex, styles.fieldType(fieldFont, fieldLine)]}>
               {SEARCH_PLACEHOLDER}
             </Text>
           </Pressable>,
-          { marginHorizontal: spacing[4] },
+          styles.fieldInset,
         )
       : shell(
           <>
             {searchIcon}
-            <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={{ flex: 1 }}>
-              <WordClampText lines={1} ellipsis="inline" allowFontScaling={!xl} style={{ fontSize: fieldFont, lineHeight: fieldLine }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={pickedLine(posting)} onPress={phase.kind === 'creating' ? undefined : () => setForm(focusSearch)} style={styles.flex}>
+              <WordClampText lines={1} ellipsis="inline" allowFontScaling={!xl} style={styles.fieldType(fieldFont, fieldLine)}>
                 {pickedLine(posting)}
               </WordClampText>
             </Pressable>
             {phase.kind === 'creating' ? null : (
-              <Pressable accessibilityRole="button" accessibilityLabel="지우기" onPress={() => setForm(clearPosting)} style={{ width: 44, height: 44, marginRight: -14, alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: c.fill2, alignItems: 'center', justifyContent: 'center' }}>
+              <Pressable accessibilityRole="button" accessibilityLabel="지우기" onPress={() => setForm(clearPosting)} style={styles.clearHit}>
+                <View style={styles.clearDot}>
                   <Icon name="x" size={12} color="t2" />
                 </View>
               </Pressable>
             )}
           </>,
-          { marginHorizontal: spacing[4] },
+          styles.fieldInset,
         )
-  const mainField = phase.kind === 'creating' ? <View style={{ opacity: FIELD_DIS }}>{fieldShell}</View> : fieldShell
+  const mainField = phase.kind === 'creating' ? <View style={styles.dim}>{fieldShell}</View> : fieldShell
 
   const searchBody = (
     <>
-      <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: noResults ? 'center' : keepTop ? 'flex-start' : 'flex-end' }}>
-        {noResults ? <Text color="t3" style={[note, { paddingBottom: 0 }]}>{SEARCH_EMPTY}</Text> : null}
+      <ScrollView keyboardShouldPersistTaps="handled" style={styles.flex} contentContainerStyle={styles.searchContent(noResults ? 'center' : keepTop ? 'flex-start' : 'flex-end')}>
+        {noResults ? <Text color="t3" style={[styles.note, styles.noteFlush]}>{SEARCH_EMPTY}</Text> : null}
         {showRows
           ? rows.map((row) => (
-              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[rowTitle, card]}>
-                <Text v="b1" weight="600" style={rowTitleText}>
+              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[styles.rowTitle, styles.card]}>
+                <Text v="b1" weight="600" style={styles.rowTitleText}>
                   <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
                 </Text>
-                <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
+                <Text color="t3" style={styles.meta}>
                   {row.meta}
                 </Text>
               </Pressable>
             ))
           : null}
         {linkWait ? (
-          <View style={{ gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[5], paddingBottom: BAR }}>
-            <View style={{ width: '70%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
-            <View style={{ width: '45%', height: 12, borderRadius: BAR, backgroundColor: c.fill }} />
+          <View style={styles.linkWait}>
+            <View style={styles.bar('70%')} />
+            <View style={styles.bar('45%')} />
           </View>
         ) : null}
-        {phase.kind === 'linkBad' ? <Text lineBreakStrategyIOS="hangul-word" style={note}>{LINK_BAD}</Text> : null}
-        {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={note}>{ERROR_BODY}</Text> : null}
+        {phase.kind === 'linkBad' ? <Text lineBreakStrategyIOS="hangul-word" style={styles.note}>{LINK_BAD}</Text> : null}
+        {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={styles.note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
-          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[rowTitle, card]}>
-            <Text weight="600" numberOfLines={2} style={rowTitleText}>
+          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[styles.rowTitle, styles.card]}>
+            <Text weight="600" numberOfLines={2} style={styles.rowTitleText}>
               {pickedLine(phase.posting)}
             </Text>
-            <Text color="t3" style={{ fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight }}>
+            <Text color="t3" style={styles.meta}>
               {phase.meta}
             </Text>
-            <Text color="t3" numberOfLines={1} style={{ fontSize: type.c2.fontSize, lineHeight: type.c2.lineHeight }}>
+            <Text color="t3" numberOfLines={1} style={styles.host}>
               {phase.host}
             </Text>
           </Pressable>
         ) : null}
       </ScrollView>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: spacing[2], paddingHorizontal: spacing[4], paddingBottom: 10 + (keyboard > 0 ? 0 : insets.bottom) }}>
+      <View style={styles.searchBar(keyboard > 0 ? 0 : insets.bottom)}>
         {shell(
           <>
             {searchIcon}
@@ -524,11 +514,11 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoCorrect={false}
               returnKeyType="search"
               allowFontScaling={!xl}
-              style={[{ flex: 1, color: c.t1, fontSize: fieldFont, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fieldFont, paddingVertical: 0 }, fontFor('400')]}
+              style={[styles.input(fieldFont), fontFor('400')]}
             />
             {linkWait ? <Spinner size={18} color="ac" /> : null}
           </>,
-          { flex: 1 },
+          styles.flex,
         )}
         {closeButton}
       </View>
@@ -536,7 +526,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 
   const footer = (
-    <View style={{ gap: spacing[2], paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
+    <View style={styles.footer(insets.bottom)}>
       <Cta
         xl={xl}
         enabled={phase.kind === 'picked' || phase.kind === 'creating' || phase.kind === 'error'}
@@ -548,9 +538,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.flex}
         behavior="padding"
         keyboardVerticalOffset={ios ? window.height - sheetBottom : 0}
         onLayout={(e) => setSheetBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
@@ -560,10 +550,10 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <BotLimitDelete bots={companyBots} onDelete={onDeleteBot} />
         ) : phase.kind === 'limit' ? (
           <>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
+            <ScrollView style={styles.flex} contentContainerStyle={styles.limitContent}>
               <LimitBody limit={bots.limit} />
             </ScrollView>
-            <View style={{ gap: spacing[2], paddingTop: spacing[3], paddingHorizontal: spacing[4], paddingBottom: insets.bottom + spacing[2] }}>
+            <View style={styles.limitActions(insets.bottom)}>
               <Button label={UPGRADE_LABEL} onPress={onUpgrade} />
               <Button label={ORGANIZE_LABEL} variant="secondary" onPress={() => setOrganizing(true)} />
             </View>
@@ -572,14 +562,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           searchBody
         ) : (
           <>
-            <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 28, paddingTop: spacing[1] }}>
+            <ScrollView keyboardShouldPersistTaps="handled" style={styles.flex} contentContainerStyle={styles.mainContent}>
               {preview}
-              <View style={{ marginBottom: 'auto' }}>
+              <View style={styles.swatchWrap}>
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
               </View>
             </ScrollView>
             <View>
-              <View style={{ paddingTop: 28, paddingBottom: spacing[3] }}>{mainField}</View>
+              <View style={styles.fieldWrap}>{mainField}</View>
               {footer}
             </View>
           </>
@@ -588,6 +578,70 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  flex: { flex: 1 },
+  center: { textAlign: 'center' },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  cta: { minHeight: CTA, borderRadius: theme.platform.buttonRadius, opacity: 1 },
+  ctaXl: { minHeight: CTA_XL },
+  ctaBusy: { opacity: CREATING_DIM },
+  ctaBusyContent: { gap: theme.spacing[2] },
+  ctaLabel: { flexShrink: 1, color: onAccent, fontSize: type.button.fontSize, lineHeight: type.button.lineHeight },
+  ctaLabelOff: { color: theme.colors.t3 },
+  ctaLabelXl: { fontSize: CTA_FONT_XL, lineHeight: 30 },
+  swatch: { width: SWATCH, height: SWATCH, alignItems: 'center', justifyContent: 'center' },
+  ring: { width: RING, height: RING, borderRadius: RING / 2, borderWidth: 0, borderColor: theme.colors.t1, alignItems: 'center', justifyContent: 'center' },
+  ringOn: { borderWidth: 2 },
+  dot: (name: BotColor) => ({ width: DOT, height: DOT, borderRadius: DOT / 2, backgroundColor: MASCOT_PALETTES[name].body }),
+  swatches: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: theme.spacing[2], rowGap: theme.spacing[1], paddingHorizontal: theme.spacing[4] },
+  limitHead: { alignItems: 'center', gap: 10, paddingTop: 28, paddingHorizontal: 36 },
+  limitMascots: { flexDirection: 'row', marginBottom: 6 },
+  overlap: { marginLeft: LIMIT_OVERLAP },
+  plans: { marginTop: theme.spacing[5], backgroundColor: theme.colors.bg2, borderRadius: theme.radius.lg, paddingHorizontal: theme.spacing[4] },
+  planRow: { minHeight: PLAN_ROW, flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: 0, borderTopColor: theme.colors.line },
+  planRowDivided: { borderTopWidth: 1 },
+  planValue: { marginLeft: 'auto' },
+  field: (control: number) => ({
+    height: control,
+    borderRadius: control / 2,
+    boxShadow: Platform.OS === 'ios' ? FIELD_SHADOW[theme.mode] : undefined,
+    backgroundColor: Platform.OS === 'ios' ? (sheetGlassFill(true, theme.mode === 'dark', theme.colors) ?? undefined) : theme.colors.fill,
+  }),
+  fieldRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], paddingHorizontal: theme.spacing[4] },
+  fieldInset: { marginHorizontal: theme.spacing[4] },
+  fieldPress: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2] },
+  fieldType: (fontSize: number, lineHeight: number) => ({ fontSize, lineHeight }),
+  clearHit: { width: 44, height: 44, marginRight: -14, alignItems: 'center', justifyContent: 'center' },
+  clearDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: theme.colors.fill2, alignItems: 'center', justifyContent: 'center' },
+  dim: { opacity: FIELD_DIS },
+  rowTitle: { justifyContent: 'center', gap: 2, paddingVertical: 14, paddingHorizontal: theme.spacing[4] },
+  rowTitleText: { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight },
+  card: { marginTop: theme.spacing[2], marginHorizontal: theme.spacing[4], borderRadius: theme.radius.lg, backgroundColor: theme.colors.bg2 },
+  note: { textAlign: 'center', paddingHorizontal: 32, paddingBottom: 28, fontSize: type.b2.fontSize, lineHeight: type.b2.lineHeight },
+  noteFlush: { paddingBottom: 0 },
+  meta: { fontSize: type.c1.fontSize, lineHeight: type.c1.lineHeight },
+  host: { fontSize: type.c2.fontSize, lineHeight: type.c2.lineHeight },
+  header: (insetTop: number) => ({ flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], paddingTop: insetTop + 14, paddingHorizontal: theme.spacing[4], paddingBottom: theme.spacing[1] }),
+  title: { flex: 1, textAlign: 'center' },
+  titleXl: { fontSize: 22, lineHeight: 30 },
+  spacer: (control: number) => ({ width: FIELD, height: control }),
+  preview: { marginTop: 'auto', alignItems: 'center', gap: theme.spacing[2], paddingTop: 2, paddingHorizontal: theme.spacing[6] },
+  previewNameWrap: { width: '100%', maxWidth: 320, alignItems: 'center' },
+  previewName: { fontSize: 24, lineHeight: 32, textAlign: 'center' },
+  previewSub: { fontSize: PREVIEW_SUB, lineHeight: PREVIEW_SUB_LINE, textAlign: 'center' },
+  searchContent: (justifyContent: 'center' | 'flex-start' | 'flex-end') => ({ flexGrow: 1, justifyContent }),
+  linkWait: { gap: theme.spacing[2], paddingTop: 14, paddingHorizontal: theme.spacing[5], paddingBottom: BAR },
+  bar: (width: `${number}%`) => ({ width, height: 12, borderRadius: BAR, backgroundColor: theme.colors.fill }),
+  searchBar: (insetBottom: number) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: theme.spacing[2], paddingHorizontal: theme.spacing[4], paddingBottom: 10 + insetBottom }),
+  input: (fontSize: number) => ({ flex: 1, color: theme.colors.t1, fontSize, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fontSize, paddingVertical: 0 }),
+  footer: (insetBottom: number) => ({ gap: theme.spacing[2], paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[4], paddingBottom: insetBottom + theme.spacing[2] }),
+  limitContent: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[4], paddingBottom: theme.spacing[6] },
+  limitActions: (insetBottom: number) => ({ gap: theme.spacing[2], paddingTop: theme.spacing[3], paddingHorizontal: theme.spacing[4], paddingBottom: insetBottom + theme.spacing[2] }),
+  mainContent: { flexGrow: 1, gap: 28, paddingTop: theme.spacing[1] },
+  swatchWrap: { marginBottom: 'auto' },
+  fieldWrap: { paddingTop: 28, paddingBottom: theme.spacing[3] },
+}))
 
 const BotNewSheetWithXlChrome = (props: Props) => (
   <XlBoardChrome>

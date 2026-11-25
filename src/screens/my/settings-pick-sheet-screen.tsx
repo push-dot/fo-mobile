@@ -4,25 +4,23 @@ import { useEffect, useState } from 'react'
 import { Platform, PlatformColor, Pressable, View } from 'react-native'
 import { SETTINGS_PICKS, useSettings, type SettingsPickKind } from '@/features/my'
 import { Sheet, Text, WheelPicker } from '@/shared/components'
-import { spacing, type as typeScale, useColors, useThemePreference, type ThemeChoice } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useThemePreference, type ThemeChoice } from '@/theme'
 
 const ANDROID = Platform.OS === 'android'
 
-const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; onPress: () => void }) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      hitSlop={8}
-      style={{ minHeight: 44, justifyContent: 'center', ...(ANDROID ? { paddingHorizontal: spacing[1] } : { minWidth: 56, alignItems: bold ? 'flex-end' : 'flex-start' }) }}
-    >
-      <Text v={ANDROID ? 'b1' : 'h3'} weight={ANDROID ? (bold ? '700' : '500') : bold ? '600' : '400'} style={{ color: ANDROID ? c.acText : PlatformColor('systemBlue') }}>
-        {label}
-      </Text>
-    </Pressable>
-  )
-}
+const TextAction = ({ label, bold, onPress }: { label: string; bold?: boolean; onPress: () => void }) => (
+  <Pressable
+    accessibilityRole="button"
+    onPress={onPress}
+    hitSlop={8}
+    style={[styles.action, ANDROID ? styles.actionAndroid : styles.actionIos, !ANDROID && bold && styles.actionIosBold]}
+  >
+    <Text v={ANDROID ? 'b1' : 'h3'} weight={ANDROID ? (bold ? '700' : '500') : bold ? '600' : '400'} style={ANDROID ? styles.actionLabelAndroid : styles.actionLabelIos}>
+      {label}
+    </Text>
+  </Pressable>
+)
 
 const SETTING_KEY = { locale: 'locale', career: 'careerStatusVisibility', contact: 'contactVisibility', tone: 'defaultTone' } as const
 
@@ -53,24 +51,37 @@ const SettingsPickSheetScreen = () => {
   return (
     <Sheet gap={ANDROID ? undefined : 0} action={ANDROID ? { label: '적용', onPress: confirm } : undefined}>
       {ANDROID ? (
-        <Text v="h2" weight="400" accessibilityRole="header" style={{ fontSize: 22, lineHeight: typeScale.h2.lineHeight }}>
+        <Text v="h2" weight="400" accessibilityRole="header" style={styles.androidTitle}>
           {pick.title}
         </Text>
       ) : null}
       {ANDROID ? null : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
-          <View style={{ minWidth: 56 }} />
+        <View style={styles.iosHeader}>
+          <View style={styles.iosHeaderSpacer} />
           <Text v="h3" weight="600" accessibilityRole="header">
             {pick.title}
           </Text>
           <TextAction label="적용" bold onPress={confirm} />
         </View>
       )}
-      <View style={ANDROID ? undefined : { marginTop: 6, marginBottom: spacing[5] }}>
+      <View style={ANDROID ? undefined : styles.iosPicker}>
         <WheelPicker items={items} value={draft ?? current} onChange={setDraft} accessibilityLabel={pick.title} short />
       </View>
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  action: { minHeight: 44, justifyContent: 'center' },
+  actionAndroid: { paddingHorizontal: theme.spacing[1] },
+  actionIos: { minWidth: 56, alignItems: 'flex-start' },
+  actionIosBold: { alignItems: 'flex-end' },
+  actionLabelAndroid: { color: theme.colors.acText },
+  actionLabelIos: { color: PlatformColor('systemBlue') },
+  androidTitle: { fontSize: 22, lineHeight: theme.type.h2.lineHeight },
+  iosHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 },
+  iosHeaderSpacer: { minWidth: 56 },
+  iosPicker: { marginTop: 6, marginBottom: theme.spacing[5] },
+}))
 
 export default SettingsPickSheetScreen

@@ -1,5 +1,5 @@
 import { View, type StyleProp, type ViewStyle } from 'react-native'
-import { spacing } from '../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import Button from './button'
 import Text from './text'
 
@@ -11,17 +11,23 @@ type Props = {
 
 const StatusNote = ({ lines, action, style }: Props) => {
   return (
-    <View style={[{ alignItems: 'center', paddingHorizontal: 40, gap: spacing[2] }, style]}>
-      <Text v="b1" color="t2" style={{ textAlign: 'center' }}>
+    <View style={[styles.note, style]}>
+      <Text v="b1" color="t2" style={styles.text}>
         {lines.join('\n')}
       </Text>
       {action ? (
-        <View style={{ marginTop: spacing[3] }}>
+        <View style={styles.action}>
           <Button label={action.label} variant="secondary" size="pill" onPress={action.onPress} />
         </View>
       ) : null}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  note: { alignItems: 'center', paddingHorizontal: 40, gap: theme.spacing[2] },
+  text: { textAlign: 'center' },
+  action: { marginTop: theme.spacing[3] },
+}))
 
 export default StatusNote

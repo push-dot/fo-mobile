@@ -16,10 +16,9 @@ import {
   usePhoneAuth,
 } from '@/features/auth'
 import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const PhoneScreen = () => {
-  const c = useColors()
   const keyboard = useKeyboardHeight()
   const email = usePhoneAuth((state) => state.email)
   const provider = usePhoneAuth((state) => state.provider)
@@ -61,21 +60,21 @@ const PhoneScreen = () => {
   if (lost) return null
 
   return (
-    <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
+    <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.screen}>
       <TopBar onBack={() => router.back()} />
-      <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
+      <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.body}>
         {email ? (
-          <View style={{ marginBottom: 18 }}>
+          <View style={styles.pill}>
             <AccountPill email={email} provider={provider} />
           </View>
         ) : null}
-        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
+        <Text accessibilityRole="header" v="h1" style={styles.title}>
           {PHONE_TITLE}
         </Text>
-        <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
+        <Text v="b2" color="t2" style={styles.subtitle}>
           {PHONE_BODY}
         </Text>
-        <View style={{ marginTop: 28 }}>
+        <View style={styles.field}>
           <PhoneField
             value={formatNational(digits)}
             onChange={(next) => {
@@ -89,16 +88,27 @@ const PhoneScreen = () => {
           />
         </View>
         {error ? (
-          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[3] }}>
+          <Text v="c1" color="red" accessibilityRole="alert" style={styles.error}>
             {error}
           </Text>
         ) : null}
       </Pressable>
       <CtaBar lift={keyboard}>
-        <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} style={{ flex: 1 }} />
+        <Button label={SEND_CODE} disabled={!e164 || busy} onPress={send} style={styles.flex} />
       </CtaBar>
     </Pressable>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  body: { paddingHorizontal: theme.spacing[6], paddingTop: theme.spacing[3] },
+  pill: { marginBottom: 18 },
+  title: { fontSize: 24, lineHeight: 33 },
+  subtitle: { marginTop: theme.spacing[2] },
+  field: { marginTop: 28 },
+  error: { marginTop: theme.spacing[3] },
+  flex: { flex: 1 },
+}))
 
 export default PhoneScreen

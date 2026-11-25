@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { EVENT_TYPES, fromDayParam, useAddCalendarEvent, type CalendarEventType } from '@/features/my'
 import { Chip, DatePicker, Sheet, Text, TextField } from '@/shared/components'
+import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '@/theme'
 import { withTime } from '@/shared/utility'
 
@@ -35,16 +36,16 @@ const AddEventSheetScreen = () => {
         onPress: () => add.mutate({ type, title: title.trim(), startsAt: withTime(date, time).toISOString() }),
       }}
     >
-      <View style={{ flexDirection: 'row', gap: Platform.OS === 'ios' ? spacing[3] : spacing[2] }}>
-        <View style={{ flex: Platform.OS === 'ios' ? undefined : 1 }}>
+      <View style={styles.dates}>
+        <View style={styles.dateCell}>
           <DatePicker label="날짜" mode="date" value={date} onChange={setDate} minHeight={52} />
         </View>
-        <View style={{ flex: Platform.OS === 'ios' ? undefined : 1 }}>
+        <View style={styles.dateCell}>
           <DatePicker label="시간" mode="time" value={time} onChange={setTime} minHeight={52} />
         </View>
       </View>
       <TextField accessibilityLabel="일정 이름" value={title} onChangeText={setTitle} placeholder="일정 이름" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
+      <View style={styles.types}>
         {EVENT_TYPES.map((t) => (
           <Chip key={t.key} label={t.label} on={type === t.key} onPress={() => setType(t.key)} />
         ))}
@@ -57,5 +58,11 @@ const AddEventSheetScreen = () => {
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  dates: { flexDirection: 'row', gap: Platform.OS === 'ios' ? theme.spacing[3] : theme.spacing[2] },
+  dateCell: { flex: Platform.OS === 'ios' ? undefined : 1 },
+  types: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },
+}))
 
 export default AddEventSheetScreen

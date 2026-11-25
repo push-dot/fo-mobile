@@ -1,5 +1,5 @@
 import { ScrollView } from 'react-native'
-import { spacing } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import { onboardingGreeting } from '../utils/usage'
 import BotText from './entries/bot'
 
@@ -14,9 +14,13 @@ const Onboarding = ({
   postingTitle?: string | null
   top?: number
 }) => (
-  <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[5], paddingTop: top + spacing[4], paddingBottom: spacing[4] }} keyboardShouldPersistTaps="handled">
+  <ScrollView contentContainerStyle={styles.content(top)} keyboardShouldPersistTaps="handled">
     <BotText item={{ type: 'agentText', id: 'onboarding', text: onboardingGreeting(kind, name, postingTitle) }} />
   </ScrollView>
 )
+
+const styles = StyleSheet.create((theme) => ({
+  content: (top: number) => ({ paddingHorizontal: theme.spacing[5], paddingTop: top + theme.spacing[4], paddingBottom: theme.spacing[4] }),
+}))
 
 export default Onboarding

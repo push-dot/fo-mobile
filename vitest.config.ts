@@ -8,5 +8,5 @@ export default defineConfig({
       '@': path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src'),
     },
   },
-  test: { include: ['src/**/*.test.ts'] },
+  test: { include: ['src/**/*.test.ts'], setupFiles: ['./vitest.setup.ts'] },
 })

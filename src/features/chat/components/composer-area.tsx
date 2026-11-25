@@ -1,9 +1,9 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { View, type TextInputInstance } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { materialPickerPath as botMaterialPath, type BotId } from '@/features/bots'
 import type { PickedFile } from '@/features/my'
-import { spacing } from '../../../theme'
 import { Composer } from './composer-body'
 import { insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import MentionPopover from './mention-popover'
@@ -46,7 +46,7 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
   }
 
   return (
-    <View style={{ gap: spacing[2] }}>
+    <View style={styles.area}>
       {query !== null ? <MentionPopover query={query} onPick={pick} /> : above}
       <Composer
         inputRef={ref}
@@ -65,3 +65,7 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  area: { gap: theme.spacing[2] },
+}))

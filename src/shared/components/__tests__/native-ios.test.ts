@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { palette } from '@/theme/tokens'
-import { find, findAll } from './native-stubs'
+import { find, findAll, flat } from './native-stubs'
 
 vi.mock('react-native', async () => (await import('./native-stubs')).stubs.reactNative)
 vi.mock('@expo/ui', () => ({ Host: 'Host' }))
@@ -35,7 +35,7 @@ describe('SegmentedControl (iOS)', () => {
   it('draws the boards\' .ios .seg: a 44pt glass track whose selected segment is filled', () => {
     const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
     expect(find(tree, 'Glass').props.style).toContainEqual({ height: 44, width: undefined, borderRadius: 22 })
-    const style = (s: { props: Record<string, unknown> }) => s.props.style as { backgroundColor?: string; boxShadow?: string }
+    const style = (s: { props: Record<string, unknown> }) => flat(s.props.style) as { backgroundColor?: string; boxShadow?: string }
     expect(find(tree, 'View').props.accessibilityRole).toBe('tablist')
     expect(segments(tree).map((s) => [s.props.accessibilityRole, s.props.accessibilityState, style(s).backgroundColor, style(s).boxShadow])).toEqual([
       ['tab', { selected: true }, palette.light.fill, '0 2px 8px rgba(0,0,0,.08)'],
@@ -52,7 +52,7 @@ describe('SegmentedControl (iOS)', () => {
     try {
       const tree = SegmentedControl({ items, value: 'received', onChange: vi.fn() })
       expect(find(tree, 'Glass').props.style).toContainEqual({ backgroundColor: palette.light.fill })
-      expect(segments(tree).map((s) => (s.props.style as { backgroundColor?: string }).backgroundColor)).toEqual([palette.light.bg, undefined])
+      expect(segments(tree).map((s) => (flat(s.props.style) as { backgroundColor?: string }).backgroundColor)).toEqual([palette.light.bg, undefined])
     } finally {
       a11y.reduceTransparency = false
     }

@@ -1,8 +1,8 @@
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
 import { Icon, Text } from '@/shared/components'
-import { radius, spacing, useColors } from '../../../theme'
 import { useCalendarEvents } from '../api/hooks'
 import { EVENT_TYPES } from '../constants'
 import { useCalendarDay } from '../stores'
@@ -18,7 +18,6 @@ const subline = (e: CalendarEvent) => {
 }
 
 const CalendarView = () => {
-  const c = useColors()
   const today = new Date()
   const selected = useCalendarDay((s) => s.day)
   const from = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate())
@@ -28,14 +27,14 @@ const CalendarView = () => {
 
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], paddingTop: spacing[3], paddingLeft: spacing[5], paddingRight: spacing[3] }}>
+      <View style={styles.head}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${dayTitle(selected, today)}, 달력 열기`}
           onPress={() => router.push('/activity/calendar')}
-          style={{ flex: 1, minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}
+          style={styles.dayButton}
         >
-          <Text v="h2" accessibilityRole="header" numberOfLines={1} style={{ flexShrink: 1 }}>
+          <Text v="h2" accessibilityRole="header" numberOfLines={1} style={styles.dayTitle}>
             {dayTitle(selected, today)}
           </Text>
           <Icon name="down" size={20} color="t1" />
@@ -44,7 +43,7 @@ const CalendarView = () => {
           accessibilityRole="button"
           accessibilityLabel="일정 추가"
           onPress={() => router.push({ pathname: '/activity/add-event', params: { day: toDayParam(selected) } })}
-          style={{ height: 44, paddingHorizontal: spacing[1], justifyContent: 'center' }}
+          style={styles.add}
         >
           <Text v="h3" weight="700" color="ac">
             추가
@@ -52,21 +51,21 @@ const CalendarView = () => {
         </Pressable>
       </View>
       {data ? (
-        <Text v="c1" color="t3" style={{ paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+        <Text v="c1" color="t3" style={styles.google}>
           {data.google.connected ? 'Google 캘린더 연결됨' : 'Google 연결 안 됨'}
         </Text>
       ) : null}
       {dayEvents.length === 0 ? (
-        <Text v="b2" color="t3" style={{ paddingVertical: 36, paddingHorizontal: spacing[5], textAlign: 'center' }}>
+        <Text v="b2" color="t3" style={styles.empty}>
           이날은 일정이 없어요.
         </Text>
       ) : (
         dayEvents.map((e) => {
           const deadline = e.type === 'DEADLINE'
           return (
-            <View key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], paddingHorizontal: spacing[5] }}>
-              <View style={{ width: 4, alignSelf: 'stretch', borderRadius: radius.pill, backgroundColor: c.t4 }} />
-              <View style={{ flex: 1, minWidth: 0 }}>
+            <View key={e.id} style={styles.event}>
+              <View style={styles.eventBar} />
+              <View style={styles.eventBody}>
                 <Text v="c2" weight="700" color="t3">
                   {deadline ? `마감 · ${monthDay(e.startsAt)}` : typeLabel(e.type)}
                 </Text>
@@ -89,5 +88,30 @@ const CalendarView = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[1],
+    paddingTop: theme.spacing[3],
+    paddingLeft: theme.spacing[5],
+    paddingRight: theme.spacing[3],
+  },
+  dayButton: { flex: 1, minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
+  dayTitle: { flexShrink: 1 },
+  add: { height: 44, paddingHorizontal: theme.spacing[1], justifyContent: 'center' },
+  google: { paddingBottom: theme.spacing[1], paddingHorizontal: theme.spacing[5] },
+  empty: { paddingVertical: 36, paddingHorizontal: theme.spacing[5], textAlign: 'center' },
+  event: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[3],
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[5],
+  },
+  eventBar: { width: 4, alignSelf: 'stretch', borderRadius: theme.radius.pill, backgroundColor: theme.colors.t4 },
+  eventBody: { flex: 1, minWidth: 0 },
+}))
 
 export default CalendarView

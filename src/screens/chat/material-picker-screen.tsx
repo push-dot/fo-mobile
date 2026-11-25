@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { PageModal, appendDraftText, attachPickedFile, docMeta, postingMeta, useChatDocs } from '@/features/chat'
 import { GroupTitle, MaterialNavRow, MaterialPickRow, SECTION_LABEL } from '@/features/materials'
 import { useBookmarkList } from '@/features/my'
 import { displayName } from '@/shared/utility/display-name'
 import { Button, TextField } from '@/shared/components'
-import { spacing } from '@/theme'
 
 type Row = { id: string; title: string; meta: string }
 
@@ -44,7 +44,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
       footer={<Button label={pasting ? '넣기' : `${picks.length}개 추가`} disabled={pasting ? !text.trim() : !picks.length} onPress={pasting ? submit : add} style={ADD_BUTTON} />}
     >
       {pasting ? (
-        <View style={{ paddingHorizontal: spacing[5] }}>
+        <View style={styles.field}>
           <TextField
             value={text}
             onChangeText={setText}
@@ -78,5 +78,9 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
     </PageModal>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  field: { paddingHorizontal: theme.spacing[5] },
+}))
 
 export default MaterialPickerScreen

@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { POST_CATEGORIES, stageBadge } from '@push/api-client'
 import { careerLabel, monthDay } from '@push/shared'
 import { Badge, Chip, ChipRow, Icon, Text } from '@/shared/components'
@@ -58,7 +59,7 @@ const Applications = () => {
           onPress={() => router.push(`/activity/applications/${a.id}`)}
         >
           <Logo name={a.company} />
-          <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={styles.body}>
             <Text v="b1" weight="700" numberOfLines={1}>
               {a.title}
             </Text>
@@ -99,16 +100,10 @@ export const Bookmarks = () => {
           accessibilityRole="button"
           accessibilityLabel={`${p.company} ${p.title}`}
           onPress={() => router.push(`/postings/${p.id}?from=bookmark`)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: spacing[4],
-            paddingVertical: spacing[3],
-            paddingHorizontal: spacing[5],
-          }}
+          style={styles.bookmark}
         >
           <Logo name={p.company} size={56} />
-          <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+          <View style={styles.bookmarkBody}>
             <Text v="c1" weight="600" color="t3">
               {p.company}
             </Text>
@@ -125,7 +120,7 @@ export const Bookmarks = () => {
             accessibilityState={{ selected: true }}
             onPress={() => unbookmark.mutate(p)}
             hitSlop={hitSlopTo(20)}
-            style={{ width: 20, height: 20 }}
+            style={styles.unbookmark}
           >
             <Icon name="bookmark" size={20} color={c.acText} filled />
           </Pressable>
@@ -135,24 +130,13 @@ export const Bookmarks = () => {
   )
 }
 
-const SeeAll = ({ label, onPress, divided }: { label: string; onPress: () => void; divided?: boolean }) => {
-  const c = useColors()
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={{
-        ...(divided ? { marginTop: spacing[1], borderTopWidth: 1, borderTopColor: c.line } : null),
-        paddingVertical: spacing[4],
-        paddingHorizontal: spacing[5],
-      }}
-    >
-      <Text v="b2" weight="600" color="t2">
-        {label}
-      </Text>
-    </Pressable>
-  )
-}
+const SeeAll = ({ label, onPress, divided }: { label: string; onPress: () => void; divided?: boolean }) => (
+  <Pressable accessibilityRole="button" onPress={onPress} style={[divided && styles.seeAllDivided, styles.seeAll]}>
+    <Text v="b2" weight="600" color="t2">
+      {label}
+    </Text>
+  </Pressable>
+)
 
 const Follows = () => {
   const following = useMyFollows()
@@ -192,7 +176,6 @@ const Follows = () => {
 }
 
 const Posts = () => {
-  const c = useColors()
   const mine = useMyPosts()
   const commented = useMyCommentedPosts()
   const posts = mine.data?.data ?? []
@@ -220,14 +203,7 @@ const Posts = () => {
           key={p.id}
           accessibilityRole="button"
           onPress={() => router.push(`/posts/${p.id}`)}
-          style={({ pressed }) => ({
-            gap: spacing[1],
-            paddingVertical: spacing[3],
-            paddingHorizontal: spacing[5],
-            borderBottomWidth: 1,
-            borderBottomColor: c.line,
-            backgroundColor: pressed ? c.fill : 'transparent',
-          })}
+          style={({ pressed }) => [styles.post, pressed && styles.postPressed]}
         >
           <Text v="c2" color="t3">
             {POST_CATEGORIES.find((k) => k.key === p.category)?.label} · {postedAt(p.createdAt)}
@@ -235,8 +211,8 @@ const Posts = () => {
           <Text v="b1" weight="700" numberOfLines={1}>
             {p.title}
           </Text>
-          <View style={{ flexDirection: 'row', gap: spacing[3] }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+          <View style={styles.stats}>
+            <View style={styles.stat}>
               <Icon name="chat" size={14} color="t3" />
               <Text v="c1" color="t3">
                 댓글 {p.commentCount}
@@ -259,9 +235,8 @@ const Posts = () => {
 }
 
 const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub; onSub: (s: ActivitySub) => void } & ScrollUnderBar) => {
-  const c = useColors()
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ flexGrow: 1, paddingTop: top, paddingBottom: LIST_PAD }}>
+    <ScrollView style={styles.scroll} contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={styles.content(top)}>
       {lead}
       <ChipRow paddingTop={spacing[4]}>
         {SUBS.map((s) => (
@@ -276,5 +251,33 @@ const ActivityTab = ({ sub, onSub, top = 0, onScroll, lead }: { sub: ActivitySub
     </ScrollView>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  body: { flex: 1, minWidth: 0 },
+  bookmark: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[4],
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[5],
+  },
+  bookmarkBody: { flex: 1, minWidth: 0, gap: 1 },
+  unbookmark: { width: 20, height: 20 },
+  seeAll: { paddingVertical: theme.spacing[4], paddingHorizontal: theme.spacing[5] },
+  seeAllDivided: { marginTop: theme.spacing[1], borderTopWidth: 1, borderTopColor: theme.colors.line },
+  post: {
+    gap: theme.spacing[1],
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[5],
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.line,
+    backgroundColor: 'transparent',
+  },
+  postPressed: { backgroundColor: theme.colors.fill },
+  stats: { flexDirection: 'row', gap: theme.spacing[3] },
+  stat: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
+  scroll: { backgroundColor: theme.colors.bg },
+  content: (top: number) => ({ flexGrow: 1, paddingTop: top, paddingBottom: LIST_PAD }),
+}))
 
 export default ActivityTab

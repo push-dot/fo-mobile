@@ -5,10 +5,9 @@ import { Pressable, View } from 'react-native'
 import { POST_CATEGORIES, type MyPostsSort } from '@push/api-client'
 import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const MyPostsScreen = () => {
-  const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()
   const [view, setView] = useState<PostsView>(box === 'commented' || box === 'saved' ? box : 'mine')
   const [sort, setSort] = useState<MyPostsSort>('latest')
@@ -16,7 +15,7 @@ const MyPostsScreen = () => {
   const posts = query.data?.data ?? []
   const empty = view === 'mine' ? emptyCta('posts') : view === 'saved' ? emptyCta('saved') : null
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar
         title={postsTitle(view)}
         onBack={() => router.back()}
@@ -29,9 +28,9 @@ const MyPostsScreen = () => {
           data={posts}
           keyExtractor={(p) => p.id}
           estimatedItemSize={92}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.list}
           ListHeaderComponent={
-            <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+            <Text v="c1" weight="600" color="t2" style={styles.count}>
               {query.data?.page.total ?? posts.length}개
             </Text>
           }
@@ -40,7 +39,7 @@ const MyPostsScreen = () => {
             <Pressable
               accessibilityRole="button"
               onPress={() => router.push(`/posts/${p.id}`)}
-              style={{ gap: spacing[1], paddingVertical: spacing[3], paddingHorizontal: spacing[5], borderBottomWidth: 1, borderBottomColor: c.line }}
+              style={styles.post}
             >
               <Text v="c2" color="t3">
                 {POST_CATEGORIES.find((k) => k.key === p.category)?.label} · {postedAt(p.createdAt)}
@@ -48,8 +47,8 @@ const MyPostsScreen = () => {
               <Text v="b1" weight="700" numberOfLines={1}>
                 {p.title}
               </Text>
-              <View style={{ flexDirection: 'row', gap: spacing[3] }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+              <View style={styles.meta}>
+                <View style={styles.metaItem}>
                   <Icon name="chat" size={14} color="t3" />
                   <Text v="c1" color="t3">
                     댓글 {p.commentCount}
@@ -66,5 +65,14 @@ const MyPostsScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  list: { flexGrow: 1 },
+  count: { paddingTop: theme.spacing[2], paddingBottom: theme.spacing[1], paddingHorizontal: theme.spacing[5] },
+  post: { gap: theme.spacing[1], paddingVertical: theme.spacing[3], paddingHorizontal: theme.spacing[5], borderBottomWidth: 1, borderBottomColor: theme.colors.line },
+  meta: { flexDirection: 'row', gap: theme.spacing[3] },
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
+}))
 
 export default MyPostsScreen

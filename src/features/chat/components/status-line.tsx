@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Mascot, Text } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
-import { largeType, spacing } from '../../../theme'
+import { largeType } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { lineFromWorking, statusLineView, type LiveLine, type StatusLineView } from '../utils/status-line'
 
@@ -18,17 +19,17 @@ const StatusLineRow = ({ view, color }: { view: StatusLineView; color: MascotCol
       accessible
       accessibilityLiveRegion="polite"
       accessibilityLabel={view.accessibilityLabel}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40, alignSelf: 'stretch' }}
+      style={styles.row}
     >
       <Mascot size={xl ? 28 : 24} state={view.mascot} color={color} motion={{ mode: view.still ? 'still' : 'animate' }} />
-      <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', flexWrap: xl ? 'wrap' : 'nowrap', alignItems: 'baseline', columnGap: spacing[2] }}>
+      <View style={[styles.body, xl && styles.bodyWrap]}>
         {view.text ? (
-          <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={xl ? undefined : 1} allowFontScaling={!xl} style={[{ flexShrink: 1 }, big?.b2]}>
+          <Text v="b2" weight="600" color={TONE_COLOR[view.tone]} numberOfLines={xl ? undefined : 1} allowFontScaling={!xl} style={[styles.text, big?.b2]}>
             {view.text}
           </Text>
         ) : null}
         {view.tail ? (
-          <Text v="c1" color="t3" allowFontScaling={!xl} style={[{ fontVariant: ['tabular-nums'] }, big?.c1]}>
+          <Text v="c1" color="t3" allowFontScaling={!xl} style={[styles.tail, big?.c1]}>
             {view.tail}
           </Text>
         ) : null}
@@ -46,6 +47,14 @@ const StatusLine = ({ line, color }: { line: LiveLine; color?: MascotColor }) =>
   }, [])
   return <StatusLineRow view={statusLineView(line, now)} color={color ?? room} />
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40, alignSelf: 'stretch' },
+  body: { flex: 1, minWidth: 0, flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'baseline', columnGap: theme.spacing[2] },
+  bodyWrap: { flexWrap: 'wrap' },
+  text: { flexShrink: 1 },
+  tail: { fontVariant: ['tabular-nums'] },
+}))
 
 export default StatusLine
 
