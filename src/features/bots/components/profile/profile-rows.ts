@@ -41,7 +41,8 @@ export const allowedTitle = (count: number) => `${ALLOWED_ROW} ${count}`
 
 const SITE_KIND = { posting: '채용 공고', company: '회사 소개' } as const
 
-export const allowedLine = (at: Date, kind: keyof typeof SITE_KIND) => `${at.getMonth() + 1}월 ${at.getDate()}일 허용 · ${SITE_KIND[kind]}`
+export const allowedLine = (at: Date, kind: keyof typeof SITE_KIND | 'other') =>
+  [`${at.getMonth() + 1}월 ${at.getDate()}일 허용`, kind === 'other' ? '' : SITE_KIND[kind]].filter((part) => part !== '').join(' · ')
 
 export const revokeA11y = (host: string) => `${host} ${REVOKE_LABEL}`
 

@@ -43,7 +43,7 @@ export type Bot = PushBot | CompanyBot
 
 export type BotRef = { id: BotId; kind: BotKind; name: string; color: BotColor | null }
 
-export type AllowedSite = { id: string; host: string; allowedAt: Date; kind: 'posting' | 'company' }
+export type AllowedSite = { id: string; host: string; allowedAt: Date; kind: 'posting' | 'company' | 'other' }
 
 export type BotProfile = {
   bot: Bot

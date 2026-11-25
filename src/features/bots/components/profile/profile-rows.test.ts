@@ -63,5 +63,6 @@ describe('bot profile allowed sites', () => {
     expect(allowedTitle(2)).toBe('허용한 사이트 2')
     expect(allowedLine(new Date(2026, 10, 3), 'posting')).toBe('11월 3일 허용 · 채용 공고')
     expect(allowedLine(new Date(2026, 10, 5), 'company')).toBe('11월 5일 허용 · 회사 소개')
+    expect(allowedLine(new Date(2026, 10, 6), 'other')).toBe('11월 6일 허용')
   })
 })

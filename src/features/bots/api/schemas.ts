@@ -1,5 +1,5 @@
 import type { BotContract } from '@push/api-client'
-import type { Bot, BotActivity, BotOutcome, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
+import type { AllowedSite, Bot, BotActivity, BotOutcome, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
 import { colorOf, dateOf, dayOf, toBotRef } from '../utils/wire'
 
 
@@ -68,7 +68,8 @@ export const toBotProfile = (dto: BotContract.BotDetail): BotProfile => ({
   materialCount: dto.materialCount ?? null,
   allowedSites: dto.allowedSites?.flatMap((s) => {
     const allowedAt = dateOf(s.allowedAt)
-    return allowedAt ? [{ id: s.id, host: s.host, allowedAt, kind: s.kind }] : []
+    const kind: AllowedSite['kind'] = s.kind === 'posting' || s.kind === 'company' ? s.kind : 'other'
+    return allowedAt ? [{ id: s.id, host: s.host, allowedAt, kind }] : []
   }) ?? null,
 })
 
