@@ -11,7 +11,7 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload, sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload, list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {
     run: async (body: unknown) => {
@@ -49,7 +49,6 @@ describe('chat attachment in mock mode', () => {
     expect(post.mock.calls[0]?.[1].body).not.toHaveProperty('file')
   })
 
-  // mock=upload-fail (ChatErrUpload): the mock API skips uploads, so the switch makes the send fail the way a dropped connection does.
   it('draws the upload error and starts no run when mock uploads fail', async () => {
     failing.on = true
     send('c-fail', '이 파일로 맞춰 주세요', file)

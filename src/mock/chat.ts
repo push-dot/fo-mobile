@@ -1,12 +1,14 @@
-// Mock routes for the chat area. Owned by that area's screens.
-// Sample data follows the AI 채팅 artboards (김서준, 모아페이 …).
-import type { ConversationTurn, LinkKind, Message, UserLink } from '@push/api-client'
+import type { A2uiFrame, ConversationTurn, LinkKind, Message, UserLink } from '@push/api-client'
 import type { ChatDoc, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
-import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_TASK, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail, WAITING_CHOICES, WAITING_SINCE_MS } from './bot-scripts/runs'
+import { AWAITING_TEXT } from '../features/chat/constants'
+import { choiceIds, fixtureFrame, withSurfaceId } from './a2ui-fixtures'
+import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_NAME, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail } from './bot-scripts/runs'
 import { PROFILE_REVIEW_HUNKS } from './bot-scripts/review-doc'
+import { editSurface, profileSurface, surface, todoSurface } from './bot-scripts/surfaces'
 import { recordRun } from './bots'
+import { consent, docs, scenario, waiting } from './chat-state'
 import { botProfileChange } from './me'
 import { mock, page } from './server'
 import { LEGAL_VERSION } from '@push/shared'
@@ -14,8 +16,6 @@ import { LEGAL_VERSION } from '@push/shared'
 type Terms = { version: string; age14At: string | null; serviceTermsAt: string | null; privacyAt: string | null; marketing: boolean; marketingAt: string | null }
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
-
-// ---------- conversations ----------
 
 const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null, at?: string): ConversationRow => ({
   id,
@@ -31,11 +31,8 @@ const conv = (id: string, title: string, min: number, lastLine: string, status: 
 
 const conversations: ConversationRow[] = [
   { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '고친 Push 프로필을 확인해 주세요', 'NEEDS_APPROVAL'), company: '모아페이' },
-  // ChatResume opens this one and draws 모아페이 in the header pill.
   { ...conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'), company: '모아페이' },
-  // ChatListPress draws this row pinned.
   { ...conv('c-career', '경력기술서 다듬기', 60 * 30, 'PDF로 저장했어요 · 적합도 8.2'), pinned: true },
-  // The design lists these two under 이번 주, so keep them inside the last six days whatever day the tour runs.
   conv('c-pado', '파도AI 자기소개서 초안', 3 * 24 * 60, '초안 v1을 만들었어요'),
   conv('c-nuri', '누리클라우드 자기소개서', 5 * 24 * 60, '지원 동기 문단을 줄였어요'),
   conv('a-toss', '토스 백엔드 이력서', 0, '적합도 7.4 · PDF로 저장했어요', null, '2026-09-28T03:00:00.000Z'),
@@ -43,12 +40,6 @@ const conversations: ConversationRow[] = [
   conv('a-baemin', '배민 공고 갭 분석', 0, '경력 섹션을 고쳤어요', null, '2026-08-30T03:00:00.000Z'),
 ]
 const archived = new Set(['a-toss', 'a-line', 'a-baemin'])
-let referenceData = false
-// Tour switch (links.ts): the 설정 boards draw 참고 데이터 제공 on; the mock starts it off so the chat asks first.
-export const grantReference = () => {
-  referenceData = true
-}
-export const hasReferenceConsent = () => referenceData
 const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)
@@ -57,9 +48,8 @@ mock('GET', 'conversations', ({ query }) =>
   page(query.get('archived') === 'true' ? byRecent(conversations.filter((c) => archived.has(c.id))) : live(), query),
 )
 mock('POST', 'conversations', ({ body }) => {
-  if (!referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
+  if (!consent.referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
   const b = body as { title: string }
-  // Every scenario targets the 모아페이 posting except the upload without one (ChatDoneNoJob) and the read failure (ChatErrors).
   const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^(ext-nojob|fail|no-posting|이 서류를 고쳐 줘)$/i.test(b.title.trim()) ? null : '모아페이' }
   conversations.push(c)
   return { status: 201, body: { data: c } }
@@ -88,19 +78,18 @@ mock('DELETE', 'conversations/:id', ({ params }) => {
   if (i >= 0) conversations.splice(i, 1)
   archived.delete(params.id!)
 })
-// The default signed-in user accepted the required terms, like a real one; phone sign-in of a new user clears them (home.ts) so the 약관 동의 screens stay reachable.
 const accepted = () => new Date().toISOString()
 const terms: Terms = { version: LEGAL_VERSION, age14At: accepted(), serviceTermsAt: accepted(), privacyAt: accepted(), marketing: false, marketingAt: null }
 export const forgetRequiredTerms = () => Object.assign(terms, { age14At: null, serviceTermsAt: null, privacyAt: null })
-mock('GET', 'me/consents', () => ({ data: { referenceData, updatedAt: null, terms } }))
+mock('GET', 'me/consents', () => ({ data: { referenceData: consent.referenceData, updatedAt: null, terms } }))
 mock('PUT', 'me/consents', ({ body }) => {
-  referenceData = (body as { referenceData?: boolean }).referenceData === true
-  return { data: { referenceData, updatedAt: new Date().toISOString(), terms } }
+  consent.referenceData = (body as { referenceData?: boolean }).referenceData === true
+  return { data: { referenceData: consent.referenceData, updatedAt: new Date().toISOString(), terms } }
 })
 mock('PUT', 'me/consents/terms', ({ body }) => {
   const marketing = (body as { marketing?: boolean }).marketing
   if (typeof marketing === 'boolean') Object.assign(terms, { marketing, marketingAt: new Date().toISOString() })
-  return { data: { referenceData, updatedAt: null, terms } }
+  return { data: { referenceData: consent.referenceData, updatedAt: null, terms } }
 })
 mock('GET', 'conversations/:id/messages', ({ params, query }) => {
   const c = find(params.id!)
@@ -111,80 +100,67 @@ mock('GET', 'conversations/:id/messages', ({ params, query }) => {
           { id: `${c.id}-a`, conversationId: c.id, role: 'ASSISTANT', text: c.lastLine, attachments: [], operationId: null, createdAt: c.updatedAt },
         ]
       : []
-  // Newest first, like push-be.
   return page(msgs.reverse(), query)
 })
 
-// ---------- scripted runs ----------
-
 type Frame = Step['frame']
-type Card = Extract<Frame, { type: 'choice' | 'approval' }>
+type Card = A2uiFrame
 
-// The scripted run answers QUEUE_BUSY as an error line with the 12s wait: the second 도토리증권 line of ChatStates.4.
 const BUSY = new Set(['queue-busy', '도토리증권 공고도 맞춰 줘'])
 
-// Per conversation: id prefix for the current scenario (so continuations update the same lines) and its to-do labels.
-const scenario = new Map<string, { prefix: string; labels: string[]; verified?: boolean }>()
-/** The card each conversation waits on: the last one its newest run sent. */
-const waiting = new Map<string, Card>()
 let runs = 0
 
-/** Clear chat drops the open card and the scenario, so the next message starts a run instead of answering the old card. */
-export const forgetRun = (id: string) => {
-  waiting.delete(id)
-  scenario.delete(id)
+const isCard = (f: Frame) => f.type === 'a2ui' && (f.kind === 'approval' || f.kind === 'choice')
+
+const answerMode = (card: Card) => {
+  const update = card.messages.find((m) => 'updateComponents' in m)
+  return update && 'updateComponents' in update ? update.updateComponents.components.find((c) => c.component === 'PushChoice')?.answer : undefined
 }
 
-const isCard = (f: Frame): f is Card => (f.type === 'choice' && !f.auto) || f.type === 'approval'
+const choiceOf = (card: Card, optionId: string) => (optionId === 'cancel' ? -1 : optionId === 'submit' ? 0 : Math.max(0, choiceIds(card).indexOf(optionId)))
 
-/** The branch the scripts take for an answer: the option's position, 0 for a section card's submit, -1 for its 그만하기. */
-const choiceOf = (card: Card, optionId: string) => (optionId === 'cancel' ? -1 : Math.max(0, card.options.findIndex((o) => o.id === optionId)))
+const typedChoice = (card: Card) => {
+  const ids = choiceIds(card)
+  if (answerMode(card) === 'submit') return 0
+  return ids.includes('apply') ? ids.indexOf('apply') : ids.length - 1
+}
 
-/** Typing while a card is open answers it: a numbered card with its last choice (직접 말하기), a section or edit card with its first. */
-const typedChoice = (card: Card) => ((card.type === 'choice' && card.sections?.length) || (card.type === 'approval' && card.kind === 'DOCUMENT_EDIT') ? 0 : card.options.length - 1)
-
-/** Ids of one scenario stay apart from another's in the same conversation, so a new scenario draws its own lines below the old ones. */
 const scoped = (f: Frame, prefix: string): Frame => {
-  const own = (id: string) => `${prefix}-${id}`
   switch (f.type) {
     case 'tool':
-      // update_my_profile keeps its name: the app finds the change id on the tool line of that name.
-      return { ...f, name: f.name === 'update_my_profile' ? f.name : own(f.name) }
-    case 'todo':
-      return { ...f, id: own(f.id ?? 'todo') }
-    case 'paper':
-      return { ...f, id: own(f.id) }
-    case 'diff':
-      return { ...f, revisionId: own(f.revisionId) }
-    case 'plan':
-      // push-be names a plan by its kind only, so two plans of one conversation share an id without the prefix.
-      return { ...f, id: own(f.id) as typeof f.id }
-    case 'choice':
-      return f.auto ? { ...f, id: own(f.id) } : f
+      return { ...f, name: f.name === 'update_my_profile' ? f.name : `${prefix}-${f.name}` }
+    case 'a2ui':
+      return isCard(f) ? f : { ...withSurfaceId(f, `${prefix}-${f.surfaceId}`), seq: f.seq }
     default:
       return f
   }
 }
 
-/** Stamps each frame with the conversation's next seq and remembers the card the run leaves open. */
+const cardTitle = (card: Card) => {
+  const update = card.messages.find((m) => 'updateComponents' in m)
+  const components = update && 'updateComponents' in update ? update.updateComponents.components : []
+  const title = components.find((c) => c.id === 'title')?.text ?? (components.find((c) => c.component === 'PushChoice')?.questions as { title?: string }[] | undefined)?.[0]?.title
+  return typeof title === 'string' ? title : ''
+}
+
 const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
   let seq = lastSeq.get(id) ?? 0
-  // A tool card carries the time it was asked, as the server's frame does (`at`), so the room draws 확인을 기다리고 있어요 under the thread (ChatBotStatusApprove).
   const at = new Date().toISOString()
-  const backdated = new Date(Date.now() - WAITING_SINCE_MS).toISOString()
-  const out: Step[] = steps.map((st) => {
+  const out: Step[] = steps.flatMap((st) => {
     const frame = prefix ? scoped(st.frame, prefix) : st.frame
-    const asked = frame.type === 'approval' ? at : frame.type === 'choice' && WAITING_CHOICES.has(frame.id) ? backdated : undefined
-    return { ...st, frame: { ...frame, ...(asked ? { at: asked } : {}), seq: ++seq } }
+    const card = frame.type === 'a2ui' && isCard(frame) ? frame : undefined
+    const wait: Step[] = card
+      ? [{ wait: st.wait, frame: { type: 'status', text: AWAITING_TEXT[card.kind as 'approval' | 'choice'], phase: 'waiting', for: card.kind === 'approval' ? 'confirm' : 'answer', cardId: card.surfaceId, since: at, seq: ++seq } as Frame }]
+      : []
+    return [...wait, { ...st, ...(wait.length ? { wait: 0 } : {}), frame: { ...frame, seq: ++seq } }]
   })
   lastSeq.set(id, seq)
-  const card = out.map((st) => st.frame).findLast(isCard)
+  const card = out.map((st) => st.frame).findLast((f): f is Card & Frame => isCard(f))
   if (card) waiting.set(id, card)
   else waiting.delete(id)
   return out
 }
 
-/** A card restored from GET .../turns has no run behind it in the mock, so answering it only closes it. */
 const closeStored = (id: string): Step[] => {
   delete storedTurns[id]
   const c = find(id)
@@ -192,25 +168,21 @@ const closeStored = (id: string): Step[] => {
   return []
 }
 
-// The 도토리증권 chat is one chat under two ids: the legacy row above and the bot (b-dotori) whose job the mock leaves running.
 const RESUMABLE_BOT = 'b-dotori'
 
 const script = (b: RunInput, card: Card | undefined, choice: number | undefined): Step[] => {
   const id = b.conversationId
   const state = scenario.get(id)
   if (card && state && choice !== undefined) {
-    // The first 병목 강도 pick fails verification (ChatVerifyFail); picking again passes.
-    const verifying = card.id === 'ph2x-level' && choice !== 3 && !state.verified
+    const verifying = card.surfaceId === 'ph2x-level' && choice !== 3 && !state.verified
     if (verifying) state.verified = true
-    return verifying ? verifyFail : (next[card.id] ?? (() => generic(b.text ?? '')))(choice, state.labels)
+    return verifying ? verifyFail : (next[card.surfaceId] ?? (() => generic(b.text ?? '')))(choice, state.labels)
   }
   if (!state && (find(id)?.status === 'RUNNING' || id === RESUMABLE_BOT)) {
     scenario.set(id, { prefix: `r${++runs}`, labels: TODO })
     return startDocument
   }
   if (b.interrupted && state && !pick(b.text ?? '', true, undefined, b.intent, account.run)) {
-    // Talking after 중지 resumes the stopped work with the new request folded in (ChatInterrupt).
-    // Fresh ids: the stopped lines stay in the transcript and the resumed work continues below them.
     scenario.set(id, { prefix: `r${++runs}`, labels: TODO_PLUS })
     return tailorResume
   }
@@ -221,7 +193,6 @@ const script = (b: RunInput, card: Card | undefined, choice: number | undefined)
     return profileChangeRun(changeId)
   }
   const p = pick(b.text ?? '', false, b.attachment, b.intent, account.run)!
-  // run1: the token served this one message.
   if (account.once) account = { ...account, run: undefined, once: false }
   scenario.set(id, { prefix: `r${++runs}`, labels: p.labels ?? TODO })
   return p.steps
@@ -231,7 +202,7 @@ mock('POST', 'chat/runs', ({ body }) => {
   const b = body as RunInput
   const id = b.conversationId
   const card = b.interrupted ? undefined : waiting.get(id)
-  if (b.resolve && b.resolve.approvalId !== card?.id) return { data: closeStored(id) }
+  if (b.resolve && b.resolve.approvalId !== card?.surfaceId) return { data: closeStored(id) }
   const choice = card && (b.resolve ? choiceOf(card, b.resolve.optionId) : typedChoice(card))
   if (BUSY.has((b.text ?? '').trim().toLowerCase())) return { data: serve(id, fail('QUEUE_BUSY', { retryAfterSec: 12 })) }
   if (account.spent && choice === undefined) return { data: serve(id, fail('INSUFFICIENT_CREDITS')) }
@@ -243,63 +214,33 @@ mock('POST', 'chat/runs', ({ body }) => {
     const events = out.flatMap((st) => mapEvent(st.frame))
     const last = events.at(-1)
     const line = events.findLast((e) => e.type === 'agentText' || e.type === 'token')
-    c.status = last?.type === 'approval' ? 'NEEDS_APPROVAL' : null
-    c.lastLine = last?.type === 'approval' ? last.approval.question : (line && 'text' in line ? line.text : '').replace(/\*\*/g, '')
+    const open = waiting.get(id)
+    c.status = open && last?.type === 'surface' && last.id === open.surfaceId ? 'NEEDS_APPROVAL' : null
+    c.lastLine = c.status && open ? cardTitle(open) : (line && 'text' in line ? line.text : '').replace(/\*\*/g, '')
     c.updatedAt = new Date().toISOString()
   }
   return { data: out }
 })
 
-// ---------- stored turns ----------
-
-// What GET .../turns returns for the seeded conversations, so reopening one draws its cards again.
+const stored = (frame: A2uiFrame, seq: number) => ({ ...frame, seq }) as ConversationTurn['events'][number]
+const doneTodo = (id: string, labels: string[]) => todoSurface(id, labels, labels.length)
 const storedTurns: Record<string, ConversationTurn['events']> = {
   'c-moa': [
-    { type: 'todo', id: 'analyze', items: PH1.map((text, i) => ({ id: String(i), text, state: 'done' as const })), seq: 1 },
+    stored(doneTodo('analyze', PH1), 1),
     { type: 'tool', name: 'read_resume', state: 'ok', summary: '이력서 읽기', target: RESUME, resultLine: '2쪽 · 경력 2건, 프로젝트 5건, 링크 3개', seq: 2 },
     { type: 'tool', name: 'analyze_posting', state: 'ok', summary: '공고 읽기', target: MOA, resultLine: '필수 5개 · 우대 3개', extra: JD_LINES, seq: 3 },
     { type: 'tool', name: 'fit_score', state: 'ok', summary: '적합도 계산', target: '5개 항목 · 가중치 반영', resultLine: '6.9점', seq: 4 },
-    {
-      type: 'fit', score: 6.9, plan: 'PRO', band: '보통 · 개선 여지 있어요', summary: '기술 스택은 잘 맞아요. 키워드와 도메인이 약해요.',
-      parts: { techStack: 7.5, experienceLink: 7, careerLevel: 8, keyword: 4.5, domain: 5 },
-      keywords: [{ label: 'Kotlin', ok: true }, { label: 'Spring Boot', ok: true }, { label: 'JPA', ok: true }, { label: 'Kafka', ok: false }, { label: '정산 도메인', ok: false }],
-      seq: 5,
-    },
+    stored(surface('fit', 'moa-fit'), 5),
     { type: 'token', text: '경력 섹션부터 공고에 맞게 고쳐 볼게요.', seq: 6 },
-    {
-      type: 'approval', id: 'moa-edit', kind: 'DOCUMENT_EDIT', title: '수정 적용', documentId: 'd1',
-      options: [{ id: 'apply', label: '적용' }, { id: 'skip', label: '그대로 두기' }],
-      hunks: PROFILE_REVIEW_HUNKS,
-      resolution: { status: 'PENDING', optionId: null },
-      seq: 7,
-    },
+    stored(editSurface('moa-edit', PROFILE_REVIEW_HUNKS.map(({ sign, text }) => ({ sign, text })), 'd1', '6줄을 더하고 4줄을 뺐어요'), 7),
   ],
   'c-dotori': [
     { type: 'tool', name: 'write_draft', state: 'ok', summary: '초안 쓰기', target: '이력서 v1', resultLine: '1쪽 · 섹션 5개 · 말투 그대로', seq: 1 },
-    {
-      type: 'choice', id: 'ph3-review', title: '첫 번째 초안(v1)이에요. 이대로 검토할까요?',
-      options: [{ id: 'review', label: '검토할게요' }, { id: 'stop', label: '그만하기' }],
-      resolution: { status: 'EXPIRED', optionId: null },
-      seq: 2,
-    },
+    stored(fixtureFrame('choice-single', 'ph3-review', { open: false, picked: [] }), 2),
   ],
-  'c-career': [
-    { type: 'todo', items: PROFILE_TODO.map((text, i) => ({ id: String(i), text, state: 'done' as const })), seq: 1 },
-    {
-      type: 'result', source: 'profile', taskLine: PROFILE_TASK, checklist: PROFILE_TODO, documentId: 'd1', company: '모아페이',
-      name: '김서준', headline: '백엔드 엔지니어', title: '김서준 · 백엔드 엔지니어', subtitle: 'Push 프로필 · 어제 수정',
-      actions: [{ id: 'apply', label: '모아페이에 바로 지원하기' }, { id: 'view', label: '프로필 보기' }],
-      summary: '다 됐어요! 적합도를 6.9 → 8.2로 올렸어요.', fitFrom: 6.9, fitTo: 8.2,
-      bullets: ['승인 API 성과를 숫자로 보여 줬어요', 'Kafka를 기술 스택 맨 앞으로 옮겼어요'],
-      seq: 2,
-    },
-  ],
+  'c-career': [stored(doneTodo('career', PROFILE_TODO), 1), stored(profileSurface('career-result', PROFILE_NAME, 'd1'), 2)],
 }
 
-/**
- * Each conversation's newest frame seq, starting after its stored turns. push-be numbers every frame from one counter,
- * so a new run never reuses a restored frame's seq, which the mapper turns into ids such as fit-<seq>.
- */
 const lastSeq = new Map(Object.entries(storedTurns).map(([id, events]) => [id, Math.max(...events.map((e) => e.seq ?? 0))]))
 
 mock('GET', 'conversations/:id/turns', ({ params, query }) => {
@@ -310,8 +251,6 @@ mock('GET', 'conversations/:id/turns', ({ params, query }) => {
     : []
   return page(turns, query)
 })
-
-// ---------- 내 링크 ----------
 
 const links: UserLink[] = [
   { id: 'l1', kind: 'job', url: 'https://careers.moapay.kr/jobs/1182', title: '모아페이 · 결제 플랫폼 시니어 엔지니어', status: 'READ', fitCount: 2, aiRead: true, createdAt: ago(60) },
@@ -353,19 +292,6 @@ mock('POST', 'me/links/:id/restore', ({ params }) => {
   return { data: link }
 })
 
-// ---------- 내 서류 · 계정 ----------
-
-const docs: ChatDoc[] = [
-  { id: 'd1', fileName: RESUME, size: 2_400_000, createdAt: '2026-10-12T09:00:00+09:00' },
-  { id: 'd2', fileName: '경력기술서_모아페이.docx', size: 640_000, createdAt: '2026-09-28T09:00:00+09:00' },
-  { id: 'd3', fileName: '포트폴리오_결제시스템.pdf', size: 8_100_000, createdAt: '2026-08-03T09:00:00+09:00' },
-  { id: 'd4', fileName: '모아페이_맞춤_이력서_v2.pdf', size: 186_000, createdAt: ago(10), aiMade: true },
-]
-/** 내 서류 and 마이 › 서류 are one list; DELETE sources/:id (me.ts) calls this too. */
-export const removeChatDoc = (id: string) => {
-  const i = docs.findIndex((d) => d.id === id)
-  if (i >= 0) docs.splice(i, 1)
-}
 mock('GET', 'chat/docs', () => ({ data: account.few ? docs.filter((d) => d.id === 'd2' || d.id === 'd4') : docs }))
 mock('POST', 'chat/docs', ({ body }) => {
   const b = body as { fileName: string; size: number }
@@ -373,14 +299,10 @@ mock('POST', 'chat/docs', ({ body }) => {
   docs.unshift(d)
   return { status: 201, body: { data: d } }
 })
-// Tour switches (links.ts): `plan-ultra` is an ULTRA account (4x PRO's credits), `credits-out` has spent all of them (ChatNoCreditUltra).
-// `few-materials` is the account ChatMention draws: two bookmarks, two documents, one link. `run` is the token the next messages play.
-// `payments-closed` answers paymentsEnabled: false, so every buy button hides (ChatPh1FitClosed).
 let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; run?: string; once?: boolean } = { ultra: false, spent: false, few: false, closed: false }
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }
 }
-// ChatAccountUsage: the bot shares add up to the 64% the account shows (3200 of 5000, and 12800 of 20000 on ULTRA); a spent account is 100%.
 const USAGE_BY_BOT = [
   { name: '모아페이', percent: 28 },
   { name: 'Push Bot', percent: 18 },
@@ -399,8 +321,6 @@ mock('GET', 'chat/account', () => {
   const now = new Date()
   return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(), usageByBot: account.spent ? USAGE_SPENT : USAGE_BY_BOT } }
 })
-
-// ---------- quick-start ingredients ----------
 
 const job = (id: string, over: string, title: string, sub: string, text: string, color: string, extra: Partial<QsData['items'][number]> = {}) => ({
   id, over, title, sub, logo: { text, color }, ...extra,
@@ -432,7 +352,6 @@ const quick: Record<string, QsData> = {
       job('s-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: '서류', tone: 'ac' }, selected: true }),
       job('s-star', '별빛게임즈', 'DevOps 엔지니어', '', '별', '#1864AB', { badge: { label: '지원함', tone: 'grey' }, selected: true }),
       job('s-raon', '라온헬스', '백엔드 개발자 (Java)', '', '라', '#364FC7', { badge: { label: '합격', tone: 'green' } }),
-      // Same ids as the 진행 중 rows, as the real list has (one application listed under both tabs is one pick).
       ...[
         job('s-moa', '모아페이', '결제 플랫폼 시니어 엔지니어', '', '모', '#1F3A8A', { badge: { label: '면접', tone: 'orange' }, seg: 1, selected: true }),
         job('s-dotori', '도토리증권', '서버 개발자 (Go)', '', '도', '#343A40', { badge: { label: '서류', tone: 'ac' }, seg: 1, selected: true }),

@@ -1,20 +1,19 @@
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Icon, Sheet, showToast, Text, TextField } from '@/shared/components'
 import { displayName, extensionOf } from '@/shared/utility/display-name'
-import { hitSlopTo, spacing, useColors } from '@/theme'
+import { hitSlopTo, spacing } from '@/theme'
 import { useDocument, useRenameDocument, useRenameSource, useSource } from '../api/hooks'
 import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, typedTitle } from '../utils'
 
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 18
-// The board's sheet starts 4 higher on the title (centre 43 under the top, not 47) and ends 38 under the CTA, not 26: the floating sheet sits at 866 on both, so the top lands 8 higher.
 const RENAME_TITLE_LIFT = -4
 const RENAME_BOTTOM_EXTRA = 12
 
 const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
-  const c = useColors()
   const doc = useDocument(source ? '' : id).data?.data
   const upload = useSource(source ? id : '').data
   const current = source ? (upload ? displayName(upload.fileName) : undefined) : doc?.title
@@ -35,16 +34,16 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
   }
   return (
     <Sheet gap={spacing[1]} actionGap={10} slimAction bottomExtra={RENAME_BOTTOM_EXTRA} action={{ label: DOC_RENAME_COPY.save, onPress: save, disabled: current === undefined || !value.trim() || over || rename.isPending }}>
-      <View style={{ minHeight: 52, justifyContent: 'center', marginTop: Platform.OS === 'ios' ? RENAME_TITLE_LIFT : 0 }}>
-        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+      <View style={styles.titleRow}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={styles.title}>
           {source ? DOC_RENAME_COPY.fileTitle : DOC_RENAME_COPY.title}
         </Text>
       </View>
-      <View style={{ paddingHorizontal: spacing[1], gap: 6 }}>
+      <View style={styles.body}>
         <Text v="b2" color="t2">
           {DOC_RENAME_COPY.description}
         </Text>
-        <View style={{ marginTop: spacing[1] }}>
+        <View style={styles.field}>
           <TextField
             value={value}
             onChangeText={(t) => setTyped(typedTitle(value, t))}
@@ -59,7 +58,7 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
                   accessibilityLabel={DOC_RENAME_COPY.clear}
                   hitSlop={hitSlopTo(CLEAR_SIZE, CLEAR_SIZE)}
                   onPress={() => setTyped('')}
-                  style={{ width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}
+                  style={styles.clear}
                 >
                   <Icon name="x" size={CLEAR_ICON} color="t3" />
                 </Pressable>
@@ -67,12 +66,21 @@ const DocRenameSheet = ({ id, source }: { id: string; source?: boolean }) => {
             }
           />
         </View>
-        <Text v="c1" color={over ? 'red' : 't3'} style={{ alignSelf: 'flex-end', paddingTop: 2, paddingRight: spacing[1] }}>
+        <Text v="c1" color={over ? 'red' : 't3'} style={styles.count}>
           {savedLength(value)}/{DOC_TITLE_MAX}
         </Text>
       </View>
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  titleRow: { minHeight: 52, justifyContent: 'center', marginTop: Platform.OS === 'ios' ? RENAME_TITLE_LIFT : 0 },
+  title: { textAlign: 'center' },
+  body: { paddingHorizontal: theme.spacing[1], gap: 6 },
+  field: { marginTop: theme.spacing[1] },
+  clear: { width: CLEAR_SIZE, height: CLEAR_SIZE, borderRadius: CLEAR_SIZE / 2, backgroundColor: theme.colors.fill, alignItems: 'center', justifyContent: 'center' },
+  count: { alignSelf: 'flex-end', paddingTop: 2, paddingRight: theme.spacing[1] },
+}))
 
 export default DocRenameSheet

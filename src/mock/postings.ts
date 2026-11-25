@@ -17,13 +17,11 @@ const base = (p: Partial<Posting> & Pick<Posting, 'id' | 'company' | 'title' | '
 })
 
 const DAY = 86_400_000
-// Deadlines keep their distance from the day the sample was written (2026-10-19), counted from today.
 const inDays = (n: number) => {
   const d = new Date(Date.now() + n * DAY)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-// Sample data from the Claude Design boards (홈, 채용공고, 채용공고 상세).
 export const postings: Posting[] = [
   base({ id: 'p1', company: '모아페이', title: '백엔드 엔지니어 (Kotlin·Spring)', location: '서울 강남구', careerMin: 4, careerMax: 6, skills: ['Kotlin', 'Spring Boot', 'JPA', 'Kafka'], deadline: inDays(13), bookmarked: true, sourceUrl: 'https://careers.moapay.kr/jobs/1182' }),
   base({ id: 'p2', company: '파도AI', title: '데이터 분석가', jobCategory: 'data', location: '서울 서초구', careerMin: 0, skills: ['SQL', 'Python'], deadline: inDays(2) }),
@@ -50,19 +48,15 @@ export const postings: Posting[] = [
   base({ id: 'p23', company: '바다물류', title: '물류 시스템 개발자', location: '경기 수원시', careerMin: 4, careerMax: 6, skills: ['Java', 'Spring Boot'], employmentType: 'dispatch', deadline: inDays(40), createdAt: '2026-10-04T09:00:00Z' }),
   base({ id: 'p24', company: '모아페이', title: '퍼포먼스 마케터', jobCategory: 'marketing', location: '서울 강남구', careerMin: 1, careerMax: 3, deadline: inDays(18), createdAt: '2026-10-03T09:00:00Z' }),
   base({ id: 'p25', company: '모아페이', title: '결제 플랫폼 시니어 엔지니어', location: '서울 강남구', careerMin: 5, deadline: inDays(21), createdAt: '2026-10-02T09:00:00Z' }),
-  // BotNewLong's long company name. Its deadline is past, so no list shows it; only `bots/new?posting=p-nuri-long` and GET postings/:id reach it.
   base({ id: 'p-nuri-long', company: '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', title: '플랫폼 엔지니어', location: '경기 성남시', careerMin: 3, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
-  // BotNewLinkPicked and BotNewXL draw 모아페이 with the short title 백엔드 엔지니어; p1 carries the full one (Kotlin·Spring). Hidden like p-nuri-long: only `bots/new?posting=p-moa-short` reaches it.
   base({ id: 'p-moa-short', company: '모아페이', title: '백엔드 엔지니어', location: '서울 강남구', careerMin: 4, careerMax: 6, deadline: inDays(-1), createdAt: '2026-09-01T09:00:00Z' }),
 ]
 
-// Tour switch (links.ts): the 마감 임박 공고 board lists 모아페이 백엔드 as its sixth tile, so it closes in 7 days there (D-13 everywhere else).
 export const closeMoapay = () => {
   const p = postings.find((x) => x.id === 'p1')
   if (p) p.deadline = inDays(7)
 }
 
-// The home 새로 올라온 공고 cards show the long title the board drew; lists and detail use the short one.
 const HOME_LATEST_TITLES: Record<string, string> = {
   p1: '백엔드 엔지니어 (Kotlin·Spring) · 결제 플랫폼팀',
   p2: '데이터 분석가 (추천·검색 랭킹 실험 설계)',
@@ -79,20 +73,17 @@ const details: Record<string, Partial<Omit<PostingDetail, keyof Posting>>> = {
 const days = (iso: string | null) => (iso ? (Date.parse(iso) - Date.now()) / DAY : Infinity)
 const csv = (q: URLSearchParams, k: string) => q.get(k)?.split(',').filter(Boolean) ?? []
 
-// 이번 주 조회수 (sort=popular).
 const views: Record<string, number> = { p6: 980, p5: 870, p4: 760, p1: 650, p2: 540, p14: 430, p9: 320 }
 
-// careerYears buckets overlap the posting's careerMin..careerMax range.
 const BUCKETS: Record<string, [number, number]> = { '0': [0, 0], '1-3': [1, 3], '4-6': [4, 6], '7-9': [7, 9], '10+': [10, Infinity] }
 const inBucket = (p: Posting, key: string) => {
   const [lo, hi] = BUCKETS[key] ?? [0, Infinity]
   return p.careerMin <= hi && (p.careerMax ?? Infinity) >= lo
 }
-// "서울" matches every 서울 district; "서울 강남구" only that one.
 const inLocation = (p: Posting, loc: string) => p.location === loc || p.location.startsWith(`${loc} `)
 
 const filter = (query: URLSearchParams) => {
-  let list = postings.filter((p) => days(p.deadline) >= 0) // 마감된 공고는 숨긴다 (feature-spec 3.3)
+  let list = postings.filter((p) => days(p.deadline) >= 0)
   const q = query.get('q')?.trim().toLowerCase()
   if (q) list = list.filter((p) => `${p.company} ${p.title}`.toLowerCase().includes(q))
   const cats = csv(query, 'category')
@@ -108,8 +99,6 @@ const filter = (query: URLSearchParams) => {
   return list
 }
 
-// shortcut: the list header and filter sheets show the design's totals (1,284 …) for the filter sets the boards draw;
-// anything else reports the real fixture count. Drop with the fixed numbers once push-be v2 serves real data.
 const SHOWN_TOTALS: Record<string, number> = {
   '': 1284,
   'careerYears=4-6': 386,
@@ -129,8 +118,6 @@ const shownTotal = (query: URLSearchParams, actual: number) => {
 mock('GET', 'postings', ({ query }) => {
   let list = filter(query)
   const sort = query.get('sort')
-  // Home sections reuse the list: ?sort=deadline → 마감 7일 이내 (feature-spec 3.3).
-  // Compared as calendar dates: the millisecond distance to a date string jumps a day with the device's UTC offset.
   if (query.get('deadlineWithin') === '7' || sort === 'deadline') list = list.filter((p) => p.deadline !== null && p.deadline <= inDays(7))
   if (sort === 'deadline') list = list.sort((a, b) => a.deadline!.localeCompare(b.deadline!))
   else if (sort === 'popular') list = list.filter((p) => views[p.id]).sort((a, b) => views[b.id]! - views[a.id]!)
@@ -140,9 +127,6 @@ mock('GET', 'postings', ({ query }) => {
   return { ...out, page: { ...out.page, total: shownTotal(query, list.length) } }
 })
 
-// Per-district counts for the 지역 sheet: FilterRegion draws 서울 전체 842 over eleven districts (761); the other 81 are postings
-// that name only 서울, which the sheet counts into 서울 전체 and does not list.
-// shortcut: fixed table, ignores the other filters; the fixtures are too few to give these numbers.
 const LOCATION_COUNTS: [string, number][] = [
   ['서울 강남구', 214], ['서울 서초구', 96], ['서울 마포구', 88], ['서울 영등포구', 71], ['서울 송파구', 64], ['서울 성동구', 58],
   ['서울 용산구', 41], ['서울 중구', 39], ['서울 종로구', 33], ['서울 강서구', 30], ['서울 구로구', 27], ['서울', 81],
@@ -164,8 +148,6 @@ mock('GET', 'postings/:id', ({ params }) => {
   return { data: detail }
 })
 
-// Newest bookmark first, like the 허브 제안 sheet lists them.
-// shortcut: p2 is in the 북마크 board's list but its card is unmarked on the home and list boards, so only this list knows it.
 const bookmarkOrder = ['p1', 'p7', 'p8', 'p2']
 const setBookmark = (id: string, on: boolean) => {
   const p = postings.find((x) => x.id === id)
@@ -176,13 +158,11 @@ const setBookmark = (id: string, on: boolean) => {
   const rest = bookmarkOrder.filter((x) => x !== id)
   bookmarkOrder.splice(0, bookmarkOrder.length, ...(on ? [id, ...rest] : rest))
 }
-// Tour switch (links.ts): ChatMention draws an account with only 모아페이 and 라온헬스 bookmarked.
 export const fewBookmarks = () => {
   bookmarkOrder.splice(2)
 }
 mock('POST', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, true))
 mock('DELETE', 'postings/:id/bookmark', ({ params }) => setBookmark(params.id!, false))
-// shortcut: the 허브 제안 sheet (the only limit=10 caller) draws the title without its stack suffix; drop when the sheet trims it.
 const SHEET_TITLES: Record<string, string> = { p1: '백엔드 엔지니어' }
 mock('GET', 'me/bookmarks', ({ query }) => {
   const list = bookmarkOrder.flatMap((id) => postings.find((p) => p.id === id) ?? []).map((p) => ({ ...p, bookmarked: true, location: p.id === 'p8' ? '성남 판교' : p.location }))

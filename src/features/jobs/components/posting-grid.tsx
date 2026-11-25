@@ -6,7 +6,7 @@ import type { Posting, PostingFilters } from '@push/api-client'
 import { JobCard, StatusNote, emptyNoteStyle } from '../../../shared/components'
 import { usePostingPages, useToggleBookmark } from '../api/hooks'
 import { JOBS_EMPTY_LINES, RESET_FILTERS_LABEL } from '../constants'
-import { spacing } from '../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import { gridCardWidth, gridFillWidth } from '../utils/grid'
 import PostingGridSkeleton from './posting-grid-skeleton'
 
@@ -14,15 +14,11 @@ type Props = {
   filters: PostingFilters
   header?: ReactElement
   onReset?: () => void
-  /** Space for a header floating over the list, and its scroll listener. */
   topInset?: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-// The grid pads its content by 20pt; the header, the empty state and the spinner run edge to edge.
-const bleed = { marginHorizontal: -spacing[5] }
-
-const Gap = () => <View style={{ height: 22 }} />
+const Gap = () => <View style={styles.gap} />
 
 const GridCard = ({ posting, width, onBookmark }: { posting: Posting; width: number; onBookmark: (p: Posting) => void }) => (
   <JobCard posting={posting} width={width} onPress={() => router.push(`/postings/${posting.id}`)} onBookmark={() => onBookmark(posting)} />
@@ -42,12 +38,11 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       numColumns={2}
       recycleItems
       estimatedItemSize={cardWidth * 0.68 + 80}
-      // The screen's ScreenBar floats over the list and passes its own height as topInset; an automatic inset would add the status bar on top of it (61pt after a sheet was dismissed).
       contentInsetAdjustmentBehavior="never"
       ListHeaderComponent={header}
-      ListHeaderComponentStyle={bleed}
-      columnWrapperStyle={{ gap: spacing[3] }}
-      contentContainerStyle={{ flexGrow: 1, paddingTop: topInset, paddingBottom: 32, paddingHorizontal: spacing[5] }}
+      ListHeaderComponentStyle={styles.bleed}
+      columnWrapperStyle={styles.columns}
+      contentContainerStyle={styles.content(topInset)}
       onScroll={onScroll}
       scrollEventThrottle={64}
       ItemSeparatorComponent={Gap}
@@ -55,7 +50,7 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
       onEndReachedThreshold={0.5}
       ListEmptyComponent={
-        <View style={{ ...bleed, flex: 1 }}>
+        <View style={styles.empty}>
         {q.isPending ? (
           <PostingGridSkeleton cardWidth={gridFillWidth(width)} />
         ) : q.isError ? (
@@ -69,9 +64,18 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
         )}
         </View>
       }
-      ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={{ marginTop: spacing[2] }} /> : undefined}
+      ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={styles.more} /> : undefined}
     />
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  gap: { height: 22 },
+  bleed: { marginHorizontal: -theme.spacing[5] },
+  columns: { gap: theme.spacing[3] },
+  content: (topInset: number) => ({ flexGrow: 1, paddingTop: topInset, paddingBottom: 32, paddingHorizontal: theme.spacing[5] }),
+  empty: { marginHorizontal: -theme.spacing[5], flex: 1 },
+  more: { marginTop: theme.spacing[2] },
+}))
 
 export default PostingGrid

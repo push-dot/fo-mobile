@@ -34,39 +34,7 @@ describe('fromStream', () => {
     expect(resume).not.toHaveBeenCalled()
     expect(await collect(fromStream(frames({ type: 'token', text: 'a', seq: 1 }), resume))).toEqual([{ type: 'token', text: 'a' }])
     expect(resume).toHaveBeenCalledTimes(1)
-    // No seq: resuming would replay from the start, so it stops instead.
     expect(await collect(fromStream(frames({ type: 'token', text: 'b' }), resume))).toEqual([{ type: 'token', text: 'b' }])
     expect(resume).toHaveBeenCalledTimes(1)
-  })
-
-  it('keeps the server choice options and leaves the detail out of the panel', async () => {
-    const resume = vi.fn(() => frames())
-    const out = await collect(
-      fromStream(
-        frames({
-          type: 'choice',
-          id: 'b1',
-          title: '점수를 한 번 더 올릴까요?',
-          detail: '적합도 6.9 → 7.4 (+0.5)',
-          options: [
-            { id: 'continue', label: '한 번 더 올리기' },
-            { id: 'stop', label: '여기서 멈추기' },
-            { id: 'cancel', label: '그만하기' },
-          ],
-        }),
-        resume,
-      ),
-    )
-    expect(out[0]).toMatchObject({
-      type: 'approval',
-      approval: {
-        question: '점수를 한 번 더 올릴까요?',
-        sections: [
-          {
-            items: [{ label: '한 번 더 올리기' }, { label: '여기서 멈추기' }, { label: '닫기' }],
-          },
-        ],
-      },
-    })
   })
 })

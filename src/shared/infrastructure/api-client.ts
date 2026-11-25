@@ -1,11 +1,11 @@
 import { ApiError, createApi, createBotApi, createClient, createRefresher } from '@push/api-client'
 import { fetch as expoFetch } from 'expo/fetch'
 import * as Crypto from 'expo-crypto'
+import { A2UI_VERSION } from './a2ui-version'
 import { API_BASE_URL } from './config'
 import { isRefreshAuthFailure } from './refresh-auth-failure'
 import { useSession } from './session-store'
 
-// The flag is read inline, not from config, so Metro folds it and production bundles leave the mock out.
 const MOCK = process.env.EXPO_PUBLIC_API_MOCK === '1'
 /* eslint-disable @typescript-eslint/no-require-imports */
 const mockFetch: typeof fetch | undefined = MOCK ? require('../../mock').mockFetch : undefined
@@ -18,13 +18,13 @@ const clientConfig = {
   getToken: () => useSession.getState().session?.accessToken,
   fetch: clientFetch,
   uuid: () => Crypto.randomUUID(),
+  a2uiVersion: A2UI_VERSION,
 }
 
 const refreshApi = createApi(createClient(clientConfig))
 
 export const refreshSession = createRefresher({
   refresh: (current) => {
-    // Not an auth failure: a missing token keeps whatever is stored.
     if (!current?.refreshToken) throw new ApiError('no refresh token', 'NO_REFRESH_TOKEN', 0)
     return refreshApi.auth.refresh(current.refreshToken)
   },

@@ -1,7 +1,6 @@
-import { Platform, useColorScheme } from 'react-native'
+import { useColorScheme } from 'react-native'
 import { themeMode } from './mode'
 import { useThemePreference } from './preference'
-import { platformTokens } from './platform'
 import { palette, shadow, type Colors } from './tokens'
 
 export * from './tokens'
@@ -18,7 +17,7 @@ export { useThemePreference } from './preference'
 export { HIT_TARGET, STATUS_ROW_MIN_HEIGHT, hitSlopTo } from './hit-target'
 export { platformTokens } from './platform'
 
-export const platformTheme = platformTokens(Platform.OS === 'ios' ? 'ios' : 'android')
+export { platformTheme } from './platform-theme'
 
 export const useThemeMode = (): 'light' | 'dark' => {
   const system = useColorScheme()

@@ -1,14 +1,10 @@
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Icon, Text } from '@/shared/components'
-import { spacing } from '../../../theme'
 
 const PickRow = ({ title, sub, onPress }: { title: string; sub: string; onPress: () => void }) => (
-  <Pressable
-    accessibilityRole="button"
-    onPress={onPress}
-    style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3] }}
-  >
-    <View style={{ flex: 1 }}>
+  <Pressable accessibilityRole="button" onPress={onPress} style={styles.row}>
+    <View style={styles.body}>
       <Text v="b1" weight="700">
         {title}
       </Text>
@@ -19,5 +15,10 @@ const PickRow = ({ title, sub, onPress }: { title: string; sub: string; onPress:
     <Icon name="chev" size={18} color="t1" />
   </Pressable>
 )
+
+const styles = StyleSheet.create((theme) => ({
+  row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[3] },
+  body: { flex: 1 },
+}))
 
 export default PickRow

@@ -1,7 +1,7 @@
 import { router, useIsFocused } from 'expo-router'
 import { useEffect, useEffectEvent } from 'react'
 import { TOAST_ABOVE, askConfirm, showToast, type ConfirmRequest } from '@/shared/components'
-import { materialCreateBotPath } from '@/features/bots'
+import { materialCreateBotPath } from '@/shared/navigation'
 import { showChoiceModal } from '@/shared/navigation'
 import { pickDocument } from '@/shared/infrastructure'
 import { displayName } from '@/shared/utility/display-name'
@@ -10,7 +10,6 @@ import type { PickedFile } from './types'
 import { deleteWithUndo, useDocDelete, useDocImport, usePendingDelete } from './stores'
 import { deleteDocCopy, SIZE_LIMIT } from './utils'
 
-// A sheet only files the request; the screen under it acts on it `ms` after regaining focus, and drops it if it loses focus first.
 const useSheetHandoff = <T,>(request: T | null | false, clear: () => void, fire: (request: T) => void, ms: number) => {
   const focused = useIsFocused()
   const onClear = useEffectEvent(clear)
@@ -57,7 +56,6 @@ export const pickResume = async (): Promise<PickedFile | null> => {
   return file
 }
 
-/** An uploaded file's ⋯ menu (MyResumeStates): 이름 변경 and 서류 삭제하기 in a regular modal; the delete confirm over the page stays an alert. */
 export const useFileMenu = (file: { id: string; fileName: string } | undefined) => () => {
   if (!file) return
   showChoiceModal({
@@ -69,7 +67,6 @@ export const useFileMenu = (file: { id: string; fileName: string } | undefined) 
   })
 }
 
-/** UploadPick: 파일 등록 asks where the 서류 comes from, in a regular modal, also over the 자료 modal (like MaterialsLinkAdd). */
 export const showImportMenu = () =>
   showChoiceModal({
     title: '서류 가져오기',

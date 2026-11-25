@@ -1,17 +1,16 @@
 import { LegendList } from '@legendapp/list/react-native'
 import { router, useIsFocused } from 'expo-router'
 import { ActivityIndicator, Platform, Pressable, ScrollView, View } from 'react-native'
-import { isJobSettled } from '@push/api-client'
+import { StyleSheet } from 'react-native-unistyles'
 import { useQueryClient } from '@tanstack/react-query'
 import { fileSize, monthDay } from '@push/shared'
 import { Button, Icon, Spinner, Text } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
-import { radius, spacing, useColors } from '../../../theme'
 import { useDocuments, useIngestJob, useMyApplications, useSources, useUpload } from '../api/hooks'
 import { INGEST_TEXT, PUSH_CARD_WIDTH } from '../constants'
 import { pickResume, showImportMenu, useFileMenu, useImportRequest, useUndoRemove } from '../hooks'
 import type { HubDocument, MySource, ScrollUnderBar } from '../types'
-import { PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, UPLOADS_TITLE } from '../utils'
+import { isJobSettled, PUSH_DOCS_TITLE, pushCardLines, pushSeeAll, RETRY_LABEL, UPLOADS_TITLE } from '../utils'
 import { TAB_EMPTY_LIFT } from './empty'
 import FitRing from './fit-ring'
 import ListTitle from './list-title'
@@ -26,31 +25,29 @@ const EMPTY_INSET = 40
 const openChat = () => router.push('/bots/push')
 
 const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
-  const c = useColors()
   const qc = useQueryClient()
   const job = useIngestJob(doc.jobId, live).data
   const openMenu = useFileMenu(doc)
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
   const retry = () => {
-    // shortcut: no re-ingest route; refetch the job and the file list.
     void qc.invalidateQueries({ queryKey: ['ai-job', doc.jobId] })
     void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
   }
   return (
     <Row label={displayName(doc.fileName)} onPress={() => router.push(`/docs/${doc.id}`)}>
-      <View style={{ flex: 1, minWidth: 0 }}>
+      <View style={styles.body}>
         <Text v="b1" weight="700" numberOfLines={1}>
           {displayName(doc.fileName)}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.meta}>
           <Text v="c1" color="t3">
             {fileSize(doc.size)}
             {doc.createdAt ? ` · ${monthDay(doc.createdAt)}` : ''}
             {reading || failed ? ' · ' : ''}
           </Text>
           {reading && !failed ? (
-            <View style={{ marginRight: spacing[1] }}>
+            <View style={styles.spinner}>
               <Spinner color="t1" />
             </View>
           ) : null}
@@ -65,7 +62,7 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         <Pressable
           accessibilityRole="button"
           onPress={retry}
-          style={{ height: RETRY_H, borderRadius: RETRY_H / 2, paddingHorizontal: spacing[3], justifyContent: 'center', backgroundColor: c.fill }}
+          style={styles.retry}
         >
           <Text v="c1" weight="700">
             {RETRY_LABEL}
@@ -76,9 +73,8 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         accessibilityRole="button"
         accessibilityLabel={`${displayName(doc.fileName)} 더 보기`}
         onPress={openMenu}
-        style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
+        style={styles.more}
       >
-        {/* MyResume: iOS draws the three-line menu glyph in t1, Android the three dots in t3 */}
         {Platform.OS === 'ios' ? <Icon name="sort" size={22} color="t1" /> : <Icon name="more" size={20} color="t3" />}
       </Pressable>
     </Row>
@@ -88,7 +84,6 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
 type PushApplication = { company: string; title: string; fitScore?: number | null }
 
 const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApplication | null }) => {
-  const c = useColors()
   const lines = pushCardLines(doc, application)
   const date = monthDay(doc.updatedAt)
   return (
@@ -96,11 +91,11 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
       accessibilityRole="button"
       accessibilityLabel={[lines.company, lines.title, lines.score && `적합도 10점 만점에 ${lines.score}점`, lines.doc, date].filter(Boolean).join(', ')}
       onPress={() => router.push(`/docs/push/${doc.id}`)}
-      style={{ width: PUSH_CARD_WIDTH, borderRadius: PUSH_CARD_RADIUS, borderWidth: 1, borderColor: c.line, backgroundColor: c.paper, padding: spacing[2] }}
+      style={styles.card}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing[3], paddingTop: spacing[4], paddingHorizontal: spacing[3], paddingBottom: spacing[5] }}>
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text v="h2" weight="800" numberOfLines={1} style={{ lineHeight: 27, letterSpacing: -0.6 }}>
+      <View style={styles.cardHead}>
+        <View style={styles.body}>
+          <Text v="h2" weight="800" numberOfLines={1} style={styles.cardTitle}>
             {lines.title}
           </Text>
           {lines.company ? (
@@ -111,8 +106,8 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
         </View>
         {lines.score ? <FitRing score={lines.score} /> : null}
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], borderRadius: radius.card, backgroundColor: c.bg2, padding: spacing[3] }}>
-        <Text v="c1" weight="600" numberOfLines={1} style={{ flex: 1 }}>
+      <View style={styles.cardDoc}>
+        <Text v="c1" weight="600" numberOfLines={1} style={styles.cardDocName}>
           {lines.doc}
         </Text>
         {date ? (
@@ -126,7 +121,6 @@ const PushCard = ({ doc, application }: { doc: HubDocument; application: PushApp
 }
 
 const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
-  const c = useColors()
   const focused = useIsFocused()
   const apps = useMyApplications()
   const { data, isLoading } = useSources()
@@ -137,29 +131,20 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
   useImportRequest(pickFile)
   const renderDoc = ({ item }: { item: MySource }) => <DocRow doc={item} live={focused} />
 
-  if (isLoading) return <ActivityIndicator style={{ marginTop: 60 }} />
+  if (isLoading) return <ActivityIndicator style={styles.loading} />
   const docs = (data?.data ?? []).filter((d) => !hidden.includes(d.id))
   const pushDocs = push.data?.data ?? []
   const preview = pushDocs.slice(0, 3)
   if (docs.length === 0 && preview.length === 0 && !upload && !push.isLoading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: spacing[2],
-          paddingHorizontal: EMPTY_INSET,
-          paddingBottom: TAB_EMPTY_LIFT,
-        }}
-      >
-        <Text v="h2" style={{ textAlign: 'center' }}>
+      <View style={styles.empty}>
+        <Text v="h2" style={styles.center}>
           아직 Push 프로필이 없어요
         </Text>
-        <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+        <Text v="b2" color="t3" style={styles.center}>
           {'Bot 채팅에서 지원할 공고에 맞춘\nPush 프로필을 만들어 보세요.'}
         </Text>
-        <View style={{ alignSelf: 'stretch', gap: spacing[2], marginTop: 18 }}>
+        <View style={styles.emptyActions}>
           <Button label="Bot 채팅에서 만들기" onPress={openChat} />
           <Button label="가진 이력서 올리기" variant="secondary" onPress={pickFile} />
         </View>
@@ -168,7 +153,7 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <LegendList
         data={docs}
         keyExtractor={(d) => d.id}
@@ -178,13 +163,13 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
         contentInsetAdjustmentBehavior="automatic"
         onScroll={onScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={{ paddingTop: top, paddingBottom: spacing[6] }}
+        contentContainerStyle={styles.list(top)}
         ListHeaderComponent={
           <>
         {lead}
         {preview.length > 0 ? (
           <>
-            <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: spacing[6], paddingBottom: spacing[1], paddingHorizontal: spacing[5] }}>
+            <View style={styles.pushHead}>
               <Text v="h2" accessibilityRole="header">
                 {PUSH_DOCS_TITLE}
               </Text>
@@ -194,7 +179,7 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
                 </Text>
               </Pressable>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingTop: 1, paddingBottom: spacing[2] }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pushScroll} contentContainerStyle={styles.pushCards}>
               {preview.map((d) => (
                 <PushCard
                   key={d.id}
@@ -208,23 +193,16 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
         <ListTitle title={UPLOADS_TITLE} count={docs.length + (upload ? 1 : 0)} top={32} />
         {upload ? (
           <Row>
-            <View style={{ flex: 1, minWidth: 0, gap: spacing[2] }}>
+            <View style={styles.upload}>
               <Text v="b1" weight="700" numberOfLines={1}>
                 {displayName(upload.name)}
               </Text>
               <View
                 accessibilityRole="progressbar"
                 accessibilityValue={{ min: 0, max: 100, now: Math.round(upload.progress * 100) }}
-                style={{ height: PROGRESS_H, borderRadius: radius.pill, backgroundColor: c.fill2, overflow: 'hidden' }}
+                style={styles.progress}
               >
-                <View
-                  style={{
-                    width: `${upload.progress * 100}%`,
-                    height: '100%',
-                    borderRadius: radius.pill,
-                    backgroundColor: c.ac,
-                  }}
-                />
+                <View style={styles.progressFill(upload.progress)} />
               </View>
               <Text v="c1" color="t3">
                 올리는 중 · {((upload.size * upload.progress) / 1_000_000).toFixed(1)} /{' '}
@@ -235,8 +213,7 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
               accessibilityRole="button"
               accessibilityLabel="취소"
               onPress={cancel}
-              // Uploading: the 취소 button is a fill circle on iOS only (r6 rule); Android draws the bare glyph. The glyph is 18.
-              style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: Platform.OS === 'ios' ? c.fill : undefined, alignItems: 'center', justifyContent: 'center' }}
+              style={styles.cancel}
             >
               <Icon name="x" size={18} color="t3" />
             </Pressable>
@@ -245,10 +222,9 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
           </>
         }
         ListFooterComponent={
-          <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
+          <View style={styles.footer}>
             <Button
               label="파일 등록"
-              // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
               onPress={() => !upload && showImportMenu()}
             />
           </View>
@@ -257,5 +233,79 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  body: { flex: 1, minWidth: 0 },
+  meta: { flexDirection: 'row', alignItems: 'center' },
+  spinner: { marginRight: theme.spacing[1] },
+  retry: { height: RETRY_H, borderRadius: RETRY_H / 2, paddingHorizontal: theme.spacing[3], justifyContent: 'center', backgroundColor: theme.colors.fill },
+  more: { width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' },
+  card: {
+    width: PUSH_CARD_WIDTH,
+    borderRadius: PUSH_CARD_RADIUS,
+    borderWidth: 1,
+    borderColor: theme.colors.line,
+    backgroundColor: theme.colors.paper,
+    padding: theme.spacing[2],
+  },
+  cardHead: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing[3],
+    paddingTop: theme.spacing[4],
+    paddingHorizontal: theme.spacing[3],
+    paddingBottom: theme.spacing[5],
+  },
+  cardTitle: { lineHeight: 27, letterSpacing: -0.6 },
+  cardDoc: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[3],
+    borderRadius: theme.radius.card,
+    backgroundColor: theme.colors.bg2,
+    padding: theme.spacing[3],
+  },
+  cardDocName: { flex: 1 },
+  loading: { marginTop: 60 },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing[2],
+    paddingHorizontal: EMPTY_INSET,
+    paddingBottom: TAB_EMPTY_LIFT,
+  },
+  center: { textAlign: 'center' },
+  emptyActions: { alignSelf: 'stretch', gap: theme.spacing[2], marginTop: 18 },
+  screen: { flex: 1 },
+  list: (top: number) => ({ paddingTop: top, paddingBottom: theme.spacing[6] }),
+  pushHead: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingTop: theme.spacing[6],
+    paddingBottom: theme.spacing[1],
+    paddingHorizontal: theme.spacing[5],
+  },
+  pushScroll: { marginTop: 10 },
+  pushCards: { gap: theme.spacing[3], paddingHorizontal: theme.spacing[5], paddingTop: 1, paddingBottom: theme.spacing[2] },
+  upload: { flex: 1, minWidth: 0, gap: theme.spacing[2] },
+  progress: { height: PROGRESS_H, borderRadius: theme.radius.pill, backgroundColor: theme.colors.fill2, overflow: 'hidden' },
+  progressFill: (progress: number) => ({
+    width: `${progress * 100}%`,
+    height: '100%',
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.ac,
+  }),
+  cancel: {
+    width: HIT,
+    height: HIT,
+    borderRadius: HIT / 2,
+    backgroundColor: Platform.OS === 'ios' ? theme.colors.fill : undefined,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: { paddingTop: theme.spacing[5], paddingHorizontal: theme.spacing[5] },
+}))
 
 export default DocsTab

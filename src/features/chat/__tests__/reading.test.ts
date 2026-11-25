@@ -7,7 +7,11 @@ vi.mock('@/features/bots', async () => ({
 }))
 
 const { botRow } = await import('@/features/bots/utils/live-state')
-const { setReading, useReadingStore } = await import('../reading')
+vi.mock('@/shared/infrastructure', () => ({ api: {}, botApi: {}, http: {}, API_MOCK: false, hapticImpactLight: vi.fn(), hapticNotify: vi.fn() }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: {} }))
+vi.mock('../api/fetchers', () => ({ chatApi: {} }))
+
+const { setReading, useReadingStore } = await import('../stores')
 
 const now = new Date(2026, 10, 16, 15, 0)
 const bot = (id: string, unread: boolean): Bot =>

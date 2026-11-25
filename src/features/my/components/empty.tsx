@@ -2,7 +2,6 @@ import { Platform } from 'react-native'
 import { StatusNote, emptyNoteStyle } from '@/shared/components'
 import { platformTheme } from '../../../theme'
 
-// The boards centre 마이 empties over the whole screen; Android's tab bar is a real inset (iOS floats over the list).
 const EMPTY_LIFT = 140
 
 export const TAB_EMPTY_LIFT = EMPTY_LIFT - (Platform.OS === 'android' ? platformTheme.tabBarHeight : 0)

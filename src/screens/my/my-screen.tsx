@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native'
 import { ActivityTab, DocsTab, MyHeader, ProfileTab, type ActivitySub } from '@/features/my'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { FloatingHeader, SegmentedControl, useFloatingHeader } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Tab = 'profile' | 'docs' | 'activity'
 const TABS: { key: Tab; label: string }[] = [
@@ -18,9 +18,7 @@ const asSub = (s?: string): ActivitySub =>
   SUBS.includes(s as ActivitySub) ? (s as ActivitySub) : 'applications'
 
 const MyScreen = () => {
-  const c = useColors()
   const { scrolled, onHeight, onScroll: onHeaderScroll, inset } = useFloatingHeader()
-  // The glass tab row is drawn above the header's fade, so it fades itself out over its first 48pt of scroll instead of showing through the title.
   const [rowOpacity, setRowOpacity] = useState(1)
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     onHeaderScroll(e)
@@ -47,17 +45,16 @@ const MyScreen = () => {
     router.setParams({ sub: s })
   }
 
-  // The tab row scrolls away with the content; only the header floats.
   const lead = (
-    <View pointerEvents={rowOpacity < 0.25 ? 'none' : 'auto'} style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], opacity: rowOpacity }}>
+    <View pointerEvents={rowOpacity < 0.25 ? 'none' : 'auto'} style={styles.lead(rowOpacity)}>
       <SegmentedControl items={TABS} value={tab} onChange={pick} />
     </View>
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.root}>
       {tab === 'profile' ? (
-        <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingTop: inset }}>
+        <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={styles.content(inset)}>
           {lead}
           <ProfileTab />
         </ScrollView>
@@ -70,5 +67,11 @@ const MyScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.bg },
+  lead: (opacity: number) => ({ paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], opacity }),
+  content: (inset: number) => ({ paddingTop: inset }),
+}))
 
 export default MyScreen

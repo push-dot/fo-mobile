@@ -44,7 +44,6 @@ describe('board tracking (device WebKit lays 12-15px narrower than CoreText)', (
     expect(boardTracking(12)).toBeCloseTo(-0.0015 * 4 * 12)
   })
 
-  // MyProfile.1 intro line 1: CoreText 362.37 at -0.02em, 30 glyphs; the board box is 361.7 in a 362 column.
   it('takes the profile intro line under the 362 pt column', () => {
     expect(362.37 + boardTracking(15) * 30).toBeLessThan(361.7 + 0.1)
   })

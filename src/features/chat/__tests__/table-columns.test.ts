@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { textWidth } from '@/shared/utility/text-width'
 import { CELL, tableColumns } from '../utils/table-columns'
-import { planTable } from '../utils/plan-table'
-import type { PlanItem } from '../types'
 
-// v489 boards at 402 pt: bubble inner width, `.mdt` column starts (ChatPh2 x74/x176, ChatPh1Feedback x87/x190).
 const INNER = (402 - 40) * 0.88 - 30
 const starts = (widths: number[]) => widths.reduce<number[]>((all, w) => [...all, all[all.length - 1]! + w], [35]).slice(0, -1)
 
@@ -30,14 +27,5 @@ describe('tableColumns', () => {
   it('wraps 숫자가 부족해요 inside its column like the board, which draws it on two lines (ChatPh1Feedback)', () => {
     const widths = tableColumns(['항목', '지금', '고칠 점'], [['키워드', 'Kafka, 정산 배치가 없어요', '경험 문장에 직접 넣기'], ['도메인', '정산 경험이 약해요', 'payment-retry-lab을 정산 맥락으로'], ['성과', '숫자가 부족해요', '승인 API 개선을 수치로']], INNER)
     expect(textWidth('숫자가 부족해요', CELL.body, 'regular', -0.02 * CELL.body)).toBeGreaterThan(widths[1]! - CELL.padRight)
-  })
-})
-
-describe('planTable', () => {
-  const plan = (id: string): PlanItem => ({ type: 'plan', id, title: '', meta: '', rows: [], keywords: [] })
-
-  it('reads the feedback head from the kind at the end of a scoped id', () => {
-    expect(planTable(plan('ph1-fit-feedback')).head).toEqual(['항목', '지금', '고칠 점'])
-    expect(planTable(plan('ph1-fit-strategy')).head).toEqual(['구분', '섹션', '바꿀 점'])
   })
 })

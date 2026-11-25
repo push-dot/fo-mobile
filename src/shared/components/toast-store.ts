@@ -6,16 +6,12 @@ export type ToastTone = 'success' | 'error'
 export type ToastInput = {
   message: string
   action?: { label: string; onPress: () => void }
-  /** Leading status icon. Leave unset on undo/action toasts. */
   tone?: ToastTone
-  /** Distance above the bottom safe inset, to clear a tab bar or CTA (see TOAST_ABOVE). Defaults to TOAST_BOTTOM_GAP. */
   bottom?: number
-  /** Leading red alert icon on a plain toast (DeleteDocFail). */
   alert?: boolean
 }
 export type Toast = ToastInput & { id: number }
 
-/** Artboard toast bottoms above the safe inset, given the tab bar's height above it. */
 export const toastOffsets = (tabBar: number) => ({ tabs: tabBar + 14, docsError: tabBar + 150, cta: 92 }) as const
 
 type OpenSheet = { id: string; height: number }
@@ -25,7 +21,6 @@ export const useToastStore = create<State>(() => ({ current: null, queued: [], h
 
 let seq = 0
 
-/** A live 되돌리기 toast: it has an action and is not itself a failure. */
 const keepsUndo = (toast: ToastInput) => !!toast.action && toast.tone !== 'error' && !toast.alert
 
 const failureToast = (toast: ToastInput) => toast.tone === 'error' || !!toast.alert
@@ -33,15 +28,12 @@ const failureToast = (toast: ToastInput) => toast.tone === 'error' || !!toast.al
 export const showToast = (toast: ToastInput) => {
   const next = { ...toast, id: ++seq }
   useToastStore.setState((s) => {
-    // A failure must not take the place of a live 되돌리기 toast: the undo would be lost. It waits, then shows.
     if (s.current && keepsUndo(s.current) && failureToast(toast)) return { queued: [...s.queued, next] }
-    // A plain toast may replace that undo. Anything already waiting stays in order and shows after this one.
     return { current: next, queued: s.queued }
   })
   return next.id
 }
 
-/** True while the toast is on screen or waiting its turn. */
 export const toastLive = (s: State, id: number) => s.current?.id === id || s.queued.some((t) => t.id === id)
 
 export const useToastLive = (id: number | null) => useToastStore((s) => id != null && toastLive(s, id))
@@ -59,7 +51,6 @@ export const hideToast = (id: number) =>
 const putSheet = (sheets: OpenSheet[], id: string, height?: number) =>
   sheets.some((x) => x.id === id) ? sheets.map((x) => (x.id === id && height !== undefined ? { id, height } : x)) : [...sheets, { id, height: height ?? 0 }]
 
-/** Android (ToastSheetAndroid): an opening sheet clears the toast and its queue. iOS keeps both. A toast shown while a sheet is open floats above its top. */
 export const mountSheet = (id: string, os: string) => {
   useToastStore.setState((s) =>
     os === 'android' ? { current: null, queued: [], sheets: putSheet(s.sheets, id) } : { sheets: putSheet(s.sheets, id) },
@@ -69,7 +60,6 @@ export const mountSheet = (id: string, os: string) => {
 
 export const sizeSheet = (id: string, height: number) => useToastStore.setState((s) => ({ sheets: putSheet(s.sheets, id, height) }))
 
-/** Height of the top open sheet, 0 when none. */
 export const topSheet = (s: State) => s.sheets.at(-1)?.height ?? 0
 
 export const toastDuration = (toast: ToastInput) => (toast.action ? TOAST_MS.action : TOAST_MS.plain)
@@ -81,7 +71,6 @@ export const mountToastHost = (id: string) => {
   return () => useToastStore.setState((s) => ({ hosts: s.hosts.filter((h) => h !== id) }))
 }
 
-/** Registers the calling ToastHost; only the last mounted host shows toasts. */
 export const useHostedToast = () => {
   const id = useId()
   useEffect(() => mountToastHost(id), [id])

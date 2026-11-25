@@ -1,13 +1,10 @@
-// Mock of the /bots routes of push-be, with the same paths and bodies. Fixtures come from the board text of design
-// version 396: AgentHome, AgentHomeLong, AgentHomeSearch, BotProfile*, BotNewLinkOk, BotNewLimit.
 import type { BotContract } from '@push/api-client'
 import { BOT_COLORS } from '../features/bots/constants'
 import { DRAFT_V1_MD } from './bot-scripts/cards'
-import { forgetRun, hasReferenceConsent } from './chat'
+import { forgetRun, hasReferenceConsent } from './chat-state'
 import { postings } from './postings'
 import { mock } from './server'
 
-/** Minutes before the request (so "10분 전" and "방금" hold in a capture), or a fixed instant ("10월 28일"). */
 export type When = number | string
 export const atOf = (when: When, now: Date) => (typeof when === 'number' ? new Date(now.getTime() - when * 60_000) : new Date(when))
 
@@ -18,14 +15,11 @@ export type MockMessage = {
   text: string
   at: When
   attachments?: BotContract.Attachment[]
-  /** The answer of a turn whose update_my_profile run changed the profile: the stored tool line carries this change id. */
   changeId?: string
   sources?: BotContract.Attachment[]
-  /** What a search hit shows for this message, when a board draws a cut push-be's snippet rule (30 characters before the hit) would not give. */
   snippet?: string
 }
 
-/** `answer` is a choice the user picks, `confirm` an approval. `expiresAt` null never expires. */
 export type MockCard = {
   id: string
   turn: string
@@ -35,50 +29,34 @@ export type MockCard = {
   at: When
   expiresAt: When | null
   options: { id: string; label: string; desc?: string }[]
-  /** The option the server marks as the suggested one; a stored answer card without it opens with no pick. */
   recommended?: string
   summary?: string
 }
 
-/** An active chat job. A status without a phase is one an older AI service wrote. */
 export type MockJob = { turn: string; at: When; status: 'QUEUED' | 'RUNNING'; statuses: { phase?: 'queued' | 'thinking' | 'working'; text: string }[] }
 
-/** A site the bot reads without asking (BotProfileAllowed). `at` is the day it was allowed. */
 export type MockAllowedSite = { id: string; host: string; at: string; kind: BotContract.AllowedSite['kind'] }
 
-/** Everything the mock knows about one bot: its row, its profile facts, and its thread. Derived fields are never stored. */
 export type BotFixture = {
   bot: Pick<BotContract.Bot, 'id' | 'kind' | 'displayName' | 'companyName' | 'color' | 'postingId' | 'notificationsMuted' | 'revision'> & { createdAt: When }
-  /** `deadlineIn` counts days from today, so a D-day label holds in a capture. */
-  // shortcut: materialCount is the profile board's number, not counted from GET /materials?bot= as the server does. Only
-  // 모아페이 draws both and they agree; count it there once a board draws another bot's materials.
   detail: { posting: { id: string; title: string; deadlineIn: number | null; closed: boolean } | null; fit: { score: number } | null; materialCount?: number; allowed?: MockAllowedSite[] }
   readAt: When | null
-  /** Oldest first. */
   messages: MockMessage[]
   cards: MockCard[]
   job: MockJob | null
-  /** The stored turns are the newest page of a longer thread, so the room draws no greeting above them. */
   older?: boolean
-  /** When the bot's newest run failed. A run, message or card after it replaces the outcome. */
   failedAt?: When
-  /** A bot that has said nothing yet but is shown unread, as AgentHomeNoBots draws the Push Bot's first-run dot. Reading it clears this. */
   unread?: boolean
 }
 
 const newest = <T>(items: T[], time: (item: T) => number) => items.reduce<T | undefined>((a, b) => (a === undefined || time(b) >= time(a) ? b : a), undefined)
 
-/** The card the view calls open: pending and not past its time. */
 export const openCardOf = (f: BotFixture, now: Date) =>
   newest(
     f.cards.filter((c) => c.status === 'PENDING' && (c.expiresAt === null || atOf(c.expiresAt, now) > now)),
     (c) => atOf(c.at, now).getTime(),
   )
 
-/**
- * The bot as GET /bots answers it, by the rules of push-be's view bot_state_v (db/migrations/0054_bot_state.sql).
- * It is a second copy of those rules, so both run the named cases of contract.md section 7.
- */
 export const botDtoOf = (f: BotFixture, now: Date, all: readonly BotFixture[] = [f]): BotContract.Bot => {
   const time = (w: When) => atOf(w, now).getTime()
   const card = openCardOf(f, now)
@@ -96,7 +74,6 @@ export const botDtoOf = (f: BotFixture, now: Date, all: readonly BotFixture[] = 
   }
 }
 
-/** The server's bot_outcome rule: nothing runs, no card is open, and the newest ending is not older than the newest thing said or asked. */
 const outcomeOf = (f: BotFixture, now: Date): BotContract.BotOutcome | null => {
   if (f.job || openCardOf(f, now)) return null
   const time = (w: When) => atOf(w, now).getTime()
@@ -130,7 +107,6 @@ const activityOf = (f: BotFixture, now: Date, all: readonly BotFixture[]): BotCo
   return { phase: 'thinking', since, label }
 }
 
-// ---------- fixtures ----------
 
 const DAY_MIN = 24 * 60
 
@@ -165,7 +141,6 @@ const said = (id: string, turn: string, text: string, at: When, role: MockMessag
 
 const MOA_POSTING = { id: 'p1', title: '백엔드 엔지니어', deadlineIn: 11, closed: false }
 
-/** AgentHome, row for row. GET /bots orders them by last activity, as the board does. */
 const home = (): BotFixture[] => [
   pushBot(),
   company(
@@ -173,7 +148,6 @@ const home = (): BotFixture[] => [
     {
       detail: { posting: MOA_POSTING, fit: { score: 8.1 }, materialCount: 8 },
       readAt: 30,
-      // AgentHomeSearch finds no message of this chat for "모아", so its text leaves the company name out.
       messages: [said('m-moa-1', 't-moa-2', '좋아요. 첫 번째부터 고쳐서 Push 프로필로 보여 주세요', 12, 'USER')],
       cards: [
         {
@@ -189,7 +163,6 @@ const home = (): BotFixture[] => [
       detail: { posting: { id: 'p3', title: '서버 개발자', deadlineIn: 3, closed: false }, fit: { score: 7.2 }, materialCount: 5 },
       readAt: 60,
       messages: [
-        // AgentHomeSearch cuts this hit right before 모아페이, where push-be's snippet rule would keep 30 characters before it.
         { ...said('m-dotori-1', 't-dotori-1', '도토리증권 서버 개발자 공고 요건을 읽고, 그동안의 모아페이 경력과 겹치는 부분을 정리했어요', 61), snippet: '…모아페이 경력과 겹치는 부분을 정리했어요' },
         said('m-dotori-2', 't-dotori-2', '경력 섹션도 공고에 맞게 고쳐 줘', 60, 'USER'),
       ],
@@ -237,12 +210,10 @@ const home = (): BotFixture[] => [
 
 const OUTCOME_ASK = '이 사이트를 열어도 될까요?'
 
-/** AgentHomeRowExpiredFailed: AgentHome with 모아페이 asking a card that ran out and 도토리증권 ending a run in failure. */
 const homeOutcome = (): BotFixture[] => {
   const [push, ...rest] = home()
   const moa = rest.find((f) => f.bot.id === 'b-moa')!
   const dotori = rest.find((f) => f.bot.id === 'b-dotori')!
-  // The user read the thread after the card was asked, so the row is 대기 with no unread dot (G19: an expired card needs nothing from the user).
   moa.messages = [said('m-moa-1', 't-moa-2', OUTCOME_ASK, 10)]
   moa.cards = [{ ...moa.cards[0]!, id: 'card-moa-out', title: OUTCOME_ASK, at: 10, expiresAt: 1 }]
   moa.readAt = 5
@@ -251,7 +222,6 @@ const homeOutcome = (): BotFixture[] => {
   return [push!, ...rest]
 }
 
-/** AgentHomeLong, row for row. Also the long names of BotProfileLong and ChatBotHeaderLong. */
 const homeLong = (): BotFixture[] => [
   pushBot(),
   company(
@@ -298,7 +268,6 @@ const homeLong = (): BotFixture[] => [
   ),
 ]
 
-/** BotNewLimitDelete: the three company bots of a FREE plan at its limit, each with the role it was made from. */
 const homeLimit = (): BotFixture[] => {
   const made = (id: string, name: string, color: BotContract.BotColor, title: string, at: When): BotFixture =>
     company(
@@ -317,7 +286,6 @@ const homeLimit = (): BotFixture[] => {
   ]
 }
 
-/** More company bots than the board draws, to check lists that must scroll (BotPick). */
 const homeMany = (): BotFixture[] => [
   ...home(),
   company(
@@ -363,7 +331,6 @@ let seq = 0
 
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
-/** Tour switches (links.ts). */
 export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit' | 'many') => {
   fixtures =
     set === 'many' ? homeMany() : set === 'long' ? homeLong() : set === 'outcome' ? homeOutcome() : set === 'limit' ? homeLimit() : set === 'none' ? [pushBot({ messages: [], readAt: null, unread: true })] : home()
@@ -371,7 +338,6 @@ export const setBots = (set: 'home' | 'none' | 'long' | 'outcome' | 'limit' | 'm
 export const setBotPlan = (next: Plan) => {
   plan = next
 }
-/** `bot:<id>:read`: the bot's newest line is read, so its row has no unread dot (AgentHomeError draws the Push Bot without one). */
 export const readBot = (id: string) => {
   const f = fixtureOf(id)
   if (f) Object.assign(f, { readAt: 0, unread: undefined })
@@ -380,10 +346,6 @@ export const muteBot = (id: string) => {
   const f = fixtureOf(id)
   if (f) f.bot.notificationsMuted = true
 }
-/**
- * BotProfileAllowed / BotProfileChiefAllowed: the bots that board draws have allowed sites (`mock=bot:<id>:allowed`). Only
- * 모아페이 and the Push Bot have a board, so the other bots keep none and their profiles draw no 허용한 사이트 row.
- */
 export const allowSites = (id: string) => {
   const f = fixtureOf(id)
   if (!f) return
@@ -398,11 +360,9 @@ export const allowSites = (id: string) => {
           { id: 's-2', host: 'moapay.notion.site', at: '2026-11-05T09:00:00+09:00', kind: 'company' },
         ]
 }
-/** The server's expiry of a stored card (contract tests): 모아페이's page-read card has run out. No board draws it any more. */
 export const expireCard = () => {
   const f = fixtureOf('b-moa')
   if (!f) return
-  // The board's thread is the one request (DESIGN_ASK), not the home row's line "좋아요. 첫 번째부터…" that wraps to two lines.
   f.messages = [said('m-moa-1', 't-moa-2', DESIGN_ASK, 12, 'USER')]
   f.cards = [
     {
@@ -412,7 +372,6 @@ export const expireCard = () => {
     },
   ]
 }
-/** `bot:<id>:empty`: a bot that has not said a word, so its chat opens on the greeting (ChatBotOnboard, ChatConsentCompany). Clear chat does the same. */
 export const emptyBot = (id: string) => {
   const f = fixtureOf(id)
   if (!f) return
@@ -425,16 +384,10 @@ export const DESIGN_SOURCES: BotContract.Attachment[] = [
   { kind: 'posting', id: 'p1', title: '모아페이 채용 공고' },
   { kind: 'document', id: 'd1', title: '김서준_백엔드_이력서' },
 ]
-/**
- * `bot:<id>:thread` is ChatBotHeader's finished chat, `bot:<id>:done` the single request of ChatBotStatusDone, `bot:<id>:sent` the one answer
- * (a paragraph, a 2-line list, 출처) under which BotPickSent attaches the picked document. Only a stored turn
- * draws the 출처 row under an answer, so a tour cannot send its way here. No open card, so the composer is there.
- */
 export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent') => {
   const f = fixtureOf(id)
   if (!f) return
   if (set === 'resume') {
-    // ChatResume: the draft's review card ran out an hour ago (the bot's earlier question as a bubble), then the user asks for a new resume and the bot offers the draft.
     Object.assign(f, {
       messages: [
         { id: 'm-resume-user', turn: 't-resume', role: 'USER', text: '새 이력서 만들어 줘', at: 5 },
@@ -453,7 +406,6 @@ export const seedThread = (id: string, set: 'thread' | 'done' | 'resume' | 'sent
   const said = (turn: string, role: MockMessage['role'], text: string, at: number, sources?: BotContract.Attachment[]): MockMessage => ({
     id: `m-${turn}-${role}`, turn, role, text, at, ...(sources ? { sources } : {}),
   })
-  // ChatBotStatusDone and BotPickSent draw the long answer (paragraph, two "- " items); ChatBotHeader's finished chat draws the short one.
   const longAnswer =
     '경력 섹션 3줄을 고쳤어요. 승인 API p95를 320ms에서 140ms로 줄인 내용을 맨 앞에 두고, 정산 지연 개선은 장애 대응 사례로 옮겼어요.\n- 대용량 트래픽 처리: 결제 승인 API 재설계로 근거 보강\n- Kafka 경험은 우대 요건이라 한 줄로 줄임'
   const answerText =
@@ -484,7 +436,6 @@ export const resetBots = () => {
 }
 
 export const fixturesNow = () => fixtures
-/** A run the scripted chat played (chat/runs) is also a stored turn, so the thread reads the same when the chat is reopened. */
 export const recordRun = (address: string, text: string, reply: string, changeId?: string) => {
   const f = fixtureOf(address)
   if (!f) return
@@ -493,21 +444,17 @@ export const recordRun = (address: string, text: string, reply: string, changeId
   f.messages.push({ id: nextId('m'), turn, role: 'USER', text, at }, { id: nextId('m'), turn, role: 'ASSISTANT', text: reply, at, ...(changeId ? { changeId } : {}) })
 }
 
-/** A bot by id, or `push` for the Push Bot, as every /bots/{id} route reads its address. */
 export const fixtureOf = (address: string) => fixtures.find((f) => (address === 'push' ? f.bot.kind === 'push' : f.bot.id === address))
 
-// ---------- routes ----------
 
 const error = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 export const notFound = () => error(404, 'NOT_FOUND', 'resource not found')
-/** Creating a bot, sending to one, and answering its card all start AI work, which needs 참고 데이터 제공. */
 export const consentRequired = () => error(403, 'CONSENT_REQUIRED', 'reference data consent is required')
 const invalid = (field: string, message: string) => error(400, 'VALIDATION_ERROR', message, { field })
 const blankName = (b: Record<string, unknown>) => typeof b.displayName === 'string' && !b.displayName.trim()
 
 const dto = (f: BotFixture, now = new Date()) => botDtoOf(f, now, fixtures)
 
-/** push-be's list order: the Push Bot, then the company bots by last activity, newest first. */
 const inListOrder = (now: Date) => {
   const rank = new Map(fixtures.map((f) => [f, f.bot.kind === 'push' ? Infinity : Date.parse(dto(f, now).lastActivityAt)]))
   return [...fixtures].sort((a, b) => rank.get(b)! - rank.get(a)!)
@@ -573,7 +520,6 @@ mock('POST', 'bots', ({ body }) => {
   return { status: 201, body: { data: dto(made) } }
 })
 
-// The lookup of a posting by its link answers only postings Push has. BotNewLinkOk draws this one.
 const LINKED: Record<string, Omit<Extract<BotContract.LinkPreview, { status: 'found' }>, 'status' | 'host' | 'deadline'> & { deadlineIn: number }> = {
   'careers.moapay.co.kr/jobs/1042': { postingId: 'p1', company: '모아페이', title: '백엔드 엔지니어', deadlineIn: 11, careerMin: 3, careerMax: null, location: '서울' },
 }
@@ -607,7 +553,6 @@ mock('POST', 'bots/link-preview', ({ body }) => {
 
 const SNIPPET = { before: 30, after: 60 }
 
-/** push-be's snippetOf: up to 30 characters before the hit and 60 after, with a leading … when cut. */
 export const snippetOf = (text: string, q: string) => {
   const chars = [...text]
   const found = text.toLowerCase().indexOf(q.toLowerCase())
@@ -624,8 +569,6 @@ mock('GET', 'bots/search', ({ query }) => {
   const bots = inListOrder(now)
     .filter((f) => has(f.bot.displayName) || has(f.bot.companyName) || has(f.detail.posting?.title ?? ''))
     .map((f) => ({ ...dto(f, now), line: f.detail.posting ? `${f.bot.companyName} · ${f.detail.posting.title}` : f.bot.displayName }))
-  // shortcut: AgentHomeSearch lists the Push Bot's hit (어제) above 도토리증권's (1시간 전), so the Push Bot comes first and the rest newest first;
-  // push-be orders by time alone. Drop the rank when the board is redrawn in time order.
   const rank = (f: BotFixture) => (f.bot.kind === 'push' ? 0 : 1)
   const hits = fixtures
     .flatMap((f) => f.messages.filter((m) => has(m.text)).map((m) => ({ f, m, at: atOf(m.at, now) })))
@@ -691,7 +634,6 @@ const revokeSiteGrant = ({ params }: { params: Record<string, string | undefined
   return undefined
 }
 mock('DELETE', 'bots/:id/site-grants/:host', revokeSiteGrant)
-// The path push-fe's api-client used before push-fe#298. Drop it once that is in develop.
 mock('DELETE', 'bots/:id/allowed-sites/:host', revokeSiteGrant)
 
 mock('POST', 'bots/:id/read', ({ params }) => {
@@ -703,7 +645,6 @@ mock('POST', 'bots/:id/read', ({ params }) => {
   return { data: { readAt } }
 })
 
-/** Clear chat: the thread goes, the bot and its settings stay. */
 mock('DELETE', 'bots/:id/transcript', ({ params }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()

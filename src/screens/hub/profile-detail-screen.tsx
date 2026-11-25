@@ -7,9 +7,8 @@ import { ProfileTab, useMyProfile } from '@/features/my'
 import { ProfileAction, profileShareMessage, useFollow, useProfile, useViewerId } from '@/features/hub'
 import { DetailWebView, FloatingHeader, Glass, Text, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
-// ProfileDetailMePdf: 내보내기 downloads the profile as a PDF and opens the share sheet.
 const OwnProfile = () => {
   const { data: me } = useMyProfile()
   const share = useShareFile()
@@ -17,7 +16,6 @@ const OwnProfile = () => {
 }
 
 const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
-  const c = useColors()
   const me = useViewerId()
   const { data: p } = useProfile(id)
   const follow = useFollow(id)
@@ -28,16 +26,16 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const { top } = useSafeAreaInsets()
 
   const actions = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing[1] }}>
+    <View style={styles.actions}>
       {self ? null : (
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ selected: following, disabled: !p }}
           disabled={!p}
           onPress={() => follow.mutate(!following)}
-          style={{ height: 44, minWidth: 40, paddingHorizontal: 10, justifyContent: 'center' }}
+          style={styles.follow}
         >
-          <Text v="b2" weight="700" style={{ color: following ? c.t3 : c.t1 }}>
+          <Text v="b2" weight="700" style={following ? styles.following : styles.followLabel}>
             {following ? '팔로잉' : '팔로우'}
           </Text>
         </Pressable>
@@ -48,23 +46,32 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
       <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
         <TopBar
           transparent
           onBack={() => router.back()}
-          right={Platform.OS === 'ios' ? <Glass interactive style={{ borderRadius: 22, height: 44, justifyContent: 'center' }}>{actions}</Glass> : actions}
+          right={Platform.OS === 'ios' ? <Glass interactive style={styles.glass}>{actions}</Glass> : actions}
         />
       </FloatingHeader>
       {self ? (
-        // ProfileDetailMe: the own profile is MyProfile's page, edited section by section like the 마이 edit pages.
-        <ScrollView contentContainerStyle={{ paddingTop: inset + top, paddingBottom: spacing[6] }}>
+        <ScrollView contentContainerStyle={styles.own(inset + top)}>
           <OwnProfile />
         </ScrollView>
       ) : null}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  actions: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: theme.spacing[1] },
+  follow: { height: 44, minWidth: 40, paddingHorizontal: 10, justifyContent: 'center' },
+  followLabel: { color: theme.colors.t1 },
+  following: { color: theme.colors.t3 },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  glass: { borderRadius: 22, height: 44, justifyContent: 'center' },
+  own: (paddingTop: number) => ({ paddingTop, paddingBottom: theme.spacing[6] }),
+}))
 
 export default ProfileDetailScreen

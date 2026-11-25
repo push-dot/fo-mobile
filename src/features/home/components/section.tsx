@@ -1,10 +1,10 @@
 import { router } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { Posting } from '@push/api-client'
 import type { SectionKind } from '@/features/jobs'
 import { Button, Icon, JobCard, Text } from '../../../shared/components'
-import { radius, spacing, useColors } from '../../../theme'
 import { useHomePostings } from '../api/hooks'
 import { SECTION_ERROR_LINES, SECTION_RETRY_LABEL } from '../constants'
 import SectionSkeleton from './section-skeleton'
@@ -14,15 +14,14 @@ const SectionCard = ({ posting, onBookmark }: { posting: Posting; onBookmark: (p
 )
 
 const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; title: string; skeleton: boolean; onBookmark: (posting: Posting) => void }) => {
-  const c = useColors()
   const q = useHomePostings(kind)
   const items = q.data?.data ?? []
   if (q.isSuccess && !items.length) return null
   if (q.isPending) return skeleton ? <SectionSkeleton /> : null
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[3] }}>
-        <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
+      <View style={styles.head}>
+        <Text v="h2" accessibilityRole="header" style={styles.title}>
           {title}
         </Text>
         <Pressable
@@ -30,7 +29,7 @@ const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; tit
           accessibilityLabel={`${title} 전체보기`}
           onPress={() => router.push(`/section/${kind}`)}
           hitSlop={14}
-          style={{ flexDirection: 'row', alignItems: 'center' }}
+          style={styles.seeAll}
         >
           <Text v="c1" weight="600" color="t3">
             전체보기
@@ -39,10 +38,10 @@ const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; tit
         </Pressable>
       </View>
       {q.isError ? (
-        <View style={{ marginHorizontal: spacing[5], borderRadius: radius.lg, backgroundColor: c.bg2, alignItems: 'center', padding: spacing[6], gap: spacing[3] }}>
+        <View style={styles.error}>
           <View>
             {SECTION_ERROR_LINES.map((line) => (
-              <Text key={line} v="b2" color="t3" style={{ textAlign: 'center' }}>
+              <Text key={line} v="b2" color="t3" style={styles.errorLine}>
                 {line}
               </Text>
             ))}
@@ -57,12 +56,35 @@ const Section = ({ kind, title, skeleton, onBookmark }: { kind: SectionKind; tit
           data={items}
           keyExtractor={(p) => p.id}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 14, paddingHorizontal: spacing[5] }}
+          contentContainerStyle={styles.list}
           renderItem={({ item }) => <SectionCard posting={item} onBookmark={onBookmark} />}
         />
       )}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  head: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing[5],
+    paddingTop: theme.spacing[6],
+    paddingBottom: theme.spacing[3],
+  },
+  title: { flex: 1 },
+  seeAll: { flexDirection: 'row', alignItems: 'center' },
+  error: {
+    marginHorizontal: theme.spacing[5],
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.bg2,
+    alignItems: 'center',
+    padding: theme.spacing[6],
+    gap: theme.spacing[3],
+  },
+  errorLine: { textAlign: 'center' },
+  list: { gap: 14, paddingHorizontal: theme.spacing[5] },
+}))
 
 export default Section

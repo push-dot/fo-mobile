@@ -15,7 +15,6 @@ export const NOTIFY_LABEL = '알림'
 export const POSTING_LABEL = '공고'
 export const FIT_LABEL = '적합도'
 export const MATERIALS_LABEL = '자료'
-// BotProfileAllowed, BotProfileAllowedRevoke
 export const ALLOWED_ROW = '허용한 사이트'
 export const ALLOWED_BODY = 'Bot이 묻지 않고 읽는 사이트예요.'
 export const REVOKE_LABEL = '허용 해제'
@@ -42,7 +41,6 @@ export const allowedTitle = (count: number) => `${ALLOWED_ROW} ${count}`
 
 const SITE_KIND = { posting: '채용 공고', company: '회사 소개' } as const
 
-/** "11월 3일 허용 · 채용 공고" */
 export const allowedLine = (at: Date, kind: keyof typeof SITE_KIND) => `${at.getMonth() + 1}월 ${at.getDate()}일 허용 · ${SITE_KIND[kind]}`
 
 export const revokeA11y = (host: string) => `${host} ${REVOKE_LABEL}`
@@ -58,9 +56,7 @@ export const profileGroups = (input: {
   posting: { deadline: Date | null } | null
   fitScore: number | null
   materialCount: number | null
-  /** Companies the user made documents for, shown on the Push Bot only. Null or 0 hides the row. */
   companyCount?: number | null
-  /** Sites the bot reads without asking. Null or 0 hides the row. */
   allowedCount?: number | null
 }): ProfileRow[][] => {
   const facts: ProfileRow[] = []

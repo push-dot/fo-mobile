@@ -1,10 +1,10 @@
 import { router } from 'expo-router'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { View, type TextInputInstance } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { materialPickerPath as botMaterialPath, type BotId } from '@/features/bots'
 import type { PickedFile } from '@/features/my'
-import { spacing } from '../../../theme'
-import { Composer } from './composer-body'
+import Composer from './composer-body'
 import { insertMention, mentionQuery, type MentionItem } from '../utils/mentions'
 import MentionPopover from './mention-popover'
 import { LOCAL_DRAFT, clearDraft, detachDraft, setDraftText, useDraftStore } from '../stores'
@@ -16,16 +16,13 @@ type Props = {
   onSend: (text: string, attachment?: PickedFile | string) => void
   working?: boolean
   onStop?: () => void
-  /** Reports typing so the first screen can hide its quick-start pills. */
   onTyping?: (typing: boolean) => void
-  /** Floats above the box (StatusRow). */
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
   disabled?: boolean
 }
 
-/** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
-export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled }: Props) => {
+const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
@@ -49,7 +46,7 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
   }
 
   return (
-    <View style={{ gap: spacing[2] }}>
+    <View style={styles.area}>
       {query !== null ? <MentionPopover query={query} onPick={pick} /> : above}
       <Composer
         inputRef={ref}
@@ -60,7 +57,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         working={working}
         onStop={onStop}
         onAttach={() => router.push(botId ? botMaterialPath(botId as BotId) : materialPickerPath())}
-        // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}
@@ -69,3 +65,9 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  area: { gap: theme.spacing[2] },
+}))
+
+export default ComposerArea

@@ -13,6 +13,6 @@ describe('v489 boards', () => {
 
   it('draws the choice rows through pm8Row and the review card 4 under its header (.pm-b)', () => {
     expect(read('../../../screens/choice/choice-sheet-screen.tsx')).toContain('...pm8Row(mark)')
-    expect(read('../../../screens/chat/review-screen.tsx')).toMatch(/marginHorizontal: spacing\[4\], marginTop: spacing\[1\], paddingTop: spacing\[5\]/)
+    expect(read('../../../screens/chat/review-screen.tsx')).toMatch(/marginHorizontal: theme\.spacing\[4\],\s+marginTop: theme\.spacing\[1\],\s+paddingTop: theme\.spacing\[5\]/)
   })
 })

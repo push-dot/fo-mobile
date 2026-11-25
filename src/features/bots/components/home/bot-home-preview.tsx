@@ -1,25 +1,16 @@
 import { View } from 'react-native'
 import { Mascot, Text } from '@/shared/components'
-import { radius, spacing, useColors } from '../../../../theme'
+import { StyleSheet } from 'react-native-unistyles'
 import type { BotRow } from '../../types'
 
 const WIDTH = 300
 
 const BotHomePreview = ({ row }: { row: BotRow }) => {
-  const c = useColors()
   return (
-    <View
-      style={{
-        width: WIDTH,
-        padding: spacing[5],
-        gap: spacing[4],
-        backgroundColor: c.bg,
-        borderRadius: radius.xl,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-        <Mascot size={64} state={row.mascot} color={row.color} unread={row.unreadDot} />
-        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+    <View style={styles.card}>
+      <View style={styles.head}>
+        <Mascot size={64} state={row.mascot} color={row.color} unread={row.unreadDot} motion={{ mode: 'animate' }} />
+        <View style={styles.titles}>
           <Text v="h3" numberOfLines={2}>
             {row.name}
           </Text>
@@ -36,5 +27,11 @@ const BotHomePreview = ({ row }: { row: BotRow }) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  card: { width: WIDTH, padding: theme.spacing[5], gap: theme.spacing[4], backgroundColor: theme.colors.bg, borderRadius: theme.radius.xl },
+  head: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
+  titles: { flex: 1, minWidth: 0, gap: 2 },
+}))
 
 export default BotHomePreview

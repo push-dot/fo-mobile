@@ -10,12 +10,10 @@ const hasBatchim = (word: string) => {
   return code >= 0 && code <= 11171 && code % 28 !== 0
 }
 
-/** One row of the virtualised list: a section title or a material. */
 export type ListRow =
   | { type: 'section'; key: string; section: MaterialSection; count: number }
   | { type: 'material'; key: string; material: Material }
 
-/** What the list body draws. `empty` names the tab whose empty board applies, or the search. */
 export type ListView =
   | { state: 'loading' }
   | { state: 'error' }
@@ -33,18 +31,15 @@ export const listView = (list: { data: MaterialsPage | undefined; isError: boole
   return { state: 'empty', empty: q.trim() ? 'search' : tab }
 }
 
-/** MaterialsSearchEmpty: "‘회고 발표’와 맞는 자료가 없어요". */
 export const searchEmptyTitle = (q: string) => {
   const word = q.trim()
   return `‘${word}’${hasBatchim(word) ? '과' : '와'} 맞는 자료가 없어요`
 }
 
-/** Opened from a bot (its profile), 보내기 attaches there; from the bot home it asks for a bot. */
 export const sendContextOf = (forBot: string | undefined): SendContext => (forBot ? { from: 'bot', botId: forBot as BotId } : { from: 'home' })
 
 const botName = (bot: BotRef) => (bot.kind === 'push' ? bot.name : `${bot.name} Bot`)
 
-/** 만든 곳. A bot deleted since has no name to print, so the row hides. */
 const madeByFact = (madeBy: MadeBy): string | null => (madeBy.by === 'user' ? '직접 올림' : madeBy.bot && botName(madeBy.bot))
 
 const deadlineFact = (m: Extract<Material, { kind: 'posting' }>, now: Date): string => {
@@ -63,7 +58,6 @@ export type Fact = { label: string; value: string }
 
 const facts = (rows: [string, string | null][]): Fact[] => rows.flatMap(([label, value]) => (value ? [{ label, value }] : []))
 
-/** The detail sheet's facts, one table per kind. A fact the server does not have hides its row. 쓰인 대화 is a 서류 fact only. */
 const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: BotRef[], now: Date) => Fact[] } = {
   file: (m, usedBy) =>
     facts([
@@ -96,12 +90,10 @@ const FACTS: { [K in MaterialKind]: (m: Extract<Material, { kind: K }>, usedBy: 
 
 export const detailFacts = (m: Material, usedBy: BotRef[], now: Date): Fact[] => (FACTS[m.kind] as (m: Material, u: BotRef[], n: Date) => Fact[])(m, usedBy, now)
 
-/** The sheet's title: a link shows its own name, every other kind its row title. */
 export const detailTitle = (m: Material) => (m.kind === 'link' ? m.title : materialTitle(m))
 
 export const NOUN: Record<MaterialKind, string> = { file: '서류', document: '서류', posting: '북마크', link: '링크' }
 
-/** MaterialDetailDelete, and the DeleteDoc toast after it. The nouns all end without a final consonant, so 를 and 는 hold. */
 export const deleteCopy = (m: Material) => {
   const title = detailTitle(m)
   const noun = NOUN[m.kind]

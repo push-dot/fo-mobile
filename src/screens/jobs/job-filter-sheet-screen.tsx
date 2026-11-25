@@ -28,13 +28,10 @@ const JobFilterSheetScreen = () => {
 
   if (!kind) return null
   const compact = CHIP_FILTER_KINDS.includes(kind)
-  // iOS chip and skill sheets (.isheet): the .inav starts 17 under the sheet top, the CTA 20 under the last chips.
   const isheet = Platform.OS === 'ios' && kind !== 'location'
 
   return (
     <Sheet
-      // iOS chip sheets: the head starts 17 under the sheet top, the CTA (52 high, slimAction) sits 20 under the chips and the sheet
-      // ends 26 under it, so FilterRole is 247 high with the CTA centre at 814.
       gap={compact || isheet ? 0 : undefined}
       slimAction={isheet}
       actionGap={isheet ? IOS_FILTER_ACTION_GAP : compact ? CHIP_SHEET_ACTION_GAP : SHEET_ACTION_GAP.filter}

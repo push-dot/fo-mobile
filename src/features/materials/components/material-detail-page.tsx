@@ -2,7 +2,8 @@ import { router } from 'expo-router'
 import { Platform, View } from 'react-native'
 import { Button, PM8, PM8_MDET_HEAD, PM8_SLIM_ACTION, pm8SecondaryFill, Sheet, SheetScroll, Spinner, Text, useSheetScrollMax } from '@/shared/components'
 import { openUrl } from '@/shared/infrastructure'
-import { spacing, useThemeMode } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { useThemeMode } from '@/theme'
 import { useMaterialDetail } from '../api/hooks'
 import { LOAD_ERROR, OPEN_LABEL, SEND_LABEL } from '../constants'
 import type { Material, MaterialKind } from '../types'
@@ -17,10 +18,6 @@ const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
   KINDS.includes(value as MaterialKind)
 
-/**
- * MaterialDetail*: a regular sheet over the 자료 modal. 서류로 들어가기, 공고로 이동, 바로가기. A link opens in the browser over the page. The others close the page and the modal
- * first, as the drawer's lists did: a full screen pushed inside a modal would draw under its top inset.
- */
 const open = (m: Material, inModal: boolean) => {
   if (m.kind === 'link') return void openUrl(m.url)
   router.dismiss(inModal ? 2 : 1)
@@ -29,7 +26,7 @@ const open = (m: Material, inModal: boolean) => {
   else router.push(`/docs/${m.id}`)
 }
 
-export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
+const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; id: string; forBot?: string }) => {
   const detail = useMaterialDetail(kind, id)
   const now = new Date()
   const bound = useSheetScrollMax()
@@ -41,14 +38,14 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
     return (
       <Sheet>
         {detail.isError ? (
-          <View accessibilityRole="alert" style={{ alignItems: 'center', gap: spacing[3], paddingVertical: spacing[4] }}>
+          <View accessibilityRole="alert" style={styles.error}>
             <Text v="b2" color="t3">
               {LOAD_ERROR.title}
             </Text>
             <Button label={LOAD_ERROR.retry} variant="secondary" size="sm" onPress={detail.refetch} />
           </View>
         ) : (
-          <View style={{ alignItems: 'center', paddingVertical: spacing[4] }}>
+          <View style={styles.loading}>
             <Spinner />
           </View>
         )}
@@ -57,7 +54,6 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   }
 
   const context = sendContextOf(forBot)
-  // BotPick is a sheet of its own over the 자료 modal, so this one leaves before it opens.
   const send = () => {
     if (context.from === 'home') router.back()
     sendMaterial(context, m)
@@ -65,18 +61,30 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
 
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout}>
-      <View style={{ minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' }}>
-        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+      <View style={styles.head}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={styles.title}>
           {detailTitle(m)}
         </Text>
       </View>
-      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout}>
+      <SheetScroll style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout}>
         <MaterialFacts facts={detailFacts(m, detail.data?.usedBy ?? [], now)} />
       </SheetScroll>
-      <View style={{ flexDirection: 'row', gap: spacing[2], marginTop: PM8.buttonsTop }}>
+      <View style={styles.buttons}>
         <Button label={SEND_LABEL} onPress={send} style={SLIM} />
-        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={[SLIM, secondaryFill ? { backgroundColor: secondaryFill } : null]} />
+        <Button label={OPEN_LABEL[m.kind]} variant="secondary" onPress={() => open(m, inModal)} style={[SLIM, secondaryFill ? styles.fill(secondaryFill) : null]} />
       </View>
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  error: { alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[4] },
+  loading: { alignItems: 'center', paddingVertical: theme.spacing[4] },
+  head: { minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' },
+  title: { textAlign: 'center' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+  buttons: { flexDirection: 'row', gap: theme.spacing[2], marginTop: PM8.buttonsTop },
+  fill: (backgroundColor: string) => ({ backgroundColor }),
+}))
+
+export default MaterialDetailPage

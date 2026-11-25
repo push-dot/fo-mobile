@@ -1,3 +1,5 @@
+export { POST_CATEGORIES } from '@push/api-client'
+
 export const MAX_COMMENT = 1000
 export const TITLE_MAX = 100
 export const TITLE_LABEL = '제목'

@@ -1,1 +1,1 @@
-export { givenName } from '@/features/my/utils/given-name'
+export { givenName } from '../../../shared/utility/given-name'

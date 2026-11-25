@@ -1,0 +1,28 @@
+name: pr-conventions
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  names:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name and PR title
+        env:
+          BRANCH: ${{ github.head_ref }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          types='feat|fix|refactor|chore|docs|test'
+          if ! printf '%s' "$BRANCH" | grep -Eq "^($types)/[a-z0-9]+(-[a-z0-9]+)*$"; then
+            printf 'Branch "%s" must be <type>/<short-kebab-summary> with type %s\n' "$BRANCH" "$types" >&2
+            exit 1
+          fi
+          if ! printf '%s' "$TITLE" | grep -Eq "^($types)\([a-z0-9-]+\): .+$" || [ "${#TITLE}" -gt 72 ]; then
+            printf 'PR title "%s" must be <type>(<scope>): <summary>, under 72 chars\n' "$TITLE" >&2
+            exit 1
+          fi

@@ -5,10 +5,8 @@ import type { Material, MaterialsPage } from '../types'
 import { toMaterial, toMaterialDetail, toMaterialsPage } from '../api/schemas'
 import { hostOf, materialRow, toAttachment, totalCount, withoutMaterial } from '../utils/material-row'
 
-// The bots index re-exports hooks that reach react-native, which vitest cannot load. Its wire readers are all the schemas use.
 vi.mock('@/features/bots', () => import('@/features/bots/utils/wire'))
 
-// The boards are drawn on 2026-11-09: 마감 11월 12일 is D-3 there.
 const now = new Date(2026, 10, 9, 15, 0)
 const day = (m: number, d: number) => new Date(2026, m - 1, d, 15)
 

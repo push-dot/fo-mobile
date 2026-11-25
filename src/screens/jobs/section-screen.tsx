@@ -1,15 +1,13 @@
-import { withDeadlineWindow } from '@push/api-client'
 import { router } from 'expo-router'
 import { View } from 'react-native'
-import { PostingGrid, SECTIONS, type SectionKind } from '@/features/jobs'
+import { PostingGrid, SECTIONS, withDeadlineWindow, type SectionKind } from '@/features/jobs'
 import { ScreenBar, Text } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const SectionScreen = ({ kind }: { kind: SectionKind }) => {
-  const c = useColors()
   const s = SECTIONS[kind]
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <ScreenBar bar={{ title: s.title, onBack: () => router.back() }}>
         {({ topInset, onScroll }) => (
           <PostingGrid
@@ -17,7 +15,7 @@ const SectionScreen = ({ kind }: { kind: SectionKind }) => {
             topInset={topInset}
             onScroll={onScroll}
             header={
-              <Text v="b2" color="t3" style={{ paddingHorizontal: spacing[5], paddingTop: spacing[1], paddingBottom: spacing[4] }}>
+              <Text v="b2" color="t3" style={styles.description}>
                 {s.description}
               </Text>
             }
@@ -27,5 +25,10 @@ const SectionScreen = ({ kind }: { kind: SectionKind }) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  description: { paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[1], paddingBottom: theme.spacing[4] },
+}))
 
 export default SectionScreen

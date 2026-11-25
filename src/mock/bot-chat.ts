@@ -1,18 +1,15 @@
-// Mock of the chat routes addressed by bot (push-be bot-chat.ts and the Python transcript route).
-// The thread is the bot fixture's messages, cards, and active job (bots.ts), so the list and the chat agree.
-// A send answers a short scripted run as a real event stream. Board scenarios replace it in the chat lane.
 import type { BotContract } from '@push/api-client'
 import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, type MockCard, type MockMessage } from './bots'
 import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
+import { storedCardSurface } from './bot-scripts/surfaces'
 import { PROFILE_CHANGE_HEADLINE } from './bot-scripts/runs'
-import { hasReferenceConsent } from './chat'
+import { hasReferenceConsent } from './chat-state'
 import { findMaterial } from './materials'
 import { readsMyFiles } from './me'
 import { postings } from './postings'
 import { mock } from './server'
 
 type TurnEvent = BotContract.TurnEvent
-/** A stored event before the thread gives it a seq and a time. */
 type Unstamped = TurnEvent extends infer E ? (E extends unknown ? Omit<E, 'seq' | 'at'> : never) : never
 type Frame = BotContract.StreamEvent
 
@@ -20,16 +17,10 @@ const REPLY = '정리했어요. 더 필요한 게 있으면 말해 주세요.'
 const error = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 
 const cardEvent = (c: MockCard, now: Date): Unstamped => {
-  // The server closes a card unanswered once its time has gone by.
   const closed = c.status === 'PENDING' && c.expiresAt !== null && atOf(c.expiresAt, now) <= now
-  const resolution = { status: closed ? ('EXPIRED' as const) : c.status, optionId: null }
-  const times = { openedAt: atOf(c.at, now).toISOString(), expiresAt: c.expiresAt === null ? null : atOf(c.expiresAt, now).toISOString(), retryable: c.expiresAt !== null }
-  return c.for === 'answer'
-    ? { type: 'choice', id: c.id, title: c.title, options: c.options, ...(c.recommended ? { recommended: c.recommended } : {}), resolution, ...times }
-    : { type: 'approval', id: c.id, kind: 'TOOL_ACTION', title: c.title, options: c.options, ...(c.summary ? { summary: c.summary } : {}), resolution, ...times }
+  return storedCardSurface(c, c.status === 'PENDING' && !closed)
 }
 
-/** The stored turns of a thread, oldest first, with the seq every event carries on the wire. */
 const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
   const time = (at: MockMessage['at']) => atOf(at, now).getTime()
   const ids = [...new Set([...f.messages, ...f.cards, ...(f.job ? [f.job] : [])].sort((a, b) => time(a.at) - time(b.at)).map((x) => x.turn))]
@@ -50,7 +41,6 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
     }
     if (bot?.changeId) events.push(stamp({ type: 'tool', name: 'update_my_profile', state: 'ok', summary: '프로필 수정', result: { headline: PROFILE_CHANGE_HEADLINE, changeId: bot.changeId } }, bot.at))
     if (bot) events.push(stamp({ type: 'token', text: bot.text }, bot.at))
-    // A finished turn keeps its waiting statuses, so an answered card still has the one it asked with.
     for (const c of cards) {
       const text = c.for === 'answer' ? '답을 기다리고 있어요' : '확인을 기다리고 있어요'
       events.push(stamp({ type: 'status', text, phase: 'waiting', since: atOf(c.at, now).toISOString(), for: c.for, cardId: c.id }, c.at))
@@ -71,7 +61,6 @@ const turnsOf = (f: BotFixture, now: Date): BotContract.Turn[] => {
 
 const sse = (frames: Frame[], open = false) => {
   const bytes = new TextEncoder().encode(frames.map((f) => `id: ${'seq' in f ? f.seq : ''}\ndata: ${JSON.stringify(f)}\n\n`).join(''))
-  // A run that is still going keeps its stream open, as the server does, until the client lets go.
   const body = new ReadableStream<Uint8Array>({
     start: (c) => {
       c.enqueue(bytes)
@@ -102,7 +91,6 @@ mock('GET', 'bots/:id/transcript/matches', ({ params, query }) => {
   const q = (query.get('q') ?? '').trim().toLowerCase()
   if (!q || [...q].length > 200) return error(400, 'VALIDATION_ERROR', 'q must be 1-200 characters', { field: 'q' })
   const now = new Date()
-  // Every hit of a message is a match (ChatBotHeaderFind counts three 프로필 in two bubbles), a source title included. The newest hit is the last in reading order, so the sources come first.
   const items = f.messages
     .flatMap((m) => [...(m.sources ?? []).filter((x) => x.title.toLowerCase().includes(q)).map(() => m), ...m.text.toLowerCase().split(q).slice(1).map(() => m)])
     .map((m) => ({ messageId: m.id, turnId: m.turn, at: atOf(m.at, now).toISOString() }))
@@ -114,16 +102,13 @@ mock('GET', 'bots/:id/transcript/matches', ({ params, query }) => {
 const SEND_FIELDS = ['text', 'attachments', 'intent', 'accessMode', 'ai']
 const MAX_ATTACHMENTS = 10
 
-/** A material of the caller, or any posting: a posting needs no bookmark to be attached. */
 const attachable = (ref: BotContract.AttachmentRef) =>
   findMaterial(ref.kind, ref.id) ?? (ref.kind === 'posting' ? postings.find((p) => p.id === ref.id) : undefined)
 
-// push-be checks the bot, then consent, then the body (postBotMessage, answerBotCard), so only that order's status comes back.
 mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
   if (!hasReferenceConsent()) return consentRequired()
-  // ChatBotReadOff: consent is given but 내 자료 읽기 is off; the chat says so with a way out instead of asking for consent again.
   if (!readsMyFiles()) return error(403, 'FILES_READ_OFF', 'reading my files is off')
   const b = (body ?? {}) as Partial<BotContract.SendBody>
   const extra = Object.keys(b).find((k) => !SEND_FIELDS.includes(k))
@@ -159,7 +144,6 @@ mock('POST', 'bots/:id/messages/stream', ({ params, body }) => {
   return sse(frames)
 })
 
-/** Reattach: the running job's frames after `after`, held open. Nothing running is 204. */
 mock('GET', 'bots/:id/stream', ({ params, query }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
@@ -184,10 +168,6 @@ const cardOf = (f: BotFixture, id: string) => f.cards.find((c) => c.id === id)
 
 const ANSWER_FIELDS = ['optionId', 'optionIds']
 
-/**
- * Every answer resumes the run that asked (202, follow the stream): push-be's resolveApproval resumes a tool card's reject too.
- * Only 닫기 on an expired card, which answers reject, closes it without a run (200).
- */
 mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
   const f = fixtureOf(params.id!)
   if (!f) return notFound()
@@ -208,7 +188,6 @@ mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
   }
   if (expired) return error(410, 'APPROVAL_EXPIRED', 'the card expired')
   if (card.status !== 'PENDING') return error(409, 'APPROVAL_ALREADY_RESOLVED', 'the card was answered')
-  // Only a tool card can be rejected. A choice card's "reject" option is an answer like any other.
   card.status = card.for === 'confirm' && optionId === 'reject' ? 'REJECTED' : 'APPROVED'
   const data: BotContract.CardAnswer = { id: card.id, status: card.status, optionId }
   return { status: 202, body: { data } }
@@ -216,7 +195,6 @@ mock('POST', 'bots/:id/approvals/:approvalId', ({ params, body }) => {
 
 const DEFAULT_LIFETIME_MIN = 10
 
-/** 다시 요청: the same card asked again with the same lifetime, unless the user wrote since. */
 mock('POST', 'bots/:id/approvals/:approvalId/retry', ({ params }) => {
   const f = fixtureOf(params.id!)
   const card = f && cardOf(f, params.approvalId!)

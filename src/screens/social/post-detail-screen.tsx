@@ -5,12 +5,12 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, TextInput, View } fr
 import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
 import { Glass, Icon, Menu, TOAST_ABOVE, Text, TopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
-import { radius, spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { radius } from '@/theme'
 
 const moreButton = { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
 
 const PostDetailScreen = ({ id }: { id: string }) => {
-  const c = useColors()
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null)
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null)
   const post = usePost(id)
@@ -29,7 +29,7 @@ const PostDetailScreen = ({ id }: { id: string }) => {
   )
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar
         onBack={() => router.back()}
         right={
@@ -64,7 +64,7 @@ const PostDetailScreen = ({ id }: { id: string }) => {
         }
       />
       {post.data ? (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <KeyboardAvoidingView style={styles.body} behavior="padding">
           <LegendList
             data={rows}
             recycleItems
@@ -72,16 +72,16 @@ const PostDetailScreen = ({ id }: { id: string }) => {
             keyExtractor={(r) => r.id}
             ListHeaderComponent={<PostHeader post={post.data} />}
             renderItem={renderComment}
-            contentContainerStyle={{ paddingHorizontal: spacing[5], paddingBottom: spacing[4] }}
+            contentContainerStyle={styles.list}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
             onEndReached={() => comments.hasNextPage && !comments.isFetchingNextPage && comments.fetchNextPage()}
-            ListFooterComponent={comments.isPending || comments.isFetchingNextPage ? <ActivityIndicator style={{ padding: spacing[4] }} /> : undefined}
+            ListFooterComponent={comments.isPending || comments.isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : undefined}
           />
           <CommentComposer postId={id} replyTo={replyTo} onClearReply={() => setReplyTo(null)} inputRef={inputRef} />
         </KeyboardAvoidingView>
       ) : (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={styles.center}>
           {post.isError ? (
             <Text v="b2" color="t3">
               게시물을 찾을 수 없어요
@@ -94,5 +94,13 @@ const PostDetailScreen = ({ id }: { id: string }) => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  body: { flex: 1 },
+  list: { paddingHorizontal: theme.spacing[5], paddingBottom: theme.spacing[4] },
+  footer: { padding: theme.spacing[4] },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+}))
 
 export default PostDetailScreen

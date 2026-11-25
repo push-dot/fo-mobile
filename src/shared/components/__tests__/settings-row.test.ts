@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { findAll } from './native-stubs'
+import { findAll, flat } from './native-stubs'
 
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Pressable: 'Pressable', View: 'View' }))
 vi.mock('../../../theme', async () => {
@@ -18,7 +18,7 @@ describe('SettingsRow', () => {
     const tree = SettingsRow({ label: '차단한 사람', value: '2명', onPress: vi.fn() })
     expect(labelOf(tree)).toMatchObject({ color: 't1' })
     expect(labelOf(tree)?.weight).toBeUndefined()
-    expect((findAll(tree, 'View')[0]?.props.style as { backgroundColor?: string }).backgroundColor).toBeUndefined()
+    expect((flat(findAll(tree, 'View')[0]?.props.style) as { backgroundColor?: string }).backgroundColor).toBeUndefined()
   })
 
   it('leaves an ordinary label in the primary colour', () => {
@@ -38,7 +38,7 @@ describe('SettingsRow', () => {
 
   it('draws the BotProfileXL row at XL_ROW_HEIGHT with a 21 pt label and an 18 pt value', () => {
     const tree = SettingsRow({ label: '공고', value: '11월 20일 마감', onPress: vi.fn(), xl: true })
-    expect((findAll(tree, 'View')[0]?.props.style as { minHeight: number }).minHeight).toBe(80)
+    expect((flat(findAll(tree, 'View')[0]?.props.style) as { minHeight: number }).minHeight).toBe(80)
     expect(findAll(tree, 'Text')[0]?.props).toMatchObject({ allowFontScaling: false, style: { fontSize: 21, lineHeight: 28 } })
     expect(findAll(tree, 'Text')[1]?.props).toMatchObject({ allowFontScaling: false, style: { fontSize: 18 } })
   })

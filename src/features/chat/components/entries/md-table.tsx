@@ -1,35 +1,42 @@
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import { Text } from '@/shared/components'
-import { useColors } from '../../../../theme'
 import type { TableBlock } from '../../utils/bot-text'
 import { CELL, cellPadRight, tableColumns } from '../../utils/table-columns'
 import Rich from './rich'
 
-/** A markdown table inside a bot bubble (the boards' `.mdt`): auto-sized columns that fill `width`, the head in grey, a hairline under every row but the last, 2 above and below (`margin:2px 0`), no fill of its own (rule 38). */
 const MdTable = ({ table, width }: { table: TableBlock; width: number }) => {
-  const c = useColors()
   const columns = tableColumns(table.head, table.rows, width)
   const row = (cells: string[], head: boolean, key: string, last: boolean) => (
-    <View key={key} style={{ flexDirection: 'row', paddingVertical: CELL.padY, borderBottomWidth: last ? 0 : 1, borderBottomColor: c.line }}>
+    <View key={key} style={[styles.row, last && styles.rowLast]}>
       {columns.map((w, col) => (
-        <View key={col} style={{ width: w, paddingRight: cellPadRight(col, columns.length) }}>
+        <View key={col} style={styles.cell(w, cellPadRight(col, columns.length))}>
           {head ? (
-            <Text v="c1" weight="600" color="t3" style={{ lineHeight: CELL.line }}>
+            <Text v="c1" weight="600" color="t3" style={styles.head}>
               {cells[col]}
             </Text>
           ) : (
-            <Rich v="b2" text={cells[col] ?? ''} style={{ fontSize: CELL.body, lineHeight: CELL.line }} />
+            <Rich v="b2" text={cells[col] ?? ''} style={styles.body} />
           )}
         </View>
       ))}
     </View>
   )
   return (
-    <View accessibilityRole="summary" style={{ width, marginVertical: 2 }}>
+    <View accessibilityRole="summary" style={styles.table(width)}>
       {row(table.head, true, 'head', false)}
       {table.rows.map((cells, i) => row(cells, false, `row${i}`, i === table.rows.length - 1))}
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: { flexDirection: 'row', paddingVertical: CELL.padY, borderBottomWidth: 1, borderBottomColor: theme.colors.line },
+  rowLast: { borderBottomWidth: 0 },
+  cell: (width: number, paddingRight: number) => ({ width, paddingRight }),
+  head: { lineHeight: CELL.line },
+  body: { fontSize: CELL.body, lineHeight: CELL.line },
+  table: (width: number) => ({ width, marginVertical: 2 }),
+}))
 
 export default MdTable

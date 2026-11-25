@@ -2,11 +2,9 @@ import type { BotContract } from '@push/api-client'
 import type { Bot, BotActivity, BotOutcome, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
 import { colorOf, dateOf, dayOf, toBotRef } from '../utils/wire'
 
-// With utils/wire, the only place that reads bot wire field names. Wire types stop here.
 
 export { dayOf }
 
-/** Null when a date does not parse. */
 const activityOf = (a: BotContract.BotActivity | null): BotActivity | null => {
   if (a === null) return { phase: 'idle' }
   const since = dateOf(a.since)
@@ -23,14 +21,12 @@ const activityOf = (a: BotContract.BotActivity | null): BotActivity | null => {
   }
 }
 
-/** Undefined when the date does not parse, null when the bot has no outcome. A card waits until it is answered, so the server's `expired` outcome is no outcome (rule 29). */
 const outcomeOf = (o: BotContract.BotOutcome | null): BotOutcome | null | undefined => {
   if (o === null || o.kind !== 'failed') return null
   const at = dateOf(o.at)
   return at ? { kind: 'failed', at } : undefined
 }
 
-/** Null for a row whose dates do not parse: a list drops it instead of drawing it half-built. */
 export const toBot = (dto: BotContract.Bot): Bot | null => {
   const lastActivityAt = dateOf(dto.lastActivityAt)
   const activity = activityOf(dto.activity)

@@ -23,10 +23,9 @@ import {
   type SearchTab,
 } from '@/features/search'
 import { Chip, Icon, Menu, Skeleton, SkeletonRows, StatusNote, Text } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) => {
-  const c = useColors()
   const { text, q, setText, search } = useSearchQuery()
   const [tab, setTab] = useState<SearchTab>(initialTab)
   const [sort, setSort] = useState<SearchSort>('relevance')
@@ -60,13 +59,13 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.root}>
       <SearchBar value={text} onChange={setText} onSubmit={submit} />
       {!q ? (
-        <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
+        <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
           {recent.terms.length ? (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[3], paddingBottom: spacing[1] }}>
+              <View style={styles.recentHeader}>
                 <Text v="h3" accessibilityRole="header">
                   최근 검색
                 </Text>
@@ -77,14 +76,14 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                 </Pressable>
               </View>
               {recent.terms.map((t) => (
-                <View key={t} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View key={t} style={styles.recentRow}>
                   <Pressable
                     accessibilityRole="button"
                     onPress={() => search(t)}
-                    style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingLeft: spacing[5], paddingVertical: spacing[3] }}
+                    style={styles.recentTerm}
                   >
                     <Icon name="clock" size={18} color="t3" />
-                    <Text v="b1" style={{ flex: 1 }} numberOfLines={1}>
+                    <Text v="b1" style={styles.flex} numberOfLines={1}>
                       {t}
                     </Text>
                   </Pressable>
@@ -92,7 +91,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                     accessibilityRole="button"
                     accessibilityLabel={`${t} 지우기`}
                     onPress={() => recent.remove(t)}
-                    style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: spacing[2] }}
+                    style={styles.removeButton}
                   >
                     <Icon name="x" size={16} color="t4" />
                   </Pressable>
@@ -101,11 +100,11 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             </>
           ) : null}
           {popular.length ? (
-            <Text v="h3" accessibilityRole="header" style={{ paddingHorizontal: spacing[5], paddingTop: spacing[6], paddingBottom: spacing[3] }}>
+            <Text v="h3" accessibilityRole="header" style={styles.popularTitle}>
               지금 많이 찾는 검색어
             </Text>
           ) : null}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing[5], columnGap: spacing[3] }}>
+          <View style={styles.popularGrid}>
             {popular.map(({ term: t }, i) => (
               <Pressable
                 key={t}
@@ -115,12 +114,12 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                   search(t)
                   recent.add(t)
                 }}
-                style={{ width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3] }}
+                style={styles.popularItem}
               >
-                <Text v="b1" weight="700" style={{ width: 16, fontVariant: ['tabular-nums'] }}>
+                <Text v="b1" weight="700" style={styles.rank}>
                   {i + 1}
                 </Text>
-                <Text v="b1" numberOfLines={1} style={{ flex: 1 }}>
+                <Text v="b1" numberOfLines={1} style={styles.flex}>
                   {t}
                 </Text>
               </Pressable>
@@ -137,23 +136,23 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+          contentContainerStyle={styles.listContent}
           onEndReached={() => active.hasNextPage && !active.isFetchingNextPage && active.fetchNextPage()}
           ListHeaderComponent={
             <>
-              <View style={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: spacing[5], paddingTop: spacing[2], paddingBottom: spacing[1] }}>
+              <View style={styles.tabs}>
                 {TABS.map((t) => {
                   const n = chipCount(results[t.key], counts?.[t.key])
                   return <Chip key={t.key} label={n === undefined ? t.label : `${t.label} ${formatCount(n)}`} on={tab === t.key} onPress={() => setTab(t.key)} />
                 })}
               </View>
               {loading ? (
-                <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: spacing[1] }}>
+                <View style={styles.summarySkeleton}>
                   <Skeleton width={120} height={12} />
                 </View>
               ) : items.length ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[5], paddingTop: spacing[4], paddingBottom: spacing[1] }}>
-                  <Text v="c1" weight="600" color="t3" numberOfLines={1} style={{ flex: 1 }}>
+                <View style={styles.summary}>
+                  <Text v="c1" weight="600" color="t3" numberOfLines={1} style={styles.flex}>
                     ‘{q}’ {TABS.find((t) => t.key === tab)!.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}{TABS.find((t) => t.key === tab)!.unit}
                   </Text>
                   {tab === 'postings' ? (
@@ -162,7 +161,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                         accessibilityLabel={`정렬, ${SEARCH_SORTS.find((s) => s.key === sort)?.label}`}
                         actions={SEARCH_SORTS.map((s) => ({ key: s.key, label: s.label, selected: s.key === sort, onPress: () => setSort(s.key) }))}
                       >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], minHeight: 44 }}>
+                        <View style={styles.sortTrigger}>
                           <Text v="c1" weight="600" color="t2">
                             {SEARCH_SORTS.find((s) => s.key === sort)?.label}
                           </Text>
@@ -170,7 +169,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
                         </View>
                       </Menu>
                     ) : (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1] }}>
+                      <View style={styles.sortStatic}>
                         <Text v="c1" weight="600" color="t2">
                           {SEARCH_SORTS[0]?.label}
                         </Text>
@@ -187,7 +186,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
             loading ? (
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
-              <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={{ flex: 1, justifyContent: 'center' }} />
+              <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={styles.error} />
             ) : undefined
           }
         />
@@ -195,5 +194,26 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: { flex: 1, backgroundColor: theme.colors.bg },
+  scrollContent: { paddingBottom: 32 },
+  recentHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[3], paddingBottom: theme.spacing[1] },
+  recentRow: { flexDirection: 'row', alignItems: 'center' },
+  recentTerm: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingLeft: theme.spacing[5], paddingVertical: theme.spacing[3] },
+  flex: { flex: 1 },
+  removeButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: theme.spacing[2] },
+  popularTitle: { paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[6], paddingBottom: theme.spacing[3] },
+  popularGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: theme.spacing[5], columnGap: theme.spacing[3] },
+  popularItem: { width: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], paddingVertical: theme.spacing[3] },
+  rank: { width: 16, fontVariant: ['tabular-nums'] },
+  listContent: { flexGrow: 1, paddingBottom: 32 },
+  tabs: { flexDirection: 'row', gap: theme.spacing[2], paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[2], paddingBottom: theme.spacing[1] },
+  summarySkeleton: { paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[4], paddingBottom: theme.spacing[1] },
+  summary: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[4], paddingBottom: theme.spacing[1] },
+  sortTrigger: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1], minHeight: 44 },
+  sortStatic: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
+  error: { flex: 1, justifyContent: 'center' },
+}))
 
 export default SearchScreen

@@ -5,7 +5,6 @@ import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/** iOS: pull-down UIMenu on tap. Pass a non-pressable trigger; the menu owns the tap. */
 const Menu = ({ actions, accessibilityLabel, children, stretch }: MenuProps) => (
   <NativeHost matchContents={stretch ? { vertical: true } : true} seedColor={useColors().t1}>
     <SwiftMenu label={<RNHostView matchContents={stretch ? { vertical: true } : true}>{children}</RNHostView>} modifiers={[a11yLabel(accessibilityLabel)]}>

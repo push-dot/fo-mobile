@@ -9,7 +9,6 @@ import Menu from './menu.ios'
 import NativeHost from './native-host'
 import Text from './text'
 
-// SwiftUI has no month-only picker, so month mode is a year UIMenu plus a month UIMenu on the field's text.
 const DatePicker = ({
   value,
   onChange,

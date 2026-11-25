@@ -1,16 +1,16 @@
 import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { Post } from '@push/api-client'
 import { Text } from '../../../shared/components'
-import { spacing } from '../../../theme'
 import AuthorRow from './author-row'
 import Band from './band'
 import ImageGrid from './image-grid'
 
 const PostHeader = ({ post }: { post: Post }) => {
   return (
-    <View style={{ gap: spacing[4], paddingTop: spacing[1], paddingBottom: spacing[4] }}>
+    <View style={styles.header}>
       <AuthorRow post={post} size={40} showViews />
-      <Text v="h1" style={{ fontSize: 24, lineHeight: 32 }}>
+      <Text v="h1" style={styles.title}>
         {post.title}
       </Text>
       {post.body.split(/\n{2,}/).map((paragraph, i) => (
@@ -19,10 +19,16 @@ const PostHeader = ({ post }: { post: Post }) => {
         </Text>
       ))}
       <ImageGrid urls={post.imageUrls} row={96} />
-      <Band style={{ marginHorizontal: -spacing[5], marginVertical: 6 }} />
+      <Band style={styles.band} />
       <Text v="h3">댓글 {post.commentCount}</Text>
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  header: { gap: theme.spacing[4], paddingTop: theme.spacing[1], paddingBottom: theme.spacing[4] },
+  title: { fontSize: 24, lineHeight: 32 },
+  band: { marginHorizontal: -theme.spacing[5], marginVertical: 6 },
+}))
 
 export default PostHeader

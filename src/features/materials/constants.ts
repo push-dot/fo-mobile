@@ -1,10 +1,8 @@
 import type { MaterialKind, MaterialSection, MaterialTab } from './types'
 
-// Copy of the Bot - 자료 boards (design version 444), word for word.
 
 export const MATERIALS_TITLE = '자료'
 
-/** Materials: the segmented control, in board order. */
 export const TABS: { key: MaterialTab; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'doc', label: '서류' },
@@ -19,11 +17,9 @@ export const SEND_LABEL = '보내기'
 export const PICK_LABEL = '선택'
 export const PICKED_LABEL = '선택됨'
 
-/** What the + menu (MaterialsAdd) and the empty states' buttons do. */
 export type AddAction = 'link' | 'upload' | 'browse'
 export const ADD_LABEL: Record<AddAction, string> = { link: '링크 추가', upload: '서류 올리기', browse: '공고 둘러보기' }
 
-/** MaterialsEmpty, MaterialsEmptyDocs, MaterialsEmptyBookmarks, MaterialsEmptyLinks. `\n` is where the boards' balanced body breaks (RN has no `text-wrap: balance`). */
 export const EMPTY: Record<MaterialTab, { title: string; body: string; action: AddAction }> = {
   all: {
     title: '아직 자료가 없어요',
@@ -35,24 +31,19 @@ export const EMPTY: Record<MaterialTab, { title: string; body: string; action: A
   link: { title: '저장한 링크가 없어요', body: 'GitHub, 블로그, 포트폴리오 주소를 저장해\n두면 Bot이 서류를 고칠 때 참고해요.', action: 'link' },
 }
 
-/** MaterialsSearchEmpty. The title names the query (see searchEmptyTitle). */
 export const SEARCH_EMPTY_BODY = '자료 이름, 회사 이름, 링크 주소로\n찾아요. 다른 단어로 다시 검색해 보세요.'
 
-/** MaterialsLoading, MaterialsError. */
 export const LIST_LOADING = '자료를 불러오는 중이에요'
 export const LOAD_ERROR = { title: '자료를 불러오지 못했어요', body: '인터넷 연결을 확인하고 다시 시도해 주세요.', retry: '다시 시도' }
 
-/** The detail sheet's second button (MaterialDetailDoc, MaterialDetailBookmark, MaterialDetailLink). */
 export const OPEN_LABEL: Record<MaterialKind, string> = { file: '서류로 들어가기', document: '서류로 들어가기', posting: '공고로 이동', link: '바로가기' }
 export const CANCEL_LABEL = '취소'
 export const DELETE_CONFIRM = '삭제'
 export const DELETE_ACTION = 'delete'
 export const UNDO_LABEL = '되돌리기'
-/** The words 마이 › 서류 uses for the same two failures. */
 export const CITED = '경력 기록에서 쓰고 있어 지울 수 없어요'
 export const RESTORE_FAILED = '되돌리지 못했어요'
 
-/** MaterialsLinkAdd. */
 export const LINK_ADD = {
   title: '링크 추가',
   submit: '추가하기',

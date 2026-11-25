@@ -23,7 +23,6 @@ const reveal = async (botId: string, match: BotContract.TranscriptMatch, list: B
   }
 }
 
-/** 채팅에서 찾기: the server searches the whole history, the app pages in older turns until the result's line exists. */
 export const useFind = (botId: string) => {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -66,7 +65,6 @@ export const useFind = (botId: string) => {
     return () => clearTimeout(timer)
   }, [open, query, botId, land])
 
-  // A blank query shows no results, whatever the last search left behind.
   const shown = query.trim() ? matches : []
 
   const step = (to: FindStep) => {

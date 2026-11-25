@@ -23,7 +23,6 @@ const ProposalSheetScreen = () => {
   if (!userId) return null
 
   return (
-    // Past the common max height the body scrolls under the title; the keyboard counts in that bound, so 제안 보내기 stays in reach.
     <Sheet onLayout={bound.onSheetLayout} action={{ label: '제안 보내기', onPress: () => send.mutate(), disabled: !message.trim() || send.isPending }}>
         <ProposalSheet
           name={p?.displayName ?? ''}

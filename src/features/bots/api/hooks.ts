@@ -11,10 +11,6 @@ const BOTS = ['bots'] as const
 const LIST = [...BOTS, 'list'] as const
 const detailKey = (address: BotAddress) => [...BOTS, 'detail', address] as const
 
-/**
- * Push Bot first, then company bots in server order. The app never re-sorts.
- * `live` is the bot home's focus: it refetches when the home comes into focus and polls while a run is under way.
- */
 export const useBots = ({ live = false }: { live?: boolean } = {}) => {
   const q = useQuery({ queryKey: LIST, queryFn: fetchBots, refetchInterval: (query) => pollIntervalOf(query.state.data?.bots, live) })
   const { refetch } = q
@@ -34,7 +30,6 @@ export const useBotProfile = (address: BotAddress) => {
   return { data: q.data, isLoading: q.isLoading, isError: q.isError, refetch: () => void q.refetch() }
 }
 
-/** One bot by address. The list cache answers first, so `'push'` draws while the list is loading or failed. */
 export const useBot = (address: BotAddress) => {
   const list = useQuery({ queryKey: LIST, queryFn: fetchBots })
   const cached = listed(list.data, address)
@@ -67,7 +62,6 @@ const restore = (qc: QueryClient, s: Snapshot) => {
   for (const [key, data] of s.details) qc.setQueryData(key, data)
 }
 
-/** Applies `update` to one bot in the list and in every profile that shows it. Null drops it from the list. */
 const writeBot = (qc: QueryClient, id: BotId, update: (bot: Bot) => Bot | null) => {
   qc.setQueryData<BotList>(LIST, (prev) => prev && { ...prev, bots: prev.bots.flatMap((b) => (b.id === id ? (update(b) ?? []) : [b])) })
   qc.setQueriesData<BotProfile>({ queryKey: [...BOTS, 'detail'] }, (prev) => {
@@ -78,7 +72,6 @@ const writeBot = (qc: QueryClient, id: BotId, update: (bot: Bot) => Bot | null) 
 
 type Patch = { bot: Bot; patch: { notificationsMuted?: boolean; color?: BotColor } }
 
-/** Optimistic. A failure restores what was drawn, and a revision conflict also reloads the bots. */
 export const patchBotMutation = (qc: QueryClient) => ({
   mutationFn: ({ bot, patch }: Patch) => updateBot(bot.id, { expectedRevision: bot.revision, ...patch }),
   onMutate: async ({ bot, patch }: Patch) => {
@@ -109,7 +102,6 @@ export const useSetBotMuted = () => {
   return async (bot: Bot, muted: boolean) => void (await patch({ bot, patch: { notificationsMuted: muted } }))
 }
 
-/** Erases the bot, its chat, and its work history on the server. The Push Bot cannot be deleted, so it is not accepted. */
 export const useDeleteBot = () => {
   const qc = useQueryClient()
   const m = useMutation({
@@ -126,7 +118,6 @@ export const useDeleteBot = () => {
   return async (bot: CompanyBot) => void (await m.mutateAsync(bot))
 }
 
-/** BotProfileAllowedRevoke: the site leaves the list at once and comes back if the server refuses. */
 export const useRevokeAllowedSite = () => {
   const qc = useQueryClient()
   const m = useMutation({
@@ -144,7 +135,6 @@ export const useRevokeAllowedSite = () => {
   return async (bot: Bot, host: string) => void (await m.mutateAsync({ bot, host }))
 }
 
-/** Idempotent. The row loses its unread state at once and gets it back if the server refuses. */
 export const useMarkBotRead = () => {
   const qc = useQueryClient()
   const m = useMutation({

@@ -7,20 +7,20 @@ import { pickResume, showImportMenu, useImportRequest, useUpload } from '@/featu
 import { useSearchQuery } from '@/features/search'
 import { Button, GlassButton, Skeleton, Text, ToastHost, type MenuAction } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 import { useMaterials, useRefreshMaterials } from '../api/hooks'
 import { ADD_LABEL, EMPTY, LIST_LOADING, LOAD_ERROR, MATERIALS_TITLE, SEARCH_EMPTY_BODY, type AddAction } from '../constants'
 import type { Material, MaterialTab } from '../types'
 import { listView, searchEmptyTitle, sendContextOf, type ListRow } from '../utils/material-view'
 import { useConfirmDeleteMaterial } from './confirm-delete-material'
 import { sendMaterial } from './send-material'
-import { MaterialItem, SectionTitle } from './material-item'
-import { MaterialsTabs } from './materials-tabs'
-import { MaterialsSearch, useSearchRoom } from './materials-search'
+import MaterialItem from './material-item'
+import SectionTitle from './section-title'
+import MaterialsTabs from './materials-tabs'
+import MaterialsSearch, { useSearchRoom } from './materials-search'
 
 const ios = Platform.OS === 'ios'
 
-/** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
 const runAdd = (action: AddAction) => {
   if (action === 'link') return router.push(materialLinkAddPath())
   if (action === 'upload') return showImportMenu()
@@ -28,20 +28,18 @@ const runAdd = (action: AddAction) => {
   router.push('/jobs')
 }
 
-/** Centred between the tabs and the search field: one block for every empty, search-empty and error state. */
 const Note = ({ title, body, action, alert, bottom }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean; bottom: number }) => (
-  <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: bottom }}>
-    <Text v="h3" style={{ textAlign: 'center' }}>
+  <View accessibilityRole={alert ? 'alert' : undefined} style={styles.note(bottom)}>
+    <Text v="h3" style={styles.center}>
       {title}
     </Text>
-    <Text v="b2" color="t3" style={{ textAlign: 'center' }}>
+    <Text v="b2" color="t3" style={styles.center}>
       {body}
     </Text>
-    {action ? <Button label={action.label} variant="secondary" size="sm" onPress={action.onPress} style={{ marginTop: spacing[3] }} /> : null}
+    {action ? <Button label={action.label} variant="secondary" size="sm" onPress={action.onPress} style={styles.noteAction} /> : null}
   </View>
 )
 
-/** MaterialsLoading: a section title and seven rows, widths as drawn. */
 const LINE_WIDTHS = [
   [170, 130],
   [140, 160],
@@ -54,13 +52,13 @@ const LINE_WIDTHS = [
 
 const Loading = () => (
   <View accessible accessibilityRole="progressbar" accessibilityLabel={LIST_LOADING}>
-    <View style={{ paddingTop: 18, paddingBottom: 6, paddingHorizontal: spacing[5] }}>
+    <View style={styles.skeletonHead}>
       <Skeleton width={40} height={12} />
     </View>
     {LINE_WIDTHS.map(([title, sub], i) => (
-      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3], minHeight: 68, paddingVertical: 10, paddingLeft: spacing[5], paddingRight: spacing[4] }}>
+      <View key={i} style={styles.skeletonRow}>
         <Skeleton width={44} height={44} radius={12} />
-        <View style={{ flex: 1, gap: spacing[2] }}>
+        <View style={styles.skeletonText}>
           <Skeleton width={title} height={14} />
           <Skeleton width={sub} height={12} />
         </View>
@@ -70,12 +68,7 @@ const Loading = () => (
   </View>
 )
 
-/**
- * The 자료 modal (Materials and its states). `forBot` is the bot whose profile opened it: the list keeps only that bot's
- * materials (MaterialsFromProfile) and 보내기 attaches there.
- */
-export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
-  const c = useColors()
+const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const [tab, setTab] = useState<MaterialTab>('all')
   const { text, q, setText } = useSearchQuery()
   const bot = forBot as BotId | undefined
@@ -129,7 +122,7 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
             onEndReachedThreshold={0.5}
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: room.list }}
+            contentContainerStyle={styles.listContent(room.list)}
           />
         )
     }
@@ -137,22 +130,38 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
 
   return (
     <XlBoardChrome>
-      <View style={{ flex: 1, backgroundColor: c.bg }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+      <View style={styles.screen}>
+        <View style={styles.header}>
           <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: '닫기', onPress: () => router.back() }]} />
-          <Text v="h3" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
+          <Text v="h3" accessibilityRole="header" style={styles.title}>
             {MATERIALS_TITLE}
           </Text>
           <GlassButton circle actions={[{ icon: 'plus', label: '자료 추가', menu: addMenu }]} />
         </View>
-        <View style={{ paddingTop: 6, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
+        <View style={styles.tabs}>
           <MaterialsTabs value={tab} onChange={setTab} />
         </View>
-        <View style={{ flex: 1 }}>{body}</View>
+        <View style={styles.flex}>{body}</View>
         <MaterialsSearch value={text} onChange={setText} />
-        {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
         {ios ? <ToastHost /> : null}
       </View>
     </XlBoardChrome>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  note: (bottom: number) => ({ flex: 1, alignItems: 'center', justifyContent: 'center', gap: theme.spacing[2], paddingHorizontal: 36, paddingBottom: bottom }),
+  center: { textAlign: 'center' },
+  noteAction: { marginTop: theme.spacing[3] },
+  skeletonHead: { paddingTop: 18, paddingBottom: 6, paddingHorizontal: theme.spacing[5] },
+  skeletonRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], minHeight: 68, paddingVertical: 10, paddingLeft: theme.spacing[5], paddingRight: theme.spacing[4] },
+  skeletonText: { flex: 1, gap: theme.spacing[2] },
+  listContent: (paddingBottom: number) => ({ paddingBottom }),
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  header: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], paddingTop: 14, paddingHorizontal: theme.spacing[4], paddingBottom: theme.spacing[1] },
+  title: { flex: 1, textAlign: 'center' },
+  tabs: { paddingTop: 6, paddingHorizontal: theme.spacing[4], paddingBottom: theme.spacing[1] },
+  flex: { flex: 1 },
+}))
+
+export default MaterialsModal

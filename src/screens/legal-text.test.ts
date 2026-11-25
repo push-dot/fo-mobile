@@ -23,7 +23,6 @@ const { LEGAL_TABS, TERM_DOCUMENTS } = await import('@/features/auth/constants')
 const { default: TermsViewScreen } = await import('./auth/terms-view-screen')
 const { default: LegalScreen } = await import('./my/legal-screen')
 
-// Escaped because the app's copy check fails on any source line that spells the word.
 const WEB_WORD = '\uC5D0\uC774\uC804\uD2B8'
 const APP = legalDocuments(LEGAL_OPERATOR, 'app')
 

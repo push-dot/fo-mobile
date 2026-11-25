@@ -5,6 +5,7 @@ import { View } from 'react-native'
 import { fullLinkUrl, LINK_KIND_LABEL, kindOf } from '@/features/chat'
 import { useAddLink } from '@/features/my'
 import { Chip, PM8, PM8_MDET_HEAD, Sheet, SheetScroll, Text, TextField, useSheetScrollMax } from '@/shared/components'
+import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '@/theme'
 import { useRefreshMaterials } from '../api/hooks'
 import { LINK_ADD } from '../constants'
@@ -13,8 +14,7 @@ const KIND_CHIP = { padding: spacing[3], height: 36 }
 const KIND_GAP = 6
 const KINDS = Object.keys(LINK_KIND_LABEL) as LinkKind[]
 
-/** MaterialsLinkAdd: a regular sheet over the 자료 modal with the five kinds. LinkedIn is not one: the list marks it from the host. */
-export const MaterialLinkAddPage = () => {
+const MaterialLinkAddPage = () => {
   const refresh = useRefreshMaterials()
   const [url, setUrl] = useState('')
   const [picked, setPicked] = useState<LinkKind | null>(null)
@@ -28,14 +28,14 @@ export const MaterialLinkAddPage = () => {
   })
   return (
     <Sheet gap={PM8.gap} topGap={PM8.topGap} actionGap={PM8.actionGap} bottomExtra={PM8.bottomExtra} slimAction onLayout={bound.onSheetLayout} action={{ label: LINK_ADD.submit, onPress: () => add.mutate({ url: full, kind: kind ?? undefined, aiRead: true }), disabled: !valid || add.isPending, pending: add.isPending }}>
-      <View style={{ minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' }}>
-        <Text v="h3" weight="600" accessibilityRole="header" style={{ textAlign: 'center' }}>
+      <View style={styles.head}>
+        <Text v="h3" weight="600" accessibilityRole="header" style={styles.title}>
           {LINK_ADD.title}
         </Text>
       </View>
-      <SheetScroll style={{ maxHeight: bound.maxHeight }} onLayout={bound.onScrollLayout} contentContainerStyle={{ gap: spacing[3] }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
+      <SheetScroll style={styles.scroll(bound.maxHeight)} onLayout={bound.onScrollLayout} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
         <TextField icon="link" placeholder="https://" value={url} onChangeText={setUrl} autoCapitalize="none" autoCorrect={false} keyboardType="url" minHeight={54} autoFocus accessibilityLabel="링크 주소" />
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: KIND_GAP }}>
+        <View style={styles.kinds}>
           {KINDS.map((k) => (
             <Chip key={k} label={LINK_KIND_LABEL[k]} on={kind === k} fit={KIND_CHIP} onPress={() => setPicked(k)} />
           ))}
@@ -44,3 +44,13 @@ export const MaterialLinkAddPage = () => {
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  head: { minHeight: PM8_MDET_HEAD.minHeight, justifyContent: 'center' },
+  title: { textAlign: 'center' },
+  scroll: (maxHeight: number) => ({ maxHeight }),
+  content: { gap: theme.spacing[3] },
+  kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: KIND_GAP },
+}))
+
+export default MaterialLinkAddPage

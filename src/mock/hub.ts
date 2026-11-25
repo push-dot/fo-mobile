@@ -1,4 +1,3 @@
-// Mock routes for the hub area. Owned by that area's screens.
 import type { Offer, Profile } from '@push/api-client'
 import { tenureOf } from '../features/hub/utils/filters'
 import { searchHangul } from '@push/shared'
@@ -18,7 +17,6 @@ const base = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYe
   ...p,
 })
 
-// Sample people from the Claude Design boards (허브, 프로필 상세, 제안하기).
 export const profiles: Profile[] = [
   base({ userId: 'u-taeyoon', displayName: '김태윤', headline: '결제 시스템을 만드는 백엔드 개발자', tenureYears: 5, careerStatus: 'seeking', skills: ['Kotlin', 'Spring Boot', 'Kafka'], followerCount: 128 }),
   base({
@@ -60,7 +58,6 @@ const sentOffer = (to: Profile): Offer => ({
   readAt: null,
   createdAt: '2026-10-15T09:00:00Z',
 })
-// The 허브 필터 board shows 보낸 제안 3.
 for (const id of ['u7', 'u8', 'u9']) offers.set(id, sentOffer(profiles.find((p) => p.userId === id)!))
 
 const csv = (q: URLSearchParams, k: string) => q.get(k)?.split(',').filter(Boolean) ?? []
@@ -72,15 +69,12 @@ mock('GET', 'profiles', ({ query }) => {
   if (cats.length) list = list.filter((p) => p.jobCategory && cats.includes(p.jobCategory))
   const tenures = csv(query, 'tenure')
   if (tenures.length) list = list.filter((p) => p.tenureYears != null && tenures.includes(tenureOf(p.tenureYears)))
-  // shortcut: 추천 ignores the status filter; the 허브 board lists 만족 and 프로필 피드백 people under an 이직/구직중 filter.
   const statuses = csv(query, 'status')
   if (statuses.length && query.get('explore') !== 'recommended') list = list.filter((p) => p.careerStatus != null && statuses.includes(p.careerStatus))
-  // shortcut: 추천 returns everyone (no "my 직군" in the mock); the real API matches the viewer's category.
   if (query.get('explore') === 'offers') list = list.filter((p) => offers.has(p.userId))
   const q = query.get('q') ?? ''
   if (q) list = searchHangul(list, q, (p) => [p.displayName, p.headline, ...p.skills]).map((r) => r.item)
   const out = page(list, query, true)
-  // The 허브 필터 board's button reads 프로필 46개 for 개발·데이터 + 3–5년 + 이직/구직중.
   const board = csv(query, 'category').join() === 'dev,data' && csv(query, 'tenure').join() === '3-5' && csv(query, 'status').join() === 'seeking'
   return board ? { ...out, page: { ...out.page, total: 46 } } : out
 })
@@ -106,7 +100,6 @@ mock('POST', 'profiles/:userId/offer', ({ params, body }) => {
     sender: { id: MOCK_USER_ID, displayName: '나', avatarUrl: null, companyName: null, headline: '' },
     recipient: { id: p.userId, displayName: p.displayName, avatarUrl: p.avatarUrl, companyName: null, headline: p.headline },
     message,
-    // shortcut: posting is not resolved in the mock; postings mock owns that data.
     posting: null,
     status: 'SENT',
     readAt: null,

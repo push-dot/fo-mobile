@@ -6,13 +6,11 @@ import { botPickPath } from '@/features/bots'
 import { postingShareMessage, usePosting, useToggleBookmark } from '@/features/jobs'
 import { Button, CtaBar, DetailWebView, FloatingHeader, GlassButton, TopBar, useFloatingHeader, type DetailFrom } from '@/shared/components'
 import { shareMessage } from '@/shared/infrastructure'
-import { useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
-// CtaBar: 14 above the buttons, 56 for them, 6 below plus the home-indicator inset.
 const CTA_HEIGHT = 14 + 56 + 6
 
 const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {
-  const c = useColors()
   const { data: p } = usePosting(id)
   const toggleBookmark = useToggleBookmark()
   const { onHeight, inset } = useFloatingHeader()
@@ -20,7 +18,7 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const { top, bottom } = useSafeAreaInsets()
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
       <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
       <TopBar
@@ -49,11 +47,16 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
           disabled={!p}
           pending={p?.applied}
           onPress={() => router.push({ pathname: '/apply', params: { postingId: id } })}
-          style={{ flex: 1 }}
+          style={styles.flex}
         />
       </CtaBar>
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  flex: { flex: 1 },
+}))
 
 export default PostingDetailScreen

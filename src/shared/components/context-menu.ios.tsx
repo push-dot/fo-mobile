@@ -1,18 +1,14 @@
 import { ContextMenu as SwiftContextMenu, RNHostView } from '@expo/ui/swift-ui'
 import { Pressable, useWindowDimensions } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { ContextMenuProps } from './menu-action'
 import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/**
- * iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress.
- * SwiftUI hands the trigger its ideal width, so a long name would push the row past the screen: the hosted row is capped at the window's width.
- */
 const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => {
   const { width } = useWindowDimensions()
   return (
-    // Without ignoreSafeArea the hosted row stops at the status bar while the list keeps scrolling, so a header row (Push Bot) overlaps the first row.
     <NativeHost matchContents={{ vertical: true }} ignoreSafeArea="all" seedColor={useColors().t1}>
       <SwiftContextMenu>
         <SwiftContextMenu.Items>
@@ -20,7 +16,7 @@ const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }
         </SwiftContextMenu.Items>
         <SwiftContextMenu.Trigger>
           <RNHostView matchContents={{ vertical: true }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={{ maxWidth: width }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={styles.trigger(width)}>
               {children}
             </Pressable>
           </RNHostView>
@@ -34,5 +30,9 @@ const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }
     </NativeHost>
   )
 }
+
+const styles = StyleSheet.create({
+  trigger: (width: number) => ({ maxWidth: width }),
+})
 
 export default ContextMenu

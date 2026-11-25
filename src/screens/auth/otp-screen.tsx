@@ -30,10 +30,9 @@ import {
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
 import { Button, CtaBar, Text, TopBar, useKeyboardHeight } from '@/shared/components'
-import { spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
 
 const OtpScreen = () => {
-  const c = useColors()
   const keyboard = useKeyboardHeight()
   const digits = usePhoneAuth((state) => state.digits)
   const email = usePhoneAuth((state) => state.email)
@@ -52,7 +51,6 @@ const OtpScreen = () => {
   const e164 = toE164(digits)
   const display = formatNational(digits)
 
-  // The code screen opens only after a code was really sent (the send sets the cooldown); a link or a back-forward into it goes back to the number.
   const sent = cooldownEndsAt !== null
   useEffect(() => {
     if (!e164 || !sent) router.replace('/phone')
@@ -116,11 +114,11 @@ const OtpScreen = () => {
 
   const status =
     otpResendSlot(remaining) === 'countdown' ? (
-      <Text v="c1" weight="600" color="t2" style={{ flex: 1, fontVariant: ['tabular-nums'] }}>
+      <Text v="c1" weight="600" color="t2" style={styles.countdown}>
         {countdownLabel(remaining)}
       </Text>
     ) : (
-      <Pressable accessibilityRole="button" disabled={busy} onPress={resend} style={{ flex: 1 }}>
+      <Pressable accessibilityRole="button" disabled={busy} onPress={resend} style={styles.flex}>
         <Text v="c1" weight="700" color="acText">
           {RESEND_CODE}
         </Text>
@@ -131,46 +129,45 @@ const OtpScreen = () => {
 
   if (blocked) {
     return (
-      <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={styles.screen}>
         <TopBar onBack={() => router.back()} />
-        <View style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
-          <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
+        <View style={styles.body}>
+          <Text accessibilityRole="header" v="h1" style={styles.title}>
             {TOO_MANY_TITLE}
           </Text>
-          <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
+          <Text v="b2" color="t2" style={styles.subtitle}>
             {TOO_MANY_BODY}
           </Text>
-          <View style={{ marginTop: 28, opacity: 0.5 }}>
+          <View style={[styles.cells, styles.cellsBlocked]}>
             <OtpBoxes value="" active={null} />
           </View>
         </View>
         <CtaBar>
-          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
+          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={styles.flex} />
         </CtaBar>
       </View>
     )
   }
 
   return (
-    // The code pad has no done key: a tap anywhere outside the cells closes it.
-    <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
+    <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.screen}>
       <TopBar onBack={() => router.back()} />
-      <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
+      <Pressable accessible={false} onPress={Keyboard.dismiss} style={styles.body}>
         {email ? (
-          <View style={{ marginBottom: 18 }}>
+          <View style={styles.pill}>
             <AccountPill email={email} provider={provider} />
           </View>
         ) : null}
-        <Text accessibilityRole="header" v="h1" style={{ fontSize: 24, lineHeight: 33 }}>
+        <Text accessibilityRole="header" v="h1" style={styles.title}>
           {OTP_TITLE}
         </Text>
-        <Text v="b2" color="t2" style={{ marginTop: spacing[2] }}>
-          <Text v="b2" weight="700" style={{ fontVariant: ['tabular-nums'] }}>
+        <Text v="b2" color="t2" style={styles.subtitle}>
+          <Text v="b2" weight="700" style={styles.tabular}>
             {display}
           </Text>
           {OTP_SENT_SUFFIX}
         </Text>
-        <View style={{ marginTop: 28 }}>
+        <View style={styles.cells}>
           <OtpCells
             value={code}
             error={otpError === 'invalid'}
@@ -180,22 +177,14 @@ const OtpScreen = () => {
             }}
           />
         </View>
-        {/* SignInErrors: iOS stacks the error over the countdown row; Android folds the error into the one row with 번호 바꾸기. */}
         {notice && Platform.OS === 'ios' ? (
-          <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[4] }}>
+          <Text v="c1" color="red" accessibilityRole="alert" style={styles.notice}>
             {notice}
           </Text>
         ) : null}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: spacing[3],
-            marginTop: notice && Platform.OS === 'ios' ? 10 : spacing[4],
-          }}
-        >
+        <View style={[styles.statusRow, notice && Platform.OS === 'ios' && styles.statusRowTight]}>
           {notice && Platform.OS === 'android' ? (
-            <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={{ flex: 1 }}>
+            <Text v="c1" weight="600" color="red" accessibilityRole="alert" style={styles.flex}>
               {notice}
             </Text>
           ) : (
@@ -210,13 +199,29 @@ const OtpScreen = () => {
       </Pressable>
       <CtaBar lift={keyboard}>
         {otpError === 'expired' ? (
-          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={{ flex: 1 }} />
+          <Button label={RESEND_CODE} disabled={busy} onPress={resend} style={styles.flex} />
         ) : (
-          <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} style={{ flex: 1 }} />
+          <Button label={CONFIRM} disabled={busy || code.length !== 6} onPress={confirm} style={styles.flex} />
         )}
       </CtaBar>
     </Pressable>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  body: { paddingHorizontal: theme.spacing[6], paddingTop: theme.spacing[3] },
+  title: { fontSize: 24, lineHeight: 33 },
+  subtitle: { marginTop: theme.spacing[2] },
+  cells: { marginTop: 28 },
+  cellsBlocked: { opacity: 0.5 },
+  pill: { marginBottom: 18 },
+  tabular: { fontVariant: ['tabular-nums'] },
+  countdown: { flex: 1, fontVariant: ['tabular-nums'] },
+  notice: { marginTop: theme.spacing[4] },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3], marginTop: theme.spacing[4] },
+  statusRowTight: { marginTop: 10 },
+  flex: { flex: 1 },
+}))
 
 export default OtpScreen

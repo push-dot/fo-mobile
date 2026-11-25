@@ -1,5 +1,9 @@
 import { ApiError } from '@push/api-client'
+import type { LoginProvider } from '../../../shared/infrastructure/phone-auth-store'
 import { FAILURE_BODY, OTP_LENGTH, PENDING_EXPIRED, PHONE_TAKEN, PHONE_UNAVAILABLE, PROVIDER_LABEL, TRY_AGAIN } from '../constants'
+
+export type { LoginProvider } from '../../../shared/infrastructure/phone-auth-store'
+export { isAppleCancel } from '../../../shared/infrastructure/apple-cancel'
 
 export const formatCountdown = (totalSeconds: number) => {
   const seconds = Math.max(0, Math.floor(totalSeconds))
@@ -10,7 +14,6 @@ export const formatCountdown = (totalSeconds: number) => {
 
 export const countdownLabel = (totalSeconds: number) => `${formatCountdown(totalSeconds)} 후에 다시 받을 수 있어요`
 
-// The boards keep a code error up while the code is edited; a newly completed code is a fresh attempt.
 export const otpErrorAfterInput = <E>(error: E | null, prev: string, next: string) => (next.length === OTP_LENGTH && next !== prev ? null : error)
 
 export type OtpResendSlot = 'countdown' | 'resend'
@@ -46,12 +49,8 @@ export const mapPhoneAuthError = (error: unknown): PhoneAuthFailure => {
   return { kind: 'unknown' }
 }
 
-export type LoginProvider = 'google' | 'apple' | 'github'
 
 export const showAppleButton = (platform: string, available: boolean) => platform === 'ios' && available
-
-export const isAppleCancel = (error: unknown) =>
-  typeof error === 'object' && error !== null && 'code' in error && (error as { code?: unknown }).code === 'ERR_REQUEST_CANCELED'
 
 export const loginFailureCopy = (provider: LoginProvider) => ({
   title: `${PROVIDER_LABEL[provider]} 로그인에 실패했어요`,

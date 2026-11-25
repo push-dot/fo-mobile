@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { ChatItem, DiffLine } from '../types'
-import { latestDiffLines, reviewRows, strongParts } from '../utils/review-doc'
+import type { DiffLine } from '../types'
+import { reviewRows, strongParts } from '../utils/review-doc'
 
 const text = (row: { parts: { text: string }[] }) => row.parts.map((p) => p.text).join('')
 
@@ -66,14 +66,5 @@ describe('reviewRows', () => {
   it('draws what the server sends today: one removed block and one added block with no document around them', () => {
     const only = reviewRows([{ sign: '-', text: '결제 API 개발' }, { sign: '+', text: '결제 승인 API 재설계\nKafka 파이프라인' }])
     expect(only.map((r) => [r.sign, text(r)])).toEqual([['-', '결제 API 개발'], ['+', '결제 승인 API 재설계'], ['+', 'Kafka 파이프라인']])
-  })
-})
-
-describe('latestDiffLines', () => {
-  const diff: ChatItem = { type: 'diff', id: 'd', lines: [{ sign: '+', text: 'a' }] }
-  it('reads the edit since the person last spoke, from the bubble or the line', () => {
-    expect(latestDiffLines([{ type: 'user', id: 'u', text: 'x' }, diff])).toEqual(diff.type === 'diff' ? diff.lines : [])
-    expect(latestDiffLines([{ type: 'agentText', id: 't', text: 'x', diff: diff as Extract<ChatItem, { type: 'diff' }> }])).toHaveLength(1)
-    expect(latestDiffLines([diff, { type: 'user', id: 'u', text: 'x' }])).toEqual([])
   })
 })

@@ -81,7 +81,7 @@ describe('mock data drawn on the design boards', () => {
 
   it('opens the phone screen as after a Google sign-in', async () => {
     const { pendingSocialPhone } = await import('../home')
-    const { usePhoneAuth } = await import('../../features/auth/stores')
+    const { usePhoneAuth } = await import('../../shared/infrastructure/phone-auth-store')
     const { emailFromPendingToken } = await import('../../features/auth/utils/auth-flow')
     pendingSocialPhone()
     const draft = usePhoneAuth.getState()

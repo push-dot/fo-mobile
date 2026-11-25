@@ -6,7 +6,7 @@ import { QUICK_STARTS } from '../constants'
 import { docMeta, initialPicks, postingMeta, quickStartFrom, startLink } from '../utils/quick-start-data'
 
 vi.mock('@/features/my', async () => {
-  const utils = await import('../../my/utils')
+  const utils = await import('../../my/utils/index')
   return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo }
 })
 
@@ -24,7 +24,6 @@ describe('quickStartFrom (real mode)', () => {
     const bookmarks = [posting('a', '2026-10-30'), posting('b', '2026-10-23'), posting('c', '2026-10-20'), posting('d', null)]
     const fit = quickStartFrom('fit', { bookmarks, doc: '이력서.pdf' }, now)
     expect(fit.doc).toBe('이력서.pdf')
-    // Same company colour as the job cards and the WebView, not the person-avatar tint.
     expect(fit.items[0]!.logo!.color).toBe(brandColor('모아페이'))
     expect(fit.items.map((i) => [i.id, i.over, !!i.selected])).toEqual([['a', '모아페이', true], ['b', '모아페이', false], ['c', '모아페이', false], ['d', '모아페이', false]])
   })
@@ -36,7 +35,6 @@ describe('quickStartFrom (real mode)', () => {
       ({ id: status, status, sender: { id: 's', displayName: '오지현' }, message: '커피챗 어떠세요?', posting: null, createdAt: '2026-10-21T08:00:00' }) as unknown as Offer
     const reply = quickStartFrom('reply', { offers: [offer('SENT'), offer('ACCEPTED')] }, now)
     expect(reply.items).toMatchObject([{ id: 'SENT', title: '오지현', body: '커피챗 어떠세요?', badge: { label: '새 제안' } }])
-    // QsReply / QsCoffee: a person's avatar is a black circle, whatever the brand colour table says.
     registerMockBrandColors()
     expect(quickStartFrom('reply', { offers: [offer('SENT')] }, now).items[0]!.avatar!.color).toBe('#16191D')
   })

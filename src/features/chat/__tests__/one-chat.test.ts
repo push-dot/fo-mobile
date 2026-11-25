@@ -21,7 +21,7 @@ const api = vi.hoisted(() => ({
   me: { updateSettings: vi.fn() },
 }))
 vi.mock('@/shared/infrastructure', () => ({ api, botApi, http: {}, API_MOCK: false, hapticImpactLight: vi.fn(), hapticNotify: vi.fn() }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload, sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload, list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: { run: vi.fn() },
   fetchConversationMessages: vi.fn(),

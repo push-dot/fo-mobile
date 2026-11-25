@@ -3,7 +3,6 @@ import type { Account } from '../api/schemas'
 import { TONES } from '@/features/my'
 import type { MenuAction } from '@/shared/components'
 
-/** 계정 › 말투: inline menu, the saved tone checked (그대로 when none is saved). */
 export const toneMenu = (current: Tone | undefined, onPick: (tone: Tone) => void): MenuAction[] =>
   TONES.map((t) => ({ key: t.key, label: t.label, selected: t.key === (current ?? 'as_is'), onPress: () => onPick(t.key) }))
 

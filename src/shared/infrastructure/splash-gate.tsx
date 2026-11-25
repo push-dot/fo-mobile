@@ -1,6 +1,6 @@
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useRef, useState } from 'react'
-import { useHomeSnapshotSync } from '@/features/home/use-home-snapshot-sync'
+import { useHomeSnapshotSync } from '@/features/home'
 import { useSession } from './session-store'
 import { SPLASH_ABSOLUTE_TIMEOUT_MS, SPLASH_SNAPSHOT_TIMEOUT_MS, shouldHideSplash } from './splash-hide'
 
@@ -48,7 +48,6 @@ const SplashGate = ({ sessionReady, themeReady }: Props) => {
       try {
         await SplashScreen.hideAsync()
       } catch {
-        // keep fail-open so a plugin error does not block the app tree
       }
     })()
   }, [sessionReady, themeReady, session, snapshotReady, timedOut, absoluteTimedOut])

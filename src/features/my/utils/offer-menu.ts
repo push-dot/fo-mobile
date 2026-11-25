@@ -9,10 +9,6 @@ export { offerMenu, otherParty, viewerBox } from '@push/shared'
 
 const hasBottomBar = (o: Offer, box: OfferBox) => o.status === 'ACCEPTED' || (box === 'received' && (o.status === 'SENT' || o.status === 'READ'))
 
-/**
- * The app toast for a shared offer-menu toast. The report toast sits above the offer's bottom bar when it has one.
- * Every other one sits 20pt above the safe inset, where ProposalToastArchived and ProposalToastBlocked draw it.
- */
 export const offerToast = (offer: Offer, box: OfferBox, { kind, message, undo }: OfferMenuToast): ToastInput => ({
   message,
   ...(kind === 'failed' ? { tone: 'error' as const } : {}),
@@ -27,7 +23,6 @@ export type OfferMenuSectionDeps = OfferMenuDeps & {
   confirm: (r: ConfirmRequest) => void
 }
 
-// ProposalBlockConfirm (v415): the app's sub text is one short line; the shared copy (also the web's) stays longer.
 const blockConfirm = (name: string) => ({
   title: `${name} 님을 차단할까요?`,
   body: '제안과 메시지를 더 받지 않아요. 상대에게는 알리지 않아요.',

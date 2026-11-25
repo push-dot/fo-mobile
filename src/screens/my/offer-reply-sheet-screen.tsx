@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
+import { StyleSheet } from 'react-native-unistyles'
 import { counterpart, ListSkeleton, RETRY_LABEL, useOffer, useOfferDecision } from '@/features/my'
 import { Sheet, TextField } from '@/shared/components'
 
@@ -38,11 +39,15 @@ const OfferReplySheetScreen = () => {
         value={reply}
         onChangeText={setReply}
         editable={!accept.isPending}
-        style={{ minHeight: 72 }}
+        style={styles.reply}
         placeholder={`${who.displayName} 님에게 답장을 써 주세요.`}
       />
     </Sheet>
   )
 }
+
+const styles = StyleSheet.create({
+  reply: { minHeight: 72 },
+})
 
 export default OfferReplySheetScreen

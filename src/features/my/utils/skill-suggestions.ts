@@ -1,6 +1,5 @@
 import { searchHangul } from '@push/shared'
 
-/** EditSkills (board): 3 rows under the field, the better match first, then the shorter name ("Re" → Redis, React, Rest Docs). */
 export const SKILL_SUGGESTION_LIMIT = 3
 
 export const skillSuggestions = (catalog: readonly string[], query: string) =>

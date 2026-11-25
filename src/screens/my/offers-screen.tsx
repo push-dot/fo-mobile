@@ -5,7 +5,8 @@ import { View } from 'react-native'
 import { Empty, OFFER_ARCHIVED_ROW, OFFER_EMPTY_ACTION, OfferRow, Row, useArchivedOffers, useOffers } from '@/features/my'
 import { Icon, SegmentedControl, SkeletonRows, Text, TopBar } from '@/shared/components'
 import type { SkeletonRowsShape } from '@/shared/components'
-import { radius, spacing, useColors } from '@/theme'
+import { StyleSheet } from 'react-native-unistyles'
+import { radius } from '@/theme'
 
 const OFFER_SKELETON: SkeletonRowsShape = {
   count: 5,
@@ -20,9 +21,9 @@ type Box = 'received' | 'sent'
 type OfferItem = ComponentProps<typeof OfferRow>['o']
 
 const ArchivedRow = ({ count }: { count: number }) => (
-  <View style={{ marginTop: spacing[1] }}>
+  <View style={styles.archived}>
     <Row label={`${OFFER_ARCHIVED_ROW} ${count}개`} onPress={() => router.push('/offers/archived')}>
-      <Text v="b1" weight="600" style={{ flex: 1 }}>
+      <Text v="b1" weight="600" style={styles.archivedLabel}>
         {OFFER_ARCHIVED_ROW}
       </Text>
       <Text v="c1" color="t3">
@@ -33,11 +34,9 @@ const ArchivedRow = ({ count }: { count: number }) => (
   </View>
 )
 
-// The board lifts the empty state by 40pt; the footer note ends the list with no extra gap (ProposalInbox).
 const LIST_END = 40
 
 const OffersScreen = () => {
-  const c = useColors()
   const [box, setBox] = useState<Box>('received')
   const received = useOffers('received')
   const sent = useOffers('sent')
@@ -47,9 +46,9 @@ const OffersScreen = () => {
   const n = (r: typeof received) => r.data?.page.total ?? r.data?.data.length ?? 0
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={styles.screen}>
       <TopBar title={box === 'received' ? '받은 제안' : '제안함'} onBack={() => router.back()} />
-      <View style={{ paddingTop: spacing[1], paddingBottom: spacing[2], paddingHorizontal: spacing[5] }}>
+      <View style={styles.segment}>
         <SegmentedControl
           items={[
             { key: 'received', label: `받은 제안 ${n(received)}` },
@@ -65,7 +64,7 @@ const OffersScreen = () => {
         renderItem={renderItem}
         estimatedItemSize={84}
         extraData={box}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={styles.list}
         ListEmptyComponent={
           q.isLoading ? (
             <SkeletonRows {...OFFER_SKELETON} />
@@ -85,7 +84,7 @@ const OffersScreen = () => {
               <Text
                 v="c2"
                 color="t3"
-                style={{ paddingTop: box === 'received' ? spacing[1] : spacing[5], paddingBottom: spacing[4], paddingHorizontal: box === 'received' ? spacing[5] : spacing[6], lineHeight: 17 }}
+                style={[styles.footnote, box === 'received' ? styles.footnoteReceived : styles.footnoteSent]}
               >
                 {box === 'received'
                   ? '허브 프로필이 공개돼 있어야 제안을 받을 수 있어요.'
@@ -98,5 +97,16 @@ const OffersScreen = () => {
     </View>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  archived: { marginTop: theme.spacing[1] },
+  archivedLabel: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.bg },
+  segment: { paddingTop: theme.spacing[1], paddingBottom: theme.spacing[2], paddingHorizontal: theme.spacing[5] },
+  list: { flexGrow: 1 },
+  footnote: { paddingBottom: theme.spacing[4], lineHeight: 17 },
+  footnoteReceived: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5] },
+  footnoteSent: { paddingTop: theme.spacing[5], paddingHorizontal: theme.spacing[6] },
+}))
 
 export default OffersScreen

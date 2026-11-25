@@ -17,7 +17,7 @@ vi.mock('@/shared/infrastructure', () => ({
   hapticImpactLight: vi.fn(),
   hapticNotify: vi.fn(),
 }))
-vi.mock('@/features/my/api/fetchers', () => ({ myApi: { upload, sources: vi.fn(), googleConnected: vi.fn() } }))
+vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload, list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {},
   fetchConversationMessages: (id: string) => api.conversations.messages(id, { limit: 50 }),

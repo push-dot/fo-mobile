@@ -1,170 +1,29 @@
-import type { BotContract, StreamEvent, StreamOption } from '@push/api-client'
-import {
-  CHOICE_QUESTION,
-  DEFAULT_ERROR_TEXT,
-  ERROR_TEXT,
-  FIT_ROWS,
-  MULTI_PICK_SUBMIT,
-  PROFILE_SAVED,
-  queueBusyMessage,
-} from '../constants'
-import type { Approval, ChatEvent, ChatItem, Choice } from '../types'
-import { closeLabel } from './close-label'
-import { resultTask } from './result-card'
-import { diffLines } from './diff-lines'
+import type { BotContract, StreamEvent } from '@push/api-client'
+import { DEFAULT_ERROR_TEXT, ERROR_TEXT, PROFILE_SAVED, queueBusyMessage } from '../constants'
+import type { ChatEvent } from '../types'
 import { noticeOf } from './notices'
-import { isSiteCard } from './card'
-import { approvalFromSections, mapPaper, mapPlan, mapThink } from './stream-v3'
 
 const detailRecord = (value: unknown): Record<string, unknown> | undefined =>
   value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : undefined
 
-/** A code with no sentence of its own, sent with a reason, is drawn as the bubble 작업 중 문제가 생겼어요. {reason}. 다시 해 볼까요? */
 export const errorReason = (code: string | undefined, reason: unknown) =>
   code !== 'QUEUE_BUSY' && !(code && ERROR_TEXT[code]) && typeof reason === 'string' && reason ? reason : undefined
 
 export const errorText = (code?: string, retryAfterSec?: number, reason?: unknown) =>
   code === 'QUEUE_BUSY' ? queueBusyMessage(retryAfterSec, reason) : (code && ERROR_TEXT[code]) || DEFAULT_ERROR_TEXT
 
-type Ask = {
-  id: string
-  question: string
-  options: StreamOption[]
-  multiple?: boolean
-  submit?: string
-  warning?: string
-  recommended?: string
-  /** Set for a card with a lifetime. `foot` replaces the pick hint, `detail` sits under the question. */
-  tool?: Pick<Approval, 'detail' | 'foot' | 'openedAt'>
-  /** When a choice card was asked: the room draws 답을 기다리고 있어요 from then, and a card it waits on with no recommended answer preselects none (ChatBotStatusHelp). A frame with no stamp keeps no line. */
-  since?: number
-  /** The server's line under a choice's title; only a help question (no recommended answer) shows it, as the message of its modal (ChatBotStatusHelp). */
-  detail?: string
-}
-
-const choiceOf = (o: StreamOption): Choice => ({
-  label: closeLabel(o.label),
-  ...(o.desc ? { desc: o.desc } : {}),
-  ...(o.badge ? { badge: { label: o.badge, tone: 'ac' as const } } : {}),
-})
-
-// A submit gate answers with its sections' selected ids, any other gate (or an empty pick with no zero label) with recommended.
-const autoPicks = (ev: Extract<StreamEvent, { type: 'choice' }>) => {
-  const recommended = ev.options.find((o) => o.id === ev.recommended)?.label
-  if (!ev.sections?.length || !ev.submit) return recommended
-  const ids = ev.sections.flatMap((s) => ('selected' in s ? s.selected : []))
-  const labels = ev.sections.flatMap((s) => s.options).filter((o) => ids.includes(o.id)).map((o) => o.label)
-  return labels.length ? labels.join(', ') : (ev.submit.zeroLabel ?? recommended)
-}
-
-const ask = ({ id, question, options, multiple, submit, warning, recommended, tool, since, detail }: Ask): ChatEvent => {
-  const first = Math.max(0, options.findIndex((o) => o.id === recommended))
-  const approval: Approval = {
-    id,
-    question,
-    warning,
-    ...(detail && since !== undefined && recommended === undefined && !multiple ? { detail } : {}),
-    submit: multiple ? MULTI_PICK_SUBMIT : submit,
-    optionIds: options.map((o) => o.id),
-    sections: [{ kind: 'choices', selected: multiple || tool?.detail || (since !== undefined && recommended === undefined) ? [] : [first], ...(multiple ? { multi: true as const } : {}), items: options.map(choiceOf) }],
-    ...(tool ? { confirm: true as const, ...tool } : since === undefined ? {} : { openedAt: since }),
-  }
-  return { type: 'approval', approval }
-}
-
-const timeOf = (iso: string | undefined) => {
-  const ms = iso === undefined ? NaN : Date.parse(iso)
-  return Number.isNaN(ms) ? undefined : ms
-}
-
-/** When a card was asked: a stored card has openedAt, a live frame its stamp `at`. */
-const askedAt = (ev: StreamEvent) => {
-  const stamped = ev as { openedAt?: string; at?: string }
-  return timeOf(stamped.openedAt ?? stamped.at)
-}
-
-/** A tool card's words and times. A stored card has openedAt; a live frame has only its stamp `at`, so the app reads the ask from that. */
-const toolCard = (ev: Extract<StreamEvent, { type: 'approval' }>): Omit<Ask, 'id'> => {
-  const stored = ev as { openedAt?: string; at?: string }
-  const openedAt = timeOf(stored.openedAt ?? stored.at)
-  // A frame with no stamp (a hand-written script) has no ask time, so it keeps no waiting line.
-  const times = openedAt === undefined ? undefined : { openedAt }
-  if (isSiteCard(ev.options.map((o) => o.id))) {
-    return { question: ev.title, options: ev.options, tool: { ...times, ...(ev.summary ? { detail: ev.summary } : {}), ...(ev.foot ? { foot: ev.foot } : {}) } }
-  }
-  // push-be words the apply card's summary generically ("이 공고에 지원해요") and puts the posting in its title: "{company} · {title}에 지원해요".
-  const posting = ev.toolName === 'apply_to_posting'
-  return { question: posting ? ev.title : ev.summary || ev.title, options: ev.options, warning: ev.foot, tool: times }
-}
-
-/** The edit card: the changed document opens as a page with 되돌리기 · 적용 (ChatApprove); the server's one-line summary is not drawn. */
-const askEdit = (ev: Extract<StreamEvent, { type: 'approval' }>): ChatEvent[] => {
-  const [apply, keep] = ev.options
-  const approval: Approval = {
-    id: ev.id,
-    question: ev.title,
-    optionIds: ev.options.map((o) => o.id),
-    sections: [],
-    ...(apply ? { submit: apply.label } : {}),
-    ...(keep ? { secondary: keep.label } : {}),
-  }
-  const diff: ChatItem[] = ev.hunks?.length ? [{ type: 'diff', id: `diff-${ev.id}`, lines: diffLines(ev.hunks) }] : []
-  return [...diff, { type: 'approval', approval }]
-}
-
-const fitOf = (ev: Extract<StreamEvent, { type: 'fit' }>): ChatItem => {
-  const rows = FIT_ROWS.flatMap((r) => {
-    const score = ev.parts?.[r.key]
-    return score === undefined ? [] : [{ label: r.label, score }]
-  })
-  const caption = ev.band ?? ev.topGap
-  return {
-    type: 'fit',
-    id: `fit-${ev.seq ?? Date.now()}`,
-    score: ev.score,
-    ...(ev.from !== undefined ? { from: ev.from } : {}),
-    ...(ev.delta ? { delta: ev.delta } : {}),
-    ...(ev.note ? { note: ev.note } : {}),
-    ...(caption ? { caption } : {}),
-    ...(ev.plan ? { plan: ev.plan } : {}),
-    ...(ev.summary ? { summary: ev.summary } : {}),
-    ...(rows.length ? { rows } : {}),
-    ...(ev.keywords?.length ? { keywords: ev.keywords } : {}),
-  }
-}
-
-/** One finished document is one run's result: the frame's seq keeps a second run on the same document from overwriting the first. */
-const resultKey = (ev: Extract<StreamEvent, { type: 'result' }>) => (ev.seq === undefined ? ev.documentId : `${ev.documentId}-${ev.seq}`)
-
-/** 다 됐어요! line above the result card, with the score change in bold. */
-const doneLine = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] => {
-  if (!ev.summary) return []
-  const change = ev.fitFrom !== undefined && ev.fitTo !== undefined ? `${ev.fitFrom.toFixed(1)} → ${ev.fitTo.toFixed(1)}` : ''
-  const text = change ? ev.summary.replace(change, `**${change}**`) : ev.summary
-  return [{ type: 'agentText', id: `done-${resultKey(ev)}`, text, ...(ev.bullets?.length ? { bullets: ev.bullets } : {}) }]
-}
-
-/** 이력서 수정 · 올린 파일 · 경력 → a finished tool line above the summary, as the done artboards draw it. */
-const taskOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem[] =>
-  ev.taskLine ? [{ type: 'tool', id: `task-${resultKey(ev)}`, state: 'ok', ...resultTask(ev.taskLine) }] : []
-
-const resultOf = (ev: Extract<StreamEvent, { type: 'result' }>): ChatItem => {
-  const base = { type: 'result' as const, id: `result-${resultKey(ev)}`, checklist: ev.checklist, documentId: ev.documentId, company: ev.company, actions: ev.actions }
-  return ev.source === 'external'
-    ? { ...base, source: ev.source, fileName: ev.fileName, pageLine: ev.pageLine, savedLine: ev.savedLine, cardMeta: ev.cardMeta }
-    : { ...base, source: ev.source, name: ev.name, headline: ev.headline, title: ev.title, subtitle: ev.subtitle }
-}
-
-/** One server frame → transcript events (an edit card or a result can add a line before itself). */
 export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
   switch (ev.type) {
     case 'token':
       return [{ type: 'token', text: ev.text }]
-    case 'status':
-      return [{ type: 'status', verbs: [ev.text] }]
+    case 'status': {
+      const card = (ev as { phase?: string; cardId?: string }).phase === 'waiting' ? (ev as { cardId?: string }).cardId : undefined
+      return [{ type: 'status', verbs: [ev.text] }, ...(card ? [{ type: 'wait' as const, surfaceId: card }] : [])]
+    }
+    case 'a2ui':
+      return [{ type: 'surface', id: ev.surfaceId, kind: ev.kind, messages: ev.messages }]
     case 'tool': {
       const error = ev.state === 'err' && typeof ev.result?.error === 'string' ? ev.result.error : undefined
-      // update_my_profile applies at once (rule 39); the server kept the old values under changeId, so a reopened chat draws 되돌리기 too.
       const changeId = ev.name === 'update_my_profile' && ev.state === 'ok' && typeof ev.result?.changeId === 'string' ? ev.result.changeId : undefined
       const line: ChatEvent[] = changeId ? [{ type: 'agentText', id: `undo-${changeId}`, text: PROFILE_SAVED, undo: changeId }] : []
       return [
@@ -183,40 +42,10 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
         ...line,
       ]
     }
-    case 'approval':
-      if (ev.kind === 'DOCUMENT_EDIT') return askEdit(ev)
-      return [ask({ id: ev.id, ...toolCard(ev) })]
-    case 'choice': {
-      // push-be #224 auto mode still sends sections; the auto line wins.
-      if (!ev.auto && ev.sections?.length) return [{ type: 'approval', approval: approvalFromSections(ev) }]
-      if (!ev.auto) {
-        const pending = ev.note && (!ev.resolution || ev.resolution.status === 'PENDING') ? ev.note : undefined
-        const since = askedAt(ev)
-        const event = ask({ id: ev.id, question: ev.title ?? CHOICE_QUESTION, options: ev.options, multiple: ev.multiple, submit: ev.submit?.label, recommended: ev.recommended, since, detail: ev.detail })
-        if (event.type === 'approval' && pending) event.approval.pendingNote = pending
-        return [event]
-      }
-      // The profile is already saved when the server sends the result gate with auto set (rule 39): nothing was picked, so no line says it was.
-      if (ev.gate === 'present') return []
-      const picked = autoPicks(ev)
-      return picked ? [{ type: 'agentText', id: `auto-${ev.id}`, text: `자동으로 골랐어요: ${picked}` }] : []
-    }
     case 'think':
-      return [mapThink(ev)]
-    case 'plan':
-      return [mapPlan(ev)]
-    case 'paper':
-      return [mapPaper(ev)]
+      return [{ type: 'think', id: `think-${ev.seq ?? ev.phase ?? '0'}`, seconds: ev.seconds }]
     case 'file':
       return [{ type: 'file', id: `file-${ev.fileId}`, name: ev.name, url: ev.downloadUrl, preview: true }]
-    case 'result':
-      return [...taskOf(ev), ...doneLine(ev), resultOf(ev)]
-    case 'todo':
-      return [{ type: 'todo', id: ev.id ? `todo-${ev.id}` : 'todo', items: ev.items.map((i) => ({ label: i.text, state: i.state, ...(i.added ? { added: true } : {}) })) }]
-    case 'diff':
-      return [{ type: 'diff', id: `diff-${ev.revisionId}`, lines: diffLines(ev.hunks) }]
-    case 'fit':
-      return [fitOf(ev)]
     case 'error': {
       const details = detailRecord(ev.error.details)
       const retry = details?.retryAfterSec
@@ -227,12 +56,10 @@ export const mapEvent = (ev: StreamEvent, turn?: string): ChatEvent[] => {
     case 'cancelled':
       return [{ type: 'stop', resumable: (ev as { resumable?: boolean }).resumable === true, ...(turn ? { turn } : {}) }]
     case 'done': {
-      // The legacy StreamEvent type predates the bot stream's `sources`.
       const sources = (ev as { sources?: BotContract.Attachment[] }).sources
       return [...(sources?.length ? [{ type: 'sources' as const, sources }] : []), { type: 'done', at: 0, awaiting: ev.awaiting }]
     }
     default: {
-      // push-be #224: a type this build does not know must not stop the stream.
       const notice = (ev as { type: string }).type === 'notice' ? noticeOf(ev as { text?: string; seq?: number }) : null
       return notice ? [notice] : []
     }
@@ -280,7 +107,6 @@ export const fromStream = async function* (
       mark('reattach-empty')
       return
     }
-    // Without seq a resume would replay from the start and duplicate text.
     if (seq === undefined) {
       mark('no-seq')
       return

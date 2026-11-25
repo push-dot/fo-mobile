@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Platform } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 import type { IconName } from '@push/design-system'
-import { hitSlopTo, radius, spacing, type, useColors } from '../../theme'
+import { hitSlopTo, spacing, type, useColors } from '../../theme'
 import GlassPressable from './glass-pressable'
 import Icon from './icon'
 import Text from './text'
@@ -12,15 +13,12 @@ type Props = {
   onPress?: () => void
   onLongPress?: () => void
   menu?: boolean
-  /** `true` draws the check before the label; `'end'` after it (the proposal sheet's posting chips). */
   check?: boolean | 'end'
   removable?: boolean
   lead?: ReactNode
   icon?: IconName
   chevron?: boolean
-  /** Left padding when `lead` is set; the quick-start chip draws 5, the proposal chip 8. */
   leadInset?: number
-  /** iOS filter sheets (.ich): 36 high, 15 regular on a white chip, a 16pt check that takes 4 off the left padding. Other platforms draw the normal chip. */
   sheet?: boolean
   fit?: { padding: number; height: number }
 }
@@ -42,13 +40,13 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, i
       hitSlop={hitSlopTo(height)}
       glass={false}
       fill={on ? 't1' : ich ? 'paper' : 'fill'}
-      style={{ minHeight: height, borderRadius: ich ? height / 2 : radius.chip, maxWidth: '100%' }}
+      style={styles.chip(height, ich)}
       contentStyle={{ paddingLeft: lead ? leadInset : ich && on && check === true ? 10 : (fit?.padding ?? 14), paddingRight: fit?.padding ?? 14, gap: lead || removable ? spacing[2] : spacing[1] }}
     >
       {lead}
       {icon ? <Icon name={icon} size={16} color={fg} /> : null}
       {check === true && on ? <Icon name="check" size={ich ? 16 : 14} color={fg} /> : null}
-      <Text v="c1" weight={ich ? '400' : '600'} style={{ fontSize: ich ? type.b2.fontSize : 14, color: fg, flexShrink: 1 }} numberOfLines={1}>
+      <Text v="c1" weight={ich ? '400' : '600'} style={styles.label(ich, fg)} numberOfLines={1}>
         {label}
       </Text>
       {check === 'end' && on ? <Icon name="check" size={14} color={fg} /> : null}
@@ -58,5 +56,10 @@ const Chip = ({ label, on, onPress, onLongPress, menu, check, removable, lead, i
     </GlassPressable>
   )
 }
+
+const styles = StyleSheet.create((theme) => ({
+  chip: (height: number, round: boolean) => ({ minHeight: height, borderRadius: round ? height / 2 : theme.radius.chip, maxWidth: '100%' }),
+  label: (ich: boolean, color: string) => ({ fontSize: ich ? type.b2.fontSize : 14, color, flexShrink: 1 }),
+}))
 
 export default Chip

@@ -1,6 +1,8 @@
 import type { CareerStatus } from '@push/api-client'
 import type { BadgeTone, SkeletonRowsShape } from '../../shared/components'
 
+export { CAREER_STATUSES, HUB_CATEGORIES } from '@push/api-client'
+
 export const STATUS_TONE: Record<CareerStatus, BadgeTone> = { seeking: 'ac', feedback: 'orange', satisfied: 'green' }
 
 
