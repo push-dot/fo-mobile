@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { createBotApi, createClient, type BotApi, type BotContract } from '@push/api-client'
 import { mockFetch } from '../index'
 import { allowSites, expireCard, readBot, resetBots, seedThread, setBotPlan, setBots } from '../bots'
-import { grantReference } from '../chat'
+import { grantReference } from '../chat-state'
 import { setMaterials } from '../materials'
 
 const api = createBotApi(createClient({ baseUrl: 'http://x/api/v1', getToken: () => 't', fetch: mockFetch, uuid: () => 'k' }))

@@ -13,7 +13,7 @@ import type {
 import type { ApplicationDetail, CalendarEvent, HubDocument, ResumeDraft } from '@/features/my'
 import { appliedOnly } from '@/features/my/utils/applied-only'
 import { deadlineEvents } from './calendar-deadlines'
-import { removeChatDoc } from './chat'
+import { removeChatDoc } from './chat-state'
 import { MOCK_USER_ID, mock, page, pdfResponse, sortPosts } from './server'
 
 const ME: UserRef = { id: MOCK_USER_ID, displayName: '김서준', avatarUrl: null }

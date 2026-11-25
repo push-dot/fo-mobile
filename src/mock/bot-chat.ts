@@ -3,7 +3,7 @@ import { atOf, consentRequired, fixtureOf, nextId, notFound, type BotFixture, ty
 import { PAGE_READ_TRIGGER, pageReadCard, pageReadFrames } from './bot-scripts/cards'
 import { storedCardSurface } from './bot-scripts/surfaces'
 import { PROFILE_CHANGE_HEADLINE } from './bot-scripts/runs'
-import { hasReferenceConsent } from './chat'
+import { hasReferenceConsent } from './chat-state'
 import { findMaterial } from './materials'
 import { readsMyFiles } from './me'
 import { postings } from './postings'
