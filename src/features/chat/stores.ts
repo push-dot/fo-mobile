@@ -286,6 +286,11 @@ const resolved = async function* (input: RunInput, signal: AbortSignal, end: Str
   yield* followed(input, signal, end, seen)
 }
 
+const streamingPiece = (id: string) => {
+  const last = get(id).items.at(-1)
+  return last?.type === 'agentText' ? last.id : undefined
+}
+
 const clearWorking = (id: string) => {
   useChatStore.setState((s) => {
     const cur = s.chats[id]
@@ -358,7 +363,7 @@ const startRun = async (input: Outgoing) => {
     const apiError = err instanceof ApiError ? err : undefined
     if (!apiError) {
       if (seen.seq !== undefined && !input.reattach) {
-        void startRun({ conversationId: id, follow: true, after: seen.seq, piece: input.piece, reattach: true })
+        void startRun({ conversationId: id, follow: true, after: seen.seq, piece: streamingPiece(id) ?? input.piece, reattach: true })
         return
       }
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: errorText(), reason: DISCONNECT_REASON })
