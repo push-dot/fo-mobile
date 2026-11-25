@@ -4,7 +4,6 @@ import type { HomePostingCard, HomeSnapshot, HomeSnapshotSections } from './type
 
 const HOME_KINDS: SectionKind[] = ['latest', 'deadline', 'popular']
 
-/** Placeholder fields home cards do not read; keeps ListEnvelope<Posting> shape for existing queries. */
 const postingPad = (card: HomePostingCard): Posting => ({
   ...card,
   jobCategory: 'dev',

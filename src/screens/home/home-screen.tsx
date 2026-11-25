@@ -16,7 +16,6 @@ const HomeScreen = () => {
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      {/* The scroll view must be the screen's first child: the native tab bar only minimizes on scroll for the first scroll view in the first-child chain. */}
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         scrollEventThrottle={64}

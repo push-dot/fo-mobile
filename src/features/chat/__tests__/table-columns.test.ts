@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { textWidth } from '@/shared/utility/text-width'
 import { CELL, tableColumns } from '../utils/table-columns'
 
-// v489 boards at 402 pt: bubble inner width, `.mdt` column starts (ChatPh2 x74/x176, ChatPh1Feedback x87/x190).
 const INNER = (402 - 40) * 0.88 - 30
 const starts = (widths: number[]) => widths.reduce<number[]>((all, w) => [...all, all[all.length - 1]! + w], [35]).slice(0, -1)
 

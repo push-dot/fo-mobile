@@ -4,7 +4,6 @@ import { useMarkBotRead, type Bot, type BotId, type LocalActivity } from '@/feat
 
 const NONE: Readonly<Record<BotId, LocalActivity>> = {}
 
-// Chats that are open at the bottom right now. The Bot home reads this beside the server list.
 export const useReadingStore = create<{ byBot: Readonly<Record<BotId, LocalActivity>> }>(() => ({ byBot: NONE }))
 
 export const setReading = (id: BotId, reading: boolean) => {
@@ -16,13 +15,8 @@ export const setReading = (id: BotId, reading: boolean) => {
   })
 }
 
-/** What this session knows about each bot beyond the bot list. */
 export const useLocalActivity = (): Readonly<Record<BotId, LocalActivity>> => useReadingStore((s) => s.byBot)
 
-/**
- * An open chat, at the bottom, is read: the home row clears at once (local), and the server is told once per
- * newest line (`lastActivityAt`), so a refused call does not loop and a line that arrives later is marked in turn.
- */
 export const useReadWhileOpen = (bot: Bot | undefined, atBottom: boolean) => {
   const markRead = useMarkBotRead()
   const mark = useRef(markRead)

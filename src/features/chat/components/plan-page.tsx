@@ -64,12 +64,10 @@ const LinkRow = ({ label, onPress }: { label: string; onPress: () => void }) => 
   )
 }
 
-/** 플랜 (PlanUpgrade, PlanUltra): its own page with a back button and the pay button at the bottom. */
 export const PlanPage = () => {
   const account = useChatAccount(true).data
   const purchase = usePersonalPurchase()
   const open = paymentsOpen(account)
-  // The store flow stays as is. Only when the server really has payments off, a tap tells why instead of opening the store.
   const pay = (buy: () => void) => () => {
     if (purchase.pending) return
     if (open) buy()
@@ -92,7 +90,6 @@ export const PlanPage = () => {
     >
       {account ? (
         <Appear kind="fade">
-          {/* PlanUltra: the h2 block starts 8 under the 6pt gap below the header and the scroll's 4: 10 in all. */}
           <Text v="h2" style={{ paddingTop: 10, paddingHorizontal: spacing[6], paddingBottom: spacing[4] }}>
             {PLAN_HEADER}
           </Text>

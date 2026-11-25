@@ -4,7 +4,6 @@ import { hideCompanyLabel, useMyFollowers, useMyProfile, useSettings, VISIBILITY
 import { SettingsGroup, SettingsRow, Switch, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
-/** SettingsVisibility: 커리어 상태 is its own page; the row shows only the current value and opens the wheel modal, with the hide-my-company switch under it. */
 const SettingsCareerScreen = () => {
   const c = useColors()
   const { s, set } = useSettings()

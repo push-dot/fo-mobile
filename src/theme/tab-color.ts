@@ -2,11 +2,6 @@ import type { Colors } from './tokens'
 
 export type TabPlatform = 'ios' | 'android'
 
-/**
- * Canvas audit 2026-10 tab bar.
- * iOS idle t1 / selected acText. Android idle t3 / selected t1.
- * The tab layout applies this. Screen restyles stay with that layout.
- */
 export const tabColor = (
   platform: TabPlatform,
   selected: boolean,

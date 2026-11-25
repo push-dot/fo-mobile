@@ -16,7 +16,6 @@ const OtpCells = ({ value, onChange, error }: { value: string; onChange: (next: 
       autoFocus
       caretHidden
       contextMenuHidden
-      // Android draws a transparent text color in its default ink, so opacity hides it too; above 0.01 so iOS still hit-tests it and TalkBack and autofill still see it.
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, color: 'transparent', opacity: 0.02 }}
     />
   </View>

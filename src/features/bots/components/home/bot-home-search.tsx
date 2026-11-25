@@ -41,7 +41,6 @@ const BotHomeSearch = ({
   now: Date
   chrome: HomeChrome
   top: number
-  /** Where the search bar's top edge is: the hint and the empty line centre between the header's bottom (`top`) and this. */
   bottom: number
   bots: readonly Bot[]
   onOpenBot: (bot: Bot) => void
@@ -55,7 +54,6 @@ const BotHomeSearch = ({
   const messageTitle = titles.find((title) => title.startsWith('대화'))
   const centred = hint || empty
   const pad = {
-    // The header stays while searching (owner, like BotNewSearchStart): the line centres between its bottom and the search bar's top.
     paddingTop: top,
     paddingBottom: centred ? bottom : Math.max(LIST_BOTTOM, bottom + SEARCH_MESSAGE_GAP),
     flexGrow: centred ? 1 : 0,
@@ -96,7 +94,6 @@ const BotHomeSearch = ({
     const { message } = item
     const when = rowTime(message.at, now)
     const label = `${message.bot.name} Bot, ${message.snippet}, ${when}`
-    // AgentHomeSearch draws the Push Bot hit with the sparkles of its unread 완료; a bot still running shows no state here.
     const found = bots.find((bot) => bot.id === message.bot.id)
     const done = found ? botRow(found, local[found.id], now).mascot === 'done' : false
     return (

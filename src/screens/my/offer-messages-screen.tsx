@@ -98,12 +98,10 @@ const Bubble = ({
   )
 }
 
-// The board centres the empty line over the whole screen (composer overlaid) with a 120pt lift; here the composer takes its own height.
 const EMPTY_LIFT = 120
 const COMPOSER_HEIGHT = 52
 const COMPOSER_RADIUS = COMPOSER_HEIGHT / 2
 const SCROLL_PAD_BOTTOM = spacing[5]
-// ProposalChat: the day label has margin-top 2 under the 16pt flex gap (4 put every bubble 2pt low).
 const DAY_LABEL_LIFT = 2
 
 type Item =

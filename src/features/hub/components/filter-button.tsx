@@ -2,7 +2,6 @@ import { Pressable } from 'react-native'
 import { Icon, Text } from '../../../shared/components'
 import { spacing } from '../../../theme'
 
-/** 필터: the icon and the word, no fill and no glass. */
 const FilterButton = ({ onPress }: { onPress: () => void }) => (
   <Pressable accessibilityRole="button" accessibilityLabel="필터" onPress={onPress} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[1], height: 28 }}>
     <Icon name="filter" size={16} />

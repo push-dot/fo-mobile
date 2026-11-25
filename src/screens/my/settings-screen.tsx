@@ -45,7 +45,6 @@ import { spacing, THEME_CHOICES, useColors, useThemePreference } from '@/theme'
 import { usePersonalPurchase } from '@/features/billing'
 import { consentTurnedOff, grantConsent } from '@/features/chat'
 
-// Settings: the 연락처 and 말투 rows open a picker sheet; iOS draws the up-down selector, Android a plain t3 chevron (`.and-only` / `.ios-only`). 언어 and 테마 keep the selector on both.
 const IOS_PICKER = Platform.OS === 'ios'
 
 const Screen = ({ title, children }: { title: string; children: ReactNode }) => {
@@ -198,7 +197,6 @@ const SettingsScreen = () => {
       <SettingsGroup title="기타">
         <SettingsRow label="고객센터" onPress={() => void openUrl(SUPPORT_MAIL)} />
         <SettingsRow label="약관 및 정책" onPress={() => router.push('/settings/legal')} />
-        {/* SettingsStates draws 구매 복원 on both platforms. */}
         <SettingsRow label={RESTORE_PURCHASES_LABEL} onPress={purchase.restore} right={<View />} />
         <SettingsRow label="로그아웃" danger onPress={logout} right={<View />} />
         <SettingsRow label="회원 탈퇴" danger onPress={withdraw} right={<View />} />

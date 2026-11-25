@@ -20,7 +20,6 @@ import { MaterialsSearch, useSearchRoom } from './materials-search'
 
 const ios = Platform.OS === 'ios'
 
-/** What the + menu and the empty states' buttons open. 서류 올리기 opens UploadPick, as 마이 › 서류 does. */
 const runAdd = (action: AddAction) => {
   if (action === 'link') return router.push(materialLinkAddPath())
   if (action === 'upload') return showImportMenu()
@@ -28,7 +27,6 @@ const runAdd = (action: AddAction) => {
   router.push('/jobs')
 }
 
-/** Centred between the tabs and the search field: one block for every empty, search-empty and error state. */
 const Note = ({ title, body, action, alert, bottom }: { title: string; body: string; action?: { label: string; onPress: () => void }; alert?: boolean; bottom: number }) => (
   <View accessibilityRole={alert ? 'alert' : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2], paddingHorizontal: 36, paddingBottom: bottom }}>
     <Text v="h3" style={{ textAlign: 'center' }}>
@@ -41,7 +39,6 @@ const Note = ({ title, body, action, alert, bottom }: { title: string; body: str
   </View>
 )
 
-/** MaterialsLoading: a section title and seven rows, widths as drawn. */
 const LINE_WIDTHS = [
   [170, 130],
   [140, 160],
@@ -70,10 +67,6 @@ const Loading = () => (
   </View>
 )
 
-/**
- * The 자료 modal (Materials and its states). `forBot` is the bot whose profile opened it: the list keeps only that bot's
- * materials (MaterialsFromProfile) and 보내기 attaches there.
- */
 export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const c = useColors()
   const [tab, setTab] = useState<MaterialTab>('all')
@@ -150,7 +143,6 @@ export const MaterialsModal = ({ forBot }: { forBot?: string }) => {
         </View>
         <View style={{ flex: 1 }}>{body}</View>
         <MaterialsSearch value={text} onChange={setText} />
-        {/* iOS: the root ToastHost sits under this modal; Android shows the root one. */}
         {ios ? <ToastHost /> : null}
       </View>
     </XlBoardChrome>

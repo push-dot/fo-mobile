@@ -6,7 +6,6 @@ import type { Material, MaterialSection } from '../types'
 import { materialRow } from '../utils/material-row'
 import { useListSize } from './list-size'
 
-/** Materials: one row, `.mrow`. The text opens the detail sheet, a long press (or the 삭제 accessibility action) asks to delete, 보내기 sends. */
 export function MaterialItem({
   material,
   now,
@@ -51,7 +50,6 @@ export function MaterialItem({
   )
 }
 
-/** `.msec`: "서류 8". The picker sheet reuses it for its own groups, which carry no count. */
 export function GroupTitle({ label, count }: { label: string; count?: number }) {
   return (
     <View accessible accessibilityRole="header" accessibilityLabel={count === undefined ? label : `${label} ${count}`} style={{ flexDirection: 'row', gap: 6, paddingTop: 18, paddingBottom: 6, paddingHorizontal: spacing[5] }}>
@@ -71,7 +69,6 @@ export function SectionTitle({ section, count }: { section: MaterialSection; cou
   return <GroupTitle label={SECTION_LABEL[section]} count={count} />
 }
 
-/** The picker sheet's row: `.mrow` with the 선택 pill where Materials has 보내기. */
 export function MaterialPickRow({ title, sub, picked, onToggle }: { title: string; sub: string; picked: boolean; onToggle: () => void }) {
   const c = useColors()
   const size = useListSize()
@@ -94,7 +91,6 @@ export function MaterialPickRow({ title, sub, picked, onToggle }: { title: strin
   )
 }
 
-/** A row that opens something else (the picker's 파일에서 고르기 and 링크 붙여넣기), in `.mrow`'s box. */
 export function MaterialNavRow({ label, onPress }: { label: string; onPress: () => void }) {
   const size = useListSize()
   return (

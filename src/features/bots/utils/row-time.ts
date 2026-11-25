@@ -2,7 +2,6 @@ const MIN = 60_000
 const HOUR = 60 * MIN
 const DAY = 24 * HOUR
 
-/** A home row's time: "방금", "10분 전", "1시간 전", "어제", "10월 28일", and the year when it is not this year ("2025. 12. 3."). */
 export const rowTime = (at: Date, now: Date): string => {
   const diff = Math.max(0, now.getTime() - at.getTime())
   if (diff < MIN) return '방금'

@@ -9,13 +9,10 @@ import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-d
 import type { Step } from '../types'
 import type { Account, ChatDoc, ConversationRow, QsData, RunInput } from './schemas'
 
-// shortcut: endpoints @push/api-client lacks go through the shared client directly; move them into
-// @push/api-client once push-be ships them.
 const c = http
 
 const data = async <T>(p: Promise<DataEnvelope<T>>) => (await p).data
 
-/** 내 서류 for chat: the same list as 마이 › 서류. */
 const realDocs = async (): Promise<ChatDoc[]> => (await myApi.sources()).data.map(chatDocFromSource)
 
 const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
@@ -32,11 +29,8 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
 export const chatApi = {
   conversations: (q: { limit?: number; archived?: 'true' } = {}) => c.get<ListEnvelope<ConversationRow>>('conversations', { query: q }),
   conversation: (id: string) => data(c.get<DataEnvelope<ConversationRow>>(`conversations/${id}`)),
-  /** Mock-only: the scripted agent run for one message or approval answer. */
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
-  /** The id of the default hub profile document the quick starts hand to the run, when the user has one. */
   hubProfileId: async () => (await api.documents.list({ kind: 'HUB_PROFILE', limit: 1 })).data[0]?.id,
-  // shortcut: push-be has no chat/docs; real mode reads 마이 › 서류 (myApi.sources) and uploads there.
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
   addDoc: async (file: PickedFile) => {
     if (API_MOCK) return data(c.post<DataEnvelope<ChatDoc>>('chat/docs', { body: { fileName: file.name, size: file.size ?? 0 } }))
@@ -47,7 +41,6 @@ export const chatApi = {
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
     return accountFromBilling(b, me.email)
   },
-  // shortcut: push-be has no chat/quick-starts; real mode assembles each sheet from existing lists (quickStartFrom).
   quickStart: async (key: string): Promise<QsData> => {
     if (API_MOCK) return data(c.get<DataEnvelope<QsData>>(`chat/quick-starts/${key}`))
     const needs = QS_NEEDS[key] ?? []
@@ -76,8 +69,6 @@ export const fetchMentionBookmarks = () => api.me.bookmarks({ limit: 20 })
 
 const bytesOf = async (res: Promise<Response>) => new Uint8Array(await (await res).arrayBuffer())
 
-// push-be sends a path relative to /api/v1, but an absolute or presigned (`?`) URL must not get the prefix. Only an
-// API-origin URL goes through the client (and carries the bearer); any other https URL is fetched bare.
 const artifactResponse = async (downloadUrl: string): Promise<Response> => {
   const base = new URL(API_BASE_URL)
   const basePath = base.pathname.replace(/\/+$/, '')

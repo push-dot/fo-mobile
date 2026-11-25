@@ -1,4 +1,3 @@
-// Mock routes for the home area (search, notifications). Owned by that area's screens.
 import type { AppNotification, Post, Posting, Profile } from '@push/api-client'
 import { searchHangul } from '@push/shared'
 import { forgetRequiredTerms } from './chat'
@@ -7,7 +6,6 @@ import { usePhoneAuth } from '../features/auth/stores'
 import { softPad } from '../features/auth/utils/soft-pad'
 import { MOCK_USER_ID, mock, page } from './server'
 
-// Search-only samples; hub/social own their full fixtures.
 const person = (p: Pick<Profile, 'userId' | 'displayName' | 'headline' | 'tenureYears'> & Partial<Profile>): Profile => ({
   avatarUrl: null,
   jobCategory: 'dev',
@@ -52,8 +50,6 @@ const posts: Post[] = [
   post('s7', '이서연', '데이터 엔지니어 커피챗 하실 분', '판교 근처에서 편하게 이야기해요.', 'coffeechat', 2, '2026-09-10T09:00:00Z'),
 ]
 
-// shortcut: the design's search boards show 공고 24 · 사람 8 · 게시글 13 for ‘백엔드’ in a fixed order; the fixtures are fewer,
-// so this query reports those totals and returns only the drawn rows.
 const BOARD_QUERY = '백엔드'
 const BOARD_TOTALS = { postings: 24, people: 8, posts: 13 }
 const BOARD_ORDER = {
@@ -62,7 +58,6 @@ const BOARD_ORDER = {
   posts: ['post-1', 's2', 's3', 's4'],
 }
 const onlyOrdered = <T,>(items: T[], idOf: (t: T) => string, order: string[]) => order.flatMap((id) => items.filter((t) => idOf(t) === id))
-// The board draws 도토리증권 as 서버·백엔드 under ‘백엔드’; the other boards show the plain title.
 const BOARD_TITLES: Record<string, string> = { p3: '서버·백엔드 개발자 (Go)' }
 
 type SearchKind = keyof typeof BOARD_TOTALS
@@ -81,7 +76,6 @@ const searchHits = (type: SearchKind, q: string): (Posting | Profile | Post)[] =
       : rank(board ? postings.map((p) => ({ ...p, title: BOARD_TITLES[p.id] ?? p.title })) : postings, (p) => [p.title, p.company], (p) => p.id)
 }
 
-// The tab chips read search/counts and the open tab reads its list's total, so both come from here and agree.
 const searchTotal = (type: SearchKind, q: string, hits = searchHits(type, q)) => (q.trim() === BOARD_QUERY ? BOARD_TOTALS[type] : hits.length)
 
 mock('GET', 'search', ({ query }) => {
@@ -104,7 +98,6 @@ mock('GET', 'search/trending', () => ({
   },
 }))
 
-// Today's rows are clamped to the start of the day so a run just after midnight still lands them under 오늘.
 const startOfToday = new Date().setHours(0, 0, 0, 0)
 const today = (minutesAgo: number) => new Date(Math.max(startOfToday, Date.now() - minutesAgo * 60_000)).toISOString()
 const daysAgo = (n: number, hour: number) => {
@@ -126,7 +119,6 @@ const notifications: AppNotification[] = [
   { id: 'n8', type: 'OFFER', title: '제안 받음', body: '한지민 님이 정산팀 채용 제안을 보냈어요.', target: { kind: 'offer', id: 'o2' }, readAt: READ, createdAt: daysAgo(12, 11) },
 ]
 
-// Tour switch (links.ts): the Notifications board draws the 마감 임박 row unread while the home bell still reads 3, so only that tour asks for it.
 export const unreadDeadline = () => {
   const n = notifications.find((x) => x.id === 'n4')
   if (n) n.readAt = null
@@ -137,19 +129,14 @@ mock('POST', 'me/notifications/read', ({ body }) => {
   const b = (body ?? {}) as { all?: boolean; ids?: string[] }
   const now = new Date().toISOString()
   for (const n of notifications) if (!n.readAt && (b.all || b.ids?.includes(n.id))) n.readAt = now
-  // shortcut: NotificationsStates draws the box after 모두 읽음 with no 오늘 group, so reading all drops today's rows (a server would keep them); revisit if a flow reads all and expects them.
   if (b.all) notifications.splice(0, notifications.length, ...notifications.filter((n) => n.createdAt < new Date(startOfToday).toISOString()))
 })
 
-/** PhoneInput: a Google sign-in that handed back a pending token, so the phone screen shows the account pill (links.ts `phone-social`). */
 export const pendingSocialPhone = () => {
   const claims = btoa(JSON.stringify({ email: 'seojun.kim@gmail.com' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
   usePhoneAuth.getState().beginSocial(`${claims}.mock`, 'seojun.kim@gmail.com', 'google')
 }
 
-// Phone sign-in. The code's tail picks the outcome so the boards' error states can be reached: 482111 wrong, 482222 expired,
-// 482333 too many tries, 482444 / 482555 / 482666 the number is already verified on a Google / Apple / Google+GitHub account and signs in to it,
-// anything else signs in a new user (who then lands on the terms screen).
 const authError = (status: number, code: string, message: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message, details } } })
 const EXISTING_ACCOUNT = new Set(['482444', '482555', '482666'])
 mock('POST', 'auth/phone/send', () => ({ data: { cooldownSeconds: 170, expiresAt: new Date(Date.now() + 180_000).toISOString() } }))
@@ -163,7 +150,6 @@ mock('POST', 'auth/phone/verify', ({ body }) => {
   return { data: { accessToken: 'mock-phone-token', refreshToken: '', expiresIn: 3600, user: { id: MOCK_USER_ID, displayName: '김서준', locale: 'ko' }, created: !existing } }
 })
 
-/** The phone field takes focus without raising the pad, as the boards draw it (links.ts `no-pad`). */
 export const hidePhonePad = () => {
   softPad.shown = false
 }

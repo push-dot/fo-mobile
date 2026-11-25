@@ -22,7 +22,6 @@ const Body = ({ children, flex }: { children: ReactNode; flex?: boolean }) => (
 
 const Block = ({ block }: { block: LegalBlock }) => {
   const c = useColors()
-  // "12." must stay on one line at large text sizes, so the marker grows with the font.
   const markerWidth = Math.ceil(MARKER_WIDTH * useWindowDimensions().fontScale)
   if (block.kind === 'paragraph') return <Body>{block.text}</Body>
   if (block.kind === 'list')

@@ -28,7 +28,6 @@ const AddEventSheetScreen = () => {
   return (
     <Sheet
       title="어떤 일정을 추가할까요?"
-      // MyCalendarStates: the iOS sheet2 draws gap 16 (the shared sheet's 14 elsewhere).
       gap={Platform.OS === 'ios' ? spacing[4] : undefined}
       action={{
         label: '일정 추가하기',

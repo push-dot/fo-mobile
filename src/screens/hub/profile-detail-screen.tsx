@@ -9,7 +9,6 @@ import { DetailWebView, FloatingHeader, Glass, Text, TopBar, useFloatingHeader, 
 import { shareMessage } from '@/shared/infrastructure'
 import { spacing, useColors } from '@/theme'
 
-// ProfileDetailMePdf: 내보내기 downloads the profile as a PDF and opens the share sheet.
 const OwnProfile = () => {
   const { data: me } = useMyProfile()
   const share = useShareFile()
@@ -58,7 +57,6 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
         />
       </FloatingHeader>
       {self ? (
-        // ProfileDetailMe: the own profile is MyProfile's page, edited section by section like the 마이 edit pages.
         <ScrollView contentContainerStyle={{ paddingTop: inset + top, paddingBottom: spacing[6] }}>
           <OwnProfile />
         </ScrollView>

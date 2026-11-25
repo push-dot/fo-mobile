@@ -4,13 +4,10 @@ export type BotTextBlock =
   | { kind: 'bullets'; items: string[] }
   | { kind: 'ordered'; items: string[] }
   | { kind: 'link'; label: string; route: string; tail: string }
-  /** "# text" is a title (17 bold), "### text" a sub title (15 semibold): the draft's name and its role line (ChatResume, ChatPh3). */
   | { kind: 'heading'; level: 1 | 2; text: string }
-  /** "> text" is a grey line under the text; "> [label](/route) tail" opens the route when tapped (ChatResume "초안 전체 보기 ›"). */
   | { kind: 'sub'; text: string; route?: string }
   | TableBlock
 
-/** A markdown table: the header cells, then one array of cells per row (rule 38). */
 export type TableBlock = { kind: 'table'; head: string[]; rows: string[][] }
 
 const LIST_LINE = /^\s*[-*]\s+(.*\S)\s*$/
@@ -29,10 +26,6 @@ const cellsOf = (line: string) =>
     .split(/(?<!\\)\|/)
     .map((cell) => cell.trim().replaceAll('\\|', '|'))
 
-/**
- * The boards draw a model's "- item" lines as a gap-4 stack under the paragraph, without markers (ChatBotHeader); "• item" lines are the marked list of a document run's bubble (ChatPh3Review);
- * "1. item" lines are a numbered list (rule 30); "# title" / "### sub title" are the draft's headings and "> line" a grey line; a line that opens with "[label](/route)" is a grey link line with its tail (ChatPh3Review "이력서 초안 v1 · 미리보기", ChatPh6Result "Push 프로필 보기 ›").
- */
 export const splitBotText = (text: string): BotTextBlock[] => {
   const blocks: BotTextBlock[] = []
   const lines = text.split('\n')

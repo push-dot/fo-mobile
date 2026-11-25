@@ -22,7 +22,6 @@ const linear = (t: number) => t
 
 const valueOn = <T>(points: readonly { at: number; value: T }[], input: number) => points.find((p) => p.at === input)?.value
 
-// What a mascot shows while its drivers rest at HOLD, read through the same cycles push-mascot.tsx interpolates.
 const held = (state: MascotState) => {
   const track = bodyTrackOf(state)
   const body = track && valueOn(sampleCycle(track, linear), HOLD.body)
@@ -39,7 +38,6 @@ const held = (state: MascotState) => {
 
 const still = { rotate: 0, translateY: 0, scaleY: 1, scale: 1 }
 
-// The ③ frames of AgentHomeMascot (version 396), as the harness HOLD table reads the board's keyframes.
 const FRAME_3: Record<MascotState, ReturnType<typeof held>> = {
   idle: { body: { origin: '50% 90%', ...still, scale: 1.03 }, eyes: 'open', lid: 1, look: null, dots: null, badge: false, spark: null },
   think: { body: null, eyes: 'up', lid: 1, look: { x: 2.5, y: -4 }, dots: [1, 1, 1], badge: false, spark: null },

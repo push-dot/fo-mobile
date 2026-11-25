@@ -9,7 +9,6 @@ import { DOC_RENAME_COPY, DOC_TITLE_MAX, renamedTitle, savedLength, titleOver, t
 
 const CLEAR_SIZE = 24
 const CLEAR_ICON = 18
-// The board's sheet starts 4 higher on the title (centre 43 under the top, not 47) and ends 38 under the CTA, not 26: the floating sheet sits at 866 on both, so the top lands 8 higher.
 const RENAME_TITLE_LIFT = -4
 const RENAME_BOTTOM_EXTRA = 12
 

@@ -7,17 +7,12 @@ import Text from './text'
 
 const INSET = spacing[1]
 
-// The boards draw the full-width control as a tab list and Settings' compact theme picker as a radio group.
 const VARIANT = {
   regular: { height: 44, width: undefined, group: 'tablist', item: 'tab', state: (on: boolean) => ({ selected: on }) },
   slim: { height: SLIM_HEIGHT, width: undefined, group: 'tablist', item: 'tab', state: (on: boolean) => ({ selected: on }) },
   compact: { height: COMPACT_HEIGHT, width: COMPACT_WIDTH, group: 'radiogroup', item: 'radio', state: (on: boolean) => ({ checked: on }) },
 } as const
 
-/**
- * iOS: the boards' `.ios .seg`, a glass track whose selected segment is filled. UISegmentedControl draws the reverse.
- * Reduce Transparency turns Glass into an opaque `bg2` view, on which a `fill` segment does not show, so it paints their plain `.seg`.
- */
 const SegmentedControl = <K extends string,>({ items, value, onChange, compact, slim }: SegmentedControlProps<K>) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'

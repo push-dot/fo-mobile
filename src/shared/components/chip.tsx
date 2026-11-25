@@ -12,15 +12,12 @@ type Props = {
   onPress?: () => void
   onLongPress?: () => void
   menu?: boolean
-  /** `true` draws the check before the label; `'end'` after it (the proposal sheet's posting chips). */
   check?: boolean | 'end'
   removable?: boolean
   lead?: ReactNode
   icon?: IconName
   chevron?: boolean
-  /** Left padding when `lead` is set; the quick-start chip draws 5, the proposal chip 8. */
   leadInset?: number
-  /** iOS filter sheets (.ich): 36 high, 15 regular on a white chip, a 16pt check that takes 4 off the left padding. Other platforms draw the normal chip. */
   sheet?: boolean
   fit?: { padding: number; height: number }
 }

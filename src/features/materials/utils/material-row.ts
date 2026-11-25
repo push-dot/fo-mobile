@@ -3,12 +3,10 @@ import { displayName } from '@/shared/utility/display-name'
 import type { LinkLabel, MadeBy, Material, MaterialKind, MaterialRowView, MaterialSection, MaterialsPage } from '../types'
 
 const DAY = 24 * 60 * 60_000
-/** A deadline this close shows its days left (Materials: "마감 11월 12일(D-3)"). */
 const SOON_DAYS = 7
 
 export const SECTION_OF: Record<MaterialKind, MaterialSection> = { file: 'doc', document: 'doc', posting: 'bookmark', link: 'link' }
 
-/** Materials, MaterialsLong, MaterialDetailLink. */
 export const LINK_LABEL: Record<LinkLabel, string> = {
   job: '채용 페이지',
   github: 'GitHub',
@@ -22,7 +20,6 @@ export const monthDay = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
 
-/** Calendar days from `from` to `to`, whatever the hours: 11월 9일 23시 to 11월 10일 1시 is one. */
 export const daysBetween = (from: Date, to: Date) => Math.round((startOfDay(to) - startOfDay(from)) / DAY)
 
 export const deadlineLabel = (deadline: Date | null, now: Date): string => {
@@ -47,7 +44,6 @@ const bareHost = (url: string) =>
 
 const PROFILE_HOSTS = new Set(['github.com'])
 
-/** A link shows its host only ("https://www.google.com/search?q=x" reads google.com); a GitHub link keeps its first path segment so the profile shows: github.com/cyjoon68. */
 export const hostOf = (url: string) => {
   const host = bareHost(url)
   if (!PROFILE_HOSTS.has(host.toLowerCase())) return host
@@ -55,7 +51,6 @@ export const hostOf = (url: string) => {
   return owner === undefined ? host : `${host}/${owner}`
 }
 
-/** The row's first line, also the title an attachment keeps. */
 export const materialTitle = (m: Material): string =>
   m.kind === 'posting' ? `${m.company} · ${m.title}` : m.kind === 'link' ? hostOf(m.url) : m.kind === 'file' ? displayName(m.title) : m.title
 
@@ -78,7 +73,6 @@ export const toAttachment = (m: Material): Attachment => ({ kind: m.kind, id: m.
 
 export const totalCount = (counts: MaterialsPage['counts']): number => counts.doc + counts.bookmark + counts.link
 
-/** The page after one material is gone: its row leaves and its section counts one less. */
 export const withoutMaterial = (page: MaterialsPage, kind: MaterialKind, id: string): MaterialsPage => {
   const hit = page.sections.some((s) => s.items.some((m) => m.kind === kind && m.id === id))
   if (!hit) return page

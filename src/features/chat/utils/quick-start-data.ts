@@ -10,16 +10,13 @@ export type QsSources = {
   applications?: Application[]
   offers?: Offer[]
   follows?: Profile[]
-  /** 최근 본 공고 (GET me/posting-views). Undefined → that segment is not shown. */
   recent?: Posting[]
-  /** 허브 추천 (GET profiles?explore=recommended). Undefined → that segment is not shown. */
   recommended?: Profile[]
   profile?: Profile
   doc?: string
 }
 
 const ACTIVE = new Set(['APPLIED', 'SCREENING', 'INTERVIEW', 'OFFER'])
-// 합격 is listed under 진행 중 but starts unchecked: there is nothing left to organize.
 const PRESELECT = new Set(['APPLIED', 'SCREENING', 'INTERVIEW'])
 
 const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem> = {}): QsItem => ({
@@ -32,21 +29,17 @@ const job = (p: Pick<Posting, 'id' | 'company' | 'title'>, extra: Partial<QsItem
 const person = (id: string, name: string, extra: Partial<QsItem> = {}): QsItem => ({
   id,
   title: name,
-  // QsReply / QsCoffee boards: every person avatar is a black circle (rule 3: no colour where it is not needed).
   avatar: { text: givenName(name), color: palette.light.t1 },
   ...extra,
 })
 
-/** Same location · career line as the jobs list card. */
 const where = (p: Posting) => [p.location, cardCareerLabel(p)].filter(Boolean).join(' · ')
 
-/** First segment, plus a second one only when its source loaded (빠른 시작 › 적합도 보기, 커피챗 제안 쓰기). */
 const segmented = (first: string, items: QsItem[], second?: { label: string; items: QsItem[]; empty: string }): QsData =>
   second
     ? { segments: [first, second.label], items: [...items, ...second.items.map((it) => ({ ...it, seg: 1 }))], empty: [undefined, second.empty] }
     : { items }
 
-// shortcut: AI-suggested items (경험 만들기, 커리어 글, 매칭 조건) stay empty until push-be suggests them.
 export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsData => {
   const bookmarks = s.bookmarks ?? []
   switch (key) {
@@ -64,7 +57,6 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
         item: job({ id: a.id, company: a.company, title: a.title }, { badge: { label: stageBadge(a.stage), tone: stageTone(a.stage) }, selected: PRESELECT.has(a.stage) }),
       }))
       const active = all.filter((x) => x.active).map((x) => x.item)
-      // An active application is listed under both tabs (same id, so one pick).
       return { segments: [`진행 중 ${active.length}`, `전체 ${all.length}`], items: [...active, ...all.map((x) => ({ ...x.item, seg: 1 }))] }
     }
     case 'reply':
@@ -128,5 +120,4 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   coffee: ['follows', 'recommended'],
 }
 
-/** The link a 공고 링크로 맞추기 starts with: the typed one, or the copied link on offer while the field is empty (QsLink). */
 export const startLink = (typed: string, copied: string) => (typed.trim() ? typed : copied)

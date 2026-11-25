@@ -4,10 +4,8 @@ import { ConsentPromptListener } from '@/features/chat'
 import { fullPageOptions, modalOptions, sheetOptions, tintedSheetOptions } from '@/shared/navigation'
 import { useColors } from '@/theme'
 
-// A cold deep link to a modal such as /compose still gets the tabs underneath, so closing it has somewhere to go.
 export const unstable_settings = { anchor: '(tabs)' }
 
-// A redirect carries `?instant=1`; nested navigators hand it down as params of params, so look through them.
 const isInstant = (params: unknown): boolean => {
   const p = params as { instant?: string; params?: unknown } | undefined
   return !!p && (!!p.instant || isInstant(p.params))
@@ -20,7 +18,6 @@ const SignedInStack = () => {
     <View style={{ flex: 1 }}>
       <ConsentPromptListener />
       <Stack screenOptions={{ headerShown: false }}>
-      {/* The tabs only come in by a replace (the Bot home button after the consent redirect), which must not slide. */}
       <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
       <Stack.Screen name="postings/[id]" />
       <Stack.Screen name="profiles/[id]" />
@@ -40,7 +37,6 @@ const SignedInStack = () => {
       <Stack.Screen name="docs/push/index" />
       <Stack.Screen name="docs/push/[id]" />
       <Stack.Screen name="docs/push/[id]/rename" options={sheetOptions(c)} />
-      {/* Opened from the 마이 tab, a profile page and a 지원 서류 alike: a modal over everything, not a screen inside the tab. */}
       <Stack.Screen name="edit-profile/[section]" options={modalOptions(c)} />
       <Stack.Screen name="activity/follows" />
       <Stack.Screen name="activity/posts" />
@@ -53,7 +49,6 @@ const SignedInStack = () => {
       <Stack.Screen name="quick-start/[key]/all" options={modalOptions(c)} />
       <Stack.Screen name="material-picker" options={modalOptions(c)} />
       <Stack.Screen name="review" options={modalOptions(c)} />
-      {/* A redirect (the Bot tab before consent) opens it with no slide: the person never sees the Bot home. */}
       <Stack.Screen name="bots/[botId]/index" options={instantNone} />
       <Stack.Screen name="bots/[botId]/profile" />
       <Stack.Screen name="bots/[botId]/companies" />
@@ -75,7 +70,6 @@ const SignedInStack = () => {
       <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />
       <Stack.Screen name="activity/calendar" options={sheetOptions(c)} />
       <Stack.Screen name="settings/pick" options={sheetOptions(c)} />
-      {/* DocToProfile draws a solid sheet: over the translucent system material the viewer's purple CTA behind it bleeds through the sheet's own CTA. */}
       <Stack.Screen name="docs/[id]/to-profile" options={{ ...sheetOptions(c), contentStyle: { backgroundColor: c.bg } }} />
       <Stack.Screen name="docs/[id]/rename" options={sheetOptions(c)} />
       <Stack.Screen name="offers/[id]/reply" options={sheetOptions(c)} />

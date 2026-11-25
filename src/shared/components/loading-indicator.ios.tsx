@@ -8,10 +8,6 @@ const STROKE = 4
 const R = (SIZE - STROKE) / 2
 const CIRC = 2 * Math.PI * R
 
-/**
- * A ring with a turning arc (the round loading spinner). It always turns: it is the only sign the page is coming, so Reduce Motion
- * does not stop it, and it turns on the native driver so a busy JS thread does not freeze it.
- */
 const LoadingIndicator = () => {
   const c = useColors()
   const [turn] = useState(() => new Animated.Value(0))

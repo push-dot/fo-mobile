@@ -10,13 +10,11 @@ import { rowTime } from '../../utils/row-time'
 import { DELETE_HINT, DELETE_LABEL } from './copy'
 
 const TILE = 44
-// BotNewLimitDelete: Android draws a flat 44pt square of the bot's colour (radius 12) where iOS draws the mascot.
 const ANDROID_TILE_RADIUS = 12
 const SECTION_GAP = 20
 
 const LimitRow = ({ bot, now, onDelete }: { bot: CompanyBot; now: Date; onDelete: (bot: CompanyBot) => void }) => {
   const c = useColors()
-  // The list answer has no posting, so each row asks for the bot's profile (cached by the bot profile screen too).
   const title = useBotProfile(bot.id).data?.posting?.title
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: spacing[3] }}>
@@ -47,7 +45,6 @@ const LimitRow = ({ bot, now, onDelete }: { bot: CompanyBot; now: Date; onDelete
   )
 }
 
-/** BotNewLimitDelete: the page the limit state's 삭제하기 opens. One row per company Bot with its own 삭제. */
 const BotLimitDelete = ({ bots, onDelete }: { bots: readonly CompanyBot[]; onDelete: (bot: CompanyBot) => void }) => {
   const insets = useSafeAreaInsets()
   const now = new Date()

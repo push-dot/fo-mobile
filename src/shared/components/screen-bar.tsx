@@ -5,15 +5,10 @@ import { spacing, useColors } from '../../theme'
 import TopBar from './top-bar'
 
 export type ScreenBarScroll = {
-  /** Space the list leaves for the floating bar (0 where the bar is not floating). */
   topInset: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-/**
- * A stack screen's header like the native Apple Stack header: the screen's own background at rest, and the list scrolls visibly
- * under it with a light fade once it moves. Android keeps the solid bar above the list.
- */
 const ScreenBar = ({ bar, children }: { bar: ComponentProps<typeof TopBar>; children: (scroll: ScreenBarScroll) => ReactNode }) => {
   const c = useColors()
   const [height, setHeight] = useState(0)

@@ -1,7 +1,3 @@
-// Mock of the /materials routes of push-be. Fixtures come from the board text of Materials, MaterialsDocs,
-// MaterialsBookmarks, MaterialsLinks, MaterialsLong, MaterialsFromProfile, and MaterialDetail* (design version 396). Each
-// section is newest first, as the server answers. A section's rows past what a board shows (the 8th 서류, links 7 to 10)
-// are not drawn anywhere.
 import type { BotContract } from '@push/api-client'
 import { fixtureOf } from './bots'
 import { mock } from './server'
@@ -16,7 +12,6 @@ const DOTORI: BotContract.BotRef = { id: 'b-dotori', kind: 'company', displayNam
 const PUSH: BotContract.BotRef = { id: 'b-push', kind: 'push', displayName: 'Push Bot', color: null }
 const NURI_LONG: BotContract.BotRef = { id: 'b-nuri', kind: 'company', displayName: '누리클라우드 플랫폼엔지니어링코리아 판교캠퍼스 유한회사', color: 'pink' }
 
-// Decimal, as @push/shared fileSize prints it: 312 KB reads "312KB" (MaterialDetailDoc).
 const KB = 1000
 const PDF = 'application/pdf'
 
@@ -25,7 +20,6 @@ const pdf = (id: string, title: string, updatedAt: string, createdBy: BotContrac
 })
 
 const DAY = 86_400_000
-/** A deadline counted from today, so 마감 임박 labels hold in a capture. The boards are drawn on 2026-11-09. */
 const dayIn = (days: number) => {
   const d = new Date(Date.now() + days * DAY)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -76,7 +70,6 @@ const links = (): Material[] => [
   link('l10', 'https://careers.moapay.kr/jobs/1182', 'job', '2026-05-20T02:00:00Z'),
 ]
 
-/** MaterialsLong: the newest row of each section has the longest text the boards draw. */
 const longSections = (): Record<Section, Material[]> => ({
   doc: [pdf('f1', '김서준_모아페이_백엔드엔지니어_지원서류_최종_진짜최종_v7_수정본.pdf', '2026-11-02T06:14:00Z', NURI_LONG, 312 * KB, 2), ...docs().filter((m) => m.id !== 'f1')],
   bookmark: [bookmark('p-nuri-senior', '누리클라우드 플랫폼엔지니어링본부', '시니어 백엔드 엔지니어(결제·정산 플랫폼)', 21, '2026-11-01T02:00:00Z'), ...bookmarks().slice(1)],
@@ -90,11 +83,6 @@ const defaults = (): Record<Section, Material[]> => ({ doc: docs(), bookmark: bo
 
 const keyOf = (m: { kind: Kind; id: string }) => `${m.kind}:${m.id}`
 
-/**
- * The bot chats each material was attached in, most recent first. With the maker they are the material's 쓰인 대화
- * (MaterialDetailDoc: 모아페이 봇, 도토리증권 봇) and the materials of a bot (MaterialsFromProfile: 모아페이 서류 4, 북마크 1, 링크 3).
- */
-// shortcut: a send to a bot does not add to this table, so the bot's materials stay as drawn; add it when a flow checks them.
 const ATTACHED_IN: Record<string, BotContract.BotRef[]> = {
   'file:f1': [DOTORI],
   'file:f2': [MOA],
@@ -105,30 +93,22 @@ const ATTACHED_IN: Record<string, BotContract.BotRef[]> = {
   'link:l3': [MOA],
 }
 
-/** A deleted bot's chat is gone with it, and what it made reads as made by no one known. */
 const live = (ref: BotContract.BotRef | null) => (ref && fixtureOf(ref.id) ? ref : null)
 
 const listed = (m: Material): Material => (m.kind === 'file' || m.kind === 'document' ? { ...m, createdBy: live(m.createdBy) } : m)
 
-/** The maker first, then the chats it was attached in. A bot's materials are the ones that name it here. */
 const usedBy = (m: Material): BotContract.BotRef[] => {
   const maker = m.kind === 'file' || m.kind === 'document' ? live(m.createdBy) : null
   const chats = (ATTACHED_IN[keyOf(m)] ?? []).filter((b) => live(b) && b.id !== maker?.id)
   return maker ? [maker, ...chats] : chats
 }
 
-/**
- * MaterialsFromProfile draws 모아페이's own list as 서류 4: 모아페이_지원동기_초안.pdf (11월 5일), 김서준_백엔드_이력서, 경력기술서_2026, 포트폴리오_결제시스템.
- * The 서류 board (MaterialsDocs) has no 지원동기 draft and lists 면접_예상질문_모아페이 as made by 모아페이 Bot, so the first is shown only in a bot's list and the second only outside it.
- */
 const ONLY_IN_BOT_LIST = new Set(['file:f0'])
 const NOT_IN_BOT_LIST = new Set(['file:f5'])
 
 let sections = defaults()
-/** Deleted materials the server still keeps for 30 days: they leave every list until a restore. */
 let kept = new Set<string>()
 
-/** Tour switches (links.ts): `none` empties every section, a section name empties that one, `long` draws MaterialsLong. */
 export const setMaterials = (set: 'default' | 'none' | 'long' | Section) => {
   sections = set === 'long' ? longSections() : defaults()
   kept = new Set()
@@ -140,7 +120,6 @@ export const SECTION_OF: Record<Kind, Section> = { file: 'doc', document: 'doc',
 
 const stored = (kind: Kind, id: string) => sections[SECTION_OF[kind]].find((m) => m.kind === kind && m.id === id)
 
-/** A material the caller can still use, or nothing once it was deleted. */
 export const findMaterial = (kind: Kind, id: string) => {
   const m = stored(kind, id)
   return m && !kept.has(keyOf(m)) ? m : undefined
@@ -190,7 +169,6 @@ mock('GET', 'materials/:kind/:id', ({ params }) => {
   return { data: detail }
 })
 
-/** A second delete answers 204 again and changes nothing. */
 mock('DELETE', 'materials/:kind/:id', ({ params }) => {
   const kind = kindOf(params.kind)
   const m = kind && stored(kind, params.id!)
@@ -199,7 +177,6 @@ mock('DELETE', 'materials/:kind/:id', ({ params }) => {
   return undefined
 })
 
-/** Undoes a delete, and answers a material that was not deleted as it is. */
 mock('POST', 'materials/:kind/:id/restore', ({ params }) => {
   const kind = kindOf(params.kind)
   const m = kind && stored(kind, params.id!)

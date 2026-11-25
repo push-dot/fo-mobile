@@ -6,7 +6,6 @@ import { ActivityTab, type ActivitySub } from '@/features/my'
 import { ScreenBar } from '@/shared/components'
 import { useColors } from '@/theme'
 
-/** 홈 > 내 활동: a page of its own on top of the home tab, not the 마이 tab. */
 const MyActivityScreen = () => {
   const c = useColors()
   const { top } = useSafeAreaInsets()

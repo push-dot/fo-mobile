@@ -58,9 +58,7 @@ const SocialScreen = () => {
         contentContainerStyle={{ flexGrow: 1, paddingTop: inset }}
         onScroll={onScroll}
         scrollEventThrottle={64}
-        // SocialStates: the empty feed draws no scroll bar
         showsVerticalScrollIndicator={posts.length > 0}
-        // The chips scroll away with the feed; only the title bar stays up.
         ListHeaderComponent={
         <View style={{ marginBottom: spacing[1] }}>
           <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>

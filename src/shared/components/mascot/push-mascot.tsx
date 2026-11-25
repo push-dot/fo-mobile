@@ -33,7 +33,6 @@ export type MascotProps = {
   color?: MascotColor
   motion?: MascotMotion
   unread?: boolean
-  /** The state has no visible label, so a mascot that shows one names it here. Without a label the mascot is decoration. */
   accessibilityLabel?: string
 }
 
@@ -42,8 +41,6 @@ type Drivers = Record<keyof typeof HOLD, Animated.Value>
 
 const STILL: MascotMotion = { mode: 'still' }
 
-// react-native-svg cuts a numeric width or height down to a whole number, which squeezes a layer that is a fraction of a
-// point wide. Every Svg fills a view that carries the exact size.
 const FILL = { width: '100%', height: '100%' } as const
 
 const EASE: Record<CssEasing, (t: number) => number> = {
@@ -62,7 +59,6 @@ const newDrivers = (): Drivers => ({
   spark: new Animated.Value(HOLD.spark),
 })
 
-// Every run is one linear native timing, so a loop never returns to JS. The easing lives in the sampled interpolation.
 const loop = (driver: Animated.Value, duration: number) =>
   Animated.loop(Animated.timing(driver, { toValue: 1, duration, easing: Easing.linear, useNativeDriver: true }))
 
@@ -80,8 +76,6 @@ const dotOpacity = (d: Drivers, index: number) => {
   return d.dots.interpolate({ inputRange: points.map((p) => p.at), outputRange: points.map((p) => p.value) })
 }
 
-// A mascot that can move is always drawn from its drivers, also while it holds. A native animation changes a view behind
-// React's back, so a plain style equal to the last rendered one would leave the view wherever the animation stopped.
 const layersOf = (state: MascotState, moves: boolean, size: number, d: Drivers) => {
   const unit = size / 100
   const track = bodyTrackOf(state)
@@ -142,9 +136,6 @@ const useSettledState = (state: MascotState) => {
 
 type LayerProps = { x: number; y: number; reach: number; unit: number; style?: AnimatedStyle | null; children: ReactNode }
 
-// A part that moves on its own, or that reaches outside the body's box, is drawn in a small layer around (x, y). The
-// layer's edges sit on device pixels and its viewBox is those same edges in drawing units, so the part lands where one
-// whole drawing would have put it.
 const Layer = ({ x, y, reach, unit, style, children }: LayerProps) => {
   const ratio = PixelRatio.get()
   const px = unit * ratio
@@ -171,9 +162,7 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
   const moves = resolved.mode !== 'still'
   const layers = useMemo(() => layersOf(shown, moves, size, drivers), [shown, moves, size, drivers])
 
-  // The eyes rise and the spark plays once when a state begins, not each time a hold ends.
   const entered = useRef(false)
-  // The drivers start on the held frame, so a mascot that has not moved yet has nothing to park.
   const holding = useRef(true)
   useEffect(() => {
     entered.current = false
@@ -183,8 +172,6 @@ const Mascot = ({ size = 36, state = 'idle', color = 'push', motion = STILL, unr
     if (resolved.mode === 'frame3') {
       if (holding.current) return
       holding.current = true
-      // A stopped native animation reports its last value to JS a moment later. Parking each driver after that report
-      // leaves JS and native agreeing on the held frame. A hold that ended in the meantime parks nothing.
       DRIVERS.forEach((name) => drivers[name].stopAnimation(() => holding.current && drivers[name].setValue(HOLD[name])))
       return
     }

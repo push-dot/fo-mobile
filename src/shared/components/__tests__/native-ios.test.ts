@@ -84,7 +84,6 @@ describe('menu items (iOS)', () => {
       ['삭제하기', undefined, 'destructive'],
       ['최신순', 'checkmark', undefined],
     ])
-    // The host tint (t1) would paint the destructive icon too; the boards draw it red like the label.
     expect(buttons.map((b) => b.props.modifiers)).toEqual([undefined, [{ name: 'tint', arg: palette.light.red }], undefined])
     ;(buttons[1]!.props.onPress as () => void)()
     expect(actions[1]!.onPress).toHaveBeenCalled()

@@ -30,7 +30,6 @@ const RootLayout = () => {
     void loadTheme()
   }, [load, loadTheme])
 
-  // Native sheets, menus and alerts follow the in-app theme, not only the system one.
   useEffect(
     () => Appearance.setColorScheme(themeChoice === 'system' ? 'unspecified' : themeChoice),
     [themeChoice],

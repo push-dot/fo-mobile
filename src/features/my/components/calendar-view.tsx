@@ -17,7 +17,6 @@ const subline = (e: CalendarEvent) => {
   return [e.notes, dur].filter(Boolean).join(' · ')
 }
 
-/** The board's MyCalendar: the day title (opens the month sheet), the add button and that day's list. */
 const CalendarView = () => {
   const c = useColors()
   const today = new Date()

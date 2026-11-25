@@ -22,7 +22,6 @@ export const useSession = create<SessionState>((set) => ({
       try {
         session = JSON.parse(raw) as Session
       } catch {
-        // A corrupted value must not keep the app on its splash: treat it as signed out.
         await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY).catch(() => undefined)
       }
     }

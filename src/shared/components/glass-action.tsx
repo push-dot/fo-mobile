@@ -14,12 +14,10 @@ export type GlassAction = {
   onPress?: () => void
   menu?: MenuProps['actions']
   active?: boolean
-  /** Glyph colour when not active (default t1). */
   color?: keyof Colors
   badge?: number
 }
 
-/** `filled`: the button is its own solid chip and answers presses like other solid buttons (ripple, 0.97). */
 const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction; width: number; iconSize?: number; filled?: boolean }) => {
   const c = useColors()
   const { button } = useXlChrome()

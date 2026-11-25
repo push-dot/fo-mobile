@@ -19,7 +19,6 @@ import type { ChatEvent, ChatItem, ChatState } from '../types'
 import { askConsent, pendingConsent, resetConsent, takeConsent } from './consent'
 import { clearDraft, resetDrafts, useDraftStore } from './draft'
 
-// Runs live outside React so they keep going when the conversation screen closes (feature-spec 2).
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
 export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
 
@@ -80,7 +79,6 @@ const tokenBatch = createTokenBatch(
 )
 
 const dispatch = (id: string, e: ChatEvent) => {
-  // A Bot run changed the profile (rule 39): what the profile screens hold is old.
   if (e.type === 'agentText' && e.undo) void queryClient.invalidateQueries({ queryKey: ['me', 'profile'] })
   if (e.type === 'token') {
     tokenBatch.push(id, e.text)
@@ -96,9 +94,6 @@ const sleep = (ms: number, signal: AbortSignal) =>
     signal.addEventListener('abort', () => (clearTimeout(t), reject(new Error('aborted'))), { once: true })
   })
 
-// The mock answers a run with its frames at once and the app plays them on the clock, because RN cannot stream a synthetic body.
-// They go through the live stream's mapper, so a mock run draws what the server's frames would.
-// Mock only: a GATED_STEP waits here until a tour sends the mock link `step-next`.
 let openGate: (() => void) | null = null
 export const nextMockStep = () => openGate?.()
 let holdStop = false
@@ -164,7 +159,6 @@ const resolved = async function* (input: RunInput, signal: AbortSignal, end: Str
   try {
     resumed = (await botApi.bots.answer(input.conversationId, approvalId, body)).resumed
   } catch (err) {
-    // The surface closed when the person answered; the answer never landed, so it waits again.
     yield { type: 'reopen', surfaceId: approvalId }
     throw err
   }
@@ -264,7 +258,6 @@ const fileOf = (attachment?: string | PickedFile) => (typeof attachment === 'str
 
 const nameOf = (attachment?: string | PickedFile) => (typeof attachment === 'string' ? attachment : attachment?.name)
 
-/** Read while the draft still holds the chip, because the composer clears it right after onSend. */
 const chipMaterial = (id: string, attachment?: string | PickedFile): BotContract.AttachmentRef | undefined => {
   const d = useDraftStore.getState().byBot[id]
   return typeof attachment === 'string' && d?.chip === attachment && d.chipId && d.chipKind ? { kind: d.chipKind, id: d.chipId } : undefined
@@ -284,7 +277,6 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
     return
   }
   if (s.waiting) {
-    // The server reads free text as the gate's answer: the surface closes with nothing picked, and the text is a message as usual.
     dispatch(id, { type: 'answer', surfaceId: s.waiting, picked: [] })
     launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
     return
@@ -292,7 +284,6 @@ export const send = (id: string, text: string, attachment?: string | PickedFile,
   launch(id, { text, file: fileOf(attachment), attachment: nameOf(attachment), intent, context })
 }
 
-/** A PushChoice answer on the waiting surface: it closes in place at once, then the approvals POST resumes the run. Any other surface is ignored. */
 export const answerSurface = (id: string, surfaceId: string, body: A2uiAnswerContext) => {
   if (get(id).waiting !== surfaceId) return
   dispatch(id, { type: 'answer', surfaceId, picked: body.optionIds ?? [body.optionId] })
@@ -311,7 +302,6 @@ const finishStop = (id: string, ctrl: AbortController | undefined, resumable: bo
 const reportCancel = (id: string) => {
   const ctrl = runs.get(id)
   if (API_MOCK) {
-    // The mock has no server to say whether a document flow is active: a flow that drew its to-do list is.
     const resumable = get(id).items.some((item) => item.type === 'surface' && item.kind === 'todo')
     if (holdStop) {
       holdStop = false
@@ -350,12 +340,9 @@ export const stop = (id: string) => {
 
 const mockFrom = new Map<string, { type: ChatItem['type']; nth: number | 'last' }>()
 
-// Where the next older page of a reopened thread starts. Null once the oldest turn is loaded.
 const olderCursor = new Map<string, string | null>()
-// A page past the end of every mock thread: the mock transcript answers it with no turns and no further page.
 const MOCK_OLDER_CURSOR = '1000'
 
-// A tour that draws the thread from one of its lines (showFrom) has older turns above it, whatever page the transcript load reports.
 export const hasOlder = (id: string) => !!olderCursor.get(id) || mockFrom.has(id)
 
 const loadingOlder = new Map<string, Promise<void>>()
@@ -391,13 +378,11 @@ export const openBot = async (address: string) => {
   return id
 }
 
-/** The thread as a mock tour draws it: from the first line of the type `showFrom` named, however many lines arrive after it. */
 export const shownItems = (id: string, items: ChatItem[]) => {
   const from = mockFrom.get(id)
   return from ? fromFirst(items, from.type, from.nth) : items
 }
 
-/** Mock tours: draws the thread from its `nth` line of `type`, as one that is longer than the page. The older turns are not there, so no greeting. */
 export const showFrom = (id: string, type: ChatItem['type'], nth: number | 'last' = 1) => {
   olderCursor.set(id, MOCK_OLDER_CURSOR)
   mockFrom.set(id, { type, nth })
@@ -443,7 +428,6 @@ export const deleteCompanyBot = async (id: string, kind: 'push' | 'company') => 
   return true
 }
 
-/** Sign-out: no run, queue, draft, or conversation of the last account stays in memory for the next one. */
 export const resetChat = () => {
   for (const id of new Set([...runs.keys(), ...Object.keys(useChatStore.getState().chats)])) tokenBatch.flushNow(id)
   for (const ctrl of runs.values()) ctrl.abort()

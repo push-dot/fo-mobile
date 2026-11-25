@@ -20,7 +20,6 @@ import {
 import { companyNames } from './companies'
 import { confirmDeleteBot } from './confirm-delete-bot'
 
-// BotProfile boards: `.pnav` is 60 high with 16pt edges, the chat header's measure. Android keeps its own bar.
 const IOS = Platform.OS === 'ios'
 const HEADER_MASCOT = 104
 const COLOR_DOT = 22

@@ -4,7 +4,6 @@ import { expandHomeSnapshot, shrinkHomeSnapshotPayload } from './dto'
 import { HOME_SECTION_KINDS } from './query-keys'
 import type { HomeSnapshot } from './types'
 
-/** Force background refetch: hydrated rows are immediately stale. */
 export const HYDRATED_QUERY_UPDATED_AT = 0
 
 export const hydrateHomeQueries = (qc: QueryClient, snapshot: HomeSnapshot) => {

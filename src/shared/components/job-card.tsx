@@ -8,7 +8,6 @@ import { assetUrl } from '../utility'
 import Icon from './icon'
 import Text from './text'
 
-// CSS color-mix(in srgb, brand 55%, #000), the cover gradient's end stop.
 const shade = (hex: string) => `#${[1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * 0.55).toString(16).padStart(2, '0')).join('')}`
 
 type Props = {

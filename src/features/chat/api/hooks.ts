@@ -64,7 +64,6 @@ export const useStartChat = () => {
 export const useConversationList = () =>
   useQuery({ queryKey: ['conversations', 'all'], queryFn: () => chatApi.conversations({ limit: 100 }) })
 
-/** One conversation by id: GET /conversations/:id (the list stops at 100), falling back to the cached list row when that fails. */
 export const useConversation = (id: string) => {
   const qc = useQueryClient()
   const listed = () => qc.getQueryData<ListEnvelope<ConversationRow>>(['conversations', 'all'])?.data.find((x) => x.id === id)
@@ -174,7 +173,6 @@ export type SharedFile =
   | { sourceId: string; name: string; mimeType?: string }
   | { profile: true; name: string; photo?: boolean }
 
-/** Shares the file itself: a document through its authenticated PDF export, an upload as its stored bytes. */
 export const useShareFile = () =>
   useMutation({
     mutationFn: (f: SharedFile) =>

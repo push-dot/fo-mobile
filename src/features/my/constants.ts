@@ -14,7 +14,6 @@ export const NEXT_EVENT_DAYS = 90
 export const FOLLOW_PREVIEW = 5
 export const POST_PREVIEW = 4
 
-// Person avatar size -> initials font size on the boards; not a ratio (36/13 but 48/15).
 export const AVATAR_TEXT: Record<number, number> = { 36: 13, 44: 14, 48: 15, 56: 18, 64: 20, 84: 26 }
 
 export const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
@@ -27,7 +26,6 @@ export const EVENT_TYPES: { key: CalendarEventType; label: string }[] = [
   { key: 'CUSTOM', label: '직접 추가' },
 ]
 
-// shortcut: static list; replace with a skills endpoint if push-be adds one.
 export const SKILL_CATALOG = [
   'Java',
   'Kotlin',
@@ -121,7 +119,6 @@ export const LANGS: { key: Settings['locale']; label: string }[] = [
   { key: 'ko', label: '한국어' },
   { key: 'en', label: 'English' },
 ]
-/** The values Settings lets you choose: every row shows only the current value and opens a wheel in a modal (iOS) or a radio dialog (Android). */
 export const SETTINGS_PICKS = {
   locale: { title: '언어', items: LANGS },
   theme: { title: '테마', items: THEME_CHOICES },
@@ -144,7 +141,6 @@ export const LOGIN_LABEL: Record<string, string> = {
 
 export const INGEST_TEXT = { reading: '읽는 중', failed: '읽지 못했어요' } as const
 
-/** Profile header spacing from the 마이 / 지원 서류용 프로필 boards: name margin-top 6, action buttons margin-top 10. */
 export const PROFILE_NAME_TOP = 6
 export const PROFILE_ACTIONS_TOP = 10
 

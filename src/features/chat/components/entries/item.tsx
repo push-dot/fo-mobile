@@ -25,7 +25,6 @@ type Of<K extends ChatItem['type']> = Extract<ChatItem, { type: K }>
 
 const dotColor = (c: Colors, s: ToolState) => ({ run: c.t3, ok: c.green, err: c.red, wait: c.orange })[s]
 
-/** ⎿ elbow before a result line. */
 const Elbow = () => {
   const c = useColors()
   return <View style={{ width: 10, height: 10, marginTop: 2, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: c.deco, borderBottomLeftRadius: 3 }} />
@@ -99,7 +98,6 @@ export const ToolLine = ({ item }: { item: Of<'tool'> }) => {
   )
 }
 
-/** A file or result the bot made sits in a bubble of its own, the bot's bubble colour and corners (rule 30). */
 const Surface = ({ children }: { children: React.ReactNode }) => {
   const c = useColors()
   return (
@@ -111,7 +109,6 @@ const Surface = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-/** A plain icon: sub buttons inside the chat are not glass (ChatDone). */
 const ShareButton = ({ onPress }: { onPress: () => void }) => (
   <Pressable accessibilityRole="button" accessibilityLabel="공유" onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
     <Icon name="share" size={20} color="t2" />
@@ -147,7 +144,6 @@ const FileCard = ({ item }: { item: Of<'file'> }) => {
   )
 }
 
-/** Renders one transcript item. Completion actions get callbacks from the screen. */
 export const Item = ({
   chatId,
   item,
@@ -156,7 +152,6 @@ export const Item = ({
 }: {
   chatId: string
   item: ChatItem
-  /** A local action a surface dispatched (never sent to the server). */
   onLocal?: (item: SurfaceItem, action: A2uiLocal) => void
   onReadOff?: (action: 'attach' | 'settings') => void
 }) => {
@@ -168,7 +163,6 @@ export const Item = ({
     case 'notice':
       return <Notice id={item.id} notice={item.notice} />
     case 'tool':
-      // Tool lines are not drawn, except a failed step that says why: the red line of ChatErrors ("자격 요건"을 읽지 못했어요 · …).
       return item.state === 'err' && item.error ? <ErrorLine id={item.id} text={item.error} /> : null
     case 'think':
       return null
@@ -179,7 +173,6 @@ export const Item = ({
     case 'worked':
       return null
     case 'error':
-      // The credit banner above the composer says it; the refused turn leaves no line of its own.
       return isUsageExhausted(item.code) ? null : item.code === READ_OFF_CODE && onReadOff ? (
         <ReadOff text={item.text} onAction={onReadOff} />
       ) : item.code === 'PLAN_REQUIRED' ? (
@@ -192,16 +185,13 @@ export const Item = ({
   }
 }
 
-// ChatErrUnavailable: an error is a bubble, not a status line (rule 29).
 const ErrorLine = ({ id, text }: { id: string; text: string }) => <Notice id={id} notice={{ kind: 'failed', text }} />
 
-// Read at render: payments can close or the account can load after the error arrived.
 const PlanRequired = ({ id }: { id: string }) => {
   const account = useChatAccount(true).data
   return <ErrorLine id={id} text={planRequired(account?.plan, paymentsOpen(account))} />
 }
 
-/** Grey clock chip for messages sent while the agent works: the icon says it waits, no label (ChatStates.3, rule 29). */
 export const Queued = ({ text }: { text: string }) => {
   const c = useColors()
   const maxWidth = useBubbleMax(27)

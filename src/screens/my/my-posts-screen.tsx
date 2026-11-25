@@ -7,7 +7,6 @@ import { GlassButton, Icon, Text, TopBar } from '@/shared/components'
 import { Empty, emptyCta, ListSkeleton, postedAt, postsMenu, postsTitle, usePostsList, type PostsView } from '@/features/my'
 import { spacing, useColors } from '@/theme'
 
-// MyPosts, MyPostsAll, MyPostsAllMenuFull and MyPostsSavedEmpty (저장한 글 with no rows: 0개 and 소셜 둘러보기).
 const MyPostsScreen = () => {
   const c = useColors()
   const { box } = useLocalSearchParams<{ box?: string }>()

@@ -6,7 +6,6 @@ import { largeType, spacing } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
 import { lineFromWorking, statusLineView, type LiveLine, type StatusLineView } from '../utils/status-line'
 
-/** The Bot whose room this is: its mascot draws every status line. */
 export const ChatBotColor = createContext<MascotColor>('push')
 
 const TONE_COLOR = { neutral: 't2', help: 'orange', quiet: 't3' } as const

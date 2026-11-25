@@ -135,7 +135,6 @@ export const Bookmarks = () => {
   )
 }
 
-// divided: the rows above have no bottom border, so the link draws the one divider; post rows already do.
 const SeeAll = ({ label, onPress, divided }: { label: string; onPress: () => void; divided?: boolean }) => {
   const c = useColors()
   return (

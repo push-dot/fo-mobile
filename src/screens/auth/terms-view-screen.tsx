@@ -6,7 +6,6 @@ import { Button, CtaBar, TopBar } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
 const CTA_CLEARANCE = 120
-// TermsViewPrivacy: no CTA, so the body ends 24 above the home bar.
 const NO_CTA_CLEARANCE = spacing[6]
 
 const TermsViewScreen = () => {
@@ -29,7 +28,6 @@ const TermsViewScreen = () => {
       <ScrollView contentContainerStyle={{ paddingHorizontal: spacing[6], paddingTop: spacing[2], paddingBottom: hasCta ? CTA_CLEARANCE : NO_CTA_CLEARANCE + insets.bottom, gap: spacing[6] }}>
         <LegalDocument document={TERM_DOCUMENTS[term]} />
       </ScrollView>
-      {/* The full privacy policy is read-only; only the consent rows have an agree button. */}
       {hasCta ? (
         <CtaBar>
           <Button

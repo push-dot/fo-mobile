@@ -9,7 +9,6 @@ import { Appear } from '../motion'
 
 export const useBubbleMax = (chrome: number) => (useWindowDimensions().width - spacing[5] * 2) * 0.82 + chrome
 
-// ChatBotHeaderXL draws the user line at 21 over 30 (.me under .xl); the system scale of 16 came out 5 % smaller.
 const UserBubble = ({ item }: { item: Extract<ChatItem, { type: 'user' }> }) => {
   const maxWidth = useBubbleMax(30)
   const xl = useXlBoardText()

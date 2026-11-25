@@ -13,10 +13,6 @@ import { useMaterialChange } from './use-material-change'
 
 const openDocument = (documentId: string) => router.push(`/docs/push/${documentId}`)
 
-/**
- * The local actions a surface dispatches, run by the app's own code. None reaches the server, and `result_action` runs only
- * its allowlisted ids (checked by the wrapper); a method or path a surface names is never called.
- */
 export const useSurfaceActions = (botId: string, onSay: () => void) => {
   const share = useShareFile()
   const convert = useConvertDocument(openDocument)

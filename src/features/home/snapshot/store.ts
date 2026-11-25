@@ -52,7 +52,6 @@ export const writeHomeSnapshot = async (userId: string, snapshot: HomeSnapshot) 
     if (!base) return
     await FileSystem.writeAsStringAsync(homeSnapshotFileUri(base, userId), JSON.stringify(snapshot))
   } catch {
-    // Best-effort cache; never crash the app on full disk or permission errors.
   }
 }
 
@@ -64,6 +63,5 @@ export const clearHomeSnapshot = async (userId: string) => {
     const info = await FileSystem.getInfoAsync(uri)
     if (info.exists) await FileSystem.deleteAsync(uri, { idempotent: true })
   } catch {
-    // ignore
   }
 }

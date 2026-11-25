@@ -8,7 +8,6 @@ import { Button, CtaBar, DetailWebView, FloatingHeader, GlassButton, TopBar, use
 import { shareMessage } from '@/shared/infrastructure'
 import { useColors } from '@/theme'
 
-// CtaBar: 14 above the buttons, 56 for them, 6 below plus the home-indicator inset.
 const CTA_HEIGHT = 14 + 56 + 6
 
 const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) => {

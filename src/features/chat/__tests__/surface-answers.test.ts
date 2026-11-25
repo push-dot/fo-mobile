@@ -25,7 +25,6 @@ const model = (id: string, surfaceId: string) => {
   return row?.type === 'surface' ? dataModel(row) : undefined
 }
 
-/** A chat paused on one gate fixture, as the stream leaves it. */
 const waitingOn = (id: string, fixture: unknown, from = emptyChat) => {
   const f = fixture as A2uiFrame & StreamEvent
   const events = [...mapEvent(f), { type: 'wait' as const, surfaceId: f.surfaceId }, { type: 'done' as const, at: 0, awaiting: f.kind as 'approval' | 'choice' }]

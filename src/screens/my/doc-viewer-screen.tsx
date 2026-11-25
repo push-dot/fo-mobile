@@ -15,23 +15,18 @@ import { CtaBar, Button, FloatingHeader, GlassButton, Skeleton, Text, TopBar, us
 import { displayName } from '@/shared/utility/display-name'
 import { counterPill, onAccent, palette, paperPage, spacing, useColors } from '@/theme'
 
-// DocViewer draws each page as a white A4 card 6 in from the screen edge, text at its natural size (file viewer mode, owner 2026-11-15).
 const PAGE_INSET = 6
 const PAGE_GAP = 10
 const PAGE_PAD_X = 24
 const PAGE_PAD_Y = 30
-// The gate device lays the board's A4 box out at the screen width (568.3 pt at 402), not at the 390 pt card width.
 const A4 = 1.414
-// The page counter floats over the paper, centred above the CTA bar (DocViewer: 28pt pill, 92pt over the home indicator).
 const COUNTER_BOTTOM = 92
 const COUNTER_HEIGHT = 28
 const CAREER_BARS = [92, 70]
 const PROJECT_BARS = [88, 76, 82, 60]
-// The board sets 4pt under the TopBar before the first page.
 const PAGE_TOP = 4
 
 const sheet = palette.light
-// The gate device's line boxes of the board's spans without a line-height (22, 13 and 14.5px text), measured on render/ios/DocViewer/1.text.json.
 const LINE = { name: 33, small: 19.5, head: 20, intro: 21, title: 22, bullet: 20 }
 
 const Bars = ({ widths }: { widths: readonly number[] }) =>

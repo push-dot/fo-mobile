@@ -40,7 +40,6 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   const [task, setTask] = useState(0)
   const [custom, setCustom] = useState('')
 
-  // Reset the picks when new quick-start data arrives (adjusting state during render, not in an effect).
   const [seen, setSeen] = useState(d)
   if (d && d !== seen) {
     setSeen(d)
@@ -50,12 +49,10 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   }
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
-  // 지원 현황 lists an active application under both tabs; pick it once.
   const picked = qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
   const hubId = useHubProfileId(!!qs.docLabel || !!qs.readsHub)
   const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
   const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
-  // QsLink: with the field empty the copied link row is on offer, and 맞추기 시작 is live for it.
   const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!, custom }
 
   const go = (override?: QsItem) => {
@@ -199,7 +196,6 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   )
 }
 
-/** The link on the clipboard, or '' (read once when the link sheet opens). */
 const useCopiedLink = (on: boolean) => {
   const [clip, setClip] = useState('')
   useEffect(() => {
@@ -260,7 +256,6 @@ const LinkField = ({ value, onChangeText }: { value: string; onChangeText: (v: s
   )
 }
 
-// A plain grey chip: a chip inside a sheet is not glass (QsMatch).
 const AddChip = ({ onPress }: { onPress: () => void }) => {
   const c = useColors()
   const fg = Platform.OS === 'ios' ? c.t1 : c.t2

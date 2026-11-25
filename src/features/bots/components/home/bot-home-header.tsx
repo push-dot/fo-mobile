@@ -22,9 +22,7 @@ const BotHomeHeader = ({
   name: string
   onAccount: () => void
   onNew: () => void
-  /** The list has scrolled under the bar: a light fade keeps the buttons readable. The bar itself has no fill. */
   scrolled: boolean
-  /** AgentHomeSearch*: the Android search header keeps only the account (the + is iOS-only there). */
   hideNew?: boolean
 }) => {
   const c = useColors()

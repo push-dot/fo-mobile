@@ -16,15 +16,12 @@ type Props = {
   onSend: (text: string, attachment?: PickedFile | string) => void
   working?: boolean
   onStop?: () => void
-  /** Reports typing so the first screen can hide its quick-start pills. */
   onTyping?: (typing: boolean) => void
-  /** Floats above the box (StatusRow). */
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
   disabled?: boolean
 }
 
-/** Composer + @ 언급 popover + attachment. Same on the first screen and in conversations. */
 export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
@@ -60,7 +57,6 @@ export const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTy
         working={working}
         onStop={onStop}
         onAttach={() => router.push(botId ? botMaterialPath(botId as BotId) : materialPickerPath())}
-        // Inserting "@" opens the suggestions right away.
         onMention={() => (change(text && !/\s$/.test(text) ? `${text} @` : `${text}@`), ref.current?.focus())}
         attachment={draft?.file?.name ?? draft?.chip}
         onClearAttachment={() => detachDraft(id)}

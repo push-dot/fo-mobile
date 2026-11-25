@@ -11,5 +11,4 @@ export const mentionListMarginBottom = -(AREA_GAP + BOARD_LIST_GAP_ABOVE_BOX)
 
 export const emptyFieldHeight = (value: string, lineHeight: number, fontScale: number) => (value ? undefined : lineHeight * fontScale)
 
-/** ChatBotStatusXL, ChatBotHeaderXL: the board draws the box text at 17 pt whatever the system size, so the XL box ignores the system scale. */
 export const composerFontScale = (xl: boolean, system: number) => (xl ? 1 : system)

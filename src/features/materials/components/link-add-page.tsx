@@ -13,7 +13,6 @@ const KIND_CHIP = { padding: spacing[3], height: 36 }
 const KIND_GAP = 6
 const KINDS = Object.keys(LINK_KIND_LABEL) as LinkKind[]
 
-/** MaterialsLinkAdd: a regular sheet over the 자료 modal with the five kinds. LinkedIn is not one: the list marks it from the host. */
 export const MaterialLinkAddPage = () => {
   const refresh = useRefreshMaterials()
   const [url, setUrl] = useState('')

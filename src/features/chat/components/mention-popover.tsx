@@ -21,7 +21,6 @@ const MentionPopover = ({ query, onPick }: { query: string; onPick: (m: MentionI
   const maxHeight = mentionMaxHeight(height, insets.top, keyboard || insets.bottom + spacing[4])
   const groups = filterMentions(useMentionGroups(), query)
   const firstId = query ? groups[0]?.items[0]?.id : undefined
-  // The list opens at its first section: a box that shrinks for the keyboard (ChatMention) keeps the end of the content in view otherwise.
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null)
   const toTop = () => scroll.current?.scrollTo({ y: 0, animated: false })
   useEffect(toTop, [query])

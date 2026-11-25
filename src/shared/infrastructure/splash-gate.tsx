@@ -48,7 +48,6 @@ const SplashGate = ({ sessionReady, themeReady }: Props) => {
       try {
         await SplashScreen.hideAsync()
       } catch {
-        // keep fail-open so a plugin error does not block the app tree
       }
     })()
   }, [sessionReady, themeReady, session, snapshotReady, timedOut, absoluteTimedOut])

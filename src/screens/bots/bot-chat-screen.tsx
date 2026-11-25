@@ -57,7 +57,6 @@ import { XlBoardChrome } from '@/shared/components/xl-chrome'
 import { spacing, useColors } from '@/theme'
 
 const COMPOSER_BOTTOM = 6
-// The list counts as at the bottom within this many points of its end.
 const AT_BOTTOM = 40
 const OPEN_REST_MS = 800
 
@@ -78,10 +77,6 @@ const BotChatScreen = () => {
   )
 }
 
-/**
- * Opened by the Bot tab's redirect (consent still missing): back would return to the page that redirected, so there is no back button until the
- * consent is given, then a button to the Bot home. The loading header needs the same answer, or a back button shows until the Bot has loaded.
- */
 const useLeading = () => {
   const redirected = !!useLocalSearchParams<{ instant?: string }>().instant
   const consented = useReferenceConsent().data?.referenceData === true
@@ -129,7 +124,6 @@ const Thread = ({ id }: { id: string }) => {
   const leading = useLeading()
   const bot = useBot(id as BotId)
   const profile = useBotProfile(id as BotId)
-  // Separate selectors: a token batch re-renders only the streaming line (ThreadCell), not this screen.
   const items = useChatItems(id)
   const queue = useChatQueue(id)
   const waiting = useChatWaiting(id)
@@ -147,20 +141,15 @@ const Thread = ({ id }: { id: string }) => {
   const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && phase === 'working')
   const empty = items.length === 0 && queue.length === 0
   const greetingTitle = profile.data?.posting?.title
-  // The greeting opens a thread; a thread with older turns above its loaded page is not at its beginning.
   const showGreeting = !empty && !hasOlder(id) && kind === 'company' && !!name
   const greeting: ChatItem[] = showGreeting && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, greetingTitle) }] : []
-  // The surface the run waits on stays a row of its own, not the list footer, so answering it does not move and remount it:
-  // a remount drops the picks and step a person made on it.
   const data: ThreadRow[] = [...greeting, ...threadRows(shownItems(id, items), working)]
-  // The newest drawn line: it is the one being written while the run works, and the one whose text may still grow.
   const lastId = data.findLast((row) => row.type !== 'running')?.id
 
   const find = useFind(id)
   const limit = useChatLimit(items)
   const [headerH, setHeaderH] = useState(0)
   const [atBottom, setAtBottom] = useState(true)
-  // Lines that are on screen when the room opens show at rest; only a line that arrives afterwards pops in (RowMotion).
   const [live, setLive] = useState(false)
   useEffect(() => {
     const timer = setTimeout(() => setLive(true), OPEN_REST_MS)
@@ -199,7 +188,6 @@ const Thread = ({ id }: { id: string }) => {
     if (action === 'plan') router.push(accountPath('plan'))
     else buyCredits.current()
   }
-  // ChatBotReadOff: 서류 첨부 opens the bot's material picker, 설정 열기 the settings.
   const onReadOff = (action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings')
   const onLocal = useSurfaceActions(id, () => setTimeout(() => input.current?.focus(), 50))
   const renderItem = ({ item }: { item: ThreadRow }) => {
@@ -246,7 +234,6 @@ const Thread = ({ id }: { id: string }) => {
         extraData={`${working}|${lastId}|${live}|${color}`}
         getItemType={(item) => item.type}
         estimatedItemSize={72}
-        // Off: Appear keeps its played/rest state in useState, so a recycled cell would show the previous row's state (a row that pops in would not).
         recycleItems={false}
         initialScrollAtEnd
         maintainScrollAtEnd={maintainScrollAtEnd}

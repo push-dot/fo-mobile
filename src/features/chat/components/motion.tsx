@@ -4,24 +4,17 @@ import { BUBBLE } from '../constants'
 import { appearFrom, appearMoves, appearMs, playAppear, type AppearKind } from './appear'
 import { useReduceMotion } from '@/shared/components'
 
-/**
- * A line pops in once, when it arrives while the room is open. A line that was already there (the greeting, history) or that a
- * list draws a second time (a row scrolled out and back, the keyboard resizing the list) just shows: the boards draw every
- * line at rest, and a frame caught mid-pop sat 18pt low and 6 % narrow (ChatBotOnboard, ChatKeyboardIOS, ChatPh3).
- */
 export const RowMotion = createContext<{ key: string; live: boolean } | null>(null)
 const played = new Set<string>()
 
 type AppearProps = {
   children: ReactNode
   style?: StyleProp<ViewStyle>
-  /** 'up' = fade + rise 10px (300ms), 'bubble' = rise 18px + scale .94 from the bottom-right (400ms). */
   kind?: AppearKind
   delay?: number
   duration?: number
 }
 
-/** Plays once on mount. */
 export const Appear = ({ children, style, kind = 'up', delay = 0, duration }: AppearProps) => {
   const reduce = useReduceMotion()
   const row = useContext(RowMotion)

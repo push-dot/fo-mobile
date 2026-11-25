@@ -6,12 +6,10 @@ import { useCalendarEvents } from '../api/hooks'
 import { dayTitle, monthGrid, sameDay } from '../utils'
 
 const DAY_SIZE = 30
-// The iOS sheet pads its content 16; the board's month sits 8 from the sheet edge and pads the rows 12 itself.
 const SHEET_INSET = Platform.OS === 'ios' ? spacing[2] : 0
 const ROW_PAD = SHEET_INSET ? spacing[3] : 0
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
-/** The board's MyCalendarModal body: a month with prev/next, one t2 dot per day that has events. */
 const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date) => void }) => {
   const c = useColors()
   const today = new Date()
@@ -27,7 +25,6 @@ const MonthGrid = ({ selected, onSelect }: { selected: Date; onSelect: (d: Date)
         <Text v="h2" accessibilityRole="header" style={{ flex: 1 }}>
           {month.getFullYear()}년 {month.getMonth() + 1}월
         </Text>
-        {/* The 44pt buttons overlap the row by 4 above and below, so the row is the board's 36 high. */}
         <View style={{ marginVertical: -spacing[1] }}>
           <GlassButton filled actions={[{ icon: 'back', label: '이전 달', onPress: () => shift(-1) }]} />
         </View>

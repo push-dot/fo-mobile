@@ -6,10 +6,6 @@ import { spacing, useColors } from '../../theme'
 
 const ios = Platform.OS === 'ios'
 
-/**
- * `light`: only a faint fade behind the buttons, so a page scrolling under the bar stays visible (the web detail pages).
- * `lift`: the keyboard height, so the bar rides above an open keyboard instead of under it.
- */
 const CtaBar = ({ children, light = false, lift = 0 }: { children: ReactNode; light?: boolean; lift?: number }) => {
   const c = useColors()
   const insets = useSafeAreaInsets()

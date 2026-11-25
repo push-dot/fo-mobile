@@ -5,13 +5,10 @@ import { copyBody, copyVersionBody, profileConvertBody, setBaseProfilePath, toRe
 
 const c = http
 
-// Values are this session's ingest job ids so the list can show 읽는 중 until the server reads the file.
 const uploaded = new Map<string, string | undefined>()
 
 export const myApi = {
-  // PATCH sources/:id sets the file name of an upload (push-be contracts/spec/documents.ts).
   renameSource: (id: string, fileName: string) => c.patch<DataEnvelope<MySource>>(`sources/${id}`, { body: { fileName } }),
-  // shortcut: first 100 uploads only; page once the docs tab loads more on scroll.
   sources: async (): Promise<ListEnvelope<MySource>> => {
     const r = await api.sources.list({ kind: 'UPLOAD', limit: 100 })
     return {
@@ -34,7 +31,6 @@ export const myApi = {
     await api.sources.remove(id)
     uploaded.delete(id)
   },
-  // push-be deletes a Push document (origin AI) by archiving it; DELETE sources/:id answers 404 for it.
   archive: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.archive(id, revision)),
   restore: (id: string) => atDocumentRevision(api.documents, id, (revision) => api.documents.restore(id, revision)),
   resumeDraft: async (sourceId: string): Promise<ResumeDraft> =>
@@ -145,7 +141,6 @@ export const reportOffer = (id: string, reason?: string) => api.me.reportOffer(i
 
 export const blockUser = (userId: string) => api.me.blockUser(userId)
 
-// shortcut: first 100 blocked people only; page once anyone blocks more.
 export const fetchBlocked = () => api.me.blocks({ limit: 100 })
 
 export const unblockUser = (userId: string) => api.me.unblockUser(userId)
@@ -159,7 +154,6 @@ export const fetchOfferMessages = (offerId: string) => api.me.offerMessages(offe
 
 export const sendOfferMessage = (offerId: string, body: string) => api.me.sendOfferMessage(offerId, body)
 
-// push-be lists archived documents too (the archive route is how a document is deleted), so the list hides them here.
 export const fetchDocuments = async () => {
   const r = await c.get<ListEnvelope<HubDocument>>('documents', { query: { limit: 50 } })
   return { ...r, data: r.data.filter((d) => d.status !== 'ARCHIVED') }
@@ -176,7 +170,6 @@ export const archiveDocument = (id: string, expectedRevision: number) =>
 export const fetchDocumentVersions = (id: string) =>
   c.get<ListEnvelope<DocVersion>>(`documents/${id}/versions`, { query: { limit: 1 } })
 
-/** push-be has no copy route: a new document under the same posting, then the source's latest version saved into it. */
 export const duplicateDocument = async (id: string) => {
   const source = (await fetchDocument(id)).data
   const version = (await fetchDocumentVersions(id)).data[0]
@@ -185,7 +178,6 @@ export const duplicateDocument = async (id: string) => {
   try {
     await c.post(`documents/${made.id}/versions`, { body: copyVersionBody(made.revision, version) })
   } catch (error) {
-    // A copy without its content is worse than none: drop the empty draft, then report the failure.
     await archiveDocument(made.id, made.revision).catch(() => undefined)
     throw error
   }

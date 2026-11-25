@@ -9,7 +9,6 @@ type Props = {
   draft: SheetFilters
   sent: number | undefined
   onChange: (sheet: SheetFilters) => void
-  /** Caps the groups at the sheet max (useSheetScrollMax): the head stays put and the groups scroll past it. */
   scroll: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
 
@@ -21,7 +20,6 @@ const HubFilterSheet = ({ draft, sent, onChange, scroll }: Props) => {
   const ios = Platform.OS === 'ios'
   const reset = () => onChange(EMPTY_SHEET)
   return (
-    // iOS: the 52pt .inav then the groups, no gap (.ihead carries its own 14 above and 6 below).
     <View style={{ gap: ios ? 0 : 14 }}>
       {ios ? (
         <FilterSheetNav title="필터" onReset={reset} />

@@ -23,7 +23,6 @@ export const PickRow = ({ bot, onPress }: { bot: Bot; onPress: () => void }) => 
   </Pressable>
 )
 
-/** BotPick: `.pick` rows (gap 12, padding 10/8, radius 16), under a title and an optional line. RULINGS 53 */
 export const BotPickSheet = ({ title, subtitle, onPick }: { title: string; subtitle?: string; onPick: ((bot: Bot) => void) | null }) => {
   const bots = useBots().data ?? []
   const bound = useSheetScrollMax()

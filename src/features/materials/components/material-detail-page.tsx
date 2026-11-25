@@ -17,10 +17,6 @@ const KINDS: readonly MaterialKind[] = ['file', 'document', 'posting', 'link']
 export const isMaterialKind = (value: string | undefined): value is MaterialKind =>
   KINDS.includes(value as MaterialKind)
 
-/**
- * MaterialDetail*: a regular sheet over the 자료 modal. 서류로 들어가기, 공고로 이동, 바로가기. A link opens in the browser over the page. The others close the page and the modal
- * first, as the drawer's lists did: a full screen pushed inside a modal would draw under its top inset.
- */
 const open = (m: Material, inModal: boolean) => {
   if (m.kind === 'link') return void openUrl(m.url)
   router.dismiss(inModal ? 2 : 1)
@@ -57,7 +53,6 @@ export const MaterialDetailPage = ({ kind, id, forBot }: { kind: MaterialKind; i
   }
 
   const context = sendContextOf(forBot)
-  // BotPick is a sheet of its own over the 자료 modal, so this one leaves before it opens.
   const send = () => {
     if (context.from === 'home') router.back()
     sendMaterial(context, m)

@@ -140,7 +140,6 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           <GlassButton
             actions={[
               { icon: 'share', label: '공유', onPress: () => share.mutate({ documentId: id }) },
-              // DocProfile / DocProfileConfirm draw only share: the menu (공고 보기, 이름 변경, 삭제) belongs to a 지원 서류
               ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
             ]}
           />

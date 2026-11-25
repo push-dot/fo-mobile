@@ -11,13 +11,11 @@ type Callbacks = Pick<ItemProps, 'onLocal' | 'onReadOff'>
 
 const noStop = () => undefined
 
-/** The running line reads the verbs itself: a status event re-renders this one row, not the list. */
 const RunningLine = ({ chatId, color }: { chatId: string; color: MascotColor }) => {
   const working = useChatWorking(chatId)
   return working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={noStop} color={color} /> : null
 }
 
-/** The last bot line grows token by token: it alone follows the store. */
 const StreamingItem = ({ chatId, row, ...rest }: { chatId: string; row: ChatItem } & Callbacks) => {
   const live = useLiveItem(chatId, row.id) ?? row
   return <Item chatId={chatId} item={live} {...rest} />
@@ -27,9 +25,7 @@ type Props = Callbacks & {
   chatId: string
   row: ThreadRow
   color: MascotColor
-  /** Lines that arrive after the room opened pop in (RowMotion). */
   live: boolean
-  /** The newest line of the thread; a bot line there may still be streaming. */
   last: boolean
 }
 

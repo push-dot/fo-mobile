@@ -20,7 +20,6 @@ const asSub = (s?: string): ActivitySub =>
 const MyScreen = () => {
   const c = useColors()
   const { scrolled, onHeight, onScroll: onHeaderScroll, inset } = useFloatingHeader()
-  // The glass tab row is drawn above the header's fade, so it fades itself out over its first 48pt of scroll instead of showing through the title.
   const [rowOpacity, setRowOpacity] = useState(1)
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     onHeaderScroll(e)
@@ -47,7 +46,6 @@ const MyScreen = () => {
     router.setParams({ sub: s })
   }
 
-  // The tab row scrolls away with the content; only the header floats.
   const lead = (
     <View pointerEvents={rowOpacity < 0.25 ? 'none' : 'auto'} style={{ paddingTop: spacing[1], paddingHorizontal: spacing[5], opacity: rowOpacity }}>
       <SegmentedControl items={TABS} value={tab} onChange={pick} />

@@ -2,14 +2,12 @@ import { View } from 'react-native'
 import { Text } from '@/shared/components'
 import { onAccent, useColors } from '../../../theme'
 
-// The quick-start boards draw each logo size with its own corner and glyph size, not one ratio.
 const LOGO_SHAPE: Record<number, { radius: number; font: number }> = {
   34: { radius: 11, font: 14 },
   40: { radius: 13, font: 15 },
   44: { radius: 14, font: 17 },
 }
 
-/** `round` is a person's avatar: the dark chip every other avatar draws (owner rule 3: no tint where black will do), not the brand colour. */
 const Mark = ({ text, color, size = 44, round }: { text: string; color: string; size?: number; round?: boolean }) => {
   const c = useColors()
   const shape = round ? undefined : LOGO_SHAPE[size]

@@ -12,14 +12,12 @@ const CLEAR = 44
 const FADE = 28
 const GAP_BELOW = spacing[2]
 
-/** The room the field takes: the list's bottom padding, so its last row scrolls clear, and how far above the bottom safe inset a toast sits. */
 export const useSearchRoom = () => {
   const { field } = useListSize()
   const bottom = useSafeAreaInsets().bottom
   return { list: FADE + field.height + GAP_BELOW + bottom, toast: field.height + GAP_BELOW + spacing[2] }
 }
 
-/** `.msearch`: the search field floats at the bottom over a fade of the background, and rides up with the keyboard as the chat composer does. */
 export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: (q: string) => void }) => {
   const c = useColors()
   const { field: size } = useListSize()
@@ -52,7 +50,6 @@ export const MaterialsSearch = ({ value, onChange }: { value: string; onChange: 
     </View>
   )
   return (
-    // The view measures itself in the sheet but reads the keyboard in screen y. An iOS page sheet ends at the screen's bottom, so its top is the offset.
     <KeyboardAvoidingView
       behavior="padding"
       keyboardVerticalOffset={Platform.OS === 'ios' ? screen - sheetHeight : 0}

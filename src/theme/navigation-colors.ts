@@ -1,6 +1,5 @@
 import type { Colors } from './tokens'
 
-/** React Navigation colours taken from the design system. Same keys in light and dark. */
 export const navigationColors = (
   colors: Pick<Colors, 'ac' | 'bg' | 'card' | 't1' | 'line' | 'red'>,
 ) => ({

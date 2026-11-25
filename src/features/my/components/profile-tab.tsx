@@ -22,7 +22,6 @@ const LOADING_ROWS = {
   ],
 } as const
 
-/** ProfileDetailMe: the header is a TopBar, not 마이's segmented control, and the board's avatar sits 17pt higher (y168; the page drew it at y185 with 24). */
 const DETAIL_TOP = spacing[6] - 17
 
 const edit = (s: ProfileSection) => router.push(`/edit-profile/${s}`)
@@ -58,7 +57,6 @@ const Section = ({
   )
 }
 
-/** `share`: MyProfile has the 공유 button under the name; ProfileDetailMe has it in the header instead. `onExport`: ProfileDetailMePdf adds 내보내기 beside 기본 정보 편집 (the profile as a PDF). */
 const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; onExport?: () => void; exporting?: boolean }) => {
   const c = useColors()
   const { data: p, isLoading } = useMyProfile()

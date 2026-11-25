@@ -40,7 +40,6 @@ export const laterConsent = () => {
 
 export const consentTurnedOff = () => useConsentPrompt.setState({ dismissed: false, open: false })
 
-/** Takes what grantConsent resumes and clears it: the held runs, the chat to open, the retry. */
 export const takeConsent = () => {
   useConsentPrompt.setState({ open: false, dismissed: true })
   const held = [...pendingConsent.values()]

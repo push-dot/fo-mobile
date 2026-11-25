@@ -37,7 +37,6 @@ export const deleteDocCopy = (fileName: string) => {
   }
 }
 
-/** DELETE /sources/:id answers 409 when a career row still cites the upload. */
 export const DELETE_REFERENCED = '경력 기록에서 쓰고 있어 지울 수 없어요'
 export const RESTORE_FAILED = '되돌리지 못했어요'
 
@@ -141,7 +140,6 @@ export const NOTIFICATION_ROWS: { key: keyof Pick<Settings, 'notifyDeadline' | '
   { key: 'notifyApplicationStage', label: '지원 상태 변경' },
 ]
 
-/** iOS subscriptions need a way to restore a purchase; the plan page no longer carries it (board v412), so settings does. */
 export const RESTORE_PURCHASES_LABEL = '구매 복원'
 export const AGENT_TITLE = 'Bot'
 export const AGENT_NOTE = '마이 › 서류와 북마크 공고를 Bot이 읽어서 이력서를 고쳐요. 끄면 매번 직접 첨부해야 해요.'
@@ -153,7 +151,6 @@ export { THEME_CHOICES, themeMode, type ThemeChoice } from '../../../theme/mode'
 
 export const hideCompanyLabel = (company: string) => `${company || '지금 다니는 회사'} 사람에게 숨기기`
 
-// v415 SettingsStates.2: two short sentences (the owner found the long body too long).
 export const WITHDRAW_BODY = '30일 안에 다시 로그인하면 복구돼요. 구독은 스토어에서 따로 해지해 주세요.'
 
 export const PREVIEW_HEADINGS = ['경력', '프로젝트', '기술 스택'] as const
@@ -166,10 +163,6 @@ export const pushCardLines = (
     ? { title: application.title, company: application.company, score: fitTen(application.fitScore), doc: doc.title }
     : { title: doc.title, company: '', score: '', doc: '' }
 
-/**
- * v415 Settings rows show only the value. Where the value alone is unclear the row keeps a short name with it
- * ('커리어 상태 모두 공개', as Claude Design drew it). 언어 and 테마 read as the value alone.
- */
 export const careerRowLabel = (key: Settings['careerStatusVisibility']) =>
   ({ everyone: '커리어 상태 모두 공개', followers: '커리어 상태 팔로워에게만 공개', private: '커리어 상태 나만 보기' })[key]
 export const contactRowLabel = (key: Settings['contactVisibility']) => (key === 'everyone' ? '연락처는 모두에게' : '연락처는 제안 수락한 사람만')

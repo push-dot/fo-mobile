@@ -17,7 +17,6 @@ const Mark = ({ checked, multi }: { checked: boolean; multi: boolean }) => {
   )
 }
 
-// .pm8: a marked row is `.pm-row.cr` (52 high, 14 gap); title 52 high, the body 4 under it (.pm-b: the message and the rows 6 apart, the sheet's own gap is 4), the button 14 under the last block.
 const ChoiceSheetScreen = () => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'

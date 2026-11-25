@@ -66,7 +66,6 @@ export const useCreatePost = () => {
   })
 }
 
-/** The server answer decides the state: the menu flips after the post's refetched `saved`, not before. */
 export const useTogglePostSave = (id: string) => {
   const qc = useQueryClient()
   const mutation = useMutation({

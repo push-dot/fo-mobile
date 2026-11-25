@@ -3,7 +3,6 @@ import type { MenuAction, MenuSection } from '@/shared/components/menu-action'
 
 export type PostsView = 'mine' | 'commented' | 'saved'
 
-// The icons follow MyPostsAllMenuFull: pencil, chat, bookmark for 보기 and clock, eye, chat for 정렬.
 export const POSTS_VIEWS: (MenuAction & { key: PostsView })[] = [
   { key: 'mine', label: '내가 쓴 글', systemImage: 'square.and.pencil', icon: 'edit', onPress: () => {} },
   { key: 'commented', label: '댓글 단 글', systemImage: 'bubble.left', icon: 'chat', onPress: () => {} },

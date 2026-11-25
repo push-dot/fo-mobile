@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Pressable } from 'react-native'
 import { Text } from '@/shared/components'
 
-/** Grey sub-text inside a bubble: one line until a tap opens it, to `more` when the long form differs (rule 30). */
 const Detail = ({ text, more }: { text: string; more?: string }) => {
   const [open, setOpen] = useState(false)
   return (

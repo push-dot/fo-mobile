@@ -81,13 +81,10 @@ const BAR = 6
 const FIELD = 44
 const FIELD_XL = 52
 const CTA = 56
-// The board's last `--glassShadow` (the audit layer after the DS one): drop, 0.5 ring, top highlight. Native glass keeps its own `0 6px 24px` shadow
-// under any style (BotNew.1 captured 235 at the bar's edge, the board 226 ring then 246), so the field is a plain view in the glass fill.
 const FIELD_SHADOW = {
   light: '0 2px 8px rgba(0,0,0,.06), 0 0 0 .5px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.95)',
   dark: '0 2px 8px rgba(0,0,0,.35), 0 0 0 .5px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.16)',
 }
-// Board: `.field.dis{opacity:.55}` on the picked-posting field and `opacity:.75` on the busy CTA.
 const CREATING_DIM = 0.75
 const FIELD_DIS = 0.55
 const CTA_XL = 64
@@ -153,7 +150,6 @@ const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (ne
   )
 }
 
-// Board `.cpick`: centred, wrapping, gap 4px 8px, padding 0 16px. 46pt swatches fill a 370pt row with 7 and leave 4 for the second row.
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
   <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing[2], rowGap: spacing[1], paddingHorizontal: spacing[4] }}>
     {BOT_COLORS.map((name) => (
@@ -347,7 +343,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     void run(form)
   }
 
-  // BotNewError: the platform's alert, not a box drawn in the screen. 다시 시도 creates again; the 만들기 button below does the same.
   const failed = phase.kind === 'error'
   const retryRef = useRef(() => {})
   useEffect(() => {
@@ -388,7 +383,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const name = posting?.company
   const linkWait = phase.kind === 'linkChecking' || phase.kind === 'linkFinding'
   const control = xl ? FIELD_XL : FIELD
-  // Board .xl: the field text is a fixed 19/29, like the name and sub (the system scale must not grow it again).
   const fieldFont = xl ? 19 : type.b1.fontSize
   const fieldLine = xl ? 29 : type.b1.lineHeight
   const ios = Platform.OS === 'ios'
@@ -401,7 +395,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   )
   const searchIcon = <Icon name="search" size={20} color="t3" />
   const closeButton = <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: SEARCH_CLOSE, onPress: () => setForm(closeSearch) }]} />
-  // Board `.smod .rr` (r4p): padding 14px 16px, no min-height, title 17/22.
   const rowTitle = { justifyContent: 'center' as const, gap: 2, paddingVertical: 14, paddingHorizontal: spacing[4] }
   const rowTitleText = { fontSize: ROW_TITLE, lineHeight: type.b2.lineHeight }
   const card = { marginTop: spacing[2], marginHorizontal: spacing[4], borderRadius: radius.lg, backgroundColor: c.bg2 }
@@ -410,7 +403,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
   const keepTop = showRows || linkWait || phase.kind === 'linkOk'
   const noResults = phase.kind === 'searching' && !!query && !asLink(query) && !loading && rows.length === 0
 
-  // The iOS modal starts under the status bar, so its header sits 14pt from the sheet's own top: the board's 36pt to the title centre. Android's full sheet reaches under the status bar.
   const header = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingTop: (ios ? 0 : insets.top) + 14, paddingHorizontal: spacing[4], paddingBottom: spacing[1] }}>
       {organizing ? (
@@ -447,7 +439,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
     </View>
   )
 
-  // Only a phase that carries a posting has a line to show; searching, link and limit phases have none.
   const fieldShell =
     !posting
       ? shell(
@@ -521,7 +512,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
         {shell(
           <>
             {searchIcon}
-            {/* Stays mounted while the link is checked: unmounting it drops the focus and the keyboard (BotNewLinkChecking draws both). */}
             <TextInput
               autoFocus
               value={fieldValue(form)}
@@ -534,8 +524,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
               autoCorrect={false}
               returnKeyType="search"
               allowFontScaling={!xl}
-              // The board's input inherits the page's -0.02em (`input{letter-spacing:inherit}`): the 31-glyph link is 228.7 pt tracked, 238.6 untracked,
-              // and the field's text box is 230 (316 - 32 padding - icon 20 - spinner 18 - 2 gaps of 8), so untracked it scrolled its first letter away.
               style={[{ flex: 1, color: c.t1, fontSize: fieldFont, letterSpacing: (type.b1.letterSpacing / type.b1.fontSize) * fieldFont, paddingVertical: 0 }, fontFor('400')]}
             />
             {linkWait ? <Spinner size={18} color="ac" /> : null}
@@ -561,7 +549,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      {/* The modal ends at the screen's bottom, so the keyboard offset is the sheet's top edge; without it the search field stays under the keyboard. */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
@@ -573,7 +560,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
           <BotLimitDelete bots={companyBots} onDelete={onDeleteBot} />
         ) : phase.kind === 'limit' ? (
           <>
-            {/* Board `.bsh-b`: padding 4px 0 24px. */}
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: spacing[1], paddingHorizontal: spacing[4], paddingBottom: spacing[6] }}>
               <LimitBody limit={bots.limit} />
             </ScrollView>
@@ -592,8 +578,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade }: Props) => {
                 <Swatches color={form.color} onPick={(next) => setForm((current) => chooseColor(current, next))} />
               </View>
             </ScrollView>
-            {/* Outside the scroll view, whose clip cut the field's shadow into a line along its bottom edge (BotNew). The field and the action share one
-                container with no fill of its own, so no sibling edge cuts the shadow into the two-tone line BotNewCreating and BotNewXL showed. */}
             <View>
               <View style={{ paddingTop: 28, paddingBottom: spacing[3] }}>{mainField}</View>
               {footer}

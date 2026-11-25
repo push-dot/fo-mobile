@@ -2,8 +2,6 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// CoreText applies the Noto Sans KR `calt` chain (Hangul + space + Hangul → a 280-unit space, 224 normally) that the WebKit render of the boards does not:
-// every such space came out 0.9 pt wider at 16 pt and lines broke or ellipsed earlier than the board (step 4). The bundled faces carry no `calt` lookup.
 const dir = join(__dirname, '../../assets/fonts')
 const FACES = ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold']
 

@@ -10,7 +10,6 @@ import Row from './row'
 
 type Box = 'received' | 'sent'
 
-/** `archived`: the 보관한 제안 list, where every row is a grey 보관함 and reads as already seen. */
 const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean }) => {
   const c = useColors()
   const who = counterpart(o, box)

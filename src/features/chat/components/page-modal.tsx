@@ -11,10 +11,8 @@ import { iosSheetFill, spacing, useColors, useThemeMode } from '@/theme'
 
 const GLASS_BUTTON = 44
 
-/** The 자료 modal's pages (`.bsh-h` and `.mpage`): 14 above the header, 4 under it, 16 beside it, a 52 spacer when no button sits right, a body that follows the header, and 20 around the actions. */
 const MPAGE = { top: 14, below: 4, side: 16, spacer: 52, inset: 20 }
 
-/** A pageSheet drawn as the boards' `.isheet.pm8`: 17 above the 52 high header (8 + the 5 grabber + 4), 16 beside it, 4 under the foot button. */
 const SHEET = { top: 17, header: 52, side: 16, bottom: 4 }
 
 const PageModal = ({
@@ -42,14 +40,10 @@ const PageModal = ({
   children: ReactNode
   footer?: ReactNode
   tight?: boolean
-  /** A full page (the plan route, owner rule 8), not a sheet: the header sits 6 under the status bar inset (PlanUltra: back button y68). */
   page?: boolean
-  /** A page pushed inside the 자료 modal (MaterialDetail*, BotPick, MaterialsLinkAdd). */
   mpage?: boolean
-  /** An iOS pageSheet on the system sheet fill (`--iSheet`), not the page background. */
   sheet?: boolean
   white?: boolean
-  /** The close X is a filled circle (ChatApprove); every other page keeps the plain glass X. */
   closeFilled?: boolean
   fadeAbove?: number
   scroll?: boolean
@@ -80,7 +74,6 @@ const PageModal = ({
         <View
           style={[
             { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: modalPage ? MPAGE.inset : iosSheet ? geo.side : spacing[4], paddingTop: 14, paddingBottom: insets.bottom + (iosSheet ? geo.bottom : modalPage ? MPAGE.inset : ios ? 6 : 10) },
-            // The boards' `.and .ctabar`: a solid `bg` bar with a 1px line on top, no fade.
             ios ? null : { backgroundColor: c.bg, borderTopWidth: 1, borderTopColor: c.line },
           ]}
         >
@@ -95,14 +88,12 @@ const PageModal = ({
           {footer}
         </View>
       ) : null}
-      {/* iOS: the root ToastHost sits under this sheet; Android shows the root one. */}
       {ios ? <ToastHost /> : null}
     </View>
   )
 }
 
 const EMPTY_INSET = 40
-// The boards centre the note in the body and keep this much clear under it (140 on pages, 160 under the search of a list).
 export const EMPTY_RESERVE = 140
 
 export const PageEmpty = ({ children, reserve = EMPTY_RESERVE }: { children: ReactNode; reserve?: number }) => {

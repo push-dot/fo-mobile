@@ -10,7 +10,6 @@ export const formatCountdown = (totalSeconds: number) => {
 
 export const countdownLabel = (totalSeconds: number) => `${formatCountdown(totalSeconds)} 후에 다시 받을 수 있어요`
 
-// The boards keep a code error up while the code is edited; a newly completed code is a fresh attempt.
 export const otpErrorAfterInput = <E>(error: E | null, prev: string, next: string) => (next.length === OTP_LENGTH && next !== prev ? null : error)
 
 export type OtpResendSlot = 'countdown' | 'resend'

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import type { BotContract } from '@push/api-client'
 import { botDtoOf, type BotFixture, type MockJob } from '../bots'
 
-// The named cases of contract.md section 7. push-be runs the same table against bot_state_v on real Postgres.
 const now = new Date('2026-11-09T06:00:00Z')
 
 const base = (over: Partial<BotFixture> = {}): BotFixture => ({
@@ -43,7 +42,6 @@ const cases: Case[] = [
   ['card', base({ messages: [user(12)], cards: [card(10)], readAt: 11 }), { phase: 'waiting', since: since(10), for: 'confirm', cardId: 'c1', cardTitle: '이 변경을 이력서에 반영할까요?', expiresAt: null }, true],
   ['card-read', base({ messages: [user(12)], cards: [card(10)], readAt: 5 }), { phase: 'waiting', since: since(10), for: 'confirm', cardId: 'c1', cardTitle: '이 변경을 이력서에 반영할까요?', expiresAt: null }, false],
   ['card-expired', base({ messages: [user(12)], cards: [card(11, 1)], readAt: 5 }), null, false],
-  // Asked again 2 minutes ago, after the user last read the chat: the card counts from the retry.
   ['card-retried', base({ messages: [user(30)], cards: [card(2, -8)], readAt: 20 }), { phase: 'waiting', since: since(2), for: 'confirm', cardId: 'c1', cardTitle: '이 변경을 이력서에 반영할까요?', expiresAt: since(-8) }, true],
   ['unread-and-working', base({ messages: [user(30), bot(25), user(9)], readAt: 28, job: running([{ phase: 'working', text: '경력 섹션 고치는 중' }]) }), { phase: 'working', since: since(9), label: '경력 섹션 고치는 중' }, true],
 ]

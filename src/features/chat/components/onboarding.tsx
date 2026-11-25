@@ -3,7 +3,6 @@ import { spacing } from '../../../theme'
 import { onboardingGreeting } from '../utils/usage'
 import BotText from './entries/bot'
 
-/** The first screen is the greeting bubble; the quick starts sit above the input (QuickStartRow). */
 const Onboarding = ({
   kind,
   name,

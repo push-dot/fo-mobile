@@ -2,7 +2,6 @@ import { ActionSheetIOS, Alert, Platform } from 'react-native'
 
 export type ActionSheetItem = { label: string; destructive?: boolean; onPress: () => void }
 
-/** The platform's own action list: an iOS action sheet, an Android dialog with the actions as buttons (MyResumeStates, UploadPick). */
 export const showActionSheet = ({ title, message, items, cancel = '취소', onCancel }: { title: string; message?: string; items: ActionSheetItem[]; cancel?: string; onCancel?: () => void }) => {
   if (Platform.OS === 'ios') {
     ActionSheetIOS.showActionSheetWithOptions(

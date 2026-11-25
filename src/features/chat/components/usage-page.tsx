@@ -19,7 +19,6 @@ const monthDay = (iso?: string) => {
 
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 
-/** 사용량 (ChatAccountUsage): the month's share in big type, a bar, each bot's share and the refill day. */
 export const UsagePage = () => {
   const c = useColors()
   const account = useChatAccount(true).data
@@ -28,7 +27,6 @@ export const UsagePage = () => {
   const percent = usagePercent(account?.credits)
   const refill = monthDay(account?.creditsRefillAt)
   const bots = account?.usageByBot ?? []
-  // ChatAccountUsage grows the fill from the left, .15s after the page opens.
   const grow = useGrow(150)
   const buy = () => {
     if (purchase.pending) return

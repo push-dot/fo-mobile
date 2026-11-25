@@ -5,7 +5,6 @@ import Text from './text'
 
 const SettingsGroup = ({ title, note, children }: { title?: string; note?: string; children: ReactNode }) => {
   const c = useColors()
-  // toArray flattens a mapped list (NOTIFICATION_ROWS.map) so every row gets its own separator, and drops null/false rows
   const rows = Children.toArray(children)
   return (
     <View>

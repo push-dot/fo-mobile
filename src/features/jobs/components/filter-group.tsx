@@ -3,7 +3,6 @@ import { Platform, View } from 'react-native'
 import { spacing } from '../../../theme'
 import { SheetHead, Text } from '../../../shared/components'
 
-// iOS (.ihead + .ichips2): the 13 regular group title sits right over the chips; Android keeps the bold title.
 const FilterGroup = ({ title, children }: { title?: string; children: ReactNode }) => {
   const ios = Platform.OS === 'ios'
   return (

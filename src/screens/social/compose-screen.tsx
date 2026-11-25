@@ -10,7 +10,6 @@ import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
 import { fontFor, onAccent, radius, spacing, type, useColors } from '@/theme'
 
-// The artboard textarea is content-box: height 200 plus 4pt padding on each side.
 const BODY_HEIGHT = 200 + spacing[1] * 2
 
 const ComposeScreen = () => {

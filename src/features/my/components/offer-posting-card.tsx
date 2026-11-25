@@ -4,7 +4,6 @@ import type { OfferPosting } from '@push/api-client'
 import { Icon, Text } from '@/shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 
-/** ProposalDetail: the posting that came with the proposal, its title and company only (v425). */
 const OfferPostingCard = ({ posting }: { posting: OfferPosting }) => {
   const c = useColors()
   return (

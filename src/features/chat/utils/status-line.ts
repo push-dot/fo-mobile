@@ -4,7 +4,6 @@ export type LiveLine =
   | { kind: 'run'; phase: 'queued'; since: Date; ahead: number }
   | { kind: 'run'; phase: 'thinking'; since: Date; text: string }
   | { kind: 'run'; phase: 'working'; since: Date; text: string }
-  /** A line that names its work ends there: no elapsed time (ChatApprove). */
   | { kind: 'waiting'; since: Date; for: 'answer' | 'confirm'; cardId: string; text: string; named?: true }
 
 export type Notice =
@@ -12,12 +11,10 @@ export type Notice =
   | { kind: 'failed'; text: string }
   | { kind: 'error'; code: string | undefined; reason: string | null }
 
-/** A notice is a result, so it is a chat bubble; `detail` is its grey sub-text (rule 29). */
 export type NoticeBubble = { text: string; detail?: string }
 
 export type StatusLineView = {
   mascot: 'idle' | 'think' | 'work' | 'help'
-  /** The mascot holds still (ChatBotStatusStopped draws it without a motion class). */
   still?: boolean
   tone: 'neutral' | 'help' | 'quiet'
   text: string
@@ -66,11 +63,9 @@ const view = (mascot: StatusLineView['mascot'], tone: StatusLineView['tone'], te
   accessibilityLabel: tail ? `${label} ${tail}` : label,
 })
 
-/** The stop was sent and the run has not ended yet: the board draws the composer's send button grey, not the stop button. */
 export const isStopping = (working: { verbs: readonly string[] } | null) => working?.verbs[0] === STOPPING_TEXT
 
 export const statusLineView = (line: LiveLine, now: Date): StatusLineView => {
-  // ChatBotStatusQueue draws the idle mascot (m-idle): nothing runs yet, the elapsed time still counts.
   if (line.kind === 'run' && line.phase === 'queued') return view('idle', 'neutral', line.ahead > 0 ? `${QUEUE_TEXT} · 앞에 작업 ${line.ahead}개` : QUEUE_TEXT, elapsedText(line.since, now))
   if (line.kind === 'run' && line.phase === 'thinking') return view('think', 'neutral', line.text, elapsedText(line.since, now))
   if (line.kind === 'run' && line.text === STOPPING_TEXT) return view('idle', 'quiet', line.text, null, line.text, true)
@@ -91,7 +86,6 @@ export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine
     return { kind: 'run', phase: 'queued', since, ahead }
   }
   if (STORED_THINKING.has(text)) return { kind: 'run', phase: 'thinking', since, text: THINK_TEXT }
-  // The server and the mock end a status with an ellipsis; the boards draw the phrase alone (rule 29).
   return { kind: 'run', phase: 'working', since, text: text.replace(/…$/, '') }
 }
 

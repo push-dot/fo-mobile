@@ -11,17 +11,12 @@ type RowProps = {
   onPress?: () => void
   right?: ReactNode
   danger?: boolean
-  /** Draws the chevron on a row that does not open anything (the board shows it before there is a posting). */
   chevron?: boolean
-  /** The row's value sits inside the board `.v` (커리어 상태, 연락처, 차단한 사람), so its chevron is t3; other rows keep the label colour (t1). */
   mutedChevron?: boolean
-  /** A value row that opens a picker (v415 Settings): the label is the value itself; only the up-down selector sits on the right. */
   picker?: boolean
-  /** BotProfileXL: the board's `.grp .it` is XL_ROW_HEIGHT high with 21 pt labels and 18 pt values, drawn in fixed pixels. */
   xl?: boolean
 }
 
-/** BotProfileXL `.grp .it`: the label is the b1 size on the b2 line, the value has no type token. Fixed pixels, so no system scaling. */
 export const XL_ROW_LABEL = { fontSize: largeType.b1.fontSize, lineHeight: largeType.b2.lineHeight }
 export const XL_ROW_VALUE = { fontSize: 18 }
 export const XL_ROW_HEIGHT = 80

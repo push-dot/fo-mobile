@@ -54,7 +54,6 @@ const PushDocsScreen = () => {
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5], paddingBottom: insets.bottom + spacing[6] }}>
-          {/* The board's count sits in a 24pt line, 1.7 lower on the baseline: the first card starts 44 under the list top. */}
           <Text v="c1" weight="600" color="t2" style={{ paddingTop: spacing[2] + 1.7, lineHeight: type.b1.lineHeight, marginBottom: -1.7 }}>
             {data?.page.total ?? docs.length}개
           </Text>

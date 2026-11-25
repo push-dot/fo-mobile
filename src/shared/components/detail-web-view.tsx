@@ -9,22 +9,17 @@ import Button from './button'
 import LoadingIndicator from './loading-indicator'
 import Text from './text'
 
-// Mock-only scripts stay out of the release path: required only when the mock API is on.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mockScripts = (): { HOLD_FIT_SCRIPT: string; SOON_FIT_SCRIPT: string } => require('./detail-mock-scripts')
 
 const APP_PATH = /^\/(?!\/)/
 
-// fo-web draws its own page in a moment after the document loads; a stalled page must not keep the skeleton up for ever.
 const LOADING_MAX_MS = 6000
 
-// A page opened once already comes from the web view's cache with its fonts in, so it opens with no loading; only a first open waits.
 const opened = new Set<string>()
 
-// Resolves after the text on screen has the web font it asked for, so no tofu or fallback glyphs show when the loading ends.
 const FONTS_READY_SCRIPT = `(function(){var done=false;function post(){if(done)return;done=true;window.ReactNativeWebView.postMessage(JSON.stringify({type:'fonts-ready'}))}setTimeout(post,2500);function frames(n,f){if(n===0)return f();requestAnimationFrame(function(){frames(n-1,f)})}function settle(){frames(3,function(){if(document.fonts.status==='loading'){document.fonts.ready.then(settle)}else{post()}})}settle()})();true;`
 
-/** The plain loading indicator over the web page until it is drawn. */
 const DetailLoading = () => {
   const c = useColors()
   return (
@@ -38,7 +33,6 @@ type Props = {
   path: string
   from?: DetailFrom
   onBridge?: (message: Record<string, unknown>) => void
-  /** The bars floating over the page: the web page keeps this much clear above and below its content and scrolls under them. */
   inset?: { top: number; bottom: number }
   onScroll?: (offsetY: number) => void
 }
@@ -117,11 +111,8 @@ const DetailWebView = ({ path, from, onBridge, inset, onScroll }: Props) => {
     } catch {
       return
     }
-    // fo-web posts its page title once the page is drawn; the loading ends when the fonts are ready too. The design draws no native header title.
     if (m.type === 'title') return void ref.current?.injectJavaScript(FONTS_READY_SCRIPT)
-    // The page is drawn and its web fonts are in: ending the loading earlier shows the fallback glyphs for a moment.
     if (m.type === 'fonts-ready') return done()
-    // The page asks for the token once it can listen; the app answers with a one-shot event, not a global.
     if (m.type === 'ready') return void ref.current?.injectJavaScript(tokenEventScript(WEB_BASE_URL, tokenRef.current))
     if (m.type === 'open' && typeof m.path === 'string' && APP_PATH.test(m.path)) router.push(m.path as Href)
     else if (m.type === 'external' && typeof m.url === 'string' && /^https?:\/\//.test(m.url)) void openBrowser(m.url)

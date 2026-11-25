@@ -3,7 +3,6 @@ import { countUnread } from '@/features/home/snapshot/dto'
 import { usePushDevice } from '../hooks'
 import { fetchNotifications, readNotifications } from './fetchers'
 
-// shortcut: first 50 only (no paging); the inbox is short-lived. Page it if users keep more.
 export const useNotifications = () =>
   useQuery({ queryKey: ['notifications'], queryFn: fetchNotifications })
 

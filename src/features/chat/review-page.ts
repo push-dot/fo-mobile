@@ -5,7 +5,6 @@ import type { DiffLine } from './types'
 
 export type ReviewPageRequest = {
   lines: DiffLine[]
-  /** Present while the edit waits for an answer: the two buttons at the bottom. Without it the page only shows the document. */
   apply?: () => void
   undo?: () => void
   onDismiss?: () => void

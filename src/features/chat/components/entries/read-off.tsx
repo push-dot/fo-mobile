@@ -5,7 +5,6 @@ import { READ_OFF_ATTACH, READ_OFF_SETTINGS } from '../../constants'
 import { Bubble } from './bot'
 import Rich from './rich'
 
-/** ChatBotReadOff: the bot line under a refused send, with 서류 첨부 and 설정 열기 as plain buttons on the bubble (btn sec2 sm on --bg). */
 const ReadOff = ({ text, onAction }: { text: string; onAction: (action: 'attach' | 'settings') => void }) => {
   const c = useColors()
   const plain = { backgroundColor: c.bg }

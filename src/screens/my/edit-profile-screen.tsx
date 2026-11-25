@@ -69,7 +69,6 @@ import { pickImage } from '@/shared/infrastructure'
 import { toBoxShadow } from '@/shared/utility'
 import { fontFor, hitSlopTo, radius, spacing, type, useColors, useShadow } from '@/theme'
 
-/** A career field on the grey card: iOS draws no box (the card is the field), Android a white one. */
 const FIELD_SURFACE = Platform.OS === 'ios' ? 'bg2' : 'bg'
 const CAREER_MISSING = '회사, 직무, 기간을 채워 주세요'
 
@@ -125,9 +124,7 @@ const Input = ({
           ...inputReset,
           minHeight: multiline ? 72 : 48,
           borderRadius: radius.md,
-          // EditCareer: iOS draws the text straight on the grey card, Android keeps the white box
           backgroundColor: Platform.OS === 'ios' ? undefined : c.bg,
-          // EditCareerStates 빈 칸 오류: Android rings the empty field in red (1.5 inset); iOS only shows the line of text below
           ...(invalid && Platform.OS !== 'ios' ? { borderWidth: 1.5, borderColor: c.red } : null),
           paddingHorizontal: spacing[4],
           paddingTop: multiline ? spacing[3] : 0,
@@ -169,7 +166,6 @@ const SelectField = ({
           }}
         >
           <Text v="b1">{value}</Text>
-          {/* EditProfileBasic: the select chevron is the field's own black (currentColor), not the muted grey. */}
           <Icon name="down" size={16} color="t1" />
         </View>
       </Menu>
@@ -357,7 +353,6 @@ const EditIntro = ({ p }: { p: Profile }) => {
           style={{ minHeight: 200, lineHeight: 25 }}
           placeholder="어떤 일을 해 왔고, 요즘 무엇에 관심 있는지 적어 보세요."
         />
-        {/* shortcut: no inline rewrite API yet, so 다듬기 hands off to AI 채팅; add one when push-be ships it */}
         <Button
           label="AI로 다듬기"
           variant="secondary"
@@ -372,7 +367,6 @@ const EditIntro = ({ p }: { p: Profile }) => {
   )
 }
 
-// Stable keys: index keys let a deleted card's field state leak into the next card and into the restored one.
 let draftSeq = 0
 const draftKey = () => `career-${++draftSeq}`
 
@@ -415,7 +409,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
   const [items, setItems] = useState<CareerDraft[]>(p.careers.map(toDraft))
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null)
   const [tried, setTried] = useState(false)
-  // DeleteCareer.2 keeps the card listed behind the banner: it leaves the list when 되돌리기 times out, and saving leaves it out from the start.
   const [pending, setPending] = useState<{ key: string; toast: number } | null>(null)
   const gone = !useToastLive(pending?.toast ?? null) ? pending?.key : undefined
   const parsed = items.map(toCareer)
@@ -426,12 +419,10 @@ const EditCareer = ({ p }: { p: Profile }) => {
       action: { label: careerDeleteCopy.undo, onPress: () => setPending(null) },
     })
     setPending({ key: item.key, toast })
-    // This toast replaced the last one, so that row's 되돌리기 is gone: it leaves now.
     if (pending) setItems((xs) => xs.filter((x) => x.key !== pending.key))
   }
   const set = (i: number, patch: Partial<CareerDraft>) =>
     setItems((xs) => xs.map((x, j) => (j === i ? { ...x, ...patch } : x)))
-  // EditCareer: the grip drags its card (끌어서 순서 바꾸기); the card follows the finger and lands where it is dropped.
   const shadow = useShadow()
   const [heights, setHeights] = useState<Record<string, number>>({})
   const dragY = useState(() => new Animated.Value(0))[0]
@@ -456,7 +447,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
       },
       onPanResponderMove: (_, g) => dragY.setValue(g.dy),
       onPanResponderRelease: (_, g) => {
-        // A card hidden behind the undo toast takes no room, so a drag passes it at once.
         const room = items.map((x) => (x.key === gone ? -FORM.gap : (heights[x.key] ?? 0)))
         move(i, dropIndex(room, i, g.dy, FORM.gap))
         endDrag()
@@ -559,7 +549,6 @@ const EditCareer = ({ p }: { p: Profile }) => {
                         onChange={(d) => set(i, { start: dateToYm(d) })}
                       />
                     </View>
-                    {/* padding on a flex:1 item widens it past the 50/50 split, so it lives on the inner row */}
                     <View style={{ flex: 1, borderRadius: radius.md, backgroundColor: Platform.OS === 'ios' ? undefined : c.bg }}>
                       <View
                         style={{
@@ -739,7 +728,6 @@ const EditSkills = ({ p }: { p: Profile }) => {
             />
           ))}
         </View>
-        {/* shortcut: long press moves a chip one place earlier (no drag library installed). */}
         <Text v="c1" color="t3">
           {skillOrderHint}
         </Text>
@@ -751,7 +739,6 @@ const EditSkills = ({ p }: { p: Profile }) => {
 const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
   const c = useColors()
   const raw = useSafeAreaInsets()
-  // A modal over the tab bar reports the tab bar as part of the bottom inset (home indicator + bar); the modal only has the window's home inset.
   const insets = { ...raw, bottom: Platform.OS === 'ios' ? (initialWindowMetrics?.insets.bottom ?? 0) : raw.bottom }
   const keyboardUp = useKeyboardHeight() > 0
   const { data: p } = useMyProfile()
@@ -766,13 +753,11 @@ const EditProfileScreen = ({ section }: { section: ProfileSection }) => {
           flex: 1,
           backgroundColor: c.bg,
           paddingTop: Platform.OS === 'android' ? insets.top : 0,
-          // Android: the padding behaviour already clears the keyboard (which includes the nav inset).
           paddingBottom: Platform.OS === 'android' && keyboardUp ? 0 : insets.bottom,
         }}
       >
         {p ? <Form p={p} /> : <SkeletonRows {...LOADING_ROWS} />}
       </KeyboardAvoidingView>
-      {/* The modal already starts under the status bar, so the toast sits 2 under the modal's top (DeleteCareer.2: y64), not under the inset again. */}
       {Platform.OS === 'ios' ? (
         <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
           <ToastHost />

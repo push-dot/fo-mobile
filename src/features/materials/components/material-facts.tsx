@@ -4,10 +4,6 @@ import { Text } from '@/shared/components'
 import { radius, spacing, useColors } from '@/theme'
 import type { Fact } from '../utils/material-view'
 
-/**
- * The detail card (`.dmeta`): a grid whose label column is as wide as its widest label (`auto minmax(0,1fr)`, 12 apart).
- * Each label reports its natural width and every label then takes the widest, so the values line up as the board's do.
- */
 const MaterialFacts = ({ facts }: { facts: Fact[] }) => {
   const c = useColors()
   const [labelWidth, setLabelWidth] = useState(0)

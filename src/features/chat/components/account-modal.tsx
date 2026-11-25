@@ -14,7 +14,6 @@ import Note from './note'
 import PageModal from './page-modal'
 
 
-/** 계정 modal (ChatAccount). 플랜 opens as its own page (PlanUpgrade), 사용량 as another (ChatAccountUsage). */
 export const AccountModal = () => {
   const account = useChatAccount(true)
   return (
@@ -49,7 +48,6 @@ const AccountRow = ({ label, value, bold, plain, onPress }: { label: string; val
   )
 }
 
-// The boards pad a group title 22 above and 8 below, and the page stacks its blocks 4 apart.
 const TITLE = { paddingTop: 22, paddingBottom: spacing[2], paddingHorizontal: spacing[6] } as const
 const GROUP = { paddingHorizontal: spacing[5], marginTop: 14 } as const
 

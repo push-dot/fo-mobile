@@ -16,7 +16,6 @@ import {
 import { Badge, Button, Chip, ChipRow, FloatingHeader, GlassButton, SkeletonRows, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
 import { spacing, useColors } from '@/theme'
 
-// Board: the 내 프로필 button's 4pt right margin plus the 2pt bar gap, plus the 8pt margin the iOS bar puts before an icon button.
 const HEADER_GAP = Platform.OS === 'ios' ? 14 : 6
 
 const HubScreen = () => {
@@ -31,7 +30,6 @@ const HubScreen = () => {
   const list = useProfileList(category, sheet)
   const items = list.data?.pages.flatMap((p) => p.data) ?? []
   const summary = filterSummary(sheet)
-  // HubEmpty board: the title row sits 8pt under the chips; every other Hub board keeps 12pt.
   const emptyList = !list.isPending && !list.isError && items.length === 0
 
   const header = (

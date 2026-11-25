@@ -18,7 +18,6 @@ const FollowsScreen = () => {
   const mine = useMyFollows()
   const fans = useMyFollowers()
   const query = following ? mine : fans
-  // shortcut: filters the first page only; page the search when the list grows past 50.
   const people = followMatches(query.data?.data ?? [], following ? q : '')
   const renderItem = ({ item: p }: { item: (typeof people)[number] }) =>
       following ? (

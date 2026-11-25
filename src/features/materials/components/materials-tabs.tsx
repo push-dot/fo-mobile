@@ -8,14 +8,12 @@ import { cssShadow, spacing, useColors, useThemeMode } from '@/theme'
 import { TABS } from '../constants'
 import type { MaterialTab } from '../types'
 
-/** `.seg` is 44 high, 52 under `.xl` (MaterialsXL: `.xl .mnav .seg`). */
 const HEIGHT = 44
 const HEIGHT_XL = 52
 const INSET = spacing[1]
 
 type Props = { value: MaterialTab; onChange: (tab: MaterialTab) => void }
 
-/** iOS: the system segmented control (UISegmentedControl), not a drawing of one. */
 const NativeTabs = ({ value, onChange }: Props) => (
   <NativeHost style={{ height: HEIGHT }}>
     <Picker label="자료 종류" selection={value} onSelectionChange={onChange} modifiers={[pickerStyle('segmented')]}>
@@ -28,9 +26,6 @@ const NativeTabs = ({ value, onChange }: Props) => (
   </NativeHost>
 )
 
-/**
- * Android: the boards' `.seg button.on`, the selected tab is a raised `bg` pill (dark: `fill2`) at weight 800.
- */
 const DrawnTabs = ({ value, onChange }: Props) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'

@@ -32,7 +32,6 @@ const PhoneScreen = () => {
   const [error, setError] = useState<string | null>(null)
   const e164 = toE164(digits)
 
-  // A social sign-in reaches this step with its pending token; without one there is nothing to finish, so start over.
   const lost = mode === 'social' && !pendingToken
   useEffect(() => {
     if (lost) router.replace('/sign-in')
@@ -62,7 +61,6 @@ const PhoneScreen = () => {
   if (lost) return null
 
   return (
-    // The phone pad has no done key: a tap anywhere outside the field closes it.
     <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
       <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>

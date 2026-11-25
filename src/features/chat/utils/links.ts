@@ -8,7 +8,6 @@ export const LINK_KIND_LABEL: Record<LinkKind, string> = {
   other: '기타',
 }
 
-/** Guesses the link kind from its address (내 링크 추가). The server decides when `kind` is omitted. */
 export const kindOf = (url: string): LinkKind =>
   /github\.com/.test(url)
     ? 'github'
@@ -22,7 +21,6 @@ export const kindOf = (url: string): LinkKind =>
 
 const GITHUB_OWNER_REPO = /^[\w-]+\/[\w.-]+$/
 
-/** The address to save: `owner/repo` with GitHub picked is a GitHub repo, anything else gets https:// when it has none. */
 export const fullLinkUrl = (typed: string, picked: LinkKind | null) => {
   const url = typed.trim()
   if (picked === 'github' && GITHUB_OWNER_REPO.test(url)) return `https://github.com/${url}`

@@ -8,7 +8,6 @@ import { useReduceMotion } from './use-reduce-motion'
 const { box, radius, stroke: width } = SPINNER
 const ARC = `M${box / 2} ${box / 2 - radius}a${radius} ${radius} 0 0 1 ${radius} ${radius}`
 
-/** iOS has no native arc spinner. */
 const Spinner = ({ size = SPINNER.size, color = 'acText' }: { size?: number; color?: keyof Colors }) => {
   const stroke = useColors()[color]
   const still = useReduceMotion()

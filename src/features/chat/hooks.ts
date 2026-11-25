@@ -25,7 +25,6 @@ export const usePop = (on: boolean, duration = 200) => {
 const NO_ITEMS: ChatItem[] = []
 const NO_QUEUE: ChatState['queue'] = []
 
-/** Same thread, except that the last bot line grew: a token batch changes only its text. */
 const sameSkeleton = (a: readonly ChatItem[], b: readonly ChatItem[]) => {
   if (a === b) return true
   if (a.length !== b.length) return false
@@ -40,10 +39,6 @@ const sameSkeleton = (a: readonly ChatItem[], b: readonly ChatItem[]) => {
   return [...keys].every((k) => (x as Record<string, unknown>)[k] === (y as Record<string, unknown>)[k])
 }
 
-/**
- * The thread's items without the streaming text: the array only changes when a line is added, replaced or changes more than its text,
- * so the screen does not re-render per token. The growing line reads its own text with `useLiveItem`.
- */
 export const useChatItems = (id: string) => {
   const kept = useRef(NO_ITEMS)
   return useChatStore((s) => {
@@ -53,7 +48,6 @@ export const useChatItems = (id: string) => {
   })
 }
 
-/** One line of the thread, always as new as the store: for the line that is still streaming. */
 export const useLiveItem = (id: string, itemId: string) => useChatStore((s) => s.chats[id]?.items.findLast((i) => i.id === itemId))
 
 export const useChatWorking = (id: string) => useChatStore((s) => s.chats[id]?.working ?? null)
@@ -62,7 +56,6 @@ export const useChatAwaiting = (id: string) => useChatStore((s) => s.chats[id]?.
 export const useChatQueue = (id: string) => useChatStore((s) => s.chats[id]?.queue ?? NO_QUEUE)
 
 export type RunPhase = 'idle' | 'working' | 'stopping'
-/** A status event (new verbs) does not change the phase, so only start, stop and done re-render a reader. */
 export const useRunPhase = (id: string): RunPhase =>
   useChatStore((s) => {
     const working = s.chats[id]?.working ?? null

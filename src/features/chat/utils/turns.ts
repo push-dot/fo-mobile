@@ -24,11 +24,6 @@ export const openPieceId = (turns: BotContract.Turn[], live?: { turnId: string; 
   return open ? piece : undefined
 }
 
-/**
- * Rebuilds a reopened chat from GET /bots/:id/transcript (newest turn first). A card replays as its surface with the answer
- * already in the data model (`/open` false, `/picked`), so an answered surface opens answered. Only the newest turn can still
- * wait, on the surface `pausedOn` picks from its own items and its waiting status.
- */
 export const restoreBotTurns = (turns: BotContract.Turn[], live?: { turnId: string; lastSeq: number } | null): ChatState => {
   let s = emptyChat
   const put = (e: ChatEvent) => {

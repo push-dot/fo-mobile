@@ -70,7 +70,6 @@ const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void 
         {row(BOT_COLORS.slice(0, 6), 0)}
         {row(BOT_COLORS.slice(6), 6)}
       </View>
-      {/* BotProfileColor: swatches 16 under the title, CTA 16 + 4 under the swatches (.csw rows 44 + 2 + 44, no extra padding). */}
       <Button label={DONE_LABEL} onPress={() => void apply()} style={{ marginTop: spacing[1] }} />
     </Sheet>
   )

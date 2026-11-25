@@ -4,7 +4,6 @@ import { answerSurface } from '../../stores'
 import type { SurfaceItem } from '../../utils/surface'
 import { Appear } from '../motion'
 
-/** A Bot card: its A2UI surface. Only the surface the run waits on takes an answer. */
 export const SurfaceRow = ({ chatId, item, onLocal }: { chatId: string; item: SurfaceItem; onLocal?: (item: SurfaceItem, action: A2uiLocal) => void }) => {
   const waiting = useChatWaiting(chatId)
   return (

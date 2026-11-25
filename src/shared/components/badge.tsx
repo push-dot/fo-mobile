@@ -4,13 +4,10 @@ import Text from './text'
 
 export type BadgeTone = 'ac' | 'grey' | 'red' | 'green' | 'orange'
 
-/** A bold lead glyph with its own right margin (the board's `.kw-ok:before` / `.kw-miss:before`). */
 export type BadgeGlyph = { char: string; gap: number }
 
 const Badge = ({ label, minWidth, glyph }: { label: string; tone?: BadgeTone; minWidth?: number; glyph?: BadgeGlyph }) => {
   const c = useColors()
-  // v412 rule 4: one badge colour; the text tells the state, so every tone draws the same grey.
-  // Rule 21 and note 276: only 합격 and 수락함 are black (white in dark mode, where t1 is the light ink).
   const passed = label === '합격' || label === '수락함'
   const bg = passed ? c.t1 : c.fill
   const fg = passed ? c.bg : c.t2

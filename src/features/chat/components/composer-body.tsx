@@ -10,7 +10,6 @@ import { COMPOSER_ROW, settleComposerLayout } from '../utils/composer-layout'
 import { composerWeight } from '../utils/composer-weight'
 
 
-/** The box stops growing at five lines and scrolls inside (ChatKeyboardIOS). */
 export const COMPOSER_MAX_LINES = 5
 
 const ROW_HEIGHT = 44
@@ -23,7 +22,6 @@ export type ComposerProps = {
   onChangeText: (t: string) => void
   onSend: () => void
   placeholder: string
-  /** Agent is working: the right side becomes a single black stop button. */
   working?: boolean
   onStop?: () => void
   onAttach?: () => void
@@ -35,11 +33,9 @@ export type ComposerProps = {
   maxLength?: number
   label?: string
   sending?: boolean
-  /** Credit-out state: the box is drawn at half opacity and takes no input. */
   disabled?: boolean
 }
 
-/** One glass pill: + 첨부, the text, @ 언급, send or stop. Once the text wraps it becomes a box with the buttons on their own row below. Shared by both platforms. */
 export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const c = useColors()
   const xl = useXlBoardText()
@@ -47,7 +43,6 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const fontScale = composerFontScale(xl, system)
   const typed = p.value.trim()
   const hasText = typed.length > 0
-  // A bare "@" only opens the suggestions; there is nothing to send yet.
   const canSend = hasText && typed !== '@' && !p.sending && !p.disabled
   const showTools = p.tools ?? true
   const round = { width: ROW_HEIGHT, height: ROW_HEIGHT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' } as const
@@ -55,11 +50,9 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   const textType = type.h3
   const [layout, setLayout] = useState(COMPOSER_ROW)
   if (!p.value && layout.box) setLayout(COMPOSER_ROW)
-  // onLayout fires only when the height changes, so deleting text that stays on one line would never leave the box. Settle again on every length change.
   const lines = useRef(1)
   useEffect(() => setLayout((l) => settleComposerLayout(l, lines.current, p.value.length)), [p.value.length])
   const box = layout.box
-  // iOS: the + and @ discs are native glass like the header buttons; Android keeps the flat `fill2` disc.
   const tool = (icon: 'plus' | 'at') =>
     Platform.OS === 'ios' ? (
       <Glass interactive style={disc}>
@@ -103,7 +96,6 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           editable={!p.disabled}
           accessibilityLabel={p.label ?? '메시지'}
           maxLength={p.maxLength}
-          // iOS keeps a multiline field at its last height after the text is cleared.
           style={[{ fontSize: textType.fontSize, lineHeight: textType.lineHeight, letterSpacing: textType.letterSpacing, color: c.t1, maxHeight: COMPOSER_MAX_LINES * textType.lineHeight * fontScale, height: emptyFieldHeight(p.value, textType.lineHeight, fontScale), ...inputReset, ...iosLineBox(textType.lineHeight, textType.fontSize, fontScale) }, fontFor(composerWeight(p.value))]}
         />
       </View>
@@ -142,7 +134,6 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
   return (
     <View pointerEvents={p.disabled ? 'none' : 'auto'} style={{ gap: spacing[2] }}>
       {p.attachment ? (
-        // MaterialsSendHere / BotPickSent (.ncomp > .achip): a 40pt white capsule (14 left, 10 right) with a 1px line ring and a soft drop shadow, no file icon, a 28pt round × on the right, 70% wide at most.
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${displayName(p.attachment)} 첨부 빼기`}
@@ -157,7 +148,6 @@ export const Composer = ({ inputRef, ...p }: ComposerProps) => {
           </View>
         </Pressable>
       ) : null}
-      {/* The glass sits behind the controls, not around them: glass drawn inside glass loses the + and @ buttons' own glass. */}
       <View style={{ flexDirection: box ? 'column' : 'row', alignItems: box ? 'stretch' : 'flex-end', padding: PILL_PAD, borderRadius: PILL_HEIGHT / 2 }}>
         <GlassField style={[StyleSheet.absoluteFill, { borderRadius: PILL_HEIGHT / 2 }]}>{null}</GlassField>
         {box ? [field, <View key="bar" style={{ flexDirection: 'row', alignItems: 'center' }}>{plus}<View style={{ flex: 1 }} />{mention}{action}</View>] : [plus, field, mention, action]}

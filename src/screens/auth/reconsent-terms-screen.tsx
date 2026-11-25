@@ -54,7 +54,6 @@ const ReconsentTermsScreen = () => {
     router.push({ pathname: TERMS_VIEW_ROUTE, params: { term } })
   }
 
-  // gestureEnabled: false only stops the iOS swipe; the terms must be answered, so Android back does nothing.
   useHardwareBack(() => undefined)
   const submit = () => {
     if (!session || !requiredOk) return

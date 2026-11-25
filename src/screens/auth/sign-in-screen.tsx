@@ -35,7 +35,6 @@ const continueWith = (provider: LoginProvider, outcome: SignInOutcome) => {
   router.push('/phone')
 }
 
-// A failed login is the platform's own alert (iOS alert, Android dialog), not a box drawn on the screen.
 const fail = (provider: LoginProvider) => {
   const { title, body } = loginFailureCopy(provider)
   Alert.alert(title, body, [{ text: '확인' }])
@@ -81,7 +80,6 @@ const SignInScreen = () => {
       </View>
 
       <View style={{ position: 'absolute', left: 20, right: 20, bottom: insets.bottom + 24, gap: spacing[3] }}>
-        {/* SignIn board: iOS Google is a borderless grey pill, Android keeps the outlined card. */}
         <ProviderButton label={GOOGLE_START} logo={GOOGLE} bg={Platform.OS === 'ios' ? c.fill : c.card} fg={c.t1} border={Platform.OS === 'ios' ? undefined : c.line} disabled={busy} onPress={() => run('google')} />
         {apple ? (
           <ProviderButton label={APPLE_START} logo={APPLE} bg={c.t1} fg={c.bg} disabled={busy} onPress={() => run('apple')} />
@@ -103,7 +101,6 @@ const SignInScreen = () => {
             style={{ position: 'absolute', top: '100%', left: 0, right: 0, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => signInWithDevToken(devToken)}
           >
-            {/* Dev builds only (__DEV__). The board has no such link, so it is transparent: still in the accessibility tree, never drawn. */}
             <Text v="c1" weight="700" style={{ color: 'transparent' }}>
               개발 토큰으로 들어가기
             </Text>

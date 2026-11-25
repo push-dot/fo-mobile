@@ -1,8 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-// The vendored Push catalog drives the iOS components directly; Android declares the props in Kotlin. The v0.9.1 catalog
-// (the one Android speaks) and the Kotlin declarations must match both ways, with the property type the schema implies.
 const root = new URL('../../../../modules/push-a2ui/', import.meta.url)
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8')
 type Schema = { type?: string; items?: { type?: string }; anyOf?: (Schema & { properties?: Record<string, unknown> })[] }
@@ -10,10 +8,8 @@ type Component = { properties: Record<string, Schema>; required?: string[] }
 const catalog = JSON.parse(read('catalog/push-catalog.json')) as { components: Record<string, Component> }
 const kotlin = read('android/src/main/java/expo/modules/pusha2ui/PushCatalog.kt')
 const PUSH = ['PushChoice', 'PushTodo', 'PushDiff', 'PushPlan', 'PushFit', 'PushDocument', 'PushJobCard']
-// Every component has these; the renderer handles them itself.
 const COMMON = new Set(['id', 'component', 'weight'])
 
-/** The A2uiProperty factory a schema calls for: a bound prop (`anyOf` a literal or a `{path}`) takes the dynamic one. */
 const factoryFor = (schema: Schema) => {
   const literal = schema.anyOf?.find((o) => !o.properties?.path)
   if (literal) return literal.type === 'boolean' ? 'dynamicBoolean' : literal.type === 'array' && literal.items?.type === 'string' ? 'dynamicStringList' : 'dynamicValue'

@@ -6,9 +6,6 @@ import GlassActionButton, { type GlassAction } from './glass-action'
 
 export type { GlassAction }
 
-/** `iconSize` overrides the glyph size (22, or 16 when `filled`).
- * `filled`: the design's solid `fill` icon chip with a 16pt glyph (sheet close buttons), on both platforms.
- * `circle`: the board's `.gbtn` — iOS draws glass, Android a solid `fill` circle (bot, chat and material headers); `.iconbtn` headers leave it off. */
 const GlassButton = ({ actions, filled, iconSize, circle }: { actions: GlassAction[]; filled?: boolean; iconSize?: number; circle?: boolean }) => {
   const single = actions.length === 1
   const solid = filled || (circle && Platform.OS === 'android')

@@ -52,7 +52,6 @@ const OtpScreen = () => {
   const e164 = toE164(digits)
   const display = formatNational(digits)
 
-  // The code screen opens only after a code was really sent (the send sets the cooldown); a link or a back-forward into it goes back to the number.
   const sent = cooldownEndsAt !== null
   useEffect(() => {
     if (!e164 || !sent) router.replace('/phone')
@@ -152,7 +151,6 @@ const OtpScreen = () => {
   }
 
   return (
-    // The code pad has no done key: a tap anywhere outside the cells closes it.
     <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ flex: 1, backgroundColor: c.bg }}>
       <TopBar onBack={() => router.back()} />
       <Pressable accessible={false} onPress={Keyboard.dismiss} style={{ paddingHorizontal: spacing[6], paddingTop: spacing[3] }}>
@@ -180,7 +178,6 @@ const OtpScreen = () => {
             }}
           />
         </View>
-        {/* SignInErrors: iOS stacks the error over the countdown row; Android folds the error into the one row with 번호 바꾸기. */}
         {notice && Platform.OS === 'ios' ? (
           <Text v="c1" color="red" accessibilityRole="alert" style={{ marginTop: spacing[4] }}>
             {notice}

@@ -27,7 +27,6 @@ const HeaderPill = ({
   kind?: 'push' | 'company'
   color?: MascotColor
   light?: HeaderLight
-  /** 'back' goes back. 'none' draws nothing (the chat was opened by a redirect, so back would go to the page that redirected). 'botHome' redirects to the Bot home. */
   leading?: 'back' | 'none' | 'botHome'
   onFind?: () => void
 }) => {
@@ -57,7 +56,6 @@ const HeaderPill = ({
   const ios = Platform.OS === 'ios'
   const { xl, button } = useXlChrome()
   const spoken = name ? botSpokenName(name) : ''
-  // The Bot home button is a redirect, like the one that opened this chat.
   if (toBotHome) return <Redirect href={botHomePath} />
   const nameButton =
     name && botId ? (

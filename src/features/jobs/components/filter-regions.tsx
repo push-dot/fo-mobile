@@ -5,7 +5,6 @@ import { SIDOS, formatCount, sidoOf, type Filters } from '../utils'
 import FilterRow from './filter-row'
 import { spacing, useColors } from '../../../theme'
 
-// FilterRow is 46 high with 4 between rows: the sido column draws all 12 sidos, and the board's sheet is as tall as that column.
 const ROW = 46
 const ROW_GAP = 4
 const LIST_HEIGHT = SIDOS.length * ROW + (SIDOS.length - 1) * ROW_GAP

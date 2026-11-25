@@ -13,7 +13,6 @@ type Props = {
   message: string
   postingId?: string
   postings: Posting[]
-  /** From useSheetScrollMax: past this height the body scrolls under the fixed title. */
   maxHeight: number
   onScrollLayout: (e: LayoutChangeEvent) => void
   error: string | null

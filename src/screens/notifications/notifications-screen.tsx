@@ -25,7 +25,6 @@ const NotificationsScreen = () => {
   const q = useNotifications()
   const read = useReadNotifications()
   const { button } = useXlChrome()
-  // NotificationsStates: the 알림 설정 button is drawn only on the board where the OS permission is off.
   const settingsVisible = useNotificationSettingsVisible()
   const items = q.data?.data ?? []
   const rows = ['오늘', '이번 주', '이전'].flatMap((title): Row[] => {

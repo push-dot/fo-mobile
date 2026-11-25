@@ -16,26 +16,20 @@ import MdTable from './md-table'
 import ProfileUndo from './profile-undo'
 import Rich, { plainOf } from './rich'
 
-// ChatBotHeaderXL draws a bot line at 21 over 31 (.msg under .xl): the system scale of 16 came out 5 % smaller, so XL sets the size itself.
 const XL_LINE = { fontSize: 21, lineHeight: 31, letterSpacing: XL_CHAT_TRACKING }
 
-/** The widest a bot bubble gets: 88 % of the thread. A number, because Yoga measures the text of a shrink-wrapped box against the thread, not against the box's own maxWidth, and the text ran into the bubble's padding (ChatResume). */
 export const useBotBubbleMax = () => (useWindowDimensions().width - spacing[5] * 2) * 0.88
 const BUBBLE_PAD_X = 15
 const BULLET_DOT = 6
 const BULLET_INDENT = 1
 const BULLET_GAP = 13
-// The list's own indent, the dot and the gap before a bullet's text (the board's `ul` padding 20 with the disc outside it).
 const BULLET_LEAD = BULLET_INDENT + BULLET_DOT + BULLET_GAP
-/** What a table can fill inside a bot bubble that is at its widest. */
 const useTableWidth = () => useBotBubbleMax() - BUBBLE_PAD_X * 2
 
-/** The bot's bubble: everything the bot says or shows in one step lives inside one of these (rule 30). */
 export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode; gap?: number; wide?: boolean }) => {
   const c = useColors()
   const maxWidth = useBotBubbleMax()
   return (
-    // With a card inside, the board's box fills its max width (the card's rows wrap).
     <Appear kind="bubble" style={{ alignSelf: 'flex-start', maxWidth, ...(wide ? { width: maxWidth } : null) }}>
       <View style={{ maxWidth, gap, paddingVertical: 11, paddingHorizontal: BUBBLE_PAD_X, borderRadius: radius.lg, borderBottomLeftRadius: radius.xs, backgroundColor: c.fill }}>
         {children}
@@ -44,11 +38,8 @@ export const Bubble = ({ children, gap = 6, wide }: { children: React.ReactNode;
   )
 }
 
-/** `ul.mdul`: a marked list in the bot's bubble (ChatPh3Review, ChatPh3Boost, ChatPh4Quality, and the closing summaries of ChatDone*, ChatPh6Apply). */
 export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: string; hitsBefore?: number[] }) => {
   const c = useColors()
-  // A row's text is measured against the row's width before the dot and the gap are taken off, then shrunk without a re-wrap, so its lines ran into the bubble's padding:
-  // the number it may use is given to it.
   const textMax = useBotBubbleMax() - BUBBLE_PAD_X * 2 - BULLET_LEAD
   return (
     <View style={{ gap: 2 }}>
@@ -62,7 +53,6 @@ export const BulletList = ({ items, markId, hitsBefore }: { items: string[]; mar
   )
 }
 
-// `ol.mdol`: the text column starts at x59 (padding 22 + 2); the device's WebKit draws the number at the left of that 24 column (x35), not beside the text.
 const NUMBER_COL = 24
 
 const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => (
@@ -71,7 +61,6 @@ const NumberMark = ({ n, color = 't1' }: { n: number; color?: 't1' | 't3' }) => 
   </View>
 )
 
-/** An ordered list in the bot's bubble: its number, then the line, 2 apart and 2 under the line above (ChatPh2XBlueprints). */
 export const NumberedList = ({ items, markId, hitsBefore }: { items: string[]; markId?: string; hitsBefore?: number[] }) => {
   const textMax = useBotBubbleMax() - BUBBLE_PAD_X * 2 - NUMBER_COL
   return (
@@ -86,7 +75,6 @@ export const NumberedList = ({ items, markId, hitsBefore }: { items: string[]; m
   )
 }
 
-/** The lines of a block that draw find marks, in render order. */
 const markedLines = (block: BotTextBlock): string[] =>
   block.kind === 'paragraph' || block.kind === 'heading' ? [block.text] : block.kind === 'ordered' || block.kind === 'bullets' || block.kind === 'list' ? block.items : []
 
@@ -96,7 +84,6 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
   const xl = useXlBoardText()
   const big = xl ? { style: XL_LINE, allowFontScaling: false } : null
   const { query } = useContext(FindHighlight)
-  // 채팅에서 찾기: the hits the lines above one hold, so the line with the current hit is the one drawn as current.
   const blocks = splitBotText(item.text)
   const lines = blocks.flatMap(markedLines)
   const above = hitsBefore(lines.map(plainOf), query)
@@ -130,7 +117,6 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
         ) : block.kind === 'ordered' ? (
           <NumberedList key={i} items={block.items} markId={item.id} hitsBefore={block.items.map((_, n) => above[first[i]! + n]!)} />
         ) : (
-          // The bubble's own gap is 6; the board's `.cthread ul{margin:4px 0 0}` adds 4 on top of `.mc{gap:6}` = 10 (ChatBotHeader y245 -> y255).
           <View key={i} style={{ gap: spacing[1], marginTop: spacing[1] }}>
             {block.items.map((line, n) => (
               <Rich key={line} v="b1" text={line} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
@@ -140,7 +126,6 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
       )}
       {item.undo ? <ProfileUndo changeId={item.undo} /> : null}
       {item.detail ? <Detail text={item.detail} /> : null}
-      {/* The closing line's summary is the dotted list of the v489 boards (ChatDone, ChatDoneNext, ChatDoneProfile, ChatDoneNoJob, ChatDoneSaveFail). */}
       {item.bullets?.length ? <BulletList items={item.bullets} markId={item.id} /> : null}
       {item.sources?.length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10, rowGap: 6 }}>
@@ -150,7 +135,6 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
           {item.sources.map((source) => (
             <Pressable key={`${source.kind}-${source.id}`} accessibilityRole="link" onPress={() => router.push(materialDetailPath(source.kind, source.id))}>
               <FindText itemId={`${item.id}:source`} v="c1" allowFontScaling={!xl} style={{ fontSize: 14, lineHeight: 20, textDecorationLine: 'underline', textDecorationColor: c.deco }}>
-                {/* Searchable like the text (ChatBotHeaderFind draws "…pdf" marked); a source mark is never the current hit, as the board draws it. */}
                 <Marked text={displayName(source.title)} itemId={`${item.id}:source`} />
               </FindText>
             </Pressable>

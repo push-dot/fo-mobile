@@ -19,7 +19,6 @@ export type SignInOutcome =
 
 const applyAuthResult = async (result: AuthResult): Promise<SignInOutcome> => {
   if (!('accessToken' in result)) return { kind: 'phone', pendingToken: result.pendingToken }
-  // Same gate as the phone code screen: a stale or missing terms version stays signed out until consent.
   const consent = await api.me.consents(result.accessToken)
   if (needsTerms(consent)) {
     usePhoneAuth.getState().hold(result)
@@ -67,7 +66,6 @@ export const signInWithApple = async (): Promise<SignInOutcome> => {
   }
 }
 
-// App Store guideline 5.1.1(v): an Apple account re-authorizes so the server can revoke the Sign in with Apple grant.
 const appleAuthorizationCode = async (): Promise<string | undefined> => {
   if (Platform.OS !== 'ios') return undefined
   const me = await api.auth.me()

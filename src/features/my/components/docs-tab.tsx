@@ -33,7 +33,6 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
   const reading = !!doc.jobId && (!job || !isJobSettled(job))
   const failed = doc.status === 'FAILED' || job?.status === 'FAILED' || job?.status === 'DEAD'
   const retry = () => {
-    // shortcut: no re-ingest route; refetch the job and the file list.
     void qc.invalidateQueries({ queryKey: ['ai-job', doc.jobId] })
     void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
   }
@@ -78,7 +77,6 @@ const DocRow = ({ doc, live }: { doc: MySource; live: boolean }) => {
         onPress={openMenu}
         style={{ width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' }}
       >
-        {/* MyResume: iOS draws the three-line menu glyph in t1, Android the three dots in t3 */}
         {Platform.OS === 'ios' ? <Icon name="sort" size={22} color="t1" /> : <Icon name="more" size={20} color="t3" />}
       </Pressable>
     </Row>
@@ -235,7 +233,6 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
               accessibilityRole="button"
               accessibilityLabel="취소"
               onPress={cancel}
-              // Uploading: the 취소 button is a fill circle on iOS only (r6 rule); Android draws the bare glyph. The glyph is 18.
               style={{ width: HIT, height: HIT, borderRadius: HIT / 2, backgroundColor: Platform.OS === 'ios' ? c.fill : undefined, alignItems: 'center', justifyContent: 'center' }}
             >
               <Icon name="x" size={18} color="t3" />
@@ -248,7 +245,6 @@ const DocsTab = ({ top = 0, onScroll, lead }: ScrollUnderBar) => {
           <View style={{ paddingTop: spacing[5], paddingHorizontal: spacing[5] }}>
             <Button
               label="파일 등록"
-              // The Uploading board keeps the CTA drawn live while a file goes up; the app holds one upload at a time, so a tap waits.
               onPress={() => !upload && showImportMenu()}
             />
           </View>

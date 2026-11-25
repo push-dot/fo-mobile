@@ -33,7 +33,6 @@ const ArchivedRow = ({ count }: { count: number }) => (
   </View>
 )
 
-// The board lifts the empty state by 40pt; the footer note ends the list with no extra gap (ProposalInbox).
 const LIST_END = 40
 
 const OffersScreen = () => {

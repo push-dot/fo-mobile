@@ -7,24 +7,17 @@ export type SegmentedControlProps<K extends string> = {
   items: { key: K; label: string }[]
   value: K | null
   onChange: (k: K) => void
-  /** The 196 x 34 control Settings draws for the theme row (same on iOS and Android); the default is the 44pt full-width one. */
   compact?: boolean
-  /** The 40pt control the quick-start sheets draw. Only iOS reads it; the prop lives here because iOS imports this shared type. */
   slim?: boolean
 }
 
 const INSET = spacing[1]
 
-// The boards draw the full-width control as a tab list and Settings' compact theme picker as a radio group.
 const VARIANT = {
   regular: { height: 44, width: undefined, group: 'tablist', item: 'tab', state: (on: boolean) => ({ selected: on }) },
   compact: { height: COMPACT_HEIGHT, width: COMPACT_WIDTH, group: 'radiogroup', item: 'radio', state: (on: boolean) => ({ checked: on }) },
 } as const
 
-/**
- * Android: the boards' `.seg`, a flat `fill` pill track with a raised `bg` (dark: `fill2`) selected segment.
- * Material 3 segmented buttons draw square middle cells, a border per cell and a check icon, none of which the boards have.
- */
 const SegmentedControl = <K extends string,>({ items, value, onChange, compact }: SegmentedControlProps<K>) => {
   const c = useColors()
   const dark = useThemeMode() === 'dark'

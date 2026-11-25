@@ -8,9 +8,7 @@ export type WheelPickerProps = {
   value: string
   onChange: (key: string) => void
   accessibilityLabel: string
-  /** One of two wheels side by side (시·도 and 구 in the job filter) instead of a full-width picker. */
   columns?: boolean
-  /** iOS: a 120pt wheel for a list of three or fewer (SettingsLanguage), so the modal is as high as its content. */
   short?: boolean
 }
 
@@ -19,7 +17,6 @@ export const WHEEL_HEIGHT = { full: 180, columns: 150, short: 120 } as const
 const ROW = 38
 const PAD = (WHEEL_HEIGHT.columns - ROW) / 2
 
-/** Android's single-choice list as SettingsLanguage draws it (.pm8 .pm-row): 50 high rows split by a hairline, a bold accent ✓ after the chosen one. */
 const RadioList = ({ items, value, onChange, accessibilityLabel }: WheelPickerProps) => {
   const c = useColors()
   return (
@@ -56,7 +53,6 @@ const RadioList = ({ items, value, onChange, accessibilityLabel }: WheelPickerPr
   )
 }
 
-// shortcut: Android has no wheel in the Compose set @expo/ui ships, so side-by-side wheels are a snapping list with a selection band.
 const SnapWheel = ({ items, value, onChange, accessibilityLabel }: WheelPickerProps) => {
   const c = useColors()
   const ref = useRef<ComponentRef<typeof ScrollView>>(null)

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { ScrollView } from 'react-native'
 import { spacing } from '../../theme'
 
-/** A horizontal row of chips (flat fills, no shadow to make room for). */
 const ChipRow = ({ children, paddingTop = 0, paddingBottom = 0 }: { children: ReactNode; paddingTop?: number; paddingBottom?: number }) => (
   <ScrollView
     horizontal

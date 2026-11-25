@@ -3,7 +3,6 @@ export const MARKETING_COPY = {
   sub: '할인, 이벤트, 새 기능 소식을 보내 드려요',
 } as const
 
-// 정보통신망법 §50⑦: tell the user who processed the change, when, and the result.
 export const marketingResult = (on: boolean, iso: string | null, now = new Date()) => {
   const d = iso ? new Date(iso) : now
   const day = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`

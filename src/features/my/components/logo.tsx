@@ -5,7 +5,6 @@ import { onAccent, radius, useColors } from '../../../theme'
 
 const LOGO_RADIUS: Record<number, number> = { 44: 14, 48: 15, 56: 16 }
 
-/** `mono`: the proposal boards draw the sender's company tile black like a person's avatar. */
 const Logo = ({ name, size = 48, mono }: { name: string; size?: number; mono?: boolean }) => {
   const c = useColors()
   return (

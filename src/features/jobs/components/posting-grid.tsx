@@ -14,12 +14,10 @@ type Props = {
   filters: PostingFilters
   header?: ReactElement
   onReset?: () => void
-  /** Space for a header floating over the list, and its scroll listener. */
   topInset?: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-// The grid pads its content by 20pt; the header, the empty state and the spinner run edge to edge.
 const bleed = { marginHorizontal: -spacing[5] }
 
 const Gap = () => <View style={{ height: 22 }} />
@@ -42,7 +40,6 @@ const PostingGrid = ({ filters, header, onReset, topInset = 0, onScroll }: Props
       numColumns={2}
       recycleItems
       estimatedItemSize={cardWidth * 0.68 + 80}
-      // The screen's ScreenBar floats over the list and passes its own height as topInset; an automatic inset would add the status bar on top of it (61pt after a sheet was dismissed).
       contentInsetAdjustmentBehavior="never"
       ListHeaderComponent={header}
       ListHeaderComponentStyle={bleed}

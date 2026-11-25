@@ -13,7 +13,6 @@ const CHECK_SIZE = 18
 
 type Props = { actions: MenuAction[] | MenuSection[]; open: boolean; onClose: () => void; children: React.ReactElement }
 
-/** Android: Material 3 dropdown anchored over its trigger; the overlay passes touches to the trigger. */
 const MenuAnchor = ({ actions, open, onClose, children }: Props) => {
   const c = useColors()
   const sections = menuSections(actions)

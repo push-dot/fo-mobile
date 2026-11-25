@@ -26,7 +26,6 @@ const lcsLength = (a: string[], b: string[]) => {
   return row[b.length]!
 }
 
-/** Words the edit kept but moved: in both lines, outside the longest common run, in a line that is mostly the old one reordered (Java · Spring Boot · MySQL · Kafka → Kafka · Kotlin · Spring Boot · MySQL). */
 const movedWords = (text: string, before: string) => {
   const now: string[] = text.match(WORD) ?? []
   const old: string[] = before.match(WORD) ?? []
@@ -35,7 +34,6 @@ const movedWords = (text: string, before: string) => {
   return new Set(now.filter((w) => old.includes(w) && lcsLength(old.filter((o) => o !== w), now.filter((n) => n !== w)) === common))
 }
 
-/** What the edit changed in a line, against the removed text it replaces: a number that is new or moved (320ms → 140ms, 99.98%) and a word that moved (Kafka). With nothing removed before it, nothing is bold. */
 export const strongParts = (text: string, before?: string): ReviewPart[] => {
   if (!before) return [{ text }]
   const marks: { start: number; end: number }[] = []
@@ -60,7 +58,6 @@ export const strongParts = (text: string, before?: string): ReviewPart[] => {
   return parts.length ? parts : [{ text }]
 }
 
-/** The document is markdown lines: "# name", "## section", "- bullet". A diff line may hold several lines (before/after are sent as one block). */
 export const reviewRows = (lines: readonly DiffLine[]): ReviewRow[] => {
   const rows: ReviewRow[] = []
   for (const line of lines) {

@@ -4,10 +4,8 @@ import { Icon, Text } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
 import { radius, spacing, userBubbleChipFill, userBubbleFill, useThemeMode } from '../../../theme'
 
-/** The board's .att chip (c1 600) sits in the bubble's 23 line under 8/10 padding, so it stands 39 high (ChatErrUpload). */
 const CHIP_TEXT = { lineHeight: 23, flexShrink: 1 } as const
 
-/** `minWidth` is the bubble's max width once its text wraps: a wrapped CSS box fills its max-width, a native Text box hugs its longest line. */
 const UserBubbleView = ({ children, attachment, minWidth }: { children: ReactNode; attachment?: string; minWidth?: number }) => {
   const mode = useThemeMode()
   return (

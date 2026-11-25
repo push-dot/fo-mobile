@@ -15,7 +15,6 @@ type Props = {
   draft: Filters
   trending: string[]
   onChange: (filters: Filters) => void
-  /** A header over one chip group: the native sheet's 52pt header with the chips right under it. */
   compact?: boolean
   scroll?: { maxHeight: number; onLayout: (e: LayoutChangeEvent) => void }
 }
@@ -35,7 +34,6 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
     ) : (
       <FilterRegions draft={draft} onToggle={(v) => set(toggleRegion(draft.location, v))} maxHeight={scroll?.maxHeight} onLayout={scroll?.onLayout} />
     )
-  // iOS chip and skill sheets are the board's .isheet: the 52pt .inav, then the groups with no gap (each .ihead carries its own 14 and 6).
   const isheet = ios && kind !== 'location'
   const reset = () => set(EMPTY[kind])
   return (
@@ -49,7 +47,6 @@ const FilterSheetBody = ({ kind, draft, trending, onChange, compact, scroll }: P
             {FILTER_TITLES[kind]}
           </Text>
           <Pressable accessibilityRole="button" onPress={reset} hitSlop={{ ...hitSlopTo(type.c1.lineHeight), left: 12, right: 12 }} style={{ width: REGION_SLOT, alignItems: 'flex-end' }}>
-            {/* The region sheet (.sheet2.rg) draws 13 regular in the accent; Android keeps the bold accent. */}
             <Text v="c1" weight={ios ? '400' : '700'} color={ios ? 'ac' : 'acText'}>
               초기화
             </Text>

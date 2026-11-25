@@ -36,7 +36,6 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const { data: p } = usePostingDetail(item?.jobId)
   const docs = useDocuments()
   const toggleBookmark = useToggleBookmark()
-  // The résumé of this application; a paged list may not hold it, so the stored fit's document is the fallback.
   const docId = docs.data?.data.find((d) => d.applicationId === id)?.id ?? detail?.fit?.documentId
   const career = p ? careerLabel(p) : null
   const fit = appliedFit(item?.fitScore, detail?.fit)

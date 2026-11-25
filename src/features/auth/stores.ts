@@ -35,7 +35,6 @@ export const usePhoneAuth = create<PhoneDraft>((set) => ({
   ...blank,
   beginSocial: (pendingToken, email, provider) => set({ ...blank, mode: 'social', pendingToken, email, provider }),
   beginPhone: () => set({ ...blank, mode: 'phone' }),
-  // A code was sent to the old number only: a different number has none, so the code screen stays closed until one is sent.
   setDigits: (digits) => set((s) => (digits === s.digits ? s : { digits, cooldownEndsAt: null })),
   setCooldown: (cooldownEndsAt) => set({ cooldownEndsAt }),
   hold: (held) => set({ held }),

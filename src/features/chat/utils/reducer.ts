@@ -15,7 +15,6 @@ const upsert = (items: ChatItem[], item: ChatItem) => {
   return next
 }
 
-/** Adds messages to one surface (an answer's patches). */
 const patchSurface = (items: ChatItem[], surfaceId: string, patch: (item: SurfaceItem) => SurfaceItem['messages']) =>
   items.map((x) => (x.type === 'surface' && x.id === surfaceId ? { ...x, messages: [...x.messages, ...patch(x)] } : x))
 
@@ -26,13 +25,11 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     case 'status':
       return { ...s, working: { verbs: e.verbs, startedAt: s.working?.startedAt ?? s.runStartedAt ?? Date.now() } }
     case 'token': {
-      // Real SSE sends text in pieces: grow the last agent line until something else lands after it.
       const last = s.items[s.items.length - 1]
       if (last?.type === 'agentText' && !last.undo) return { ...s, items: [...s.items.slice(0, -1), { ...last, text: last.text + e.text }] }
       return { ...s, items: [...s.items, { type: 'agentText', id: `tok-${s.items.length}`, text: e.text }] }
     }
     case 'sources': {
-      // Only a bot line of the turn that just ended can cite sources.
       const at = s.items.findLastIndex((x) => x.type === 'agentText' || x.type === 'user')
       const line = s.items[at]
       if (!e.sources.length || line?.type !== 'agentText') return s
@@ -49,7 +46,6 @@ export const applyEvent = (s: ChatState, e: ChatEvent): ChatState => {
     case 'dequeue':
       return { ...s, queue: s.queue.slice(1) }
     case 'stop': {
-      // The cancel POST and the server's `cancelled` frame both report one stop.
       const last = s.items[s.items.length - 1]
       const items = last?.type === 'notice' && last.notice.kind === 'stopped' ? s.items.slice(0, -1) : s.items
       return {

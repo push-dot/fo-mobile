@@ -17,7 +17,6 @@ export type CalendarEvent = {
 
 export type FitPartKey = 'techStack' | 'experienceLink' | 'careerLevel' | 'keyword' | 'domain'
 
-/** push-be GET /applications/{id}. `fit` is the stored posting fit of the applied document, absent until one was run. */
 export type ApplicationDetail = Application & {
   stageEnteredAt?: Partial<Record<ApplicationStage, string>>
   fit?: {
@@ -79,5 +78,4 @@ export type ActivitySub = 'applications' | 'calendar' | 'bookmarks' | 'follows' 
 
 export type OfferPerson = UserRef & { companyName?: string | null; headline?: string; kind?: 'PERSON' | 'COMPANY' }
 
-/** A tab scrolling under the floating header of the 마이 screen: `top` clears it, `onScroll` tells it when to draw the fade. */
-export type ScrollUnderBar = { top?: number; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void; /** Scrolls with the content, above it (the 마이 tab row). */ lead?: ReactNode }
+export type ScrollUnderBar = { top?: number; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void; lead?: ReactNode }

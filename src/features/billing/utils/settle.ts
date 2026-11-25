@@ -39,7 +39,6 @@ export const outcomeFromCode = (code: string | undefined): PurchaseFeedback => {
   return { kind: 'failed', message: IAP_FAILED_MESSAGE }
 }
 
-// Servers before push-be #246 send no paymentsEnabled and keep payments open; no account data at all (loading, error) stays closed.
 export const paymentsOpen = (status: { paymentsEnabled?: boolean } | undefined) => status !== undefined && status.paymentsEnabled !== false
 
 export const verifyFailedMessage = (error: unknown) =>

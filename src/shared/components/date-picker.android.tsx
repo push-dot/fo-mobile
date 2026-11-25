@@ -10,19 +10,16 @@ import Text from './text'
 export type DatePickerProps = {
   value: Date | null
   onChange: (date: Date) => void
-  /** Accessibility label; also the placeholder on Android while value is null. */
   label: string
   mode?: 'date' | 'time' | 'month'
   min?: Date
   max?: Date
-  /** Field background: 'fill' on sheets, 'bg' inside bg2 cards, 'bg2' inside bg cards. */
   surface?: 'fill' | 'bg' | 'bg2'
   minHeight?: number
 }
 
 const FORMAT = { date: formatDay, time: formatTime, month: formatMonth }
 
-/** Android: a field that opens the Material 3 date or time dialog. Month mode keeps year and month of the picked day. */
 const DatePicker = ({ value, onChange, label, mode = 'date', min, max, surface = 'fill', minHeight = 48 }: DatePickerProps) => {
   const c = useColors()
   const [open, setOpen] = useState(false)

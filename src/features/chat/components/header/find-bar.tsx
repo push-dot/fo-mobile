@@ -8,7 +8,6 @@ const ios = Platform.OS === 'ios'
 
 type Props = { query: string; label: string; onQuery: (q: string) => void; onStep: (step: FindStep) => void; onClose: () => void }
 
-/** Takes the place of the header pill (ChatBotHeaderFind). */
 export const FindBar = ({ query, label, onQuery, onStep, onClose }: Props) => {
   const c = useColors()
   useHardwareBack(onClose)

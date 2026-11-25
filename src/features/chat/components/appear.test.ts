@@ -28,7 +28,7 @@ describe('playAppear', () => {
     const order: string[] = []
     const first = playAppear(v, { still: false, reduce: false }, () => ({ stop: () => order.push('stop') }))
     v.setValue.mockImplementation(() => order.push('set 1'))
-    first?.() // the effect's cleanup when `reduce` flips
+    first?.()
     playAppear(v, { still: false, reduce: true }, vi.fn())
     expect(order).toEqual(['stop', 'set 1'])
   })

@@ -12,7 +12,6 @@ export const useSearch = <T extends SearchTab>(q: string, type: T, sort: SearchS
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
     enabled: searchEnabled(q, active),
-    // keeps the tab counts on screen while the next query loads (the HomeLoading search board draws them)
     placeholderData: keepPreviousData,
   })
 

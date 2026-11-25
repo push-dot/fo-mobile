@@ -2,7 +2,6 @@ import { Pressable } from 'react-native'
 import { Icon, Text } from '../../../shared/components'
 import { radius, spacing, useColors } from '../../../theme'
 
-// FilterRegion: the selected row is the soft accent fill with black bold text, count and check (owner rule 3: the accent is the fill only).
 const FilterRow = ({ label, count, on, check, onPress }: { label: string; count: string; on: boolean; check?: boolean; onPress: () => void }) => {
   const c = useColors()
   return (

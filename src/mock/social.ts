@@ -1,4 +1,3 @@
-// Mock routes for the social area. Owned by that area's screens.
 import type { Comment, Post, PostCategory, UserRef } from '@push/api-client'
 import { MOCK_USER_ID, mock, page, sortPosts } from './server'
 
@@ -23,7 +22,6 @@ const seed: Omit<Post, 'id' | 'createdAt'>[] = [
   { author: subin, category: 'marketing', title: '첫 퍼포먼스 광고 집행 회고', body: '예산 200만 원으로 2주 동안 돌려 본 결과를 공유해요. 생각보다 크리에이티브가 중요했어요.', imageUrls: [], commentCount: 5, viewCount: 88 },
 ]
 
-// Repeat the seed so the infinite feed has a few pages.
 const posts: Post[] = Array.from({ length: 28 }, (_, i) => ({
   ...seed[i % seed.length]!,
   id: `post-${i + 1}`,
@@ -47,7 +45,6 @@ export const emptyFeed = () => {
   feedEmpty = true
 }
 
-// Posts the reader saved, newest save first (push-be post_saves); two are saved from the start so 저장한 글 has rows.
 const savedIds = ['post-3', 'post-5']
 const withSaved = (p: Post): Post => ({ ...p, saved: savedIds.includes(p.id) })
 
@@ -110,7 +107,6 @@ mock('POST', 'posts/:id/comments', ({ params, body }) => {
   return { status: 201, body: { data: c } }
 })
 
-// FormData body isn't inspected; every upload gets a placeholder image.
 mock('POST', 'uploads/images', () => {
   const key = `img-${++seq}`
   uploads.set(key, img(key))

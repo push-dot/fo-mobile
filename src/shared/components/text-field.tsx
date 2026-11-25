@@ -7,7 +7,6 @@ import Icon from './icon'
 import { inputMetrics, iosLineBox } from './text-field-metrics'
 import Text from './text'
 
-/** `compact`: the 48pt `.field` some boards draw instead of the 56pt default. `slim`: the iOS filter sheet's 40pt `.isearch` (17pt text, 12pt side padding). */
 type Props = TextInputProps & { icon?: IconName; label?: string; max?: number; variant?: 'field' | 'search'; compact?: boolean; slim?: boolean; trailing?: ReactNode; minHeight?: number }
 
 const TextField = ({ icon, label, max, multiline, value, style, variant = 'field', compact, slim, trailing, minHeight, ...rest }: Props) => {
@@ -15,7 +14,6 @@ const TextField = ({ icon, label, max, multiline, value, style, variant = 'field
   const { fontScale } = useWindowDimensions()
   const search = variant === 'search'
   const dark = useThemeMode() === 'dark'
-  // Rule 27 (note 264): a search or filter input is the iOS glass input.
   const glass = Platform.OS === 'ios' && (search || icon === 'search')
   const Surface = glass ? GlassField : View
   return (

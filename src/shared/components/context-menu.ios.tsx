@@ -5,14 +5,9 @@ import MenuButtons from './menu-buttons'
 import { useColors } from '../../theme'
 import NativeHost from './native-host'
 
-/**
- * iOS: UIContextMenu on long press, lifting the row or the given preview. Tap still runs onPress.
- * SwiftUI hands the trigger its ideal width, so a long name would push the row past the screen: the hosted row is capped at the window's width.
- */
 const ContextMenu = ({ actions, accessibilityLabel, onPress, preview, children }: ContextMenuProps) => {
   const { width } = useWindowDimensions()
   return (
-    // Without ignoreSafeArea the hosted row stops at the status bar while the list keeps scrolling, so a header row (Push Bot) overlaps the first row.
     <NativeHost matchContents={{ vertical: true }} ignoreSafeArea="all" seedColor={useColors().t1}>
       <SwiftContextMenu>
         <SwiftContextMenu.Items>

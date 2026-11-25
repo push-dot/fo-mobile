@@ -11,7 +11,6 @@ export const fetchBotProfile = async (address: BotAddress) => toBotProfile(await
 
 export const searchBots = async (q: string) => toBotSearch((await botApi.bots.search(q)).data)
 
-/** The caller's bot for the company of a posting, or null. The server decides what "same company" means. */
 export const findBotForPosting = async (postingId: string) => toBots((await botApi.bots.list({ postingId })).data)[0] ?? null
 
 export const checkLink = async (url: string) => toLinkCheck(await botApi.bots.linkPreview(url))
