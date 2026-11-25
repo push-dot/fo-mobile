@@ -95,3 +95,9 @@ export type BotRow = {
   time: string
   accessibilityLabel: string
 }
+
+export type ScheduleCadence = BotContract.BotScheduleCadence
+
+export type BotSchedule = { id: string; prompt: string; cadence: ScheduleCadence; hour: number; weekday: number | null; enabled: boolean; lastError: string | null }
+
+export type NewSchedule = { prompt: string; cadence: ScheduleCadence; hour: number; weekday?: number }

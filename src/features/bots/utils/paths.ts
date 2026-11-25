@@ -6,6 +6,7 @@ export const botChatAtPath = (id: BotId, messageId: string) => `/bots/${id}?at=$
 export const botProfilePath = (id: BotId) => `/bots/${id}/profile` as const
 export const botCompaniesPath = (id: BotId) => `/bots/${id}/companies` as const
 export const botAllowedPath = (id: BotId) => `/bots/${id}/allowed` as const
+export const botSchedulesPath = (id: BotId) => `/bots/${id}/schedules` as const
 export const botColorPath = (id: BotId) => `/bots/${id}/color` as const
 export const botNewPath = (postingId?: string) => (postingId ? (`/bots/new?posting=${postingId}` as const) : ('/bots/new' as const))
 export const botPickPath = (a: Pick<Attachment, 'kind' | 'id'>) => `/materials/pick?kind=${a.kind}&id=${a.id}` as const

@@ -1,9 +1,9 @@
 import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import { ApiError } from '@push/api-client'
-import type { Bot, BotAddress, BotColor, BotId, BotLimit, BotProfile, CompanyBot } from '../types'
+import type { Bot, BotAddress, BotColor, BotId, BotLimit, BotProfile, BotSchedule, CompanyBot, NewSchedule } from '../types'
 import { pollIntervalOf } from '../utils/live-state'
-import { createBot, deleteBot, fetchBotProfile, fetchBots, markBotRead, revokeAllowedSite, searchBots, updateBot } from './fetchers'
+import { createBot, createSchedule, deleteBot, deleteSchedule, fetchBotProfile, fetchBots, fetchSchedules, markBotRead, revokeAllowedSite, searchBots, setScheduleEnabled, updateBot } from './fetchers'
 
 type BotList = { bots: Bot[]; limit: BotLimit | undefined }
 
@@ -150,4 +150,58 @@ export const useMarkBotRead = () => {
     onError: (_error, _bot, before) => before && restore(qc, before),
   })
   return async (bot: Bot) => void (await m.mutateAsync(bot))
+}
+
+const schedulesKey = (id: BotId) => [...BOTS, 'schedules', id] as const
+
+export const useBotSchedules = (id: BotId | undefined) => {
+  const q = useQuery({ queryKey: schedulesKey(id ?? ('' as BotId)), queryFn: () => fetchSchedules(id!), enabled: id !== undefined })
+  return { data: q.data, isLoading: q.isLoading, isError: q.isError, refetch: () => void q.refetch() }
+}
+
+export const useCreateSchedule = (id: BotId) => {
+  const qc = useQueryClient()
+  const m = useMutation({
+    mutationFn: (body: NewSchedule) => createSchedule(id, body),
+    onSuccess: (made) => qc.setQueryData<BotSchedule[]>(schedulesKey(id), (prev) => [...(prev ?? []), made]),
+  })
+  return { create: m.mutateAsync, isPending: m.isPending }
+}
+
+const useScheduleEdit = <V extends { scheduleId: string }>(
+  id: BotId,
+  send: (vars: V) => Promise<unknown>,
+  edit: (list: BotSchedule[], vars: V) => BotSchedule[],
+) => {
+  const qc = useQueryClient()
+  const key = schedulesKey(id)
+  return useMutation({
+    mutationFn: send,
+    onMutate: async (vars: V) => {
+      await qc.cancelQueries({ queryKey: key })
+      const before = qc.getQueryData<BotSchedule[]>(key)
+      qc.setQueryData<BotSchedule[]>(key, (prev) => prev && edit(prev, vars))
+      return before
+    },
+    onError: (_error, _vars, before) => qc.setQueryData(key, before),
+    onSettled: () => qc.invalidateQueries({ queryKey: key }),
+  }).mutateAsync
+}
+
+export const useToggleSchedule = (id: BotId) => {
+  const toggle = useScheduleEdit(
+    id,
+    ({ scheduleId, enabled }: { scheduleId: string; enabled: boolean }) => setScheduleEnabled(id, scheduleId, enabled),
+    (list, { scheduleId, enabled }) => list.map((s) => (s.id === scheduleId ? { ...s, enabled } : s)),
+  )
+  return async (scheduleId: string, enabled: boolean) => void (await toggle({ scheduleId, enabled }))
+}
+
+export const useDeleteSchedule = (id: BotId) => {
+  const remove = useScheduleEdit(
+    id,
+    ({ scheduleId }: { scheduleId: string }) => deleteSchedule(id, scheduleId),
+    (list, { scheduleId }) => list.filter((s) => s.id !== scheduleId),
+  )
+  return async (scheduleId: string) => void (await remove({ scheduleId }))
 }

@@ -1,6 +1,6 @@
 import { botApi } from '@/shared/infrastructure'
-import type { BotAddress, BotColor, BotId, CreateBotResult, NewBot } from '../types'
-import { toBotProfile, toBotSearch, toBots, toCompanyBot, toLinkCheck, toOneBot } from './schemas'
+import type { BotAddress, BotColor, BotId, CreateBotResult, NewBot, NewSchedule } from '../types'
+import { toBotProfile, toBotSchedule, toBotSearch, toBots, toCompanyBot, toLinkCheck, toOneBot } from './schemas'
 
 export const fetchBots = async () => {
   const res = await botApi.bots.list()
@@ -28,3 +28,11 @@ export const deleteBot = (id: BotId) => botApi.bots.remove(id)
 export const revokeAllowedSite = (id: BotId, host: string) => botApi.bots.revokeSite(id, host)
 
 export const markBotRead = (address: BotAddress) => botApi.bots.markRead(address)
+
+export const fetchSchedules = async (id: BotId) => (await botApi.bots.schedules(id)).map(toBotSchedule)
+
+export const createSchedule = async (id: BotId, body: NewSchedule) => toBotSchedule(await botApi.bots.createSchedule(id, body))
+
+export const setScheduleEnabled = async (id: BotId, scheduleId: string, enabled: boolean) => toBotSchedule(await botApi.bots.updateSchedule(id, scheduleId, { enabled }))
+
+export const deleteSchedule = (id: BotId, scheduleId: string) => botApi.bots.removeSchedule(id, scheduleId)

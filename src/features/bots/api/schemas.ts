@@ -1,5 +1,5 @@
 import type { BotContract } from '@push/api-client'
-import type { AllowedSite, Bot, BotActivity, BotOutcome, BotId, BotProfile, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
+import type { AllowedSite, Bot, BotActivity, BotOutcome, BotId, BotProfile, BotSchedule, BotSearch, CardId, CompanyBot, LinkCheck } from '../types'
 import { colorOf, dateOf, dayOf, toBotRef } from '../utils/wire'
 
 
@@ -87,4 +87,14 @@ export const toBotSearch = (dto: BotContract.BotSearch): BotSearch => ({
     return at ? [{ bot: toBotRef(m.bot), messageId: m.messageId, at, fromBot: m.role === 'ASSISTANT', snippet: m.snippet }] : []
   }),
   messageTotal: dto.messageTotal,
+})
+
+export const toBotSchedule = (dto: BotContract.BotSchedule): BotSchedule => ({
+  id: dto.id,
+  prompt: dto.prompt,
+  cadence: dto.cadence,
+  hour: dto.hour,
+  weekday: dto.weekday,
+  enabled: dto.enabled,
+  lastError: dto.lastError,
 })
