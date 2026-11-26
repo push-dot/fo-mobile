@@ -11,7 +11,6 @@ import {
   parseYm,
   toDayParam,
   ymToDate,
-  stageTone,
   postedAt,
   timeAgo,
   toResumeDraft,
@@ -85,11 +84,9 @@ describe('my lib', () => {
   })
 
   it('maps stages and offer states to badges', () => {
-    expect(stageTone('INTERVIEW')).toBe('orange')
-    expect(stageTone('APPLIED')).toBe('grey')
-    expect(offerBadge({ status: 'SENT' }, 'received')).toEqual({ label: '새 제안', tone: 'ac' })
+    expect(offerBadge({ status: 'SENT' }, 'received')).toEqual({ label: '새 제안', solid: false })
     expect(offerBadge({ status: 'READ' }, 'sent').label).toBe('읽음')
-    expect(offerBadge({ status: 'ACCEPTED' }, 'sent').tone).toBe('green')
+    expect(offerBadge({ status: 'ACCEPTED' }, 'sent')).toEqual({ label: '수락함', solid: true })
   })
 
   it('ymToDate parses 2022.03 to March 2022', () => {

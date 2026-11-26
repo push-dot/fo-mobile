@@ -188,7 +188,7 @@ const LimitBody = ({ limit }: { limit: BotLimit | undefined }) => {
             <Text v="b1" weight="700">
               {row.plan}
             </Text>
-            {row.current ? <Badge label={CURRENT_PLAN} tone="grey" /> : null}
+            {row.current ? <Badge label={CURRENT_PLAN} /> : null}
             <Text v="b1" weight="700" color="t2" style={styles.planValue}>
               {row.value}
             </Text>

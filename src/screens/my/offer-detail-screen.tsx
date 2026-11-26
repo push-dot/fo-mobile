@@ -77,7 +77,7 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
               <Text v="h3" accessibilityRole="header" numberOfLines={1} style={styles.name}>
                 {who.displayName}
               </Text>
-              <Badge label={badge.label} tone={badge.tone} />
+              <Badge label={badge.label} solid={badge.solid} />
             </View>
             {personLine(who) ? (
               <Text v="c1" color="t3">

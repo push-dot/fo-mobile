@@ -7,7 +7,7 @@ import { spacing } from '../../../theme'
 import { useAppliedApplications, useMyFollowers, useMyFollows, usePostsList } from '../api/hooks'
 import { ACTIVITY_LIST_PAD, FOLLOW_PREVIEW, POST_CATEGORIES, POST_PREVIEW } from '../constants'
 import type { ActivitySub, ScrollUnderBar } from '../types'
-import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageBadge, stageTone } from '../utils'
+import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageBadge, stageSolid } from '../utils'
 import ActivityBookmarks from './activity-bookmarks'
 import CalendarView from './calendar-view'
 import Empty, { TAB_EMPTY_LIFT } from './empty'
@@ -59,7 +59,7 @@ const Applications = () => {
               {a.company} · {monthDay(a.appliedAt ?? a.createdAt)}
             </Text>
           </View>
-          <Badge label={stageBadge(a.stage)} tone={stageTone(a.stage)} />
+          <Badge label={stageBadge(a.stage)} solid={stageSolid(a.stage)} />
         </Row>
       ))}
     </>

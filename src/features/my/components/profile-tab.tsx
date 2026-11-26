@@ -76,8 +76,8 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
           </Text>
         ) : null}
         <View style={styles.badges}>
-          {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} tone="grey" /> : null}
-          {status ? <Badge label={status} tone="grey" /> : null}
+          {job || p.tenureYears != null ? <Badge label={[job, tenureLabel(p.tenureYears)].filter(Boolean).join(' · ')} /> : null}
+          {status ? <Badge label={status} /> : null}
         </View>
         <View style={styles.counts}>
           {(
@@ -159,7 +159,7 @@ const ProfileTab = ({ share = true, onExport, exporting }: { share?: boolean; on
         ) : (
           <View style={styles.skills}>
             {p.skills.map((s) => (
-              <Badge key={s} label={s} tone="grey" />
+              <Badge key={s} label={s} />
             ))}
           </View>
         )}
