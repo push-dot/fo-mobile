@@ -24,8 +24,8 @@ describe('home snapshot hydrate', () => {
     expect(qc.getQueryState(['postings', 'home', 'latest'])?.dataUpdatedAt).toBe(HYDRATED_QUERY_UPDATED_AT)
     expect(Date.now() - (qc.getQueryState(['postings', 'home', 'latest'])?.dataUpdatedAt ?? 0)).toBeGreaterThan(30_000)
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['postings', 'home'] })
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['notifications'] })
-    expect(qc.getQueryData(['notifications'])).toMatchObject({ homeUnread: 4, data: [] })
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: ['notifications'] })
+    expect(qc.getQueryData(['notifications'])).toBeUndefined()
   })
 
   it('drops home queries so another user cannot see leftover cache', () => {
@@ -36,12 +36,24 @@ describe('home snapshot hydrate', () => {
     expect(collectHomeSnapshotPayload(qc)).toBeNull()
   })
 
-  it('collects a trimmed snapshot when every home query has succeeded', () => {
+  it('does not save hydrated sections again under a new timestamp', () => {
     const qc = new QueryClient()
     hydrateHomeQueries(qc, snapshot)
+    qc.setQueryData(['notifications'], { data: [], page: { nextCursor: null, hasMore: false } })
+    expect(collectHomeSnapshotPayload(qc, 99)).toBeNull()
+  })
+
+  it('collects a trimmed snapshot once every home query has fetched', () => {
+    const qc = new QueryClient()
+    hydrateHomeQueries(qc, snapshot)
+    for (const kind of ['latest', 'deadline', 'popular'] as const) {
+      qc.setQueryData(['postings', 'home', kind], qc.getQueryData(['postings', 'home', kind]))
+    }
+    const unread = { id: 'n1', readAt: null }
+    qc.setQueryData(['notifications'], { data: [unread, { id: 'n2', readAt: '2026-01-01' }, unread], page: { nextCursor: null, hasMore: false } })
     expect(collectHomeSnapshotPayload(qc, 99)).toMatchObject({
       savedAt: 99,
-      unreadCount: 4,
+      unreadCount: 2,
       sections: { latest: [{ id: 'a' }], popular: [{ id: 'c' }] },
     })
   })

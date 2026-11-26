@@ -39,6 +39,8 @@ describe('snapshot persist gate', () => {
     const gate = createSnapshotPersistGate(() => current)
     const qc = new QueryClient()
     hydrateHomeQueries(qc, snapshot)
+    for (const kind of ['latest', 'deadline', 'popular'] as const) qc.setQueryData(['postings', 'home', kind], qc.getQueryData(['postings', 'home', kind]))
+    qc.setQueryData(['notifications'], { data: [], page: { nextCursor: null, hasMore: false } })
     const gen = gate.currentGeneration()
     await persistHomeSnapshotIfCurrent(qc, 'u1', gen, gate)
     expect(disk.size).toBe(1)

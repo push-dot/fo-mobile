@@ -31,31 +31,18 @@ const toSectionEnvelope = (cards: HomePostingCard[]): ListEnvelope<Posting> => (
   page: { nextCursor: null, hasMore: false },
 })
 
-export type CachedNotificationsEnvelope = ListEnvelope<AppNotification> & { homeUnread?: number }
-
-export const notificationsFromUnread = (unreadCount: number): CachedNotificationsEnvelope => ({
-  data: [],
-  page: { nextCursor: null, hasMore: false },
-  homeUnread: unreadCount,
-})
-
-export const countUnread = (raw: CachedNotificationsEnvelope | ListEnvelope<AppNotification> | undefined) => {
-  if (!raw) return 0
-  if (raw.data.length > 0) return raw.data.filter((n) => !n.readAt).length
-  return (raw as CachedNotificationsEnvelope).homeUnread ?? 0
-}
+export const countUnread = (raw: ListEnvelope<AppNotification> | undefined) => raw?.data.filter((n) => !n.readAt).length ?? 0
 
 export const expandHomeSnapshot = (snapshot: HomeSnapshot) => ({
   sections: Object.fromEntries(HOME_KINDS.map((k) => [k, toSectionEnvelope(snapshot.sections[k])])) as Record<
     SectionKind,
     ListEnvelope<Posting>
   >,
-  notifications: notificationsFromUnread(snapshot.unreadCount),
 })
 
 export const shrinkHomeSnapshotPayload = (
   sections: Record<SectionKind, ListEnvelope<Posting>>,
-  notifications: ListEnvelope<AppNotification> | CachedNotificationsEnvelope,
+  notifications: ListEnvelope<AppNotification>,
   savedAt: number,
 ): Omit<HomeSnapshot, 'version'> => {
   const trimmed = {} as HomeSnapshotSections

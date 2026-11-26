@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
 import type { SectionKind } from '@/features/jobs'
 import { useSession } from '@/shared/infrastructure'
+import { onSessionCleared } from '@/shared/utility/session-reset'
 import { createSnapshotPersistGate, persistHomeSnapshotIfCurrent } from './utils/snapshot-persist'
 import { hydrateHomeQueries } from './utils/snapshot-hydrate'
 import { isHomeQueryKey, removeHomeQueries } from './utils/snapshot-query-keys'
@@ -28,12 +29,13 @@ const schedulePersist = (
   )
 }
 
-const useHydratedUser = create<{ userId: string | null }>(() => ({ userId: null }))
-const setHydratedUser = (userId: string) => useHydratedUser.setState({ userId })
+const useHydrated = create<{ userId: string | null; unread: number }>(() => ({ userId: null, unread: 0 }))
+onSessionCleared(() => useHydrated.setState({ userId: null, unread: 0 }))
+export const useSeededUnread = () => useHydrated((s) => s.unread)
 
 export const useHomeSnapshotReady = () => {
   const userId = useSession((s) => s.session?.user.id ?? null)
-  const hydratedUser = useHydratedUser((s) => s.userId)
+  const hydratedUser = useHydrated((s) => s.userId)
   return !userId || hydratedUser === userId
 }
 
@@ -65,7 +67,7 @@ export const useHomeSnapshotSync = () => {
       const snapshot = await readHomeSnapshot(userId)
       if (cancelled) return
       if (snapshot) hydrateHomeQueries(qc, snapshot)
-      if (!cancelled) setHydratedUser(userId)
+      useHydrated.setState({ userId, unread: snapshot?.unreadCount ?? 0 })
     })()
     return () => {
       cancelled = true
