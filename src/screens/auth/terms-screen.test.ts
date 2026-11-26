@@ -8,6 +8,8 @@ const h = vi.hoisted(() => ({
   reset: vi.fn(),
   focused: true,
   unmount: [] as (() => void)[],
+  hardwareBack: null as (() => void) | null,
+  setSession: vi.fn(),
 }))
 
 const heldSession = {
@@ -26,7 +28,7 @@ vi.mock('react', async (orig) => {
       if (typeof cleanup === 'function') h.unmount.push(cleanup)
     },
     useCallback: (fn: () => void) => fn,
-    useRef: () => ({ current: false }),
+    useRef: (init: unknown) => ({ current: init }),
     useState: (init: unknown) => [init, vi.fn()],
   }
 })
@@ -34,6 +36,7 @@ vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Pressable: 'Pressable'
 const router = vi.hoisted(() => ({ back: vi.fn(), dismissTo: vi.fn(), replace: vi.fn(), push: vi.fn() }))
 vi.mock('expo-router', () => ({
   router,
+  Stack: { Screen: 'Stack.Screen' },
   useFocusEffect: (cb: () => void) => cb(),
 }))
 vi.mock('@/features/auth', () => ({
@@ -51,7 +54,12 @@ vi.mock('@/features/auth', () => ({
     { getState: () => ({ held: h.held, clear: h.clear }) },
   ),
 }))
-vi.mock('@/shared/infrastructure', () => ({ useSession: { getState: () => ({ set: vi.fn() }) } }))
+vi.mock('@/shared/infrastructure', () => ({ useSession: { getState: () => ({ set: h.setSession }) } }))
+vi.mock('@/shared/utility', () => ({
+  useHardwareBack: (onBack: (() => void) | null) => {
+    h.hardwareBack = onBack
+  },
+}))
 vi.mock('@/shared/components', () => ({
   showToast: vi.fn(),
 }))
@@ -59,11 +67,20 @@ vi.mock('@/features/my', () => ({ marketingResult: () => 'ok' }))
 vi.mock('@/theme', () => ({ spacing: {}, useColors: () => ({ bg: '#fff' }) }))
 
 const TermsScreen = (await import('./terms-screen')).default
+const { saveTerms } = await import('@/features/auth')
+
+type Consent = Awaited<ReturnType<typeof saveTerms>>
+type FormProps = { onBack: () => void; onSubmit: (marketing: boolean) => void }
+const renderForm = () => {
+  const screen = TermsScreen() as ReactElement<{ children: [ReactElement, ReactElement<FormProps>] }>
+  return screen.props.children[1].props
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
   h.held = heldSession
   h.unmount = []
+  h.hardwareBack = null
 })
 
 describe('signup terms screen', () => {
@@ -93,12 +110,31 @@ describe('signup terms screen', () => {
   })
 
   it('leaves for sign-in with one navigation and lets unmount clear held tokens', () => {
-    const screen = TermsScreen() as ReactElement<{ onBack: () => void }>
-    screen.props.onBack()
+    renderForm().onBack()
     expect(router.dismissTo).toHaveBeenCalledTimes(1)
     expect(router.dismissTo).toHaveBeenCalledWith('/sign-in')
     expect(router.back).not.toHaveBeenCalled()
     expect(router.replace).not.toHaveBeenCalled()
+    expect(h.clear).not.toHaveBeenCalled()
+  })
+  it('routes hardware back through the same single navigation to sign-in', () => {
+    renderForm()
+    h.hardwareBack?.()
+    expect(router.dismissTo).toHaveBeenCalledTimes(1)
+    expect(router.dismissTo).toHaveBeenCalledWith('/sign-in')
+    expect(router.back).not.toHaveBeenCalled()
+    expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  it('does not sign in when the user leaves while consent is saving', async () => {
+    let resolve: (consent: Consent) => void = () => undefined
+    vi.mocked(saveTerms).mockReturnValue(new Promise((r) => (resolve = r)))
+    const form = renderForm()
+    form.onSubmit(false)
+    form.onBack()
+    resolve({ referenceData: false, updatedAt: null })
+    await new Promise((r) => setTimeout(r, 0))
+    expect(h.setSession).not.toHaveBeenCalled()
     expect(h.clear).not.toHaveBeenCalled()
   })
 })
