@@ -7,22 +7,24 @@ import {
   counterpart,
   Logo,
   OFFER_DECLINE,
+  OFFER_MENU_COPY,
   OfferPostingCard,
   offerBadge,
   personLine,
+  RETRY_LABEL,
   useOffer,
   useOfferDecision,
   useOfferMenu,
   useViewerBox,
 } from '@/features/my'
 import { openPostingBot } from '@/features/bots'
-import { CtaBar, Badge, Button, Chip, Icon, Skeleton, Text, NativeTopBar } from '@/shared/components'
+import { CtaBar, Badge, Button, Chip, emptyNoteStyle, Icon, Skeleton, StatusNote, Text, NativeTopBar } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 
 type Box = 'received' | 'sent'
 
 const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: Box }) => {
-  const { data: o, isLoading } = useOffer(id)
+  const { data: o, isLoading, isError, refetch } = useOffer(id)
   const box = useViewerBox(o, hint)
   const { decline } = useOfferDecision(id, '', () => undefined)
   const menu = useOfferMenu(o, box)
@@ -36,6 +38,12 @@ const OfferDetailScreen = ({ id, box: hint = 'received' }: { id: string; box?: B
             <Skeleton width="60%" height={24} />
             <Skeleton width="100%" height={96} />
           </View>
+        ) : isError ? (
+          <StatusNote
+            lines={[OFFER_MENU_COPY.failed]}
+            action={{ label: RETRY_LABEL, onPress: () => void refetch() }}
+            style={emptyNoteStyle(140)}
+          />
         ) : null}
       </View>
     )
