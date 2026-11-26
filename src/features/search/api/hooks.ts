@@ -8,7 +8,7 @@ import { searchEnabled } from '../utils/search-enabled'
 export const useSearch = <T extends SearchTab>(q: string, type: T, sort: SearchSort, active = true) =>
   useInfiniteQuery({
     queryKey: ['search', type, q, sort],
-    queryFn: ({ pageParam }) => fetchSearch(q, type, pageParam, sort),
+    queryFn: ({ pageParam }) => fetchSearch(q, type, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
     enabled: searchEnabled(q, active),

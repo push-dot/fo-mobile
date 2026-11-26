@@ -8,6 +8,7 @@ import {
   PersonRow,
   PostingRow,
   PostRow,
+  SEARCH_EMPTY,
   SEARCH_ERROR_LINES,
   SEARCH_RETRY_LABEL,
   SEARCH_SKELETON,
@@ -38,6 +39,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
   }
   const counts = useSearchCounts(q).data
   const active = results[tab]
+  const activeTab = TABS.find((t) => t.key === tab)!
   const loading = active.isPending || active.isPlaceholderData
   const pageItems = active.data?.pages.flatMap((p): (Posting | Profile | Post)[] => p.data) ?? []
   const items = loading ? [] : pageItems
@@ -153,7 +155,7 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               ) : items.length ? (
                 <View style={styles.summary}>
                   <Text v="c1" weight="600" color="t3" numberOfLines={1} style={styles.flex}>
-                    ‘{q}’ {TABS.find((t) => t.key === tab)!.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}{TABS.find((t) => t.key === tab)!.unit}
+                    ‘{q}’ {activeTab.label} {formatCount(totalOf(tab) ?? items.length)}{totalOf(tab) === undefined && active.hasNextPage ? '+' : ''}{activeTab.unit}
                   </Text>
                   {tab === 'postings' ? (
                     SEARCH_SORTS.length > 1 ? (
@@ -187,6 +189,8 @@ const SearchScreen = ({ initialTab = 'postings' }: { initialTab?: SearchTab }) =
               <SkeletonRows {...SEARCH_SKELETON} />
             ) : active.isError ? (
               <StatusNote lines={SEARCH_ERROR_LINES} action={{ label: SEARCH_RETRY_LABEL, onPress: () => active.refetch() }} style={styles.error} />
+            ) : active.isSuccess ? (
+              <StatusNote lines={[SEARCH_EMPTY]} style={styles.error} />
             ) : undefined
           }
         />
