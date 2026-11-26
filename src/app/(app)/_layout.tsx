@@ -1,8 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Slot } from 'expo-router'
 import { useEffect } from 'react'
-import { API_MOCK } from '@/shared/infrastructure'
+import { API_MOCK, useSession } from '@/shared/infrastructure'
 import { useColdStartTermsCheck } from '@/features/auth'
+import { recoverPurchases } from '@/features/billing'
 import { botListQuery } from '@/features/bots'
 import { useHomeSnapshotSync } from '@/features/home'
 import { usePushDevice } from '@/features/notifications'
@@ -25,6 +26,13 @@ const useTabPrefetch = (ready: boolean) => {
   }, [qc, ready])
 }
 
+const useRecoverPurchases = () => {
+  const userId = useSession((s) => s.session?.user.id)
+  useEffect(() => {
+    if (userId) void recoverPurchases()
+  }, [userId])
+}
+
 const PushDevice = () => {
   usePushDevice()
   return null
@@ -34,6 +42,7 @@ const AppLayout = () => {
   const ready = useHomeSnapshotSync()
   useColdStartTermsCheck()
   useTabPrefetch(ready)
+  useRecoverPurchases()
   if (!ready) return null
   return (
     <>
