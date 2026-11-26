@@ -1,6 +1,5 @@
 import { keepPreviousData, queryOptions, skipToken, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
-import { ApiError } from '@push/api-client'
 import { showToast } from '@/shared/components/toast-store'
 import type { Bot, BotAddress, BotColor, BotId, BotLimit, BotProfile, BotSchedule, CompanyBot, NewSchedule } from '../types'
 import { botErrorCopy } from '../utils/bot-errors'
@@ -97,7 +96,7 @@ export const patchBotMutation = (qc: QueryClient) => ({
   },
   onError: (error: unknown, _vars: Patch, before: Snapshot | undefined) => {
     if (before) restore(qc, before)
-    if (error instanceof ApiError && error.code === 'REVISION_CONFLICT') void qc.invalidateQueries({ queryKey: BOTS })
+    void qc.invalidateQueries({ queryKey: BOTS })
     onBotError(error)
   },
   onSuccess: (server: Bot) => writeBot(qc, server.id, () => server),
@@ -130,7 +129,7 @@ export const useDeleteBot = () => {
       onBotError(error)
     },
     onSuccess: (_v, bot) => qc.removeQueries({ queryKey: detailKey(bot.id) }),
-    onSettled: () => qc.invalidateQueries({ queryKey: LIST }),
+    onSettled: () => void qc.invalidateQueries({ queryKey: LIST }),
   })
   return async (bot: CompanyBot) => void (await m.mutateAsync(bot))
 }
@@ -160,15 +159,12 @@ export const useMarkBotRead = () => {
   const m = useMutation({
     mutationFn: (bot: Bot) => markBotRead(bot.id),
     onMutate: async (bot) => {
-      await qc.cancelQueries({ queryKey: BOTS })
+      await qc.cancelQueries({ queryKey: LIST })
       const before = snapshot(qc)
       writeBot(qc, bot.id, (b) => ({ ...b, unread: false }))
       return before
     },
-    onError: (error, _bot, before) => {
-      if (before) restore(qc, before)
-      onBotError(error)
-    },
+    onError: (_error, _bot, before) => before && restore(qc, before),
   })
   return (bot: Bot) => m.mutate(bot)
 }

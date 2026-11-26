@@ -62,11 +62,11 @@ describe('changing a bot colour or mute', () => {
     expect(qc.getQueryState(LIST)?.isInvalidated).toBe(true)
   })
 
-  it('rolls back on any other failure without a reload', async () => {
+  it('rolls back on any other failure, reloads the bots and says so once', async () => {
     updateBot.mockRejectedValue(new Error('offline'))
     await patch({ bot: moapay, patch: { notificationsMuted: true } })
     expect(listed()).toEqual(moapay)
-    expect(qc.getQueryState(LIST)?.isInvalidated).toBe(false)
+    expect(qc.getQueryState(LIST)?.isInvalidated).toBe(true)
     expect(showToast).toHaveBeenCalledTimes(1)
     expect(showToast).toHaveBeenCalledWith({ message: '처리하지 못했어요', tone: 'error' })
   })
