@@ -1,5 +1,1 @@
-import LegalScreen from '@/screens/my/legal-screen'
-
-const SettingsLegal = () => <LegalScreen />
-
-export default SettingsLegal
+export { default } from '@/screens/my/legal-screen'

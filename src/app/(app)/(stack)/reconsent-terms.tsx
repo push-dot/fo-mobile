@@ -1,3 +1,1 @@
-import ReconsentTermsScreen from '@/screens/auth/reconsent-terms-screen'
-
-export default ReconsentTermsScreen
+export { default } from '@/screens/auth/reconsent-terms-screen'
