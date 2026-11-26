@@ -361,11 +361,12 @@ const POSTS_LISTS = {
 export const usePostsList = (view: PostsView, sort: MyPostsSort) =>
   useQuery({ queryKey: ['me', POSTS_LISTS[view].key, sort], queryFn: () => POSTS_LISTS[view].fetch(sort) })
 
-export const useCalendarEvents = (from: string, to: string) =>
-  useQuery({
-    queryKey: ['calendar', from],
-    queryFn: () => myApi.calendar(from, to),
-  })
+export const calendarEventsQuery = (from: string, to: string) =>
+  queryOptions({ queryKey: ['calendar', from, to], queryFn: () => fetchEvents(from, to) })
+
+export const useCalendarEvents = (from: string, to: string) => useQuery(calendarEventsQuery(from, to))
+
+export const useGoogleConnected = () => useQuery({ queryKey: ['integrations', 'google'], queryFn: myApi.googleConnected })
 
 export const useNextEvent = (applicationId: string) =>
   useQuery({
@@ -421,15 +422,14 @@ export const useSaveProfile = () => {
 
 export const useOffer = (id: string) => {
   const qc = useQueryClient()
-  const query = useQuery({
+  return useQuery({
     queryKey: ['me', 'offer', id],
-    queryFn: () => fetchOffer(id),
+    queryFn: async () => {
+      const o = await fetchOffer(id)
+      void qc.invalidateQueries({ queryKey: ['me', 'offers'] })
+      return o
+    },
   })
-  const o = query.data
-  useEffect(() => {
-    if (o) void qc.invalidateQueries({ queryKey: ['me', 'offers'] })
-  }, [o?.id, qc]) // eslint-disable-line react-hooks/exhaustive-deps
-  return query
 }
 
 export const useOfferDecision = (id: string, reply: string, onAccepted: () => void) => {
@@ -447,7 +447,11 @@ export const useOfferDecision = (id: string, reply: string, onAccepted: () => vo
     },
     onError: () => Alert.alert('수락하지 못했어요', '잠시 뒤에 다시 시도해 주세요.'),
   })
-  const decline = useMutation({ mutationFn: () => declineOffer(id), onSuccess: done })
+  const decline = useMutation({
+    mutationFn: () => declineOffer(id),
+    onSuccess: done,
+    onError: () => Alert.alert('거절하지 못했어요', '잠시 뒤에 다시 시도해 주세요.'),
+  })
   return { accept, decline }
 }
 
@@ -518,13 +522,15 @@ const settleUpload = async (file: PickedFile, isCancelled: () => boolean, onDone
 export const useUpload = (onDone?: () => void) => {
   const qc = useQueryClient()
   const [upload, setUpload] = useState<Upload | null>(null)
-  const cancelled = useRef(false)
+  const current = useRef<{ cancelled: boolean } | null>(null)
   const timer = useRef<ReturnType<typeof setInterval> | null>(null)
   useEffect(() => () => clearInterval(timer.current ?? undefined), [])
 
   const start = async (file: PickedFile) => {
+    clearInterval(timer.current ?? undefined)
+    const run = { cancelled: false }
+    current.current = run
     const size = file.size ?? 0
-    cancelled.current = false
     setUpload({ name: file.name, size, progress: 0.05 })
     timer.current = setInterval(
       () => setUpload((u) => u && { ...u, progress: mockUploadHeldAt() ?? u.progress + (0.9 - u.progress) * 0.12 }),
@@ -532,17 +538,18 @@ export const useUpload = (onDone?: () => void) => {
     )
     await settleUpload(
       file,
-      () => cancelled.current,
+      () => run.cancelled,
       onDone,
       () => {
+        void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
+        if (current.current !== run) return
         clearInterval(timer.current ?? undefined)
         setUpload(null)
-        void qc.invalidateQueries({ queryKey: ['me', 'sources'] })
       },
     )
   }
   const cancel = () => {
-    cancelled.current = true
+    if (current.current) current.current.cancelled = true
     clearInterval(timer.current ?? undefined)
     setUpload(null)
   }
