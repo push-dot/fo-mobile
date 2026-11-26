@@ -5,6 +5,8 @@ import { collectHomeSnapshotPayload, HYDRATED_QUERY_UPDATED_AT, hydrateHomeQueri
 import { removeHomeQueries } from './snapshot-query-keys'
 import type { HomeSnapshot } from '../types'
 
+vi.mock('../api/fetchers', () => ({ fetchHomePostings: vi.fn() }))
+
 const snapshot: HomeSnapshot = {
   version: HOME_SNAPSHOT_VERSION,
   savedAt: 1_700_000_000_000,

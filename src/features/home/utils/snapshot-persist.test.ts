@@ -5,6 +5,8 @@ import { hydrateHomeQueries } from './snapshot-hydrate'
 import { createSnapshotPersistGate, persistHomeSnapshotIfCurrent } from './snapshot-persist'
 import type { HomeSnapshot } from '../types'
 
+vi.mock('../api/fetchers', () => ({ fetchHomePostings: vi.fn() }))
+
 const disk = vi.hoisted(() => new Map<string, string>())
 
 vi.mock('expo-file-system', () => {
