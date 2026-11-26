@@ -46,7 +46,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={a.badge ? `${a.label} ${a.badge}` : a.label}
+      accessibilityLabel={a.label}
       accessibilityState={{ selected: !!a.active }}
       onPress={a.onPress}
       hitSlop={4}
