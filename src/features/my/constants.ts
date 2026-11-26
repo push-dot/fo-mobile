@@ -79,7 +79,7 @@ export const SKILL_CATALOG = [
   '부하 테스트',
 ]
 
-export const DOC_TYPES = [
+const DOC_TYPES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ]
@@ -102,7 +102,7 @@ export const TONES: { key: Tone; label: string }[] = [
   { key: 'technical', label: '기술 중심' },
   { key: 'friendly', label: '친근한' },
 ]
-export const CONTACT: { key: Settings['contactVisibility']; label: string }[] = [
+const CONTACT: { key: Settings['contactVisibility']; label: string }[] = [
   { key: 'accepted', label: '제안 수락한 사람만' },
   { key: 'everyone', label: '모두에게' },
 ]

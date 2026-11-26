@@ -4,13 +4,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { monthDay } from '@push/shared'
 import { Badge, Chip, ChipRow, Icon, Text } from '@/shared/components'
 import { spacing } from '../../../theme'
-import {
-  useAppliedApplications,
-  useMyCommentedPosts,
-  useMyFollowers,
-  useMyFollows,
-  useMyPosts,
-} from '../api/hooks'
+import { useAppliedApplications, useMyFollowers, useMyFollows, usePostsList } from '../api/hooks'
 import { ACTIVITY_LIST_PAD, FOLLOW_PREVIEW, POST_CATEGORIES, POST_PREVIEW } from '../constants'
 import type { ActivitySub, ScrollUnderBar } from '../types'
 import { appliedOnly, commentedSee, emptyCta, followSeeAll, followerSee, postsSeeAll, postedAt, stageBadge, stageTone } from '../utils'
@@ -118,8 +112,8 @@ const Follows = () => {
 }
 
 const Posts = () => {
-  const mine = useMyPosts()
-  const commented = useMyCommentedPosts()
+  const mine = usePostsList('mine', 'latest')
+  const commented = usePostsList('commented', 'latest')
   const posts = mine.data?.data ?? []
   const postCount = mine.data?.page.total ?? posts.length
   const commentCount = commented.data?.page.total ?? commented.data?.data.length ?? 0

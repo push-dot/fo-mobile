@@ -1,6 +1,6 @@
 import { searchHangul } from '@push/shared'
 
-export const SKILL_SUGGESTION_LIMIT = 3
+const SKILL_SUGGESTION_LIMIT = 3
 
 export const skillSuggestions = (catalog: readonly string[], query: string) =>
   searchHangul([...catalog], query, (s) => [s])

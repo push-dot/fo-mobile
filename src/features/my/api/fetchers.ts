@@ -70,10 +70,6 @@ export const fetchBookmarkList = () => api.me.bookmarks({ limit: 100 })
 
 export const fetchLinks = () => api.me.links(undefined, { limit: 100 })
 
-export const deleteLink = api.me.deleteLink
-
-export const restoreLink = api.me.restoreLink
-
 export const addLink = api.me.addLink
 
 export const fetchMyApplications = () => api.applications.list(FIRST)
