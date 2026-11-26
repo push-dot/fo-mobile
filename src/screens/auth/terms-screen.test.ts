@@ -38,6 +38,7 @@ vi.mock('expo-router', () => ({
   router,
   Stack: { Screen: 'Stack.Screen' },
   useFocusEffect: (cb: () => void) => cb(),
+  useIsFocused: () => h.focused,
 }))
 vi.mock('@/features/auth', () => ({
   TRY_AGAIN: 'again',
@@ -81,6 +82,7 @@ beforeEach(() => {
   h.held = heldSession
   h.unmount = []
   h.hardwareBack = null
+  h.focused = true
 })
 
 describe('signup terms screen', () => {
@@ -124,6 +126,12 @@ describe('signup terms screen', () => {
     expect(router.dismissTo).toHaveBeenCalledWith('/sign-in')
     expect(router.back).not.toHaveBeenCalled()
     expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  it('releases hardware back while a term document covers the screen', () => {
+    h.focused = false
+    renderForm()
+    expect(h.hardwareBack).toBeNull()
   })
 
   it('does not sign in when the user leaves while consent is saving', async () => {

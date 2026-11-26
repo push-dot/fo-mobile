@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { router } from 'expo-router'
+import { router, useIsFocused } from 'expo-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { TRY_AGAIN, TermsConsentForm, saveTerms, useTermsConsent } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
@@ -14,6 +14,7 @@ const ReconsentTermsScreen = () => {
   const session = useSession((s) => s.session)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const focused = useIsFocused()
 
   useEffect(() => {
     if (!session) router.replace(HOME_ROUTE)
@@ -21,7 +22,8 @@ const ReconsentTermsScreen = () => {
 
   useEffect(() => () => useTermsConsent.getState().reset(), [])
 
-  useHardwareBack(() => undefined)
+  useHardwareBack(focused ? () => undefined : null)
+
   const submit = (marketing: boolean) => {
     if (!session) return
     setBusy(true)

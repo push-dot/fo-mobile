@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Stack, router } from 'expo-router'
+import { Stack, router, useIsFocused } from 'expo-router'
 import { TRY_AGAIN, TermsConsentForm, saveTerms, useTermsConsent, usePhoneAuth } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
 import { showToast } from '@/shared/components'
@@ -12,26 +12,27 @@ const TermsScreen = () => {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const left = useRef(false)
+  const focused = useIsFocused()
 
   useEffect(() => {
     if (!held) router.replace('/sign-in')
   }, [held])
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    left.current = false
+    return () => {
       left.current = true
       useTermsConsent.getState().reset()
       if (usePhoneAuth.getState().held) clear()
-    },
-    [clear],
-  )
+    }
+  }, [clear])
 
   const leave = () => {
     left.current = true
     router.dismissTo('/sign-in')
   }
 
-  useHardwareBack(leave)
+  useHardwareBack(focused ? leave : null)
 
   const submit = (marketing: boolean) => {
     if (!held) return
