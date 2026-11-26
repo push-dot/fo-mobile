@@ -1,18 +1,20 @@
-import { Redirect, router } from 'expo-router'
-import { useState } from 'react'
+import { router } from 'expo-router'
 import { Platform, Pressable, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { botHomePath, botProfilePath, type BotId } from '@/features/bots'
-import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm } from '@/shared/components'
+import { Glass, GlassButton, Mascot, Text, TopBar, askConfirm, showToast } from '@/shared/components'
 import { useXlChrome } from '@/shared/components/xl-chrome'
 import { largeType } from '../../../theme'
 import type { MascotColor } from '../../../theme/mascot'
+import { TRY_LATER } from '../constants'
 import HeaderLamp from './header/header-lamp'
 import type { HeaderLight } from './header/state'
 import { clearPushChat, deleteCompanyBot } from '../stores'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'
 
 const openProfile = (botId: string) => router.push(botProfilePath(botId as BotId))
+
+const failed = () => showToast({ message: TRY_LATER })
 
 const HeaderPill = ({
   botId,
@@ -31,14 +33,13 @@ const HeaderPill = ({
   leading?: 'back' | 'none' | 'botHome'
   onFind?: () => void
 }) => {
-  const [toBotHome, setToBotHome] = useState(false)
   const run = (id: HeaderMenuId) => {
     if (!botId || !kind || !name) return
     if (id === 'profile') openProfile(botId)
     if (id === 'find') onFind?.()
     if (id === 'clear') {
       const copy = clearChatConfirm()
-      askConfirm({ ...copy, danger: true, onConfirm: () => void clearPushChat(botId, kind) })
+      askConfirm({ ...copy, danger: true, onConfirm: () => void clearPushChat(botId, kind).catch(failed) })
     }
     if (id === 'delete') {
       const copy = deleteBotConfirm(name)
@@ -48,7 +49,7 @@ const HeaderPill = ({
         onConfirm: () => {
           void deleteCompanyBot(botId, kind).then((ok) => {
             if (ok) router.back()
-          })
+          }, failed)
         },
       })
     }
@@ -56,7 +57,6 @@ const HeaderPill = ({
   const ios = Platform.OS === 'ios'
   const { xl, button } = useXlChrome()
   const spoken = name ? botSpokenName(name) : ''
-  if (toBotHome) return <Redirect href={botHomePath} />
   const nameButton =
     name && botId ? (
       <Pressable
@@ -78,7 +78,7 @@ const HeaderPill = ({
     <TopBar
       translucent
       chat
-      onBack={leading === 'back' ? () => router.back() : leading === 'botHome' ? () => setToBotHome(true) : undefined}
+      onBack={leading === 'back' ? () => router.back() : leading === 'botHome' ? () => router.replace(botHomePath) : undefined}
       backIcon={leading === 'botHome' ? 'menu' : undefined}
       backLabel={leading === 'botHome' ? 'Bot 홈' : undefined}
       reserveBack={leading === 'none'}

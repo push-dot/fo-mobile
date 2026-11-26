@@ -67,7 +67,7 @@ const BotText = ({ item }: { item: Extract<ChatItem, { type: 'agentText' }> }) =
         ) : (
           <View key={i} style={styles.list}>
             {block.items.map((line, n) => (
-              <Rich key={line} v="b1" text={line} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
+              <Rich key={n} v="b1" text={line} markId={item.id} hitsBefore={above[first[i]! + n]} {...big} />
             ))}
           </View>
         ),

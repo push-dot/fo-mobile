@@ -3,10 +3,10 @@ import type { BotContract } from '@push/api-client'
 import { showToast } from '@/shared/components/toast-store'
 import { botApi } from '@/shared/infrastructure'
 import { hasOlder, loadOlder, useChatStore } from '../../stores'
+import { TRY_LATER } from '../../constants'
 import { hitOf, matchLabel, revealMatch, stepMatch, type FindStep } from '../../utils/find'
 
 const DEBOUNCE_MS = 300
-const FAILED = '잠시 뒤에 다시 해 주세요.'
 
 const FAIL = Symbol('reveal-failed')
 
@@ -37,7 +37,7 @@ export const useFind = (botId: string) => {
       if (!match) return
       const found = await reveal(botId, match, list, at)
       if (ticket !== latest.current) return
-      if (found === FAIL) showToast({ message: FAILED })
+      if (found === FAIL) showToast({ message: TRY_LATER })
       else setCurrent(found)
     },
     [botId],
@@ -58,7 +58,7 @@ export const useFind = (botId: string) => {
           void land(found.items, 0, ticket)
         },
         () => {
-          if (ticket === latest.current) showToast({ message: FAILED })
+          if (ticket === latest.current) showToast({ message: TRY_LATER })
         },
       )
     }, DEBOUNCE_MS)

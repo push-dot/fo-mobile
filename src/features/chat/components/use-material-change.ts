@@ -2,9 +2,11 @@ import { router } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { materialPickerPath, type BotId } from '@/features/bots'
 import { useBookmarkList } from '@/features/my'
+import { showToast } from '@/shared/components'
 import { showChoiceModal } from '@/shared/navigation'
 import { displayName } from '@/shared/utility/display-name'
 import { useChatDocs } from '../api/hooks'
+import { TRY_LATER } from '../constants'
 import { appendDraftText } from '../stores'
 import { attachPickedFile } from '../utils/pick-file'
 import { docMeta, postingMeta } from '../utils/quick-start-data'
@@ -65,7 +67,7 @@ export const useMaterialChange = (botId: string, onSay: () => void, enabled: boo
           chevron: true,
           onPress: () => list('북마크한 공고', '북마크한 공고가 아직 없어요', (now().bookmarks ?? []).map((p) => ({ label: `${p.company} · ${p.title}`, sub: postingMeta(p) }))),
         },
-        { label: '파일에서 고르기', onPress: () => void attachPickedFile(botId).then(say) },
+        { label: '파일에서 고르기', onPress: () => void attachPickedFile(botId).then(say, () => showToast({ message: TRY_LATER })) },
         {
           label: '링크 붙여넣기',
           chevron: true,
