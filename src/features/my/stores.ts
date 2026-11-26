@@ -62,6 +62,7 @@ const remove = (id: string, bottom?: number) => {
 const restoreArchived = (id: string) => {
   const job = removals.get(id)
   if (!job) return
+  removals.delete(id)
   void job.then((archived) => {
     if (!archived) return
     return myApi
@@ -79,6 +80,7 @@ let undoBottom: number | undefined
 const pending = createUndo((id) => {
   const mark = marks.get(id)
   if (mark) mark.committed = true
+  marks.delete(id)
   remove(id, undoBottom)
   queueMicrotask(showFailed)
 }, UNDO_MS)

@@ -3,13 +3,13 @@ import type { MenuAction, MenuSection } from '@/shared/components/menu-action'
 
 export type PostsView = 'mine' | 'commented' | 'saved'
 
-export const POSTS_VIEWS: (MenuAction & { key: PostsView })[] = [
+const POSTS_VIEWS: (MenuAction & { key: PostsView })[] = [
   { key: 'mine', label: '내가 쓴 글', systemImage: 'square.and.pencil', icon: 'edit', onPress: () => {} },
   { key: 'commented', label: '댓글 단 글', systemImage: 'bubble.left', icon: 'chat', onPress: () => {} },
   { key: 'saved', label: '저장한 글', systemImage: 'bookmark', icon: 'bookmark', onPress: () => {} },
 ]
 
-export const POSTS_SORTS: (MenuAction & { key: MyPostsSort })[] = [
+const POSTS_SORTS: (MenuAction & { key: MyPostsSort })[] = [
   { key: 'latest', label: '최신순', systemImage: 'clock', icon: 'clock', onPress: () => {} },
   { key: 'views', label: '조회 많은 순', systemImage: 'eye', icon: 'eye-2', onPress: () => {} },
   { key: 'comments', label: '댓글 많은 순', systemImage: 'bubble.left', icon: 'chat', onPress: () => {} },

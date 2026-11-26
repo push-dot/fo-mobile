@@ -18,7 +18,7 @@ export const offerToast = (offer: Offer, box: OfferBox, { kind, message, undo }:
 
 export type OfferMenuDeps = Omit<SharedDeps, 'toast'> & { toast: (t: ToastInput) => void }
 
-export type OfferMenuSectionDeps = OfferMenuDeps & {
+type OfferMenuSectionDeps = OfferMenuDeps & {
   profile: (userId: string) => void
   confirm: (r: ConfirmRequest) => void
 }

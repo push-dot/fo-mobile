@@ -10,7 +10,7 @@ const hasBatchim = (word: string) => {
   return code >= 0 && code <= 11171 && code % 28 !== 0
 }
 
-export const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
+const objectParticle = (word: string) => (hasBatchim(word) ? '을' : '를')
 
 export const skillOrderHint = '길게 누르면 앞으로 옮겨요. 앞의 5개가 허브 목록에 보여요.'
 
@@ -115,7 +115,6 @@ export const stageFlow = (stage: string) => {
 
 export const INTERVIEW_PREP = 'Bot으로 면접 준비'
 export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
-export const FIX_DOC = '이 서류를 고쳐 줘'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'
 export const OFFER_FAIL = '잠시 뒤에 다시 보내 주세요.'
@@ -126,7 +125,7 @@ export const OFFER_BLOCKED_COMPOSER = '이 대화에는 더 이상 메시지를 
 export const OFFER_ARCHIVED_NOTE = '보관한 제안은 받은 제안 목록과 알림에서 빠져요. 열어서 보관을 풀 수 있어요.'
 export const OFFER_ARCHIVED_ROW = '보관한 제안'
 export const OFFER_ARCHIVED_BADGE = '보관함'
-export { OFFER_MENU_COPY, offerBlockConfirm, offerBlocked } from '@push/shared'
+export { OFFER_MENU_COPY } from '@push/shared'
 export const OFFER_EMPTY_ACTION = '허브 프로필 다듬기'
 export const RETRY_LABEL = '다시 시도'
 export const PUSH_DOCS_TITLE = 'Push 프로필'

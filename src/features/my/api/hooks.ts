@@ -7,7 +7,7 @@ import { DAY, NEXT_EVENT_DAYS } from '../constants'
 import type { CalendarEvent, PickedFile } from '../types'
 import { askConfirm, showToast } from '@/shared/components'
 import { mockUploadHeldAt, useSession } from '@/shared/infrastructure'
-import { marketingResult, nextEventFor, type PostsView, OFFER_MENU_COPY, offerMenuSections, restoreLinkFailure, viewerBox } from '../utils'
+import { marketingResult, nextEventFor, type PostsView, OFFER_MENU_COPY, offerMenuSections, viewerBox } from '../utils'
 import {
   acceptOffer,
   addLink,
@@ -18,9 +18,7 @@ import {
   reportOffer,
   unarchiveOffer,
   declineOffer,
-  deleteLink,
   duplicateDocument,
-  restoreLink,
   fetchAuthMe,
   fetchBookmarkList,
   fetchCommentedPosts,
@@ -72,6 +70,7 @@ import { ingestEnabled } from '../utils/ingest-enabled'
 export const unreadOffersQuery = queryOptions({ queryKey: ['me', 'offers', 'received', 'unread'], queryFn: fetchUnreadOffers })
 export const myProfileQuery = queryOptions({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
 export const consentsQuery = queryOptions({ queryKey: ['me', 'consents'], queryFn: fetchConsents })
+export const settingsQuery = queryOptions({ queryKey: ['me', 'settings'], queryFn: fetchSettings })
 
 export const useUnreadOffers = () => useQuery({ ...unreadOffersQuery, select: (r) => r.data.filter((o) => !o.readAt).length })
 
@@ -82,14 +81,14 @@ export const useReferenceConsent = () => {
   const q = useQuery(consentsQuery)
   const m = useMutation({
     mutationFn: updateReferenceConsent,
-    onSuccess: (data) => qc.setQueryData(['me', 'consents'], data),
+    onSuccess: (data) => qc.setQueryData(consentsQuery.queryKey, data),
     onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
   const grant = useMutation({
     mutationFn: grantReferenceAccess,
     onSuccess: (data) => {
-      qc.setQueryData(['me', 'consents'], data)
-      void qc.invalidateQueries({ queryKey: ['me', 'settings'] })
+      qc.setQueryData(consentsQuery.queryKey, data)
+      void qc.invalidateQueries({ queryKey: settingsQuery.queryKey })
     },
     onError: () => Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
@@ -102,7 +101,7 @@ export const useMarketingConsent = () => {
   const m = useMutation({
     mutationFn: updateMarketingConsent,
     onSuccess: (data) => {
-      qc.setQueryData(['me', 'consents'], data)
+      qc.setQueryData(consentsQuery.queryKey, data)
       showToast({ message: marketingResult(data.terms?.marketing ?? false, data.terms?.marketingAt ?? null) })
     },
     onError: () => Alert.alert('알림 수신 설정을 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
@@ -184,13 +183,13 @@ export const useArchivedOffers = (box: Box) =>
 
 export const useSettings = () => {
   const qc = useQueryClient()
-  const key = ['me', 'settings']
-  const q = useQuery({ queryKey: key, queryFn: fetchSettings })
+  const key = settingsQuery.queryKey
+  const q = useQuery(settingsQuery)
   const m = useMutation({
     mutationFn: (patch: Partial<Settings>) => updateSettings(patch),
     onMutate: async (patch) => {
       await qc.cancelQueries({ queryKey: key })
-      const prev = qc.getQueryData<Settings>(key)
+      const prev = qc.getQueryData(key)
       if (prev) qc.setQueryData(key, { ...prev, ...patch })
       return prev
     },
@@ -200,7 +199,7 @@ export const useSettings = () => {
     },
     onSuccess: (s) => qc.setQueryData(key, s),
   })
-  return { s: q.data, set: m.mutate }
+  return { s: q.data, set: m.mutate, isError: q.isError, refetch: q.refetch }
 }
 
 export const useBlocked = () => useQuery({ queryKey: ['me', 'blocks'], queryFn: fetchBlocked, refetchOnMount: 'always' })
@@ -219,14 +218,13 @@ export const useUnblock = () => {
   })
 }
 
-export const useMySettings = (enabled: boolean) =>
-  useQuery({ queryKey: ['me', 'settings'], queryFn: fetchSettings, enabled })
+export const useMySettings = (enabled: boolean) => useQuery({ ...settingsQuery, enabled })
 
 export const useUpdateSettings = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (patch: Partial<Settings>) => updateSettings(patch),
-    onSuccess: (s) => qc.setQueryData(['me', 'settings'], s),
+    onSuccess: (s) => qc.setQueryData(settingsQuery.queryKey, s),
     onError: () => Alert.alert('바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'),
   })
 }
@@ -265,24 +263,6 @@ export const useBookmarkList = (enabled: boolean) =>
 
 export const useMyLinks = (enabled: boolean) =>
   useQuery({ queryKey: ['me', 'links'], queryFn: fetchLinks, enabled })
-
-export const useDeleteLink = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: deleteLink,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'links'] }),
-    onError: () => Alert.alert('지우지 못했어요', '잠시 뒤에 다시 해 주세요.'),
-  })
-}
-
-export const useRestoreLink = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: restoreLink,
-    onSettled: () => qc.invalidateQueries({ queryKey: ['me', 'links'] }),
-    onError: (e) => Alert.alert(...restoreLinkFailure(e)),
-  })
-}
 
 export const useAddLink = (onAdded: () => void) => {
   const qc = useQueryClient()
@@ -334,23 +314,9 @@ export const useFollowToggle = (userId: string, setFollowing: (next: boolean) =>
   })
 }
 
-export const useMyFollows = () =>
-  useQuery({ queryKey: ['me', 'follows'], queryFn: fetchFollows })
+export const useMyFollows = (enabled = true) => useQuery({ queryKey: ['me', 'follows'], queryFn: fetchFollows, enabled })
 
-export const useMyFollowers = () =>
-  useQuery({
-    queryKey: ['me', 'followers'],
-    queryFn: fetchFollowers,
-  })
-
-export const useMyPosts = (sort: MyPostsSort = 'latest') =>
-  useQuery({ queryKey: ['me', 'posts', sort], queryFn: () => fetchMyPosts(sort) })
-
-export const useMyCommentedPosts = (sort: MyPostsSort = 'latest') =>
-  useQuery({
-    queryKey: ['me', 'commented-posts', sort],
-    queryFn: () => fetchCommentedPosts(sort),
-  })
+export const useMyFollowers = (enabled = true) => useQuery({ queryKey: ['me', 'followers'], queryFn: fetchFollowers, enabled })
 
 const POSTS_LISTS = {
   mine: { key: 'posts', fetch: fetchMyPosts },
