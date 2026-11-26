@@ -3,6 +3,8 @@ import type { AppNotification, ListEnvelope } from '@push/api-client'
 import { countUnread, useSeededUnread } from '@/features/home'
 import { fetchNotifications, readNotifications } from './fetchers'
 
+const NOTIFICATIONS_KEY = ['notifications']
+
 export const useNotifications = () =>
   useQuery({ queryKey: NOTIFICATIONS_KEY, queryFn: fetchNotifications })
 
@@ -11,8 +13,6 @@ export const useUnreadCount = () => {
   const seeded = useSeededUnread()
   return data ? countUnread(data) : seeded
 }
-
-const NOTIFICATIONS_KEY = ['notifications']
 
 export const useReadNotifications = () => {
   const qc = useQueryClient()
