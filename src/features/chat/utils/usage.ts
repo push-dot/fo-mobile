@@ -3,7 +3,7 @@ import type { MenuAction } from '@/shared/components/menu-action'
 import type { AttachmentKind } from '@/features/bots'
 import type { ChatItem } from '../types'
 
-const BOT_SUFFIX = /(?:봇|Bot)$/
+const BOT_SUFFIX = /(?:봇|Bot)$/ // bot-copy: keep, server bot names may end in 봇
 
 export const botSpokenName = (name: string) => (BOT_SUFFIX.test(name) ? name : `${name} Bot`)
 
