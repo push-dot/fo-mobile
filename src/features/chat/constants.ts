@@ -8,7 +8,7 @@ export const BUBBLE = [0.2, 0.9, 0.25, 1.15] as const
 
 export const DEFAULT_ACCESS_MODE: AccessMode = 'AUTO'
 
-export const ACCESS_TITLE = '봇이 어떻게 실행할까요?'
+export const ACCESS_TITLE = 'Bot이 어떻게 실행할까요?'
 
 export const ACCESS_MODES: readonly { key: AccessMode; label: string }[] = [
   { key: 'ALWAYS_ASK', label: '항상 묻기' },

@@ -5,7 +5,7 @@ describe('accessMenu', () => {
   it('offers the three modes under the sheet title and marks the saved one', () => {
     const picked: string[] = []
     const [section] = accessMenu('ALWAYS_ASK', (mode) => picked.push(mode))
-    expect(section!.title).toBe('봇이 어떻게 실행할까요?')
+    expect(section!.title).toBe('Bot이 어떻게 실행할까요?')
     expect(section!.actions.map((a) => [a.label, a.selected])).toEqual([
       ['항상 묻기', true],
       ['자동', false],

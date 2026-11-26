@@ -105,7 +105,7 @@ pnpm --filter @push/fo-mobile lint
 pnpm --filter @push/fo-mobile typecheck
 ```
 
-화면 문구는 `에이전트` 대신 `봇`을 씁니다. `src`에 `에이전트`가 남아 있으면 `src/shared/__tests__/bot-copy.test.ts`가 실패합니다. `node scripts/bot-copy.mjs`는 조사까지 맞춰 바꾸고, `--check`를 붙이면 남은 줄만 보여 줍니다. 약관 원문은 push-fe `packages/shared`에 있어 이 검사 밖입니다. 같은 원문을 앱 렌더링은 `봇`으로, 웹 렌더링은 `에이전트`로 보여 줍니다.
+화면 문구는 `에이전트`나 `봇` 대신 `Bot`을 씁니다. `src`에 `에이전트`나 `봇`이 남아 있으면 `src/shared/__tests__/bot-copy.test.ts`가 실패합니다. `node scripts/bot-copy.mjs`는 조사까지 맞춰 바꾸고, `--check`를 붙이면 남은 줄만 보여 줍니다. 약관 원문은 push-fe `packages/shared`에 있어 이 검사 밖입니다. 같은 원문을 앱 렌더링은 `Bot`으로, 웹 렌더링은 `에이전트`로 보여 줍니다.
 
 
 ## CI/배포
