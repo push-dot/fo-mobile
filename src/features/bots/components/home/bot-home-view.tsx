@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { LegendList, useViewability } from '@legendapp/list/react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -9,6 +9,7 @@ import { useColors } from '../../../../theme'
 import { useBotSearch } from '../../api/hooks'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
+import { useDebouncedQuery } from '@/shared/utility/use-debounced-query'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { accountLabel, companyMenu, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
@@ -109,13 +110,7 @@ const BotHomeView = ({
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
   const [searching, setSearching] = useState(false)
-  const [text, setText] = useState('')
-  const [q, setQ] = useState('')
-  useEffect(() => {
-    const t = text.trim()
-    const id = setTimeout(() => setQ(t), t ? SEARCH_DEBOUNCE_MS : 0)
-    return () => clearTimeout(id)
-  }, [text])
+  const { text, q, setText } = useDebouncedQuery(SEARCH_DEBOUNCE_MS)
   const [scrolled, setScrolled] = useState(false)
   const found = useBotSearch(q)
   const now = new Date()
