@@ -92,7 +92,7 @@ describe('bot header and onboarding', () => {
     const next = withMaterial({ a: { text: '안녕', chip: '이력서' }, b: { text: '다른 Bot' } }, 'a', '공고', { text: '' })
     expect(next.a).toEqual({ text: '안녕 공고', chip: '이력서' })
     expect(next.b).toEqual({ text: '다른 Bot' })
-    expect(withMaterial({}, 'b', '링크', { text: '' }).b.text).toBe('링크')
+    expect(withMaterial({}, 'b', '링크', { text: '' }).b?.text).toBe('링크')
   })
 })
 

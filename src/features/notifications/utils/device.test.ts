@@ -226,10 +226,10 @@ describe('push device retry', () => {
     await device.signOut()
     const newer = device.signIn('u2')
     await vi.waitFor(() => expect(gates).toHaveLength(2))
-    gates[0]()
+    gates[0]?.()
     await stale
     expect(removes).toEqual([])
-    gates[1]()
+    gates[1]?.()
     await newer
     await device.signIn('u2')
     expect(registers).toEqual([TOKEN, TOKEN])

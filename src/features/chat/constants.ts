@@ -23,12 +23,13 @@ export const STOPPING_TEXT = '중지하는 중'
 
 export const AWAITING_TEXT = { approval: '확인을 기다리고 있어요', choice: '답을 기다리고 있어요' } as const
 
+const QUEUE_BUSY_TEXT = '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.'
 export const queueBusyText = (sec: number) => `지금 요청이 많아요. ${sec}초 뒤에 다시 보내 주세요.`
 export const billingLockedText = (sec: number) => `결제 정보를 정리하고 있어요. ${sec}초 뒤에 다시 보내 주세요.`
 export const queueBusyMessage = (retryAfterSec?: number, reason?: unknown) => {
   if (retryAfterSec && reason === 'BILLING_LOCKED') return billingLockedText(retryAfterSec)
   if (retryAfterSec) return queueBusyText(retryAfterSec)
-  return ERROR_TEXT.QUEUE_BUSY
+  return QUEUE_BUSY_TEXT
 }
 export const TRY_LATER = '잠시 뒤에 다시 해 주세요.'
 export const DISCONNECT_REASON = '연결이 끊겼어요'
@@ -212,7 +213,7 @@ export const ERROR_TEXT: Record<string, string> = {
   INSUFFICIENT_CREDITS: USAGE_BODY,
   PLAN_REQUIRED: planRequired('FREE'),
   [READ_OFF_CODE]: READ_OFF_TEXT,
-  QUEUE_BUSY: '지금 요청이 많아요. 잠시 뒤에 다시 보내 주세요.',
+  QUEUE_BUSY: QUEUE_BUSY_TEXT,
   APPROVAL_ALREADY_RESOLVED: '이미 답한 요청이에요.',
   APPROVAL_EXPIRED: '시간이 지나서 답할 수 없어요. 다시 보내 주세요.',
   NOT_CONFIGURED: '지금은 Bot을 쓸 수 없어요. 잠시 뒤에 다시 해 주세요.',
