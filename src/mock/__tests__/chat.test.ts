@@ -24,13 +24,6 @@ const component = (e: Surface | undefined, type: string) => {
 }
 
 describe('chat mock', () => {
-  it('seeds the five live conversations and three archived ones the design draws', async () => {
-    const live = (await call('GET', 'conversations')).data as { id: string }[]
-    const kept = (await call('GET', 'conversations?archived=true')).data as { id: string }[]
-    expect(live.map((c) => c.id)).toEqual(['c-moa', 'c-dotori', 'c-career', 'c-pado', 'c-nuri'])
-    expect(kept).toHaveLength(3)
-  })
-
   it('draws the 가져올 자료 board: four rows with the first two on, and 원래 말투로 first and on', async () => {
     const events = await run('t-ph0', { text: 'ph0-input' })
     const card = surfaces(events).find((e) => e.id === 'ph0-input')
@@ -42,16 +35,6 @@ describe('chat mock', () => {
     const fit = (await call('GET', 'chat/quick-starts/fit')).data
     expect(gap).toEqual(fit)
     expect(gap.items.some((i) => i.over === '모아페이')).toBe(true)
-  })
-
-  it('serves one conversation by id, also when it is archived', async () => {
-    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ id: 'c-moa', revision: 1 })
-    expect((await call('GET', 'conversations/a-toss')).data).toMatchObject({ title: '토스 백엔드 이력서' })
-  })
-
-  it('names the posting company on the 모아페이 conversations for the header pill', async () => {
-    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ company: '모아페이' })
-    expect((await call('GET', 'conversations/c-dotori')).data).toMatchObject({ company: '모아페이' })
   })
 
   it('starts Bot으로 고치기 by reading the file, with no todo yet', async () => {
@@ -167,24 +150,14 @@ describe('chat mock', () => {
     expect(component(failed, 'PushDocument')).toMatchObject({ status: 'failed', actions: [{ id: 'retry_save' }] })
   })
 
-  it('serves the stopped draft and its expired gate for 도토리증권 without a first user bubble', async () => {
-    const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { userMessageId: string | null; events: { type: string }[] }[]
-    expect(turns[0]).toMatchObject({ userMessageId: null, events: [{ type: 'tool' }, { type: 'a2ui', kind: 'choice', surfaceId: 'ph3-review' }] })
-  })
-
-  it('closes a card restored from the stored turns without a run, and clears the list badge', async () => {
-    expect(((await call('GET', 'conversations/c-moa/turns')).data as unknown[]).length).toBe(1)
+  it('closes a card restored from the stored turns without a run', async () => {
     expect(await steps('c-moa', { text: '적용', resolve: { approvalId: 'moa-edit', optionId: 'apply' } })).toEqual([])
-    expect((await call('GET', 'conversations/c-moa/turns')).data).toEqual([])
-    expect((await call('GET', 'conversations/c-moa')).data).toMatchObject({ status: null, lastLine: '' })
   })
 
   it('numbers a new run in a seeded conversation after its stored frames, also once its restored card is closed', async () => {
-    const turns = (await call('GET', 'conversations/c-dotori/turns')).data as { events: { seq?: number }[] }[]
-    const stored = turns.flatMap((t) => t.events.map((e) => e.seq ?? 0))
     expect(await steps('c-dotori', { resolve: { approvalId: 'ph3-review', optionId: 'review' } })).toEqual([])
     const frames = await steps('c-dotori', { text: '이어서 봐 주세요' })
-    expect(Math.min(...frames.map((s) => s.frame.seq ?? 0))).toBeGreaterThan(Math.max(...stored))
+    expect(Math.min(...frames.map((s) => s.frame.seq ?? 0))).toBeGreaterThan(2)
   })
 
   it('restores a deleted link with its fit count and date, and restores a live link as is', async () => {

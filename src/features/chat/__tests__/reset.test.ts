@@ -56,4 +56,32 @@ describe('clear chat', () => {
 
     expect(useChatStore.getState().chats.c2).toEqual(emptyChat)
   })
+
+  it('keeps a newer run working when an aborted run ends without frames', async () => {
+    let release: (() => void) | undefined
+    botApi.bots.send
+      .mockImplementationOnce(() =>
+        (async function* () {
+          await new Promise<void>((resolve) => {
+            release = resolve
+          })
+        })(),
+      )
+      .mockImplementationOnce(() =>
+        (async function* () {
+          await new Promise(() => undefined)
+        })(),
+      )
+    botApi.bots.clearChat.mockResolvedValue(undefined)
+    send('c3', '안녕')
+    await vi.waitFor(() => expect(release).toBeDefined())
+
+    await clearPushChat('c3', 'push')
+    send('c3', '다시')
+    expect(useChatStore.getState().chats.c3!.working).not.toBeNull()
+    release?.()
+    await new Promise((resolve) => setTimeout(resolve, 40))
+
+    expect(useChatStore.getState().chats.c3!.working).not.toBeNull()
+  })
 })

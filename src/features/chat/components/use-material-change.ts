@@ -67,7 +67,14 @@ export const useMaterialChange = (botId: string, onSay: () => void, enabled: boo
           chevron: true,
           onPress: () => list('북마크한 공고', '북마크한 공고가 아직 없어요', (now().bookmarks ?? []).map((p) => ({ label: `${p.company} · ${p.title}`, sub: postingMeta(p) }))),
         },
-        { label: '파일에서 고르기', onPress: () => void attachPickedFile(botId).then(say, () => showToast({ message: TRY_LATER })) },
+        {
+          label: '파일에서 고르기',
+          onPress: () =>
+            void attachPickedFile(botId).then(say, () => {
+              showToast({ message: TRY_LATER })
+              say()
+            }),
+        },
         {
           label: '링크 붙여넣기',
           chevron: true,
