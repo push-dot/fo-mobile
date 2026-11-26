@@ -7,7 +7,7 @@ export const verifyPhoneCode = (body: { phone: string; code: string; pendingToke
 
 export const readConsents = (accessToken: string) => api.me.consents(accessToken)
 
-export const saveTerms = (accessToken: string, marketing: boolean) =>
+export const saveTerms = (accessToken: string | undefined, marketing: boolean) =>
   api.me.updateTerms(
     { age14: true, serviceTerms: true, privacy: true, marketing, termsVersion: TERMS_VERSION },
     accessToken,
