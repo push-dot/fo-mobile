@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
@@ -9,7 +9,7 @@ import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import { isConsentRequired } from '@/shared/utility/consent-error'
 import { botErrorKind } from '../../utils/bot-errors'
-import { checkLink, findBotForPosting } from '../../api/fetchers'
+import { checkLink } from '../../api/fetchers'
 import { useBots, useCreateBot, useDeleteBot } from '../../api/hooks'
 import { BOT_COLORS } from '../../constants'
 import type { BotColor, BotId, BotLimit, CompanyBot } from '../../types'
@@ -28,7 +28,6 @@ import {
   linkLabel,
   linkMissing,
   markFinding,
-  onPostingChosen,
   pickPosting,
   postingMeta,
   postingOf,
@@ -40,6 +39,7 @@ import {
   type PostingPick,
 } from '../../utils/create-form'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
+import { colorA11y } from '../profile/profile-rows'
 import BotLimitDelete from './bot-limit-delete'
 import {
   CANCEL_LABEL,
@@ -139,9 +139,9 @@ const Cta = ({ label, onPress, busy, enabled, xl }: { label: string; onPress: ()
 
 const RING = DOT + 10
 
-const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (next: BotColor) => void }) => {
+const Swatch = ({ name, index, on, onPick }: { name: BotColor; index: number; on: boolean; onPick: (next: BotColor) => void }) => {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={name} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={styles.swatch}>
+    <Pressable accessibilityRole="radio" accessibilityLabel={colorA11y(index)} accessibilityState={{ selected: on }} onPress={() => onPick(name)} style={styles.swatch}>
       <View style={[styles.ring, on && styles.ringOn]}>
         <View style={styles.dot(name)} />
       </View>
@@ -151,8 +151,8 @@ const Swatch = ({ name, on, onPick }: { name: BotColor; on: boolean; onPick: (ne
 
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
   <View style={styles.swatches}>
-    {BOT_COLORS.map((name) => (
-      <Swatch key={name} name={name} on={name === color} onPick={onPick} />
+    {BOT_COLORS.map((name, index) => (
+      <Swatch key={name} name={name} index={index} on={name === color} onPick={onPick} />
     ))}
   </View>
 )
@@ -214,10 +214,13 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
   const bots = useBots()
   const removeBot = useDeleteBot()
   const { create } = useCreateBot()
-  const openRef = useRef(onOpenBot)
-  useEffect(() => {
-    openRef.current = onOpenBot
-  }, [onOpenBot])
+  const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')
+  const existingFor = (id: string) => companyBots.find((bot) => bot.postingId === id)
+  const openExisting = useEffectEvent((id: string) => {
+    const existing = existingFor(id)
+    if (existing) onOpenBot(existing.id)
+    return !!existing
+  })
   const phase = form.phase
   const searching = searchPhase(form)
   const posting = postingOf(phase)
@@ -225,14 +228,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
 
   useEffect(() => {
     if (!postingId) return
+    if (openExisting(postingId)) return
     let cancel = false
     void (async () => {
-      const existing = await findBotForPosting(postingId).catch(() => null)
-      if (cancel) return
-      if (existing) {
-        openRef.current(existing.id)
-        return
-      }
       const posting = await loadPosting(postingId)
       if (cancel || !posting) return
       setForm((current) => (current.phase.kind === 'idle' ? pickPosting(current, posting) : current))
@@ -321,7 +319,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
     setForm(beginCreate(base))
     try {
       const result = await create({ postingId: action.posting.postingId, color: action.color })
-      openRef.current(result.bot.id)
+      onOpenBot(result.bot.id)
     } catch (error) {
       if (isConsentRequired(error)) {
         setForm(base)
@@ -332,7 +330,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
         limitFrom.current = postingOf(base.phase)
         setForm(failCreate(base, 'limit'))
       }
-      else setForm(failCreate(base, 'error'))
+      else {
+        const next = failCreate(base, 'error')
+        setForm(next)
+        Alert.alert(ERROR_TITLE, ERROR_BODY, [
+          { text: CANCEL_LABEL, style: 'cancel' },
+          { text: RETRY_LABEL, onPress: () => void run(next) },
+        ])
+      }
     }
   }
 
@@ -340,20 +345,6 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
     void run(form)
   }
 
-  const failed = phase.kind === 'error'
-  const retryRef = useRef(() => {})
-  useEffect(() => {
-    retryRef.current = () => void run(form)
-  })
-  useEffect(() => {
-    if (!failed) return
-    Alert.alert(ERROR_TITLE, ERROR_BODY, [
-      { text: CANCEL_LABEL, style: 'cancel' },
-      { text: RETRY_LABEL, onPress: () => retryRef.current() },
-    ])
-  }, [failed])
-
-  const companyBots = (bots.data ?? []).filter((bot): bot is CompanyBot => bot.kind === 'company')
   const onDeleteBot = (bot: CompanyBot) =>
     confirmDeleteBot(bot.name, () => {
       void removeBot(bot)
@@ -365,10 +356,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
         .catch(() => undefined)
     })
 
-  const choose = async (row: PostingPick) => {
-    const existing = await findBotForPosting(row.postingId).catch(() => null)
-    const choice = onPostingChosen(existing, row)
-    if (choice.type === 'open' && existing) openRef.current(existing.id)
+  const choose = (row: PostingPick) => {
+    const existing = existingFor(row.postingId)
+    if (existing) onOpenBot(existing.id)
     else setForm((current) => pickPosting(current, row))
   }
 
@@ -467,7 +457,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
         {noResults ? <Text color="t3" style={[styles.note, styles.noteFlush]}>{SEARCH_EMPTY}</Text> : null}
         {showRows
           ? rows.map((row) => (
-              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => void choose(row)} style={[styles.rowTitle, styles.card]}>
+              <Pressable key={row.postingId} accessibilityRole="button" onPress={() => choose(row)} style={[styles.rowTitle, styles.card]}>
                 <Text v="b1" weight="600" style={styles.rowTitleText}>
                   <Highlight text={pickedLine(row)} q={query.trim()} weight="600" />
                 </Text>
@@ -486,7 +476,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
         {phase.kind === 'linkBad' ? <Text lineBreakStrategyIOS="hangul-word" style={styles.note}>{LINK_BAD}</Text> : null}
         {phase.kind === 'linkRetry' ? <Text color="t3" lineBreakStrategyIOS="hangul-word" style={styles.note}>{ERROR_BODY}</Text> : null}
         {phase.kind === 'linkOk' ? (
-          <Pressable accessibilityRole="button" onPress={() => void choose(phase.posting)} style={[styles.rowTitle, styles.card]}>
+          <Pressable accessibilityRole="button" onPress={() => choose(phase.posting)} style={[styles.rowTitle, styles.card]}>
             <Text weight="600" numberOfLines={2} style={styles.rowTitleText}>
               {pickedLine(phase.posting)}
             </Text>
