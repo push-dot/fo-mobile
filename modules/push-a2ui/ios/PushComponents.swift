@@ -278,7 +278,6 @@ struct PushTodoView: View {
   let node: Node
   @Environment(\.pushTheme) private var t
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var dim = false
 
   var body: some View {
     let items = node.list("items")
@@ -297,10 +296,6 @@ struct PushTodoView: View {
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .onAppear {
-      guard !reduceMotion else { return }
-      withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) { dim = true }
-    }
   }
 
   @ViewBuilder private func mark(_ state: String, n: Int) -> some View {
@@ -310,7 +305,8 @@ struct PushTodoView: View {
         Circle().fill(t.color("green"))
         Image(systemName: "checkmark").font(.system(size: 9, weight: .heavy)).foregroundStyle(t.color("bg"))
       case "running":
-        Circle().fill(t.color("ac")).opacity(dim ? 0.35 : 1)
+        Circle().fill(t.color("ac"))
+          .phaseAnimator(reduceMotion ? [1.0] : [1.0, 0.35]) { view, o in view.opacity(o) } animation: { _ in .easeInOut(duration: 0.5) }
         Circle().fill(t.color("onFill")).frame(width: 6, height: 6)
       default:
         Circle().fill(t.color("fill2"))
@@ -385,7 +381,7 @@ struct PushPlanView: View {
       let keywords = node.strings("keywords")
       if !keywords.isEmpty {
         Flow {
-          ForEach(keywords, id: \.self) { word in
+          ForEach(Array(keywords.enumerated()), id: \.offset) { _, word in
             Text(verbatim: word).font(t.font(13)).foregroundStyle(t.color("t1"))
               .padding(.horizontal, 10).padding(.vertical, 4)
               .background(t.color("fill2"), in: Capsule())
@@ -502,6 +498,7 @@ struct PushDocumentView: View {
       .background(t.color("card"), in: RoundedRectangle(cornerRadius: t.r("sm", 12)))
       .contentShape(Rectangle())
       .onTapGesture { if let documentId { dispatch("open_review", ["documentId": documentId], from: node.id) } }
+      .accessibilityAddTraits(.isButton)
       if status != "writing" {
         VStack(spacing: 8) {
           ForEach(Array(node.list("actions").enumerated()), id: \.offset) { i, action in
@@ -547,6 +544,8 @@ struct PushJobCardView: View {
     .onTapGesture {
       if let id = node.string(for: "postingId") { dispatch("open_posting", ["postingId": id], from: node.id) }
     }
+    .accessibilityElement(children: .combine)
+    .accessibilityAddTraits(.isButton)
   }
 
   @ViewBuilder private func photo(_ company: String) -> some View {
