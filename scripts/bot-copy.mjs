@@ -18,16 +18,9 @@ const PARTICLES = { 가: '이', 를: '을', 는: '은', 와: '과', 로: '으로
 // 로봇 is a different word.
 const PATTERN = new RegExp(`(${OLD}|(?<!로)${SHORT})([${Object.keys(PARTICLES).join('')}]?)`, 'g')
 
-// A line marked with KEEP is matched against data, not shown as copy.
-export const KEEP = 'bot-copy: keep'
-
 /** @param {string} text */
 export const renameCopy = (text) =>
-  text.split('\n').map((line) => (line.includes(KEEP) ? line : renameLine(line))).join('\n')
-
-/** @param {string} line */
-const renameLine = (line) =>
-  line.replace(
+  text.replace(
     PATTERN,
     (_, /** @type {string} */ word, /** @type {keyof typeof PARTICLES | ''} */ particle) =>
       NEW + (word === OLD && particle ? PARTICLES[particle] : particle),
@@ -42,7 +35,11 @@ const filesUnder = (dir) =>
     entry.isDirectory() ? filesUnder(join(dir, entry.name)) : [join(dir, entry.name)],
   )
 
-const sources = (app = APP) => ROOTS.flatMap((root) => filesUnder(join(app, root)))
+// These files match 봇 in server bot names, they do not show it as copy.
+const KEEP = ['src/features/chat/utils/usage.ts']
+
+const sources = (app = APP) =>
+  ROOTS.flatMap((root) => filesUnder(join(app, root))).filter((file) => !KEEP.includes(relative(app, file)))
 
 /** Lines that still say 에이전트 or 봇, as `path:line: text`. */
 export const leftovers = (app = APP) =>

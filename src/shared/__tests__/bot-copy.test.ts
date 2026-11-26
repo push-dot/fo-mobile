@@ -17,7 +17,6 @@ describe('Bot copy', () => {
     [`${SHORT}이 어떻게 실행할까요?`, 'Bot이 어떻게 실행할까요?'],
     [`${SHORT}으로 고치기`, 'Bot으로 고치기'],
     ['로봇 청소기', '로봇 청소기'],
-    ["/봇$/ // bot-copy: keep", "/봇$/ // bot-copy: keep"],
     ['AI와 함께 하는 커리어', 'AI와 함께 하는 커리어'],
   ])('%s reads %s', (before, after) => {
     expect(renameCopy(before)).toBe(after)
