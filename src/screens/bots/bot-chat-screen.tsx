@@ -180,13 +180,9 @@ const Thread = ({ id }: { id: string }) => {
     if (at >= 0) void list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
   }, [currentId])
 
-  const buyCredits = useRef(purchase.buyCredits)
-  useEffect(() => {
-    buyCredits.current = purchase.buyCredits
-  }, [purchase.buyCredits])
   const onUsage = (action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
-    else buyCredits.current()
+    else purchase.buyCredits()
   }
   const onReadOff = (action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings')
   const onLocal = useSurfaceActions(id, () => setTimeout(() => input.current?.focus(), 50))
