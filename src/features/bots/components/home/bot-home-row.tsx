@@ -40,7 +40,7 @@ const BotHomeRow = ({
   const content = (
     <View accessible={false} importantForAccessibility="no-hide-descendants" style={box}>
       <View style={mascot}>
-        <Mascot size={chrome.rowMascot} state={row.mascot} color={row.color} unread={row.unreadDot} motion={rowMotion(index, held)} />
+        <Mascot key={row.id} size={chrome.rowMascot} state={row.mascot} color={row.color} unread={row.unreadDot} motion={rowMotion(index, held)} />
       </View>
       <View style={body}>
         <View style={top}>

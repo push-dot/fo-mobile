@@ -206,6 +206,104 @@ describe('push device retry', () => {
     expect(removes).toEqual([TOKEN])
   })
 
+  it('keeps the newer token when a stale register resolves while the newer one is in flight', async () => {
+    const gates: (() => void)[] = []
+    const registers: string[] = []
+    const removes: string[] = []
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: (token) => {
+        registers.push(token)
+        return new Promise<void>((resolve) => { gates.push(resolve) })
+      },
+      remove: async (token) => { removes.push(token) },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(gates).toHaveLength(1))
+    await device.signOut()
+    const newer = device.signIn('u2')
+    await vi.waitFor(() => expect(gates).toHaveLength(2))
+    gates[0]()
+    await stale
+    expect(removes).toEqual([])
+    gates[1]()
+    await newer
+    await device.signIn('u2')
+    expect(registers).toEqual([TOKEN, TOKEN])
+    await device.signOut()
+    expect(removes).toEqual([TOKEN])
+  })
+
+  it('registers the newer sign-in when a stale remove fails before the newer one claims the token', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let grant: (permission: PushPermission) => void = () => {}
+    let permissions = 0
+    const registers: string[] = []
+    const device = createPushDevice({
+      permission: () => {
+        permissions += 1
+        if (permissions === 1) return Promise.resolve('granted')
+        return new Promise((resolve) => { grant = resolve })
+      },
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async (token) => {
+        registers.push(token)
+        if (registers.length === 1) await gate
+      },
+      remove: async () => {
+        throw new Error('offline')
+      },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(registers).toHaveLength(1))
+    await device.signOut()
+    const newer = device.signIn('u2')
+    await vi.waitFor(() => expect(permissions).toBe(2))
+    release()
+    await stale
+    grant('granted')
+    await newer
+    expect(registers).toEqual([TOKEN, TOKEN])
+  })
+
+  it('retries removing a stale token at the next sign-in when the stale remove failed', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let registers = 0
+    let failRemove = true
+    const removes: string[] = []
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async () => {
+        registers += 1
+        if (registers === 1) await gate
+      },
+      remove: async (token) => {
+        if (failRemove) {
+          failRemove = false
+          throw new Error('offline')
+        }
+        removes.push(token)
+      },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(registers).toBe(1))
+    await device.signOut()
+    release()
+    await stale
+    await device.signIn('u2')
+    expect(removes).toEqual([TOKEN])
+  })
+
   it('does not ask again after a same-id retry', async () => {
     const { device, asks } = harness('undetermined', 'denied')
     await device.signIn('u1')

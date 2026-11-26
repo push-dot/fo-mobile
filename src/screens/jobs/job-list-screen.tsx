@@ -61,7 +61,7 @@ const JobListScreen = () => {
           actions: [{ icon: 'search', label: '검색', onPress: () => router.push('/search') }],
         }}
       >
-        {({ topInset, onScroll }) => <PostingGrid filters={query} header={header} onReset={() => setFilters(EMPTY)} topInset={topInset} onScroll={onScroll} />}
+        {({ topInset }) => <PostingGrid filters={query} header={header} onReset={() => setFilters(EMPTY)} topInset={topInset} />}
       </ScreenBar>
     </View>
   )

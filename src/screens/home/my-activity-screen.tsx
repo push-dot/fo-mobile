@@ -10,7 +10,7 @@ const MyActivityScreen = () => {
   return (
     <View style={styles.screen}>
       <ScreenBar bar={{ title: '내 활동', onBack: () => router.back() }}>
-        {({ onScroll }) => <ActivityTab sub={sub} onSub={setSub} onScroll={onScroll} />}
+        {() => <ActivityTab sub={sub} onSub={setSub} />}
       </ScreenBar>
     </View>
   )

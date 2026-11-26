@@ -30,7 +30,7 @@ export const createPushDevice = (ports: PushDevicePorts) => {
       try {
         await ports.remove(token)
       } catch {
-        registeredToken = token
+        if (!userId) registeredToken = token
       }
       return
     }
