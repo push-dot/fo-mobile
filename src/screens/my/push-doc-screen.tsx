@@ -176,8 +176,8 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
               </Text>
             ) : null}
             <View style={styles.badges}>
-              {jobLine ? <Badge label={jobLine} tone="grey" /> : null}
-              {application ? null : <Badge label={HUB_BADGE} tone="ac" />}
+              {jobLine ? <Badge label={jobLine} /> : null}
+              {application ? null : <Badge label={HUB_BADGE} />}
             </View>
             {application ? (
               <View style={styles.actions}>
@@ -251,7 +251,7 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
             <Section title="기술 스택" onEdit={editable('skills')} gap={spacing[3]}>
               <View style={styles.skills}>
                 {profile.skills.map((s) => (
-                  <Badge key={s} label={s} tone="grey" />
+                  <Badge key={s} label={s} />
                 ))}
               </View>
             </Section>

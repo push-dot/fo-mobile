@@ -1,6 +1,6 @@
 import { stageBadge, type Application, type Offer, type Posting, type Profile } from '@push/api-client'
 import { brandColor, careerLabel, cardCareerLabel } from '@push/shared'
-import { dday, givenName, stageTone, timeAgo } from '@/features/my'
+import { dday, givenName, stageSolid, timeAgo } from '@/features/my'
 import { palette } from '../../../theme/tokens'
 import type { ChatDoc, QsData, QsItem } from '../api/schemas'
 import type { QuickStart } from '../constants'
@@ -54,7 +54,7 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
     case 'status': {
       const all = (s.applications ?? []).map((a) => ({
         active: ACTIVE.has(a.stage),
-        item: job({ id: a.id, company: a.company, title: a.title }, { badge: { label: stageBadge(a.stage), tone: stageTone(a.stage) }, selected: PRESELECT.has(a.stage) }),
+        item: job({ id: a.id, company: a.company, title: a.title }, { badge: { label: stageBadge(a.stage), solid: stageSolid(a.stage) }, selected: PRESELECT.has(a.stage) }),
       }))
       const active = all.filter((x) => x.active).map((x) => x.item)
       return { segments: [`진행 중 ${active.length}`, `전체 ${all.length}`], items: [...active, ...all.map((x) => ({ ...x.item, seg: 1 }))] }
@@ -66,7 +66,7 @@ export const quickStartFrom = (key: string, s: QsSources, now = new Date()): QsD
           .map((o) =>
             person(o.id, o.sender.displayName, {
               sub: o.posting ? `${o.posting.company} · ${o.posting.title}` : '',
-              badge: o.status === 'SENT' ? { label: '새 제안', tone: 'ac' } : undefined,
+              badge: o.status === 'SENT' ? { label: '새 제안' } : undefined,
               meta: timeAgo(o.createdAt, now),
               body: o.message,
             }),

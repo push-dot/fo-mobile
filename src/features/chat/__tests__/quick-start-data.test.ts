@@ -7,7 +7,7 @@ import { docMeta, initialPicks, postingMeta, quickStartFrom, startLink } from '.
 
 vi.mock('@/features/my', async () => {
   const utils = await import('../../my/utils/index')
-  return { dday: utils.dday, givenName: utils.givenName, stageTone: utils.stageTone, timeAgo: utils.timeAgo }
+  return { dday: utils.dday, givenName: utils.givenName, stageSolid: utils.stageSolid, timeAgo: utils.timeAgo }
 })
 
 const now = new Date('2026-10-21T09:00:00')

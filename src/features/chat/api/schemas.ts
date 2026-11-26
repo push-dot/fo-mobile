@@ -19,7 +19,7 @@ export type QsItem = {
   sub?: string
   logo?: { text: string; color: string }
   avatar?: { text: string; color: string }
-  badge?: { label: string; tone: 'ac' | 'grey' | 'red' | 'green' | 'orange' }
+  badge?: { label: string; solid?: boolean }
   meta?: string
   body?: string
   date?: { dow: string; day: string; color: 'red' | 'orange' | 'green' }

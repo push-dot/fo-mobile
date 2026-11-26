@@ -14,7 +14,7 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
   const who = counterpart(o, box)
   const unread = !archived && box === 'received' && !o.readAt
   const badge = archived
-    ? { label: OFFER_ARCHIVED_BADGE, tone: 'grey' as const }
+    ? { label: OFFER_ARCHIVED_BADGE, solid: false }
     : offerBadge(o, box)
   return (
     <Row
@@ -34,7 +34,7 @@ const OfferRow = ({ o, box, archived }: { o: Offer; box: Box; archived?: boolean
           <Text v="b1" weight="700" numberOfLines={1} style={styles.name}>
             {who.displayName}
           </Text>
-          <Badge label={badge.label} tone={badge.tone} />
+          <Badge label={badge.label} solid={badge.solid} />
           <Text v="c2" color="t3" style={styles.time}>
             {timeAgo(o.createdAt)}
           </Text>

@@ -4,7 +4,6 @@ import type { Profile } from '@push/api-client'
 import { Badge, Icon, Text } from '../../../shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { prefetchProfile } from '../api/hooks'
-import { STATUS_TONE } from '../constants'
 import { careerLine, statusLabel } from '../utils'
 import Avatar from './avatar'
 
@@ -16,7 +15,7 @@ const ProfileRow = ({ p }: { p: Profile }) => (
         <Text v="b1" weight="700" numberOfLines={1} style={styles.name}>
           {p.displayName}
         </Text>
-        {p.careerStatus ? <Badge label={statusLabel(p.careerStatus)} tone={STATUS_TONE[p.careerStatus]} /> : null}
+        {p.careerStatus ? <Badge label={statusLabel(p.careerStatus)} /> : null}
       </View>
       <Text v="b2" color="t2" numberOfLines={1}>
         {p.headline}
