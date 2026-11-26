@@ -304,6 +304,93 @@ describe('push device retry', () => {
     expect(removes).toEqual([TOKEN])
   })
 
+  it('waits for a pending stale remove before the newer sign-in registers', async () => {
+    let releaseRegister: () => void = () => {}
+    const registerGate = new Promise<void>((resolve) => { releaseRegister = resolve })
+    let releaseRemove: () => void = () => {}
+    const removeGate = new Promise<void>((resolve) => { releaseRemove = resolve })
+    let grant: (permission: PushPermission) => void = () => {}
+    let permissions = 0
+    const events: string[] = []
+    const device = createPushDevice({
+      permission: () => {
+        permissions += 1
+        if (permissions === 1) return Promise.resolve('granted')
+        return new Promise((resolve) => { grant = resolve })
+      },
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async () => {
+        events.push('register')
+        if (events.length === 1) await registerGate
+      },
+      remove: async () => {
+        events.push('remove')
+        await removeGate
+        events.push('removed')
+      },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(events).toEqual(['register']))
+    await device.signOut()
+    const newer = device.signIn('u2')
+    await vi.waitFor(() => expect(permissions).toBe(2))
+    releaseRegister()
+    await vi.waitFor(() => expect(events).toEqual(['register', 'remove']))
+    grant('granted')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(events).toEqual(['register', 'remove'])
+    releaseRemove()
+    await stale
+    await newer
+    expect(events).toEqual(['register', 'remove', 'removed', 'register'])
+  })
+
+  it('removes an orphaned stale token at sign-out when the newer register failed', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let grant: (permission: PushPermission) => void = () => {}
+    let permissions = 0
+    let registers = 0
+    let failRemove = true
+    const removes: string[] = []
+    const device = createPushDevice({
+      permission: () => {
+        permissions += 1
+        if (permissions === 1) return Promise.resolve('granted')
+        return new Promise((resolve) => { grant = resolve })
+      },
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async () => {
+        registers += 1
+        if (registers === 1) await gate
+        else throw new Error('offline')
+      },
+      remove: async (token) => {
+        if (failRemove) {
+          failRemove = false
+          throw new Error('offline')
+        }
+        removes.push(token)
+      },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(registers).toBe(1))
+    await device.signOut()
+    const newer = device.signIn('u2')
+    await vi.waitFor(() => expect(permissions).toBe(2))
+    release()
+    await stale
+    grant('granted')
+    await expect(newer).rejects.toThrow('offline')
+    expect(removes).toEqual([])
+    await device.signOut()
+    expect(removes).toEqual([TOKEN])
+  })
+
   it('does not ask again after a same-id retry', async () => {
     const { device, asks } = harness('undetermined', 'denied')
     await device.signIn('u1')
