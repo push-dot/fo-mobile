@@ -11,7 +11,7 @@ import { COMPOSER_ROW, settleComposerLayout } from '../utils/composer-layout'
 import { composerWeight } from '../utils/composer-weight'
 
 
-export const COMPOSER_MAX_LINES = 5
+const COMPOSER_MAX_LINES = 5
 
 const ROW_HEIGHT = 44
 const PILL_PAD = 4

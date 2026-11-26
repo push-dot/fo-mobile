@@ -1,12 +1,12 @@
-import { type DataEnvelope, type ListEnvelope } from '@push/api-client'
+import { type DataEnvelope } from '@push/api-client'
 import { api, http, API_BASE_URL, API_MOCK } from '@/shared/infrastructure'
-import { sourcesApi, type PickedFile } from '@/shared/infrastructure/sources'
+import { sourcesApi } from '@/shared/infrastructure/sources'
 import { DEFAULT_DOC } from '../constants'
 import { accountFromBilling } from '../utils/account'
 import { chatDocFromSource } from '../utils/docs'
 import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
-import type { Account, ChatDoc, ConversationRow, QsData, RunInput } from './schemas'
+import type { Account, ChatDoc, QsData, RunInput } from './schemas'
 
 const c = http
 
@@ -26,15 +26,9 @@ const load: { [K in keyof QsSources]-?: () => Promise<QsSources[K]> } = {
 }
 
 export const chatApi = {
-  conversations: (q: { limit?: number; archived?: 'true' } = {}) => c.get<ListEnvelope<ConversationRow>>('conversations', { query: q }),
-  conversation: (id: string) => data(c.get<DataEnvelope<ConversationRow>>(`conversations/${id}`)),
   run: (body: RunInput) => data(c.post<DataEnvelope<Step[]>>('chat/runs', { body })),
   hubProfileId: async () => (await api.documents.list({ kind: 'HUB_PROFILE', limit: 1 })).data[0]?.id,
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
-  addDoc: async (file: PickedFile) => {
-    if (API_MOCK) return data(c.post<DataEnvelope<ChatDoc>>('chat/docs', { body: { fileName: file.name, size: file.size ?? 0 } }))
-    await sourcesApi.upload(file)
-  },
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
     const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
@@ -47,20 +41,6 @@ export const chatApi = {
     return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]])))
   },
 }
-
-export const createConversation = api.conversations.create
-
-export const renameConversation = api.conversations.rename
-
-export const archiveConversation = api.conversations.archive
-
-export const pinConversation = (id: string, expectedRevision: number, pinned: boolean) =>
-  c.patch<DataEnvelope<ConversationRow>>(`conversations/${id}`, { body: { expectedRevision, pinned } })
-
-export const unarchiveConversation = (id: string, expectedRevision: number) =>
-  c.post<DataEnvelope<ConversationRow>>(`conversations/${id}/unarchive`, { body: { expectedRevision } })
-
-export const deleteConversation = (id: string) => c.delete<void>(`conversations/${id}`)
 
 export const fetchMyProfile = api.me.profile
 
@@ -94,13 +74,3 @@ export const fetchDocumentPdf = async (id: string) => {
   if (!version) throw new Error(`document ${id} has no version`)
   return { title: doc.title, bytes: await bytesOf(api.documents.exportFile(id, version)) }
 }
-
-export const streamConversation = api.conversations.stream
-
-export const followConversation = api.conversations.follow
-
-export const resolveConversationApproval = api.conversations.resolveApproval
-
-export const fetchConversationMessages = (id: string) => api.conversations.messages(id, { limit: 50 })
-
-export const fetchConversationTurns = (id: string) => api.conversations.turns(id, { limit: 50 })

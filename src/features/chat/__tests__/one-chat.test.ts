@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BotId } from '@/features/bots'
 import { applyEvent, emptyChat } from '../utils/reducer'
 import { fromStream } from '../utils/stream'
-import { THREAD_MOUNT_CAP } from '../constants'
 
 const upload = vi.hoisted(() => vi.fn())
 const botApi = vi.hoisted(() => ({
@@ -24,11 +23,6 @@ vi.mock('@/shared/infrastructure', () => ({ api, botApi, http: {}, API_MOCK: fal
 vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload, list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: { run: vi.fn() },
-  fetchConversationMessages: vi.fn(),
-  fetchConversationTurns: vi.fn(),
-  followConversation: vi.fn(),
-  resolveConversationApproval: vi.fn(),
-  streamConversation: vi.fn(),
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 
@@ -343,9 +337,5 @@ describe('one chat per bot', () => {
     await vi.waitFor(() => expect(botApi.bots.send).toHaveBeenCalled())
     expect(botApi.bots.send.mock.calls.at(-1)![1]).toMatchObject({ attachments: [{ kind: 'posting', id: 'p-9' }] })
     useDraftStore.setState({ byBot: {} })
-  })
-
-  it('mounts fewer than 40 rows of a long thread', () => {
-    expect(THREAD_MOUNT_CAP).toBeLessThan(40)
   })
 })

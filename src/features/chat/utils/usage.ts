@@ -22,12 +22,6 @@ export const botHeaderMenu = (kind: 'push' | 'company'): HeaderMenuItem[] =>
     ? [PROFILE, FIND, { id: 'clear', label: '대화 지우기', ...TRASH }]
     : [PROFILE, FIND, { id: 'delete', label: '삭제', ...TRASH }]
 
-export const headerAction = (id: HeaderMenuId, kind: 'push' | 'company') => {
-  if (id === 'clear') return kind === 'push' ? 'confirm-clear' : 'noop'
-  if (id === 'delete') return kind === 'company' ? 'confirm-delete' : 'noop'
-  return id
-}
-
 export const clearChatConfirm = () => ({
   title: 'Push Bot과 나눈 대화를 지울까요?',
   body: '대화 내용이 모두 지워지고 되돌릴 수 없어요. 내 서류에 저장한 파일과 자료는 그대로 남아요.',

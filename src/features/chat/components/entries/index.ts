@@ -1,6 +1,5 @@
 export { default as Item } from './item'
 export { default as Queued } from './queued'
-export { default as ToolLine } from './tool-line'
 export { default as MdTable } from './md-table'
 export { default as Rich } from './rich'
 export { default as UserBubble } from './user'

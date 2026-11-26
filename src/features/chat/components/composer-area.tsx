@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { View, type TextInputInstance } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { materialPickerPath as botMaterialPath, type BotId } from '@/features/bots'
@@ -16,23 +16,18 @@ type Props = {
   onSend: (text: string, attachment?: PickedFile | string) => void
   working?: boolean
   onStop?: () => void
-  onTyping?: (typing: boolean) => void
   above?: ReactNode
   inputRef?: React.RefObject<TextInputInstance | null>
   disabled?: boolean
 }
 
-const ComposerArea = ({ botId, placeholder, onSend, working, onStop, onTyping, above, inputRef, disabled }: Props) => {
+const ComposerArea = ({ botId, placeholder, onSend, working, onStop, above, inputRef, disabled }: Props) => {
   const id = botId ?? LOCAL_DRAFT
   const draft = useDraftStore((s) => s.byBot[id])
   const text = draft?.text ?? ''
   const own = useRef<TextInputInstance>(null)
   const ref = inputRef ?? own
   const query = disabled ? null : mentionQuery(text)
-
-  useEffect(() => {
-    onTyping?.(text.length > 0)
-  }, [onTyping, text])
 
   const change = (t: string) => setDraftText(id, t)
   const submit = () => {
