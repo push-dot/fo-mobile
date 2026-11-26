@@ -87,7 +87,7 @@ export const hapticNotify = (kind: 'success' | 'warning') =>
     kind === 'success' ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning,
   )
 
-export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content)
+export const shareMessage = (content: Parameters<typeof Share.share>[0]) => Share.share(content).catch(() => undefined)
 
 export const openUrl = async (url: string) => {
   if (OPENABLE_URL.test(url)) await Linking.openURL(url)
