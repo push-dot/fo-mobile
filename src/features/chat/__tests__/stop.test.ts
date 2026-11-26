@@ -44,6 +44,21 @@ describe('stop', () => {
     expect(useChatStore.getState().chats.c1!.working?.verbs).toEqual(['생각하는 중…'])
   })
 
+  it('keeps the chat idle when the cancel fails after the run already ended', async () => {
+    prime()
+    let fail: ((error: Error) => void) | undefined
+    botApi.bots.cancel.mockReturnValueOnce(
+      new Promise((_, reject) => {
+        fail = reject
+      }),
+    )
+    stop('c1')
+    useChatStore.setState((s) => ({ chats: { ...s.chats, c1: { ...s.chats.c1!, working: null, runStartedAt: null } } }))
+    fail?.(new Error('offline'))
+    await settled()
+    expect(useChatStore.getState().chats.c1!.working).toBeNull()
+  })
+
   it('cancels the server job once, then clears the local run', async () => {
     prime()
     stop('c1')
