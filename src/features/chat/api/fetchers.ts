@@ -10,6 +10,8 @@ import type { Account, ChatDoc, QsData, RunInput } from './schemas'
 
 const c = http
 
+const QS_OPTIONAL = new Set(['hub'])
+
 const data = async <T>(p: Promise<DataEnvelope<T>>) => (await p).data
 
 const realDocs = async (): Promise<ChatDoc[]> => (await sourcesApi.list()).data.map(chatDocFromSource)
@@ -38,7 +40,7 @@ export const chatApi = {
     const needs = QS_NEEDS[key] ?? []
     const got = await Promise.allSettled(needs.map((k) => load[k]()))
     const failed = got.filter((r, i): r is PromiseRejectedResult => needs[i] !== 'doc' && r.status === 'rejected')
-    const fetched = key === 'hub' ? 0 : needs.filter((k) => k !== 'doc').length
+    const fetched = QS_OPTIONAL.has(key) ? 0 : needs.filter((k) => k !== 'doc').length
     if (fetched > 0 && failed.length === fetched) throw failed[0]!.reason
     return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]!.status === 'fulfilled' ? got[i]!.value : undefined])))
   },

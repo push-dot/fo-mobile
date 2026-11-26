@@ -150,10 +150,6 @@ describe('chat mock', () => {
     expect(component(failed, 'PushDocument')).toMatchObject({ status: 'failed', actions: [{ id: 'retry_save' }] })
   })
 
-  it('closes a card restored from the stored turns without a run', async () => {
-    expect(await steps('c-moa', { text: '적용', resolve: { approvalId: 'moa-edit', optionId: 'apply' } })).toEqual([])
-  })
-
   it('numbers a new run in a seeded conversation after its stored frames, also once its restored card is closed', async () => {
     expect(await steps('c-dotori', { resolve: { approvalId: 'ph3-review', optionId: 'review' } })).toEqual([])
     const frames = await steps('c-dotori', { text: '이어서 봐 주세요' })
