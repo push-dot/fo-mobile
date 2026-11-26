@@ -21,17 +21,23 @@ export const useToggleBookmark = () => {
   const { mutate } = useMutation({
     mutationFn: togglePostingBookmark,
     onMutate: async (p) => {
+      const interrupted = BOOKMARK_KEYS.flatMap((queryKey) => qc.getQueryCache().findAll({ queryKey, fetchStatus: 'fetching' })).map((q) => q.queryKey)
       await Promise.all(BOOKMARK_KEYS.map((queryKey) => qc.cancelQueries({ queryKey })))
-      const before = BOOKMARK_KEYS.flatMap((queryKey) => qc.getQueriesData({ queryKey }))
-      for (const queryKey of BOOKMARK_KEYS) qc.setQueriesData({ queryKey }, (old) => patchPostingBookmark(old, p.id, !p.bookmarked))
-      return before
+      const before = BOOKMARK_KEYS.flatMap((queryKey) => qc.getQueriesData({ queryKey })).filter(([, old]) => patchPostingBookmark(old, p.id, !p.bookmarked) !== old)
+      for (const [key, old] of before) qc.setQueryData(key, patchPostingBookmark(old, p.id, !p.bookmarked))
+      return { before, interrupted }
     },
-    onError: (_e, _p, before) => {
-      before?.forEach(([key, data]) => qc.setQueryData(key, data))
+    onError: (_e, _p, ctx) => {
+      ctx?.before.forEach(([key, data]) => qc.setQueryData(key, data))
       void qc.invalidateQueries({ queryKey: ['postings'] })
       void qc.invalidateQueries({ queryKey: ['search', 'postings'] })
     },
-    onSettled: () => Promise.all([qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }), qc.invalidateQueries({ queryKey: ['calendar'] })]),
+    onSettled: (_d, _e, _p, ctx) =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
+        qc.invalidateQueries({ queryKey: ['calendar'] }),
+        ...(ctx?.interrupted ?? []).map((queryKey) => qc.invalidateQueries({ queryKey, exact: true })),
+      ]),
   })
   return mutate
 }

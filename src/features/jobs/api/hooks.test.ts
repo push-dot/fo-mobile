@@ -74,4 +74,14 @@ describe('useToggleBookmark', () => {
     expect(h.qc.getQueryData(KEYS.bookmarks)).toEqual(envelope(false))
     expect(invalidated()).toEqual([KEYS.list, KEYS.detail, KEYS.search, KEYS.bookmarks, KEYS.calendar])
   })
+  it('refetches a query the tap interrupted and leaves unrelated queries fresh', async () => {
+    const pending = ['postings', 'list', { q: 'slow' }]
+    const count = ['postings', 'count', 'q=slow']
+    h.qc.setQueryData(count, { total: 3 }, { updatedAt: 1 })
+    void h.qc.fetchQuery({ queryKey: pending, queryFn: () => new Promise(() => {}) }).catch(() => undefined)
+    h.toggle.mockResolvedValue(undefined)
+    await (useToggleBookmark()(posting) as unknown as Promise<unknown>)
+    expect(invalidated()).toContainEqual(pending)
+    expect(h.qc.getQueryState(count)?.dataUpdatedAt).toBe(1)
+  })
 })
