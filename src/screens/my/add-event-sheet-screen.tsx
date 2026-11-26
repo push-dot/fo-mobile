@@ -20,9 +20,10 @@ const AddEventSheetScreen = () => {
   const [time, setTime] = useState<Date | null>(day ? atNine(day) : null)
   const add = useAddCalendarEvent(() => router.back())
 
+  const missing = !day
   useEffect(() => {
-    if (!day) router.back()
-  }, [day])
+    if (missing) router.back()
+  }, [missing])
 
   if (!day || !date || !time) return null
 

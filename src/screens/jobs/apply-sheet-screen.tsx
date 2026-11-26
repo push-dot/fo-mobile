@@ -26,10 +26,6 @@ const ApplySheetScreen = () => {
     if (!postingId) router.back()
   }, [postingId])
 
-  useEffect(() => {
-    if (apply.isError) Alert.alert('지원하지 못했어요', '잠시 후 다시 눌러 주세요.', [{ text: '닫기', style: 'cancel' }])
-  }, [apply.isError])
-
   if (!postingId) return null
 
   const p = posting.data
@@ -40,7 +36,10 @@ const ApplySheetScreen = () => {
       description={p ? `${p.company} · ${p.title}` : undefined}
       action={{
         label: apply.isPending ? '지원하는 중…' : '이 서류로 지원하기',
-        onPress: () => apply.mutate(applyBody(doc, chosen)),
+        onPress: () =>
+          apply.mutate(applyBody(doc, chosen), {
+            onError: () => Alert.alert('지원하지 못했어요', '잠시 후 다시 눌러 주세요.', [{ text: '닫기', style: 'cancel' }]),
+          }),
         disabled: !doc,
         pending: apply.isPending,
       }}

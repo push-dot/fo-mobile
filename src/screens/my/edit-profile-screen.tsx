@@ -158,15 +158,17 @@ const EditBasic = ({ p }: { p: Profile }) => {
   const [photo, setPhoto] = useState<{ uri: string; key?: string } | null>(null)
 
   const pickPhoto = async () => {
-    const res = await pickImage(AVATAR_IMAGE_OPTIONS)
-    const a = res.canceled ? null : res.assets[0]
-    if (!a) return
-    setPhoto({ uri: a.uri })
+    const before = photo
     try {
+      const res = await pickImage(AVATAR_IMAGE_OPTIONS)
+      if (res.canceled) return
+      const a = res.assets[0]
+      if (!a) return
+      setPhoto({ uri: a.uri })
       const { key } = await uploadAvatarImage(a)
       setPhoto({ uri: a.uri, key })
     } catch {
-      setPhoto(null)
+      setPhoto(before)
       Alert.alert('사진을 올리지 못했어요', '잠시 뒤에 다시 골라 주세요.')
     }
   }
@@ -198,6 +200,8 @@ const EditBasic = ({ p }: { p: Profile }) => {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="프로필 사진 바꾸기"
+            accessibilityState={{ busy: uploading }}
+            disabled={uploading}
             onPress={() => void pickPhoto()}
           >
             <Avatar name={name || p.displayName} url={photo?.uri ?? p.avatarUrl} size={64} />

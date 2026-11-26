@@ -33,7 +33,7 @@ const MaterialPickerScreen = ({ target, onClose }: { target: string; onClose: ()
     if (await attachPickedFile(target)) onClose()
   }
   const others: [string, () => void][] = [
-    ['파일에서 고르기', () => void pickFile()],
+    ['파일에서 고르기', () => void pickFile().catch(() => undefined)],
     ['링크 붙여넣기', () => setPasting(true)],
   ]
   return (

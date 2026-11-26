@@ -1,4 +1,4 @@
-import { router, type Href } from 'expo-router'
+import { router } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, Platform, View } from 'react-native'
 import {
@@ -6,7 +6,6 @@ import {
   HUB_CATEGORIES,
   HUB_SKELETON,
   ProfileRow,
-  appliedCount,
   filterSummary,
   toggle,
   useHubFilterStore,
@@ -63,9 +62,9 @@ const HubScreen = () => {
         right={
           <View style={styles.right}>
             {viewerId ? (
-              <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}` as Href)} />
+              <Button label="내 프로필" variant="secondary" size="sm" glass onPress={() => router.push(`/profiles/${viewerId}`)} />
             ) : null}
-            <GlassButton actions={[{ icon: 'search', label: '이름, 직무, 기술 검색', onPress: () => router.push({ pathname: '/search', params: { tab: 'people' } } as unknown as Href) }]} />
+            <GlassButton actions={[{ icon: 'search', label: '이름, 직무, 기술 검색', onPress: () => router.push({ pathname: '/search', params: { tab: 'people' } }) }]} />
           </View>
         }
       />
