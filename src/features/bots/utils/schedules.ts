@@ -55,6 +55,15 @@ export const scheduleSaveError = (e: unknown) => {
 
 export const schedulesValue = (count: number | null) => (count === null ? '' : `${count}개`)
 
+export type SchedulesView = 'loading' | 'error' | 'empty' | 'list'
+
+export const schedulesView = (q: { isLoading: boolean; isError: boolean; count: number | null }): SchedulesView => {
+  if (q.count !== null && q.count > 0) return 'list'
+  if (q.isError) return 'error'
+  if (q.count === 0) return 'empty'
+  return 'loading'
+}
+
 export const schedulesTitle = (count: number) => (count === 0 ? SCHEDULES_ROW : `${SCHEDULES_ROW} ${count}`)
 
 export const scheduleBody = (input: { prompt: string; cadence: ScheduleCadence; hour: number; weekday: number }) => {

@@ -29,7 +29,7 @@ const listed = (list: BotList | undefined, address: BotAddress) =>
 
 export const useBotProfile = (address: BotAddress) => {
   const q = useQuery({ queryKey: detailKey(address), queryFn: () => fetchBotProfile(address) })
-  return { data: q.data, isLoading: q.isLoading, isError: q.isError, refetch: () => void q.refetch() }
+  return { data: q.data, isLoading: q.isLoading, isFetching: q.isFetching, isError: q.isError, refetch: () => void q.refetch() }
 }
 
 export const useBot = (address: BotAddress) => {
@@ -156,7 +156,7 @@ const schedulesKey = (id: BotId) => [...BOTS, 'schedules', id] as const
 
 export const useBotSchedules = (id: BotId | undefined) => {
   const q = useQuery({ queryKey: schedulesKey(id ?? ('' as BotId)), queryFn: () => fetchSchedules(id!), enabled: id !== undefined })
-  return { data: q.data, isLoading: q.isLoading, isError: q.isError, refetch: () => void q.refetch() }
+  return { data: q.data, isLoading: q.isLoading, isFetching: q.isFetching, isError: q.isError, refetch: () => void q.refetch() }
 }
 
 export const useCreateSchedule = (id: BotId) => {

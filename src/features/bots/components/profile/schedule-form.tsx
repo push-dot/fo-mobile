@@ -65,7 +65,7 @@ const ScheduleForm = ({ botId, onDone }: { botId: BotId; onDone: () => void }) =
           </Text>
           <View style={styles.wrap}>
             {SCHEDULE_PRESETS.map((preset) => (
-              <Chip key={preset} label={preset} sheet on={prompt === preset} onPress={() => setPrompt(preset)} />
+              <Chip key={preset} label={preset} on={prompt === preset} onPress={() => setPrompt(preset)} />
             ))}
           </View>
           <TextField value={prompt} onChangeText={setPrompt} placeholder={SCHEDULE_PROMPT_PLACEHOLDER} multiline max={SCHEDULE_PROMPT_MAX} accessibilityLabel={SCHEDULE_PROMPT_LABEL} />
