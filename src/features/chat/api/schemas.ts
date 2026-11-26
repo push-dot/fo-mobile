@@ -5,7 +5,6 @@ export type ConversationRow = Conversation & { status?: 'NEEDS_APPROVAL' | 'RUNN
 export type ChatDoc = { id: string; fileName: string; size: number; createdAt: string; aiMade?: boolean }
 
 export type Account = {
-  email: string | null
   plan: 'FREE' | 'PRO' | 'ULTRA'
   credits: { used: number; total: number } | null
   paymentsEnabled?: boolean

@@ -1,4 +1,3 @@
-import { useCallback, useEffect } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ApiError, type ChatIntent } from '@push/api-client'
 import { router } from 'expo-router'
@@ -22,31 +21,26 @@ import type { RunInput } from './schemas'
 
 const RETRY_LATER = '잠시 뒤에 다시 해 주세요.'
 
-export const useStartChat = () => {
-  const run = useCallback(
-    async (title: string, message: string, attachment?: string | PickedFile, replace?: boolean, intent?: ChatIntent, context?: RunInput['context']) => {
-      try {
-        const id = await openBot('push')
-        const path = botChatPath(id as BotId)
-        if (replace) router.replace(path)
-        else router.push(path)
-        send(id, message, attachment, intent, context)
-      } catch (err) {
-        if (isConsentRequired(err)) {
-          holdOpen({ title, message, attachment, intent, context })
-          askConsent(true)
-          return
-        }
-        Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)
-      }
-    },
-    [],
-  )
-  useEffect(() => {
-    bindOpenChat((p) => void run(p.title, p.message, p.attachment, undefined, p.intent, p.context))
-  }, [run])
-  return run
+const startChat = async (title: string, message: string, attachment?: string | PickedFile, replace?: boolean, intent?: ChatIntent, context?: RunInput['context']) => {
+  try {
+    const id = await openBot('push')
+    const path = botChatPath(id as BotId)
+    if (replace) router.replace(path)
+    else router.push(path)
+    send(id, message, attachment, intent, context)
+  } catch (err) {
+    if (isConsentRequired(err)) {
+      holdOpen({ title, message, attachment, intent, context })
+      askConsent(true)
+      return
+    }
+    Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)
+  }
 }
+
+bindOpenChat((p) => void startChat(p.title, p.message, p.attachment, undefined, p.intent, p.context))
+
+export const useStartChat = () => startChat
 
 export const useMe = () => {
   const session = useSession((s) => s.session)

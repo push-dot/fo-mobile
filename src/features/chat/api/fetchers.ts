@@ -31,14 +31,15 @@ export const chatApi = {
   docs: () => (API_MOCK ? data(c.get<DataEnvelope<ChatDoc[]>>('chat/docs')) : realDocs()),
   account: async (): Promise<Account> => {
     if (API_MOCK) return data(c.get<DataEnvelope<Account>>('chat/account'))
-    const [b, me] = await Promise.all([api.billing.status(), api.auth.me()])
-    return accountFromBilling(b, me.email)
+    return accountFromBilling(await api.billing.status())
   },
   quickStart: async (key: string): Promise<QsData> => {
     if (API_MOCK) return data(c.get<DataEnvelope<QsData>>(`chat/quick-starts/${key}`))
     const needs = QS_NEEDS[key] ?? []
-    const got = await Promise.all(needs.map((k) => load[k]().catch(() => undefined)))
-    return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]])))
+    const got = await Promise.allSettled(needs.map((k) => load[k]()))
+    const failed = got.filter((r) => r.status === 'rejected')
+    if (needs.length > 0 && failed.length === needs.length) throw failed[0]!.reason
+    return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]!.status === 'fulfilled' ? got[i]!.value : undefined])))
   },
 }
 
