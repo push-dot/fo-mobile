@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
-import { LegendList, useViewability } from '@legendapp/list/react-native'
-import { useState } from 'react'
+import { LegendList, useRecyclingState, useViewability } from '@legendapp/list/react-native'
+import { useEffect, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,7 +11,7 @@ import { confirmDeleteBot } from '../profile/confirm-delete-bot'
 import { useXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
 import type { Bot, CompanyBot, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
-import { accountLabel, companyMenu, dropDeleted, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
+import { accountLabel, companyMenu, rowMotion, splitHome, type HomeMenuKey } from '../../utils/home-rows'
 import { openBotNew } from '../../utils/open-bot-new'
 import { accountPath, botChatAtPath, botChatPath, botProfilePath, materialsPath } from '../../utils/paths'
 import BotHomeBar from './bot-home-bar'
@@ -22,6 +22,7 @@ import BotHomeLoading from './bot-home-loading'
 import BotHomeRow from './bot-home-row'
 import BotHomeSearch from './bot-home-search'
 import { FIRST_SCREEN, LIST_BOTTOM } from './copy'
+import { SEARCH_DEBOUNCE_MS } from '../new/copy'
 import { barLift } from './bar-lift'
 import { homeChrome, type HomeChrome } from './metrics'
 
@@ -46,7 +47,7 @@ const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
 const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
 
 const menuActions = (bot: Bot, onMenu: (key: HomeMenuKey, bot: Bot) => void): MenuAction[] =>
-  companyMenu(bot.kind, bot.muted).map((item) => ({
+  companyMenu(bot.kind).map((item) => ({
     key: item.key,
     label: item.label,
     destructive: item.destructive,
@@ -65,7 +66,7 @@ type HomeRowProps = {
 }
 
 const HomeRow = ({ bot, activity, now, chrome, index, onMenu }: HomeRowProps) => {
-  const [seen, setSeen] = useState<boolean | null>(null)
+  const [seen, setSeen] = useRecyclingState<boolean | null>(null)
   useViewability((token) => setSeen(token.isViewable))
   const row = botRow(bot, activity, now)
   const actions = menuActions(bot, onMenu)
@@ -106,10 +107,16 @@ const BotHomeView = ({
   const xl = useXlBoardText()
   const chrome = homeChrome(xl)
   const ios = Platform.OS === 'ios'
-  const [query, setQuery] = useState<string | null>(null)
+  const [searching, setSearching] = useState(false)
+  const [text, setText] = useState('')
+  const [q, setQ] = useState('')
+  useEffect(() => {
+    const t = text.trim()
+    const id = setTimeout(() => setQ(t), t ? SEARCH_DEBOUNCE_MS : 0)
+    return () => clearTimeout(id)
+  }, [text])
   const [scrolled, setScrolled] = useState(false)
-  const searching = query !== null
-  const found = useBotSearch(query ?? '')
+  const found = useBotSearch(q)
   const now = new Date()
   const home = splitHome(bots ?? [])
   const push = home.push ?? (fallbackPush?.kind === 'push' ? fallbackPush : undefined)
@@ -136,7 +143,7 @@ const BotHomeView = ({
     if (key === 'delete')
       confirmDeleteBot(bot.name, () => {
         void onDelete(bot)
-          .then(() => dropDeleted(home.companies, bot.id, onForget))
+          .then(() => onForget(bot.id))
           .catch(() => undefined)
       })
   }
@@ -144,15 +151,7 @@ const BotHomeView = ({
   const renderItem = ({ item, index }: { item: Bot; index: number }) => <HomeRow bot={item} activity={local[item.id]} now={now} chrome={chrome} index={index} onMenu={run} />
 
   const hero = push ? (
-    <BotHomeHero
-      chrome={chrome}
-      state={botRow(push, local[push.id], now).mascot}
-      unread={botRow(push, local[push.id], now).unreadDot}
-      motion={rowMotion(0, false)}
-      row={botRow(push, local[push.id], now)}
-      actions={menuActions(push, run)}
-      onPress={() => openChat(push)}
-    />
+    <BotHomeHero chrome={chrome} motion={rowMotion(0, false)} row={botRow(push, local[push.id], now)} actions={menuActions(push, run)} onPress={() => openChat(push)} />
   ) : null
 
   return (
@@ -170,7 +169,8 @@ const BotHomeView = ({
         />
         {searching ? (
           <BotHomeSearch
-            query={query}
+            query={q}
+            hint={text.trim() === ''}
             data={found.data}
             pending={found.isLoading}
             local={local}
@@ -180,7 +180,7 @@ const BotHomeView = ({
             bottom={lift + chrome.control}
             bots={bots ?? []}
             onOpenBot={openChat}
-            onOpenMessage={(id, messageId) => router.push(botChatAtPath(id as Bot['id'], messageId))}
+            onOpenMessage={(id, messageId) => router.push(botChatAtPath(id, messageId))}
           />
         ) : loading && !bots ? (
           <BotHomeLoading chrome={chrome} top={top} />
@@ -216,11 +216,17 @@ const BotHomeView = ({
           chrome={chrome}
           lift={lift}
           searching={searching}
-          query={query ?? ''}
-          onSearch={() => setQuery('')}
+          query={text}
+          onSearch={() => {
+            setText('')
+            setSearching(true)
+          }}
           onMaterials={openMaterials}
-          onChange={setQuery}
-          onClose={() => setQuery(null)}
+          onChange={setText}
+          onClose={() => {
+            setText('')
+            setSearching(false)
+          }}
         />
       </View>
     </XlBoardChrome>

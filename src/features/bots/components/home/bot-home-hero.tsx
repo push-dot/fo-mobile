@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import { ContextMenu, Mascot, Text, type MenuAction } from '@/shared/components'
 import { useColors } from '../../../../theme'
-import type { BotRow, MascotState } from '../../types'
+import type { BotRow } from '../../types'
 import { heroLabel, type HomeMotion } from '../../utils/home-rows'
 import { HERO_NAME } from './copy'
 import BotHomePreview from './bot-home-preview'
@@ -9,16 +9,12 @@ import type { HomeChrome } from './metrics'
 
 const BotHomeHero = ({
   chrome,
-  state,
-  unread,
   motion,
   row,
   actions,
   onPress,
 }: {
   chrome: HomeChrome
-  state: MascotState
-  unread: boolean
   motion: HomeMotion
   row: BotRow
   actions: MenuAction[]
@@ -31,24 +27,24 @@ const BotHomeHero = ({
   const dot = { width: 8, height: 8, borderRadius: 4, backgroundColor: c.ac }
   const content = (
     <View style={wrap}>
-      <Mascot size={chrome.hero} state={state} color="push" motion={motion} />
+      <Mascot size={chrome.hero} state={row.mascot} color="push" motion={motion} />
       <View style={nameRow}>
         <Text allowFontScaling={chrome.noScale} weight="700" style={name}>
           {HERO_NAME}
         </Text>
-        {unread ? <View style={dot} /> : null}
+        {row.unreadDot ? <View style={dot} /> : null}
       </View>
     </View>
   )
   if (actions.length === 0) {
     return (
-      <Pressable accessibilityRole="button" accessibilityLabel={heroLabel(unread)} onPress={onPress}>
+      <Pressable accessibilityRole="button" accessibilityLabel={heroLabel(row.unreadDot)} onPress={onPress}>
         {content}
       </Pressable>
     )
   }
   return (
-    <ContextMenu actions={actions} accessibilityLabel={heroLabel(unread)} onPress={onPress} preview={<BotHomePreview row={row} />}>
+    <ContextMenu actions={actions} accessibilityLabel={heroLabel(row.unreadDot)} onPress={onPress} preview={<BotHomePreview row={row} />}>
       {content}
     </ContextMenu>
   )
