@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { LegendList } from '@legendapp/list/react-native'
 import { Platform, View } from 'react-native'
 import { materialDetailPath, materialLinkAddPath, type BotId } from '@/features/bots'
@@ -75,7 +75,7 @@ const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const list = useMaterials({ tab, q, bot })
   const view = listView(list, tab, q)
   const context = sendContextOf(forBot)
-  const now = new Date()
+  const [now] = useState(() => new Date())
   const refresh = useRefreshMaterials()
   const room = useSearchRoom()
 
@@ -85,13 +85,8 @@ const MaterialsModal = ({ forBot }: { forBot?: string }) => {
   const onOpen = (m: Material) => router.push(materialDetailPath(m.kind, m.id, bot))
   const onSend = (m: Material) => sendMaterial(context, m)
   const confirmDelete = useConfirmDeleteMaterial(room.toast)
-  const confirmRef = useRef(confirmDelete)
-  useEffect(() => {
-    confirmRef.current = confirmDelete
-  })
-  const onDelete = (m: Material) => confirmRef.current(m)
   const renderItem = ({ item }: { item: ListRow }) =>
-    item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} onDelete={onDelete} />
+    item.type === 'section' ? <SectionTitle section={item.section} count={item.count} /> : <MaterialItem material={item.material} now={now} onOpen={onOpen} onSend={onSend} onDelete={confirmDelete} />
 
   const addMenu: MenuAction[] = [
     { key: 'link', label: ADD_LABEL.link, systemImage: 'link', icon: 'link', onPress: () => runAdd('link') },

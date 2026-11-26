@@ -74,18 +74,14 @@ const Body = ({ title, description, children, action, secondary, secondaryGap, g
         <View style={styles.grabber} />
       ) : null}
       {title ? (
-        <View style={styles.header}>
-          {title ? (
-            <View style={styles.titles}>
-              <Text v="h2" accessibilityRole="header">
-                {title}
-              </Text>
-              {description ? (
-                <Text v="b2" color="t3">
-                  {description}
-                </Text>
-              ) : null}
-            </View>
+        <View style={styles.titles}>
+          <Text v="h2" accessibilityRole="header">
+            {title}
+          </Text>
+          {description ? (
+            <Text v="b2" color="t3">
+              {description}
+            </Text>
           ) : null}
         </View>
       ) : null}
@@ -121,8 +117,7 @@ const styles = StyleSheet.create((theme) => ({
   fill: { flex: 1 },
   shrink: { flex: 0 },
   grabber: { ...GRABBER.android, backgroundColor: theme.colors.deco, alignSelf: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
-  titles: { flex: 1, gap: theme.spacing[1] },
+  titles: { gap: theme.spacing[1] },
   actionEnd: { marginTop: 'auto' },
   gapTop: (marginTop: number) => ({ marginTop }),
   secondaryFill: (backgroundColor: string) => ({ backgroundColor }),

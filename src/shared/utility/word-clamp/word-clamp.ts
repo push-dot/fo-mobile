@@ -1,7 +1,7 @@
-const WORD_JOINER = /⁠/g
+import { WORD_JOINER } from '../keep-words'
 
 export const clampLines = (laidOut: string[], count: number) =>
-  laidOut.length <= count ? null : laidOut.slice(0, count).map((line) => line.replace(WORD_JOINER, '').replace(/\n$/, ''))
+  laidOut.length <= count ? null : laidOut.slice(0, count).map((line) => line.replaceAll(WORD_JOINER, '').replace(/\n$/, ''))
 
 export const dotted = (line: string) => {
   const chars = Array.from(line.trimEnd())

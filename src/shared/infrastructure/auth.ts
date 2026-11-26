@@ -5,7 +5,7 @@ import { Platform } from 'react-native'
 import { api } from './api-client'
 import { isAppleCancel } from './apple-cancel'
 import { AUTH_REDIRECT_URI } from './constants'
-import { createPkce } from './pkce'
+import { bytesToBase64Url, createPkce } from './pkce'
 import { usePhoneAuth } from './phone-auth-store'
 import { mockAppleFailing, openAuthSession } from './platform'
 import { useSession } from './session-store'
@@ -28,9 +28,6 @@ const applyAuthResult = async (result: AuthResult): Promise<SignInOutcome> => {
   await useSession.getState().set(result)
   return { kind: 'session' }
 }
-
-const bytesToBase64Url = (bytes: Uint8Array) =>
-  btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 
 export const signIn = async (provider: 'google' | 'github'): Promise<SignInOutcome> => {
   const { verifier, challenge } = await createPkce()
