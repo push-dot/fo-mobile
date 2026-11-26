@@ -2,19 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   ACCOUNT_REFERENCE_NOTE,
   ACCOUNT_REFERENCE_TITLE,
-  BOOKMARK_EMPTY,
   CONSENT_BODY,
   CONSENT_TITLE,
-  LINK_ADD_NOTE,
-  LINK_DELETED_TOAST,
-  LINK_EMPTY,
-  LINK_UNDO,
   PLAN_HEADER,
   docAiSub,
-  linkDeleteBody,
   linkMentionSub,
 } from '../constants'
-import { conversationRowMenu, headerMenu } from '../utils/conversation-menu'
 
 describe('agent s copy', () => {
   it('access mode title', () => {
@@ -32,30 +25,8 @@ describe('agent s copy', () => {
     expect(ACCOUNT_REFERENCE_NOTE).toBe('대화를 시작할 때 Bot이 이 정보부터 읽어요.')
   })
 
-  it('link delete body', () => {
-    expect(linkDeleteBody('모아페이 · 결제 플랫폼 시니어 엔지니어')).toBe('모아페이 · 결제 플랫폼 시니어 엔지니어 링크를 내 링크에서 지워요.')
-    expect(LINK_EMPTY).toBe('아직 모아 둔 링크가 없어요.')
-    expect(LINK_ADD_NOTE).toBe('추가하면 Bot이 README와 커밋을 읽어 둬요')
-    expect(LINK_DELETED_TOAST).toBe('링크를 삭제했어요')
-    expect(LINK_UNDO).toBe('되돌리기')
-    expect(BOOKMARK_EMPTY).toBe('북마크한 공고가 없어요.')
-  })
-
   it('mention rows read the way the boards draw them', () => {
     expect(docAiSub('방금')).toBe('Bot으로 만듦 · 방금')
     expect(linkMentionSub('공고', 'https://careers.moapay.kr/jobs/1182')).toBe('공고 · careers.moapay.kr/jobs/1182')
-  })
-})
-
-describe('conversation menus', () => {
-  it('header menu order', () => {
-    expect(headerMenu(false).map((a) => a.label)).toEqual(['이름 바꾸기', '쓴 서류·공고 보기', '대화 공유', '고정', '보관', '대화 삭제'])
-    expect(headerMenu(true)[3]!.label).toBe('고정 해제')
-    expect(headerMenu(false).filter((a) => a.label !== '고정').map((a) => a.label)).toEqual(headerMenu(true).filter((a) => a.label !== '고정 해제').map((a) => a.label))
-  })
-
-  it('context menu includes rename', () => {
-    expect(conversationRowMenu(false).map((a) => a.label)).toEqual(['이름 바꾸기', '고정', '보관', '삭제'])
-    expect(conversationRowMenu(true)[1]!.label).toBe('고정 해제')
   })
 })

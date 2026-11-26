@@ -39,11 +39,6 @@ export const UPLOAD_ERROR_TEXT = '파일을 올리지 못했어요. 네트워크
 export const CHAT_STOP_FORBIDDEN = '다른 담당자가 시작한 작업이라 멈출 수 없어요'
 export const CHAT_STOP_FAILED = '멈추지 못했어요. 한 번 더 눌러 주세요'
 
-export const THREAD_INITIAL_RENDER = 10
-export const THREAD_BATCH = 8
-export const THREAD_WINDOW = 2
-export const THREAD_MOUNT_CAP = THREAD_INITIAL_RENDER + THREAD_BATCH * THREAD_WINDOW
-
 export const CONSENT_TITLE = 'Bot을 쓰려면 동의가 필요해요'
 export const CONSENT_BODY = '내 서류를 다른 Bot이 참고 자료로 써요.'
 export const PLAN_HEADER = '플랜마다\n쓸 수 있는 양이 달라요'
@@ -53,15 +48,9 @@ export const USAGE_BY_BOT_TITLE = 'Bot별'
 export const ACCOUNT_REFERENCE_NOTE = '대화를 시작할 때 Bot이 이 정보부터 읽어요.'
 export const docAiSub = (ago: string) => `Bot으로 만듦 · ${ago}`
 export const linkMentionSub = (kindLabel: string, url: string) => `${kindLabel} · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
-export const linkDeleteBody = (title: string) => `${title} 링크를 내 링크에서 지워요.`
-export const LINK_EMPTY = '아직 모아 둔 링크가 없어요.'
-export const LINK_ADD_NOTE = '추가하면 Bot이 README와 커밋을 읽어 둬요'
-export const LINK_DELETED_TOAST = '링크를 삭제했어요'
 export const FILE_SHARE_FAILED = '파일을 공유하지 못했어요. 잠시 뒤에 다시 해 주세요.'
 export const FILE_SHARE_NOT_FINALIZED = '아직 마무리되지 않은 서류라 공유할 수 없어요.'
-export const LINK_UNDO = '되돌리기'
 export const PROFILE_SAVED = '프로필을 고쳤어요.'
-export const BOOKMARK_EMPTY = '북마크한 공고가 없어요.'
 export const CONSENT_AGREE = '동의하고 시작하기'
 export const DEFAULT_DOC = '허브 프로필'
 const eulReul = (name = '') => `${name}${/[가-힣]$/.test(name) && (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0 ? '을' : '를'}`
@@ -73,14 +62,9 @@ export const CHAT_ATTACHMENT_TYPES = [
   'text/plain',
   'text/markdown',
 ]
-export const CHAT_DOC_TYPES = [
-  'application/pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-]
 export const CHAT_ATTACHMENT_OPTIONS = { type: CHAT_ATTACHMENT_TYPES, copyToCacheDirectory: true }
 export const CHAT_ATTACHMENT_OPTIONS_ANDROID = { type: [...CHAT_ATTACHMENT_TYPES, 'text/*', 'application/octet-stream'], copyToCacheDirectory: true }
 export const isChatAttachment = (name: string) => /\.(pdf|docx|txt|md)$/i.test(name)
-export const CHAT_DOC_OPTIONS = { type: CHAT_DOC_TYPES, copyToCacheDirectory: true }
 
 export type QsLayout = 'link' | 'match' | 'pick' | 'status' | 'calendar' | 'cards' | 'reply'
 
@@ -208,12 +192,6 @@ const calendarAsk = (task: string, events: number): [string, string] => {
   if (task === '준비 알림 만들기') return ['준비 알림 만들기', '다가오는 일정마다 준비할 일을 알림으로 만들어 주세요']
   return ['이번 주 일정 정리', events ? `이번 주 일정 ${events}건을 정리해 주세요` : '이번 주 일정을 정리해 주세요']
 }
-
-export const KEYWORD_GLYPH = {
-  ok: { char: '✓', gap: 3 },
-  // eslint-disable-next-line no-restricted-syntax -- board value; importing the theme here breaks the node tests
-  miss: { char: '!', gap: 4 },
-} as const
 
 
 export const READ_OFF_CODE = 'FILES_READ_OFF'

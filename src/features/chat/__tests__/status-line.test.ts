@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STATUS_STEPS, canStop, isStopping, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
+import { STATUS_STEPS, isStopping, lineFromWorking, noticeBubble, statusLineView, type LiveLine } from '../utils/status-line'
 
 const at = (ms: number) => new Date(ms)
 const NOW = at(161_000)
@@ -87,10 +87,8 @@ describe('statusLineView', () => {
     expect(lineFromWorking(['중지하는 중'], NOW)).toMatchObject({ text: '중지하는 중' })
   })
 
-  it('reads a stored thinking verb as 생각 중 and can stop only a run', () => {
+  it('reads a stored thinking verb as 생각 중', () => {
     expect(lineFromWorking(['생각하는 중…'], NOW)).toMatchObject({ phase: 'thinking', text: '생각 중' })
     expect(lineFromWorking(['대기 중'], NOW)).toMatchObject({ phase: 'queued', ahead: 0 })
-    expect(canStop([{ kind: 'run', phase: 'working', since: NOW, text: '결과를 검토하는 중' }])).toBe(true)
-    expect(canStop([{ kind: 'waiting', since: NOW, for: 'answer', cardId: 'c', text: '답을 기다리고 있어요' }])).toBe(false)
   })
 })

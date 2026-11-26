@@ -9,11 +9,9 @@ import StatusRow from './status-row'
 type ItemProps = Parameters<typeof Item>[0]
 type Callbacks = Pick<ItemProps, 'onLocal' | 'onReadOff'>
 
-const noStop = () => undefined
-
 const RunningLine = ({ chatId, color }: { chatId: string; color: MascotColor }) => {
   const working = useChatWorking(chatId)
-  return working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} onStop={noStop} color={color} /> : null
+  return working ? <StatusRow verbs={working.verbs} startedAt={working.startedAt} color={color} /> : null
 }
 
 const StreamingItem = ({ chatId, row, ...rest }: { chatId: string; row: ChatItem } & Callbacks) => {

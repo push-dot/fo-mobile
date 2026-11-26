@@ -17,12 +17,6 @@ vi.mock('@/shared/infrastructure', () => ({
 vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {},
-  createConversation: vi.fn(),
-  fetchConversationMessages: vi.fn(),
-  fetchConversationTurns: vi.fn(),
-  followConversation: vi.fn(),
-  resolveConversationApproval: vi.fn(),
-  streamConversation: vi.fn(),
 }))
 
 const { useConsentPrompt } = await import('../stores')

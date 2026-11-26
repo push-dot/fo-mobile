@@ -1,38 +1,24 @@
 import { useCallback, useEffect } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ApiError, type ChatIntent, type ListEnvelope } from '@push/api-client'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { ApiError, type ChatIntent } from '@push/api-client'
 import { router } from 'expo-router'
 import { Alert } from 'react-native'
 import { botChatPath, type BotId } from '@/features/bots'
 import { fetchProfileChange, undoProfileChange, useMyLinks, type PickedFile } from '@/features/my'
 import { queryClient } from '@/providers/query-client'
-import { pickDocument, shareBytes, useSession } from '../../../shared/infrastructure'
+import { shareBytes, useSession } from '../../../shared/infrastructure'
 import { TOAST_ABOVE, showToast } from '@/shared/components'
 import { displayName } from '@/shared/utility/display-name'
-import { CHAT_DOC_OPTIONS, CHAT_DOCS_KEY, docAiSub, linkMentionSub } from '../constants'
+import { CHAT_DOCS_KEY, docAiSub, linkMentionSub } from '../constants'
 import { ago } from '../utils/ago'
 import { LINK_KIND_LABEL } from '../utils/links'
 import { cacheName } from '../utils/cache-name'
 import { exclusive, pdfName, shareErrorText } from '../utils/share'
 import type { MentionGroup } from '../utils/mentions'
 import { isConsentRequired } from '@/shared/utility/consent-error'
-import { retryUnlessMissing } from '../utils/retry'
-import { askConsent, bindOpenChat, forget, holdOpen, openBot, send } from '../stores'
-import {
-  archiveConversation,
-  chatApi,
-  deleteConversation,
-  fetchArtifactBytes,
-  fetchDocumentPdf,
-  fetchSourceBytes,
-  fetchMentionBookmarks,
-  fetchMyProfile,
-  fetchProfilePdf,
-  pinConversation,
-  renameConversation,
-  unarchiveConversation,
-} from './fetchers'
-import type { ConversationRow, RunInput } from './schemas'
+import { askConsent, bindOpenChat, holdOpen, openBot, send } from '../stores'
+import { chatApi, fetchArtifactBytes, fetchDocumentPdf, fetchSourceBytes, fetchMentionBookmarks, fetchMyProfile, fetchProfilePdf } from './fetchers'
+import type { RunInput } from './schemas'
 
 const RETRY_LATER = '잠시 뒤에 다시 해 주세요.'
 
@@ -62,71 +48,6 @@ export const useStartChat = () => {
   return run
 }
 
-export const useConversationList = () =>
-  useQuery({ queryKey: ['conversations', 'all'], queryFn: () => chatApi.conversations({ limit: 100 }) })
-
-export const useConversation = (id: string) => {
-  const qc = useQueryClient()
-  const listed = () => qc.getQueryData<ListEnvelope<ConversationRow>>(['conversations', 'all'])?.data.find((x) => x.id === id)
-  const q = useQuery({ queryKey: ['conversations', 'one', id], queryFn: () => chatApi.conversation(id), initialData: listed, retry: retryUnlessMissing })
-  const data = q.data ?? listed()
-  return { data, failed: !data && q.isError, loading: !data && q.isFetching, retry: () => void q.refetch() }
-}
-
-export const useRenameConversation = (id: string, revision: number | undefined) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (title: string) => {
-      if (revision === undefined) throw new Error('missing conversation')
-      return renameConversation(id, revision, title)
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('이름을 바꾸지 못했어요', RETRY_LATER),
-  })
-}
-
-export const usePinConversation = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (row: ConversationRow) => pinConversation(row.id, row.revision, !row.pinned),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('고정을 바꾸지 못했어요', RETRY_LATER),
-  })
-}
-
-export const useArchiveConversation = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (row: ConversationRow) => archiveConversation(row.id, row.revision),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관하지 못했어요', RETRY_LATER),
-  })
-}
-
-export const useUnarchiveConversation = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (row: ConversationRow) => unarchiveConversation(row.id, row.revision),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['conversations'] }),
-    onError: () => Alert.alert('보관을 해제하지 못했어요', RETRY_LATER),
-  })
-}
-
-export const useDeleteConversation = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => deleteConversation(id),
-    onSuccess: (_d, id) => {
-      forget(id)
-      void qc.invalidateQueries({ queryKey: ['conversations'] })
-    },
-    onError: () => Alert.alert('대화를 삭제하지 못했어요', RETRY_LATER),
-  })
-}
-
-export const useArchivedConversations = (enabled: boolean) =>
-  useQuery({ queryKey: ['conversations', 'archived'], queryFn: () => chatApi.conversations({ archived: 'true', limit: 100 }), enabled })
-
 export const useMe = () => {
   const session = useSession((s) => s.session)
   const profile = useQuery({ queryKey: ['me', 'profile'], queryFn: fetchMyProfile })
@@ -139,26 +60,8 @@ export const useChatDocs = (enabled = true) =>
 
 export const useHubProfileId = (enabled = true) => useQuery({ queryKey: ['me', 'hub-profile-id'], queryFn: chatApi.hubProfileId, enabled })
 
-export const useUploadChatDoc = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async () => {
-      const r = await pickDocument(CHAT_DOC_OPTIONS)
-      const f = r.canceled ? null : r.assets[0]
-      if (!f) return
-      if ((f.size ?? 0) > 20_000_000) throw new Error('too big')
-      await chatApi.addDoc(f)
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['me', 'sources'] }),
-    onError: (e) => Alert.alert('올리지 못했어요', e.message === 'too big' ? '20MB까지 올릴 수 있어요.' : RETRY_LATER),
-  })
-}
-
 export const useChatAccount = (enabled: boolean) =>
   useQuery({ queryKey: ['chat', 'account'], queryFn: chatApi.account, enabled })
-
-export const useRecentConversations = (enabled: boolean) =>
-  useQuery({ queryKey: ['conversations', 'recent'], queryFn: () => chatApi.conversations({ limit: 4 }), enabled })
 
 const oneShare = exclusive()
 const shareAs = (name: string, bytes: Uint8Array, mimeType?: string) => shareBytes(cacheName(name), bytes, mimeType)
@@ -169,7 +72,7 @@ export const useOpenArtifact = () =>
     onError: () => Alert.alert('파일을 열지 못했어요', RETRY_LATER),
   })
 
-export type SharedFile =
+type SharedFile =
   | { documentId: string; name?: string }
   | { sourceId: string; name: string; mimeType?: string }
   | { profile: true; name: string; photo?: boolean }

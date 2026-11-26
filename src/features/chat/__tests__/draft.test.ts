@@ -22,11 +22,6 @@ vi.mock('@/shared/infrastructure', () => ({ api, botApi, http: {}, API_MOCK: fal
 vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload: vi.fn(), list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: { run: vi.fn() },
-  fetchConversationMessages: vi.fn(),
-  fetchConversationTurns: vi.fn(),
-  followConversation: vi.fn(),
-  resolveConversationApproval: vi.fn(),
-  streamConversation: vi.fn(),
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast: vi.fn() }))
 

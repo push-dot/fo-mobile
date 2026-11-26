@@ -7,7 +7,6 @@ import {
   clearChatConfirm,
   composerPlaceholder,
   deleteBotConfirm,
-  headerAction,
   isDrawn,
   threadRows,
   isUsageExhausted,
@@ -64,16 +63,11 @@ describe('bot header and onboarding', () => {
     expect(askPlaceholder('모아페이')).toBe('모아페이 Bot에게 물어보기')
   })
 
-  it('follows the bot kind and refuses the other destructive row', () => {
+  it('follows the bot kind', () => {
     expect(botHeaderMenu('company').map((item) => item.label)).toEqual(['프로필 보기', '채팅에서 찾기', '삭제'])
     expect(botHeaderMenu('push').map((item) => item.label)).toEqual(['프로필 보기', '채팅에서 찾기', '대화 지우기'])
     expect(botHeaderMenu('company').map((item) => item.systemImage)).toEqual(['person', 'magnifyingglass', 'trash'])
     expect(botHeaderMenu('company').map((item) => item.icon)).toEqual(['user', 'search', 'delete'])
-    expect(headerAction('delete', 'company')).toBe('confirm-delete')
-    expect(headerAction('delete', 'push')).toBe('noop')
-    expect(headerAction('clear', 'push')).toBe('confirm-clear')
-    expect(headerAction('clear', 'company')).toBe('noop')
-    expect(headerAction('find', 'push')).toBe('find')
   })
 
   it('uses the drawn confirm and greeting lines', () => {

@@ -141,8 +141,6 @@ export const attach = (botId: BotId, attachment: Attachment) => attachDraftChip(
 export const resetDrafts = () => useDraftStore.setState({ byBot: {} })
 
 export const useChatStore = create<{ chats: Record<string, ChatState> }>(() => ({ chats: {} }))
-export const useChat = (id: string) => useChatStore((s) => s.chats[id] ?? emptyChat)
-
 type Outgoing = RunInput & { file?: PickedFile; reattach?: boolean }
 
 const posted = ({ file: _, ...rest }: Outgoing): RunInput => rest

@@ -19,11 +19,6 @@ vi.mock('../api/fetchers', () => ({
       return r.data
     },
   },
-  fetchConversationMessages: () => Promise.resolve({ data: [] }),
-  fetchConversationTurns: () => Promise.resolve({ data: [] }),
-  followConversation: () => (async function* () {})(),
-  resolveConversationApproval: vi.fn(),
-  streamConversation: () => (async function* () {})(),
 }))
 
 const { send, useChatStore } = await import('../stores')

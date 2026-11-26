@@ -88,7 +88,3 @@ export const lineFromWorking = (verbs: readonly string[], since: Date): LiveLine
   if (STORED_THINKING.has(text)) return { kind: 'run', phase: 'thinking', since, text: THINK_TEXT }
   return { kind: 'run', phase: 'working', since, text: text.replace(/…$/, '') }
 }
-
-export const canStop = (lines: readonly LiveLine[]) => lines.some((line) => line.kind === 'run')
-
-export const isWorkTrail = (type: string) => type === 'think' || type === 'tool' || type === 'worked'

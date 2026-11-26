@@ -13,11 +13,6 @@ vi.mock('@/shared/infrastructure', () => ({ api, botApi, http: {}, API_MOCK: fal
 vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { upload: vi.fn(), list: vi.fn() } }))
 vi.mock('../api/fetchers', () => ({
   chatApi: {},
-  fetchConversationMessages: (id: string) => api.conversations.messages(id, { limit: 50 }),
-  fetchConversationTurns: (id: string) => api.conversations.turns(id, { limit: 50 }),
-  followConversation: (...args: [string, unknown, AbortSignal]) => api.conversations.follow(...args),
-  resolveConversationApproval: (...args: unknown[]) => api.conversations.resolveApproval(...(args as [string, string, string])),
-  streamConversation: (...args: unknown[]) => api.conversations.stream(...(args as [string, object, AbortSignal])),
 }))
 vi.mock('@/shared/components/toast-store', () => ({ showToast }))
 
