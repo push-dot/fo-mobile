@@ -58,7 +58,9 @@ describe('legal text the app shows', () => {
   it.each(screens)('$name shows the app rendering, which never says the web-only word', ({ render }) => {
     const documents = shown(render())
     expect(documents).toHaveLength(1)
-    expect(documents[0]).toEqual(APP[documents[0].key])
-    expect(legalMarkdown(documents[0])).not.toContain(WEB_WORD)
+    for (const doc of documents) {
+      expect(doc).toEqual(APP[doc.key])
+      expect(legalMarkdown(doc)).not.toContain(WEB_WORD)
+    }
   })
 })

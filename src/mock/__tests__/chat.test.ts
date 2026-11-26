@@ -221,10 +221,10 @@ describe('chat mock', () => {
       for (const e of await run(id, { text: 'profile-done' })) state = applyEvent(state, e)
     }
     const at = (type: string) => state.items.flatMap((it, i) => (it.type === type || (it.type === 'surface' && it.kind === type) ? [i] : []))
-    const [u1, u2] = at('user')
-    const [r1, r2] = at('result')
-    expect(at('result')).toHaveLength(2)
-    expect(u1 < r1 && r1 < u2 && u2 < r2).toBe(true)
+    const users = at('user')
+    const results = at('result')
+    expect(results).toHaveLength(2)
+    expect([...users, ...results].sort((a, b) => a - b)).toEqual([users[0], results[0], users[1], results[1]])
   })
 
   it('plays a chat token for any text when a run: switch is set, until reset', async () => {
