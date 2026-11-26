@@ -1,11 +1,34 @@
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useRef, useState, type ComponentRef } from 'react'
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import type { PostCategory } from '@push/api-client'
-import { BODY_LABEL, MAX_IMAGES, POST_IMAGE_OPTIONS, TITLE_HINT, TITLE_LABEL, TITLE_MAX, acceptedPostImages, categoryLabel, toSocialImage, useCreatePost, type SocialImage, POST_CATEGORIES } from '@/features/social'
+import {
+  BODY_LABEL,
+  MAX_IMAGES,
+  POST_IMAGE_OPTIONS,
+  TITLE_HINT,
+  TITLE_LABEL,
+  TITLE_MAX,
+  acceptedPostImages,
+  categoryLabel,
+  toSocialImage,
+  useCreatePost,
+  type SocialImage,
+  POST_CATEGORIES,
+} from '@/features/social'
 import { Button, GlassButton, Icon, Menu, Text } from '@/shared/components'
 import { inputReset, iosLineBox } from '@/shared/components/text-field-metrics'
 import { pickImage } from '@/shared/infrastructure'
@@ -28,10 +51,17 @@ const ComposeScreen = () => {
 
   const pick = async () => {
     Keyboard.dismiss()
-    const res = await pickImage({ ...POST_IMAGE_OPTIONS, selectionLimit: MAX_IMAGES - images.length })
-    if (res.canceled) return
+    const res = await pickImage({
+      ...POST_IMAGE_OPTIONS,
+      selectionLimit: MAX_IMAGES - images.length,
+    }).catch(() => undefined)
+    if (!res || res.canceled) return
     const ok = acceptedPostImages(res.assets.map(toSocialImage))
-    if (ok.length < res.assets.length) Alert.alert('올릴 수 없는 사진이 있어요', 'JPG, PNG, WEBP, HEIC 사진만 장당 10MB까지 올릴 수 있어요.')
+    if (ok.length < res.assets.length)
+      Alert.alert(
+        '올릴 수 없는 사진이 있어요',
+        'JPG, PNG, WEBP, HEIC 사진만 장당 10MB까지 올릴 수 있어요.',
+      )
     setImages((prev) => [...prev, ...ok].slice(0, MAX_IMAGES))
   }
 
@@ -42,14 +72,37 @@ const ComposeScreen = () => {
         <Text v="h3" accessibilityRole="header" style={styles.title}>
           새 글
         </Text>
-        <Button label="게시" size="pill" style={styles.submit} disabled={!ready} onPress={() => submit.mutate({ category: category!, title, body, images })} />
+        <Button
+          label="게시"
+          size="pill"
+          style={styles.submit}
+          disabled={!ready}
+          onPress={() =>
+            submit.mutate(
+              { category: category!, title, body, images },
+              { onSuccess: () => router.back() },
+            )
+          }
+        />
       </View>
-      <ScrollView contentContainerStyle={styles.content(insets.bottom)} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content(insets.bottom)}
+        keyboardShouldPersistTaps="handled"
+      >
         <Menu
           stretch
           accessibilityLabel={`카테고리, ${category ? categoryLabel(category) : '고르지 않음'}`}
           actions={POST_CATEGORIES.flatMap((x) =>
-            x.key ? [{ key: x.key, label: x.label, selected: x.key === category, onPress: () => setCategory(x.key) }] : [],
+            x.key
+              ? [
+                  {
+                    key: x.key,
+                    label: x.label,
+                    selected: x.key === category,
+                    onPress: () => setCategory(x.key),
+                  },
+                ]
+              : [],
           )}
         >
           <View style={styles.category}>
@@ -65,7 +118,11 @@ const ComposeScreen = () => {
           </View>
         </Menu>
         <View style={styles.field}>
-          <Pressable accessible={false} onPress={() => titleRef.current?.focus()} style={styles.titleLabel}>
+          <Pressable
+            accessible={false}
+            onPress={() => titleRef.current?.focus()}
+            style={styles.titleLabel}
+          >
             <Text v="c1" weight="700" color="t2">
               {TITLE_LABEL}
             </Text>
@@ -86,7 +143,11 @@ const ComposeScreen = () => {
           />
         </View>
         <View style={styles.field}>
-          <Pressable accessible={false} onPress={() => bodyRef.current?.focus()} style={styles.bodyLabel}>
+          <Pressable
+            accessible={false}
+            onPress={() => bodyRef.current?.focus()}
+            style={styles.bodyLabel}
+          >
             <Text v="c1" weight="700" color="t2">
               {BODY_LABEL}
             </Text>
@@ -107,7 +168,12 @@ const ComposeScreen = () => {
         <View style={styles.images}>
           {images.map((a, i) => (
             <View key={a.uri}>
-              <Image source={a.uri} contentFit="cover" style={styles.image} accessibilityIgnoresInvertColors />
+              <Image
+                source={a.uri}
+                contentFit="cover"
+                style={styles.image}
+                accessibilityIgnoresInvertColors
+              />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`사진 ${i + 1} 빼기`}
@@ -120,7 +186,11 @@ const ComposeScreen = () => {
             </View>
           ))}
           {images.length < MAX_IMAGES ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`} onPress={pick}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`사진 추가, ${images.length}/${MAX_IMAGES}`}
+              onPress={pick}
+            >
               <View style={styles.addImage}>
                 <Icon name="plus" size={22} color="t1" />
                 <Text v="c2" weight="700" color="t1">
@@ -147,11 +217,27 @@ const styles = StyleSheet.create((theme) => ({
   }),
   title: { flex: 1, textAlign: 'center' },
   submit: { flexGrow: 0 },
-  content: (bottom: number) => ({ paddingHorizontal: theme.spacing[5], gap: theme.spacing[4], paddingBottom: bottom + theme.spacing[4] }),
-  category: { minHeight: 56, paddingHorizontal: theme.spacing[4], borderRadius: theme.radius.md, backgroundColor: theme.colors.fill, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  content: (bottom: number) => ({
+    paddingHorizontal: theme.spacing[5],
+    gap: theme.spacing[4],
+    paddingBottom: bottom + theme.spacing[4],
+  }),
+  category: {
+    minHeight: 56,
+    paddingHorizontal: theme.spacing[4],
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.fill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   categoryValue: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[1] },
   field: { gap: 6 },
-  titleLabel: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: theme.spacing[1] },
+  titleLabel: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing[1],
+  },
   titleInput: {
     ...inputReset,
     fontSize: 22,
@@ -179,8 +265,26 @@ const styles = StyleSheet.create((theme) => ({
   }),
   images: { flexDirection: 'row', gap: theme.spacing[2], alignItems: 'center' },
   image: { width: 80, height: 80, borderRadius: 14, backgroundColor: theme.colors.fill2 },
-  removeImage: { position: 'absolute', top: 5, right: 5, width: 22, height: 22, borderRadius: 11, backgroundColor: theme.colors.scrim, alignItems: 'center', justifyContent: 'center' },
-  addImage: { width: 80, height: 80, borderRadius: theme.radius.md, backgroundColor: theme.colors.fill, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  removeImage: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: theme.colors.scrim,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addImage: {
+    width: 80,
+    height: 80,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.fill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
 }))
 
 export default ComposeScreen

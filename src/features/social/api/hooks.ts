@@ -62,7 +62,6 @@ export const useCreatePost = () => {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['posts'] })
-      router.back()
     },
     onError: () => Alert.alert('글을 올리지 못했어요', '잠시 후 다시 시도해 주세요.'),
   })

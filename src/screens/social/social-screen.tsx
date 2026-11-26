@@ -4,7 +4,17 @@ import { LegendList } from '@legendapp/list/react-native'
 import { ActivityIndicator, View } from 'react-native'
 import type { PostCategory } from '@push/api-client'
 import { Band, PostCard, PostListSkeleton, usePosts, POST_CATEGORIES } from '@/features/social'
-import { Chip, ChipRow, FloatingHeader, GlassButton, StatusNote, Text, TopBar, emptyNoteStyle, useFloatingHeader } from '@/shared/components'
+import {
+  Chip,
+  ChipRow,
+  FloatingHeader,
+  GlassButton,
+  StatusNote,
+  Text,
+  TopBar,
+  emptyNoteStyle,
+  useFloatingHeader,
+} from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '@/theme'
 
@@ -13,6 +23,7 @@ const Separator = () => <Band />
 const SocialScreen = () => {
   const [category, setCategory] = useState<PostCategory | null>(null)
   const q = usePosts(category)
+  const [refreshing, setRefreshing] = useState(false)
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   const posts = q.data?.pages.flatMap((p) => p.data) ?? []
   const renderItem = ({ item }: { item: (typeof posts)[number] }) => <PostCard post={item} />
@@ -20,28 +31,36 @@ const SocialScreen = () => {
   return (
     <View style={styles.screen}>
       <FloatingHeader scrolled={scrolled} onHeight={onHeight}>
-      <TopBar
-        transparent
-        left={
-          <Text v="h1" accessibilityRole="header">
-            소셜
-          </Text>
-        }
-        right={
-          <>
-            <GlassButton
-              actions={[
-                {
-                  icon: 'search',
-                  label: '검색',
-                  onPress: () => router.push({ pathname: '/search', params: { tab: 'posts' } }),
-                },
-              ]}
-            />
-            <GlassButton actions={[{ icon: 'plus', label: '글쓰기', onPress: () => router.push('/(app)/(stack)/compose') }]} />
-          </>
-        }
-      />
+        <TopBar
+          transparent
+          left={
+            <Text v="h1" accessibilityRole="header">
+              소셜
+            </Text>
+          }
+          right={
+            <>
+              <GlassButton
+                actions={[
+                  {
+                    icon: 'search',
+                    label: '검색',
+                    onPress: () => router.push({ pathname: '/search', params: { tab: 'posts' } }),
+                  },
+                ]}
+              />
+              <GlassButton
+                actions={[
+                  {
+                    icon: 'plus',
+                    label: '글쓰기',
+                    onPress: () => router.push('/(app)/(stack)/compose'),
+                  },
+                ]}
+              />
+            </>
+          }
+        />
       </FloatingHeader>
       <LegendList
         data={posts}
@@ -53,20 +72,28 @@ const SocialScreen = () => {
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={() => q.hasNextPage && !q.isFetchingNextPage && q.fetchNextPage()}
         onEndReachedThreshold={0.5}
-        refreshing={q.isRefetching && !q.isFetchingNextPage}
-        onRefresh={() => q.refetch()}
+        refreshing={refreshing}
+        onRefresh={() => {
+          setRefreshing(true)
+          void q.refetch().finally(() => setRefreshing(false))
+        }}
         contentContainerStyle={styles.list(inset)}
         onScroll={onScroll}
         scrollEventThrottle={64}
         showsVerticalScrollIndicator={posts.length > 0}
         ListHeaderComponent={
-        <View style={styles.chips}>
-          <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>
-            {POST_CATEGORIES.map((cat) => (
-              <Chip key={cat.label} label={cat.label} on={cat.key === category} onPress={() => setCategory(cat.key)} />
-            ))}
-          </ChipRow>
-        </View>
+          <View style={styles.chips}>
+            <ChipRow paddingTop={spacing[2]} paddingBottom={spacing[1]}>
+              {POST_CATEGORIES.map((cat) => (
+                <Chip
+                  key={cat.label}
+                  label={cat.label}
+                  on={cat.key === category}
+                  onPress={() => setCategory(cat.key)}
+                />
+              ))}
+            </ChipRow>
+          </View>
         }
         ListEmptyComponent={
           q.isPending ? (
@@ -83,7 +110,9 @@ const SocialScreen = () => {
             />
           )
         }
-        ListFooterComponent={q.isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : undefined}
+        ListFooterComponent={
+          q.isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : undefined
+        }
       />
     </View>
   )

@@ -2,7 +2,18 @@ import { router } from 'expo-router'
 import { LegendList } from '@legendapp/list/react-native'
 import { useRef, useState, type ComponentRef } from 'react'
 import { ActivityIndicator, KeyboardAvoidingView, TextInput, View } from 'react-native'
-import { CommentComposer, CommentRow, PostHeader, postShareMessage, postUrl, saveMenuAction, threadComments, useComments, usePost, useTogglePostSave } from '@/features/social'
+import {
+  CommentComposer,
+  CommentRow,
+  PostHeader,
+  postShareMessage,
+  postUrl,
+  saveMenuAction,
+  threadComments,
+  useComments,
+  usePost,
+  useTogglePostSave,
+} from '@/features/social'
 import { TOAST_ABOVE, Text, NativeTopBar, showToast } from '@/shared/components'
 import { copyText, shareMessage } from '@/shared/infrastructure'
 import { StyleSheet } from 'react-native-unistyles'
@@ -15,14 +26,14 @@ const PostDetailScreen = ({ id }: { id: string }) => {
   const comments = useComments(id, !!post.data)
   const rows = threadComments(comments.data?.pages.flatMap((p) => p.data) ?? [])
   const renderComment = ({ item }: { item: (typeof rows)[number] }) => (
-      <CommentRow
-        comment={item}
-        reply={item.reply}
-        onReply={() => {
-          setReplyTo({ id: item.parentId ?? item.id, name: item.author.displayName })
-          inputRef.current?.focus()
-        }}
-      />
+    <CommentRow
+      comment={item}
+      reply={item.reply}
+      onReply={() => {
+        setReplyTo({ id: item.parentId ?? item.id, name: item.author.displayName })
+        inputRef.current?.focus()
+      }}
+    />
   )
 
   return (
@@ -34,16 +45,30 @@ const PostDetailScreen = ({ id }: { id: string }) => {
             icon: 'more',
             label: '더 보기',
             menu: [
-              { key: 'save', actions: [saveMenuAction(!!post.data?.saved, () => toggleSave.mutate(!post.data?.saved))] },
+              {
+                key: 'save',
+                actions: [
+                  saveMenuAction(!!post.data?.saved, () => toggleSave.mutate(!post.data?.saved)),
+                ],
+              },
               {
                 key: 'send',
                 actions: [
-                  { key: 'share', label: '공유하기', systemImage: 'square.and.arrow.up', onPress: () => void shareMessage({ message: postShareMessage(id, post.data) }) },
+                  {
+                    key: 'share',
+                    label: '공유하기',
+                    systemImage: 'square.and.arrow.up',
+                    onPress: () => void shareMessage({ message: postShareMessage(id, post.data) }),
+                  },
                   {
                     key: 'copy',
                     label: '링크 복사',
                     systemImage: 'link',
-                    onPress: () => void copyText(postUrl(id)).then(() => showToast({ message: '링크를 복사했어요', bottom: TOAST_ABOVE.cta })),
+                    onPress: () =>
+                      void copyText(postUrl(id)).then(
+                        () => showToast({ message: '링크를 복사했어요', bottom: TOAST_ABOVE.cta }),
+                        () => undefined,
+                      ),
                   },
                 ],
               },
@@ -63,10 +88,21 @@ const PostDetailScreen = ({ id }: { id: string }) => {
             contentContainerStyle={styles.list}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
-            onEndReached={() => comments.hasNextPage && !comments.isFetchingNextPage && comments.fetchNextPage()}
-            ListFooterComponent={comments.isPending || comments.isFetchingNextPage ? <ActivityIndicator style={styles.footer} /> : undefined}
+            onEndReached={() =>
+              comments.hasNextPage && !comments.isFetchingNextPage && comments.fetchNextPage()
+            }
+            ListFooterComponent={
+              comments.isPending || comments.isFetchingNextPage ? (
+                <ActivityIndicator style={styles.footer} />
+              ) : undefined
+            }
           />
-          <CommentComposer postId={id} replyTo={replyTo} onClearReply={() => setReplyTo(null)} inputRef={inputRef} />
+          <CommentComposer
+            postId={id}
+            replyTo={replyTo}
+            onClearReply={() => setReplyTo(null)}
+            inputRef={inputRef}
+          />
         </KeyboardAvoidingView>
       ) : (
         <View style={styles.center}>
