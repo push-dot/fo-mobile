@@ -1,5 +1,5 @@
 import { ApiError } from '@push/api-client'
-import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_PRODUCT_TOPUP, PAYMENTS_CLOSED_MESSAGE } from '../constants'
+import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_OTHER_ACCOUNT_MESSAGE, IAP_PRODUCT_TOPUP, PAYMENTS_CLOSED_MESSAGE } from '../constants'
 import type { PurchaseFeedback, StorePlatform, StorePurchase, SubscriptionProduct, VerifyPurchaseBody } from '../types'
 
 export const verifyBody = (platform: StorePlatform, productId: string, token: string): VerifyPurchaseBody =>
@@ -43,5 +43,8 @@ export const outcomeFromCode = (code: string | undefined): PurchaseFeedback => {
 
 export const paymentsOpen = (status: { paymentsEnabled?: boolean } | undefined) => status !== undefined && status.paymentsEnabled !== false
 
-export const verifyFailedMessage = (error: unknown) =>
-  error instanceof ApiError && error.code === 'PAYMENTS_DISABLED' ? PAYMENTS_CLOSED_MESSAGE : IAP_FAILED_MESSAGE
+export const verifyFailedMessage = (error: unknown) => {
+  if (!(error instanceof ApiError)) return IAP_FAILED_MESSAGE
+  if (error.code === 'PAYMENTS_DISABLED') return PAYMENTS_CLOSED_MESSAGE
+  return error.code === 'CONFLICT' ? IAP_OTHER_ACCOUNT_MESSAGE : IAP_FAILED_MESSAGE
+}

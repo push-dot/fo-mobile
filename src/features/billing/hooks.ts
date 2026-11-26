@@ -14,9 +14,13 @@ import {
 } from 'expo-iap'
 import { queryClient } from '@/providers/query-client'
 import { verifyPurchase } from './api/fetchers'
-import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
+import { IAP_DEFERRED_PRO_MESSAGE, IAP_FAILED_MESSAGE, IAP_OTHER_ACCOUNT_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
 import type { StorePurchase, SubscriptionProduct } from './types'
 import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored, verifyFailedMessage } from './utils/settle'
+
+type Plan = 'PRO' | 'ULTRA'
+
+const PLAN_OF_PRODUCT: Record<string, Plan> = { [IAP_PRODUCT_PRO]: 'PRO', [IAP_PRODUCT_ULTRA]: 'ULTRA' }
 
 let pending = false
 const listeners = new Set<() => void>()
@@ -24,7 +28,8 @@ const claimed = new Set<string>()
 let connecting: Promise<unknown> | null = null
 let started = false
 let lastSku: string | null = null
-let recovering: Promise<boolean> | null = null
+let deferring = false
+let recovering: Promise<string[]> | null = null
 
 const setPending = (value: boolean) => {
   pending = value
@@ -61,11 +66,12 @@ const fail = (message: string) => {
 }
 
 const report = (code?: string) => {
+  deferring = false
   const outcome = outcomeFromCode(code)
   if (outcome.kind === 'cancelled') return setPending(false)
   if (outcome.kind === 'already-owned' && lastSku === IAP_PRODUCT_TOPUP) {
     if (!pending) return
-    void recoverPurchases().then((settled) => (settled ? setPending(false) : fail(IAP_FAILED_MESSAGE)))
+    void recoverPurchases().then((settled) => (settled.includes(IAP_PRODUCT_TOPUP) ? setPending(false) : fail(IAP_FAILED_MESSAGE)))
     return
   }
   fail(outcome.message ?? IAP_FAILED_MESSAGE)
@@ -75,9 +81,12 @@ const accept = async (purchase: Purchase) => {
   if (purchase.purchaseState === 'pending') return setPending(false)
   if (!purchase.purchaseToken) return fail(IAP_FAILED_MESSAGE)
   if (!claim(purchase)) return
+  const deferred = deferring && purchase.productId in PLAN_OF_PRODUCT
+  if (deferred) deferring = false
   try {
     await settlePurchase(purchase, deps)
     refreshAccount()
+    if (deferred) Alert.alert(IAP_DEFERRED_PRO_MESSAGE)
   } catch (error) {
     fail(verifyFailedMessage(error))
   } finally {
@@ -104,19 +113,35 @@ const ready = () => {
   return connecting
 }
 
-const buy = async (sku: string, type: 'in-app' | 'subs') => {
+const buy = async (sku: string, type: 'in-app' | 'subs', serverPlan?: Plan | 'FREE') => {
   if (pending) return
   setPending(true)
   lastSku = sku
+  deferring = false
   try {
     await ready()
     if (type === 'subs' && Platform.OS === 'android') {
       const products = await fetchProducts({ skus: [sku], type: 'subs' })
       const token = androidOfferToken(Array.isArray(products) ? (products as SubscriptionProduct[]) : [], sku)
       if (!token) throw new Error('missing offer')
+      const owned = (await getAvailablePurchases()).find(
+        (p) => p.productId !== sku && p.productId in PLAN_OF_PRODUCT && p.purchaseState !== 'pending' && p.purchaseToken,
+      )
+      if (owned && PLAN_OF_PRODUCT[owned.productId] !== serverPlan) return fail(IAP_OTHER_ACCOUNT_MESSAGE)
+      const deferred = sku !== IAP_PRODUCT_ULTRA
+      const replacement = owned && {
+        purchaseToken: owned.purchaseToken,
+        subscriptionProductReplacementParams: {
+          oldProductId: owned.productId,
+          replacementMode: deferred ? ('deferred' as const) : ('charge-prorated-price' as const),
+        },
+      }
+      deferring = Boolean(owned && deferred)
       await requestPurchase({
         type: 'subs',
-        request: { google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: token }] } },
+        request: {
+          google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: token }], ...replacement },
+        },
       })
       return
     }
@@ -175,15 +200,15 @@ const unsettledPurchases = async (): Promise<Purchase[]> => {
 }
 
 const recoverOnce = async () => {
-  let settled = false
+  const settled: string[] = []
   try {
     await ready()
     for (const purchase of await unsettledPurchases()) {
-      if (await settleQuietly(purchase)) settled = true
+      if (await settleQuietly(purchase)) settled.push(purchase.productId)
     }
   } catch {
   }
-  if (settled) refreshAccount()
+  if (settled.length) refreshAccount()
   return settled
 }
 
@@ -203,8 +228,8 @@ const subscribe = (listener: () => void) => {
 
 const getPending = () => pending
 
-const buyPlan = (plan: 'PRO' | 'ULTRA') => {
-  void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs')
+const buyPlan = (plan: Plan, serverPlan: Plan | 'FREE' | undefined) => {
+  void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs', serverPlan)
 }
 
 const buyCredits = () => {
