@@ -89,6 +89,81 @@ describe('push device', () => {
   })
 })
 
+describe('push device retry', () => {
+  it('registers on a second sign-in with the same id after a rejected register', async () => {
+    const registers: string[] = []
+    let fail = true
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async (token) => {
+        if (fail) throw new Error('offline')
+        registers.push(token)
+      },
+      remove: async () => {},
+    })
+    await expect(device.signIn('u1')).rejects.toThrow('offline')
+    fail = false
+    await device.signIn('u1')
+    await device.signIn('u1')
+    expect(registers).toEqual([TOKEN])
+  })
+
+  it('does not start a second register while one is in flight', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    const registers: string[] = []
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async (token) => {
+        registers.push(token)
+        await gate
+      },
+      remove: async () => {},
+    })
+    const first = device.signIn('u1')
+    await device.signIn('u1')
+    release()
+    await first
+    expect(registers).toEqual([TOKEN])
+  })
+
+  it('does not restart a bot-job register when the permission dialog returns the app to active', async () => {
+    let grant: (permission: PushPermission) => void = () => {}
+    const registers: string[] = []
+    const removes: string[] = []
+    const device = createPushDevice({
+      permission: async () => 'undetermined',
+      request: () => new Promise((resolve) => { grant = resolve }),
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async (token) => { registers.push(token) },
+      remove: async (token) => { removes.push(token) },
+    })
+    await device.signIn('u1')
+    const job = device.botJob()
+    await device.signIn('u1')
+    grant('granted')
+    await job
+    expect(registers).toEqual([TOKEN])
+    expect(removes).toEqual([])
+  })
+
+  it('does not ask again after a same-id retry', async () => {
+    const { device, asks } = harness('undetermined', 'denied')
+    await device.signIn('u1')
+    await device.botJob()
+    await device.signIn('u1')
+    await device.botJob()
+    expect(asks()).toBe(1)
+  })
+})
+
 describe('bot job send', () => {
   it('runs the send and counts the job even when the ask throws', () => {
     let jobs = 0

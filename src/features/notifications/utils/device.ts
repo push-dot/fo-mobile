@@ -34,22 +34,36 @@ export const createPushDevice = (ports: PushDevicePorts) => {
     registeredToken = token
   }
 
+  let inflight = 0
+  const track = async (job: Promise<void>) => {
+    inflight += 1
+    try {
+      await job
+    } finally {
+      inflight -= 1
+    }
+  }
+
+  const start = async (id: string) => {
+    const leftover = registeredToken
+    if (userId !== id) asked = false
+    userId = id
+    registeredToken = null
+    const gen = ++generation
+    if (leftover) {
+      await ports.remove(leftover).catch(() => undefined)
+      if (gen !== generation) return
+    }
+    const permission = await ports.permission()
+    if (gen !== generation || userId !== id) return
+    if (permission !== 'granted') return
+    await register(gen)
+  }
+
   return {
     signIn: async (id: string) => {
-      if (userId === id) return
-      const leftover = registeredToken
-      userId = id
-      asked = false
-      registeredToken = null
-      const gen = ++generation
-      if (leftover) {
-        await ports.remove(leftover).catch(() => undefined)
-        if (gen !== generation) return
-      }
-      const permission = await ports.permission()
-      if (gen !== generation || userId !== id) return
-      if (permission !== 'granted') return
-      await register(gen)
+      if (userId === id && (registeredToken || inflight)) return
+      await track(start(id))
     },
     signOut: async () => {
       generation += 1
@@ -69,15 +83,17 @@ export const createPushDevice = (ports: PushDevicePorts) => {
       asked = true
       const gen = generation
       const id = userId
-      let permission: PushPermission
-      try {
-        permission = await ports.request()
-      } catch {
-        return
-      }
-      if (gen !== generation || userId !== id) return
-      if (permission !== 'granted') return
-      await register(gen)
+      await track((async () => {
+        let permission: PushPermission
+        try {
+          permission = await ports.request()
+        } catch {
+          return
+        }
+        if (gen !== generation || userId !== id) return
+        if (permission !== 'granted') return
+        await register(gen)
+      })())
     },
   }
 }
