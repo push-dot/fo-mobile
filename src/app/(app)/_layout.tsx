@@ -25,15 +25,20 @@ const useTabPrefetch = (ready: boolean) => {
   }, [qc, ready])
 }
 
+const PushDevice = () => {
+  usePushDevice()
+  return null
+}
+
 const AppLayout = () => {
   const ready = useHomeSnapshotSync()
-  usePushDevice()
   useColdStartTermsCheck()
   useTabPrefetch(ready)
   if (!ready) return null
   return (
     <>
       <Slot />
+      <PushDevice />
       {API_MOCK ? null : <WarmWebView />}
     </>
   )
