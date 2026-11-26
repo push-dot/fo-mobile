@@ -1,7 +1,6 @@
 import type { A2uiFrame, ConversationTurn, LinkKind, UserLink } from '@push/api-client'
 import type { ConversationRow, QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
-import { mapEvent } from '../features/chat/utils/stream'
 import { AWAITING_TEXT } from '../features/chat/constants'
 import { choiceIds, fixtureFrame, withSurfaceId } from './a2ui-fixtures'
 import { fail, generic, PROFILE_CHANGE_ASK, PROFILE_CHANGE_HEADLINE, PROFILE_CHANGE_REPLY, profileChangeRun, JD_LINES, MOA, next, PH1, pick, PROFILE_NAME, PROFILE_TODO, RESUME, startDocument, tailorResume, TODO, TODO_PLUS, verifyFail } from './bot-scripts/runs'
@@ -17,14 +16,14 @@ type Terms = { version: string; age14At: string | null; serviceTermsAt: string |
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 
-const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null, at?: string): ConversationRow => ({
+const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null): ConversationRow => ({
   id,
   revision: 1,
   applicationId: null,
   title,
   pinned: false,
-  createdAt: at ?? ago(min + 30),
-  updatedAt: at ?? ago(min),
+  createdAt: ago(min + 30),
+  updatedAt: ago(min),
   status,
   lastLine,
 })
@@ -33,11 +32,6 @@ const conversations: ConversationRow[] = [
   { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '고친 Push 프로필을 확인해 주세요', 'NEEDS_APPROVAL'), company: '모아페이' },
   { ...conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'), company: '모아페이' },
   { ...conv('c-career', '경력기술서 다듬기', 60 * 30, 'PDF로 저장했어요 · 적합도 8.2'), pinned: true },
-  conv('c-pado', '파도AI 자기소개서 초안', 3 * 24 * 60, '초안 v1을 만들었어요'),
-  conv('c-nuri', '누리클라우드 자기소개서', 5 * 24 * 60, '지원 동기 문단을 줄였어요'),
-  conv('a-toss', '토스 백엔드 이력서', 0, '적합도 7.4 · PDF로 저장했어요', null, '2026-09-28T03:00:00.000Z'),
-  conv('a-line', '라인 커버레터 초안', 0, '초안 v2를 만들었어요', null, '2026-09-14T03:00:00.000Z'),
-  conv('a-baemin', '배민 공고 갭 분석', 0, '경력 섹션을 고쳤어요', null, '2026-08-30T03:00:00.000Z'),
 ]
 const find = (id: string) => conversations.find((c) => c.id === id)
 
@@ -87,13 +81,6 @@ const scoped = (f: Frame, prefix: string): Frame => {
   }
 }
 
-const cardTitle = (card: Card) => {
-  const update = card.messages.find((m) => 'updateComponents' in m)
-  const components = update && 'updateComponents' in update ? update.updateComponents.components : []
-  const title = components.find((c) => c.id === 'title')?.text ?? (components.find((c) => c.component === 'PushChoice')?.questions as { title?: string }[] | undefined)?.[0]?.title
-  return typeof title === 'string' ? title : ''
-}
-
 const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
   let seq = lastSeq.get(id) ?? 0
   const at = new Date().toISOString()
@@ -113,9 +100,8 @@ const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
 }
 
 const closeStored = (id: string): Step[] => {
-  delete storedTurns[id]
   const c = find(id)
-  if (c) Object.assign(c, { status: null, lastLine: '' })
+  if (c) c.status = null
   return []
 }
 
@@ -161,15 +147,7 @@ mock('POST', 'chat/runs', ({ body }) => {
   const out = serve(id, steps, scenario.get(id)!.prefix)
 
   const c = find(id)
-  if (c) {
-    const events = out.flatMap((st) => mapEvent(st.frame))
-    const last = events.at(-1)
-    const line = events.findLast((e) => e.type === 'agentText' || e.type === 'token')
-    const open = waiting.get(id)
-    c.status = open && last?.type === 'surface' && last.id === open.surfaceId ? 'NEEDS_APPROVAL' : null
-    c.lastLine = c.status && open ? cardTitle(open) : (line && 'text' in line ? line.text : '').replace(/\*\*/g, '')
-    c.updatedAt = new Date().toISOString()
-  }
+  if (c) c.status = null
   return { data: out }
 })
 
