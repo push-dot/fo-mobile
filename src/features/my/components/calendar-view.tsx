@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native-unistyles'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
 import { Icon, Text } from '@/shared/components'
-import { useCalendarEvents } from '../api/hooks'
+import { useCalendarEvents, useGoogleConnected } from '../api/hooks'
 import { EVENT_TYPES } from '../constants'
 import { useCalendarDay } from '../stores'
 import type { CalendarEvent } from '../types'
@@ -23,6 +23,7 @@ const CalendarView = () => {
   const from = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate())
   const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1)
   const { data } = useCalendarEvents(from.toISOString(), to.toISOString())
+  const { data: googleConnected } = useGoogleConnected()
   const dayEvents = [...(data?.data ?? [])].sort((a, b) => a.startsAt.localeCompare(b.startsAt))
 
   return (
@@ -50,12 +51,12 @@ const CalendarView = () => {
           </Text>
         </Pressable>
       </View>
-      {data ? (
+      {googleConnected === undefined ? null : (
         <Text v="c1" color="t3" style={styles.google}>
-          {data.google.connected ? 'Google 캘린더 연결됨' : 'Google 연결 안 됨'}
+          {googleConnected ? 'Google 캘린더 연결됨' : 'Google 연결 안 됨'}
         </Text>
-      ) : null}
-      {dayEvents.length === 0 ? (
+      )}
+      {!data ? null : dayEvents.length === 0 ? (
         <Text v="b2" color="t3" style={styles.empty}>
           이날은 일정이 없어요.
         </Text>

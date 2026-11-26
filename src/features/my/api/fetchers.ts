@@ -21,13 +21,6 @@ export const myApi = {
     c
       .get<DataEnvelope<{ calendarStatus: string }>>('integrations/google')
       .then((r) => r.data.calendarStatus === 'CONNECTED', () => false),
-  calendar: async (from: string, to: string) => {
-    const [events, connected] = await Promise.all([
-      c.get<ListEnvelope<CalendarEvent>>('calendar/events', { query: { from, to, limit: 100 } }),
-      myApi.googleConnected(),
-    ])
-    return { data: events.data, google: { connected } }
-  },
   addEvent: async (body: Pick<CalendarEvent, 'type' | 'title' | 'startsAt'>) => {
     const endsAt = new Date(Date.parse(body.startsAt) + 3_600_000).toISOString()
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
