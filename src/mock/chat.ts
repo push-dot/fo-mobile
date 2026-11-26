@@ -1,5 +1,5 @@
 import type { A2uiFrame, ConversationTurn, LinkKind, UserLink } from '@push/api-client'
-import type { ConversationRow, QsData, RunInput, Step } from '@/features/chat'
+import type { QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
 import { AWAITING_TEXT } from '../features/chat/constants'
 import { choiceIds, fixtureFrame, withSurfaceId } from './a2ui-fixtures'
@@ -16,24 +16,7 @@ type Terms = { version: string; age14At: string | null; serviceTermsAt: string |
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 
-const conv = (id: string, title: string, min: number, lastLine: string, status: ConversationRow['status'] = null): ConversationRow => ({
-  id,
-  revision: 1,
-  applicationId: null,
-  title,
-  pinned: false,
-  createdAt: ago(min + 30),
-  updatedAt: ago(min),
-  status,
-  lastLine,
-})
-
-const conversations: ConversationRow[] = [
-  { ...conv('c-moa', '모아페이 백엔드 이력서', 10, '고친 Push 프로필을 확인해 주세요', 'NEEDS_APPROVAL'), company: '모아페이' },
-  { ...conv('c-dotori', '도토리증권 공고 갭 분석', 60, '경력 섹션 고치는 중', 'RUNNING'), company: '모아페이' },
-  { ...conv('c-career', '경력기술서 다듬기', 60 * 30, 'PDF로 저장했어요 · 적합도 8.2'), pinned: true },
-]
-const find = (id: string) => conversations.find((c) => c.id === id)
+const running = new Set(['c-dotori'])
 
 const accepted = () => new Date().toISOString()
 const terms: Terms = { version: LEGAL_VERSION, age14At: accepted(), serviceTermsAt: accepted(), privacyAt: accepted(), marketing: false, marketingAt: null }
@@ -100,8 +83,7 @@ const serve = (id: string, steps: Step[], prefix?: string): Step[] => {
 }
 
 const closeStored = (id: string): Step[] => {
-  const c = find(id)
-  if (c) c.status = null
+  running.delete(id)
   return []
 }
 
@@ -115,7 +97,7 @@ const script = (b: RunInput, card: Card | undefined, choice: number | undefined)
     if (verifying) state.verified = true
     return verifying ? verifyFail : (next[card.surfaceId] ?? (() => generic(b.text ?? '')))(choice, state.labels)
   }
-  if (!state && (find(id)?.status === 'RUNNING' || id === RESUMABLE_BOT)) {
+  if (!state && (running.has(id) || id === RESUMABLE_BOT)) {
     scenario.set(id, { prefix: `r${++runs}`, labels: TODO })
     return startDocument
   }
@@ -145,9 +127,7 @@ mock('POST', 'chat/runs', ({ body }) => {
   if (account.spent && choice === undefined) return { data: serve(id, fail('INSUFFICIENT_CREDITS')) }
   const steps = script(b, card, choice)
   const out = serve(id, steps, scenario.get(id)!.prefix)
-
-  const c = find(id)
-  if (c) c.status = null
+  running.delete(id)
   return { data: out }
 })
 
