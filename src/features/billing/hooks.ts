@@ -20,13 +20,15 @@ import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored, ver
 
 type Plan = 'PRO' | 'ULTRA'
 
+const PLAN_OF_PRODUCT: Record<string, Plan> = { [IAP_PRODUCT_PRO]: 'PRO', [IAP_PRODUCT_ULTRA]: 'ULTRA' }
+
 let pending = false
 const listeners = new Set<() => void>()
 const claimed = new Set<string>()
 let connecting: Promise<unknown> | null = null
 let started = false
 let lastSku: string | null = null
-let deferredSku: string | null = null
+let deferring = false
 let recovering: Promise<string[]> | null = null
 
 const setPending = (value: boolean) => {
@@ -64,7 +66,7 @@ const fail = (message: string) => {
 }
 
 const report = (code?: string) => {
-  deferredSku = null
+  deferring = false
   const outcome = outcomeFromCode(code)
   if (outcome.kind === 'cancelled') return setPending(false)
   if (outcome.kind === 'already-owned' && lastSku === IAP_PRODUCT_TOPUP) {
@@ -79,13 +81,12 @@ const accept = async (purchase: Purchase) => {
   if (purchase.purchaseState === 'pending') return setPending(false)
   if (!purchase.purchaseToken) return fail(IAP_FAILED_MESSAGE)
   if (!claim(purchase)) return
+  const deferred = deferring && purchase.productId in PLAN_OF_PRODUCT
+  if (deferred) deferring = false
   try {
     await settlePurchase(purchase, deps)
     refreshAccount()
-    if (purchase.productId === deferredSku) {
-      deferredSku = null
-      Alert.alert(IAP_DEFERRED_PRO_MESSAGE)
-    }
+    if (deferred) Alert.alert(IAP_DEFERRED_PRO_MESSAGE)
   } catch (error) {
     fail(verifyFailedMessage(error))
   } finally {
@@ -112,13 +113,11 @@ const ready = () => {
   return connecting
 }
 
-const PLAN_OF_PRODUCT: Record<string, Plan> = { [IAP_PRODUCT_PRO]: 'PRO', [IAP_PRODUCT_ULTRA]: 'ULTRA' }
-
 const buy = async (sku: string, type: 'in-app' | 'subs', serverPlan?: Plan | 'FREE') => {
   if (pending) return
   setPending(true)
   lastSku = sku
-  deferredSku = null
+  deferring = false
   try {
     await ready()
     if (type === 'subs' && Platform.OS === 'android') {
@@ -137,7 +136,7 @@ const buy = async (sku: string, type: 'in-app' | 'subs', serverPlan?: Plan | 'FR
           replacementMode: deferred ? ('deferred' as const) : ('charge-prorated-price' as const),
         },
       }
-      if (owned && deferred) deferredSku = sku
+      deferring = Boolean(owned && deferred)
       await requestPurchase({
         type: 'subs',
         request: {

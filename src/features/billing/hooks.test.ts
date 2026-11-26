@@ -217,16 +217,36 @@ describe('android plan change', () => {
     expect(h.alert).not.toHaveBeenCalled()
   })
 
-  it('tells the user the downgrade starts at the next billing date once it settles', async () => {
+  it.each([
+    ['the store delivers the replacement under the original plan', IAP_PRODUCT_ULTRA],
+    ['the store delivers the replacement under the new plan', IAP_PRODUCT_PRO],
+  ])('tells the user once that the downgrade starts at the next billing date: %s', async (_name, productId) => {
     owning(IAP_PRODUCT_PRO, { productId: IAP_PRODUCT_ULTRA, purchaseToken: 'owned-token' })
     h.requestPurchase.mockResolvedValue(undefined)
     usePersonalPurchase().buyPlan('PRO', 'ULTRA')
     await vi.waitFor(() => expect(h.requestPurchase).toHaveBeenCalled())
-    h.onUpdate?.({ productId: IAP_PRODUCT_PRO, purchaseState: 'purchased', purchaseToken: 'pro-token' })
+    h.onUpdate?.({ productId, purchaseState: 'purchased', purchaseToken: 'replacement-token' })
     await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
-    expect(h.verify).toHaveBeenCalledWith({ platform: 'GOOGLE_PLAY', productId: IAP_PRODUCT_PRO, purchaseToken: 'pro-token' })
+    h.onUpdate?.({ productId, purchaseState: 'purchased', purchaseToken: 'renewal-token' })
+    await vi.waitFor(() => expect(h.verify).toHaveBeenCalledTimes(2))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(h.verify).toHaveBeenCalledWith({ platform: 'GOOGLE_PLAY', productId, purchaseToken: 'replacement-token' })
     expect(h.alert).toHaveBeenCalledTimes(1)
     expect(h.alert).toHaveBeenCalledWith(IAP_DEFERRED_PRO_MESSAGE)
+  })
+
+  it('drops the downgrade notice when verifying the replacement fails', async () => {
+    owning(IAP_PRODUCT_PRO, { productId: IAP_PRODUCT_ULTRA, purchaseToken: 'owned-token' })
+    h.requestPurchase.mockResolvedValue(undefined)
+    h.verify.mockRejectedValueOnce(new Error('verify failed'))
+    usePersonalPurchase().buyPlan('PRO', 'ULTRA')
+    await vi.waitFor(() => expect(h.requestPurchase).toHaveBeenCalled())
+    h.onUpdate?.({ productId: IAP_PRODUCT_ULTRA, purchaseState: 'purchased', purchaseToken: 'replacement-token' })
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    h.onUpdate?.({ productId: IAP_PRODUCT_ULTRA, purchaseState: 'purchased', purchaseToken: 'retry-token' })
+    await vi.waitFor(() => expect(h.verify).toHaveBeenCalledTimes(2))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(h.alert).not.toHaveBeenCalledWith(IAP_DEFERRED_PRO_MESSAGE)
   })
 
   it('does not show the downgrade notice when the upgrade settles', async () => {
