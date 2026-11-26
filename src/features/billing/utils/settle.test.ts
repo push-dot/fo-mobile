@@ -1,6 +1,6 @@
 import { ApiError } from '@push/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA, PAYMENTS_CLOSED_MESSAGE } from '../constants'
+import { IAP_ALREADY_OWNED_MESSAGE, IAP_FAILED_MESSAGE, IAP_OTHER_ACCOUNT_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA, PAYMENTS_CLOSED_MESSAGE } from '../constants'
 import { androidOfferToken, outcomeFromCode, paymentsOpen, settlePurchase, settleRestored, verifyBody, verifyFailedMessage } from './settle'
 
 const purchase = (productId: string, purchaseToken: string | null) => ({ productId, purchaseToken })
@@ -119,7 +119,12 @@ describe('verifyFailedMessage', () => {
     expect(PAYMENTS_CLOSED_MESSAGE).toBe('지금은 결제할 수 없어요. 잠시 뒤에 다시 해 주세요.')
   })
 
+  it('says the subscription belongs to another account for 409 CONFLICT', () => {
+    expect(verifyFailedMessage(new ApiError('taken', 'CONFLICT', 409))).toBe(IAP_OTHER_ACCOUNT_MESSAGE)
+  })
+
   it('keeps the generic failure for anything else', () => {
+    expect(verifyFailedMessage(new ApiError('subscribed', 'ALREADY_SUBSCRIBED', 409))).toBe(IAP_FAILED_MESSAGE)
     expect(verifyFailedMessage(new ApiError('boom', 'INTERNAL', 500))).toBe(IAP_FAILED_MESSAGE)
     expect(verifyFailedMessage(new Error('offline'))).toBe(IAP_FAILED_MESSAGE)
   })

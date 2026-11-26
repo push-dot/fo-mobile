@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { IAP_FAILED_MESSAGE, IAP_PRODUCT_TOPUP } from './constants'
+import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
 
 type Listener<T> = (value: T) => void
 const h = vi.hoisted(() => ({
@@ -10,6 +10,7 @@ const h = vi.hoisted(() => ({
   invalidate: vi.fn(),
   pendingIOS: vi.fn(),
   available: vi.fn(),
+  fetchProducts: vi.fn(),
   platform: { OS: 'ios' as 'ios' | 'android' },
   onUpdate: null as Listener<unknown> | null,
   onError: null as Listener<{ code?: string }> | null,
@@ -20,7 +21,7 @@ vi.mock('react-native', () => ({ Alert: { alert: h.alert }, Platform: h.platform
 vi.mock('@/providers/query-client', () => ({ queryClient: { invalidateQueries: h.invalidate } }))
 vi.mock('./api/fetchers', () => ({ verifyPurchase: h.verify }))
 vi.mock('expo-iap', () => ({
-  fetchProducts: vi.fn(),
+  fetchProducts: h.fetchProducts,
   finishTransaction: h.finish,
   getAvailablePurchases: h.available,
   getPendingTransactionsIOS: h.pendingIOS,
@@ -45,6 +46,7 @@ beforeEach(() => {
   h.invalidate.mockClear()
   h.pendingIOS.mockReset()
   h.available.mockReset()
+  h.fetchProducts.mockReset()
   h.platform.OS = 'ios'
 })
 
@@ -103,6 +105,15 @@ describe('recoverPurchases', () => {
     expect(h.alert).not.toHaveBeenCalled()
   })
 
+  it('alerts when recovery settles only another product', async () => {
+    h.pendingIOS.mockResolvedValue([{ productId: IAP_PRODUCT_PRO, purchaseToken: 'sub-jws' }])
+    h.requestPurchase.mockRejectedValue(Object.assign(new Error('owned'), { code: 'already-owned' }))
+    usePersonalPurchase().buyCredits()
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.verify).toHaveBeenCalledTimes(1)
+    expect(h.alert).toHaveBeenCalledWith(IAP_FAILED_MESSAGE)
+  })
+
   it('holds pending and then alerts once when recovery settles nothing', async () => {
     let empty: (purchases: unknown[]) => void = () => {}
     h.pendingIOS.mockImplementation(() => new Promise((resolve) => { empty = resolve }))
@@ -123,7 +134,7 @@ describe('recoverPurchases', () => {
   it('skips android purchases the store still holds as pending', async () => {
     h.platform.OS = 'android'
     h.available.mockResolvedValue([{ ...unacked, purchaseState: 'pending' }])
-    await expect(recoverPurchases()).resolves.toBe(false)
+    await expect(recoverPurchases()).resolves.toEqual([])
     expect(h.verify).not.toHaveBeenCalled()
   })
 
@@ -131,7 +142,7 @@ describe('recoverPurchases', () => {
     h.platform.OS = 'android'
     h.available.mockResolvedValue([unacked])
     h.verify.mockRejectedValue(new Error('verify down'))
-    await expect(recoverPurchases()).resolves.toBe(false)
+    await expect(recoverPurchases()).resolves.toEqual([])
     expect(h.alert).not.toHaveBeenCalled()
     expect(h.finish).not.toHaveBeenCalled()
     expect(h.invalidate).not.toHaveBeenCalled()
@@ -151,5 +162,34 @@ describe('restore', () => {
     expect(h.verify).toHaveBeenCalledTimes(2)
     expect(h.invalidate).toHaveBeenCalledTimes(1)
     expect(h.alert).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('android plan change', () => {
+  const replacing = (oldProductId: string, replacementMode: string) => ({
+    purchaseToken: 'owned-token',
+    subscriptionProductReplacementParams: { oldProductId, replacementMode },
+  })
+
+  it.each([
+    ['charges the prorated price when upgrading', IAP_PRODUCT_PRO, 'ULTRA' as const, IAP_PRODUCT_ULTRA, replacing(IAP_PRODUCT_PRO, 'charge-prorated-price')],
+    ['defers the change when downgrading', IAP_PRODUCT_ULTRA, 'PRO' as const, IAP_PRODUCT_PRO, replacing(IAP_PRODUCT_ULTRA, 'deferred')],
+    ['sends a plain request when no other plan is owned', IAP_PRODUCT_ULTRA, 'ULTRA' as const, IAP_PRODUCT_ULTRA, {}],
+  ])('%s', async (_name, ownedProductId, plan, sku, replacement) => {
+    h.platform.OS = 'android'
+    h.fetchProducts.mockResolvedValue([{ id: sku, subscriptionOffers: [{ offerTokenAndroid: 'offer' }] }])
+    h.available.mockResolvedValue([
+      { productId: IAP_PRODUCT_TOPUP, purchaseToken: 'topup-token' },
+      { productId: ownedProductId, purchaseToken: 'owned-token' },
+    ])
+    h.requestPurchase.mockRejectedValue(Object.assign(new Error('cancelled'), { code: 'user-cancelled' }))
+    usePersonalPurchase().buyPlan(plan)
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.requestPurchase).toHaveBeenCalledWith({
+      type: 'subs',
+      request: {
+        google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: 'offer' }], ...replacement },
+      },
+    })
   })
 })

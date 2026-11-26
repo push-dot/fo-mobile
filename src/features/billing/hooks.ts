@@ -24,7 +24,7 @@ const claimed = new Set<string>()
 let connecting: Promise<unknown> | null = null
 let started = false
 let lastSku: string | null = null
-let recovering: Promise<boolean> | null = null
+let recovering: Promise<string[]> | null = null
 
 const setPending = (value: boolean) => {
   pending = value
@@ -65,7 +65,7 @@ const report = (code?: string) => {
   if (outcome.kind === 'cancelled') return setPending(false)
   if (outcome.kind === 'already-owned' && lastSku === IAP_PRODUCT_TOPUP) {
     if (!pending) return
-    void recoverPurchases().then((settled) => (settled ? setPending(false) : fail(IAP_FAILED_MESSAGE)))
+    void recoverPurchases().then((settled) => (settled.includes(IAP_PRODUCT_TOPUP) ? setPending(false) : fail(IAP_FAILED_MESSAGE)))
     return
   }
   fail(outcome.message ?? IAP_FAILED_MESSAGE)
@@ -114,9 +114,24 @@ const buy = async (sku: string, type: 'in-app' | 'subs') => {
       const products = await fetchProducts({ skus: [sku], type: 'subs' })
       const token = androidOfferToken(Array.isArray(products) ? (products as SubscriptionProduct[]) : [], sku)
       if (!token) throw new Error('missing offer')
+      const owned = (await getAvailablePurchases()).find(
+        (p) =>
+          p.productId !== sku &&
+          (p.productId === IAP_PRODUCT_PRO || p.productId === IAP_PRODUCT_ULTRA) &&
+          p.purchaseToken,
+      )
+      const replacement = owned && {
+        purchaseToken: owned.purchaseToken,
+        subscriptionProductReplacementParams: {
+          oldProductId: owned.productId,
+          replacementMode: sku === IAP_PRODUCT_ULTRA ? ('charge-prorated-price' as const) : ('deferred' as const),
+        },
+      }
       await requestPurchase({
         type: 'subs',
-        request: { google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: token }] } },
+        request: {
+          google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: token }], ...replacement },
+        },
       })
       return
     }
@@ -175,15 +190,15 @@ const unsettledPurchases = async (): Promise<Purchase[]> => {
 }
 
 const recoverOnce = async () => {
-  let settled = false
+  const settled: string[] = []
   try {
     await ready()
     for (const purchase of await unsettledPurchases()) {
-      if (await settleQuietly(purchase)) settled = true
+      if (await settleQuietly(purchase)) settled.push(purchase.productId)
     }
   } catch {
   }
-  if (settled) refreshAccount()
+  if (settled.length) refreshAccount()
   return settled
 }
 
