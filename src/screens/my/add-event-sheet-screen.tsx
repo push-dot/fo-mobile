@@ -5,14 +5,12 @@ import { EVENT_TYPES, fromDayParam, useAddCalendarEvent, type CalendarEventType 
 import { Chip, DatePicker, Sheet, Text, TextField } from '@/shared/components'
 import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '@/theme'
-import { withTime } from '@/shared/utility'
-
-const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+import { firstParam, withTime } from '@/shared/utility'
 
 const atNine = (day: Date) => new Date(day.getFullYear(), day.getMonth(), day.getDate(), 9, 0)
 
 const AddEventSheetScreen = () => {
-  const dayParam = param(useLocalSearchParams<{ day?: string }>().day)
+  const dayParam = firstParam(useLocalSearchParams<{ day?: string }>().day)
   const day = dayParam ? fromDayParam(dayParam) : null
   const [title, setTitle] = useState('')
   const [type, setType] = useState<CalendarEventType>('INTERVIEW')

@@ -4,9 +4,10 @@ import { Platform } from 'react-native'
 import { CHIP_FILTER_KINDS, FILTER_KEYS, FilterSheetBody, LONG_FILTER_KINDS, formatCount, useJobListStore, usePostingCount, type FilterKey } from '@/features/jobs'
 import { useTrending } from '@/features/search'
 import { IOS_FILTER_ACTION_GAP, Sheet, SHEET_ACTION_GAP, useSheetScrollMax } from '@/shared/components'
+import { firstParam } from '@/shared/utility'
 
 const kindOf = (value: string | string[] | undefined) => {
-  const kind = Array.isArray(value) ? value[0] : value
+  const kind = firstParam(value)
   return FILTER_KEYS.includes(kind as FilterKey) ? (kind as FilterKey) : null
 }
 
