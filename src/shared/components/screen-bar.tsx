@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react'
-import { Platform, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useHeaderHeight } from 'expo-router/react-navigation'
 import { StyleSheet } from 'react-native-unistyles'
 import { spacing } from '../../theme'
@@ -9,7 +9,6 @@ import TopBar from './top-bar'
 
 type ScreenBarScroll = {
   topInset: number
-  onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
 const ScreenBar = ({ bar: { actions, ...bar }, children }: { bar: ComponentProps<typeof TopBar> & { actions?: GlassAction[] }; children: (scroll: ScreenBarScroll) => ReactNode }) => {

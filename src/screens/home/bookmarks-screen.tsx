@@ -8,8 +8,8 @@ const BookmarksScreen = () => {
   return (
     <View style={styles.screen}>
       <ScreenBar bar={{ title: '북마크', onBack: () => router.back() }}>
-        {({ onScroll }) => (
-          <ScrollView contentInsetAdjustmentBehavior="automatic" onScroll={onScroll} scrollEventThrottle={16}>
+        {() => (
+          <ScrollView contentInsetAdjustmentBehavior="automatic">
             <ActivityBookmarks />
           </ScrollView>
         )}

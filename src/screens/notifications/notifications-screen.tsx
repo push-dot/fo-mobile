@@ -56,7 +56,7 @@ const NotificationsScreen = () => {
           right: <Button label="모두 읽음" variant="secondary" size="sm" glass paddingX={18} style={styles.allRead(button)} disabled={!q.isPending && !unread} onPress={() => read.mutate('all')} />,
         }}
       >
-        {({ topInset, onScroll }) => (
+        {({ topInset }) => (
         <LegendList
           data={rows}
           keyExtractor={(r) => r.key}
@@ -64,8 +64,6 @@ const NotificationsScreen = () => {
           estimatedItemSize={72}
           contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.list(topInset)}
-            onScroll={onScroll}
-            scrollEventThrottle={64}
           renderItem={renderItem}
           ListEmptyComponent={
             q.isPending ? (

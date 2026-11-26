@@ -40,7 +40,7 @@ import {
   type PostingPick,
 } from '../../utils/create-form'
 import { confirmDeleteBot } from '../profile/confirm-delete-bot'
-import { colorA11y } from '../profile/profile-rows'
+import { COLOR_TITLE, colorA11y } from '../profile/profile-rows'
 import BotLimitDelete from './bot-limit-delete'
 import {
   CANCEL_LABEL,
@@ -151,7 +151,7 @@ const Swatch = ({ name, index, on, onPick }: { name: BotColor; index: number; on
 }
 
 const Swatches = ({ color, onPick }: { color: BotColor; onPick: (next: BotColor) => void }) => (
-  <View accessibilityRole="radiogroup" style={styles.swatches}>
+  <View accessibilityRole="radiogroup" accessibilityLabel={COLOR_TITLE} style={styles.swatches}>
     {BOT_COLORS.map((name, index) => (
       <Swatch key={name} name={name} index={index} on={name === color} onPick={onPick} />
     ))}
@@ -228,11 +228,12 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
     if (!postingId) return
     let cancel = false
     void (async () => {
+      const pending = loadPosting(postingId)
       const list = await queryClient.ensureQueryData(botListQuery).catch(() => undefined)
       if (cancel) return
       const existing = list?.bots.find((bot) => bot.kind === 'company' && bot.postingId === postingId)
       if (existing) return openBot(existing.id)
-      const posting = await loadPosting(postingId)
+      const posting = await pending
       if (cancel || !posting) return
       setForm((current) => (current.phase.kind === 'idle' ? pickPosting(current, posting) : current))
     })()
@@ -390,7 +391,7 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
       {organizing ? (
         <GlassButton circle iconSize={20} actions={[{ icon: 'back', label: '뒤로', onPress: () => setOrganizing(false) }]} />
       ) : (
-        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: phase.kind === 'creating' ? undefined : onClose }]} />
+        <GlassButton circle iconSize={20} actions={[{ icon: 'x', label: CLOSE_LABEL, onPress: onClose, disabled: phase.kind === 'creating' }]} />
       )}
       <Text v="h3" accessibilityRole="header" allowFontScaling={!xl} style={[styles.title, xl && styles.titleXl]}>
         {organizing ? DELETE_TITLE : SHEET_TITLE}

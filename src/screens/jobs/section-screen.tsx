@@ -9,11 +9,10 @@ const SectionScreen = ({ kind }: { kind: SectionKind }) => {
   return (
     <View style={styles.screen}>
       <ScreenBar bar={{ title: s.title, onBack: () => router.back() }}>
-        {({ topInset, onScroll }) => (
+        {({ topInset }) => (
           <PostingGrid
             filters={withDeadlineWindow({ sort: kind })}
             topInset={topInset}
-            onScroll={onScroll}
             header={
               <Text v="b2" color="t3" style={styles.description}>
                 {s.description}

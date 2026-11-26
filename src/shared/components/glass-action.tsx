@@ -17,6 +17,7 @@ type GlassAction = {
   active?: boolean
   color?: keyof Colors
   badge?: number
+  disabled?: boolean
 }
 
 const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction; width: number; iconSize?: number; filled?: boolean }) => {
@@ -47,7 +48,8 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={a.label}
-      accessibilityState={{ selected: !!a.active }}
+      accessibilityState={{ selected: !!a.active, disabled: !!a.disabled }}
+      disabled={a.disabled}
       onPress={a.onPress}
       hitSlop={4}
       android_ripple={filled ? { color: c.fill2, foreground: true } : undefined}
