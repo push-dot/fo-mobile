@@ -162,7 +162,10 @@ export const QUICK_STARTS: QuickStart[] = [
   {
     key: 'calendar', label: '캘린더 관리', icon: 'qs-calendar', layout: 'calendar', action: (n) => CALENDAR_TASKS[n]!,
     title: '캘린더로 무엇을 할까요?', description: '지원·면접·마감·커피챗을 한곳에서 정리해요.',
-    start: (i) => opened('이번 주 일정 정리', `${i.task}: 이번 주 일정 ${i.picked.length}건을 정리해 주세요`, 'calendar'),
+    start: (i) => {
+      const [title, ask] = calendarAsk(i.task, i.picked.length)
+      return opened(title, `${i.task}: ${ask}`, 'calendar')
+    },
   },
   {
     key: 'hub', label: '허브 프로필 다듬기', icon: 'qs-hub', layout: 'cards', multi: true, grid: true, action: '다듬기 시작', readsHub: true,
@@ -198,6 +201,13 @@ export const QUICK_STARTS: QuickStart[] = [
 ]
 
 export const CALENDAR_TASKS = ['이번 주 정리하기', '마감일 넣기', '면접·커피챗 잡기', '준비 알림 만들기'] as const
+
+const calendarAsk = (task: string, events: number): [string, string] => {
+  if (task === '마감일 넣기') return ['마감일 넣기', '북마크한 공고의 마감일을 캘린더에 넣어 주세요']
+  if (task === '면접·커피챗 잡기') return ['면접·커피챗 잡기', '면접과 커피챗 일정을 캘린더에 잡아 주세요']
+  if (task === '준비 알림 만들기') return ['준비 알림 만들기', '다가오는 일정마다 준비할 일을 알림으로 만들어 주세요']
+  return ['이번 주 일정 정리', events ? `이번 주 일정 ${events}건을 정리해 주세요` : '이번 주 일정을 정리해 주세요']
+}
 
 export const KEYWORD_GLYPH = {
   ok: { char: '✓', gap: 3 },
