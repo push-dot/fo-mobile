@@ -30,6 +30,7 @@ export const queueBusyMessage = (retryAfterSec?: number, reason?: unknown) => {
   if (retryAfterSec) return queueBusyText(retryAfterSec)
   return ERROR_TEXT.QUEUE_BUSY
 }
+export const TRY_LATER = '잠시 뒤에 다시 해 주세요.'
 export const DISCONNECT_REASON = '연결이 끊겼어요'
 export const DEFAULT_ERROR_TEXT = '작업을 이어가지 못했어요. 다시 보내 주세요.'
 export const GATED_STEP = -1

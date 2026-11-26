@@ -13,7 +13,7 @@ const BulletList = ({ items, markId, hitsBefore }: { items: string[]; markId: st
   return (
     <View style={styles.bullets}>
       {items.map((line, i) => (
-        <View key={line} style={styles.bulletRow}>
+        <View key={i} style={styles.bulletRow}>
           <View style={styles.bulletDot} />
           <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[i]} style={styles.item(textMax)} />
         </View>

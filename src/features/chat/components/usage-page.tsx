@@ -52,8 +52,8 @@ const UsagePage = () => {
               <GroupTitle style={TITLE}>{USAGE_BY_BOT_TITLE}</GroupTitle>
               <View style={styles.group}>
                 <SettingsGroup>
-                  {bots.map((b) => (
-                    <View key={b.name} style={styles.row}>
+                  {bots.map((b, i) => (
+                    <View key={i} style={styles.row}>
                       <Text v="b1" style={styles.name}>{b.name}</Text>
                       <Text v="b2" color="t2" style={styles.nums}>{`${b.percent}%`}</Text>
                     </View>

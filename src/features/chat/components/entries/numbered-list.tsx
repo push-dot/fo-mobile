@@ -17,7 +17,7 @@ const NumberedList = ({ items, markId, hitsBefore }: { items: string[]; markId?:
   return (
     <View style={styles.numbered}>
       {items.map((line, n) => (
-        <View key={line} style={styles.row}>
+        <View key={n} style={styles.row}>
           <NumberMark n={n + 1} />
           <Rich v="b1" text={line} markId={markId} hitsBefore={hitsBefore?.[n]} style={styles.item(textMax)} />
         </View>
