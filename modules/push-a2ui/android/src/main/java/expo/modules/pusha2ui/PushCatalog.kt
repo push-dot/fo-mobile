@@ -18,6 +18,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -31,6 +32,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -60,6 +63,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextDecoration
@@ -256,7 +261,10 @@ object PushChoice : A2uiComponent {
         Modifier.fillMaxWidth()
           .heightIn(min = 52.dp)
           .alpha(if (!open && !on) ANSWERED_ALPHA else 1f)
-          .clickable(enabled = live && q.answerable && !c.change, role = if (q.multiple) Role.Checkbox else Role.RadioButton) { tap(q, c) }
+          .then(
+            if (q.multiple) Modifier.toggleable(value = on, enabled = live && q.answerable && !c.change, role = Role.Checkbox) { tap(q, c) }
+            else Modifier.selectable(selected = on, enabled = live && q.answerable && !c.change, role = Role.RadioButton) { tap(q, c) }
+          )
           .padding(horizontal = 4.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -337,8 +345,6 @@ object PushTodo : A2uiComponent {
     val context = LocalContext.current
     // Android's "Remove animations" sets the animator scale to 0; the running step then holds still, as on iOS.
     val still = remember { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
-    val pulse by rememberInfiniteTransition(label = "todo").animateFloat(1f, 0.35f, infiniteRepeatable(tween(500), RepeatMode.Reverse), label = "running")
-    val blink = if (still) 1f else pulse
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
       Title("할 일")
       properties.bind(Items).maps().forEachIndexed { i, item ->
@@ -352,7 +358,7 @@ object PushTodo : A2uiComponent {
                 PushIcon(PushIcons.CHECK, t.color("bg"), 11.dp, strokeWidth = 3f)
               }
               "running" -> {
-                Box(Modifier.matchParentSize().alpha(blink).background(t.color("ac"), shape))
+                RunningMark(t.color("ac"), shape, still)
                 Box(Modifier.size(6.dp).background(t.color("onFill"), CircleShape))
               }
               else -> {
@@ -371,6 +377,16 @@ object PushTodo : A2uiComponent {
       }
     }
   }
+}
+
+@Composable
+private fun BoxScope.RunningMark(color: Color, shape: Shape, still: Boolean) {
+  if (still) {
+    Box(Modifier.matchParentSize().background(color, shape))
+    return
+  }
+  val pulse = rememberInfiniteTransition(label = "todo").animateFloat(1f, 0.35f, infiniteRepeatable(tween(500), RepeatMode.Reverse), label = "running")
+  Box(Modifier.matchParentSize().graphicsLayer { alpha = pulse.value }.background(color, shape))
 }
 
 // MARK: PushDiff
@@ -540,7 +556,7 @@ object PushDocument : A2uiComponent {
         Modifier.fillMaxWidth()
           .clip(RoundedCornerShape(t.r("sm", 12.dp)))
           .background(t.color("card"))
-          .clickable(enabled = documentId != null) { documentId?.let { send("open_review", mapOf("documentId" to it)) } }
+          .clickable(enabled = documentId != null, role = Role.Button) { documentId?.let { send("open_review", mapOf("documentId" to it)) } }
           .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -553,7 +569,7 @@ object PushDocument : A2uiComponent {
           properties[Meta]?.takeIf { it.isNotEmpty() }?.let { Caption(it) }
         }
         if (properties[Share] == true && documentId != null) {
-          Box(Modifier.size(36.dp).clip(CircleShape).clickable(role = Role.Button) { send("share", mapOf("documentId" to documentId)) }, contentAlignment = Alignment.Center) {
+          Box(Modifier.size(36.dp).clip(CircleShape).clickable(onClickLabel = "공유하기", role = Role.Button) { send("share", mapOf("documentId" to documentId)) }, contentAlignment = Alignment.Center) {
             PushIcon(PushIcons.SHARE, t.color("t2"), 20.dp)
           }
         }
@@ -592,7 +608,7 @@ object PushJobCard : A2uiComponent {
     val t = LocalPushTheme.current
     val company = properties[Company].orEmpty()
     val on = properties.bind(Bookmarked) == true
-    Column(modifier.width(169.dp).clickable { properties[PostingId]?.let { send("open_posting", mapOf("postingId" to it)) } }, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(modifier.width(169.dp).clickable(role = Role.Button) { properties[PostingId]?.let { send("open_posting", mapOf("postingId" to it)) } }, verticalArrangement = Arrangement.spacedBy(2.dp)) {
       // shortcut: always the placeholder; the module has no image loader. Draw imageUrl with one when a server card sends PushJobCard.
       Box(
         Modifier.size(169.dp, 115.dp).clip(RoundedCornerShape(t.r("md", 16.dp))).background(Brush.linearGradient(listOf(t.color("ac"), t.color("ac").copy(alpha = 0.55f)))),

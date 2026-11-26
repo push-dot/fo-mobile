@@ -1,6 +1,7 @@
 package expo.modules.pusha2ui
 
 import android.content.Context
+import android.util.Log
 import androidx.a2ui.compose.runtime.A2uiMessageParser
 import androidx.a2ui.compose.ui.A2uiMessageProcessor
 import androidx.a2ui.model.processor.processInput
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptimizedComposeProps
 data class A2uiSurfaceViewProps(
@@ -54,7 +56,12 @@ private class Feeder(context: Context) {
 
   fun feed(messages: List<String>) {
     if (messages.size <= fed) return
-    for (i in fed until messages.size) processor.processInput(parser, messages[i])
+    for (i in fed until messages.size) {
+      runCatching { processor.processInput(parser, messages[i]) }.onFailure {
+        if (it is CancellationException) throw it
+        Log.e("PushA2ui", "A2UI message rejected", it)
+      }
+    }
     fed = messages.size
   }
 }

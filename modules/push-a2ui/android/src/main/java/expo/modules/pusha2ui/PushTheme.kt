@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -49,13 +50,16 @@ class PushTheme(
   }
 
   companion object {
+    private var cached: Pair<String, PushTheme>? = null
+
     fun parse(context: Context, json: String?): PushTheme {
       if (json.isNullOrEmpty()) return PushTheme()
+      cached?.let { (key, theme) -> if (key == json) return theme }
       val root = runCatching { JSONObject(json) }.getOrNull() ?: return PushTheme()
       val colors = root.optJSONObject("colors")?.let { o -> o.keys().asSequence().mapNotNull { k -> parseColor(o.getString(k))?.let { k to it } }.toMap() }.orEmpty()
       val fonts = root.optJSONObject("fonts")?.let { o -> o.keys().asSequence().mapNotNull { k -> loadFont(context, o.getString(k))?.let { k.toInt() to it } }.toMap() }.orEmpty()
       val radius = root.optJSONObject("radius")?.let { o -> o.keys().asSequence().map { k -> k to o.getDouble(k).toFloat().dp }.toMap() }.orEmpty()
-      return PushTheme(colors, fonts, radius)
+      return PushTheme(colors, fonts, radius).also { cached = json to it }
     }
 
     /** `#RRGGBB`, `#RRGGBBAA` or `rgba(r,g,b,a)` as the design tokens write them. */
@@ -91,7 +95,7 @@ val LocalPushInteractive = compositionLocalOf { false }
 /** A 24×24 line icon from the design system's SVG path (2px stroke, round caps), or filled. */
 @Composable
 fun PushIcon(path: String, color: Color, size: Dp, strokeWidth: Float = 2f, filled: Boolean = false, modifier: Modifier = Modifier) {
-  val shape = PathParser().parsePathString(path).toPath()
+  val shape = remember(path) { PathParser().parsePathString(path).toPath() }
   Canvas(modifier.size(size)) {
     scale(this.size.width / 24f, pivot = androidx.compose.ui.geometry.Offset.Zero) {
       if (filled) drawPath(shape, color, style = Fill)
