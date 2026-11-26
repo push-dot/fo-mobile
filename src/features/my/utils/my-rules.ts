@@ -115,6 +115,7 @@ export const stageFlow = (stage: string) => {
 
 export const INTERVIEW_PREP = 'Bot으로 면접 준비'
 export const APPLICATION_LOAD_FAILED = '지원 내역을 불러오지 못했어요'
+export const LOAD_FAILED = '불러오지 못했어요'
 export const CALENDAR_ADD = '일정 추가하기'
 export const OFFER_DECLINE = '거절'
 export const OFFER_FAIL = '잠시 뒤에 다시 보내 주세요.'

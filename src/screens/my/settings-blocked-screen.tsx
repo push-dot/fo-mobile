@@ -41,7 +41,7 @@ const SettingsBlockedScreen = () => {
                   label={BLOCKED_COPY.unblock}
                   size="sm"
                   weight="600"
-                  disabled={unblock.isPending && unblock.variables === b.user.id}
+                  disabled={unblock.isPending}
                   style={styles.unblock}
                   onPress={() => unblock.mutate(b.user.id)}
                 />

@@ -37,6 +37,7 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
   const toggleBookmark = useToggleBookmark()
   const docId = docs.data?.data.find((d) => d.applicationId === id)?.id ?? detail?.fit?.documentId
   const career = p ? careerLabel(p) : null
+  const employment = EMPLOYMENT_TYPES.find((t) => t.key === p?.employmentType)?.label
   const fit = appliedFit(item?.fitScore, detail?.fit)
 
   return (
@@ -46,8 +47,17 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
         actions={
           p
             ? [
-                { icon: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크', active: p.bookmarked, onPress: () => toggleBookmark(p) },
-                { icon: 'share', label: '공유', onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }) },
+                {
+                  icon: 'bookmark',
+                  label: p.bookmarked ? '북마크 해제' : '북마크',
+                  active: p.bookmarked,
+                  onPress: () => toggleBookmark(p),
+                },
+                {
+                  icon: 'share',
+                  label: '공유',
+                  onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }),
+                },
               ]
             : undefined
         }
@@ -55,7 +65,11 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       {isLoading || detailLoading ? (
         <ListSkeleton />
       ) : detailQuery.isError && !detail ? (
-        <Empty text={APPLICATION_LOAD_FAILED} action={RETRY_LABEL} onAction={() => void detailQuery.refetch()} />
+        <Empty
+          text={APPLICATION_LOAD_FAILED}
+          action={RETRY_LABEL}
+          onAction={() => void detailQuery.refetch()}
+        />
       ) : !item ? (
         <Empty text={emptyCta('applications').title} />
       ) : (
@@ -74,25 +88,30 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
               <View style={styles.badges}>
                 <Badge label={p.location} />
                 {career ? <Badge label={career === '신입' ? career : `경력 ${career}`} /> : null}
-                <Badge label={EMPLOYMENT_TYPES.find((t) => t.key === p.employmentType)?.label ?? ''} />
+                {employment ? <Badge label={employment} /> : null}
               </View>
             ) : null}
           </View>
           <StageTracker a={detail ?? item} />
-          {fit ? (
-            <AppliedFitCard
-              fit={fit}
-              onPress={() => openPostingBot(item.jobId)}
-            />
-          ) : null}
+          {fit ? <AppliedFitCard fit={fit} onPress={() => openPostingBot(item.jobId)} /> : null}
           {p ? (
             <>
-              <PostingSection title="하는 일" items={p.description.split('\n').map((s) => s.trim()).filter(Boolean)} />
+              <PostingSection
+                title="하는 일"
+                items={p.description
+                  .split('\n')
+                  .map((s) => s.trim())
+                  .filter(Boolean)}
+              />
               <PostingSection title="자격 요건" items={p.requirements} />
               <PostingSection title="우대 사항" items={p.preferred ?? []} />
               <PostingSection title="근무 조건" items={workConditionLines(p.workConditions)} />
               {p.sourceUrl ? (
-                <Pressable accessibilityRole="link" onPress={() => p.sourceUrl && void openBrowser(p.sourceUrl)} style={styles.sourceLink}>
+                <Pressable
+                  accessibilityRole="link"
+                  onPress={() => p.sourceUrl && void openBrowser(p.sourceUrl)}
+                  style={styles.sourceLink}
+                >
                   <Icon name="ext" size={14} color="t3" />
                   <Text v="c1" weight="600" color="t3">
                     원문 보기 · {item.company} 채용 사이트
@@ -106,8 +125,17 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
       )}
       {item ? (
         <CtaBar>
-        <Button label="지원한 서류" variant="secondary" disabled={!docId} onPress={() => docId && router.push(`/docs/push/${docId}`)} />
-        <Button label={INTERVIEW_PREP} onPress={() => router.push(botChatPath('push'))} style={styles.primaryCta} />
+          <Button
+            label="지원한 서류"
+            variant="secondary"
+            disabled={!docId}
+            onPress={() => docId && router.push(`/docs/push/${docId}`)}
+          />
+          <Button
+            label={INTERVIEW_PREP}
+            onPress={() => router.push(botChatPath('push'))}
+            style={styles.primaryCta}
+          />
         </CtaBar>
       ) : null}
     </View>
@@ -116,7 +144,12 @@ const ApplicationDetailScreen = ({ id }: { id: string }) => {
 
 const styles = StyleSheet.create((theme) => ({
   screen: { flex: 1, backgroundColor: theme.colors.bg },
-  content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 120, gap: theme.spacing[6] },
+  content: {
+    paddingTop: theme.spacing[1],
+    paddingHorizontal: theme.spacing[5],
+    paddingBottom: 120,
+    gap: theme.spacing[6],
+  },
   header: { gap: theme.spacing[3] },
   companyRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing[2] },

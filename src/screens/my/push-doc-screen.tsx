@@ -13,6 +13,7 @@ import {
   deleteConfirm,
   deleteDocCopy,
   ListSkeleton,
+  LOAD_FAILED,
   hubProfile,
   type ProfileSection,
   PROFILE_ACTIONS_TOP,
@@ -34,7 +35,19 @@ import {
   JOB_CATEGORIES,
 } from '@/features/my'
 import { showChoiceModal } from '@/shared/navigation'
-import { CtaBar, askConfirm, Badge, Button, Icon, showToast, TOAST_ABOVE, Text, NativeTopBar } from '@/shared/components'
+import {
+  CtaBar,
+  askConfirm,
+  Badge,
+  Button,
+  emptyNoteStyle,
+  Icon,
+  showToast,
+  StatusNote,
+  TOAST_ABOVE,
+  Text,
+  NativeTopBar,
+} from '@/shared/components'
 import { spacing } from '@/theme'
 
 const HUB_BADGE = '지원용 프로필'
@@ -142,7 +155,13 @@ const PushDocScreen = ({ id, jobId }: { id: string; jobId?: string }) => {
           ...(application ? [{ icon: 'more' as const, label: '더 보기', menu }] : []),
         ]}
       />
-      {doc.isLoading || !item || !lines ? (
+      {doc.isError && !item ? (
+        <StatusNote
+          lines={[LOAD_FAILED]}
+          action={{ label: RETRY_LABEL, onPress: () => void doc.refetch() }}
+          style={emptyNoteStyle(140)}
+        />
+      ) : doc.isLoading || !item || !lines ? (
         <ListSkeleton />
       ) : (
         <ScrollView contentContainerStyle={[styles.content, !!application && styles.contentWithCta]}>
