@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useNavigation } from 'expo-router'
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -8,6 +9,7 @@ import { fontFor, onAccent, useColors, type } from '@/theme'
 import { sheetGlassFill } from '@/shared/components/glass'
 import { MASCOT_PALETTES } from '@/theme/mascot'
 import { isXlBoardText, XlBoardChrome } from '@/shared/components/xl-chrome'
+import { useHardwareBack } from '@/shared/utility'
 import { isConsentRequired } from '@/shared/utility/consent-error'
 import { botErrorKind } from '../../utils/bot-errors'
 import { checkLink } from '../../api/fetchers'
@@ -223,6 +225,21 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
   const searching = searchPhase(form)
   const posting = postingOf(phase)
   const query = phase.kind === 'searching' ? phase.query : ''
+  const creating = phase.kind === 'creating'
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: !creating })
+  }, [navigation, creating])
+  useHardwareBack(creating ? () => undefined : null)
+
+  const alive = useRef(true)
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false
+    }
+  }, [])
 
   useEffect(() => {
     if (!postingId) return
@@ -321,8 +338,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
     setForm(beginCreate(base))
     try {
       const result = await create({ postingId: action.posting.postingId, color: action.color })
-      onOpenBot(result.bot.id)
+      if (alive.current) onOpenBot(result.bot.id)
     } catch (error) {
+      if (!alive.current) return
       if (isConsentRequired(error)) {
         setForm(base)
         onConsentRequired(() => void run(base))

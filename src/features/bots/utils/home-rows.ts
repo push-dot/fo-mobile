@@ -36,8 +36,12 @@ export const accountLabel = (name: string, plan: string | undefined) => (plan ? 
 
 const PUSH_KEYS: readonly HomeMenuKey[] = ['find', 'read']
 
-export const companyMenu = (kind: 'push' | 'company') =>
-  MENU.filter((item) => kind === 'company' || PUSH_KEYS.includes(item.key))
+const UNMUTE_LABEL = '알림 켜기'
+
+export const companyMenu = (kind: 'push' | 'company', muted: boolean) =>
+  MENU.filter((item) => kind === 'company' || PUSH_KEYS.includes(item.key)).map((item) =>
+    item.key === 'mute' && muted ? { ...item, label: UNMUTE_LABEL } : item,
+  )
 
 export const rowMotion = (index: number, held: boolean): HomeMotion => (held ? { mode: 'frame3' } : { mode: 'animate', delayMs: index * STAGGER_MS })
 

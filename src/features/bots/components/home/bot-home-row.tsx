@@ -67,7 +67,7 @@ const BotHomeRow = ({
     )
   }
   return (
-    <ContextMenu actions={actions} accessibilityLabel={row.accessibilityLabel} onPress={onPress} preview={<BotHomePreview row={row} />}>
+    <ContextMenu key={row.id} actions={actions} accessibilityLabel={row.accessibilityLabel} onPress={onPress} preview={<BotHomePreview row={row} />}>
       {content}
     </ContextMenu>
   )

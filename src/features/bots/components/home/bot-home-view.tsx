@@ -48,7 +48,7 @@ const MENU_ICON: Record<HomeMenuKey, MenuAction['icon']> = {
 const openChat = (bot: Bot) => router.push(botChatPath(bot.kind === 'push' ? 'push' : bot.id))
 
 const menuActions = (bot: Bot, onMenu: (key: HomeMenuKey, bot: Bot) => void): MenuAction[] =>
-  companyMenu(bot.kind).map((item) => ({
+  companyMenu(bot.kind, bot.muted).map((item) => ({
     key: item.key,
     label: item.label,
     destructive: item.destructive,
