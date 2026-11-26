@@ -84,7 +84,7 @@ const BotChatScreen = () => {
 const useLeading = () => {
   const redirected = !!useLocalSearchParams<{ instant?: string }>().instant
   const consented = useReferenceConsent().data?.referenceData === true
-  return redirected ? (consented ? 'botHome' : 'none') : 'back'
+  return redirected && consented ? 'botHome' : 'back'
 }
 
 const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) => {
