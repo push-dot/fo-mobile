@@ -30,7 +30,7 @@ const SKELETON_MASCOT_RADIUS = 36
 
 const Loading = () => {
   return (
-    <View style={styles.screen} accessibilityLabel={PROFILE_LOADING_LABEL}>
+    <View style={styles.screen} accessible accessibilityRole="progressbar" accessibilityLabel={PROFILE_LOADING_LABEL}>
       <TopBar circleBack chat={IOS} onBack={() => router.back()} />
       <View style={styles.head}>
         <View style={styles.skeletonMascot}>
@@ -150,7 +150,7 @@ const BotProfileView = ({ address }: { address: BotAddress }) => {
   const rowOf = (row: ProfileRow) => {
     if (row.id === 'notify') {
       return (
-        <SettingsRow key={row.id} xl={xl} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => void setMuted(bot, !on)} />} />
+        <SettingsRow key={row.id} xl={xl} label={row.label} right={<Switch value={!bot.muted} label={row.label} onValueChange={(on) => setMuted(bot, !on)} />} />
       )
     }
     if (row.id === 'color' && bot.kind === 'company') {

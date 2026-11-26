@@ -1,7 +1,9 @@
-import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { keepPreviousData, queryOptions, skipToken, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import { ApiError } from '@push/api-client'
+import { showToast } from '@/shared/components/toast-store'
 import type { Bot, BotAddress, BotColor, BotId, BotLimit, BotProfile, BotSchedule, CompanyBot, NewSchedule } from '../types'
+import { botErrorCopy } from '../utils/bot-errors'
 import { pollIntervalOf } from '../utils/live-state'
 import { createBot, createSchedule, deleteBot, deleteSchedule, fetchBotProfile, fetchBots, fetchSchedules, markBotRead, revokeAllowedSite, searchBots, setScheduleEnabled, updateBot } from './fetchers'
 
@@ -42,7 +44,7 @@ export const useBot = (address: BotAddress) => {
 
 export const useBotSearch = (q: string) => {
   const query = q.trim()
-  const r = useQuery({ queryKey: [...BOTS, 'search', query], queryFn: () => searchBots(query), enabled: query !== '' })
+  const r = useQuery({ queryKey: [...BOTS, 'search', query], queryFn: () => searchBots(query), enabled: query !== '', placeholderData: keepPreviousData })
   return { data: r.data, isLoading: r.isLoading }
 }
 
@@ -72,10 +74,18 @@ const writeBot = (qc: QueryClient, id: BotId, update: (bot: Bot) => Bot | null) 
   })
 }
 
+const onBotError = (error: unknown) => showToast({ message: botErrorCopy(error).title, tone: 'error' })
+
+const latestRevision = (qc: QueryClient, bot: Bot) =>
+  listed(qc.getQueryData<BotList>(LIST), bot.id)?.revision ??
+  qc.getQueriesData<BotProfile>({ queryKey: [...BOTS, 'detail'] }).find(([, data]) => data?.bot.id === bot.id)?.[1]?.bot.revision ??
+  bot.revision
+
 type Patch = { bot: Bot; patch: { notificationsMuted?: boolean; color?: BotColor } }
 
 export const patchBotMutation = (qc: QueryClient) => ({
-  mutationFn: ({ bot, patch }: Patch) => updateBot(bot.id, { expectedRevision: bot.revision, ...patch }),
+  scope: { id: 'bots:patch' },
+  mutationFn: ({ bot, patch }: Patch) => updateBot(bot.id, { expectedRevision: latestRevision(qc, bot), ...patch }),
   onMutate: async ({ bot, patch }: Patch) => {
     await qc.cancelQueries({ queryKey: BOTS })
     const before = snapshot(qc)
@@ -88,20 +98,21 @@ export const patchBotMutation = (qc: QueryClient) => ({
   onError: (error: unknown, _vars: Patch, before: Snapshot | undefined) => {
     if (before) restore(qc, before)
     if (error instanceof ApiError && error.code === 'REVISION_CONFLICT') void qc.invalidateQueries({ queryKey: BOTS })
+    onBotError(error)
   },
   onSuccess: (server: Bot) => writeBot(qc, server.id, () => server),
 })
 
-const usePatchBot = () => useMutation(patchBotMutation(useQueryClient())).mutateAsync
+const usePatchBot = () => useMutation(patchBotMutation(useQueryClient()))
 
 export const useSetBotColor = () => {
-  const patch = usePatchBot()
-  return async (bot: CompanyBot, color: BotColor) => void (await patch({ bot, patch: { color } }))
+  const m = usePatchBot()
+  return { setColor: async (bot: CompanyBot, color: BotColor) => void (await m.mutateAsync({ bot, patch: { color } })), isPending: m.isPending }
 }
 
 export const useSetBotMuted = () => {
-  const patch = usePatchBot()
-  return async (bot: Bot, muted: boolean) => void (await patch({ bot, patch: { notificationsMuted: muted } }))
+  const m = usePatchBot()
+  return (bot: Bot, muted: boolean) => m.mutate({ bot, patch: { notificationsMuted: muted } })
 }
 
 export const useDeleteBot = () => {
@@ -114,8 +125,12 @@ export const useDeleteBot = () => {
       writeBot(qc, bot.id, () => null)
       return before
     },
-    onError: (_error, _bot, before) => before && restore(qc, before),
+    onError: (error, _bot, before) => {
+      if (before) restore(qc, before)
+      onBotError(error)
+    },
     onSuccess: (_v, bot) => qc.removeQueries({ queryKey: detailKey(bot.id) }),
+    onSettled: () => qc.invalidateQueries({ queryKey: LIST }),
   })
   return async (bot: CompanyBot) => void (await m.mutateAsync(bot))
 }
@@ -132,7 +147,10 @@ export const useRevokeAllowedSite = () => {
       )
       return before
     },
-    onError: (_error, _vars, before) => before && restore(qc, before),
+    onError: (error, _vars, before) => {
+      if (before) restore(qc, before)
+      onBotError(error)
+    },
   })
   return async (bot: Bot, host: string) => void (await m.mutateAsync({ bot, host }))
 }
@@ -142,20 +160,23 @@ export const useMarkBotRead = () => {
   const m = useMutation({
     mutationFn: (bot: Bot) => markBotRead(bot.id),
     onMutate: async (bot) => {
-      await qc.cancelQueries({ queryKey: LIST })
+      await qc.cancelQueries({ queryKey: BOTS })
       const before = snapshot(qc)
       writeBot(qc, bot.id, (b) => ({ ...b, unread: false }))
       return before
     },
-    onError: (_error, _bot, before) => before && restore(qc, before),
+    onError: (error, _bot, before) => {
+      if (before) restore(qc, before)
+      onBotError(error)
+    },
   })
-  return async (bot: Bot) => void (await m.mutateAsync(bot))
+  return (bot: Bot) => m.mutate(bot)
 }
 
-const schedulesKey = (id: BotId) => [...BOTS, 'schedules', id] as const
+const schedulesKey = (id: BotId | undefined) => [...BOTS, 'schedules', id] as const
 
 export const useBotSchedules = (id: BotId | undefined) => {
-  const q = useQuery({ queryKey: schedulesKey(id ?? ('' as BotId)), queryFn: () => fetchSchedules(id!), enabled: id !== undefined })
+  const q = useQuery({ queryKey: schedulesKey(id), queryFn: id ? () => fetchSchedules(id) : skipToken })
   return { data: q.data, isLoading: q.isLoading, isFetching: q.isFetching, isError: q.isError, refetch: () => void q.refetch() }
 }
 
