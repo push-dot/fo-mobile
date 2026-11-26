@@ -1,3 +1,4 @@
+import type { Application } from '@push/api-client'
 import { monthDay } from '@push/shared'
 import { router } from 'expo-router'
 import { Pressable, ScrollView, View } from 'react-native'
@@ -8,9 +9,7 @@ import { Text, NativeTopBar } from '@/shared/components'
 import { lineRing } from '@/theme'
 import type { HubDocument } from '@/features/my'
 
-const Line = ({ doc }: { doc: HubDocument }) => {
-  const apps = useMyApplications()
-  const application = apps.data?.data.find((a) => a.id === doc.applicationId) ?? null
+const Line = ({ doc, application }: { doc: HubDocument; application: Application | null }) => {
   const lines = pushCardLines(doc, application)
   const sub = [lines.doc, monthDay(doc.updatedAt)].filter(Boolean).join(' · ')
   return (
@@ -45,6 +44,7 @@ const Line = ({ doc }: { doc: HubDocument }) => {
 const PushDocsScreen = () => {
   const insets = useSafeAreaInsets()
   const { data, isLoading } = useDocuments()
+  const apps = useMyApplications().data?.data ?? []
   const docs = data?.data ?? []
   return (
     <View style={styles.screen}>
@@ -57,7 +57,7 @@ const PushDocsScreen = () => {
             {data?.page.total ?? docs.length}개
           </Text>
           {docs.map((doc) => (
-            <Line key={doc.id} doc={doc} />
+            <Line key={doc.id} doc={doc} application={apps.find((a) => a.id === doc.applicationId) ?? null} />
           ))}
         </ScrollView>
       )}

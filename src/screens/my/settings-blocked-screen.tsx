@@ -1,3 +1,4 @@
+import type { BlockedUser } from '@push/api-client'
 import { router } from 'expo-router'
 import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { Avatar, BLOCKED_COPY, blockedLine, OFFER_MENU_COPY, RETRY_LABEL, useBlocked, useUnblock } from '@/features/my'
@@ -7,9 +8,33 @@ import { HIT_TARGET } from '@/theme'
 
 const UNBLOCK_HEIGHT = 36
 
+const BlockedRow = ({ b }: { b: BlockedUser }) => {
+  const unblock = useUnblock()
+  return (
+    <View style={styles.row}>
+      <Avatar name={b.user.displayName} size={44} />
+      <View style={styles.rowText}>
+        <Text v="b1" numberOfLines={1}>
+          {b.user.displayName}
+        </Text>
+        <Text v="c1" color="t3" numberOfLines={1}>
+          {blockedLine(b)}
+        </Text>
+      </View>
+      <Button
+        label={BLOCKED_COPY.unblock}
+        size="sm"
+        weight="600"
+        disabled={unblock.isPending}
+        style={styles.unblock}
+        onPress={() => unblock.mutate(b.user.id)}
+      />
+    </View>
+  )
+}
+
 const SettingsBlockedScreen = () => {
   const { data, isPending, refetch } = useBlocked()
-  const unblock = useUnblock()
   const rows = data?.data
   return (
     <View style={styles.screen}>
@@ -27,25 +52,7 @@ const SettingsBlockedScreen = () => {
           </Text>
           <SettingsGroup note={BLOCKED_COPY.note}>
             {rows.map((b) => (
-              <View key={b.user.id} style={styles.row}>
-                <Avatar name={b.user.displayName} size={44} />
-                <View style={styles.rowText}>
-                  <Text v="b1" numberOfLines={1}>
-                    {b.user.displayName}
-                  </Text>
-                  <Text v="c1" color="t3" numberOfLines={1}>
-                    {blockedLine(b)}
-                  </Text>
-                </View>
-                <Button
-                  label={BLOCKED_COPY.unblock}
-                  size="sm"
-                  weight="600"
-                  disabled={unblock.isPending && unblock.variables === b.user.id}
-                  style={styles.unblock}
-                  onPress={() => unblock.mutate(b.user.id)}
-                />
-              </View>
+              <BlockedRow key={b.user.id} b={b} />
             ))}
           </SettingsGroup>
         </ScrollView>

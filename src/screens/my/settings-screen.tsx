@@ -12,6 +12,7 @@ import {
   contactRowLabel,
   LANGS,
   NOTIFY_SUB,
+  LOAD_FAILED,
   LOGIN_LABEL,
   MARKETING_COPY,
   NOTIFICATION_ROWS,
@@ -19,6 +20,7 @@ import {
   RESTORE_PURCHASES_LABEL,
   REFERENCE_LABEL,
   REFERENCE_SUB,
+  RETRY_LABEL,
   signOutSession,
   SUPPORT_MAIL,
   themeRowLabel,
@@ -37,6 +39,7 @@ import {
   Icon,
   SettingsGroup,
   SettingsRow,
+  StatusNote,
   Switch,
   Text,
   NativeTopBar,
@@ -57,7 +60,7 @@ const Screen = ({ title, children }: { title: string; children: ReactNode }) => 
 )
 
 const SettingsScreen = () => {
-  const { s, set } = useSettings()
+  const { s, set, isError, refetch } = useSettings()
   const theme = useThemePreference((state) => state.choice)
   const consent = useReferenceConsent()
   const marketing = useMarketingConsent()
@@ -69,7 +72,15 @@ const SettingsScreen = () => {
   if (!s) {
     return (
       <Screen title="설정">
-        <ActivityIndicator style={styles.spinner} />
+        {isError ? (
+          <StatusNote
+            lines={[LOAD_FAILED]}
+            action={{ label: RETRY_LABEL, onPress: () => void refetch() }}
+            style={styles.loadState}
+          />
+        ) : (
+          <ActivityIndicator style={styles.loadState} />
+        )}
       </Screen>
     )
   }
@@ -204,7 +215,7 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create((theme) => ({
   screen: { flex: 1, backgroundColor: theme.colors.bg },
   content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 48, gap: 22 },
-  spinner: { marginTop: 40 },
+  loadState: { marginTop: 40 },
   profile: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
   profileText: { flex: 1 },
 }))
