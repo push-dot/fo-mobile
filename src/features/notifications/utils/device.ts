@@ -15,6 +15,7 @@ export const createPushDevice = (ports: PushDevicePorts) => {
   let registeredToken: string | null = null
   let asked = false
   let generation = 0
+  let claim: { gen: number; token: string } | null = null
 
   const register = async (gen: number) => {
     if (registeredToken || !userId) return
@@ -22,8 +23,10 @@ export const createPushDevice = (ports: PushDevicePorts) => {
     if (!platform) return
     const token = await ports.token()
     if (gen !== generation || !userId || !token) return
+    claim = { gen, token }
     await ports.register(token, platform)
     if (gen !== generation || !userId) {
+      if (claim.gen === generation && claim.token === token) return
       try {
         await ports.remove(token)
       } catch {

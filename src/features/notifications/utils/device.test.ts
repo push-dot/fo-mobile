@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createPushDevice, type PushPermission, tapSend } from './device'
 
 const TOKEN = 'ExponentPushToken[a]'
@@ -152,6 +152,58 @@ describe('push device retry', () => {
     await job
     expect(registers).toEqual([TOKEN])
     expect(removes).toEqual([])
+  })
+
+  it('keeps the token a newer sign-in registered while a stale register was in flight', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    const registers: string[] = []
+    const removes: string[] = []
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: async (token) => {
+        registers.push(token)
+        if (registers.length === 1) await gate
+      },
+      remove: async (token) => { removes.push(token) },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(registers).toHaveLength(1))
+    await device.signOut()
+    await device.signIn('u2')
+    release()
+    await stale
+    expect(registers).toEqual([TOKEN, TOKEN])
+    expect(removes).toEqual([])
+    await device.signOut()
+    expect(removes).toEqual([TOKEN])
+  })
+
+  it('removes a stale register when no newer sign-in claimed the token', async () => {
+    let release: () => void = () => {}
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    const removes: string[] = []
+    let registering = false
+    const device = createPushDevice({
+      permission: async () => 'granted',
+      request: async () => 'granted',
+      token: async () => TOKEN,
+      platform: () => 'ios',
+      register: () => {
+        registering = true
+        return gate
+      },
+      remove: async (token) => { removes.push(token) },
+    })
+    const stale = device.signIn('u1')
+    await vi.waitFor(() => expect(registering).toBe(true))
+    await device.signOut()
+    release()
+    await stale
+    expect(removes).toEqual([TOKEN])
   })
 
   it('does not ask again after a same-id retry', async () => {
