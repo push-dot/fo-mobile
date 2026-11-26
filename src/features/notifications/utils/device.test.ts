@@ -173,9 +173,10 @@ describe('push device retry', () => {
     const stale = device.signIn('u1')
     await vi.waitFor(() => expect(registers).toHaveLength(1))
     await device.signOut()
-    await device.signIn('u2')
+    const newer = device.signIn('u2')
     release()
     await stale
+    await newer
     expect(registers).toEqual([TOKEN, TOKEN])
     expect(removes).toEqual([])
     await device.signOut()
@@ -206,35 +207,76 @@ describe('push device retry', () => {
     expect(removes).toEqual([TOKEN])
   })
 
-  it('keeps the newer token when a stale register resolves while the newer one is in flight', async () => {
+  const server = () => {
+    let session: string | null = null
+    let owner: string | null = null
     const gates: (() => void)[] = []
-    const registers: string[] = []
     const removes: string[] = []
     const device = createPushDevice({
       permission: async () => 'granted',
       request: async () => 'granted',
       token: async () => TOKEN,
       platform: () => 'ios',
-      register: (token) => {
-        registers.push(token)
-        return new Promise<void>((resolve) => { gates.push(resolve) })
+      register: async () => {
+        const who = session
+        if (gates.length === 0) await new Promise<void>((resolve) => { gates.push(resolve) })
+        else gates.push(() => {})
+        owner = who
       },
-      remove: async (token) => { removes.push(token) },
+      remove: async (token) => {
+        removes.push(token)
+        owner = null
+      },
     })
-    const stale = device.signIn('u1')
-    await vi.waitFor(() => expect(gates).toHaveLength(1))
-    await device.signOut()
-    const newer = device.signIn('u2')
-    await vi.waitFor(() => expect(gates).toHaveLength(2))
-    gates[0]?.()
+    return {
+      device,
+      gates,
+      removes,
+      owner: () => owner,
+      signIn: (id: string) => {
+        session = id
+        return device.signIn(id)
+      },
+      signOut: () => {
+        session = null
+        return device.signOut()
+      },
+    }
+  }
+
+  it('keeps the token on the new account when a slow old register resolves after a direct switch', async () => {
+    const s = server()
+    const stale = s.signIn('u1')
+    await vi.waitFor(() => expect(s.gates).toHaveLength(1))
+    const newer = s.signIn('u2')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(s.gates).toHaveLength(1)
+    s.gates[0]?.()
     await stale
-    expect(removes).toEqual([])
-    gates[1]?.()
     await newer
-    await device.signIn('u2')
-    expect(registers).toEqual([TOKEN, TOKEN])
-    await device.signOut()
-    expect(removes).toEqual([TOKEN])
+    expect(s.gates).toHaveLength(2)
+    expect(s.owner()).toBe('u2')
+    expect(s.removes).toEqual([])
+    await s.signIn('u2')
+    expect(s.gates).toHaveLength(2)
+  })
+
+  it('keeps the token on the new account when sign-out and sign-in happen during a slow register', async () => {
+    const s = server()
+    const stale = s.signIn('u1')
+    await vi.waitFor(() => expect(s.gates).toHaveLength(1))
+    await s.signOut()
+    const newer = s.signIn('u2')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(s.gates).toHaveLength(1)
+    s.gates[0]?.()
+    await stale
+    await newer
+    expect(s.owner()).toBe('u2')
+    expect(s.removes).toEqual([])
+    await s.signOut()
+    expect(s.removes).toEqual([TOKEN])
+    expect(s.owner()).toBeNull()
   })
 
   it('registers the newer sign-in when a stale remove fails before the newer one claims the token', async () => {

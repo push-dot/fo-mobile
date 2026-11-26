@@ -18,11 +18,29 @@ export const createPushDevice = (ports: PushDevicePorts) => {
   let claim: { gen: number; token: string } | null = null
   let orphan: string | null = null
   let removing: Promise<unknown> = Promise.resolve()
+  let sending: Promise<unknown> = Promise.resolve()
 
   const remove = (token: string) => {
     const job = ports.remove(token)
     removing = Promise.all([removing, job.catch(() => undefined)])
     return job
+  }
+
+  const send = async (gen: number, token: string, platform: PushPlatform) => {
+    await removing
+    if (gen !== generation || !userId) return
+    await ports.register(token, platform)
+    if (orphan === token) orphan = null
+    if (gen !== generation || !userId) {
+      if (claim?.gen === generation && claim.token === token) return
+      try {
+        await remove(token)
+      } catch {
+        orphan = token
+      }
+      return
+    }
+    registeredToken = token
   }
 
   const register = async (gen: number) => {
@@ -32,20 +50,9 @@ export const createPushDevice = (ports: PushDevicePorts) => {
     const token = await ports.token()
     if (gen !== generation || !userId || !token) return
     claim = { gen, token }
-    await removing
-    if (gen !== generation || !userId) return
-    await ports.register(token, platform)
-    if (orphan === token) orphan = null
-    if (gen !== generation || !userId) {
-      if (claim.gen === generation && claim.token === token) return
-      try {
-        await remove(token)
-      } catch {
-        orphan = token
-      }
-      return
-    }
-    registeredToken = token
+    const job = sending.then(() => send(gen, token, platform))
+    sending = job.catch(() => undefined)
+    await job
   }
 
   let inflight = 0
