@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, givenName, profileQuery, proposalSubtitle, TENURE_CHIPS, tenureChipOn, tenureOf, toggleTenureChip } from './filters'
+import { appliedCount, careerLine, EMPTY_SHEET, filterSummary, profileQuery, proposalSubtitle, TENURE_CHIPS, tenureChipOn, tenureOf, toggleTenureChip } from './filters'
 
 describe('hub filters', () => {
   it('buckets tenure years', () => {
@@ -41,7 +41,6 @@ describe('hub filters', () => {
     expect(careerLine({ jobCategory: 'dev', tenureYears: 5 })).toBe('개발 · 5년차')
     expect(careerLine({ jobCategory: null, tenureYears: 0 })).toBe('신입')
     expect(careerLine({ jobCategory: 'plan', tenureYears: null })).toBe('기획')
-    expect(givenName('김태윤')).toBe('태윤')
   })
 
   it('sends every picked tenure and status to push-be', () => {

@@ -52,5 +52,3 @@ export const profileQuery = (category: JobCategory[], f: SheetFilters): ProfileF
   tenure: f.tenure,
   status: f.status,
 })
-
-export const givenName = (name: string) => (name.length === 3 ? name.slice(1) : name.slice(0, 2))

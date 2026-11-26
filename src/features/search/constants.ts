@@ -6,6 +6,7 @@ export const SEARCH_PAGE_LIMIT = 20
 export const SEARCH_DEBOUNCE_MS = 250
 export const SEARCH_ERROR_LINES = ['검색하지 못했어요.', '잠시 후 다시 시도해 주세요.'] as const
 export const SEARCH_RETRY_LABEL = '다시 시도'
+export const SEARCH_EMPTY = '검색 결과가 없어요'
 
 export const SEARCH_SORTS = [{ key: 'relevance' as const, label: '관련도순' }]
 
