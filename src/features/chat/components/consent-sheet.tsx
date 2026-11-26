@@ -11,7 +11,7 @@ export const ConsentSheet = ({ kind }: { kind: 'push' | 'company' | undefined })
   useEffect(() => {
     if (!focused || !off || kind !== 'push' || askedThisVisit.current) return
     askedThisVisit.current = true
-    askConsent(true)
+    askConsent()
   }, [focused, off, kind])
 
   return null

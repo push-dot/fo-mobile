@@ -21,7 +21,7 @@ describe('session cleared', () => {
     })
     useChatStore.setState({ chats: { c1: { ...emptyChat } } })
     setDraftText('c1', '쓰던 글')
-    useConsentPrompt.setState({ open: true, dismissed: true })
+    useConsentPrompt.setState({ open: true })
     send('c1', '안녕')
     await vi.waitFor(() => expect(signal).toBeDefined())
 
@@ -30,7 +30,7 @@ describe('session cleared', () => {
     expect(signal?.aborted).toBe(true)
     expect(useChatStore.getState().chats).toEqual({})
     expect(useDraftStore.getState().byBot).toEqual({})
-    expect(useConsentPrompt.getState()).toEqual({ open: false, dismissed: false })
+    expect(useConsentPrompt.getState()).toEqual({ open: false })
   })
 })
 
