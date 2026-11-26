@@ -3,7 +3,6 @@ import { Component, type ErrorInfo, type ReactNode, useEffect } from 'react'
 import { View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import Button from './button'
-import { reduceError, type ErrorBoundaryUiState } from './reduce-error'
 import Text from './text'
 
 const ErrorFallbackView = ({ onRetry }: { onRetry: () => void }) => {
@@ -28,27 +27,25 @@ const styles = StyleSheet.create((theme) => ({
   title: { textAlign: 'center' },
 }))
 
-type State = { ui: ErrorBoundaryUiState }
+type State = { failed: boolean }
 
 type Props = { children: ReactNode }
 
 class RootErrorBoundary extends Component<Props, State> {
-  state: State = { ui: 'ok' }
+  state: State = { failed: false }
 
-  static getDerivedStateFromError(): State {
-    return { ui: reduceError('ok', 'error') }
-  }
+  static getDerivedStateFromError = (): State => ({ failed: true })
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(error, info.componentStack)
   }
 
   private retry = () => {
-    this.setState({ ui: reduceError(this.state.ui, 'retry') })
+    this.setState({ failed: false })
   }
 
   render() {
-    if (this.state.ui === 'error') {
+    if (this.state.failed) {
       return <ErrorFallbackView onRetry={this.retry} />
     }
     return this.props.children

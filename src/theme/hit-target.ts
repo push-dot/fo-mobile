@@ -5,5 +5,3 @@ export const hitSlopTo = (height: number, width = HIT_TARGET) => {
   const h = Math.max(0, (HIT_TARGET - width) / 2)
   return { top: v, bottom: v, left: h, right: h }
 }
-
-export const STATUS_ROW_MIN_HEIGHT = { ios: 36, android: 28 } as const

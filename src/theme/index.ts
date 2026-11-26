@@ -14,7 +14,7 @@ export { tabColor } from './tab-color'
 export { userBubbleChipFill, userBubbleFill } from './user-bubble'
 export type { TabPlatform } from './tab-color'
 export { useThemePreference } from './preference'
-export { HIT_TARGET, STATUS_ROW_MIN_HEIGHT, hitSlopTo } from './hit-target'
+export { HIT_TARGET, hitSlopTo } from './hit-target'
 export { platformTokens } from './platform'
 
 export { platformTheme } from './platform-theme'

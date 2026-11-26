@@ -13,7 +13,7 @@ const GlassButton = ({ actions, filled, iconSize, circle }: { actions: GlassActi
   const row = (
     <View style={[styles.row, single && styles.rowSingle]}>
       {actions.map((a) => (
-        <GlassActionButton key={a.label} a={a} width={single ? button : 40} iconSize={iconSize ?? (filled ? 16 : 22)} filled={solid} />
+        <GlassActionButton key={a.icon} a={a} width={single ? button : 40} iconSize={iconSize ?? (filled ? 16 : 22)} filled={solid} />
       ))}
     </View>
   )
