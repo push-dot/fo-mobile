@@ -36,17 +36,8 @@ vi.mock('expo-router', () => ({
   useFocusEffect: (cb: () => void) => cb(),
 }))
 vi.mock('@/features/auth', () => ({
-  TERM_ROWS: [{ id: 'service', label: '서비스', required: true }],
-  TERMS_BODY: 'body',
-  TERMS_OPTIONAL: '선택',
-  TERMS_PRIVACY_POLICY: 'privacy',
-  TERMS_REQUIRED: '필수',
-  TERMS_START: '시작',
-  TERMS_TITLE: 'title',
   TRY_AGAIN: 'again',
-  TermRow: () => null,
-  TermsAllRow: () => null,
-  isTermKey: () => false,
+  TermsConsentForm: () => null,
   saveTerms: vi.fn(),
   useTermsConsent: Object.assign(
     (selector: (s: { checked: Record<string, boolean>; toggle: () => void; toggleAll: () => void }) => unknown) =>
@@ -61,10 +52,6 @@ vi.mock('@/features/auth', () => ({
 }))
 vi.mock('@/shared/infrastructure', () => ({ useSession: { getState: () => ({ set: vi.fn() }) } }))
 vi.mock('@/shared/components', () => ({
-  Button: () => null,
-  CtaBar: ({ children }: { children: unknown }) => children,
-  Text: () => null,
-  TopBar: () => null,
   showToast: vi.fn(),
 }))
 vi.mock('@/features/my', () => ({ marketingResult: () => 'ok' }))
