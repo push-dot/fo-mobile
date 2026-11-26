@@ -11,6 +11,7 @@ const ConsentSheetScreen = () => {
   const agreed = useRef(false)
   const onLater = request?.onLater
   const required = !!request && !onLater
+  const onClose = onLater ?? request?.onDismiss
   const navigation = useNavigation()
   useEffect(() => {
     if (!request) router.back()
@@ -20,9 +21,9 @@ const ConsentSheetScreen = () => {
   }, [navigation, required])
   useEffect(
     () => () => {
-      if (!agreed.current) onLater?.()
+      if (!agreed.current) onClose?.()
     },
-    [onLater],
+    [onClose],
   )
   if (!request) return null
   const agree = () => {
