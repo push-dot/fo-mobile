@@ -14,9 +14,11 @@ import {
 } from 'expo-iap'
 import { queryClient } from '@/providers/query-client'
 import { verifyPurchase } from './api/fetchers'
-import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
+import { IAP_DEFERRED_PRO_MESSAGE, IAP_FAILED_MESSAGE, IAP_OTHER_ACCOUNT_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
 import type { StorePurchase, SubscriptionProduct } from './types'
 import { androidOfferToken, outcomeFromCode, settlePurchase, settleRestored, verifyFailedMessage } from './utils/settle'
+
+type Plan = 'PRO' | 'ULTRA'
 
 let pending = false
 const listeners = new Set<() => void>()
@@ -24,6 +26,7 @@ const claimed = new Set<string>()
 let connecting: Promise<unknown> | null = null
 let started = false
 let lastSku: string | null = null
+let deferredSku: string | null = null
 let recovering: Promise<string[]> | null = null
 
 const setPending = (value: boolean) => {
@@ -61,6 +64,7 @@ const fail = (message: string) => {
 }
 
 const report = (code?: string) => {
+  deferredSku = null
   const outcome = outcomeFromCode(code)
   if (outcome.kind === 'cancelled') return setPending(false)
   if (outcome.kind === 'already-owned' && lastSku === IAP_PRODUCT_TOPUP) {
@@ -78,6 +82,10 @@ const accept = async (purchase: Purchase) => {
   try {
     await settlePurchase(purchase, deps)
     refreshAccount()
+    if (purchase.productId === deferredSku) {
+      deferredSku = null
+      Alert.alert(IAP_DEFERRED_PRO_MESSAGE)
+    }
   } catch (error) {
     fail(verifyFailedMessage(error))
   } finally {
@@ -104,10 +112,13 @@ const ready = () => {
   return connecting
 }
 
-const buy = async (sku: string, type: 'in-app' | 'subs') => {
+const PLAN_OF_PRODUCT: Record<string, Plan> = { [IAP_PRODUCT_PRO]: 'PRO', [IAP_PRODUCT_ULTRA]: 'ULTRA' }
+
+const buy = async (sku: string, type: 'in-app' | 'subs', serverPlan?: Plan | 'FREE') => {
   if (pending) return
   setPending(true)
   lastSku = sku
+  deferredSku = null
   try {
     await ready()
     if (type === 'subs' && Platform.OS === 'android') {
@@ -115,18 +126,18 @@ const buy = async (sku: string, type: 'in-app' | 'subs') => {
       const token = androidOfferToken(Array.isArray(products) ? (products as SubscriptionProduct[]) : [], sku)
       if (!token) throw new Error('missing offer')
       const owned = (await getAvailablePurchases()).find(
-        (p) =>
-          p.productId !== sku &&
-          (p.productId === IAP_PRODUCT_PRO || p.productId === IAP_PRODUCT_ULTRA) &&
-          p.purchaseToken,
+        (p) => p.productId !== sku && p.productId in PLAN_OF_PRODUCT && p.purchaseState !== 'pending' && p.purchaseToken,
       )
+      if (owned && PLAN_OF_PRODUCT[owned.productId] !== serverPlan) return fail(IAP_OTHER_ACCOUNT_MESSAGE)
+      const deferred = sku !== IAP_PRODUCT_ULTRA
       const replacement = owned && {
         purchaseToken: owned.purchaseToken,
         subscriptionProductReplacementParams: {
           oldProductId: owned.productId,
-          replacementMode: sku === IAP_PRODUCT_ULTRA ? ('charge-prorated-price' as const) : ('deferred' as const),
+          replacementMode: deferred ? ('deferred' as const) : ('charge-prorated-price' as const),
         },
       }
+      if (owned && deferred) deferredSku = sku
       await requestPurchase({
         type: 'subs',
         request: {
@@ -218,8 +229,8 @@ const subscribe = (listener: () => void) => {
 
 const getPending = () => pending
 
-const buyPlan = (plan: 'PRO' | 'ULTRA') => {
-  void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs')
+const buyPlan = (plan: Plan, serverPlan: Plan | 'FREE' | undefined) => {
+  void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs', serverPlan)
 }
 
 const buyCredits = () => {

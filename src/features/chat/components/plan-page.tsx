@@ -76,7 +76,7 @@ const PlanPage = () => {
         account?.plan === 'ULTRA' ? (
           <Button label="지금 ULTRA를 쓰고 있어요" disabled />
         ) : (
-          <Button label="ULTRA로 업그레이드" onPress={pay(() => purchase.buyPlan('ULTRA'))} disabled={purchase.pending || !account} />
+          <Button label="ULTRA로 업그레이드" onPress={pay(() => purchase.buyPlan('ULTRA', account?.plan))} disabled={purchase.pending || !account} />
         )
       }
     >
@@ -92,7 +92,7 @@ const PlanPage = () => {
                 plan={p}
                 current={p.key === account.plan}
                 disabled={purchase.pending || p.key === 'FREE' || p.key === account.plan}
-                onPress={pay(() => purchase.buyPlan(p.key as 'PRO' | 'ULTRA'))}
+                onPress={pay(() => purchase.buyPlan(p.key as 'PRO' | 'ULTRA', account.plan))}
               />
             ))}
           </View>

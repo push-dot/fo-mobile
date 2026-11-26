@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
+import { IAP_DEFERRED_PRO_MESSAGE, IAP_FAILED_MESSAGE, IAP_OTHER_ACCOUNT_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
 
 type Listener<T> = (value: T) => void
 const h = vi.hoisted(() => ({
@@ -171,19 +171,20 @@ describe('android plan change', () => {
     subscriptionProductReplacementParams: { oldProductId, replacementMode },
   })
 
-  it.each([
-    ['charges the prorated price when upgrading', IAP_PRODUCT_PRO, 'ULTRA' as const, IAP_PRODUCT_ULTRA, replacing(IAP_PRODUCT_PRO, 'charge-prorated-price')],
-    ['defers the change when downgrading', IAP_PRODUCT_ULTRA, 'PRO' as const, IAP_PRODUCT_PRO, replacing(IAP_PRODUCT_ULTRA, 'deferred')],
-    ['sends a plain request when no other plan is owned', IAP_PRODUCT_ULTRA, 'ULTRA' as const, IAP_PRODUCT_ULTRA, {}],
-  ])('%s', async (_name, ownedProductId, plan, sku, replacement) => {
+  const owning = (sku: string, owned: Record<string, unknown>) => {
     h.platform.OS = 'android'
     h.fetchProducts.mockResolvedValue([{ id: sku, subscriptionOffers: [{ offerTokenAndroid: 'offer' }] }])
-    h.available.mockResolvedValue([
-      { productId: IAP_PRODUCT_TOPUP, purchaseToken: 'topup-token' },
-      { productId: ownedProductId, purchaseToken: 'owned-token' },
-    ])
+    h.available.mockResolvedValue([{ productId: IAP_PRODUCT_TOPUP, purchaseToken: 'topup-token' }, owned])
+  }
+
+  it.each([
+    ['charges the prorated price when upgrading', IAP_PRODUCT_PRO, 'PRO' as const, 'ULTRA' as const, IAP_PRODUCT_ULTRA, replacing(IAP_PRODUCT_PRO, 'charge-prorated-price')],
+    ['defers the change when downgrading', IAP_PRODUCT_ULTRA, 'ULTRA' as const, 'PRO' as const, IAP_PRODUCT_PRO, replacing(IAP_PRODUCT_ULTRA, 'deferred')],
+    ['sends a plain request when no other plan is owned', IAP_PRODUCT_ULTRA, 'FREE' as const, 'ULTRA' as const, IAP_PRODUCT_ULTRA, {}],
+  ])('%s', async (_name, ownedProductId, serverPlan, plan, sku, replacement) => {
+    owning(sku, { productId: ownedProductId, purchaseToken: 'owned-token' })
     h.requestPurchase.mockRejectedValue(Object.assign(new Error('cancelled'), { code: 'user-cancelled' }))
-    usePersonalPurchase().buyPlan(plan)
+    usePersonalPurchase().buyPlan(plan, serverPlan)
     await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
     expect(h.requestPurchase).toHaveBeenCalledWith({
       type: 'subs',
@@ -191,5 +192,51 @@ describe('android plan change', () => {
         google: { skus: [sku], subscriptionOffers: [{ sku, offerToken: 'offer' }], ...replacement },
       },
     })
+  })
+
+  it.each([
+    ['the signed-in account is on FREE', 'FREE' as const],
+    ['the signed-in account is on another plan', 'ULTRA' as const],
+  ])('skips the purchase and alerts when the owned plan is not the signed-in account plan: %s', async (_name, serverPlan) => {
+    owning(IAP_PRODUCT_ULTRA, { productId: IAP_PRODUCT_PRO, purchaseToken: 'owned-token' })
+    usePersonalPurchase().buyPlan('ULTRA', serverPlan)
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.requestPurchase).not.toHaveBeenCalled()
+    expect(h.alert).toHaveBeenCalledWith(IAP_OTHER_ACCOUNT_MESSAGE)
+  })
+
+  it('ignores an owned plan the store still holds as pending', async () => {
+    owning(IAP_PRODUCT_ULTRA, { productId: IAP_PRODUCT_PRO, purchaseToken: 'owned-token', purchaseState: 'pending' })
+    h.requestPurchase.mockRejectedValue(Object.assign(new Error('cancelled'), { code: 'user-cancelled' }))
+    usePersonalPurchase().buyPlan('ULTRA', 'FREE')
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.requestPurchase).toHaveBeenCalledWith({
+      type: 'subs',
+      request: { google: { skus: [IAP_PRODUCT_ULTRA], subscriptionOffers: [{ sku: IAP_PRODUCT_ULTRA, offerToken: 'offer' }] } },
+    })
+    expect(h.alert).not.toHaveBeenCalled()
+  })
+
+  it('tells the user the downgrade starts at the next billing date once it settles', async () => {
+    owning(IAP_PRODUCT_PRO, { productId: IAP_PRODUCT_ULTRA, purchaseToken: 'owned-token' })
+    h.requestPurchase.mockResolvedValue(undefined)
+    usePersonalPurchase().buyPlan('PRO', 'ULTRA')
+    await vi.waitFor(() => expect(h.requestPurchase).toHaveBeenCalled())
+    h.onUpdate?.({ productId: IAP_PRODUCT_PRO, purchaseState: 'purchased', purchaseToken: 'pro-token' })
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.verify).toHaveBeenCalledWith({ platform: 'GOOGLE_PLAY', productId: IAP_PRODUCT_PRO, purchaseToken: 'pro-token' })
+    expect(h.alert).toHaveBeenCalledTimes(1)
+    expect(h.alert).toHaveBeenCalledWith(IAP_DEFERRED_PRO_MESSAGE)
+  })
+
+  it('does not show the downgrade notice when the upgrade settles', async () => {
+    owning(IAP_PRODUCT_ULTRA, { productId: IAP_PRODUCT_PRO, purchaseToken: 'owned-token' })
+    h.requestPurchase.mockResolvedValue(undefined)
+    usePersonalPurchase().buyPlan('ULTRA', 'PRO')
+    await vi.waitFor(() => expect(h.requestPurchase).toHaveBeenCalled())
+    h.onUpdate?.({ productId: IAP_PRODUCT_ULTRA, purchaseState: 'purchased', purchaseToken: 'ultra-token' })
+    await vi.waitFor(() => expect(h.verify).toHaveBeenCalled())
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.alert).not.toHaveBeenCalled()
   })
 })
