@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ApiError } from '@push/api-client'
-import { HOUR_ITEMS, WEEKDAY_ITEMS, hourLabel, scheduleBody, scheduleErrorLine, scheduleSaveError, scheduleTiming, schedulesTitle, schedulesValue } from './schedules'
+import { HOUR_ITEMS, WEEKDAY_ITEMS, hourLabel, scheduleBody, scheduleErrorLine, scheduleSaveError, scheduleTiming, schedulesTitle, schedulesValue, schedulesView } from './schedules'
 
 describe('schedule timing line', () => {
   it('reads the hour in Korean twelve-hour time', () => {
@@ -49,5 +49,16 @@ describe('schedule rows and body', () => {
     expect(scheduleBody({ prompt: 'a', cadence: 'WEEKLY', hour: 9, weekday: 3 })).toEqual({ prompt: 'a', cadence: 'WEEKLY', hour: 9, weekday: 3 })
     expect(scheduleBody({ prompt: '   ', cadence: 'DAILY', hour: 9, weekday: 1 })).toBeNull()
     expect(scheduleBody({ prompt: 'a'.repeat(501), cadence: 'DAILY', hour: 9, weekday: 1 })).toBeNull()
+  })
+})
+
+describe('schedules sheet state', () => {
+  it('shows loading until the list arrives, the retry note on an error, and the list over a later refetch error', () => {
+    expect(schedulesView({ isLoading: true, isError: false, count: null })).toBe('loading')
+    expect(schedulesView({ isLoading: false, isError: true, count: null })).toBe('error')
+    expect(schedulesView({ isLoading: false, isError: false, count: 0 })).toBe('empty')
+    expect(schedulesView({ isLoading: false, isError: false, count: 2 })).toBe('list')
+    expect(schedulesView({ isLoading: false, isError: true, count: 2 })).toBe('list')
+    expect(schedulesView({ isLoading: false, isError: false, count: null }), 'a paused offline query offers retry').toBe('error')
   })
 })
