@@ -117,7 +117,7 @@ const styles = StyleSheet.create((theme) => ({
   fill: { flex: 1 },
   shrink: { flex: 0 },
   grabber: { ...GRABBER.android, backgroundColor: theme.colors.deco, alignSelf: 'center' },
-  titles: { flex: 1, gap: theme.spacing[1] },
+  titles: { gap: theme.spacing[1] },
   actionEnd: { marginTop: 'auto' },
   gapTop: (marginTop: number) => ({ marginTop }),
   secondaryFill: (backgroundColor: string) => ({ backgroundColor }),
