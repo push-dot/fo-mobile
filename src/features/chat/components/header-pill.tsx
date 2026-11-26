@@ -10,6 +10,7 @@ import { TRY_LATER } from '../constants'
 import HeaderLamp from './header/header-lamp'
 import type { HeaderLight } from './header/state'
 import { clearPushChat, deleteCompanyBot } from '../stores'
+import { leaveChat } from '../utils/leave-chat'
 import { botHeaderMenu, botSpokenName, clearChatConfirm, deleteBotConfirm, type HeaderMenuId } from '../utils/usage'
 
 const openProfile = (botId: string) => router.push(botProfilePath(botId as BotId))
@@ -48,7 +49,7 @@ const HeaderPill = ({
         danger: true,
         onConfirm: () => {
           void deleteCompanyBot(botId, kind).then((ok) => {
-            if (ok) router.back()
+            if (ok) leaveChat()
           }, failed)
         },
       })
@@ -78,7 +79,7 @@ const HeaderPill = ({
     <TopBar
       translucent
       chat
-      onBack={leading === 'back' ? () => router.back() : leading === 'botHome' ? () => router.replace(botHomePath) : undefined}
+      onBack={leading === 'back' ? leaveChat : leading === 'botHome' ? () => router.replace(botHomePath) : undefined}
       backIcon={leading === 'botHome' ? 'menu' : undefined}
       backLabel={leading === 'botHome' ? 'Bot 홈' : undefined}
       reserveBack={leading === 'none'}

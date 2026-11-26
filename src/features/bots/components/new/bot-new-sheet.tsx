@@ -233,6 +233,14 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
   }, [navigation, creating])
   useHardwareBack(creating ? () => undefined : null)
 
+  const alive = useRef(true)
+  useEffect(() => {
+    alive.current = true
+    return () => {
+      alive.current = false
+    }
+  }, [])
+
   useEffect(() => {
     if (!postingId) return
     let cancel = false
@@ -330,8 +338,9 @@ const BotNewSheet = ({ postingId, onClose, onOpenBot, onUpgrade, onConsentRequir
     setForm(beginCreate(base))
     try {
       const result = await create({ postingId: action.posting.postingId, color: action.color })
-      onOpenBot(result.bot.id)
+      if (alive.current) onOpenBot(result.bot.id)
     } catch (error) {
+      if (!alive.current) return
       if (isConsentRequired(error)) {
         setForm(base)
         onConsentRequired(() => void run(base))
