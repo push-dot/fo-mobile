@@ -13,7 +13,7 @@ const RING = 2
 const GAP = 3
 
 const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void }) => {
-  const setColor = useSetBotColor()
+  const { setColor, isPending } = useSetBotColor()
   const [picked, setPicked] = useState<BotColor>(bot.color)
   const apply = async () => {
     try {
@@ -57,7 +57,7 @@ const BotColorSheet = ({ bot, onClose }: { bot: CompanyBot; onClose: () => void 
         {row(BOT_COLORS.slice(0, 6), 0)}
         {row(BOT_COLORS.slice(6), 6)}
       </View>
-      <Button label={DONE_LABEL} onPress={() => void apply()} style={styles.done} />
+      <Button label={DONE_LABEL} pending={isPending} onPress={() => void apply()} style={styles.done} />
     </Sheet>
   )
 }

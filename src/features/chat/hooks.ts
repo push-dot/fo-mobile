@@ -64,6 +64,6 @@ export const useReadWhileOpen = (bot: Bot | undefined, atBottom: boolean) => {
   useEffect(() => {
     if (!bot || !unread || !atBottom || told.current === `${bot.id}@${at}`) return
     told.current = `${bot.id}@${at}`
-    void mark.current(bot).catch(() => undefined)
+    mark.current(bot)
   }, [bot, unread, at, atBottom])
 }

@@ -5,6 +5,8 @@ import type { Bot, BotId, BotProfile, CompanyBot } from '../types'
 
 const updateBot = vi.fn()
 vi.mock('../api/fetchers', () => ({ fetchBots: vi.fn(), updateBot: (...args: unknown[]) => updateBot(...args) }))
+const showToast = vi.fn()
+vi.mock('@/shared/components/toast-store', () => ({ showToast: (...args: unknown[]) => showToast(...args) }))
 const { patchBotMutation } = await import('../api/hooks')
 
 const moapay: CompanyBot = {
@@ -20,6 +22,7 @@ const profiled = () => qc.getQueryData<BotProfile>(DETAIL)?.bot
 
 beforeEach(() => {
   updateBot.mockReset()
+  showToast.mockReset()
   qc = new QueryClient()
   qc.setQueryData(LIST, { bots: [moapay], limit: undefined })
   qc.setQueryData(DETAIL, { bot: moapay, posting: null, fitScore: null, materialCount: 8 })
@@ -41,6 +44,15 @@ describe('changing a bot colour or mute', () => {
     expect(listed()?.revision).toBe(4)
   })
 
+  it('sends the second change on the revision the first one returned', async () => {
+    updateBot.mockImplementation((_id: BotId, body: { expectedRevision: number }) =>
+      Promise.resolve({ ...moapay, revision: body.expectedRevision + 1 }),
+    )
+    await Promise.all([patch({ bot: moapay, patch: { color: 'red' } }), patch({ bot: moapay, patch: { notificationsMuted: true } })])
+    expect(updateBot.mock.calls.map(([, body]) => body.expectedRevision)).toEqual([3, 4])
+    expect(listed()?.revision).toBe(5)
+  })
+
   it('rolls back on REVISION_CONFLICT and reloads the bots', async () => {
     updateBot.mockRejectedValue(new ApiError('changed', 'REVISION_CONFLICT', 409, { currentRevision: 4 }))
     const error = await patch({ bot: moapay, patch: { color: 'red' } })
@@ -50,10 +62,12 @@ describe('changing a bot colour or mute', () => {
     expect(qc.getQueryState(LIST)?.isInvalidated).toBe(true)
   })
 
-  it('rolls back on any other failure without a reload', async () => {
+  it('rolls back on any other failure, reloads the bots and says so once', async () => {
     updateBot.mockRejectedValue(new Error('offline'))
     await patch({ bot: moapay, patch: { notificationsMuted: true } })
     expect(listed()).toEqual(moapay)
-    expect(qc.getQueryState(LIST)?.isInvalidated).toBe(false)
+    expect(qc.getQueryState(LIST)?.isInvalidated).toBe(true)
+    expect(showToast).toHaveBeenCalledTimes(1)
+    expect(showToast).toHaveBeenCalledWith({ message: '처리하지 못했어요', tone: 'error' })
   })
 })

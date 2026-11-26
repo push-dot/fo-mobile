@@ -26,8 +26,8 @@ const BotHomeScreen = () => {
       plan={account.data?.plan}
       onRetry={list.refetch}
       onDelete={remove}
-      onRead={(bot) => void markRead(bot)}
-      onMute={(bot, muted) => void setMuted(bot, muted)}
+      onRead={markRead}
+      onMute={setMuted}
       onForget={forget}
     />
   )
