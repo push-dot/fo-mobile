@@ -4,13 +4,11 @@ import { sourcesApi } from '@/shared/infrastructure/sources'
 import { DEFAULT_DOC } from '../constants'
 import { accountFromBilling } from '../utils/account'
 import { chatDocFromSource } from '../utils/docs'
-import { QS_NEEDS, quickStartFrom, type QsSources } from '../utils/quick-start-data'
+import { QS_NEEDS, QS_OPTIONAL, quickStartFrom, type QsSources } from '../utils/quick-start-data'
 import type { Step } from '../types'
 import type { Account, ChatDoc, QsData, RunInput } from './schemas'
 
 const c = http
-
-const QS_OPTIONAL = new Set(['hub'])
 
 const data = async <T>(p: Promise<DataEnvelope<T>>) => (await p).data
 

@@ -120,4 +120,6 @@ export const QS_NEEDS: Record<string, (keyof QsSources)[]> = {
   coffee: ['follows', 'recommended'],
 }
 
+export const QS_OPTIONAL = new Set(['hub'])
+
 export const startLink = (typed: string, copied: string) => (typed.trim() ? typed : copied)

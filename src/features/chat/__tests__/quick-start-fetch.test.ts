@@ -9,6 +9,7 @@ vi.mock('@/shared/infrastructure', () => ({ api, http: {}, API_BASE_URL: 'https:
 vi.mock('@/shared/infrastructure/sources', () => ({ sourcesApi: { list: vi.fn() } }))
 vi.mock('../utils/quick-start-data', () => ({
   QS_NEEDS: { status: ['applications'], coffee: ['follows', 'recommended'], gap: ['bookmarks', 'recent', 'doc'], hub: ['doc', 'profile'] },
+  QS_OPTIONAL: new Set(['hub']),
   quickStartFrom: (key: string, sources: object) => ({ key, sources }),
 }))
 
