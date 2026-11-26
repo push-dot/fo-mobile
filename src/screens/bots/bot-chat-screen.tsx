@@ -1,7 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { LegendList, type LegendListRef } from '@legendapp/list/react-native'
-import { useEffect, useRef, useState } from 'react'
-import { KeyboardAvoidingView, Platform, View, type NativeScrollEvent, type NativeSyntheticEvent, type TextInputInstance } from 'react-native'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import {
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  type TextInputInstance,
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import { usePersonalPurchase } from '@/features/billing'
@@ -55,6 +62,7 @@ import {
 import { useReferenceConsent } from '@/features/my'
 import { Button, Text, useKeyboardHeight, useReduceMotion } from '@/shared/components'
 import { XlBoardChrome } from '@/shared/components/xl-chrome'
+import { firstParam } from '@/shared/utility'
 
 const COMPOSER_BOTTOM = 6
 const AT_BOTTOM = 40
@@ -62,11 +70,8 @@ const OPEN_REST_MS = 800
 
 const Gap = () => <View style={styles.gap} />
 
-const addressOf = (botId: string | string[] | undefined) => (Array.isArray(botId) ? (botId[0] ?? '') : (botId ?? ''))
-
 const BotChatScreen = () => {
-  const raw = useLocalSearchParams<{ botId: string }>().botId
-  const address = addressOf(raw)
+  const address = firstParam(useLocalSearchParams<{ botId: string }>().botId) ?? ''
   const [tryN, setTryN] = useState(0)
 
   return (
@@ -84,7 +89,7 @@ const useLeading = () => {
 
 const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) => {
   const leading = useLeading()
-  const [id, setId] = useState<string | null>(null)
+  const [id, setId] = useState<BotId | null>(null)
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
@@ -92,7 +97,7 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
     let live = true
     void openBot(address).then(
       (resolved) => {
-        if (live) setId(resolved)
+        if (live) setId(resolved as BotId)
       },
       () => {
         if (live) setFailed(true)
@@ -119,10 +124,10 @@ const Opened = ({ address, onRetry }: { address: string; onRetry: () => void }) 
   )
 }
 
-const Thread = ({ id }: { id: string }) => {
+const Thread = ({ id }: { id: BotId }) => {
   const leading = useLeading()
-  const bot = useBot(id as BotId)
-  const profile = useBotProfile(id as BotId)
+  const bot = useBot(id)
+  const profile = useBotProfile(id)
   const items = useChatItems(id)
   const queue = useChatQueue(id)
   const waiting = useChatWaiting(id)
@@ -138,11 +143,18 @@ const Thread = ({ id }: { id: string }) => {
   const input = useRef<TextInputInstance>(null)
   const chipKind = useDraftStore((s) => s.byBot[id]?.chipKind)
   const typing = useDraftStore((s) => !!s.byBot[id]?.text)
-  const placeholder = composerPlaceholder(name, chipKind, Platform.OS === 'android' && phase === 'working')
+  const placeholder = composerPlaceholder(
+    name,
+    chipKind,
+    Platform.OS === 'android' && phase === 'working',
+  )
   const empty = items.length === 0 && queue.length === 0
   const greetingTitle = profile.data?.posting?.title
   const showGreeting = !empty && !hasOlder(id) && kind === 'company' && !!name
-  const greeting: ChatItem[] = showGreeting && name ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, greetingTitle) }] : []
+  const greeting: ChatItem[] =
+    showGreeting && name
+      ? [{ type: 'agentText', id: 'greeting', text: threadGreeting(name, greetingTitle) }]
+      : []
   const data: ThreadRow[] = [...greeting, ...threadRows(shownItems(id, items), working)]
   const lastId = data.findLast((row) => row.type !== 'running')?.id
 
@@ -159,12 +171,13 @@ const Thread = ({ id }: { id: string }) => {
   useReadWhileOpen(bot.data, atBottom)
   const reduceMotion = useReduceMotion()
   const failed = turnFailed(items)
-  const light = headerLightOf({ creditsOut: limit.out, unseenBotMessages: unseen, failed, attention: !!waiting })
-  const list = useRef<LegendListRef>(null)
-  const dataRef = useRef(data)
-  useEffect(() => {
-    dataRef.current = data
+  const light = headerLightOf({
+    creditsOut: limit.out,
+    unseenBotMessages: unseen,
+    failed,
+    attention: !!waiting,
   })
+  const list = useRef<LegendListRef>(null)
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent
     setAtBottom(contentOffset.y + layoutMeasurement.height >= contentSize.height - AT_BOTTOM)
@@ -174,22 +187,33 @@ const Thread = ({ id }: { id: string }) => {
   }
   const toBottom = () => void list.current?.scrollToEnd({ animated: !reduceMotion })
   const currentId = find.currentId
-  useEffect(() => {
-    if (!currentId) return
-    const at = dataRef.current.findIndex((i) => i.id === currentId)
+  const scrollToMatch = useEffectEvent((matchId: string) => {
+    const at = data.findIndex((i) => i.id === matchId)
     if (at >= 0) void list.current?.scrollToIndex({ index: at, viewPosition: 0.5, animated: true })
+  })
+  useEffect(() => {
+    if (currentId) scrollToMatch(currentId)
   }, [currentId])
 
   const onUsage = (action: 'plan' | 'credits') => {
     if (action === 'plan') router.push(accountPath('plan'))
     else purchase.buyCredits()
   }
-  const onReadOff = (action: 'attach' | 'settings') => router.push(action === 'attach' ? materialPickerPath(id as BotId) : '/settings')
+  const onReadOff = (action: 'attach' | 'settings') =>
+    router.push(action === 'attach' ? materialPickerPath(id) : '/settings')
   const onLocal = useSurfaceActions(id, () => setTimeout(() => input.current?.focus(), 50))
   const renderItem = ({ item }: { item: ThreadRow }) => {
     const last = item.id === lastId
     return (
-      <ThreadCell chatId={id} row={item} color={color} live={live} last={last} onLocal={onLocal} onReadOff={onReadOff} />
+      <ThreadCell
+        chatId={id}
+        row={item}
+        color={color}
+        live={live}
+        last={last}
+        onLocal={onLocal}
+        onReadOff={onReadOff}
+      />
     )
   }
   const onboardingMotion = { key: `${id}/onboarding`, live }
@@ -207,75 +231,96 @@ const Thread = ({ id }: { id: string }) => {
     <View style={styles.flex}>
       <View onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)} style={styles.header}>
         {find.open ? (
-          <FindBar query={find.query} label={find.label} onQuery={find.setQuery} onStep={find.step} onClose={find.close} />
+          <FindBar
+            query={find.query}
+            label={find.label}
+            onQuery={find.setQuery}
+            onStep={find.step}
+            onClose={find.close}
+          />
         ) : (
-          <HeaderPill botId={id} name={name} kind={kind} color={color} light={light} leading={leading} onFind={find.show} />
+          <HeaderPill
+            botId={id}
+            name={name}
+            kind={kind}
+            color={color}
+            light={light}
+            leading={leading}
+            onFind={find.show}
+          />
         )}
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.flex}>
-      {empty && kind && name ? (
-        <RowMotion.Provider value={onboardingMotion}>
-          <Onboarding kind={kind} name={name} postingTitle={profile.data?.posting?.title} top={headerH} />
-        </RowMotion.Provider>
-      ) : (
-      <View style={styles.flex}>
-      <ChatBotColor.Provider value={color}>
-      <FindHighlight.Provider value={find.highlight}>
-      <LegendList
-        ref={list}
-        data={data}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        extraData={`${working}|${lastId}|${live}|${color}`}
-        getItemType={(item) => item.type}
-        estimatedItemSize={72}
-        recycleItems={false}
-        initialScrollAtEnd
-        maintainScrollAtEnd={maintainScrollAtEnd}
-        maintainVisibleContentPosition
-        onStartReached={onStartReached}
-        onStartReachedThreshold={1}
-        onScroll={onScroll}
-        scrollEventThrottle={100}
-        keyboardDismissMode="interactive"
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.thread(threadBottomGap(keyboard))}
-        ItemSeparatorComponent={Gap}
-        ListHeaderComponent={listHeader}
-        ListFooterComponent={listFooter}
-      />
-      </FindHighlight.Provider>
-      </ChatBotColor.Provider>
-      {unseen > 0 && followScroll(atBottom, working, reduceMotion) === 'fresh' ? <NewMessagesPill count={unseen} onPress={toBottom} /> : null}
-      </View>
-      )}
-      {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
-      <View style={styles.composer(keyboard ? null : insets.bottom + COMPOSER_BOTTOM)}>
-        <ComposerArea
-          botId={id}
-          inputRef={input}
-          placeholder={placeholder}
-          working={phase === 'working'}
-          disabled={!!limit.banner}
-          onStop={() => stop(id)}
-          onSend={(text, attachment) => send(id, text, attachment)}
-          above={
-            awaiting ? (
-              <AwaitingRow text={AWAITING_TEXT[awaiting]} color={color} />
-            ) : empty && kind && !typing ? (
-              <QuickStartRow
-                kind={kind}
-                onChip={(key) => {
-                  const run = instantRun(key)
-                  if (run) send(id, run.message, undefined, run.intent)
-                  else router.push(quickStartPath(key))
-                }}
-              />
-            ) : null
-          }
-        />
-      </View>
-      <ConsentSheet kind={kind} />
+        {empty && kind && name ? (
+          <RowMotion.Provider value={onboardingMotion}>
+            <Onboarding
+              kind={kind}
+              name={name}
+              postingTitle={profile.data?.posting?.title}
+              top={headerH}
+            />
+          </RowMotion.Provider>
+        ) : (
+          <View style={styles.flex}>
+            <ChatBotColor.Provider value={color}>
+              <FindHighlight.Provider value={find.highlight}>
+                <LegendList
+                  ref={list}
+                  data={data}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderItem}
+                  extraData={`${working}|${lastId}|${live}|${color}`}
+                  getItemType={(item) => item.type}
+                  estimatedItemSize={72}
+                  recycleItems={false}
+                  initialScrollAtEnd
+                  maintainScrollAtEnd={maintainScrollAtEnd}
+                  maintainVisibleContentPosition
+                  onStartReached={onStartReached}
+                  onStartReachedThreshold={1}
+                  onScroll={onScroll}
+                  scrollEventThrottle={100}
+                  keyboardDismissMode="interactive"
+                  keyboardShouldPersistTaps="handled"
+                  contentContainerStyle={styles.thread(threadBottomGap(keyboard))}
+                  ItemSeparatorComponent={Gap}
+                  ListHeaderComponent={listHeader}
+                  ListFooterComponent={listFooter}
+                />
+              </FindHighlight.Provider>
+            </ChatBotColor.Provider>
+            {unseen > 0 && followScroll(atBottom, working, reduceMotion) === 'fresh' ? (
+              <NewMessagesPill count={unseen} onPress={toBottom} />
+            ) : null}
+          </View>
+        )}
+        {limit.banner ? <CreditBanner banner={limit.banner} onAction={onUsage} /> : null}
+        <View style={styles.composer(keyboard ? null : insets.bottom + COMPOSER_BOTTOM)}>
+          <ComposerArea
+            botId={id}
+            inputRef={input}
+            placeholder={placeholder}
+            working={phase === 'working'}
+            disabled={!!limit.banner}
+            onStop={() => stop(id)}
+            onSend={(text, attachment) => send(id, text, attachment)}
+            above={
+              awaiting ? (
+                <AwaitingRow text={AWAITING_TEXT[awaiting]} color={color} />
+              ) : empty && kind && !typing ? (
+                <QuickStartRow
+                  kind={kind}
+                  onChip={(key) => {
+                    const run = instantRun(key)
+                    if (run) send(id, run.message, undefined, run.intent)
+                    else router.push(quickStartPath(key))
+                  }}
+                />
+              ) : null
+            }
+          />
+        </View>
+        <ConsentSheet kind={kind} />
       </KeyboardAvoidingView>
     </View>
   )
@@ -285,12 +330,24 @@ const styles = StyleSheet.create((theme) => ({
   flex: { flex: 1 },
   screen: { flex: 1, backgroundColor: theme.colors.bg },
   gap: { height: BUBBLE_GAP },
-  failed: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing[2], padding: theme.spacing[5] },
+  failed: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing[2],
+    padding: theme.spacing[5],
+  },
   height: (height: number) => ({ height }),
   queue: { gap: BUBBLE_GAP, paddingTop: BUBBLE_GAP },
   header: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3 },
-  thread: (paddingBottom: number) => ({ paddingHorizontal: theme.spacing[5], paddingTop: theme.spacing[4], paddingBottom }),
-  composer: (paddingBottom: number | null) => ({ paddingHorizontal: theme.spacing[3], paddingBottom: paddingBottom ?? theme.spacing[2] }),
+  thread: (paddingBottom: number) => ({
+    paddingHorizontal: theme.spacing[5],
+    paddingTop: theme.spacing[4],
+    paddingBottom,
+  }),
+  composer: (paddingBottom: number | null) => ({
+    paddingHorizontal: theme.spacing[3],
+    paddingBottom: paddingBottom ?? theme.spacing[2],
+  }),
 }))
 
 const BotChatScreenWithXlChrome = () => (

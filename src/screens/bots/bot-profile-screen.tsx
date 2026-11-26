@@ -1,9 +1,9 @@
 import { useLocalSearchParams } from 'expo-router'
-import { BotProfileView, type BotAddress } from '@/features/bots'
+import { BotProfileView, botAddressParam } from '@/features/bots'
 
 const BotProfileScreen = () => {
   const { botId } = useLocalSearchParams<{ botId: string }>()
-  const address = (typeof botId === 'string' ? botId : 'push') as BotAddress
+  const address = botAddressParam(botId)
   return <BotProfileView address={address} />
 }
 

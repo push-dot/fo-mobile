@@ -4,11 +4,10 @@ import { Alert } from 'react-native'
 import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
 import { StyleSheet } from 'react-native-unistyles'
 import { Sheet, SheetScroll, TOAST_ABOVE, showToast, useSheetScrollMax } from '@/shared/components'
-
-const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+import { firstParam } from '@/shared/utility'
 
 const ApplySheetScreen = () => {
-  const postingId = param(useLocalSearchParams<{ postingId?: string }>().postingId)
+  const postingId = firstParam(useLocalSearchParams<{ postingId?: string }>().postingId)
   const posting = usePosting(postingId ?? '')
   const docs = useApplyDocs(!!postingId).data ?? []
   const { main, extras } = splitApplyDocs(docs)

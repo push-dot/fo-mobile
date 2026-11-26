@@ -1,9 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { BotAllowedSheet, type BotAddress } from '@/features/bots'
+import { BotAllowedSheet, botAddressParam } from '@/features/bots'
 
 const BotAllowedSheetScreen = () => {
   const { botId } = useLocalSearchParams<{ botId: string }>()
-  const address = (typeof botId === 'string' ? botId : 'push') as BotAddress
+  const address = botAddressParam(botId)
   return <BotAllowedSheet address={address} onClose={() => router.back()} />
 }
 

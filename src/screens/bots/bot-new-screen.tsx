@@ -1,11 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { accountPath, botChatPath, BotNewSheet } from '@/features/bots'
 import { askConsentThen } from '@/features/chat'
-
-const param = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+import { firstParam } from '@/shared/utility'
 
 const BotNewScreen = () => {
-  const postingId = param(useLocalSearchParams<{ posting?: string }>().posting)
+  const postingId = firstParam(useLocalSearchParams<{ posting?: string }>().posting)
   return (
     <BotNewSheet
       postingId={postingId}
