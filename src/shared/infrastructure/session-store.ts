@@ -17,18 +17,23 @@ type SessionState = {
   set: (s: Session | null) => Promise<void>
 }
 
+const isStored = (v: unknown): v is StoredSession => {
+  const s = v as { accessToken?: unknown; user?: { id?: unknown } } | null
+  return typeof s?.accessToken === 'string' && typeof s.user?.id === 'string'
+}
+
 export const useSession = create<SessionState>((set) => ({
   session: null,
   ready: false,
   load: async () => {
-    const raw = await SecureStore.getItemAsync(SESSION_STORAGE_KEY)
+    const raw = await SecureStore.getItemAsync(SESSION_STORAGE_KEY).catch(() => null)
     let session: StoredSession | null = null
     if (raw) {
       try {
-        session = JSON.parse(raw) as StoredSession
-      } catch {
-        await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY).catch(() => undefined)
-      }
+        const parsed: unknown = JSON.parse(raw)
+        if (isStored(parsed)) session = parsed
+      } catch {}
+      if (!session) await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY).catch(() => undefined)
     }
     set({ session, ready: true })
   },
@@ -36,7 +41,7 @@ export const useSession = create<SessionState>((set) => ({
     const session = next && next.expiresIn > 0 ? { ...next, expiresAt: Date.now() + next.expiresIn * 1000 } : next
     const hadSession = useSession.getState().session != null
     if (session) await SecureStore.setItemAsync(SESSION_STORAGE_KEY, JSON.stringify(session))
-    else await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY)
+    else await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY).catch(() => undefined)
     if (hadSession && session === null) {
       await queryClient.cancelQueries()
       queryClient.clear()

@@ -18,7 +18,7 @@ export const useThemePreference = create<State>((set) => ({
   choice: 'system',
   ready: false,
   load: async () => {
-    const raw = await SecureStore.getItemAsync(KEY)
+    const raw = await SecureStore.getItemAsync(KEY).catch(() => null)
     set({ choice: isChoice(raw) ? raw : 'system', ready: true })
   },
   setChoice: async (choice) => {

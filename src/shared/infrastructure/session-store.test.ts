@@ -80,6 +80,17 @@ describe('useSession.set', () => {
     off()
     expect(listener).toHaveBeenCalledTimes(1)
   })
+
+  it('signs out even when the keychain delete fails', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session, ready: true })
+    deleteItemAsync.mockRejectedValueOnce(new Error('keychain'))
+
+    await useSession.getState().set(null)
+
+    expect(useSession.getState().session).toBeNull()
+    expect(clearSpy).toHaveBeenCalled()
+  })
 })
 
 describe('useSession.load', () => {
@@ -102,6 +113,30 @@ describe('useSession.load', () => {
     await useSession.getState().load()
 
     expect(useSession.getState()).toMatchObject({ session, ready: true })
+  })
+
+  it('boots signed out without deleting the session when the keychain read fails', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session: null, ready: false })
+    deleteItemAsync.mockClear()
+    getItemAsync.mockRejectedValue(new Error('locked'))
+
+    await useSession.getState().load()
+
+    expect(useSession.getState()).toMatchObject({ session: null, ready: true })
+    expect(deleteItemAsync).not.toHaveBeenCalled()
+  })
+
+  it('drops a stored session with the wrong shape', async () => {
+    const { useSession } = await import('./session-store')
+    useSession.setState({ session: null, ready: false })
+    deleteItemAsync.mockClear()
+    getItemAsync.mockResolvedValue(JSON.stringify({ accessToken: 'at' }))
+
+    await useSession.getState().load()
+
+    expect(useSession.getState()).toMatchObject({ session: null, ready: true })
+    expect(deleteItemAsync).toHaveBeenCalled()
   })
 })
 

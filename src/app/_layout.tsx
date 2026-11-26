@@ -42,7 +42,7 @@ const RootLayout = () => {
     <DesignThemeProvider>
       <QueryClientProvider client={queryClient}>
         <RootErrorBoundary>
-          <SplashGate sessionReady={ready} themeReady={themeReady} />
+          <SplashGate />
           <View style={styles.root} {...noSelectionGrant}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Protected guard={signedIn} redirectTo="/sign-in">
