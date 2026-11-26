@@ -63,6 +63,13 @@ describe('quick start intent payloads', () => {
     expect(made?.context).toBeUndefined()
   })
 
+  it('asks the calendar for the task chip the user picked', () => {
+    expect(start('calendar', { task: '이번 주 정리하기', picked: [] })).toMatchObject({ title: '이번 주 일정 정리', message: '이번 주 정리하기: 이번 주 일정을 정리해 주세요' })
+    expect(start('calendar', { task: '마감일 넣기', picked: [job] })).toMatchObject({ title: '마감일 넣기', message: '마감일 넣기: 북마크한 공고의 마감일을 캘린더에 넣어 주세요' })
+    expect(start('calendar', { task: '면접·커피챗 잡기', picked: [job] })).toMatchObject({ title: '면접·커피챗 잡기', message: '면접·커피챗 잡기: 면접과 커피챗 일정을 캘린더에 잡아 주세요' })
+    expect(start('calendar', { task: '준비 알림 만들기', picked: [job] })).toMatchObject({ title: '준비 알림 만들기', message: '준비 알림 만들기: 다가오는 일정마다 준비할 일을 알림으로 만들어 주세요' })
+  })
+
   it('sends each tool intent in the seed sentence and no extra context keys', () => {
     expect(start('status', { picked: [job] })).toMatchObject({
       intent: 'applications',
