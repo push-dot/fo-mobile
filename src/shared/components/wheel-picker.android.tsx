@@ -51,7 +51,18 @@ const SnapWheel = ({ items, value, onChange, accessibilityLabel }: WheelPickerPr
   const index = Math.max(0, items.findIndex((it) => it.key === value))
   useEffect(() => ref.current?.scrollTo({ y: index * ROW, animated: false }), [index, items])
   return (
-    <View accessibilityLabel={accessibilityLabel} style={styles.wheel}>
+    <View
+      accessible
+      accessibilityRole="adjustable"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityValue={{ text: items[index]?.label }}
+      accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+      onAccessibilityAction={(e) => {
+        const next = items[index + (e.nativeEvent.actionName === 'increment' ? 1 : -1)]
+        if (next) onChange(next.key)
+      }}
+      style={styles.wheel}
+    >
       <ScrollView
         ref={ref}
         showsVerticalScrollIndicator={false}

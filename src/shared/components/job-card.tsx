@@ -23,7 +23,17 @@ const JobCard = ({ posting: p, width = 200, onPress, onPressIn, onBookmark }: Pr
   const c = useColors()
   const brand = brandColor(p.company)
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${p.company} ${p.title}`} onPress={onPress} onPressIn={onPressIn} style={styles.card(width)}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${p.company} ${p.title}`}
+      accessibilityActions={onBookmark ? [{ name: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크' }] : undefined}
+      onAccessibilityAction={(e) => {
+        if (e.nativeEvent.actionName === 'bookmark') onBookmark?.()
+      }}
+      onPress={onPress}
+      onPressIn={onPressIn}
+      style={styles.card(width)}
+    >
       <View style={styles.media(Math.round((width * 136) / 200))}>
         {p.imageUrl ? (
           <Image source={{ uri: assetUrl(p.imageUrl) }} recyclingKey={p.id} style={styles.cover} contentFit="cover" cachePolicy="memory-disk" />

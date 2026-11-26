@@ -26,6 +26,7 @@ const { default: Menu } = await import('../menu.android')
 const { default: ContextMenu } = await import('../context-menu.android')
 const { default: DatePicker } = await import('../date-picker.android')
 const { default: Sheet } = await import('../sheet')
+const { default: WheelPicker } = await import('../wheel-picker.android')
 
 const c = palette.light
 const actions = [
@@ -200,5 +201,19 @@ describe('DatePicker (Android)', () => {
     const dialog = find(DatePicker({ value: new Date(2026, 9, 23, 9, 0), onChange, label: '시간', mode: 'time' }), 'TimePickerDialog')
     ;(dialog.props.onDateSelected as (d: Date) => void)(new Date(2000, 0, 1, 14, 30))
     expect(onChange).toHaveBeenCalledWith(new Date(2026, 9, 23, 14, 30))
+  })
+})
+
+describe('WheelPicker columns (Android)', () => {
+  it('is one adjustable control that TalkBack can step through', () => {
+    const onChange = vi.fn()
+    const items = [{ key: '1', label: '1월' }, { key: '2', label: '2월' }, { key: '3', label: '3월' }]
+    const picker = WheelPicker({ items, value: '2', onChange, accessibilityLabel: '월', columns: true })
+    const wheel = (picker.type as typeof WheelPicker)(picker.props as Parameters<typeof WheelPicker>[0])
+    expect(wheel.props).toMatchObject({ accessible: true, accessibilityRole: 'adjustable', accessibilityLabel: '월', accessibilityValue: { text: '2월' } })
+    const act = (actionName: string) => (wheel.props.onAccessibilityAction as (e: unknown) => void)({ nativeEvent: { actionName } })
+    act('increment')
+    act('decrement')
+    expect(onChange.mock.calls).toEqual([['3'], ['1']])
   })
 })

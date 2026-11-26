@@ -32,10 +32,10 @@ const SIZES: Record<Size, { minHeight: number; borderRadius: number; paddingHori
   sm: { minHeight: 40, borderRadius: platformTheme.buttonSmRadius, paddingHorizontal: 14, text: 'c1', fontSize: 14, icon: 16 },
 }
 
-const VARIANTS: Record<Variant, { glass: boolean; fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
-  primary: { glass: false, fill: 'ac', pressedFill: 'acPress', ink: 'accent' },
-  secondary: { glass: false, fill: 'fill', ink: 't1' },
-  danger: { glass: false, fill: 'red', ink: 'accent' },
+const VARIANTS: Record<Variant, { fill: keyof Colors; pressedFill?: keyof Colors; ink: 'accent' | 't1' }> = {
+  primary: { fill: 'ac', pressedFill: 'acPress', ink: 'accent' },
+  secondary: { fill: 'fill', ink: 't1' },
+  danger: { fill: 'red', ink: 'accent' },
 }
 
 const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSize, paddingX, weight, disabled, pending, glass, style }: Props) => {
@@ -46,11 +46,11 @@ const Button = ({ label, onPress, variant = 'primary', size = 'lg', icon, iconSi
   return (
     <GlassPressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: disabled || pending }}
+      accessibilityState={{ disabled: disabled || pending, busy: pending }}
       disabled={disabled || pending}
       dimOpacity={pending ? PENDING_OPACITY : undefined}
       onPress={onPress}
-      glass={glass ?? v.glass}
+      glass={glass ?? false}
       fill={v.fill}
       pressedFill={v.pressedFill}
       style={[{ minHeight: s.minHeight, borderRadius: s.borderRadius }, style]}

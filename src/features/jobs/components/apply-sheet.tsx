@@ -18,7 +18,7 @@ const ApplySheet = ({ main, extras, pickedId, extraIds, onPick, onToggleExtra }:
       <DocRow key={d.id} doc={d} on={d.id === pickedId} onPress={() => onPick(d.id)} />
     ))}
     {extras.map((d) => (
-      <DocRow key={d.id} doc={{ ...d, note: extraNote(d) }} on={extraIds.includes(d.id)} onPress={() => onToggleExtra(d.id)} />
+      <DocRow key={d.id} doc={{ ...d, note: extraNote(d) }} multi on={extraIds.includes(d.id)} onPress={() => onToggleExtra(d.id)} />
     ))}
   </View>
 )

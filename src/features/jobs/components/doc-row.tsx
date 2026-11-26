@@ -4,8 +4,8 @@ import { displayName } from '../../../shared/utility/display-name'
 import { StyleSheet } from 'react-native-unistyles'
 import type { ApplyDoc } from '../types'
 
-const DocRow = ({ doc, on, onPress }: { doc: ApplyDoc; on: boolean; onPress: () => void }) => (
-  <Pressable accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={onPress} style={styles.row}>
+const DocRow = ({ doc, on, multi, onPress }: { doc: ApplyDoc; on: boolean; multi?: boolean; onPress: () => void }) => (
+  <Pressable accessibilityRole={multi ? 'checkbox' : 'radio'} accessibilityState={{ checked: on }} onPress={onPress} style={styles.row}>
     <View style={[styles.radio, on ? styles.radioOn : styles.radioOff]} />
     <View style={styles.text}>
       <Text v="b1" weight="600" numberOfLines={1}>
