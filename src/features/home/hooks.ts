@@ -1,15 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
-import type { SectionKind } from '@/features/jobs'
 import { useSession } from '@/shared/infrastructure'
 import { onSessionCleared } from '@/shared/utility/session-reset'
 import { createSnapshotPersistGate, persistHomeSnapshotIfCurrent } from './utils/snapshot-persist'
 import { hydrateHomeQueries } from './utils/snapshot-hydrate'
 import { isHomeQueryKey, removeHomeQueries } from './utils/snapshot-query-keys'
 import { clearHomeSnapshot, readHomeSnapshot } from './utils/snapshot-store'
-
-export const useHomeSections = (): SectionKind[] => ['latest', 'deadline', 'popular']
 
 const schedulePersist = (
   userId: string,

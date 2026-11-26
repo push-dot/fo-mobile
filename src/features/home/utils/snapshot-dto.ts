@@ -2,7 +2,7 @@ import type { AppNotification, ListEnvelope, Posting } from '@push/api-client'
 import type { SectionKind } from '@/features/jobs'
 import type { HomePostingCard, HomeSnapshot, HomeSnapshotSections } from '../types'
 
-const HOME_KINDS: SectionKind[] = ['latest', 'deadline', 'popular']
+export const HOME_SECTION_KINDS = ['latest', 'deadline', 'popular'] as const satisfies readonly SectionKind[]
 
 const postingPad = (card: HomePostingCard): Posting => ({
   ...card,
@@ -34,7 +34,7 @@ const toSectionEnvelope = (cards: HomePostingCard[]): ListEnvelope<Posting> => (
 export const countUnread = (raw: ListEnvelope<AppNotification> | undefined) => raw?.data.filter((n) => !n.readAt).length ?? 0
 
 export const expandHomeSnapshot = (snapshot: HomeSnapshot) => ({
-  sections: Object.fromEntries(HOME_KINDS.map((k) => [k, toSectionEnvelope(snapshot.sections[k])])) as Record<
+  sections: Object.fromEntries(HOME_SECTION_KINDS.map((k) => [k, toSectionEnvelope(snapshot.sections[k])])) as Record<
     SectionKind,
     ListEnvelope<Posting>
   >,
@@ -46,7 +46,7 @@ export const shrinkHomeSnapshotPayload = (
   savedAt: number,
 ): Omit<HomeSnapshot, 'version'> => {
   const trimmed = {} as HomeSnapshotSections
-  for (const kind of HOME_KINDS) {
+  for (const kind of HOME_SECTION_KINDS) {
     trimmed[kind] = sections[kind].data.map(toPostingCard)
   }
   return {

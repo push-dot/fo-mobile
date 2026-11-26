@@ -1,7 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
+import type { AppNotification, ListEnvelope, Posting } from '@push/api-client'
 import type { SectionKind } from '@/features/jobs'
-import { expandHomeSnapshot, shrinkHomeSnapshotPayload } from './snapshot-dto'
-import { HOME_SECTION_KINDS } from './snapshot-query-keys'
+import { HOME_POSTINGS_KEY, homePostingsQuery } from '../api/hooks'
+import { expandHomeSnapshot, HOME_SECTION_KINDS, shrinkHomeSnapshotPayload } from './snapshot-dto'
+import { NOTIFICATIONS_KEY } from './snapshot-query-keys'
 import type { HomeSnapshot } from '../types'
 
 export const HYDRATED_QUERY_UPDATED_AT = 0
@@ -9,22 +11,21 @@ export const HYDRATED_QUERY_UPDATED_AT = 0
 export const hydrateHomeQueries = (qc: QueryClient, snapshot: HomeSnapshot) => {
   const { sections } = expandHomeSnapshot(snapshot)
   for (const kind of HOME_SECTION_KINDS) {
-    qc.setQueryData(['postings', 'home', kind as SectionKind], sections[kind as SectionKind], {
-      updatedAt: HYDRATED_QUERY_UPDATED_AT,
-    })
+    qc.setQueryData(homePostingsQuery(kind).queryKey, sections[kind], { updatedAt: HYDRATED_QUERY_UPDATED_AT })
   }
-  void qc.invalidateQueries({ queryKey: ['postings', 'home'] })
+  void qc.invalidateQueries({ queryKey: HOME_POSTINGS_KEY })
 }
 
 export const collectHomeSnapshotPayload = (qc: QueryClient, savedAt = Date.now()) => {
-  const sections = {} as Parameters<typeof shrinkHomeSnapshotPayload>[0]
+  const sections = {} as Record<SectionKind, ListEnvelope<Posting>>
   for (const kind of HOME_SECTION_KINDS) {
-    if (qc.getQueryState(['postings', 'home', kind])?.dataUpdatedAt === HYDRATED_QUERY_UPDATED_AT) return null
-    const data = qc.getQueryData<Parameters<typeof shrinkHomeSnapshotPayload>[0][typeof kind]>(['postings', 'home', kind])
+    const { queryKey } = homePostingsQuery(kind)
+    if (qc.getQueryState(queryKey)?.dataUpdatedAt === HYDRATED_QUERY_UPDATED_AT) return null
+    const data = qc.getQueryData(queryKey)
     if (!data) return null
     sections[kind] = data
   }
-  const notifications = qc.getQueryData<Parameters<typeof shrinkHomeSnapshotPayload>[1]>(['notifications'])
+  const notifications = qc.getQueryData<ListEnvelope<AppNotification>>(NOTIFICATIONS_KEY)
   if (!notifications) return null
   return shrinkHomeSnapshotPayload(sections, notifications, savedAt)
 }

@@ -1,15 +1,14 @@
 import { router } from 'expo-router'
 import { ScrollView, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
-import { HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS, useHomeSections } from '@/features/home'
-import { SECTIONS, useToggleBookmark, type SectionKind } from '@/features/jobs'
+import { HOME_SECTION_KINDS, HOME_SKELETON_SECTIONS, Section, Shortcut, SHORTCUTS } from '@/features/home'
+import { SECTIONS, useToggleBookmark } from '@/features/jobs'
 import { useUnreadCount } from '@/features/notifications'
 import { FloatingHeader, GlassButton, TopBar, Wordmark, useFloatingHeader } from '@/shared/components'
 
 const HomeScreen = () => {
   const unread = useUnreadCount()
   const toggleBookmark = useToggleBookmark()
-  const kinds: SectionKind[] = useHomeSections()
   const { scrolled, onHeight, onScroll, inset } = useFloatingHeader()
   return (
     <View style={styles.screen}>
@@ -24,7 +23,7 @@ const HomeScreen = () => {
             <Shortcut key={s.label} {...s} />
           ))}
         </View>
-        {kinds.map((kind, index) => (
+        {HOME_SECTION_KINDS.map((kind, index) => (
           <Section key={kind} kind={kind} title={SECTIONS[kind].title} skeleton={index < HOME_SKELETON_SECTIONS} onBookmark={toggleBookmark} />
         ))}
       </ScrollView>
