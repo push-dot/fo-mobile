@@ -23,10 +23,7 @@ const TermsScreen = () => {
     [clear],
   )
 
-  const leave = () => {
-    if (held) clear()
-    router.back()
-  }
+  const leave = () => router.dismissTo('/sign-in')
 
   const submit = (marketing: boolean) => {
     if (!held) return

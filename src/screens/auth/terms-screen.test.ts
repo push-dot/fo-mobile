@@ -1,4 +1,5 @@
 import type { Session } from '@push/api-client'
+import type { ReactElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const h = vi.hoisted(() => ({
@@ -30,7 +31,7 @@ vi.mock('react', async (orig) => {
   }
 })
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' }, Pressable: 'Pressable', View: 'View' }))
-const router = vi.hoisted(() => ({ back: vi.fn(), replace: vi.fn(), push: vi.fn() }))
+const router = vi.hoisted(() => ({ back: vi.fn(), dismissTo: vi.fn(), replace: vi.fn(), push: vi.fn() }))
 vi.mock('expo-router', () => ({
   router,
   useFocusEffect: (cb: () => void) => cb(),
@@ -91,10 +92,13 @@ describe('signup terms screen', () => {
     expect(h.held).toBe(heldSession)
   })
 
-  it('wires the top bar back action to clear held tokens before router.back', async () => {
-    const { readFileSync } = await import('node:fs')
-    const source = readFileSync(new URL('./terms-screen.tsx', import.meta.url), 'utf8')
-    expect(source).toContain('onBack={leave}')
-    expect(source).toMatch(/const leave = \(\) => \{[^}]*clear\(\)[^}]*router\.back\(\)/s)
+  it('leaves for sign-in with one navigation and lets unmount clear held tokens', () => {
+    const screen = TermsScreen() as ReactElement<{ onBack: () => void }>
+    screen.props.onBack()
+    expect(router.dismissTo).toHaveBeenCalledTimes(1)
+    expect(router.dismissTo).toHaveBeenCalledWith('/sign-in')
+    expect(router.back).not.toHaveBeenCalled()
+    expect(router.replace).not.toHaveBeenCalled()
+    expect(h.clear).not.toHaveBeenCalled()
   })
 })
