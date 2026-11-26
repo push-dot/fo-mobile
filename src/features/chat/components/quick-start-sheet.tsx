@@ -21,6 +21,8 @@ const QuickStartSheet = ({ qs, onClose, all }: { qs: QuickStart | null; onClose:
   return qs ? <Body key={qs.key} qs={qs} onClose={onClose} all={all} /> : null
 }
 
+const HUB_DOC_ID = 'hub-profile'
+
 const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?: boolean }) => {
   const bound = useSheetScrollMax()
   const start = useStartChat()
@@ -34,7 +36,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   const [chips, setChips] = useState<string[]>([])
   const [adding, setAdding] = useState<string | null>(null)
   const [option, setOption] = useState(true)
-  const [doc, setDoc] = useState<string>()
+  const [doc, setDoc] = useState<{ id?: string; name: string }>()
   const [pickingDoc, setPickingDoc] = useState(!!all)
   const [pickingJob, setPickingJob] = useState(false)
   const [task, setTask] = useState(0)
@@ -45,15 +47,17 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
     setSeen(d)
     setSel(initialPicks(qs, d.items))
     setChips(d.chips ?? [])
-    setDoc(d.doc && !qs.docLabel ? DEFAULT_DOC : d.doc)
+    setDoc(d.doc ? (qs.docLabel ? { name: d.doc } : { id: HUB_DOC_ID, name: DEFAULT_DOC }) : undefined)
   }
 
   const visible = d?.items.filter((i) => (i.seg ?? 0) === seg) ?? []
   const picked = qs.layout === 'calendar' ? (d?.items ?? []) : (d?.items ?? []).filter((i, k, all) => sel.includes(i.id) && all.findIndex((x) => x.id === i.id) === k)
   const hubId = useHubProfileId(!!qs.docLabel || !!qs.readsHub)
-  const docList = [{ id: 'hub-profile', fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
-  const documentId = doc === DEFAULT_DOC ? hubId.data : docs.data?.find((x) => x.fileName === doc)?.id
-  const input = { picked, url: startLink(url, clip), chips, option, doc: doc && displayName(doc), documentId, task: CALENDAR_TASKS[task]!, custom }
+  const docList = [{ id: HUB_DOC_ID, fileName: DEFAULT_DOC }, ...(docs.data ?? [])]
+  const pickedDoc = doc && docList.find((x) => (doc.id ? x.id === doc.id : x.fileName === doc.name))
+  const docName = pickedDoc?.fileName ?? doc?.name
+  const documentId = pickedDoc?.id === HUB_DOC_ID ? hubId.data : pickedDoc?.id
+  const input = { picked, url: startLink(url, clip), chips, option, doc: docName && displayName(docName), documentId, task: CALENDAR_TASKS[task]!, custom }
 
   const go = (override?: QsItem) => {
     const r = qs.start(override ? { ...input, picked: [override] } : input)
@@ -71,7 +75,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
   const listOpen = all || !job || pickingJob || !!qs.openList
   const seeAll = all ? undefined : () => router.replace(quickStartAllPath(qs.key))
   const docField = qs.docLabel ? (
-    <DocField label={qs.docLabel} doc={doc} picking={pickingDoc} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(name) => (setDoc(name), setPickingDoc(false))} onSeeAll={seeAll} />
+    <DocField label={qs.docLabel} doc={docName} docId={pickedDoc?.id} picking={pickingDoc} docs={docList} onToggle={() => setPickingDoc((v) => !v)} onPick={(x) => (setDoc({ id: x.id, name: x.fileName }), setPickingDoc(false))} onSeeAll={seeAll} />
   ) : null
   const typing = custom.trim() !== ''
   const content = !d ? (
@@ -101,6 +105,7 @@ const Body = ({ qs, onClose, all }: { qs: QuickStart; onClose: () => void; all?:
               placeholder="예: 판교, Kafka"
               value={adding}
               onChangeText={setAdding}
+              accessibilityLabel="조건 추가"
               autoFocus
               returnKeyType="done"
               onSubmitEditing={() => {
@@ -293,6 +298,7 @@ const PickerRow = ({ label, value, onPress }: { label: string; value: string; on
 const DocField = ({
   label,
   doc,
+  docId,
   picking,
   docs,
   onToggle,
@@ -301,10 +307,11 @@ const DocField = ({
 }: {
   label: string
   doc?: string
+  docId?: string
   picking: boolean
   docs: { id: string; fileName: string }[]
   onToggle: () => void
-  onPick: (name: string) => void
+  onPick: (doc: { id: string; fileName: string }) => void
   onSeeAll?: () => void
 }) =>
   doc ? (
@@ -318,11 +325,11 @@ const DocField = ({
           renderItem={(x) => (
             <Pressable
               accessibilityRole="radio"
-              accessibilityState={{ selected: x.fileName === doc }}
-              onPress={() => onPick(x.fileName)}
+              accessibilityState={{ selected: x.id === docId }}
+              onPress={() => onPick(x)}
               style={styles.docRow}
             >
-              <Pick on={x.fileName === doc} />
+              <Pick on={x.id === docId} />
               <Text v="b2" numberOfLines={1} style={styles.flex}>
                 {displayName(x.fileName)}
               </Text>

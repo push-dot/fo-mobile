@@ -17,11 +17,11 @@ const billing = (more: Partial<BillingStatus> = {}): BillingStatus => ({
 
 describe('accountFromBilling', () => {
   it('turns micro credits into credits', () => {
-    expect(accountFromBilling(billing(), 'a@b.c').credits).toEqual({ used: 3200, total: 5000 })
+    expect(accountFromBilling(billing()).credits).toEqual({ used: 3200, total: 5000 })
   })
 
-  it('carries plan, email, payments and refill date as before', () => {
-    const account = accountFromBilling(billing({ plan: null, monthlyMicroCredits: 0, paymentsEnabled: false, creditsRefillAt: '2026-12-01T00:00:00Z' }), '')
-    expect(account).toMatchObject({ email: null, plan: 'FREE', credits: null, paymentsEnabled: false, creditsRefillAt: '2026-12-01T00:00:00Z' })
+  it('carries plan, payments and refill date as before', () => {
+    const account = accountFromBilling(billing({ plan: null, monthlyMicroCredits: 0, paymentsEnabled: false, creditsRefillAt: '2026-12-01T00:00:00Z' }))
+    expect(account).toEqual({ plan: 'FREE', credits: null, paymentsEnabled: false, creditsRefillAt: '2026-12-01T00:00:00Z' })
   })
 })

@@ -319,7 +319,7 @@ mock('GET', 'chat/account', () => {
   const total = account.ultra ? 20_000 : 5000
   const used = account.spent ? total : account.ultra ? 12_800 : 3200
   const now = new Date()
-  return { data: { email: 'seojun.kim@gmail.com', plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(), usageByBot: account.spent ? USAGE_SPENT : USAGE_BY_BOT } }
+  return { data: { plan: account.ultra ? 'ULTRA' : 'PRO', credits: { used, total }, ...(account.closed ? { paymentsEnabled: false } : {}), creditsRefillAt: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(), usageByBot: account.spent ? USAGE_SPENT : USAGE_BY_BOT } }
 })
 
 const job = (id: string, over: string, title: string, sub: string, text: string, color: string, extra: Partial<QsData['items'][number]> = {}) => ({
