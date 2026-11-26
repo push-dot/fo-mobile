@@ -18,8 +18,10 @@ import {
   failedLine,
   failedSend,
   OFFER_BLOCKED_COMPOSER,
+  OFFER_MENU_COPY,
   personLine,
   postingSentLine,
+  RETRY_LABEL,
   useOffer,
   useOfferMenu,
   useViewerBox,
@@ -27,7 +29,7 @@ import {
   type FailedSend,
 } from '@/features/my'
 import { Composer } from '@/features/chat'
-import { Icon, Skeleton, Text, NativeTopBar, useKeyboardHeight } from '@/shared/components'
+import { emptyNoteStyle, Icon, Skeleton, StatusNote, Text, NativeTopBar, useKeyboardHeight } from '@/shared/components'
 import { composerPadding } from '@/shared/utility'
 import { onAccent, spacing } from '@/theme'
 
@@ -97,8 +99,8 @@ const DAY_LABEL_LIFT = 2
 type Item =
   | { kind: 'msg'; key: string; m: { id: string; senderId: string; body: string; createdAt: string; day: string | null }; first: boolean }
   | { kind: 'posted'; key: string }
-  | { kind: 'empty'; key: string }
-  | { kind: 'pending'; key: string }
+  | { kind: 'empty'; key: 'empty' }
+  | { kind: 'pending'; key: 'pending'; body: string }
   | { kind: 'failed'; key: string; f: FailedSend }
 
 const Gap = () => <View style={styles.gap} />
@@ -116,7 +118,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const [text, setText] = useState('')
   const [composerH, setComposerH] = useState(0)
   const [failed, setFailed] = useState<FailedSend[]>([])
-  const { data: o } = useOffer(id)
+  const { data: o, isError, refetch } = useOffer(id)
   const box = useViewerBox(o, hint)
   const menu = useOfferMenu(o, box)
   const { data, send } = useOfferMessages(id)
@@ -125,10 +127,18 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
     return (
       <View style={styles.screen}>
         <NativeTopBar onBack={() => router.back()} />
-        <View style={styles.loading}>
-          <Skeleton width="100%" height={64} />
-          <Skeleton width="60%" height={44} />
-        </View>
+        {isError ? (
+          <StatusNote
+            lines={[OFFER_MENU_COPY.failed]}
+            action={{ label: RETRY_LABEL, onPress: () => void refetch() }}
+            style={emptyNoteStyle(140)}
+          />
+        ) : (
+          <View style={styles.loading}>
+            <Skeleton width="100%" height={64} />
+            <Skeleton width="60%" height={44} />
+          </View>
+        )}
       </View>
     )
   }
@@ -162,9 +172,9 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
   const closed = composerClosed(failed, o.canSend)
   const items: Item[] = [
     ...thread.map((m, i): Item => ({ kind: 'msg', key: m.id, m, first: i === 0 })),
-    ...(thread.length === 0 && posted ? [{ kind: 'posted', key: 'posted' } as Item] : []),
-    ...(empty ? [{ kind: 'empty', key: 'empty' } as Item] : []),
-    ...(send.isPending ? [{ kind: 'pending', key: 'pending' } as Item] : []),
+    ...(thread.length === 0 && posted ? ([{ kind: 'posted', key: 'posted' }] satisfies Item[]) : []),
+    ...(empty ? ([{ kind: 'empty', key: 'empty' }] satisfies Item[]) : []),
+    ...(send.isPending ? ([{ kind: 'pending', key: 'pending', body: send.variables ?? '' }] satisfies Item[]) : []),
     ...failed.map((f): Item => ({ kind: 'failed', key: f.key, f })),
   ]
   const renderItem = ({ item }: { item: Item }) => {
@@ -193,7 +203,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
           </View>
         )
       case 'pending':
-        return <Bubble body={send.variables ?? ''} mine faded />
+        return <Bubble body={item.body} mine faded />
       case 'failed': {
         const f = item.f
         return (
@@ -257,6 +267,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
         keyExtractor={(it) => it.key}
         getItemType={(it) => it.kind}
         renderItem={renderItem}
+        extraData={composerH}
         ItemSeparatorComponent={Gap}
         estimatedItemSize={64}
         alignItemsAtEnd
@@ -285,6 +296,7 @@ const OfferMessagesScreen = ({ id, box: hint }: { id: string; box: Box }) => {
             value={text}
             onChangeText={setText}
             placeholder="메시지를 입력해 주세요"
+            sending={send.isPending}
             onSend={() => {
               post(text.trim())
               setText('')
