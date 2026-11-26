@@ -1,10 +1,11 @@
+import { needsTerms } from '@push/api-client'
+import { useQueryClient } from '@tanstack/react-query'
 import { router } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
+import { consentsQuery } from '@/features/my'
 import { useSession } from '@/shared/infrastructure'
-import { readConsents } from './api/fetchers'
 import { remainingSeconds, showAppleButton } from './utils/auth-flow'
-import { runColdStartTermsCheck, shouldRunColdStartTermsForUser } from './utils/cold-start-terms'
 
 const RECONSENT_TERMS_ROUTE = '/(app)/(stack)/reconsent-terms' as const
 
@@ -12,7 +13,11 @@ export const useCountdown = (endsAt: number | null) => {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     if (endsAt == null) return
-    const id = setInterval(() => setNow(Date.now()), 1000)
+    const id = setInterval(() => {
+      const t = Date.now()
+      setNow(t)
+      if (t >= endsAt) clearInterval(id)
+    }, 1000)
     return () => clearInterval(id)
   }, [endsAt])
   if (endsAt == null) return 0
@@ -40,15 +45,19 @@ export const useAppleSignIn = () => {
 }
 
 export const useColdStartTermsCheck = () => {
-  const session = useSession((s) => s.session)
-  const ranFor = useRef<string | null>(null)
-
+  const qc = useQueryClient()
+  const userId = useSession((s) => s.session?.user.id)
   useEffect(() => {
-    if (!session) return
-    if (!shouldRunColdStartTermsForUser(ranFor.current, session.user.id)) return
-    ranFor.current = session.user.id
-    void runColdStartTermsCheck(session, readConsents, {
-      route: () => router.replace(RECONSENT_TERMS_ROUTE),
-    })
-  }, [session])
+    if (!userId) return
+    let live = true
+    qc.fetchQuery(consentsQuery).then(
+      (consent) => {
+        if (live && needsTerms(consent)) router.replace(RECONSENT_TERMS_ROUTE)
+      },
+      () => undefined,
+    )
+    return () => {
+      live = false
+    }
+  }, [qc, userId])
 }

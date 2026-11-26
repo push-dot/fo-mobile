@@ -87,8 +87,8 @@ const OtpScreen = () => {
     setOtpError(null)
     verifyPhoneCode({ phone: e164, code, pendingToken: pendingToken ?? undefined })
       .then(async (session) => {
-        const consent = await readConsents(session.accessToken)
-        if (needsTerms(consent)) {
+        const consent = await readConsents(session.accessToken).catch(() => null)
+        if (consent && needsTerms(consent)) {
           hold(session)
           router.push('/signup-terms')
           return

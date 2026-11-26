@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   TERM_ROWS,
   TERMS_BODY,
@@ -18,7 +19,7 @@ import {
 } from '@/features/auth'
 import { useSession } from '@/shared/infrastructure'
 import { Button, CtaBar, Text, TopBar, showToast } from '@/shared/components'
-import { marketingResult } from '@/features/my'
+import { consentsQuery, marketingResult } from '@/features/my'
 import { useHardwareBack } from '@/shared/utility'
 import { StyleSheet } from 'react-native-unistyles'
 
@@ -26,6 +27,7 @@ const TERMS_VIEW_ROUTE = '/(app)/(stack)/terms-view' as const
 const HOME_ROUTE = '/(app)/(stack)/(tabs)/(home)' as const
 
 const ReconsentTermsScreen = () => {
+  const qc = useQueryClient()
   const session = useSession((s) => s.session)
   const checked = useTermsConsent((state) => state.checked)
   const toggle = useTermsConsent((state) => state.toggle)
@@ -59,8 +61,9 @@ const ReconsentTermsScreen = () => {
     setBusy(true)
     setError(null)
     const marketing = Boolean(checked.marketing)
-    saveTerms(session.accessToken, marketing)
+    saveTerms(undefined, marketing)
       .then((consent) => {
+        qc.setQueryData(consentsQuery.queryKey, consent)
         if (marketing) showToast({ message: marketingResult(true, consent.terms?.marketingAt ?? null) })
         router.replace(HOME_ROUTE)
       })
