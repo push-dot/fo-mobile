@@ -7,18 +7,35 @@ import type { HomeSnapshot } from '../types'
 
 const disk = vi.hoisted(() => new Map<string, string>())
 
-vi.mock('expo-file-system/legacy', () => ({
-  documentDirectory: 'file:///docs/',
-  getInfoAsync: async (uri: string) => ({ exists: disk.has(uri), uri, isDirectory: false }),
-  makeDirectoryAsync: async () => undefined,
-  writeAsStringAsync: async (uri: string, contents: string) => {
-    disk.set(uri, contents)
-  },
-  readAsStringAsync: async (uri: string) => disk.get(uri) ?? '',
-  deleteAsync: async (uri: string) => {
-    disk.delete(uri)
-  },
-}))
+vi.mock('expo-file-system', () => {
+  const join = (parts: unknown[]) => parts.map((p) => (typeof p === 'string' ? p : (p as { uri: string }).uri).replace(/\/$/, '')).join('/')
+  class Directory {
+    uri: string
+    constructor(...parts: unknown[]) {
+      this.uri = join(parts)
+    }
+    create() {}
+  }
+  class File {
+    uri: string
+    constructor(...parts: unknown[]) {
+      this.uri = join(parts)
+    }
+    get exists() {
+      return disk.has(this.uri)
+    }
+    async text() {
+      return disk.get(this.uri) ?? ''
+    }
+    async write(contents: string) {
+      disk.set(this.uri, contents)
+    }
+    delete() {
+      disk.delete(this.uri)
+    }
+  }
+  return { Directory, File, Paths: { document: new Directory('file:///docs/') } }
+})
 
 const snapshot: HomeSnapshot = {
   version: HOME_SNAPSHOT_VERSION,

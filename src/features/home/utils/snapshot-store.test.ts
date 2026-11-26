@@ -11,20 +11,35 @@ const fsMock = vi.hoisted(() => {
   return { disk, DOC }
 })
 
-vi.mock('expo-file-system/legacy', () => ({
-  documentDirectory: fsMock.DOC,
-  getInfoAsync: async (uri: string) => ({ exists: fsMock.disk.has(uri), uri, isDirectory: uri.endsWith('/') }),
-  makeDirectoryAsync: async (uri: string) => {
-    fsMock.disk.set(uri.endsWith('/') ? uri : `${uri}/`, '')
-  },
-  readAsStringAsync: async (uri: string) => fsMock.disk.get(uri) ?? '',
-  writeAsStringAsync: async (uri: string, contents: string) => {
-    fsMock.disk.set(uri, contents)
-  },
-  deleteAsync: async (uri: string) => {
-    fsMock.disk.delete(uri)
-  },
-}))
+vi.mock('expo-file-system', () => {
+  const join = (parts: unknown[]) => parts.map((p) => (typeof p === 'string' ? p : (p as { uri: string }).uri).replace(/\/$/, '')).join('/')
+  class Directory {
+    uri: string
+    constructor(...parts: unknown[]) {
+      this.uri = join(parts)
+    }
+    create() {}
+  }
+  class File {
+    uri: string
+    constructor(...parts: unknown[]) {
+      this.uri = join(parts)
+    }
+    get exists() {
+      return fsMock.disk.has(this.uri)
+    }
+    async text() {
+      return fsMock.disk.get(this.uri) ?? ''
+    }
+    async write(contents: string) {
+      fsMock.disk.set(this.uri, contents)
+    }
+    delete() {
+      fsMock.disk.delete(this.uri)
+    }
+  }
+  return { Directory, File, Paths: { document: new Directory(fsMock.DOC) } }
+})
 
 const posting = (i: number): Posting => ({
   id: `p-${i}`,
@@ -65,6 +80,8 @@ const snapshot = (savedAt: number): HomeSnapshot => ({
   unreadCount: 3,
 })
 
+const LEGACY_URI = `${fsMock.DOC}home-snapshots/u1.json`
+
 beforeEach(() => fsMock.disk.clear())
 
 describe('home snapshot store', () => {
@@ -85,12 +102,16 @@ describe('home snapshot store', () => {
     await expect(readHomeSnapshot('u1', now)).resolves.toBeNull()
   })
 
+  it('writes to the same file the legacy store used', async () => {
+    await writeHomeSnapshot('u1', snapshot(4_000_000))
+    expect([...fsMock.disk.keys()]).toEqual([LEGACY_URI])
+  })
+
   it('keeps a realistic home payload small without full posting bodies', async () => {
     const now = 3_000_000
     const body = realisticSnapshot(now)
     await writeHomeSnapshot('u1', body)
-    const uri = `${fsMock.DOC}home-snapshots/u1.json`
-    const raw = fsMock.disk.get(uri)!
+    const raw = fsMock.disk.get(LEGACY_URI)!
     expect(raw.length).toBeLessThan(20_000)
     expect(JSON.parse(raw).sections.latest[0].description).toBeUndefined()
   })
