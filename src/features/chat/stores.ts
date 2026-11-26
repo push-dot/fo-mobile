@@ -13,6 +13,7 @@ import type { ChatEvent, ChatItem, ChatState, ReviewPageRequest } from './types'
 import { isConsentRequired } from '@/shared/utility/consent-error'
 import { fromFirst, prependOlder } from './utils/find'
 import { applyEvent, emptyChat } from './utils/reducer'
+import { isStopping } from './utils/status-line'
 import { errorText, fromStream, type StreamEnd } from './utils/stream'
 import { createTokenBatch } from './utils/token-batch'
 import { openPieceId, restoreBotTurns } from './utils/turns'
@@ -205,6 +206,7 @@ const dispatch = (id: string, e: ChatEvent) => {
   }
   tokenBatch.flushNow(id)
   setChatEvent(id, e)
+  if (e.type === 'done') void queryClient.invalidateQueries({ queryKey: ['chat', 'account'] })
 }
 
 const sleep = (ms: number, signal: AbortSignal) =>
@@ -331,6 +333,7 @@ const startRun = async (input: Outgoing) => {
   let run: RunInput | undefined
   try {
     run = await withUpload(input)
+    if (ctrl.signal.aborted) return
     if (!run) {
       dispatch(id, { type: 'error', id: `err-${Date.now()}`, text: UPLOAD_ERROR_TEXT, code: UPLOAD_ERROR_CODE })
       release = true
@@ -343,6 +346,7 @@ const startRun = async (input: Outgoing) => {
             ? followed(run, ctrl.signal, end, seen)
             : streamed(run, ctrl.signal, end, seen)
       for await (const e of events) {
+        if (ctrl.signal.aborted) return
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
       if (end.reason === 'reattach-empty') {
@@ -450,7 +454,7 @@ const reportCancel = (id: string) => {
         return
       }
       halting.delete(id)
-      if (before) dispatch(id, { type: 'status', verbs: before })
+      if (before && isStopping(get(id).working)) dispatch(id, { type: 'status', verbs: before })
       showToast({ message: error instanceof ApiError && error.status === 403 ? CHAT_STOP_FORBIDDEN : CHAT_STOP_FAILED })
     },
   )
@@ -477,6 +481,7 @@ export const loadOlder = (id: string) => {
   if (running) return running
   const job = (async () => {
     const page = await botApi.bots.transcript(id, { cursor })
+    if (olderCursor.get(id) !== cursor) return
     olderCursor.set(id, page.page.nextCursor)
     const older = restoreBotTurns(page.data).items
     useChatStore.setState((s) => {
@@ -488,13 +493,16 @@ export const loadOlder = (id: string) => {
   return job
 }
 
+let chatEpoch = 0
+
 const busy = (id: string) => runs.has(id) || !!get(id).working || get(id).items.length > 0
 
 export const openBot = async (address: string) => {
+  const epoch = chatEpoch
   const id = address === 'push' ? (await botApi.bots.get(address)).id : address
-  if (busy(id)) return id
+  if (epoch !== chatEpoch || busy(id)) return id
   const page = await botApi.bots.transcript(id)
-  if (busy(id)) return id
+  if (epoch !== chatEpoch || busy(id)) return id
   olderCursor.set(id, page.page.nextCursor)
   useChatStore.setState((s) => ({ chats: { ...s.chats, [id]: restoreBotTurns(page.data, page.live) } }))
   if (page.live && !API_MOCK) void startRun({ conversationId: id, follow: true, after: page.live.lastSeq, piece: openPieceId(page.data, page.live) })
@@ -525,6 +533,7 @@ export const forget = (id: string) => {
 }
 
 export const dropRun = (id: string) => {
+  tokenBatch.flushNow(id)
   runs.get(id)?.abort()
   runs.delete(id)
   heldQueues.delete(id)
@@ -552,6 +561,7 @@ export const deleteCompanyBot = async (id: string, kind: 'push' | 'company') => 
 }
 
 export const resetChat = () => {
+  chatEpoch += 1
   for (const id of new Set([...runs.keys(), ...Object.keys(useChatStore.getState().chats)])) tokenBatch.flushNow(id)
   for (const ctrl of runs.values()) ctrl.abort()
   runs.clear()
