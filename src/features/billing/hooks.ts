@@ -1,7 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { Alert, Platform } from 'react-native'
 import {
-  deepLinkToSubscriptions,
   fetchProducts,
   finishTransaction,
   getAvailablePurchases,
@@ -12,7 +11,6 @@ import {
   restorePurchases,
   type Purchase,
 } from 'expo-iap'
-import Constants from 'expo-constants'
 import { queryClient } from '@/providers/query-client'
 import { verifyPurchase } from './api/fetchers'
 import { IAP_FAILED_MESSAGE, IAP_PRODUCT_PRO, IAP_PRODUCT_TOPUP, IAP_PRODUCT_ULTRA } from './constants'
@@ -53,23 +51,29 @@ const refreshAccount = () => {
   void queryClient.invalidateQueries({ queryKey: ['chat', 'account'] })
 }
 
-const report = (code?: string) => {
+const fail = (message: string) => {
+  if (!pending) return
   setPending(false)
+  Alert.alert(message)
+}
+
+const report = (code?: string) => {
   const outcome = outcomeFromCode(code)
-  if (outcome.kind === 'cancelled') return
-  Alert.alert(outcome.message ?? IAP_FAILED_MESSAGE)
+  if (outcome.kind === 'cancelled') return setPending(false)
+  fail(outcome.message ?? IAP_FAILED_MESSAGE)
 }
 
 const accept = async (purchase: Purchase) => {
   if (purchase.purchaseState === 'pending') return setPending(false)
+  if (!purchase.purchaseToken) return fail(IAP_FAILED_MESSAGE)
   if (!claim(purchase)) return
   try {
     await settlePurchase(purchase, deps)
     refreshAccount()
   } catch (error) {
-    release(purchase)
-    Alert.alert(verifyFailedMessage(error))
+    fail(verifyFailedMessage(error))
   } finally {
+    release(purchase)
     setPending(false)
   }
 }
@@ -77,9 +81,12 @@ const accept = async (purchase: Purchase) => {
 const ready = () => {
   if (!started) {
     started = true
-    purchaseUpdatedListener((purchase) => {
-      void accept(purchase)
-    })
+    purchaseUpdatedListener(
+      (purchase) => {
+        void accept(purchase)
+      },
+      { dedupeTransactionIOS: false },
+    )
     purchaseErrorListener((error) => report(error.code))
   }
   connecting ??= initConnection().catch((error: unknown) => {
@@ -130,38 +137,34 @@ const restoreAll = async () => {
     await settleRestored(fresh, deps)
     refreshAccount()
   } catch (error) {
-    fresh.forEach(release)
-    Alert.alert(verifyFailedMessage(error))
+    fail(verifyFailedMessage(error))
   } finally {
+    fresh.forEach(release)
     setPending(false)
   }
 }
 
-export const usePersonalPurchase = () => {
-  const isPending = useSyncExternalStore(
-    (listener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    },
-    () => pending,
-    () => pending,
-  )
-
-  return {
-    pending: isPending,
-    buyPlan: (plan: 'PRO' | 'ULTRA') => {
-      void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs')
-    },
-    manage: (plan: 'PRO' | 'ULTRA') => {
-      void deepLinkToSubscriptions({ skuAndroid: plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, packageNameAndroid: Constants.expoConfig?.android?.package }).catch(() => Alert.alert(IAP_FAILED_MESSAGE))
-    },
-    buyCredits: () => {
-      void buy(IAP_PRODUCT_TOPUP, 'in-app')
-    },
-    restore: () => {
-      if (pending) return
-      setPending(true)
-      void restoreAll()
-    },
+const subscribe = (listener: () => void) => {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
   }
 }
+
+const getPending = () => pending
+
+const buyPlan = (plan: 'PRO' | 'ULTRA') => {
+  void buy(plan === 'PRO' ? IAP_PRODUCT_PRO : IAP_PRODUCT_ULTRA, 'subs')
+}
+
+const buyCredits = () => {
+  void buy(IAP_PRODUCT_TOPUP, 'in-app')
+}
+
+const restore = () => {
+  if (pending) return
+  setPending(true)
+  void restoreAll()
+}
+
+export const usePersonalPurchase = () => ({ pending: useSyncExternalStore(subscribe, getPending, getPending), buyPlan, buyCredits, restore })

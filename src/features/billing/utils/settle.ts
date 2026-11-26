@@ -26,15 +26,17 @@ export const settlePurchase = async <T extends StorePurchase>(purchase: T, deps:
 }
 
 export const settleRestored = async <T extends StorePurchase>(purchases: T[], deps: SettleDeps<T>) => {
+  const errors: unknown[] = []
   for (const purchase of purchases) {
     if (!purchase.purchaseToken) continue
-    await settlePurchase(purchase, deps)
+    await settlePurchase(purchase, deps).catch((error: unknown) => errors.push(error))
   }
+  if (errors.length) throw errors[0]
 }
 
 export const outcomeFromCode = (code: string | undefined): PurchaseFeedback => {
   const value = (code ?? '').toLowerCase()
-  if (value.includes('cancel')) return { kind: 'cancelled' }
+  if (value.includes('cancel') || value.includes('deferred') || value === 'pending') return { kind: 'cancelled' }
   if (value.includes('already') && value.includes('own')) return { kind: 'already-owned', message: IAP_ALREADY_OWNED_MESSAGE }
   return { kind: 'failed', message: IAP_FAILED_MESSAGE }
 }

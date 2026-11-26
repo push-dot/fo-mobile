@@ -46,6 +46,11 @@ describe('outcomeFromCode', () => {
     expect(outcomeFromCode('E_USER_CANCELED')).toEqual({ kind: 'cancelled' })
   })
 
+  it('stays quiet while a payment waits for approval', () => {
+    expect(outcomeFromCode('deferred-payment')).toEqual({ kind: 'cancelled' })
+    expect(outcomeFromCode('pending')).toEqual({ kind: 'cancelled' })
+  })
+
   it('names an already owned plan', () => {
     expect(outcomeFromCode('already-owned')).toEqual({ kind: 'already-owned', message: IAP_ALREADY_OWNED_MESSAGE })
   })
@@ -70,6 +75,19 @@ describe('settleRestored', () => {
     expect(order).toEqual(['verify:push.pro.monthly', 'finish:push.pro.monthly', 'verify:push.credits.topup', 'finish:push.credits.topup'])
     expect(finish).toHaveBeenNthCalledWith(1, kept[0], false)
     expect(finish).toHaveBeenNthCalledWith(2, kept[2], true)
+  })
+
+  it('settles the rest after one fails and throws the first error', async () => {
+    const verify = vi.fn(async (body: { productId: string }) => {
+      if (body.productId === IAP_PRODUCT_PRO) throw new Error('first')
+      if (body.productId === IAP_PRODUCT_ULTRA) throw new Error('second')
+    })
+    const finish = vi.fn(async () => undefined)
+    const kept = [purchase(IAP_PRODUCT_PRO, 'jws-pro'), purchase(IAP_PRODUCT_TOPUP, 'jws-topup'), purchase(IAP_PRODUCT_ULTRA, 'jws-ultra')]
+    await expect(settleRestored(kept, { platform: 'ios', verify, finish })).rejects.toThrow('first')
+    expect(verify).toHaveBeenCalledTimes(3)
+    expect(finish).toHaveBeenCalledTimes(1)
+    expect(finish).toHaveBeenCalledWith(kept[1], true)
   })
 })
 
