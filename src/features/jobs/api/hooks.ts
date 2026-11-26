@@ -3,7 +3,7 @@ import type { PostingDetail, PostingFilters } from '@push/api-client'
 import { queryClient } from '@/providers/query-client'
 import { applyDoc, toQuery, type Filters } from '../utils'
 import type { ApplyBody } from '../types'
-import { invalidateAfterPostingBookmarkToggle } from '../utils/bookmark-invalidation'
+import { patchPostingBookmark } from '../utils/bookmark-invalidation'
 import { applyToPosting, fetchApplyDocs, fetchMyProfile, fetchPosting, fetchPostingCount, fetchPostingLocations, fetchPostingPages, togglePostingBookmark } from './fetchers'
 
 export const usePostingPages = (f: PostingFilters) =>
@@ -14,11 +14,30 @@ export const usePostingPages = (f: PostingFilters) =>
     getNextPageParam: (last) => last.page.nextCursor ?? undefined,
   })
 
+const BOOKMARK_KEYS = [['postings'], ['search', 'postings'], ['me', 'bookmarks']] as const
+
 export const useToggleBookmark = () => {
   const qc = useQueryClient()
   const { mutate } = useMutation({
     mutationFn: togglePostingBookmark,
-    onSettled: () => invalidateAfterPostingBookmarkToggle(qc),
+    onMutate: async (p) => {
+      const interrupted = BOOKMARK_KEYS.flatMap((queryKey) => qc.getQueryCache().findAll({ queryKey, fetchStatus: 'fetching' })).map((q) => q.queryKey)
+      await Promise.all(BOOKMARK_KEYS.map((queryKey) => qc.cancelQueries({ queryKey })))
+      const before = BOOKMARK_KEYS.flatMap((queryKey) => qc.getQueriesData({ queryKey })).filter(([, old]) => patchPostingBookmark(old, p.id, !p.bookmarked) !== old)
+      for (const [key, old] of before) qc.setQueryData(key, patchPostingBookmark(old, p.id, !p.bookmarked))
+      return { before, interrupted }
+    },
+    onError: (_e, _p, ctx) => {
+      ctx?.before.forEach(([key, data]) => qc.setQueryData(key, data))
+      void qc.invalidateQueries({ queryKey: ['postings'] })
+      void qc.invalidateQueries({ queryKey: ['search', 'postings'] })
+    },
+    onSettled: (_d, _e, _p, ctx) =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: ['me', 'bookmarks'] }),
+        qc.invalidateQueries({ queryKey: ['calendar'] }),
+        ...(ctx?.interrupted ?? []).map((queryKey) => qc.invalidateQueries({ queryKey, exact: true })),
+      ]),
   })
   return mutate
 }
