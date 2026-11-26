@@ -61,7 +61,7 @@ export const schedulesView = (q: { isLoading: boolean; isError: boolean; count: 
   if (q.count !== null && q.count > 0) return 'list'
   if (q.isError) return 'error'
   if (q.count === 0) return 'empty'
-  return 'loading'
+  return q.isLoading ? 'loading' : 'error'
 }
 
 export const schedulesTitle = (count: number) => (count === 0 ? SCHEDULES_ROW : `${SCHEDULES_ROW} ${count}`)

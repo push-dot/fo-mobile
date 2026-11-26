@@ -59,5 +59,6 @@ describe('schedules sheet state', () => {
     expect(schedulesView({ isLoading: false, isError: false, count: 0 })).toBe('empty')
     expect(schedulesView({ isLoading: false, isError: false, count: 2 })).toBe('list')
     expect(schedulesView({ isLoading: false, isError: true, count: 2 })).toBe('list')
+    expect(schedulesView({ isLoading: false, isError: false, count: null }), 'a paused offline query offers retry').toBe('error')
   })
 })
