@@ -97,6 +97,11 @@ export const usePushDevice = () => {
       if (!nextId) settle(device.signOut())
       else settle(device.signIn(nextId))
     })
+    AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return
+      const active = useSession.getState().session?.user.id
+      if (active) settle(device.signIn(active))
+    })
     subscribePushOpens((open) => {
       openPush(open.id, open.data)
     })

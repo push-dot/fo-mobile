@@ -34,22 +34,34 @@ export const createPushDevice = (ports: PushDevicePorts) => {
     registeredToken = token
   }
 
+  let inflight: Promise<void> | null = null
+
+  const start = async (id: string) => {
+    const leftover = registeredToken
+    if (userId !== id) asked = false
+    userId = id
+    registeredToken = null
+    const gen = ++generation
+    if (leftover) {
+      await ports.remove(leftover).catch(() => undefined)
+      if (gen !== generation) return
+    }
+    const permission = await ports.permission()
+    if (gen !== generation || userId !== id) return
+    if (permission !== 'granted') return
+    await register(gen)
+  }
+
   return {
     signIn: async (id: string) => {
-      if (userId === id) return
-      const leftover = registeredToken
-      userId = id
-      asked = false
-      registeredToken = null
-      const gen = ++generation
-      if (leftover) {
-        await ports.remove(leftover).catch(() => undefined)
-        if (gen !== generation) return
+      if (userId === id && (registeredToken || inflight)) return
+      const job = start(id)
+      inflight = job
+      try {
+        await job
+      } finally {
+        if (inflight === job) inflight = null
       }
-      const permission = await ports.permission()
-      if (gen !== generation || userId !== id) return
-      if (permission !== 'granted') return
-      await register(gen)
     },
     signOut: async () => {
       generation += 1
