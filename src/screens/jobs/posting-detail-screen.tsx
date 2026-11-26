@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { botPickPath } from '@/features/bots'
@@ -16,25 +15,24 @@ const PostingDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const floating = useFloatingHeader()
   const { onHeight } = floating
   const inset = useNativeTopBarInset(floating.inset)
-  const [offset, setOffset] = useState(0)
   const { top, bottom } = useSafeAreaInsets()
 
   return (
     <View style={styles.screen}>
-      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={setOffset} />
-      <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
-      <NativeTopBar
-        transparent
-        onBack={() => router.back()}
-        actions={
-          p
-            ? [
-                { icon: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크', active: p.bookmarked, onPress: () => toggleBookmark(p) },
-                { icon: 'share', label: '공유', onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }) },
-              ]
-            : undefined
-        }
-      />
+      <DetailWebView path={`/postings/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: CTA_HEIGHT + bottom }} onScroll={floating.onScroll} />
+      <FloatingHeader scrolled={floating.scrolled} onHeight={onHeight}>
+        <NativeTopBar
+          transparent
+          onBack={() => router.back()}
+          actions={
+            p
+              ? [
+                  { icon: 'bookmark', label: p.bookmarked ? '북마크 해제' : '북마크', active: p.bookmarked, onPress: () => toggleBookmark(p) },
+                  { icon: 'share', label: '공유', onPress: () => void shareMessage({ message: postingShareMessage(p.id, p) }) },
+                ]
+              : undefined
+          }
+        />
       </FloatingHeader>
       <CtaBar light>
         <Button

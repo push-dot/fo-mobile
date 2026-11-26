@@ -1,5 +1,4 @@
 import { router } from 'expo-router'
-import { useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useShareFile } from '@/features/chat'
@@ -24,7 +23,6 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
   const floating = useFloatingHeader()
   const { onHeight } = floating
   const inset = useNativeTopBarInset(floating.inset)
-  const [offset, setOffset] = useState(0)
   const { top } = useSafeAreaInsets()
 
   const actions = (
@@ -49,8 +47,8 @@ const ProfileDetailScreen = ({ id, from }: { id: string; from?: DetailFrom }) =>
 
   return (
     <View style={styles.screen}>
-      {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: 0 }} onScroll={setOffset} />}
-      <FloatingHeader scrolled={offset > 0} onHeight={onHeight}>
+      {self ? null : <DetailWebView path={`/profiles/${encodeURIComponent(id)}`} from={from} seed={p && { data: p, updatedAt: dataUpdatedAt }} inset={{ top: inset + top, bottom: 0 }} onScroll={floating.onScroll} />}
+      <FloatingHeader scrolled={floating.scrolled} onHeight={onHeight}>
         <NativeTopBar
           transparent
           onBack={() => router.back()}
