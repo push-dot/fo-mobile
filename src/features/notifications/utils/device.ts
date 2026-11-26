@@ -16,6 +16,14 @@ export const createPushDevice = (ports: PushDevicePorts) => {
   let asked = false
   let generation = 0
   let claim: { gen: number; token: string } | null = null
+  let orphan: string | null = null
+  let removing: Promise<unknown> = Promise.resolve()
+
+  const remove = (token: string) => {
+    const job = ports.remove(token)
+    removing = Promise.all([removing, job.catch(() => undefined)])
+    return job
+  }
 
   const register = async (gen: number) => {
     if (registeredToken || !userId) return
@@ -24,13 +32,16 @@ export const createPushDevice = (ports: PushDevicePorts) => {
     const token = await ports.token()
     if (gen !== generation || !userId || !token) return
     claim = { gen, token }
+    await removing
+    if (gen !== generation || !userId) return
     await ports.register(token, platform)
+    if (orphan === token) orphan = null
     if (gen !== generation || !userId) {
       if (claim.gen === generation && claim.token === token) return
       try {
-        await ports.remove(token)
+        await remove(token)
       } catch {
-        if (!userId) registeredToken = token
+        orphan = token
       }
       return
     }
@@ -48,13 +59,14 @@ export const createPushDevice = (ports: PushDevicePorts) => {
   }
 
   const start = async (id: string) => {
-    const leftover = registeredToken
+    const leftover = registeredToken ?? orphan
     if (userId !== id) asked = false
     userId = id
     registeredToken = null
+    orphan = null
     const gen = ++generation
     if (leftover) {
-      await ports.remove(leftover).catch(() => undefined)
+      await remove(leftover).catch(() => undefined)
       if (gen !== generation) return
     }
     const permission = await ports.permission()
@@ -72,11 +84,12 @@ export const createPushDevice = (ports: PushDevicePorts) => {
       generation += 1
       userId = null
       asked = false
-      const token = registeredToken
+      const token = registeredToken ?? orphan
       if (!token) return
       try {
-        await ports.remove(token)
+        await remove(token)
         if (registeredToken === token) registeredToken = null
+        if (orphan === token) orphan = null
       } catch {
         return
       }

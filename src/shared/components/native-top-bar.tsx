@@ -40,6 +40,7 @@ const barItem = (a: GlassAction, c: Colors): NativeStackHeaderItem => {
     icon: { type: 'sfSymbol' as const, name: headerSymbol(a)! },
     tintColor: a.active ? c.acText : a.color ? c[a.color] : undefined,
     badge: a.badge ? { value: a.badge > 99 ? '99+' : a.badge } : undefined,
+    disabled: a.disabled,
   }
   if (!a.menu) return { ...shared, type: 'button', onPress: a.onPress ?? (() => undefined) }
   const sections = menuSections(a.menu)

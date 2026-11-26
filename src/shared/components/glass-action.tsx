@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import type { IconName } from '@push/design-system'
 import { useColors, type Colors } from '../../theme'
-import { PRESS_SCALE } from './constants'
+import { DISABLED_OPACITY, PRESS_SCALE } from './constants'
 import Icon, { type AppIconName } from './icon'
 import Menu from './menu'
 import type { MenuProps } from './menu-action'
@@ -53,7 +53,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
       onPress={a.onPress}
       hitSlop={4}
       android_ripple={filled ? { color: c.fill2, foreground: true } : undefined}
-      style={({ pressed }) => [styles.box(button, width), filled && styles.filled, filled && styles.pressable(pressed)]}
+      style={({ pressed }) => [styles.box(button, width), filled && styles.filled, filled && styles.pressable(pressed), a.disabled && styles.disabled]}
     >
       {face}
     </Pressable>
@@ -63,6 +63,7 @@ const GlassActionButton = ({ a, width, iconSize = 22, filled }: { a: GlassAction
 const styles = StyleSheet.create((theme) => ({
   box: (height: number, minWidth: number) => ({ height, minWidth, alignItems: 'center', justifyContent: 'center' }),
   filled: { backgroundColor: theme.colors.fill, borderRadius: theme.radius.pill },
+  disabled: { opacity: DISABLED_OPACITY },
   pressable: (pressed: boolean) => ({ overflow: 'hidden', transform: [{ scale: pressed ? PRESS_SCALE : 1 }] }),
   badge: {
     position: 'absolute',
