@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { LegendList, useRecyclingState, useViewability } from '@legendapp/list/react-native'
+import { LegendList, useViewability } from '@legendapp/list/react-native'
 import { useEffect, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -66,12 +66,13 @@ type HomeRowProps = {
 }
 
 const HomeRow = ({ bot, activity, now, chrome, index, onMenu }: HomeRowProps) => {
-  const [seen, setSeen] = useRecyclingState<boolean | null>(null)
-  useViewability((token) => setSeen(token.isViewable))
+  const [seen, setSeen] = useState<{ id: string; viewable: boolean } | null>(null)
+  useViewability((token) => setSeen({ id: token.key, viewable: token.isViewable }))
+  const viewable = seen?.id === bot.id ? seen.viewable : null
   const row = botRow(bot, activity, now)
   const actions = menuActions(bot, onMenu)
   const onPress = () => openChat(bot)
-  return <BotHomeRow row={row} chrome={chrome} index={index} held={seen === null ? index >= FIRST_SCREEN : !seen} actions={actions} onPress={onPress} />
+  return <BotHomeRow row={row} chrome={chrome} index={index} held={viewable === null ? index >= FIRST_SCREEN : !viewable} actions={actions} onPress={onPress} />
 }
 
 const BotHomeView = ({
