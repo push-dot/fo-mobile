@@ -1,23 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { AccessibilityInfo } from 'react-native'
 
-let current = false
-const learn = (on: boolean) => {
-  current = on
-}
-void AccessibilityInfo?.isReduceMotionEnabled?.().then(learn)
-AccessibilityInfo?.addEventListener?.('reduceMotionChanged', learn)
+type Event = 'reduceMotionChanged' | 'reduceTransparencyChanged'
 
-export const useReduceMotion = () => {
-  const [on, setOn] = useState(current)
-  useEffect(() => {
-    const set = (v: boolean) => {
-      learn(v)
-      setOn(v)
-    }
-    void AccessibilityInfo.isReduceMotionEnabled().then(set)
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', set)
-    return () => sub.remove()
-  }, [])
-  return on
+const flag = (query: (() => Promise<boolean>) | undefined, event: Event) => {
+  let on = false
+  const listeners = new Set<() => void>()
+  const set = (next: boolean) => {
+    if (next === on) return
+    on = next
+    listeners.forEach((l) => l())
+  }
+  void query?.().then(set, () => undefined)
+  AccessibilityInfo?.addEventListener?.(event, set)
+  const subscribe = (l: () => void) => {
+    listeners.add(l)
+    return () => void listeners.delete(l)
+  }
+  const get = () => on
+  return () => useSyncExternalStore(subscribe, get, get)
 }
+
+export const useReduceMotion = flag(AccessibilityInfo?.isReduceMotionEnabled, 'reduceMotionChanged')
+export const useReduceTransparency = flag(AccessibilityInfo?.isReduceTransparencyEnabled, 'reduceTransparencyChanged')

@@ -1,21 +1,14 @@
 import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect'
-import { useContext, useEffect, useState, type ReactNode } from 'react'
-import { AccessibilityInfo, Platform, View, type ColorValue, type StyleProp, type ViewStyle } from 'react-native'
+import { useContext, type ReactNode } from 'react'
+import { Platform, View, type ColorValue, type StyleProp, type ViewStyle } from 'react-native'
 import { useColors, useShadow, useThemeMode, type Colors } from '../../theme'
 import { toBoxShadow } from '../utility'
 import { SheetSurface } from './sheet-surface'
+import { useReduceTransparency } from './use-reduce-motion'
 
 const glassAvailable = Platform.OS === 'ios' && isGlassEffectAPIAvailable()
 
-export const useReduceTransparency = () => {
-  const [on, setOn] = useState(false)
-  useEffect(() => {
-    void AccessibilityInfo.isReduceTransparencyEnabled().then(setOn)
-    const sub = AccessibilityInfo.addEventListener('reduceTransparencyChanged', setOn)
-    return () => sub.remove()
-  }, [])
-  return on
-}
+export { useReduceTransparency } from './use-reduce-motion'
 
 export const useGlassSurface = () => {
   const reduce = useReduceTransparency()
