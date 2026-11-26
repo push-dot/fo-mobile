@@ -347,6 +347,7 @@ const startRun = async (input: Outgoing) => {
         if (ctrl.signal.aborted) return
         dispatch(id, e.type === 'done' ? { ...e, at: Date.now() } : e)
       }
+      if (ctrl.signal.aborted) return
       if (end.reason === 'reattach-empty') {
         clearWorking(id)
         release = true

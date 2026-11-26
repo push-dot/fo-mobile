@@ -1,5 +1,5 @@
-import type { A2uiFrame, ConversationTurn, LinkKind, Message, UserLink } from '@push/api-client'
-import type { ChatDoc, ConversationRow, QsData, RunInput, Step } from '@/features/chat'
+import type { A2uiFrame, ConversationTurn, LinkKind, UserLink } from '@push/api-client'
+import type { ConversationRow, QsData, RunInput, Step } from '@/features/chat'
 import { kindOf } from '../features/chat/utils/links'
 import { mapEvent } from '../features/chat/utils/stream'
 import { AWAITING_TEXT } from '../features/chat/constants'
@@ -39,45 +39,8 @@ const conversations: ConversationRow[] = [
   conv('a-line', '라인 커버레터 초안', 0, '초안 v2를 만들었어요', null, '2026-09-14T03:00:00.000Z'),
   conv('a-baemin', '배민 공고 갭 분석', 0, '경력 섹션을 고쳤어요', null, '2026-08-30T03:00:00.000Z'),
 ]
-const archived = new Set(['a-toss', 'a-line', 'a-baemin'])
-const byRecent = (rows: ConversationRow[]) => rows.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-const live = () => byRecent(conversations.filter((c) => !archived.has(c.id)))
 const find = (id: string) => conversations.find((c) => c.id === id)
 
-mock('GET', 'conversations', ({ query }) =>
-  page(query.get('archived') === 'true' ? byRecent(conversations.filter((c) => archived.has(c.id))) : live(), query),
-)
-mock('POST', 'conversations', ({ body }) => {
-  if (!consent.referenceData) return { status: 403, body: { error: { code: 'CONSENT_REQUIRED', message: 'consent' } } }
-  const b = body as { title: string }
-  const c = { ...conv(`c-${Date.now()}`, b.title.slice(0, 300), 0, ''), company: /^(ext-nojob|fail|no-posting|이 서류를 고쳐 줘)$/i.test(b.title.trim()) ? null : '모아페이' }
-  conversations.push(c)
-  return { status: 201, body: { data: c } }
-})
-mock('GET', 'conversations/:id', ({ params }) => {
-  const c = find(params.id!)
-  return c ? { data: c } : { status: 404, body: { error: { code: 'NOT_FOUND', message: 'conversation' } } }
-})
-mock('PATCH', 'conversations/:id', ({ params, body }) => {
-  const c = find(params.id!)
-  if (!c) return { status: 404, body: { error: { code: 'NOT_FOUND', message: 'conversation' } } }
-  const b = body as { title?: string; pinned?: boolean }
-  Object.assign(c, { title: b.title ?? c.title, pinned: b.pinned ?? c.pinned, revision: c.revision + 1 })
-  return { data: c }
-})
-mock('POST', 'conversations/:id/archive', ({ params }) => {
-  archived.add(params.id!)
-  return { data: find(params.id!) }
-})
-mock('POST', 'conversations/:id/unarchive', ({ params }) => {
-  archived.delete(params.id!)
-  return { data: find(params.id!) }
-})
-mock('DELETE', 'conversations/:id', ({ params }) => {
-  const i = conversations.findIndex((c) => c.id === params.id)
-  if (i >= 0) conversations.splice(i, 1)
-  archived.delete(params.id!)
-})
 const accepted = () => new Date().toISOString()
 const terms: Terms = { version: LEGAL_VERSION, age14At: accepted(), serviceTermsAt: accepted(), privacyAt: accepted(), marketing: false, marketingAt: null }
 export const forgetRequiredTerms = () => Object.assign(terms, { age14At: null, serviceTermsAt: null, privacyAt: null })
@@ -91,18 +54,6 @@ mock('PUT', 'me/consents/terms', ({ body }) => {
   if (typeof marketing === 'boolean') Object.assign(terms, { marketing, marketingAt: new Date().toISOString() })
   return { data: { referenceData: consent.referenceData, updatedAt: null, terms } }
 })
-mock('GET', 'conversations/:id/messages', ({ params, query }) => {
-  const c = find(params.id!)
-  const msgs: Message[] =
-    c && c.lastLine
-      ? [
-          { id: `${c.id}-u`, conversationId: c.id, role: 'USER', text: `${c.title} 부탁해요`, attachments: [], operationId: null, createdAt: c.createdAt },
-          { id: `${c.id}-a`, conversationId: c.id, role: 'ASSISTANT', text: c.lastLine, attachments: [], operationId: null, createdAt: c.updatedAt },
-        ]
-      : []
-  return page(msgs.reverse(), query)
-})
-
 type Frame = Step['frame']
 type Card = A2uiFrame
 
@@ -242,16 +193,6 @@ const storedTurns: Record<string, ConversationTurn['events']> = {
 }
 
 const lastSeq = new Map(Object.entries(storedTurns).map(([id, events]) => [id, Math.max(...events.map((e) => e.seq ?? 0))]))
-
-mock('GET', 'conversations/:id/turns', ({ params, query }) => {
-  const c = find(params.id!)
-  const events = c && storedTurns[c.id]
-  const turns: ConversationTurn[] = events
-    ? [{ jobId: `${c.id}-j`, status: 'DONE', createdAt: c.updatedAt, userMessageId: c.id === 'c-dotori' ? null : `${c.id}-u`, assistantMessageId: null, answer: null, events }]
-    : []
-  return page(turns, query)
-})
-
 const links: UserLink[] = [
   { id: 'l1', kind: 'job', url: 'https://careers.moapay.kr/jobs/1182', title: '모아페이 · 결제 플랫폼 시니어 엔지니어', status: 'READ', fitCount: 2, aiRead: true, createdAt: ago(60) },
   { id: 'l2', kind: 'job', url: 'https://nuricloud.career.greetinghr.com', title: '누리클라우드 · 백엔드 개발자', status: 'READ', fitCount: 0, aiRead: true, createdAt: ago(300) },
@@ -293,12 +234,6 @@ mock('POST', 'me/links/:id/restore', ({ params }) => {
 })
 
 mock('GET', 'chat/docs', () => ({ data: account.few ? docs.filter((d) => d.id === 'd2' || d.id === 'd4') : docs }))
-mock('POST', 'chat/docs', ({ body }) => {
-  const b = body as { fileName: string; size: number }
-  const d: ChatDoc = { id: `d${Date.now()}`, fileName: b.fileName, size: b.size, createdAt: new Date().toISOString() }
-  docs.unshift(d)
-  return { status: 201, body: { data: d } }
-})
 let account: { ultra: boolean; spent: boolean; few: boolean; closed: boolean; run?: string; once?: boolean } = { ultra: false, spent: false, few: false, closed: false }
 export const setAccount = (next: Partial<typeof account>) => {
   account = { ...account, ...next }

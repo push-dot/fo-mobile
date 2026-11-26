@@ -37,8 +37,9 @@ export const chatApi = {
     if (API_MOCK) return data(c.get<DataEnvelope<QsData>>(`chat/quick-starts/${key}`))
     const needs = QS_NEEDS[key] ?? []
     const got = await Promise.allSettled(needs.map((k) => load[k]()))
-    const failed = got.filter((r) => r.status === 'rejected')
-    if (needs.length > 0 && failed.length === needs.length) throw failed[0]!.reason
+    const failed = got.filter((r, i): r is PromiseRejectedResult => needs[i] !== 'doc' && r.status === 'rejected')
+    const fetched = key === 'hub' ? 0 : needs.filter((k) => k !== 'doc').length
+    if (fetched > 0 && failed.length === fetched) throw failed[0]!.reason
     return quickStartFrom(key, Object.fromEntries(needs.map((k, i) => [k, got[i]!.status === 'fulfilled' ? got[i]!.value : undefined])))
   },
 }
