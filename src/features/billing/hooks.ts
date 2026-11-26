@@ -24,6 +24,7 @@ const claimed = new Set<string>()
 let connecting: Promise<unknown> | null = null
 let started = false
 let lastSku: string | null = null
+let recovering: Promise<boolean> | null = null
 
 const setPending = (value: boolean) => {
   pending = value
@@ -63,8 +64,8 @@ const report = (code?: string) => {
   const outcome = outcomeFromCode(code)
   if (outcome.kind === 'cancelled') return setPending(false)
   if (outcome.kind === 'already-owned' && lastSku === IAP_PRODUCT_TOPUP) {
-    setPending(false)
-    void recoverPurchases()
+    if (!pending) return
+    void recoverPurchases().then((settled) => (settled ? setPending(false) : fail(IAP_FAILED_MESSAGE)))
     return
   }
   fail(outcome.message ?? IAP_FAILED_MESSAGE)
@@ -167,19 +168,30 @@ const settleQuietly = async (purchase: Purchase) => {
 const unsettledPurchases = async (): Promise<Purchase[]> => {
   if (Platform.OS === 'ios') return getPendingTransactionsIOS()
   const purchases = await getAvailablePurchases()
-  return purchases.filter((purchase) => 'isAcknowledgedAndroid' in purchase && purchase.isAcknowledgedAndroid === false)
+  return purchases.filter(
+    (purchase) =>
+      purchase.purchaseState !== 'pending' && 'isAcknowledgedAndroid' in purchase && purchase.isAcknowledgedAndroid === false,
+  )
 }
 
-export const recoverPurchases = async () => {
+const recoverOnce = async () => {
+  let settled = false
   try {
     await ready()
-    let settled = false
     for (const purchase of await unsettledPurchases()) {
       if (await settleQuietly(purchase)) settled = true
     }
-    if (settled) refreshAccount()
   } catch {
   }
+  if (settled) refreshAccount()
+  return settled
+}
+
+export const recoverPurchases = () => {
+  recovering ??= recoverOnce().finally(() => {
+    recovering = null
+  })
+  return recovering
 }
 
 const subscribe = (listener: () => void) => {

@@ -94,19 +94,44 @@ describe('recoverPurchases', () => {
   })
 
   it('recovers instead of alerting when the top-up is already owned', async () => {
-    h.pendingIOS.mockResolvedValue([])
+    h.pendingIOS.mockResolvedValue([{ productId: IAP_PRODUCT_TOPUP, purchaseToken: 'owned-jws' }])
     h.requestPurchase.mockRejectedValue(Object.assign(new Error('owned'), { code: 'already-owned' }))
     usePersonalPurchase().buyCredits()
-    await vi.waitFor(() => expect(h.pendingIOS).toHaveBeenCalled())
-    expect(usePersonalPurchase().pending).toBe(false)
+    await vi.waitFor(() => expect(h.verify).toHaveBeenCalled())
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.finish).toHaveBeenCalledTimes(1)
     expect(h.alert).not.toHaveBeenCalled()
+  })
+
+  it('holds pending and then alerts once when recovery settles nothing', async () => {
+    let empty: (purchases: unknown[]) => void = () => {}
+    h.pendingIOS.mockImplementation(() => new Promise((resolve) => { empty = resolve }))
+    h.requestPurchase.mockImplementation(async () => {
+      h.onError?.({ code: 'already-owned' })
+      throw Object.assign(new Error('owned'), { code: 'already-owned' })
+    })
+    usePersonalPurchase().buyCredits()
+    await vi.waitFor(() => expect(h.pendingIOS).toHaveBeenCalled())
+    expect(usePersonalPurchase().pending).toBe(true)
+    empty([])
+    await vi.waitFor(() => expect(usePersonalPurchase().pending).toBe(false))
+    expect(h.pendingIOS).toHaveBeenCalledTimes(1)
+    expect(h.alert).toHaveBeenCalledTimes(1)
+    expect(h.alert).toHaveBeenCalledWith(IAP_FAILED_MESSAGE)
+  })
+
+  it('skips android purchases the store still holds as pending', async () => {
+    h.platform.OS = 'android'
+    h.available.mockResolvedValue([{ ...unacked, purchaseState: 'pending' }])
+    await expect(recoverPurchases()).resolves.toBe(false)
+    expect(h.verify).not.toHaveBeenCalled()
   })
 
   it('stays silent when verify fails', async () => {
     h.platform.OS = 'android'
     h.available.mockResolvedValue([unacked])
     h.verify.mockRejectedValue(new Error('verify down'))
-    await expect(recoverPurchases()).resolves.toBeUndefined()
+    await expect(recoverPurchases()).resolves.toBe(false)
     expect(h.alert).not.toHaveBeenCalled()
     expect(h.finish).not.toHaveBeenCalled()
     expect(h.invalidate).not.toHaveBeenCalled()
