@@ -76,10 +76,10 @@ const SettingsScreen = () => {
           <StatusNote
             lines={[LOAD_FAILED]}
             action={{ label: RETRY_LABEL, onPress: () => void refetch() }}
-            style={styles.spinner}
+            style={styles.loadState}
           />
         ) : (
-          <ActivityIndicator style={styles.spinner} />
+          <ActivityIndicator style={styles.loadState} />
         )}
       </Screen>
     )
@@ -215,7 +215,7 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create((theme) => ({
   screen: { flex: 1, backgroundColor: theme.colors.bg },
   content: { paddingTop: theme.spacing[1], paddingHorizontal: theme.spacing[5], paddingBottom: 48, gap: 22 },
-  spinner: { marginTop: 40 },
+  loadState: { marginTop: 40 },
   profile: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: theme.spacing[3] },
   profileText: { flex: 1 },
 }))
