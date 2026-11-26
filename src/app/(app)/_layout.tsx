@@ -5,6 +5,7 @@ import { API_MOCK } from '@/shared/infrastructure'
 import { useColdStartTermsCheck } from '@/features/auth'
 import { botListQuery } from '@/features/bots'
 import { useHomeSnapshotSync } from '@/features/home'
+import { usePushDevice } from '@/features/notifications'
 import { profileListQuery, useHubFilterStore } from '@/features/hub'
 import { consentsQuery, myProfileQuery, unreadOffersQuery } from '@/features/my'
 import { postsQuery } from '@/features/social'
@@ -26,6 +27,7 @@ const useTabPrefetch = (ready: boolean) => {
 
 const AppLayout = () => {
   const ready = useHomeSnapshotSync()
+  usePushDevice()
   useColdStartTermsCheck()
   useTabPrefetch(ready)
   if (!ready) return null
