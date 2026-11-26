@@ -100,7 +100,7 @@ const SignInScreen = () => {
           <Pressable
             accessibilityRole="button"
             style={styles.dev}
-            onPress={() => signInWithDevToken(devToken)}
+            onPress={() => void signInWithDevToken(devToken).catch(() => undefined)}
           >
             <Text v="c1" weight="700" style={styles.devLabel}>
               개발 토큰으로 들어가기
