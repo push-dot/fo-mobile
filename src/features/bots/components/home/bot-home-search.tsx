@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native'
 import { StyleSheet } from 'react-native-unistyles'
 import { Highlight, Mascot, Text } from '@/shared/components'
 import { spacing, type } from '../../../../theme'
-import type { Bot, BotSearch, LocalActivity } from '../../types'
+import type { Bot, BotId, BotSearch, LocalActivity } from '../../types'
 import { botRow } from '../../utils/live-state'
 import { rowTime } from '../../utils/row-time'
 import { searchSections } from '../../utils/home-rows'
@@ -24,6 +24,7 @@ const SearchBotRow = ({ bot, match, activity, now, chrome, query, onOpenBot }: {
 
 const BotHomeSearch = ({
   query,
+  hint,
   data,
   pending,
   local,
@@ -36,6 +37,7 @@ const BotHomeSearch = ({
   onOpenMessage,
 }: {
   query: string
+  hint: boolean
   data: BotSearch | undefined
   pending: boolean
   local: Readonly<Record<string, LocalActivity | undefined>>
@@ -45,14 +47,11 @@ const BotHomeSearch = ({
   bottom: number
   bots: readonly Bot[]
   onOpenBot: (bot: Bot) => void
-  onOpenMessage: (botId: string, messageId: string) => void
+  onOpenMessage: (botId: BotId, messageId: string) => void
 }) => {
   const trimmed = query.trim()
-  const hint = trimmed === ''
   const empty = !hint && !pending && !!data && data.bots.length === 0 && data.messages.length === 0
-  const titles = data && !hint ? searchSections(data.bots.length > 0 ? data.botTotal : 0, data.messages.length > 0 ? data.messageTotal : 0) : []
-  const botTitle = titles.find((title) => title.startsWith('Bot'))
-  const messageTitle = titles.find((title) => title.startsWith('대화'))
+  const { bots: botTitle, messages: messageTitle } = data && !hint ? searchSections(data.bots.length > 0 ? data.botTotal : 0, data.messages.length > 0 ? data.messageTotal : 0) : {}
   const centred = hint || empty
   const pad = {
     paddingTop: top,

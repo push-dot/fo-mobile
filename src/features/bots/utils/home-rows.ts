@@ -36,18 +36,12 @@ export const accountLabel = (name: string, plan: string | undefined) => (plan ? 
 
 const PUSH_KEYS: readonly HomeMenuKey[] = ['find', 'read']
 
-export const companyMenu = (kind: 'push' | 'company', muted = false) =>
-  MENU.filter((item) => kind === 'company' || PUSH_KEYS.includes(item.key)).map((item) => ({
-    ...item,
-    label: item.key === 'mute' && muted ? '알림 끄기' : item.label,
-  }))
-
-export const dropDeleted = <T extends { id: string }>(rows: readonly T[], id: string, forget: (id: string) => void) => {
-  forget(id)
-  return rows.filter((row) => row.id !== id)
-}
+export const companyMenu = (kind: 'push' | 'company') =>
+  MENU.filter((item) => kind === 'company' || PUSH_KEYS.includes(item.key))
 
 export const rowMotion = (index: number, held: boolean): HomeMotion => (held ? { mode: 'frame3' } : { mode: 'animate', delayMs: index * STAGGER_MS })
 
-export const searchSections = (botCount: number, messageCount: number) =>
-  [botCount > 0 ? `Bot ${botCount}` : '', messageCount > 0 ? `대화 ${messageCount}` : ''].filter((title) => title !== '')
+export const searchSections = (botCount: number, messageCount: number): { bots?: string; messages?: string } => ({
+  ...(botCount > 0 ? { bots: `Bot ${botCount}` } : {}),
+  ...(messageCount > 0 ? { messages: `대화 ${messageCount}` } : {}),
+})

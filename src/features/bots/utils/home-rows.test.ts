@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Bot, BotId, CompanyBot } from '../types'
-import { companyMenu, dropDeleted, heroLabel, homeRowLabel, rowMotion, searchSections, splitHome } from './home-rows'
+import { companyMenu, heroLabel, homeRowLabel, rowMotion, searchSections, splitHome } from './home-rows'
 
 const company = (id: string, name: string, at: string): CompanyBot => ({
   id: id as BotId,
@@ -66,19 +66,6 @@ describe('companyMenu', () => {
     expect(companyMenu('company').map((a) => a.label)).toEqual(['Bot 프로필 보기', '채팅에서 찾기', '읽음으로 표시', '알림 끄기', '삭제'])
     expect(companyMenu('push').map((a) => a.key)).toEqual(['find', 'read'])
   })
-
-  it('keeps the board mute phrase when the bot is already muted', () => {
-    expect(companyMenu('company', true).find((a) => a.key === 'mute')?.label).toBe('알림 끄기')
-  })
-})
-
-describe('dropDeleted', () => {
-  it('removes that row and forgets its chat', () => {
-    const forgotten: string[] = []
-    const next = dropDeleted([company('a', '모아페이', '2026-11-01'), company('b', '파도AI', '2026-11-02')], 'a', (id) => forgotten.push(id))
-    expect(next.map((b) => b.id)).toEqual(['b'])
-    expect(forgotten).toEqual(['a'])
-  })
 })
 
 describe('rowMotion', () => {
@@ -91,7 +78,8 @@ describe('rowMotion', () => {
 
 describe('searchSections', () => {
   it('names a section only when that side has hits', () => {
-    expect(searchSections(1, 2)).toEqual(['Bot 1', '대화 2'])
-    expect(searchSections(0, 0)).toEqual([])
+    expect(searchSections(1, 2)).toEqual({ bots: 'Bot 1', messages: '대화 2' })
+    expect(searchSections(0, 3)).toEqual({ messages: '대화 3' })
+    expect(searchSections(0, 0)).toEqual({})
   })
 })
