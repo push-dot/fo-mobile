@@ -1,5 +1,1 @@
-import BookmarksScreen from '@/screens/home/bookmarks-screen'
-
-const Bookmarks = () => <BookmarksScreen />
-
-export default Bookmarks
+export { default } from '@/screens/home/bookmarks-screen'

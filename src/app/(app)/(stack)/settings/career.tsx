@@ -1,5 +1,1 @@
-import SettingsCareerScreen from '@/screens/my/settings-career-screen'
-
-const SettingsCareer = () => <SettingsCareerScreen />
-
-export default SettingsCareer
+export { default } from '@/screens/my/settings-career-screen'

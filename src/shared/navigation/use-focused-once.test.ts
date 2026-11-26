@@ -9,6 +9,7 @@ vi.mock('react', async (orig) => ({
     if (!(i in h.slots)) h.slots[i] = init
     return [h.slots[i], (v: unknown) => (h.slots[i] = v)]
   },
+  useEffect: () => undefined,
 }))
 vi.mock('expo-router', () => ({ useIsFocused: () => h.focused, Stack: Object.assign(() => null, { Screen: () => null }) }))
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' } }))
@@ -64,15 +65,18 @@ describe.each(tabs)('$group tab', ({ group, screen, rootSource, Layout, Root }) 
   })
 
   it('mounts its first screen on the first focus and keeps it after a blur', () => {
+    expect(render(Root)).toBeNull()
+    h.focused = true
+    const first = render(Root)
+    h.focused = false
+    const blurred = render(Root)
     if (group === '(home)') {
-      expect(render(Root)).toBeNull()
-      h.focused = true
-      expect(render(Root)?.type).toBe(screen)
-      h.focused = false
-      expect(render(Root)?.type).toBe(screen)
+      expect(first?.type).toBe(screen)
+      expect(blurred?.type).toBe(screen)
       return
     }
-    expect(rootSource).toContain('useFocusedOnce')
+    expect(first).not.toBeNull()
+    expect(blurred).not.toBeNull()
     expect(rootSource).toContain('import(')
     expect(rootSource).not.toMatch(/from ['"]@\/screens\//)
   })

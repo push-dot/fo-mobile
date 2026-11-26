@@ -1,3 +1,1 @@
-import TermsViewScreen from '@/screens/auth/terms-view-screen'
-
-export default TermsViewScreen
+export { default } from '@/screens/auth/terms-view-screen'
