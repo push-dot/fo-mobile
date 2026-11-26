@@ -31,7 +31,7 @@ const startChat = async (title: string, message: string, attachment?: string | P
   } catch (err) {
     if (isConsentRequired(err)) {
       holdOpen({ title, message, attachment, intent, context })
-      askConsent(true)
+      askConsent()
       return
     }
     Alert.alert('대화를 시작하지 못했어요', RETRY_LATER)

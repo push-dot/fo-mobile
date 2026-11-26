@@ -73,7 +73,7 @@ beforeEach(() => {
   effects.clear()
   refs.current = undefined
   nav.focused = false
-  useConsentPrompt.setState({ open: false, dismissed: false })
+  useConsentPrompt.setState({ open: false })
 })
 
 describe('ConsentPromptListener', () => {
@@ -100,13 +100,13 @@ describe('ConsentPromptListener', () => {
   })
 
   it('opens the consent sheet again after the user dismissed it', () => {
-    askConsent(true)
+    askConsent()
     ConsentPromptListener()
     expect(shown).toHaveBeenCalledOnce()
 
     shown.mock.calls[0]?.[1].onDismiss()
     ConsentPromptListener()
-    askConsent(true)
+    askConsent()
     ConsentPromptListener()
 
     expect(shown).toHaveBeenCalledTimes(2)

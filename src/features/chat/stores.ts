@@ -19,7 +19,7 @@ import { createTokenBatch } from './utils/token-batch'
 import { openPieceId, restoreBotTurns } from './utils/turns'
 import { withMaterial } from './utils/usage'
 
-export const useConsentPrompt = create<{ open: boolean; dismissed: boolean }>(() => ({ open: false, dismissed: false }))
+export const useConsentPrompt = create<{ open: boolean }>(() => ({ open: false }))
 
 export type PendingOpen = { title: string; message: string; attachment?: string | PickedFile; intent?: ChatIntent; context?: RunInput['context'] }
 
@@ -28,15 +28,13 @@ let pendingOpen: PendingOpen | null = null
 let pendingRetry: (() => void) | null = null
 let openChat: ((p: PendingOpen) => void) | null = null
 
-export const askConsent = (force = false) => {
-  const s = useConsentPrompt.getState()
-  if (!(force || !s.dismissed) || s.open) return
-  useConsentPrompt.setState({ open: true })
+export const askConsent = () => {
+  if (!useConsentPrompt.getState().open) useConsentPrompt.setState({ open: true })
 }
 
 export const askConsentThen = (retry: () => void) => {
   pendingRetry = retry
-  askConsent(true)
+  askConsent()
 }
 
 export const holdOpen = (p: PendingOpen) => {
@@ -51,13 +49,13 @@ export const laterConsent = () => {
   pendingConsent.clear()
   pendingOpen = null
   pendingRetry = null
-  useConsentPrompt.setState({ open: false, dismissed: true })
+  useConsentPrompt.setState({ open: false })
 }
 
-export const consentTurnedOff = () => useConsentPrompt.setState({ dismissed: false, open: false })
+export const consentTurnedOff = () => useConsentPrompt.setState({ open: false })
 
 export const takeConsent = () => {
-  useConsentPrompt.setState({ open: false, dismissed: true })
+  useConsentPrompt.setState({ open: false })
   const held = [...pendingConsent.values()]
   pendingConsent.clear()
   const open = pendingOpen
@@ -71,7 +69,7 @@ export const resetConsent = () => {
   pendingConsent.clear()
   pendingOpen = null
   pendingRetry = null
-  useConsentPrompt.setState({ open: false, dismissed: false })
+  useConsentPrompt.setState({ open: false })
 }
 
 export const LOCAL_DRAFT = 'local'
@@ -359,7 +357,7 @@ const startRun = async (input: Outgoing) => {
     if (isConsentRequired(err)) {
       pendingConsent.set(id, run ?? posted(input))
       clearWorking(id)
-      askConsent(true)
+      askConsent()
       return
     }
     const apiError = err instanceof ApiError ? err : undefined
