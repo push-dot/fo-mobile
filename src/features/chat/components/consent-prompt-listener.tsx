@@ -19,6 +19,7 @@ export const ConsentPromptListener = () => {
           (data) => (qc.setQueryData(['me', 'consents'], data), void qc.invalidateQueries({ queryKey: ['me', 'settings'] }), grantConsent()),
           () => (Alert.alert('동의를 바꾸지 못했어요', '잠시 뒤에 다시 해 주세요.'), laterConsent()),
         ),
+      onDismiss: () => useConsentPrompt.setState({ open: false }),
     })
   }, [open, qc])
   return null
