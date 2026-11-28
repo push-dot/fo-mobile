@@ -43,3 +43,25 @@ export const SECTIONS: Record<SectionKind, { title: string; description: string 
 }
 
 export const APPLY_DOC_LIMIT = 100
+
+export const CONTACT_TITLE = '연락받을 정보를 확인해 주세요'
+export const CONTACT_BODY = '기업이 지원 결과를 이 번호와 이메일로 알려 줘요.'
+export const CONTACT_PHONE = '휴대폰 번호'
+export const CONTACT_EMAIL = '이메일'
+export const CONTACT_SEND = '인증번호 받기'
+export const CONTACT_CODE = '인증번호 6자리'
+export const CONTACT_CONFIRM = '확인'
+export const CONTACT_DONE = '인증했어요'
+export const CONTACT_USE_LOGIN = '이 이메일 쓰기'
+export const CONTACT_CONTINUE = '지원 계속하기'
+export const CONTACT_TAKEN_TITLE = '이 번호로 가입한 다른 계정이 있어요'
+export const CONTACT_TAKEN_BODY = '그 계정의 서류와 파일을 지금 계정으로 옮기고, 번호를 이 계정에 연결할까요?'
+export const CONTACT_TAKEN_CANCEL = '닫기'
+export const CONTACT_TAKEN_MOVE = '옮기고 연결하기'
+export const CONTACT_CODE_INVALID = '인증번호가 맞지 않아요'
+export const CONTACT_CODE_EXPIRED = '인증번호 시간이 지났어요. 다시 받아 주세요'
+export const CONTACT_TRY_AGAIN = '잠시 후 다시 시도해 주세요.'
+export const contactMailSent = (email: string) => `${email}로 인증번호를 보냈어요`
+export const contactCooldown = (sec: number) => `${sec}초 뒤에 다시 받을 수 있어요`
+export const contactMoved = (moved: { documents: number; files: number } | undefined) =>
+  moved && moved.documents + moved.files > 0 ? `서류 ${moved.documents}개와 파일 ${moved.files}개를 옮겼어요` : '번호를 연결했어요'

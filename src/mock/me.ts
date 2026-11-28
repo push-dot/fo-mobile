@@ -962,3 +962,31 @@ mock('POST', 'me/devices', ({ body }) => {
 mock('DELETE', 'me/devices/:id', ({ params }) => {
   devices.delete(params.id ?? '')
 })
+
+const contact: { phone: string | null; email: string | null; loginEmail: string | null } = { phone: null, email: null, loginEmail: 'seojun@push.app' }
+let mailTo: string | null = null
+const contactError = (status: number, code: string, details?: Record<string, unknown>) => ({ status, body: { error: { code, message: code, details } } })
+const codeOf = (body: unknown) => (body as { code?: string } | undefined)?.code ?? ''
+mock('GET', 'me/contact', () => ({ data: contact }))
+mock('POST', 'me/contact/phone', ({ body }) => {
+  const b = body as { phone: string; moveDocuments?: boolean }
+  if (codeOf(body) === '111111') return contactError(400, 'PHONE_CODE_INVALID', { attemptsLeft: 4 })
+  if (codeOf(body) === '222222' && !b.moveDocuments) return contactError(409, 'PHONE_TAKEN', { conflict: 'PHONE', provider: 'phone', canMoveDocuments: true })
+  contact.phone = b.phone
+  return { data: b.moveDocuments ? { phone: b.phone, moved: { documents: 2, files: 1 } } : { phone: b.phone } }
+})
+mock('POST', 'me/contact/email/send', ({ body }) => {
+  const email = String((body as { email?: string } | undefined)?.email ?? '').trim().toLowerCase()
+  if (email === contact.loginEmail) {
+    contact.email = email
+    return { data: { email, verified: true } }
+  }
+  mailTo = email
+  return { status: 202, body: { data: { cooldownSeconds: 60, expiresAt: new Date(Date.now() + 600_000).toISOString() } } }
+})
+mock('POST', 'me/contact/email', ({ body }) => {
+  const email = String((body as { email?: string } | undefined)?.email ?? '')
+  if (email !== mailTo || codeOf(body) === '111111') return contactError(400, 'EMAIL_CODE_INVALID', { attemptsLeft: 4 })
+  contact.email = email
+  return { data: { email, verified: true } }
+})

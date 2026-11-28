@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
-import { ApplySheet, applyBody, splitApplyDocs, useApplyDocs, useApplyPosting, usePosting } from '@/features/jobs'
+import { ApplySheet, applyBody, contactMissing, contactRequired, splitApplyDocs, useApplyDocs, useApplyPosting, useContact, usePosting } from '@/features/jobs'
 import { StyleSheet } from 'react-native-unistyles'
 import { Sheet, SheetScroll, TOAST_ABOVE, showToast, useSheetScrollMax } from '@/shared/components'
 import { firstParam } from '@/shared/utility'
@@ -25,7 +25,13 @@ const ApplySheetScreen = () => {
     if (!postingId) router.back()
   }, [postingId])
 
-  if (!postingId) return null
+  const contact = useContact()
+  const needsContact = contactMissing(contact.data).length > 0 || contactRequired(apply.error) !== null
+  useEffect(() => {
+    if (postingId && needsContact) router.replace({ pathname: '/contact', params: { postingId } })
+  }, [postingId, needsContact])
+
+  if (!postingId || needsContact) return null
 
   const p = posting.data
   return (
@@ -37,9 +43,12 @@ const ApplySheetScreen = () => {
         label: apply.isPending ? '지원하는 중…' : '이 서류로 지원하기',
         onPress: () =>
           apply.mutate(applyBody(doc, chosen), {
-            onError: () => Alert.alert('지원하지 못했어요', '잠시 후 다시 눌러 주세요.', [{ text: '닫기', style: 'cancel' }]),
+            onError: (error) => {
+              if (contactRequired(error)) return
+              Alert.alert('지원하지 못했어요', '잠시 후 다시 눌러 주세요.', [{ text: '닫기', style: 'cancel' }])
+            },
           }),
-        disabled: !doc,
+        disabled: !doc || !contact.data,
         pending: apply.isPending,
       }}
     >
