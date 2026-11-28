@@ -20,3 +20,13 @@ export const applyToPosting = (postingId: string, body: ApplyBody) => api.postin
 export const fetchApplyDocs = () => api.sources.list({ limit: APPLY_DOC_LIMIT })
 
 export const fetchPosting = (id: string) => api.postings.get(id)
+
+export const fetchContact = () => api.me.contact()
+
+export const sendContactPhoneCode = (phone: string) => api.auth.phoneSend(phone)
+
+export const verifyContactPhone = (body: { phone: string; code: string; moveDocuments?: boolean }) => api.me.verifyContactPhone(body)
+
+export const sendContactEmailCode = (email: string) => api.me.sendContactEmail(email)
+
+export const verifyContactEmail = (email: string, code: string) => api.me.verifyContactEmail(email, code)

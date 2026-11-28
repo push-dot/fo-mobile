@@ -78,6 +78,7 @@ const SignedInStack = () => {
         <Stack.Screen name="memories" options={fullPageOptions()} />
         <Stack.Screen name="job-filter" options={tintedSheetOptions(c)} />
         <Stack.Screen name="apply" options={sheetOptions(c)} />
+        <Stack.Screen name="contact" options={fullPageOptions()} />
         <Stack.Screen name="hub-filter" options={tintedSheetOptions(c)} />
         <Stack.Screen name="proposal" options={sheetOptions(c, 'fitToContents')} />
         <Stack.Screen name="activity/add-event" options={sheetOptions(c)} />

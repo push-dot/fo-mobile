@@ -4,7 +4,7 @@ import { queryClient } from '@/providers/query-client'
 import { applyDoc, toQuery, type Filters } from '../utils'
 import type { ApplyBody } from '../types'
 import { patchPostingBookmark } from '../utils/bookmark-invalidation'
-import { applyToPosting, fetchApplyDocs, fetchMyProfile, fetchPosting, fetchPostingCount, fetchPostingLocations, fetchPostingPages, togglePostingBookmark } from './fetchers'
+import { applyToPosting, fetchApplyDocs, fetchContact, fetchMyProfile, fetchPosting, fetchPostingCount, fetchPostingLocations, fetchPostingPages, togglePostingBookmark } from './fetchers'
 
 export const usePostingPages = (f: PostingFilters) =>
   useInfiniteQuery({
@@ -84,3 +84,7 @@ export const postingDetailQuery = (id: string) => queryOptions({ queryKey: ['pos
 export const prefetchPosting = (id: string) => void queryClient.prefetchQuery(postingDetailQuery(id))
 
 export const usePosting = (id: string) => useQuery({ ...postingDetailQuery(id), enabled: id.length > 0 })
+
+export const CONTACT_KEY = ['me', 'contact'] as const
+
+export const useContact = () => useQuery({ queryKey: CONTACT_KEY, queryFn: fetchContact })
